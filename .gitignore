@@ -1,0 +1,13 @@
+# Arquivos de dados brutos
+AtomicCards.json
+
+# Arquivos gerados pelo Dart/Flutter
+.dart_tool/
+.packages
+build/
+
+# Arquivos de configuração de ambiente
+.env
+
+# Logs
+*.log
