@@ -108,5 +108,6 @@ CREATE TABLE IF NOT EXISTS meta_decks (
     archetype TEXT, -- Ex: 'Rakdos Midrange', 'Mono Red Aggro'
     source_url TEXT UNIQUE NOT NULL, -- URL de origem para evitar duplicatas
     card_list TEXT NOT NULL, -- Lista de cartas em texto puro (formato de importação)
+    placement TEXT, -- Posição no torneio (ex: '1', 'Top 8')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

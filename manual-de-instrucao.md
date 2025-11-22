@@ -495,6 +495,26 @@ Usar os dados coletados pelo Crawler para dar conselhos práticos ao usuário.
 **Resultado:**
 O usuário recebe: "Seu deck parece um 'Rakdos Midrange'. A maioria desses decks usa 'Fable of the Mirror-Breaker', mas você não tem. Considere adicionar."
 
+### 3.13. IA Generativa (Deck Builder Automático)
+
+**Objetivo:**
+Criar decks completos a partir de uma descrição em linguagem natural, usando o conhecimento do Meta para evitar alucinações.
+
+**Endpoint:** `POST /ai/generate`
+
+**Fluxo de Dados (RAG - Retrieval Augmented Generation):**
+1.  **Input:** Usuário pede "Deck agressivo de Goblins com Krenko".
+2.  **Busca de Contexto:** O sistema busca na tabela `meta_decks` por decks que contenham "Goblin" ou "Krenko".
+3.  **Prompt Engineering:** Montamos um prompt para a OpenAI contendo:
+    - O pedido do usuário.
+    - Exemplos reais de decks do meta (se encontrados).
+    - Regras estritas de formato (JSON, 100 cartas, etc).
+4.  **Geração:** A LLM (GPT-4o-mini) gera a lista de cartas.
+5.  **Output:** Retorna o JSON pronto para ser importado pelo frontend.
+
+**Segurança:**
+A rota é protegida por JWT (`routes/ai/_middleware.dart`), garantindo que apenas usuários logados consumam créditos da API.
+
 ---
 
 ## 6. Guia para Desenvolvimento Futuro

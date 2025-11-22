@@ -89,19 +89,34 @@ Future<void> _processEvent(dynamic conn, String eventUrl) async {
     // Mas a página do evento já contém os IDs dos decks nos links.
     // Links de deck: "event?e=XXXXX&d=YYYYY&f=ST"
     
-    final deckLinks = document.querySelectorAll('div.hover_tr')
-        .map((div) => div.querySelector('a'))
-        .where((a) => a != null && a.attributes['href']!.contains('&d='))
-        .toList();
-
-    print('     Encontrados ${deckLinks.length} decks neste evento.');
+    final rows = document.querySelectorAll('div.hover_tr');
+    print('     Encontrados ${rows.length} linhas de decks neste evento.');
 
     // Processa apenas os Top 8 (ou menos para teste)
-    for (final link in deckLinks.take(5)) {
-      final href = link!.attributes['href']!;
+    for (final row in rows.take(8)) {
+      final link = row.querySelector('a');
+      if (link == null || !link.attributes['href']!.contains('&d=')) continue;
+
+      final href = link.attributes['href']!;
       final deckUrl = 'https://www.mtgtop8.com/$href';
       final deckName = link.text.trim();
       
+      // Tenta extrair a posição (Rank)
+      // Geralmente é o primeiro texto dentro da div.hover_tr ou em uma div filha
+      // Estrutura comum: <div>Rank</div> <div><a href>Deck</a></div>
+      var placement = '';
+      final divs = row.querySelectorAll('div');
+      if (divs.isNotEmpty) {
+        // O primeiro div costuma ser o rank
+        placement = divs.first.text.trim();
+      }
+      
+      // Se não achou em div, tenta pegar o texto direto do row antes do link
+      if (placement.isEmpty) {
+         // Fallback simples
+         placement = '?';
+      }
+
       // Verifica se já importamos
       final exists = await conn.execute(
         Sql.named('SELECT 1 FROM meta_decks WHERE source_url = @url'),
@@ -109,11 +124,11 @@ Future<void> _processEvent(dynamic conn, String eventUrl) async {
       );
       
       if (exists.isNotEmpty) {
-        print('     [SKIP] Deck já importado: $deckName');
+        print('     [SKIP] Deck já importado: $deckName ($placement)');
         continue;
       }
 
-      print('     [NEW] Importando deck: $deckName...');
+      print('     [NEW] Importando deck: $deckName ($placement)...');
       
       // Para pegar a lista de texto, o MTGTop8 tem um endpoint de exportação
       // A URL é algo como: mtgtop8.com/mtgo?d=YYYYY&f=ST
@@ -131,14 +146,15 @@ Future<void> _processEvent(dynamic conn, String eventUrl) async {
           // Salva no banco
           await conn.execute(
             Sql.named('''
-            INSERT INTO meta_decks (format, archetype, source_url, card_list)
-            VALUES (@format, @archetype, @url, @list)
+            INSERT INTO meta_decks (format, archetype, source_url, card_list, placement)
+            VALUES (@format, @archetype, @url, @list, @placement)
             '''),
             parameters: {
               'format': uri.queryParameters['f'] ?? 'Unknown',
               'archetype': deckName, // MTGTop8 usa o nome do arquétipo como link text
               'url': deckUrl,
               'list': cardList,
+              'placement': placement,
             },
           );
           print('     [OK] Salvo no banco.');

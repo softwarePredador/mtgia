@@ -16,10 +16,12 @@ import '../routes/decks/[id]/index.dart' as decks_$id_index;
 import '../routes/decks/[id]/recommendations/index.dart' as decks_$id_recommendations_index;
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
+import '../routes/ai/generate/index.dart' as ai_generate_index;
 
 import '../routes/_middleware.dart' as middleware;
 import '../routes/import/_middleware.dart' as import_middleware;
 import '../routes/decks/_middleware.dart' as decks_middleware;
+import '../routes/ai/_middleware.dart' as ai_middleware;
 
 void main() async {
   final address = InternetAddress.tryParse('') ?? InternetAddress.anyIPv6;
@@ -35,6 +37,7 @@ Future<HttpServer> createServer(InternetAddress address, int port) {
 Handler buildRootHandler() {
   final pipeline = const Pipeline().addMiddleware(middleware.middleware);
   final router = Router()
+    ..mount('/ai/generate', (context) => buildAiGenerateHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/recommendations', (context,id,) => buildDecks$idRecommendationsHandler(id,)(context))
@@ -44,6 +47,13 @@ Handler buildRootHandler() {
     ..mount('/rules', (context) => buildRulesHandler()(context))
     ..mount('/users', (context) => buildUsersHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
+  return pipeline.addHandler(router);
+}
+
+Handler buildAiGenerateHandler() {
+  final pipeline = const Pipeline().addMiddleware(ai_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => ai_generate_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
