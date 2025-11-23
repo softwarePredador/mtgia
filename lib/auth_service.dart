@@ -19,7 +19,18 @@ class AuthService {
 
   AuthService._internal() {
     final env = DotEnv(includePlatformEnvironment: true)..load();
-    _jwtSecret = env['JWT_SECRET'] ?? Platform.environment['JWT_SECRET'] ?? 'mtg_deck_builder_secret_key_2024';
+    final secret = env['JWT_SECRET'] ?? Platform.environment['JWT_SECRET'];
+    
+    if (secret == null || secret.isEmpty) {
+      throw StateError(
+        'ERRO CRÍTICO: JWT_SECRET não configurado!\n'
+        'Adicione no arquivo .env:\n'
+        'JWT_SECRET=sua_chave_secreta_aleatoria_aqui\n\n'
+        'Gere uma chave segura com: openssl rand -base64 48'
+      );
+    }
+    
+    _jwtSecret = secret;
   }
 
   /// Duração de validade do token (24 horas)
