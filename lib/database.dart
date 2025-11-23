@@ -35,11 +35,19 @@ class Database {
     final database = env['DB_NAME'];
     final username = env['DB_USER'];
     final password = env['DB_PASS'];
+    final environment = env['ENVIRONMENT'] ?? 'development';
 
     if (host == null || port == null || database == null || username == null || password == null) {
       print('Erro: As variáveis de ambiente do banco de dados não estão configuradas no arquivo .env');
       return;
     }
+
+    // Determina o modo SSL baseado no ambiente
+    // Produção: SSL obrigatório para segurança
+    // Desenvolvimento: SSL desabilitado para facilitar setup local
+    final sslMode = environment == 'production' 
+        ? SslMode.require 
+        : SslMode.disable;
 
     _pool = Pool.withEndpoints(
       [
@@ -51,14 +59,14 @@ class Database {
           password: password,
         )
       ],
-      settings: const PoolSettings(
+      settings: PoolSettings(
         maxConnectionCount: 10, // Ajuste conforme necessário
-        sslMode: SslMode.disable,
+        sslMode: sslMode,
       ),
     );
 
     _connected = true;
-    print('✅ Pool de conexões com o banco de dados inicializado.');
+    print('✅ Pool de conexões com o banco de dados inicializado (SSL: ${sslMode == SslMode.require ? "HABILITADO" : "DESABILITADO"}).');
   }
 
   /// Fecha a conexão com o banco de dados.
