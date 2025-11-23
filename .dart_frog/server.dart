@@ -20,6 +20,7 @@ import '../routes/cards/index.dart' as cards_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/login.dart' as auth_login;
 import '../routes/ai/generate/index.dart' as ai_generate_index;
+import '../routes/ai/explain/index.dart' as ai_explain_index;
 
 import '../routes/_middleware.dart' as middleware;
 import '../routes/import/_middleware.dart' as import_middleware;
@@ -40,6 +41,7 @@ Future<HttpServer> createServer(InternetAddress address, int port) {
 Handler buildRootHandler() {
   final pipeline = const Pipeline().addMiddleware(middleware.middleware);
   final router = Router()
+    ..mount('/ai/explain', (context) => buildAiExplainHandler()(context))
     ..mount('/ai/generate', (context) => buildAiGenerateHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
@@ -52,6 +54,13 @@ Handler buildRootHandler() {
     ..mount('/rules', (context) => buildRulesHandler()(context))
     ..mount('/users', (context) => buildUsersHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
+  return pipeline.addHandler(router);
+}
+
+Handler buildAiExplainHandler() {
+  final pipeline = const Pipeline().addMiddleware(ai_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => ai_explain_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
