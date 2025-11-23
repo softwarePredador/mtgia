@@ -28,7 +28,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 2. Buscar cartas do deck
     final cardsResult = await conn.execute(
       Sql.named('''
-        SELECT c.id, c.name, c.mana_cost, c.type_line, c.oracle_text, dc.quantity
+        SELECT c.id, c.name, c.mana_cost, c.type_line, c.oracle_text, c.price, dc.quantity
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId
@@ -38,16 +38,21 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
 
     final cards = cardsResult.map((row) => row.toColumnMap()).toList();
 
-    // 3. Análise: Curva de Mana e Cores
+    // 3. Análise: Curva de Mana, Cores e Preço
     final manaCurve = <int, int>{};
     final colorDistribution = <String, int>{'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'C': 0};
     var totalCards = 0;
     var totalLands = 0;
+    double totalPrice = 0.0;
 
     for (final card in cards) {
       final quantity = card['quantity'] as int;
       final typeLine = card['type_line'] as String? ?? '';
       final manaCost = card['mana_cost'] as String? ?? '';
+      final price = double.tryParse(card['price']?.toString() ?? '0') ?? 0.0;
+
+      totalPrice += price * quantity;
+      totalCards += quantity;
 
       totalCards += quantity;
       if (typeLine.toLowerCase().contains('land')) {
@@ -324,6 +329,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       'stats': {
         'total_cards': totalCards,
         'total_lands': totalLands,
+        'total_price': double.parse(totalPrice.toStringAsFixed(2)),
         'avg_cmc': double.parse(avgCmc.toStringAsFixed(2)),
         'composition': {
           'ramp': rampCount,

@@ -13,6 +13,7 @@ import '../routes/rules/index.dart' as rules_index;
 import '../routes/import/index.dart' as import_index;
 import '../routes/decks/index.dart' as decks_index;
 import '../routes/decks/[id]/index.dart' as decks_$id_index;
+import '../routes/decks/[id]/simulate/index.dart' as decks_$id_simulate_index;
 import '../routes/decks/[id]/recommendations/index.dart' as decks_$id_recommendations_index;
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
@@ -41,6 +42,7 @@ Handler buildRootHandler() {
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/recommendations', (context,id,) => buildDecks$idRecommendationsHandler(id,)(context))
+    ..mount('/decks/<id>/simulate', (context,id,) => buildDecks$idSimulateHandler(id,)(context))
     ..mount('/decks/<id>', (context,id,) => buildDecks$idHandler(id,)(context))
     ..mount('/decks', (context) => buildDecksHandler()(context))
     ..mount('/import', (context) => buildImportHandler()(context))
@@ -75,6 +77,13 @@ Handler buildDecks$idRecommendationsHandler(String id,) {
   final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
   final router = Router()
     ..all('/', (context) => decks_$id_recommendations_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildDecks$idSimulateHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => decks_$id_simulate_index.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 

@@ -138,6 +138,20 @@ Preparar o banco de dados para armazenar o conhecimento gerado pela IA e permiti
 4.  **`battle_simulations`:** A tabela mais importante para o ML. Ela guarda o `game_log` (JSON) de cada batalha simulada.
     -   **Por que JSONB?** O log de uma partida de Magic é complexo e variável. JSONB no PostgreSQL permite armazenar essa estrutura flexível e ainda fazer queries eficientes sobre ela se necessário.
 
+### 3.15. Sistema de Preços e Orçamento
+
+**Objetivo:**
+Permitir que o usuário saiba o custo financeiro do deck e filtre cartas por orçamento.
+
+**Implementação:**
+1.  **Banco de Dados:** Adicionada coluna `price` (DECIMAL) na tabela `cards`.
+2.  **Atualização de Preços (`bin/update_prices.dart`):**
+    - Script que consulta a API da Scryfall em lotes (batches) de 75 cartas.
+    - Usa o endpoint `/cards/collection` para eficiência.
+    - Mapeia o `oracle_id` do banco para obter o preço médio/padrão da carta.
+3.  **Análise Financeira:**
+    - O endpoint `/decks/[id]/analysis` agora calcula e retorna o `total_price` do deck, somando `price * quantity` de cada carta.
+
 ## 5. Implementações da API (Rotas)
 
 ### 5.1. Rota de Busca de Cartas (`GET /cards`)
@@ -514,6 +528,24 @@ Criar decks completos a partir de uma descrição em linguagem natural, usando o
 
 **Segurança:**
 A rota é protegida por JWT (`routes/ai/_middleware.dart`), garantindo que apenas usuários logados consumam créditos da API.
+
+### 3.14. Simulador de Probabilidade (Monte Carlo)
+
+**Objetivo:**
+Responder à pergunta "Esse deck roda na prática?" sem precisar jogar uma partida inteira.
+
+**Endpoint:** `GET /decks/[id]/simulate`
+
+**Metodologia:**
+O sistema executa **1.000 simulações** de mãos iniciais e dos primeiros 5 turnos.
+1.  **Embaralhamento:** Usa `Random()` para ordenar o deck aleatoriamente.
+2.  **Mão Inicial:** Compra 7 cartas e conta os terrenos.
+3.  **Curva de Mana:** Simula compras turno a turno e verifica se há mana disponível para jogar mágicas na curva (Turno 1 = Custo 1, Turno 2 = Custo 2, etc).
+
+**Métricas Geradas:**
+- **Distribuição de Terrenos:** Probabilidade de começar com 0, 1, 2... 7 terrenos.
+- **Risco de Mulligan:** Se a soma de mãos ruins (0, 1, 6, 7 terrenos) for alta (>30%), emite um alerta.
+- **Probabilidade "On Curve":** Chance de ter uma jogada válida em cada um dos primeiros 5 turnos.
 
 ---
 
