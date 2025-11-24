@@ -42,7 +42,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Get Cards
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.name, dc.is_commander 
+        SELECT c.name, dc.is_commander, c.type_line 
         FROM deck_cards dc 
         JOIN cards c ON c.id = dc.card_id 
         WHERE dc.deck_id = @id
@@ -52,15 +52,50 @@ Future<Response> onRequest(RequestContext context) async {
 
     final commanders = <String>[];
     final otherCards = <String>[];
+    int landCount = 0;
 
     for (final row in cardsResult) {
       final name = row[0] as String;
       final isCmdr = row[1] as bool;
+      final typeLine = (row[2] as String?) ?? '';
+      
       if (isCmdr) {
         commanders.add(name);
       } else {
         otherCards.add(name);
+        if (typeLine.toLowerCase().contains('land')) {
+          landCount++;
+        }
       }
+    }
+
+    // 1.5 Fetch Meta Decks for Context
+    // Tenta encontrar decks do meta com o mesmo comandante ou arquétipo similar
+    String metaContext = "";
+    try {
+      final metaResult = await pool.execute(
+        Sql.named('''
+          SELECT archetype, card_list 
+          FROM meta_decks 
+          WHERE archetype ILIKE @query OR card_list ILIKE @commander
+          ORDER BY created_at DESC 
+          LIMIT 1
+        '''),
+        parameters: {
+          'query': '%$archetype%',
+          'commander': '%${commanders.firstOrNull ?? "Unknown"}%'
+        },
+      );
+
+      if (metaResult.isNotEmpty) {
+        final metaDeckName = metaResult.first[0] as String;
+        final metaList = metaResult.first[1] as String;
+        // Envia o deck completo (até 150 linhas para segurança) para a IA ter o contexto total
+        final metaSample = metaList.split('\n').take(150).join(', ');
+        metaContext = "CONTEXTO DO META (Deck Top Tier encontrado: $metaDeckName): As cartas usadas neste arquétipo incluem: $metaSample...";
+      }
+    } catch (e) {
+      print('Erro ao buscar meta decks: $e');
     }
 
     // 2. Prepare Prompt
@@ -78,24 +113,37 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final prompt = '''
-    Atue como um especialista em Magic: The Gathering.
-    Tenho um deck de formato $deckFormat chamado "$deckName".
-    Comandante(s): ${commanders.join(', ')}
+    Atue como um Juiz e Especialista Pro Player de Magic: The Gathering.
+    Estou construindo um deck de formato $deckFormat chamado "$deckName" ($archetype) com Comandante: ${commanders.join(', ')}.
     
-    Quero otimizar este deck seguindo este arquétipo/estratégia: "$archetype".
+    ESTATÍSTICAS ATUAIS DO MEU DECK:
+    - Total de cartas na lista principal: ${otherCards.length}
+    - Total de Terrenos (Lands): $landCount
     
-    Lista atual de cartas (algumas): ${otherCards.take(50).join(', ')}...
+    $metaContext
     
-    Sua tarefa:
-    1. Identifique 3 a 5 cartas da lista atual que NÃO sinergizam bem com a estratégia "$archetype" e devem ser removidas.
-    2. Sugira 3 a 5 cartas que DEVEM ser adicionadas para fortalecer essa estratégia (considere cartas populares e eficientes).
-    3. Forneça uma breve justificativa.
+    LISTA COMPLETA DO MEU DECK:
+    ${otherCards.join(', ')}
     
-    Responda APENAS um JSON válido (sem markdown, sem ```json) no seguinte formato:
+    SUA MISSÃO (ANÁLISE ESTRUTURAL E COMPETITIVA):
+    1. **Análise de Mana Base:** Verifique se a quantidade de terrenos ($landCount) é adequada. Se for baixa (ex: < 34 para Commander), ou se faltar correção de cor (Fetch Lands, Shock Lands, Triomes), ISSO É PRIORIDADE MÁXIMA.
+    2. **Análise de Staples:** Verifique se faltam cartas essenciais do formato (ex: Sol Ring, Arcane Signet, Swords to Plowshares) ou do arquétipo.
+    3. **Cortes de "Gordura":** Identifique cartas que são estritamente piores que outras opções ou que não sinergizam.
+    
+    REGRAS CRÍTICAS:
+    - **EQUILÍBRIO NUMÉRICO:** O número de cartas removidas DEVE SER IGUAL ao número de cartas adicionadas, a menos que o deck precise de ajuste para chegar a 100 cartas (Commander).
+    - **EXPLICAÇÃO OBRIGATÓRIA:** O campo "reasoning" deve explicar POR QUE você fez essas trocas (ex: "Removi X pois é muito lento, adicionei Y para corrigir a curva de mana").
+    
+    SAÍDA ESPERADA:
+    Gere um JSON com uma lista de trocas (Remover -> Adicionar).
+    - NÃO se limite a 3 cartas. Se o deck precisar de 10 ou 15 mudanças para ficar viável, liste todas.
+    - Priorize consertar a base de mana e ramp primeiro.
+    
+    Formato JSON estrito:
     {
-      "removals": ["Nome Exato Carta 1", "Nome Exato Carta 2"],
-      "additions": ["Nome Exato Carta A", "Nome Exato Carta B"],
-      "reasoning": "Explicação resumida..."
+      "removals": ["Carta Ruim 1", "Carta Ruim 2", ...],
+      "additions": ["Fetch Land 1", "Ramp Spell 1", ...],
+      "reasoning": "Explicação detalhada focando na estrutura..."
     }
     ''';
 

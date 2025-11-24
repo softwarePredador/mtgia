@@ -7,8 +7,6 @@ import 'package:dart_frog/dart_frog.dart';
 
 
 import '../routes/index.dart' as index;
-import '../routes/users/register.dart' as users_register;
-import '../routes/users/login.dart' as users_login;
 import '../routes/rules/index.dart' as rules_index;
 import '../routes/import/index.dart' as import_index;
 import '../routes/decks/index.dart' as decks_index;
@@ -19,12 +17,15 @@ import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/login.dart' as auth_login;
+import '../routes/ai/optimize/index.dart' as ai_optimize_index;
 import '../routes/ai/generate/index.dart' as ai_generate_index;
 import '../routes/ai/explain/index.dart' as ai_explain_index;
+import '../routes/ai/archetypes/index.dart' as ai_archetypes_index;
 
 import '../routes/_middleware.dart' as middleware;
 import '../routes/import/_middleware.dart' as import_middleware;
 import '../routes/decks/_middleware.dart' as decks_middleware;
+import '../routes/auth/_middleware.dart' as auth_middleware;
 import '../routes/ai/_middleware.dart' as ai_middleware;
 
 void main() async {
@@ -41,8 +42,10 @@ Future<HttpServer> createServer(InternetAddress address, int port) {
 Handler buildRootHandler() {
   final pipeline = const Pipeline().addMiddleware(middleware.middleware);
   final router = Router()
+    ..mount('/ai/archetypes', (context) => buildAiArchetypesHandler()(context))
     ..mount('/ai/explain', (context) => buildAiExplainHandler()(context))
     ..mount('/ai/generate', (context) => buildAiGenerateHandler()(context))
+    ..mount('/ai/optimize', (context) => buildAiOptimizeHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
@@ -52,8 +55,14 @@ Handler buildRootHandler() {
     ..mount('/decks', (context) => buildDecksHandler()(context))
     ..mount('/import', (context) => buildImportHandler()(context))
     ..mount('/rules', (context) => buildRulesHandler()(context))
-    ..mount('/users', (context) => buildUsersHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
+  return pipeline.addHandler(router);
+}
+
+Handler buildAiArchetypesHandler() {
+  final pipeline = const Pipeline().addMiddleware(ai_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => ai_archetypes_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
@@ -71,8 +80,15 @@ Handler buildAiGenerateHandler() {
   return pipeline.addHandler(router);
 }
 
+Handler buildAiOptimizeHandler() {
+  final pipeline = const Pipeline().addMiddleware(ai_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => ai_optimize_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
 Handler buildAuthHandler() {
-  final pipeline = const Pipeline();
+  final pipeline = const Pipeline().addMiddleware(auth_middleware.middleware);
   final router = Router()
     ..all('/register', (context) => auth_register.onRequest(context,))..all('/login', (context) => auth_login.onRequest(context,));
   return pipeline.addHandler(router);
@@ -131,13 +147,6 @@ Handler buildRulesHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => rules_index.onRequest(context,));
-  return pipeline.addHandler(router);
-}
-
-Handler buildUsersHandler() {
-  final pipeline = const Pipeline();
-  final router = Router()
-    ..all('/register', (context) => users_register.onRequest(context,))..all('/login', (context) => users_login.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
