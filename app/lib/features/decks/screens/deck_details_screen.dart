@@ -315,7 +315,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
             ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   Future<void> _showAiExplanation(BuildContext context, DeckCardItem card) async {
