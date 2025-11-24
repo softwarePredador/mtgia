@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:postgres/postgres.dart';
+import 'dart:developer' as developer;
 
 /// Serviço de validação de cartas para prevenir alucinações da IA
 /// 
@@ -65,7 +66,7 @@ class CardValidationService {
         };
       }
     } catch (e) {
-      print('Erro ao buscar carta $cardName: $e');
+      developer.log('Erro ao buscar carta $cardName', error: e, name: 'CardValidation');
     }
 
     return null;
@@ -89,7 +90,7 @@ class CardValidationService {
 
       return result.map((row) => row[0] as String).toList();
     } catch (e) {
-      print('Erro ao buscar cartas similares: $e');
+      developer.log('Erro ao buscar cartas similares', error: e, name: 'CardValidation');
       return [];
     }
   }
@@ -116,7 +117,7 @@ class CardValidationService {
       final status = result.first[0] as String;
       return status == 'legal' || status == 'restricted';
     } catch (e) {
-      print('Erro ao verificar legalidade: $e');
+      developer.log('Erro ao verificar legalidade', error: e, name: 'CardValidation');
       return false; // Por segurança, assume ilegal em caso de erro
     }
   }
@@ -195,7 +196,7 @@ class CardValidationService {
         };
       }
     } catch (e) {
-      print('Erro ao buscar info da carta: $e');
+      developer.log('Erro ao buscar info da carta', error: e, name: 'CardValidation');
     }
 
     return null;
@@ -208,7 +209,8 @@ class CardValidationService {
     var cleaned = name.trim().replaceAll(RegExp(r'\s+'), ' ');
     
     // Remove caracteres problemáticos mas mantém aspas e apóstrofos
-    cleaned = cleaned.replaceAll(RegExp(r'[^\w\s\'\-,]'), '');
+    // Regex corrigido: hífen no final para evitar escape
+    cleaned = cleaned.replaceAll(RegExp(r'[^\w\s\',\-]'), '');
     
     // Capitalização: primeira letra de cada palavra em maiúscula
     cleaned = cleaned.split(' ').map((word) {

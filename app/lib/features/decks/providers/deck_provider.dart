@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../../core/api/api_client.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
@@ -339,7 +340,9 @@ class DeckProvider extends ChangeNotifier {
           }
         } catch (e) {
           // Se não conseguir encontrar a carta, ignora
-          print('Erro ao buscar carta $cardName: $e');
+          if (kDebugMode) {
+            debugPrint('Erro ao buscar carta $cardName: $e');
+          }
         }
       }
 
@@ -358,7 +361,9 @@ class DeckProvider extends ChangeNotifier {
             }
           }
         } catch (e) {
-          print('Erro ao buscar carta $cardName: $e');
+          if (kDebugMode) {
+            debugPrint('Erro ao buscar carta $cardName: $e');
+          }
         }
       }
 

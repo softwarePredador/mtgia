@@ -47,9 +47,10 @@ class RateLimiter {
       return forwardedFor.split(',').first.trim();
     }
     
-    // Fallback para IP direto (pode não estar disponível em Dart Frog)
-    // Em produção com proxy reverso, X-Forwarded-For sempre estará presente
-    return context.request.headers['Host'] ?? 'unknown';
+    // Fallback: usar "anonymous" quando IP não está disponível
+    // Em produção com proxy reverso (ex: Nginx), X-Forwarded-For sempre estará presente
+    // Se não estiver disponível, não podemos identificar o cliente de forma confiável
+    return 'anonymous';
   }
 
   bool isAllowed(String clientId) {

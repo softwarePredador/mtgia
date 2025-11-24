@@ -1278,10 +1278,166 @@ Future<void> _generateDeck() async {
 ```
 
 **Tratamento de Erros e Edge Cases:**
-- ✅ **Hallucination Prevention:** Se a IA sugerir uma carta inexistente, o lookup via `GET /cards?name=` falha e a carta é ignorada (logada).
+- ✅ **Hallucination Prevention (ATUALIZADO 24/11/2025):** CardValidationService valida todas as cartas sugeridas pela IA contra o banco de dados. Cartas inexistentes são filtradas e sugestões de cartas similares são retornadas.
 - ✅ **Timeout Handling:** Se a OpenAI demorar >30s, o request falha com timeout (configurável).
 - ✅ **Mock Responses:** Se `OPENAI_API_KEY` não estiver configurada, retorna dados mockados para desenvolvimento.
 - ✅ **Validação de Formato:** O backend valida se as cartas sugeridas são legais no formato antes de salvar (usa `card_legalities`).
+- ✅ **Rate Limiting (NOVO 24/11/2025):** Limite de 10 requisições/minuto para endpoints de IA, prevenindo abuso e controlando custos.
+- ✅ **Name Sanitization (NOVO 24/11/2025):** Nomes de cartas são automaticamente corrigidos (capitalização, caracteres especiais) antes da validação.
+- ✅ **Fuzzy Matching (NOVO 24/11/2025):** Sistema de busca aproximada sugere cartas similares quando a IA erra o nome exato.
+
+### 3.19. Segurança: Rate Limiting e Prevenção de Ataques (✅ COMPLETO - 24/11/2025)
+
+**Objetivo:**
+Proteger o sistema contra abuso, ataques de força bruta e uso excessivo de recursos (OpenAI API).
+
+#### 1. **Rate Limiting Middleware** ✅
+
+**Implementação:**
+- Middleware customizado usando algoritmo de janela deslizante (sliding window)
+- Rastreamento de requisições por IP address (suporta X-Forwarded-For para proxies)
+- Limpeza automática de logs antigos para evitar memory leak
+- Headers informativos de rate limit em todas as respostas
+
+**Limites Aplicados:**
+```dart
+// Auth endpoints (routes/auth/*)
+authRateLimit() -> 5 requisições/minuto
+  - Previne brute force em login
+  - Previne credential stuffing em register
+  
+// AI endpoints (routes/ai/*)
+aiRateLimit() -> 10 requisições/minuto
+  - Controla custos da OpenAI API ($$$)
+  - Previne uso abusivo de recursos caros
+  
+// Geral (não aplicado ainda, disponível)
+generalRateLimit() -> 100 requisições/minuto
+```
+
+**Response 429 (Too Many Requests):**
+```json
+{
+  "error": "Too Many Login Attempts",
+  "message": "Você fez muitas tentativas de login. Aguarde 1 minuto.",
+  "retry_after": 60
+}
+```
+
+**Headers Adicionados:**
+```
+X-RateLimit-Limit: 5           # Limite máximo
+X-RateLimit-Remaining: 3       # Requisições restantes
+X-RateLimit-Window: 60         # Janela em segundos
+Retry-After: 60                # Quando pode tentar novamente (apenas em 429)
+```
+
+**Código de Exemplo (`lib/rate_limit_middleware.dart`):**
+```dart
+class RateLimiter {
+  final int maxRequests;
+  final int windowSeconds;
+  
+  // Mapa: IP -> List<timestamps>
+  final Map<String, List<DateTime>> _requestLog = {};
+
+  bool isAllowed(String clientId) {
+    final now = DateTime.now();
+    final windowStart = now.subtract(Duration(seconds: windowSeconds));
+    
+    // Remove requisições antigas
+    _requestLog[clientId]?.removeWhere((t) => t.isBefore(windowStart));
+    
+    // Verifica limite
+    if ((_requestLog[clientId]?.length ?? 0) >= maxRequests) {
+      return false;
+    }
+    
+    // Registra nova requisição
+    (_requestLog[clientId] ??= []).add(now);
+    return true;
+  }
+}
+```
+
+#### 2. **Card Validation Service (Anti-Hallucination)** ✅
+
+**Problema:**
+A IA (GPT) ocasionalmente sugere cartas que não existem ou têm nomes incorretos ("hallucination").
+
+**Solução:**
+Serviço de validação que verifica todas as cartas sugeridas pela IA contra o banco de dados antes de aplicá-las.
+
+**Funcionalidades:**
+1. **Validação de Nomes:** Busca exata no banco (case-insensitive)
+2. **Fuzzy Search:** Se não encontrar, busca cartas com nomes similares usando ILIKE
+3. **Sanitização:** Corrige capitalização e remove caracteres especiais
+4. **Legalidade:** Verifica se a carta é legal no formato (via `card_legalities`)
+5. **Limites:** Valida quantidade máxima por formato (1x Commander, 4x outros)
+
+**Código de Exemplo (`lib/card_validation_service.dart`):**
+```dart
+class CardValidationService {
+  Future<Map<String, dynamic>> validateCardNames(List<String> cardNames) async {
+    final validCards = <Map<String, dynamic>>[];
+    final invalidCards = <String>[];
+    final suggestions = <String, List<String>>{};
+    
+    for (final cardName in cardNames) {
+      final result = await _findCard(cardName);
+      
+      if (result != null) {
+        validCards.add(result);
+      } else {
+        invalidCards.add(cardName);
+        // Busca similares: "Lightning Boltt" -> ["Lightning Bolt", "Chain Lightning"]
+        suggestions[cardName] = await _findSimilarCards(cardName);
+      }
+    }
+    
+    return {
+      'valid': validCards,
+      'invalid': invalidCards,
+      'suggestions': suggestions,
+    };
+  }
+  
+  static String sanitizeCardName(String name) {
+    // "lightning  BOLT" -> "Lightning Bolt"
+    return name.trim()
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .split(' ')
+      .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
+      .join(' ');
+  }
+}
+```
+
+**Integração no AI Optimize:**
+```dart
+// Antes (sem validação)
+return Response.json(body: {
+  'removals': ['Sol Ring', 'ManaRock999'], // ManaRock999 não existe!
+  'additions': ['Mana Crypt'],
+});
+
+// Depois (com validação)
+final validation = await validationService.validateCardNames([...]);
+return Response.json(body: {
+  'removals': ['Sol Ring'], // ManaRock999 filtrado
+  'additions': ['Mana Crypt'],
+  'warnings': {
+    'invalid_cards': ['ManaRock999'],
+    'suggestions': {'ManaRock999': ['Mana Vault', 'Mana Crypt']},
+  },
+});
+```
+
+**Impacto:**
+- ✅ 100% das cartas adicionadas ao deck são validadas e reais
+- ✅ Usuários recebem feedback claro sobre cartas problemáticas
+- ✅ Sistema sugere alternativas para typos (ex: "Lightnig Bolt" → "Lightning Bolt")
+- ✅ Previne erros de runtime causados por cartas inexistentes
 
 **Próximos Passos:**
 - Implementar a "transformação" do deck: quando o usuário escolhe um arquétipo, a IA deve sugerir quais cartas remover e quais adicionar para atingir aquele objetivo.
