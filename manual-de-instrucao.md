@@ -53,6 +53,18 @@ Este documento serve como guia definitivo para o entendimento, manutenção e ex
 - [x] Estrutura de features (`features/auth`, `features/decks`, `features/home`)
 - [x] ApiClient com suporte a GET, POST, PUT, DELETE
 
+### ✅ **Implementado (Módulo 1: O Analista Matemático)**
+- [x] **Backend:**
+  - Validação de regras de formato (Commander 1x, Standard 4x).
+  - Verificação de cartas banidas (`card_legalities`).
+  - Endpoint de Importação (`POST /import`) com validação de regras.
+- [x] **Frontend:**
+  - **ManaHelper:** Utilitário para cálculo de CMC e Devoção.
+  - **Gráficos (fl_chart):**
+    - Curva de Mana (Bar Chart).
+    - Distribuição de Cores (Pie Chart).
+  - Aba de Análise no `DeckDetailsScreen`.
+
 ### 🚧 **Em Desenvolvimento**
 *Nenhuma feature em andamento no momento.*
 
@@ -471,6 +483,8 @@ As dependências são gerenciadas no arquivo `pubspec.yaml`.
 | **bcrypt** | ^1.1.3 | Criptografia de senhas (hashing). | Padrão de mercado para segurança de senhas. Transforma a senha em um código irreversível. |
 | **dart_jsonwebtoken** | ^2.12.0 | Geração e validação de JSON Web Tokens (JWT). | Essencial para autenticação stateless. O usuário faz login uma vez e usa o token para se autenticar. |
 | **collection** | ^1.18.0 | Funções utilitárias para coleções (listas, mapas). | Facilita manipulação de dados complexos. |
+| **fl_chart** | ^0.40.0 | Biblioteca de gráficos para Flutter. | Para visualização de dados estatísticos (ex: curva de mana). |
+| **flutter_svg** | ^1.0.0 | Renderização de símbolos de mana. | Para exibir ícones e símbolos em formato SVG. |
 
 ---
 

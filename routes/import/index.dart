@@ -93,13 +93,14 @@ Future<Response> _importDeck(RequestContext context) async {
   
   if (namesToQuery.isNotEmpty) {
     final result = await conn.execute(
-      Sql.named('SELECT id, name FROM cards WHERE lower(name) = ANY(@names)'),
+      Sql.named('SELECT id, name, type_line FROM cards WHERE lower(name) = ANY(@names)'),
       parameters: {'names': TypedValue(Type.textArray, namesToQuery.toList())},
     );
     for (final row in result) {
       final id = row[0] as String;
       final name = row[1] as String;
-      foundCardsMap[name.toLowerCase()] = {'id': id, 'name': name};
+      final typeLine = row[2] as String;
+      foundCardsMap[name.toLowerCase()] = {'id': id, 'name': name, 'type_line': typeLine};
     }
   }
 
@@ -124,13 +125,14 @@ Future<Response> _importDeck(RequestContext context) async {
   // 4. Busca em lote para os Fallbacks
   if (cleanNamesToQuery.isNotEmpty) {
     final result = await conn.execute(
-      Sql.named('SELECT id, name FROM cards WHERE lower(name) = ANY(@names)'),
+      Sql.named('SELECT id, name, type_line FROM cards WHERE lower(name) = ANY(@names)'),
       parameters: {'names': TypedValue(Type.textArray, cleanNamesToQuery.toList())},
     );
     for (final row in result) {
       final id = row[0] as String;
       final name = row[1] as String;
-      foundCardsMap[name.toLowerCase()] = {'id': id, 'name': name};
+      final typeLine = row[2] as String;
+      foundCardsMap[name.toLowerCase()] = {'id': id, 'name': name, 'type_line': typeLine};
     }
   }
 
@@ -150,13 +152,14 @@ Future<Response> _importDeck(RequestContext context) async {
 
   if (splitPatternsToQuery.isNotEmpty) {
       final result = await conn.execute(
-        Sql.named('SELECT id, name FROM cards WHERE lower(name) LIKE ANY(@patterns)'),
+        Sql.named('SELECT id, name, type_line FROM cards WHERE lower(name) LIKE ANY(@patterns)'),
         parameters: {'patterns': TypedValue(Type.textArray, splitPatternsToQuery)},
       );
       
       for (final row in result) {
         final id = row[0] as String;
         final dbName = row[1] as String;
+        final typeLine = row[2] as String;
         final dbNameLower = dbName.toLowerCase();
         
         // Split robusto
@@ -164,7 +167,7 @@ Future<Response> _importDeck(RequestContext context) async {
         if (parts.isNotEmpty) {
             final prefix = parts[0].trim();
             if (!foundCardsMap.containsKey(prefix)) {
-                 foundCardsMap[prefix] = {'id': id, 'name': dbName};
+                 foundCardsMap[prefix] = {'id': id, 'name': dbName, 'type_line': typeLine};
             }
         }
       }
@@ -190,6 +193,8 @@ Future<Response> _importDeck(RequestContext context) async {
         'card_id': cardData['id'],
         'quantity': item['quantity'],
         'is_commander': isCommander,
+        'name': dbName,
+        'type_line': cardData['type_line'],
       });
     } else {
       // Se chegou até aqui e não achou, agora sim é erro
@@ -204,6 +209,51 @@ Future<Response> _importDeck(RequestContext context) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': 'No valid cards found in the list.', 'not_found': notFoundCards},
     );
+  }
+
+  // 7. Validação de Regras (Banlist e Limites)
+  final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
+  final cardIdsToCheck = <String>[];
+
+  for (final card in cardsToInsert) {
+    final name = card['name'] as String;
+    final typeLine = card['type_line'] as String;
+    final quantity = card['quantity'] as int;
+    final isBasicLand = typeLine.toLowerCase().contains('basic land');
+
+    if (!isBasicLand && quantity > limit) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'Regra violada: $name tem $quantity cópias (Limite: $limit).'},
+      );
+    }
+    cardIdsToCheck.add(card['card_id'] as String);
+  }
+
+  if (cardIdsToCheck.isNotEmpty) {
+    final legalityResult = await conn.execute(
+      Sql.named(
+        'SELECT c.name, cl.status FROM card_legalities cl JOIN cards c ON c.id = cl.card_id WHERE cl.card_id = ANY(@ids) AND cl.format = @format'
+      ),
+      parameters: {
+        'ids': TypedValue(Type.textArray, cardIdsToCheck),
+        'format': format,
+      }
+    );
+
+    final bannedCards = <String>[];
+    for (final row in legalityResult) {
+      if (row[1] == 'banned') {
+        bannedCards.add(row[0] as String);
+      }
+    }
+
+    if (bannedCards.isNotEmpty) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'O deck contém cartas BANIDAS no formato $format: ${bannedCards.join(", ")}'},
+      );
+    }
   }
 
   try {

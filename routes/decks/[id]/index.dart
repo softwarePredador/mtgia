@@ -74,13 +74,15 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     final updatedDeck = await conn.runTx((session) async {
       // 1. Verifica se o deck existe e pertence ao usuário
       final deckCheck = await session.execute(
-        Sql.named('SELECT id FROM decks WHERE id = @deckId AND user_id = @userId'),
+        Sql.named('SELECT id, format FROM decks WHERE id = @deckId AND user_id = @userId'),
         parameters: {'deckId': deckId, 'userId': userId},
       );
 
       if (deckCheck.isEmpty) {
         throw Exception('Deck not found or permission denied.');
       }
+
+      final currentFormat = (format ?? deckCheck.first[1] as String).toLowerCase();
 
       // 2. Atualiza os dados do deck
       if (name != null || format != null || description != null) {
@@ -99,6 +101,56 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 
       // 3. Se uma nova lista de cartas for enviada, substitui a antiga
       if (cards != null) {
+        // --- VALIDAÇÃO DE REGRAS (Magic: The Gathering) ---
+        for (final card in cards) {
+           final cardId = card['card_id'];
+           final quantity = card['quantity'] as int;
+           
+           // Busca informações básicas da carta para validação
+           final cardInfo = await session.execute(
+             Sql.named('SELECT name, type_line FROM cards WHERE id = @id'),
+             parameters: {'id': cardId}
+           );
+           
+           if (cardInfo.isNotEmpty) {
+             final cardName = cardInfo.first[0] as String;
+             final typeLine = (cardInfo.first[1] as String).toLowerCase();
+             
+             // Regra 1: Limite de Cópias
+             // Commander/Brawl: 1 cópia. Outros: 4 cópias.
+             // Exceção: Terrenos Básicos (Basic Land) e cartas como "Relentless Rats" (não implementado aqui ainda)
+             final isBasicLand = typeLine.contains('basic land');
+             int limit = 4;
+             if (currentFormat == 'commander' || currentFormat == 'brawl') {
+               limit = 1;
+             }
+             
+             if (!isBasicLand && quantity > limit) {
+               throw Exception('Regra violada: "$cardName" excede o limite de $limit cópia(s) para o formato $currentFormat.');
+             }
+             
+             // Regra 2: Legalidade (Banidas/Restritas)
+             final legalityCheck = await session.execute(
+               Sql.named('SELECT status FROM card_legalities WHERE card_id = @id AND format = @format'),
+               parameters: {'id': cardId, 'format': currentFormat}
+             );
+             
+             if (legalityCheck.isNotEmpty) {
+               final status = legalityCheck.first[0] as String;
+               if (status == 'banned') {
+                 throw Exception('Regra violada: "$cardName" é BANIDA no formato $currentFormat.');
+               }
+               if (status == 'not_legal') {
+                 throw Exception('Regra violada: "$cardName" não é válida no formato $currentFormat.');
+               }
+               if (status == 'restricted' && quantity > 1) {
+                 throw Exception('Regra violada: "$cardName" é RESTRITA no formato $currentFormat (máx. 1).');
+               }
+             }
+           }
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
         // Apaga as cartas antigas
         await session.execute(
           Sql.named('DELETE FROM deck_cards WHERE deck_id = @deckId'),
