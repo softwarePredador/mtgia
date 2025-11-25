@@ -98,102 +98,104 @@ void main(List<String> args) async {
       print('\n🎴 Sincronizando staples para formato: ${format.toUpperCase()}');
       print('${'─' * 60}');
       
-      final syncLogId = await _createSyncLog(conn, format);
-      
-      int totalInserted = 0;
-      int totalUpdated = 0;
-      int totalBanned = 0;
+      await conn.run((session) async {
+        final syncLogId = await _createSyncLog(session, format);
+        
+        int totalInserted = 0;
+        int totalUpdated = 0;
+        int totalBanned = 0;
 
-      // 1. Buscar staples universais do formato (Top 100)
-      print('  📥 Buscando staples universais...');
-      final universalStaples = await _fetchScryfallCards(
-        query: '${supportedFormats[format]} -is:banned',
-        limit: 100,
-      );
-      
-      if (universalStaples.isNotEmpty) {
-        final result = await _upsertStaples(
-          conn: conn, 
-          cards: universalStaples, 
-          format: format, 
-          archetype: null,  // NULL = universal
-          category: 'staple',
+        // 1. Buscar staples universais do formato (Top 100)
+        print('  📥 Buscando staples universais...');
+        final universalStaples = await _fetchScryfallCards(
+          query: '${supportedFormats[format]} -is:banned',
+          limit: 100,
         );
-        totalInserted += result['inserted']!;
-        totalUpdated += result['updated']!;
-        print('     ✓ ${universalStaples.length} staples universais processados');
-      }
-
-      // 2. Buscar staples por arquétipo
-      for (final archetype in archetypeQueries.keys) {
-        print('  📥 Buscando staples para arquétipo: $archetype...');
         
-        final query = '${supportedFormats[format]} ${archetypeQueries[archetype]!['query']} -is:banned';
-        final archetypeCards = await _fetchScryfallCards(query: query, limit: 50);
-        
-        if (archetypeCards.isNotEmpty) {
+        if (universalStaples.isNotEmpty) {
           final result = await _upsertStaples(
-            conn: conn,
-            cards: archetypeCards,
-            format: format,
-            archetype: archetype,
-            category: archetype, // Usa o arquétipo como categoria
+            conn: session, 
+            cards: universalStaples, 
+            format: format, 
+            archetype: null,  // NULL = universal
+            category: 'staple',
           );
           totalInserted += result['inserted']!;
           totalUpdated += result['updated']!;
-          print('     ✓ ${archetypeCards.length} staples de $archetype processados');
+          print('     ✓ ${universalStaples.length} staples universais processados');
         }
-        
-        // Rate limiting para Scryfall API (máximo 10 req/s)
-        await Future.delayed(Duration(milliseconds: 150));
-      }
 
-      // 3. Buscar staples por cor (para Commander especialmente)
-      if (format == 'commander') {
-        for (final color in colorCombinations.where((c) => c.isNotEmpty)) {
-          print('  📥 Buscando staples para cor: $color...');
+        // 2. Buscar staples por arquétipo
+        for (final archetype in archetypeQueries.keys) {
+          print('  📥 Buscando staples para arquétipo: $archetype...');
           
-          final colorQuery = 'format:commander id=$color -is:banned';
-          final colorCards = await _fetchScryfallCards(query: colorQuery, limit: 30);
+          final query = '${supportedFormats[format]} ${archetypeQueries[archetype]!['query']} -is:banned';
+          final archetypeCards = await _fetchScryfallCards(query: query, limit: 50);
           
-          if (colorCards.isNotEmpty) {
+          if (archetypeCards.isNotEmpty) {
             final result = await _upsertStaples(
-              conn: conn,
-              cards: colorCards,
+              conn: session,
+              cards: archetypeCards,
               format: format,
-              archetype: null,
-              category: 'color_staple',
-              colorIdentity: color.split(''),
+              archetype: archetype,
+              category: archetype, // Usa o arquétipo como categoria
             );
             totalInserted += result['inserted']!;
             totalUpdated += result['updated']!;
+            print('     ✓ ${archetypeCards.length} staples de $archetype processados');
           }
           
+          // Rate limiting para Scryfall API (máximo 10 req/s)
           await Future.delayed(Duration(milliseconds: 150));
         }
-        print('     ✓ Staples por cor processados');
-      }
 
-      // 4. Verificar e marcar cartas banidas
-      print('  🚫 Verificando cartas banidas...');
-      totalBanned = await _syncBannedCards(conn, format);
-      print('     ✓ $totalBanned cartas marcadas como banidas');
+        // 3. Buscar staples por cor (para Commander especialmente)
+        if (format == 'commander') {
+          for (final color in colorCombinations.where((c) => c.isNotEmpty)) {
+            print('  📥 Buscando staples para cor: $color...');
+            
+            final colorQuery = 'format:commander id=$color -is:banned';
+            final colorCards = await _fetchScryfallCards(query: colorQuery, limit: 30);
+            
+            if (colorCards.isNotEmpty) {
+              final result = await _upsertStaples(
+                conn: session,
+                cards: colorCards,
+                format: format,
+                archetype: null,
+                category: 'color_staple',
+                colorIdentity: color.split(''),
+              );
+              totalInserted += result['inserted']!;
+              totalUpdated += result['updated']!;
+            }
+            
+            await Future.delayed(Duration(milliseconds: 150));
+          }
+          print('     ✓ Staples por cor processados');
+        }
 
-      // 5. Atualizar log de sincronização
-      await _updateSyncLog(
-        conn: conn,
-        syncLogId: syncLogId,
-        inserted: totalInserted,
-        updated: totalUpdated,
-        deleted: totalBanned,
-        status: 'success',
-      );
+        // 4. Verificar e marcar cartas banidas
+        print('  🚫 Verificando cartas banidas...');
+        totalBanned = await _syncBannedCards(session, format);
+        print('     ✓ $totalBanned cartas marcadas como banidas');
 
-      print('');
-      print('  ═══════════════════════════════════════════════════');
-      print('  ✅ SINCRONIZAÇÃO COMPLETA PARA $format');
-      print('     📊 Inseridos: $totalInserted | Atualizados: $totalUpdated | Banidos: $totalBanned');
-      print('  ═══════════════════════════════════════════════════');
+        // 5. Atualizar log de sincronização
+        await _updateSyncLog(
+          conn: session,
+          syncLogId: syncLogId,
+          inserted: totalInserted,
+          updated: totalUpdated,
+          deleted: totalBanned,
+          status: 'success',
+        );
+
+        print('');
+        print('  ═══════════════════════════════════════════════════');
+        print('  ✅ SINCRONIZAÇÃO COMPLETA PARA $format');
+        print('     📊 Inseridos: $totalInserted | Atualizados: $totalUpdated | Banidos: $totalBanned');
+        print('  ═══════════════════════════════════════════════════');
+      });
     }
 
     print('\n🎉 Sincronização finalizada com sucesso!');
@@ -274,7 +276,7 @@ Future<List<Map<String, dynamic>>> _fetchScryfallCards({
 
 /// Insere ou atualiza staples no banco de dados
 Future<Map<String, int>> _upsertStaples({
-  required Connection conn,
+  required Session conn,
   required List<Map<String, dynamic>> cards,
   required String format,
   required String? archetype,
@@ -328,7 +330,7 @@ Future<Map<String, int>> _upsertStaples({
 }
 
 /// Verifica cartas banidas e marca no banco
-Future<int> _syncBannedCards(Connection conn, String format) async {
+Future<int> _syncBannedCards(Session conn, String format) async {
   int bannedCount = 0;
 
   try {
@@ -382,7 +384,7 @@ Future<int> _syncBannedCards(Connection conn, String format) async {
 }
 
 /// Cria registro de log de sincronização
-Future<String> _createSyncLog(Connection conn, String format) async {
+Future<String> _createSyncLog(Session conn, String format) async {
   final result = await conn.execute(
     Sql.named('''
       INSERT INTO sync_log (sync_type, format, status, started_at)
@@ -397,7 +399,7 @@ Future<String> _createSyncLog(Connection conn, String format) async {
 
 /// Atualiza registro de log de sincronização
 Future<void> _updateSyncLog({
-  required Connection conn,
+  required Session conn,
   required String syncLogId,
   required int inserted,
   required int updated,
