@@ -1662,3 +1662,278 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS archetype TEXT;
    - Confirmar que cartas removidas são efetivamente removidas
    - Confirmar que cartas adicionadas aparecem no deck
    - Verificar refresh automático da tela
+
+---
+
+### 3.21. Sistema de Staples Dinâmicos (✅ COMPLETO - 25/11/2025)
+
+**Objetivo:**
+Substituir listas hardcoded de staples por um sistema dinâmico que busca dados atualizados do Scryfall API e armazena em cache local no banco de dados.
+
+#### **Problema Original:**
+
+```dart
+// CÓDIGO ANTIGO (hardcoded) - routes/ai/optimize/index.dart
+case 'control':
+  recommendations['staples']!.addAll([
+    'Counterspell', 'Swords to Plowshares', 'Path to Exile',
+    'Cyclonic Rift', 'Teferi\'s Protection'  // E se alguma for banida?
+  ]);
+
+// E se Mana Crypt for banida? Precisa editar código e fazer deploy!
+if (colors.contains('B')) {
+  recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge', 'Dockside Extortionist']);
+  // Dockside foi banida em 2024! Mas o código não sabe disso.
+}
+```
+
+**Problemas:**
+1. ❌ Listas desatualizadas quando há bans (ex: Mana Crypt, Nadu, Dockside)
+2. ❌ Precisa editar código e fazer deploy para atualizar
+3. ❌ Não considera popularidade atual (EDHREC rank muda)
+4. ❌ Duplicação de código para cada arquétipo/cor
+
+#### **Solução Implementada:**
+
+##### 1. Nova Tabela `format_staples`
+```sql
+CREATE TABLE format_staples (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_name TEXT NOT NULL,              -- Nome exato da carta
+    format TEXT NOT NULL,                  -- 'commander', 'standard', etc.
+    archetype TEXT,                        -- 'aggro', 'control', NULL = universal
+    color_identity TEXT[],                 -- {'W'}, {'U', 'B'}, etc.
+    edhrec_rank INTEGER,                   -- Rank de popularidade
+    category TEXT,                         -- 'ramp', 'draw', 'removal', 'staple'
+    scryfall_id UUID,                      -- Referência ao Scryfall
+    is_banned BOOLEAN DEFAULT FALSE,       -- Atualizado via sync
+    last_synced_at TIMESTAMP,              -- Quando foi atualizado
+    UNIQUE(card_name, format, archetype)
+);
+```
+
+##### 2. Script de Sincronização (`bin/sync_staples.dart`)
+
+**Funcionalidades:**
+- Busca Top 100 staples universais do Scryfall (ordenado por EDHREC)
+- Busca Top 50 staples por arquétipo (aggro, control, combo, etc.)
+- Busca Top 30 staples por cor (W, U, B, R, G)
+- Sincroniza lista de cartas banidas
+- Registra log de sincronização para auditoria
+
+**Uso:**
+```bash
+# Sincronizar apenas Commander
+dart run bin/sync_staples.dart commander
+
+# Sincronizar todos os formatos
+dart run bin/sync_staples.dart ALL
+```
+
+**Configuração de Cron Job (Linux):**
+```bash
+# Sincronizar toda segunda-feira às 3h da manhã
+0 3 * * 1 cd /path/to/server && dart run bin/sync_staples.dart ALL >> /var/log/mtg_sync.log 2>&1
+```
+
+##### 3. Serviço de Staples (`lib/format_staples_service.dart`)
+
+**Classe FormatStaplesService:**
+```dart
+class FormatStaplesService {
+  final Pool _pool;
+  static const int cacheMaxAgeHours = 24;
+  
+  /// Busca staples de duas fontes:
+  /// 1. DB local (cache) - Se dados < 24h
+  /// 2. Scryfall API - Fallback
+  Future<List<Map<String, dynamic>>> getStaples({
+    required String format,
+    List<String>? colors,
+    String? archetype,
+    int limit = 50,
+    bool excludeBanned = true,
+  }) async { ... }
+  
+  /// Verifica se carta está banida
+  Future<bool> isBanned(String cardName, String format) async { ... }
+  
+  /// Retorna recomendações organizadas por categoria
+  Future<Map<String, List<String>>> getRecommendationsForDeck({
+    required String format,
+    required List<String> colors,
+    String? archetype,
+  }) async { ... }
+}
+```
+
+**Exemplo de Uso:**
+```dart
+// Em routes/ai/optimize/index.dart
+
+final staplesService = FormatStaplesService(pool);
+
+// Buscar staples para deck Dimir Control
+final staples = await staplesService.getStaples(
+  format: 'commander',
+  colors: ['U', 'B'],
+  archetype: 'control',
+  limit: 20,
+);
+
+// Verificar se carta está banida
+final isBanned = await staplesService.isBanned('Mana Crypt', 'commander');
+// Retorna TRUE (Mana Crypt foi banida em 2024)
+
+// Obter recomendações completas
+final recommendations = await staplesService.getRecommendationsForDeck(
+  format: 'commander',
+  colors: ['U', 'B', 'G'],
+  archetype: 'combo',
+);
+// Retorna: { 'universal': [...], 'ramp': [...], 'draw': [...], 'removal': [...], 'archetype_specific': [...] }
+```
+
+##### 4. Refatoração do AI Optimize
+
+**Antes (hardcoded):**
+```dart
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors
+) async {
+  // Listas hardcoded que ficam desatualizadas
+  case 'control':
+    recommendations['staples']!.addAll([
+      'Counterspell', 'Swords to Plowshares', ...
+    ]);
+}
+```
+
+**Depois (dinâmico):**
+```dart
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors,
+  Pool pool,  // Novo parâmetro
+) async {
+  final staplesService = FormatStaplesService(pool);
+  
+  // Buscar staples universais do banco/Scryfall
+  final universalStaples = await staplesService.getStaples(
+    format: 'commander',
+    colors: colors,
+    limit: 20,
+  );
+  
+  // Buscar staples do arquétipo
+  final archetypeStaples = await staplesService.getStaples(
+    format: 'commander',
+    colors: colors,
+    archetype: archetype.toLowerCase(),
+    limit: 15,
+  );
+  
+  recommendations['staples']!.addAll(
+    [...universalStaples, ...archetypeStaples].map((s) => s['name'] as String)
+  );
+  
+  // Remove duplicatas
+  recommendations['staples'] = recommendations['staples']!.toSet().toList();
+}
+```
+
+##### 5. Tabela de Log de Sincronização
+
+```sql
+CREATE TABLE sync_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sync_type TEXT NOT NULL,               -- 'staples', 'banlist', 'meta'
+    format TEXT,                           -- Formato sincronizado
+    records_updated INTEGER DEFAULT 0,
+    records_inserted INTEGER DEFAULT 0,
+    records_deleted INTEGER DEFAULT 0,     -- Cartas banidas
+    status TEXT NOT NULL,                  -- 'success', 'partial', 'failed'
+    error_message TEXT,
+    started_at TIMESTAMP,
+    finished_at TIMESTAMP
+);
+```
+
+**Consultar histórico de sincronização:**
+```sql
+SELECT sync_type, format, status, records_inserted, records_updated, 
+       finished_at - started_at as duration
+FROM sync_log
+ORDER BY started_at DESC
+LIMIT 10;
+```
+
+#### **Fluxo de Dados:**
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    SINCRONIZAÇÃO SEMANAL                           │
+│                    (bin/sync_staples.dart)                         │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                       SCRYFALL API                                 │
+│  - format:commander -is:banned order:edhrec                        │
+│  - Retorna Top 100 cartas mais populares                           │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                    TABELA format_staples                           │
+│  - Cache local de staples por formato/arquétipo/cor                │
+│  - Atualizado semanalmente                                         │
+│  - is_banned = TRUE para cartas banidas                            │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                  FormatStaplesService                              │
+│  1. Verifica cache local (< 24h)                                   │
+│  2. Se cache desatualizado → Fallback Scryfall                     │
+│  3. Filtra por formato/cores/arquétipo                             │
+│  4. Exclui cartas banidas (is_banned = TRUE)                       │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                  AI Optimize Endpoint                              │
+│  - Recebe recomendações dinâmicas                                  │
+│  - Passa para OpenAI no prompt                                     │
+│  - Valida cartas sugeridas antes de aplicar                        │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+#### **Benefícios:**
+
+| Antes (Hardcoded) | Depois (Dinâmico) |
+|-------------------|-------------------|
+| ❌ Listas fixas no código | ✅ Dados do Scryfall (fonte oficial) |
+| ❌ Deploy para atualizar | ✅ Sync automático semanal |
+| ❌ Cartas banidas sugeridas | ✅ Banlist sincronizado |
+| ❌ Popularidade estática | ✅ EDHREC rank atualizado |
+| ❌ Duplicação de código | ✅ Uma fonte de verdade |
+
+#### **Arquivos Modificados/Criados:**
+
+| Arquivo | Tipo | Descrição |
+|---------|------|-----------|
+| `server/database_setup.sql` | Modificado | +Tabelas format_staples e sync_log |
+| `server/bin/sync_staples.dart` | Novo | Script de sincronização |
+| `server/lib/format_staples_service.dart` | Novo | Serviço de staples dinâmicos |
+| `server/routes/ai/optimize/index.dart` | Modificado | Usa FormatStaplesService |
+| `server/lib/ai/prompt.md` | Modificado | Referencia banlist dinâmico |
+| `FORMULARIO_AUDITORIA_ALGORITMO.md` | Modificado | Documentação v1.3 |
+
+#### **Próximos Passos:**
+
+1. **Automatizar Sincronização:** Configurar cron job ou Cloud Scheduler para rodar `sync_staples.dart` semanalmente
+2. **Monitoramento:** Dashboard para visualizar histórico de sincronização
+3. **Alertas:** Notificação quando há novos bans detectados
+4. **Cache Inteligente:** Sincronizar apenas deltas (cartas que mudaram de rank)

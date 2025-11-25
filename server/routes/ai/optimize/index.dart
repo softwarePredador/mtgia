@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
+import '../../../lib/format_staples_service.dart';
+import '../../../lib/archetype_counters_service.dart';
 
 /// Classe para análise de arquétipo do deck
 /// Implementa detecção automática baseada em curva de mana, tipos de cartas e cores
@@ -204,115 +206,155 @@ Future<List<String>> _fetchScryfallCards(String query, int limit) async {
 }
 
 /// Gera recomendações específicas por arquétipo
-Future<Map<String, List<String>>> getArchetypeRecommendations(String archetype, List<String> colors) async {
+/// ATUALIZADO: Agora usa FormatStaplesService para buscar dados dinâmicos do banco/Scryfall
+/// Evita hardcoded staples e mantém dados sempre atualizados
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors,
+  Pool pool,
+) async {
   final recommendations = <String, List<String>>{
     'staples': [],
     'avoid': [],
     'priority': [],
   };
-  
-  // 1. Staples universais (Via API Scryfall - Sempre atualizado e sem banidas)
-  final universalStaples = await _fetchScryfallCards('', 20);
-  
-  if (universalStaples.isNotEmpty) {
-    recommendations['staples']!.addAll(universalStaples);
-  } else {
-    // Fallback seguro (apenas cartas muito seguras)
+
+  final staplesService = FormatStaplesService(pool);
+
+  try {
+    // 1. Buscar staples universais do formato (via DB ou Scryfall API)
+    final universalStaples = await staplesService.getStaples(
+      format: 'commander',
+      colors: colors,
+      limit: 20,
+    );
+
+    if (universalStaples.isNotEmpty) {
+      recommendations['staples']!.addAll(
+        universalStaples.map((s) => s['name'] as String)
+      );
+    } else {
+      // Fallback mínimo apenas se ambos DB e Scryfall falharem
+      recommendations['staples']!.addAll(['Sol Ring', 'Arcane Signet', 'Command Tower']);
+    }
+
+    // 2. Buscar staples específicos do arquétipo (via DB ou Scryfall API)
+    final archetypeStaples = await staplesService.getStaples(
+      format: 'commander',
+      colors: colors,
+      archetype: archetype.toLowerCase(),
+      limit: 15,
+    );
+
+    if (archetypeStaples.isNotEmpty) {
+      recommendations['staples']!.addAll(
+        archetypeStaples.map((s) => s['name'] as String)
+      );
+    }
+
+    // 3. Lógica específica para Infect (geralmente é Aggro/Combo)
+    if (archetype.toLowerCase().contains('infect')) {
+      // Busca staples de infect dinamicamente via Scryfall
+      final infectStaples = await _fetchScryfallCards('oracle:infect', 15);
+      recommendations['staples']!.addAll(infectStaples);
+
+      if (colors.contains('G')) {
+        final pumpSpells = await _fetchScryfallCards('function:pump-spell color:G', 10);
+        recommendations['priority']!.addAll(pumpSpells);
+      }
+
+      recommendations['priority']!.addAll([
+        'Protection', 'Evasion (Unblockable/Flying)'
+      ]);
+      recommendations['avoid']!.addAll([
+        'Cartas de lifegain', 'Estratégias lentas', 'Cartas que dependem de dano normal'
+      ]);
+      return recommendations;
+    }
+
+    // 4. Recomendações de "avoid" e "priority" por arquétipo
+    // Estas são heurísticas de estratégia, não listas de cartas específicas
+    switch (archetype.toLowerCase()) {
+      case 'aggro':
+        recommendations['avoid']!.addAll([
+          'Cartas com CMC > 5', 'Criaturas defensivas', 'Removal lento'
+        ]);
+        recommendations['priority']!.addAll([
+          'Haste enablers', 'Anthems (+1/+1)', 'Card draw rápido'
+        ]);
+        break;
+      case 'control':
+        recommendations['avoid']!.addAll([
+          'Criaturas vanilla', 'Cartas agressivas sem utilidade'
+        ]);
+        recommendations['priority']!.addAll([
+          'Counters', 'Removal eficiente', 'Card advantage', 'Wipes'
+        ]);
+        break;
+      case 'combo':
+        recommendations['avoid']!.addAll([
+          'Cartas que não avançam o combo', 'Creatures irrelevantes'
+        ]);
+        recommendations['priority']!.addAll([
+          'Tutors', 'Proteção de combo', 'Card draw', 'Fast mana'
+        ]);
+        break;
+      case 'midrange':
+        recommendations['avoid']!.addAll([
+          'Cartas muito situacionais', 'Win-more cards'
+        ]);
+        recommendations['priority']!.addAll([
+          'Valor creatures', 'Flexible removal', 'Card advantage engines'
+        ]);
+        break;
+      default:
+        break;
+    }
+
+    // 5. Buscar staples por categoria (ramp, draw, removal) dinamicamente
+    if (colors.isNotEmpty) {
+      final rampStaples = await staplesService.getStaplesByCategory(
+        format: 'commander',
+        category: 'ramp',
+        colors: colors,
+        limit: 5,
+      );
+      recommendations['staples']!.addAll(rampStaples);
+
+      final drawStaples = await staplesService.getStaplesByCategory(
+        format: 'commander',
+        category: 'draw',
+        colors: colors,
+        limit: 5,
+      );
+      recommendations['staples']!.addAll(drawStaples);
+    }
+
+    // 6. Buscar hate cards para arquétipos comuns (via ArchetypeCountersService)
+    final countersService = ArchetypeCountersService(pool);
+    final commonArchetypes = ['graveyard', 'artifacts', 'combo', 'tokens'];
+    
+    for (final oppArchetype in commonArchetypes) {
+      final hateCards = await countersService.getHateCards(
+        archetype: oppArchetype,
+        colors: colors,
+        priorityMax: 1, // Apenas hate cards essenciais
+      );
+      
+      if (hateCards.isNotEmpty) {
+        recommendations['hate_$oppArchetype'] = hateCards.take(3).toList();
+      }
+    }
+
+    // Remove duplicatas mantendo a ordem
+    recommendations['staples'] = recommendations['staples']!.toSet().toList();
+
+  } catch (e) {
+    print('⚠️ Erro ao buscar recomendações dinâmicas: $e');
+    // Fallback mínimo em caso de erro
     recommendations['staples']!.addAll(['Sol Ring', 'Arcane Signet', 'Command Tower']);
   }
-  
-  // Lógica específica para Infect (que geralmente é Aggro/Combo)
-  if (archetype.toLowerCase().contains('infect')) {
-    // Busca staples de infect dinamicamente
-    final infectStaples = await _fetchScryfallCards('oracle:infect', 15);
-    recommendations['staples']!.addAll(infectStaples);
-    
-    // Busca pump spells se tiver verde
-    if (colors.contains('G')) {
-      final pumpSpells = await _fetchScryfallCards('function:pump-spell color:G', 10);
-      recommendations['priority']!.addAll(pumpSpells);
-    }
-    
-    recommendations['priority']!.addAll([
-      'Protection', 'Evasion (Unblockable/Flying)'
-    ]);
-    recommendations['avoid']!.addAll([
-      'Cartas de lifegain', 'Estratégias lentas', 'Cartas que dependem de dano normal'
-    ]);
-    return recommendations;
-  }
 
-  switch (archetype.toLowerCase()) {
-    case 'aggro':
-      recommendations['staples']!.addAll([
-        'Lightning Greaves', 'Swiftfoot Boots', 
-        'Jeska\'s Will', 'Deflecting Swat'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas com CMC > 5', 'Criaturas defensivas', 'Removal lento'
-      ]);
-      recommendations['priority']!.addAll([
-        'Haste enablers', 'Anthems (+1/+1)', 'Card draw rápido'
-      ]);
-      break;
-    case 'control':
-      recommendations['staples']!.addAll([
-        'Counterspell', 'Swords to Plowshares', 'Path to Exile',
-        'Cyclonic Rift', 'Teferi\'s Protection'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Criaturas vanilla', 'Cartas agressivas sem utilidade'
-      ]);
-      recommendations['priority']!.addAll([
-        'Counters', 'Removal eficiente', 'Card advantage', 'Wipes'
-      ]);
-      break;
-    case 'combo':
-      recommendations['staples']!.addAll([
-        'Demonic Tutor', 'Vampiric Tutor', 'Mystical Tutor',
-        'Rhystic Study', 'Necropotence'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas que não avançam o combo', 'Creatures irrelevantes'
-      ]);
-      recommendations['priority']!.addAll([
-        'Tutors', 'Proteção de combo', 'Card draw', 'Fast mana'
-      ]);
-      break;
-    case 'midrange':
-      recommendations['staples']!.addAll([
-        'Beast Within', 'Chaos Warp', 'Generous Gift',
-        'Skullclamp', 'The Great Henge'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas muito situacionais', 'Win-more cards'
-      ]);
-      recommendations['priority']!.addAll([
-        'Valor creatures', 'Flexible removal', 'Card advantage engines'
-      ]);
-      break;
-    default:
-      break;
-  }
-  
-  // Adicionar staples por cor
-  if (colors.contains('W')) {
-    recommendations['staples']!.addAll(['Swords to Plowshares', 'Path to Exile', 'Esper Sentinel']);
-  }
-  if (colors.contains('U')) {
-    recommendations['staples']!.addAll(['Counterspell', 'Cyclonic Rift', 'Rhystic Study']);
-  }
-  if (colors.contains('B')) {
-    recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge', 'Orcish Bowmasters']);
-  }
-  if (colors.contains('R')) {
-    // Removido Dockside Extortionist (Banido)
-    recommendations['staples']!.addAll(['Jeska\'s Will', 'Ragavan, Nimble Pilferer', 'Deflecting Swat']);
-  }
-  if (colors.contains('G')) {
-    recommendations['staples']!.addAll(['Nature\'s Lore', 'Three Visits', 'Birds of Paradise']);
-  }
-  
   return recommendations;
 }
 
@@ -418,7 +460,8 @@ Future<Response> onRequest(RequestContext context) async {
     final targetArchetype = archetype;
     final archetypeRecommendations = await getArchetypeRecommendations(
       targetArchetype, 
-      deckColors.toList()
+      deckColors.toList(),
+      pool, // Passar pool para busca dinâmica de staples
     );
 
     // 1.6 Fetch Meta Decks for Context (filtrado por arquétipo)

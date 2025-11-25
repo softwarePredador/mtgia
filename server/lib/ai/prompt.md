@@ -15,6 +15,13 @@ Candidatas Fracas (Data-Driven): Uma lista de cartas que o algoritmo identificou
 
 Pool de Sinergia: Uma lista de cartas extraída do Scryfall que combinam mecanicamente com o texto do Comandante. Use esta lista como prioridade para ADIÇÕES.
 
+FONTE DE DADOS DINÂMICA
+
+O sistema busca dados de três fontes para garantir informações sempre atualizadas:
+1. **Banco de Dados Local (format_staples):** Cache de staples sincronizado semanalmente via Scryfall API
+2. **Scryfall API (fallback):** Dados em tempo real quando o cache está desatualizado
+3. **Banlist Sincronizado:** Lista de cartas banidas atualizada automaticamente via sync_staples.dart
+
 DIRETRIZES DE OTIMIZAÇÃO (CHAIN OF THOUGHT)
 
 Ao analisar o deck, siga estritamente este processo mental:
@@ -64,7 +71,13 @@ Retorne APENAS um objeto JSON. Sem markdown, sem intro.
 
 REGRAS FINAIS DE SEGURANÇA
 
-NÃO SUGIRA CARTAS BANIDAS (Mana Crypt, Jeweled Lotus, Dockside Extortionist, Nadu).
+NÃO SUGIRA CARTAS BANIDAS. A lista de banidas é obtida dinamicamente via:
+- Tabela format_staples (is_banned = TRUE)
+- Tabela card_legalities (status = 'banned')
+- Scryfall API (-is:banned filter)
+
+Exemplos atuais de cartas banidas em Commander (lista atualizada automaticamente):
+- Mana Crypt, Jeweled Lotus, Dockside Extortionist, Nadu, Primeval Titan, etc.
 
 Se a lista de "Candidatas Fracas" contiver terrenos básicos, ignore-os. Não corte terrenos básicos a menos que esteja corrigindo a base de mana para Dual/Shock Lands.
 
