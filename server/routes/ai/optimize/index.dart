@@ -168,18 +168,69 @@ class DeckArchetypeAnalyzer {
   }
 }
 
+/// Busca cartas no Scryfall ordenadas por EDHREC (popularidade)
+Future<List<String>> _fetchScryfallCards(String query, int limit) async {
+  try {
+    // Adiciona filtro de commander e remove banidas automaticamente
+    final q = query.isEmpty ? 'format:commander -is:banned' : '$query format:commander -is:banned';
+    
+    final uri = Uri.https('api.scryfall.com', '/cards/search', {
+      'q': q,
+      'order': 'edhrec',
+    });
+    
+    final response = await http.get(uri);
+    
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> cards = data['data'];
+      return cards.take(limit).map<String>((c) => c['name'] as String).toList();
+    }
+  } catch (e) {
+    print('Erro ao buscar no Scryfall ($query): $e');
+  }
+  return [];
+}
+
 /// Gera recomendações específicas por arquétipo
-Map<String, List<String>> getArchetypeRecommendations(String archetype, List<String> colors) {
+Future<Map<String, List<String>>> getArchetypeRecommendations(String archetype, List<String> colors) async {
   final recommendations = <String, List<String>>{
     'staples': [],
     'avoid': [],
     'priority': [],
   };
   
-  // Staples universais
-  final universalStaples = ['Sol Ring', 'Arcane Signet', 'Command Tower'];
-  recommendations['staples']!.addAll(universalStaples);
+  // 1. Staples universais (Via API Scryfall - Sempre atualizado e sem banidas)
+  final universalStaples = await _fetchScryfallCards('', 20);
   
+  if (universalStaples.isNotEmpty) {
+    recommendations['staples']!.addAll(universalStaples);
+  } else {
+    // Fallback seguro (apenas cartas muito seguras)
+    recommendations['staples']!.addAll(['Sol Ring', 'Arcane Signet', 'Command Tower']);
+  }
+  
+  // Lógica específica para Infect (que geralmente é Aggro/Combo)
+  if (archetype.toLowerCase().contains('infect')) {
+    // Busca staples de infect dinamicamente
+    final infectStaples = await _fetchScryfallCards('oracle:infect', 15);
+    recommendations['staples']!.addAll(infectStaples);
+    
+    // Busca pump spells se tiver verde
+    if (colors.contains('G')) {
+      final pumpSpells = await _fetchScryfallCards('function:pump-spell color:G', 10);
+      recommendations['priority']!.addAll(pumpSpells);
+    }
+    
+    recommendations['priority']!.addAll([
+      'Protection', 'Evasion (Unblockable/Flying)'
+    ]);
+    recommendations['avoid']!.addAll([
+      'Cartas de lifegain', 'Estratégias lentas', 'Cartas que dependem de dano normal'
+    ]);
+    return recommendations;
+  }
+
   switch (archetype.toLowerCase()) {
     case 'aggro':
       recommendations['staples']!.addAll([
@@ -235,19 +286,20 @@ Map<String, List<String>> getArchetypeRecommendations(String archetype, List<Str
   
   // Adicionar staples por cor
   if (colors.contains('W')) {
-    recommendations['staples']!.addAll(['Swords to Plowshares', 'Path to Exile']);
+    recommendations['staples']!.addAll(['Swords to Plowshares', 'Path to Exile', 'Esper Sentinel']);
   }
   if (colors.contains('U')) {
-    recommendations['staples']!.addAll(['Counterspell', 'Cyclonic Rift']);
+    recommendations['staples']!.addAll(['Counterspell', 'Cyclonic Rift', 'Rhystic Study']);
   }
   if (colors.contains('B')) {
-    recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge']);
+    recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge', 'Orcish Bowmasters']);
   }
   if (colors.contains('R')) {
-    recommendations['staples']!.addAll(['Dockside Extortionist', 'Jeska\'s Will']);
+    // Removido Dockside Extortionist (Banido)
+    recommendations['staples']!.addAll(['Jeska\'s Will', 'Ragavan, Nimble Pilferer', 'Deflecting Swat']);
   }
   if (colors.contains('G')) {
-    recommendations['staples']!.addAll(['Nature\'s Lore', 'Three Visits']);
+    recommendations['staples']!.addAll(['Nature\'s Lore', 'Three Visits', 'Birds of Paradise']);
   }
   
   return recommendations;
@@ -293,9 +345,9 @@ Future<Response> onRequest(RequestContext context) async {
                COALESCE(
                  (SELECT SUM(
                    CASE 
-                     WHEN m ~ '^[0-9]+$' THEN m::int
-                     WHEN m IN ('W','U','B','R','G','C') THEN 1
-                     WHEN m = 'X' THEN 0
+                     WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                     WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                     WHEN m[1] = 'X' THEN 0
                      ELSE 1
                    END
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
@@ -353,7 +405,7 @@ Future<Response> onRequest(RequestContext context) async {
     
     // Usar arquétipo passado pelo usuário, mas incluir análise detectada para contexto
     final targetArchetype = archetype;
-    final archetypeRecommendations = getArchetypeRecommendations(
+    final archetypeRecommendations = await getArchetypeRecommendations(
       targetArchetype, 
       deckColors.toList()
     );
@@ -443,6 +495,8 @@ Future<Response> onRequest(RequestContext context) async {
     - **EQUILÍBRIO NUMÉRICO:** O número de cartas removidas DEVE SER IGUAL ao número de cartas adicionadas.
     - **FOCO NO ARQUÉTIPO:** Toda sugestão deve ser justificada pelo arquétipo $targetArchetype.
     - **EXPLICAÇÃO OBRIGATÓRIA:** O campo "reasoning" deve explicar as trocas no CONTEXTO do arquétipo.
+    - **PRESERVAR STAPLES:** NUNCA sugira remover staples de formato (ex: Mana Drain, Fetch Lands, Shock Lands, Tutors, Sol Ring, Mana Crypt) a menos que sejam ilegais no formato.
+    - **SEM DUPLICATAS:** Não sugira remover ou adicionar a mesma carta mais de uma vez.
     
     Formato JSON estrito:
     {
@@ -499,18 +553,18 @@ Future<Response> onRequest(RequestContext context) async {
       final allSuggestions = [...sanitizedRemovals, ...sanitizedAdditions];
       final validation = await validationService.validateCardNames(allSuggestions);
       
-      // Filtrar apenas cartas válidas
+      // Filtrar apenas cartas válidas e remover duplicatas
       final validRemovals = sanitizedRemovals.where((name) {
         return (validation['valid'] as List).any((card) => 
           (card['name'] as String).toLowerCase() == name.toLowerCase()
         );
-      }).toList();
+      }).toSet().toList();
       
       final validAdditions = sanitizedAdditions.where((name) {
         return (validation['valid'] as List).any((card) => 
           (card['name'] as String).toLowerCase() == name.toLowerCase()
         );
-      }).toList();
+      }).toSet().toList();
       
       // Preparar resposta com avisos sobre cartas inválidas
       final invalidCards = validation['invalid'] as List<String>;

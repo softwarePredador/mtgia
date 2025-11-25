@@ -288,8 +288,12 @@ class DeckProvider extends ChangeNotifier {
     required List<String> cardsToAdd,
   }) async {
     try {
+      debugPrint('🔄 [DeckProvider] Iniciando otimização do deck $deckId');
+      debugPrint('📋 [DeckProvider] Remover: ${cardsToRemove.length} cartas | Adicionar: ${cardsToAdd.length} cartas');
+
       // 1. Buscar o deck atual para pegar a lista de cartas
       if (_selectedDeck == null || _selectedDeck!.id != deckId) {
+        debugPrint('📥 [DeckProvider] Buscando detalhes do deck...');
         await fetchDeckDetails(deckId);
       }
       
@@ -320,66 +324,89 @@ class DeckProvider extends ChangeNotifier {
         }
       }
 
-      // 3. Buscar IDs das cartas a adicionar pelo nome
+      // 3. Buscar IDs das cartas a adicionar pelo nome (EM PARALELO)
+      debugPrint('🔍 [DeckProvider] Buscando IDs das cartas a adicionar...');
       final cardsToAddIds = <Map<String, dynamic>>[];
       
-      for (final cardName in cardsToAdd) {
+      final addFutures = cardsToAdd.map((cardName) async {
         try {
-          // Buscar carta pelo nome na API
+          debugPrint('  🔎 Buscando: $cardName');
           final searchResponse = await _apiClient.get('/cards?name=$cardName&limit=1');
           
-          if (searchResponse.statusCode == 200 && searchResponse.data is List) {
-            final results = searchResponse.data as List;
+          if (searchResponse.statusCode == 200) {
+             // Verifica se o corpo da resposta é um Map com chave 'data' (formato paginado) ou Lista direta
+             List results = [];
+             if (searchResponse.data is Map && searchResponse.data['data'] is List) {
+               results = searchResponse.data['data'] as List;
+             } else if (searchResponse.data is List) {
+               results = searchResponse.data as List;
+             }
+
             if (results.isNotEmpty) {
               final card = results[0] as Map<String, dynamic>;
-              cardsToAddIds.add({
+              debugPrint('  ✅ Encontrado: $cardName -> ${card['id']}');
+              return {
                 'card_id': card['id'],
                 'quantity': 1,
                 'is_commander': false,
-              });
+              };
+            } else {
+              debugPrint('  ❌ Não encontrado: $cardName');
             }
           }
         } catch (e) {
-          // Se não conseguir encontrar a carta, ignora
-          if (kDebugMode) {
-            debugPrint('Erro ao buscar carta $cardName: $e');
-          }
+          debugPrint('  ⚠️ Erro ao buscar $cardName: $e');
         }
-      }
+        return null;
+      });
 
-      // 4. Buscar IDs das cartas a remover pelo nome
+      final addResults = await Future.wait(addFutures);
+      cardsToAddIds.addAll(addResults.whereType<Map<String, dynamic>>());
+
+      // 4. Buscar IDs das cartas a remover pelo nome (EM PARALELO)
+      debugPrint('🔍 [DeckProvider] Buscando IDs das cartas a remover...');
       final cardsToRemoveIds = <String>{};
       
-      for (final cardName in cardsToRemove) {
+      final removeFutures = cardsToRemove.map((cardName) async {
         try {
+          debugPrint('  🔎 Buscando para remover: $cardName');
           final searchResponse = await _apiClient.get('/cards?name=$cardName&limit=1');
           
-          if (searchResponse.statusCode == 200 && searchResponse.data is List) {
-            final results = searchResponse.data as List;
+          if (searchResponse.statusCode == 200) {
+             List results = [];
+             if (searchResponse.data is Map && searchResponse.data['data'] is List) {
+               results = searchResponse.data['data'] as List;
+             } else if (searchResponse.data is List) {
+               results = searchResponse.data as List;
+             }
+
             if (results.isNotEmpty) {
               final card = results[0] as Map<String, dynamic>;
-              cardsToRemoveIds.add(card['id'] as String);
+              debugPrint('  ✅ Encontrado para remoção: $cardName -> ${card['id']}');
+              return card['id'] as String;
             }
           }
         } catch (e) {
-          if (kDebugMode) {
-            debugPrint('Erro ao buscar carta $cardName: $e');
-          }
+          debugPrint('  ⚠️ Erro ao buscar $cardName: $e');
         }
-      }
+        return null;
+      });
+
+      final removeResults = await Future.wait(removeFutures);
+      cardsToRemoveIds.addAll(removeResults.whereType<String>());
 
       // 5. Remover as cartas da lista atual
+      debugPrint('✂️ [DeckProvider] Removendo ${cardsToRemoveIds.length} cartas...');
       currentCards.removeWhere((key, value) => cardsToRemoveIds.contains(key));
 
       // 6. Adicionar as novas cartas
+      debugPrint('➕ [DeckProvider] Adicionando ${cardsToAddIds.length} cartas...');
       for (final cardToAdd in cardsToAddIds) {
         final cardId = cardToAdd['card_id'] as String;
         
-        // Se a carta já existe, aumenta a quantidade (até o limite)
         if (currentCards.containsKey(cardId)) {
           final existing = currentCards[cardId]!;
           final newQuantity = (existing['quantity'] as int) + 1;
-          // Limite básico (não aplica regras complexas aqui)
           if (newQuantity <= 4) {
             currentCards[cardId] = {
               ...existing,
@@ -392,18 +419,20 @@ class DeckProvider extends ChangeNotifier {
       }
 
       // 7. Atualizar o deck via API
+      debugPrint('💾 [DeckProvider] Salvando alterações no servidor...');
       final response = await _apiClient.put('/decks/$deckId', {
         'cards': currentCards.values.toList(),
       });
 
       if (response.statusCode == 200) {
-        // Recarregar os detalhes do deck
+        debugPrint('✅ [DeckProvider] Deck atualizado com sucesso!');
         await fetchDeckDetails(deckId);
         return true;
       } else {
         throw Exception('Falha ao atualizar deck: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('❌ [DeckProvider] Erro fatal na otimização: $e');
       rethrow;
     }
   }
