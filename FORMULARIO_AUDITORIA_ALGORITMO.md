@@ -450,20 +450,39 @@ final rank = (card['edhrec_rank'] as int?) ?? medianRank;
 
 | Staple | Protegido pelo sistema? | Como? |
 |--------|-------------------------|-------|
-| Sol Ring | ☑ Sim | EDHREC Rank 1 → Score baixíssimo |
-| Mana Crypt | ☑ Sim (mas banido) | Rank ~10 → Score baixo |
+| Sol Ring | ☑ Sim | EDHREC Rank 1 → Score baixíssimo + Tabela format_staples |
+| Mana Crypt | ☑ Sim (banido) | is_banned = TRUE na format_staples |
 | Rhystic Study | ☑ Sim | Rank ~5 → Score baixo |
 | Demonic Tutor | ☑ Sim | Rank ~15 → Score baixo |
 
 **Existe uma lista hardcoded de staples protegidos?** 
-- [x] Sim → No prompt da IA: `server/lib/ai/prompt.md` linha 67
-- Também no prompt dinâmico: `ai/optimize/index.dart` linhas 498
+- [x] ~~Sim~~ **ATUALIZADO (v1.3):** Agora usa tabela `format_staples` dinâmica
+- A tabela é sincronizada semanalmente via `bin/sync_staples.dart`
+- Fallback para Scryfall API em tempo real se dados estiverem desatualizados
 
-**Proteção no Prompt:**
+**Novo Fluxo de Proteção de Staples (v1.3):**
+```dart
+// lib/format_staples_service.dart - FormatStaplesService
+// Busca staples de duas fontes:
+// 1. Banco de dados local (format_staples) - Mais rápido, cache 24h
+// 2. Scryfall API - Fallback quando DB desatualizado
+
+final staplesService = FormatStaplesService(pool);
+final staples = await staplesService.getStaples(
+  format: 'commander',
+  colors: ['U', 'B'],
+  archetype: 'control',
+);
+// Retorna lista dinâmica de staples do formato/cores/arquétipo
+```
+
+**Proteção no Prompt (Atualizada):**
 ```markdown
 // lib/ai/prompt.md - REGRAS FINAIS DE SEGURANÇA
-REGRA: NUNCA sugira remover staples de formato (ex: Mana Drain, Fetch Lands, 
-Shock Lands, Tutors, Sol Ring, Mana Crypt) a menos que sejam ilegais no formato.
+REGRA: NÃO SUGIRA CARTAS BANIDAS. A lista de banidas é obtida dinamicamente via:
+- Tabela format_staples (is_banned = TRUE)
+- Tabela card_legalities (status = 'banned')
+- Scryfall API (-is:banned filter)
 ```
 
 **Proteção Adicional - Terrenos Básicos:**
@@ -481,25 +500,43 @@ if ((card['type_line'] as String).contains('Basic Land')) {
 
 **P3.2.1:** Qual é a **fórmula** para decidir que uma carta é "BOA/STAPLE"?
 
-**Fórmula atual:**
+**Fórmula atual (ATUALIZADO v1.3):**
 ```dart
-// Não há fórmula explícita de "staple_score" no código.
-// As sugestões vêm de:
+// NOVA IMPLEMENTAÇÃO: Staples são buscados dinamicamente
 
-// 1. Scryfall API ordenado por popularidade EDHREC:
-// lib/ai/sinergia.dart - searchScryfall()
+// 1. Primeiro tenta buscar do banco de dados (tabela format_staples)
+//    lib/format_staples_service.dart - FormatStaplesService._getStaplesFromDB()
+final dbStaples = await _getStaplesFromDB(
+  format: format,
+  colors: colors,
+  archetype: archetype,
+  limit: limit,
+);
+
+// 2. Se DB estiver desatualizado (>24h), busca do Scryfall API
+//    lib/format_staples_service.dart - FormatStaplesService._getStaplesFromScryfall()
 final uri = Uri.https('api.scryfall.com', '/cards/search', {
-  'q': finalQuery,
+  'q': 'format:commander id<=${colors.join('')} -is:banned',
   'order': 'edhrec',  // ← Ordenação por popularidade
 });
 
-// 2. Listas hardcoded por arquétipo:
-// routes/ai/optimize/index.dart - getArchetypeRecommendations()
-case 'control':
-  recommendations['staples']!.addAll([
-    'Counterspell', 'Swords to Plowshares', 'Path to Exile',
-    'Cyclonic Rift', 'Teferi\'s Protection'
-  ]);
+// 3. Tabela format_staples é sincronizada semanalmente via:
+//    bin/sync_staples.dart
+// Sincroniza Top 100 staples universais + Top 50 por arquétipo + Top 30 por cor
+```
+
+**Estrutura da Tabela format_staples:**
+```sql
+CREATE TABLE format_staples (
+    card_name TEXT NOT NULL,
+    format TEXT NOT NULL,
+    archetype TEXT,           -- NULL = universal
+    color_identity TEXT[],
+    edhrec_rank INTEGER,
+    category TEXT,            -- 'ramp', 'draw', 'removal', 'staple'
+    is_banned BOOLEAN,        -- Atualizado automaticamente
+    last_synced_at TIMESTAMP
+);
 ```
 
 ---
@@ -620,11 +657,26 @@ if (text.contains('destroy all') || text.contains('exile all')) {
 
 | Fonte | Usado? | Prioridade |
 |-------|--------|------------|
-| Listas hardcoded no código | ☑ Sim | Fallback (quando Scryfall falha) |
-| Query dinâmica no Scryfall API | ☑ Sim | Principal |
+| Tabela `format_staples` (NOVO v1.3) | ☑ Sim | **Principal** (cache local) |
+| Query dinâmica no Scryfall API | ☑ Sim | Fallback (quando DB > 24h) |
+| Listas hardcoded no código | ☑ **Removido** | ~~Fallback~~ → Apenas Sol Ring/Arcane Signet/Command Tower como fallback mínimo |
 | Banco de dados interno (tabela `cards`) | ☑ Sim | Validação pós-sugestão |
 | Meta decks (tabela `meta_decks`) | ☑ Sim | Contexto adicional |
 | OpenAI (GPT) com liberdade criativa | ☑ Sim | Decisão final |
+
+**Novo Fluxo de Sugestões (v1.3):**
+```
+1. FormatStaplesService.getStaples()
+   ├── Tenta buscar de format_staples (DB local)
+   │   └── Se dados frescos (<24h): Retorna do cache
+   └── Fallback: Busca Scryfall API em tempo real
+       └── Ordena por EDHREC rank (popularidade)
+
+2. SynergyEngine.fetchCommanderSynergies()
+   └── Busca cartas que combinam com o comandante
+
+3. OpenAI combina tudo e toma decisão final
+```
 
 ---
 
@@ -1151,6 +1203,8 @@ case 'aggro':
    - Fallbacks múltiplos no parsing de cartas
    - Double-check de banlist (Scryfall + DB local)
    - Sistema de arquétipo com confiança
+   - ✅ (v1.3) Staples dinâmicos via FormatStaplesService
+   - ✅ (v1.3) Sincronização automática de banlist
 
 3. PONTOS FRACOS:
    - Fórmula de weakness_score muito simples (só EDHREC + CMC)
@@ -1158,13 +1212,20 @@ case 'aggro':
    - Threshold de arquétipo hardcoded (deveria ser ML)
    - Não há simulação de mãos iniciais (Monte Carlo)
 
-4. PRÓXIMAS MELHORIAS SUGERIDAS:
+4. MELHORIAS IMPLEMENTADAS (v1.3):
+   - ✅ Staples dinâmicos em vez de hardcoded (FormatStaplesService)
+   - ✅ Tabela format_staples para cache de staples por formato/arquétipo
+   - ✅ Script sync_staples.dart para sincronização semanal via Scryfall
+   - ✅ Banlist dinâmico sincronizado automaticamente
+   - ✅ Tabela sync_log para auditoria de atualizações
+
+5. PRÓXIMAS MELHORIAS SUGERIDAS:
    - Implementar Levenshtein distance para fuzzy match
    - Adicionar campo `synergy_with_commander` no score
    - Treinar modelo de ML para detecção de arquétipo
    - Implementar simulador de Goldfish (mãos iniciais)
 
-5. SEGURANÇA:
+6. SEGURANÇA:
    - API key da OpenAI vem de .env (correto)
    - Rate limiting implementado em endpoints sensíveis
    - Sanitização de nomes de cartas antes de queries SQL
@@ -1188,10 +1249,23 @@ Assinatura: _______________
 
 _Este formulário deve ser revisado sempre que houver mudanças significativas nos algoritmos de otimização._
 
-**Versão do Formulário:** 1.2  
+**Versão do Formulário:** 1.3  
 **Última Atualização:** 25 de Novembro de 2025  
 
 **Changelog:**
+- v1.3: **MAJOR** - Sistema de Staples Dinâmicos
+  - ✅ Criada tabela `format_staples` para armazenar staples por formato/arquétipo/cor
+  - ✅ Criada tabela `sync_log` para auditoria de sincronizações
+  - ✅ Implementado `FormatStaplesService` para busca dinâmica de staples
+  - ✅ Implementado script `bin/sync_staples.dart` para sincronização semanal via Scryfall
+  - ✅ Removidas listas hardcoded de staples em `routes/ai/optimize/index.dart`
+  - ✅ Atualizado `lib/ai/prompt.md` para referenciar banlist dinâmico
+  - ✅ Banlist agora é sincronizado automaticamente via `is_banned` flag
+  - **Por que essa mudança?**
+    - Listas hardcoded ficam desatualizadas quando há bans (ex: Mana Crypt, Nadu)
+    - Scryfall API é a fonte de verdade para popularidade (EDHREC rank)
+    - Cache local (24h) evita sobrecarga na API e melhora performance
+    - Script de sync pode ser executado via cron job semanal
 - v1.2: Implementação das correções identificadas na auditoria
   - ✅ CMC híbrido corrigido (`{2/W}` → 2)
   - ✅ Contagem de tipos múltiplos (Artifact Creature conta para ambos)
@@ -1201,7 +1275,14 @@ _Este formulário deve ser revisado sempre que houver mudanças significativas n
 - v1.1: Preenchimento completo do formulário com dados do codebase
 - v1.0: Template inicial do formulário
 
-**Arquivos Modificados:**
+**Arquivos Modificados (v1.3):**
+- `server/database_setup.sql` - Tabelas format_staples e sync_log
+- `server/bin/sync_staples.dart` - Script de sincronização (NOVO)
+- `server/lib/format_staples_service.dart` - Serviço de staples dinâmicos (NOVO)
+- `server/routes/ai/optimize/index.dart` - Usa FormatStaplesService
+- `server/lib/ai/prompt.md` - Banlist dinâmico
+
+**Arquivos Modificados (v1.2):**
 - `server/routes/import/index.dart` - Validação de comandante
 - `server/routes/decks/[id]/analysis/index.dart` - CMC híbrido
 - `server/routes/ai/optimize/index.dart` - Contagem de tipos + Battle
@@ -1215,3 +1296,18 @@ _Este formulário deve ser revisado sempre que houver mudanças significativas n
 - `server/lib/ai/sinergia.dart`
 - `server/lib/ai/prompt.md`
 - `server/lib/card_validation_service.dart`
+- `server/lib/format_staples_service.dart` (NOVO)
+- `server/bin/sync_staples.dart` (NOVO)
+
+**Instruções para Sincronização de Staples:**
+```bash
+# Sincronizar apenas Commander (recomendado para primeira execução)
+dart run bin/sync_staples.dart commander
+
+# Sincronizar todos os formatos
+dart run bin/sync_staples.dart ALL
+
+# Configurar cron job para sincronização semanal (Linux)
+# Toda segunda-feira às 3h da manhã:
+0 3 * * 1 cd /path/to/server && dart run bin/sync_staples.dart ALL >> /var/log/mtg_sync.log 2>&1
+```

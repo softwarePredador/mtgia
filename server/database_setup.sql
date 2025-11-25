@@ -114,3 +114,43 @@ CREATE TABLE IF NOT EXISTS meta_decks (
     placement TEXT, -- Posição no torneio (ex: '1', 'Top 8')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
+-- Armazena as cartas mais populares de cada formato, atualizada semanalmente
+-- Para evitar hardcoded staples e manter dados sempre atualizados
+CREATE TABLE IF NOT EXISTS format_staples (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_name TEXT NOT NULL,              -- Nome exato da carta (ex: 'Sol Ring')
+    format TEXT NOT NULL,                  -- 'commander', 'standard', 'modern', etc.
+    archetype TEXT,                        -- 'aggro', 'control', 'combo', 'midrange', NULL = universal
+    color_identity TEXT[],                 -- Cores da carta: {'W'}, {'U', 'B'}, etc. NULL = incolor/universal
+    edhrec_rank INTEGER,                   -- Rank EDHREC (1 = mais popular)
+    category TEXT,                         -- 'ramp', 'draw', 'removal', 'staple', 'finisher', etc.
+    scryfall_id UUID,                      -- ID da carta no Scryfall para referência
+    is_banned BOOLEAN DEFAULT FALSE,       -- Se foi banida recentemente (atualizado via sync)
+    last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(card_name, format, archetype)   -- Evita duplicatas por formato/arquétipo
+);
+
+-- Índices para busca eficiente de staples
+CREATE INDEX IF NOT EXISTS idx_format_staples_format ON format_staples (format);
+CREATE INDEX IF NOT EXISTS idx_format_staples_archetype ON format_staples (archetype);
+CREATE INDEX IF NOT EXISTS idx_format_staples_color ON format_staples USING GIN (color_identity);
+CREATE INDEX IF NOT EXISTS idx_format_staples_category ON format_staples (category);
+CREATE INDEX IF NOT EXISTS idx_format_staples_rank ON format_staples (edhrec_rank);
+
+-- 11. Tabela de Histórico de Sincronização (Log de Atualizações)
+-- Registra quando os dados foram sincronizados para auditoria e debugging
+CREATE TABLE IF NOT EXISTS sync_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sync_type TEXT NOT NULL,               -- 'staples', 'banlist', 'meta', 'prices'
+    format TEXT,                           -- Formato sincronizado (NULL = todos)
+    records_updated INTEGER DEFAULT 0,     -- Quantidade de registros atualizados
+    records_inserted INTEGER DEFAULT 0,    -- Quantidade de registros inseridos
+    records_deleted INTEGER DEFAULT 0,     -- Quantidade de registros removidos (bans)
+    status TEXT NOT NULL,                  -- 'success', 'partial', 'failed'
+    error_message TEXT,                    -- Mensagem de erro se houver
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP WITH TIME ZONE
+);
