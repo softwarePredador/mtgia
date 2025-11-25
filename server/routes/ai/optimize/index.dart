@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
+import '../../../lib/format_staples_service.dart';
+import '../../../lib/archetype_counters_service.dart';
 
 /// Classe para análise de arquétipo do deck
 /// Implementa detecção automática baseada em curva de mana, tipos de cartas e cores
@@ -34,6 +36,7 @@ class DeckArchetypeAnalyzer {
   }
   
   /// Conta cartas por tipo
+  /// Agora conta tipos múltiplos (ex: Artifact Creature conta para ambos)
   Map<String, int> countCardTypes() {
     final counts = <String, int>{
       'creatures': 0,
@@ -43,27 +46,37 @@ class DeckArchetypeAnalyzer {
       'artifacts': 0,
       'planeswalkers': 0,
       'lands': 0,
+      'battles': 0,
     };
     
     for (final card in cards) {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       
-      // Sistema de prioridade: cada carta é contada apenas uma vez em seu tipo principal
-      // Prioridade: Land > Creature > Planeswalker > Instant > Sorcery > Artifact > Enchantment
+      // Conta TODOS os tipos presentes na carta (não apenas o principal)
+      // Isso permite estatísticas mais precisas para arquétipos
       if (typeLine.contains('land')) {
         counts['lands'] = counts['lands']! + 1;
-      } else if (typeLine.contains('creature')) {
+      }
+      if (typeLine.contains('creature')) {
         counts['creatures'] = counts['creatures']! + 1;
-      } else if (typeLine.contains('planeswalker')) {
+      }
+      if (typeLine.contains('planeswalker')) {
         counts['planeswalkers'] = counts['planeswalkers']! + 1;
-      } else if (typeLine.contains('instant')) {
+      }
+      if (typeLine.contains('instant')) {
         counts['instants'] = counts['instants']! + 1;
-      } else if (typeLine.contains('sorcery')) {
+      }
+      if (typeLine.contains('sorcery')) {
         counts['sorceries'] = counts['sorceries']! + 1;
-      } else if (typeLine.contains('artifact')) {
+      }
+      if (typeLine.contains('artifact')) {
         counts['artifacts'] = counts['artifacts']! + 1;
-      } else if (typeLine.contains('enchantment')) {
+      }
+      if (typeLine.contains('enchantment')) {
         counts['enchantments'] = counts['enchantments']! + 1;
+      }
+      if (typeLine.contains('battle')) {
+        counts['battles'] = counts['battles']! + 1;
       }
     }
     
@@ -114,11 +127,94 @@ class DeckArchetypeAnalyzer {
     return 'midrange';
   }
   
+  /// Analisa a base de mana (Devotion vs Sources)
+  Map<String, dynamic> analyzeManaBase() {
+    final manaSymbols = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0};
+    final landSources = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'Any': 0};
+    
+    // 1. Contar símbolos de mana nas cartas (Devotion)
+    for (final card in cards) {
+      final manaCost = (card['mana_cost'] as String?) ?? '';
+      for (final color in manaSymbols.keys) {
+        manaSymbols[color] = manaSymbols[color]! + manaCost.split(color).length - 1;
+      }
+    }
+    
+    // 2. Contar fontes de mana nos terrenos (Heurística melhorada via Oracle Text)
+    for (final card in cards) {
+      final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+      if (typeLine.contains('land')) {
+        final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];
+        final oracleText = ((card['oracle_text'] as String?) ?? '').toLowerCase();
+        
+        // Detecção de Rainbow Lands via texto (sem hardcode de nomes)
+        if (oracleText.contains('add one mana of any color') || 
+            oracleText.contains('add one mana of any type')) {
+           landSources['Any'] = landSources['Any']! + 1;
+        } 
+        // Detecção de Fetch Lands (simplificada)
+        else if (oracleText.contains('search your library for') && 
+                 (oracleText.contains('plains') || oracleText.contains('island') || 
+                  oracleText.contains('swamp') || oracleText.contains('mountain') || 
+                  oracleText.contains('forest'))) {
+           // Fetch lands contam como "Any" das cores que buscam, mas para simplificar a heurística
+           // e evitar complexidade excessiva, vamos considerar como "Any" se buscar 2+ tipos,
+           // ou contar especificamente se for simples.
+           // Por segurança, Fetchs genéricas contam como Any no contexto de correção de cor.
+           landSources['Any'] = landSources['Any']! + 1;
+        }
+        else if (cardColors.isEmpty) {
+           // Terrenos incolores que não são rainbow nem fetch (ex: Reliquary Tower)
+           // Não contam para cores.
+        } else {
+          for (final color in cardColors) {
+            if (landSources.containsKey(color)) {
+              landSources[color] = landSources[color]! + 1;
+            }
+          }
+        }
+      }
+    }
+    
+    return {
+      'symbols': manaSymbols,
+      'sources': landSources,
+      'assessment': _assessManaBase(manaSymbols, landSources),
+    };
+  }
+
+  String _assessManaBase(Map<String, int> symbols, Map<String, int> sources) {
+    final totalSymbols = symbols.values.reduce((a, b) => a + b);
+    if (totalSymbols == 0) return 'N/A';
+    
+    final issues = <String>[];
+    
+    symbols.forEach((color, count) {
+      if (count > 0) {
+        final percent = count / totalSymbols;
+        final sourceCount = sources[color]! + sources['Any']!;
+        
+        // Regra de Frank Karsten (simplificada):
+        // Para castar consistentemente spells de uma cor, você precisa de X fontes.
+        // Se a cor representa > 30% dos símbolos, precisa de pelo menos 15 fontes.
+        if (percent > 0.30 && sourceCount < 15) {
+          issues.add('Falta mana $color (Tem $sourceCount fontes, ideal > 15)');
+        } else if (percent > 0.10 && sourceCount < 10) {
+          issues.add('Falta mana $color (Tem $sourceCount fontes, ideal > 10)');
+        }
+      }
+    });
+    
+    if (issues.isEmpty) return 'Base de mana equilibrada';
+    return issues.join('. ');
+  }
+  
   /// Gera descrição da análise do deck
   Map<String, dynamic> generateAnalysis() {
     final avgCMC = calculateAverageCMC();
     final typeCounts = countCardTypes();
     final detectedArchetype = detectArchetype();
+    final manaAnalysis = analyzeManaBase();
     
     return {
       'detected_archetype': detectedArchetype,
@@ -126,6 +222,7 @@ class DeckArchetypeAnalyzer {
       'type_distribution': typeCounts,
       'total_cards': cards.length,
       'mana_curve_assessment': _assessManaCurve(avgCMC, detectedArchetype),
+      'mana_base_assessment': manaAnalysis['assessment'],
       'archetype_confidence': _calculateConfidence(avgCMC, typeCounts, detectedArchetype),
     };
   }
@@ -193,115 +290,155 @@ Future<List<String>> _fetchScryfallCards(String query, int limit) async {
 }
 
 /// Gera recomendações específicas por arquétipo
-Future<Map<String, List<String>>> getArchetypeRecommendations(String archetype, List<String> colors) async {
+/// ATUALIZADO: Agora usa FormatStaplesService para buscar dados dinâmicos do banco/Scryfall
+/// Evita hardcoded staples e mantém dados sempre atualizados
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors,
+  Pool pool,
+) async {
   final recommendations = <String, List<String>>{
     'staples': [],
     'avoid': [],
     'priority': [],
   };
-  
-  // 1. Staples universais (Via API Scryfall - Sempre atualizado e sem banidas)
-  final universalStaples = await _fetchScryfallCards('', 20);
-  
-  if (universalStaples.isNotEmpty) {
-    recommendations['staples']!.addAll(universalStaples);
-  } else {
-    // Fallback seguro (apenas cartas muito seguras)
+
+  final staplesService = FormatStaplesService(pool);
+
+  try {
+    // 1. Buscar staples universais do formato (via DB ou Scryfall API)
+    final universalStaples = await staplesService.getStaples(
+      format: 'commander',
+      colors: colors,
+      limit: 20,
+    );
+
+    if (universalStaples.isNotEmpty) {
+      recommendations['staples']!.addAll(
+        universalStaples.map((s) => s['name'] as String)
+      );
+    } else {
+      // Fallback mínimo apenas se ambos DB e Scryfall falharem
+      recommendations['staples']!.addAll(['Sol Ring', 'Arcane Signet', 'Command Tower']);
+    }
+
+    // 2. Buscar staples específicos do arquétipo (via DB ou Scryfall API)
+    final archetypeStaples = await staplesService.getStaples(
+      format: 'commander',
+      colors: colors,
+      archetype: archetype.toLowerCase(),
+      limit: 15,
+    );
+
+    if (archetypeStaples.isNotEmpty) {
+      recommendations['staples']!.addAll(
+        archetypeStaples.map((s) => s['name'] as String)
+      );
+    }
+
+    // 3. Lógica específica para Infect (geralmente é Aggro/Combo)
+    if (archetype.toLowerCase().contains('infect')) {
+      // Busca staples de infect dinamicamente via Scryfall
+      final infectStaples = await _fetchScryfallCards('oracle:infect', 15);
+      recommendations['staples']!.addAll(infectStaples);
+
+      if (colors.contains('G')) {
+        final pumpSpells = await _fetchScryfallCards('function:pump-spell color:G', 10);
+        recommendations['priority']!.addAll(pumpSpells);
+      }
+
+      recommendations['priority']!.addAll([
+        'Protection', 'Evasion (Unblockable/Flying)'
+      ]);
+      recommendations['avoid']!.addAll([
+        'Cartas de lifegain', 'Estratégias lentas', 'Cartas que dependem de dano normal'
+      ]);
+      return recommendations;
+    }
+
+    // 4. Recomendações de "avoid" e "priority" por arquétipo
+    // Estas são heurísticas de estratégia, não listas de cartas específicas
+    switch (archetype.toLowerCase()) {
+      case 'aggro':
+        recommendations['avoid']!.addAll([
+          'Cartas com CMC > 5', 'Criaturas defensivas', 'Removal lento'
+        ]);
+        recommendations['priority']!.addAll([
+          'Haste enablers', 'Anthems (+1/+1)', 'Card draw rápido'
+        ]);
+        break;
+      case 'control':
+        recommendations['avoid']!.addAll([
+          'Criaturas vanilla', 'Cartas agressivas sem utilidade'
+        ]);
+        recommendations['priority']!.addAll([
+          'Counters', 'Removal eficiente', 'Card advantage', 'Wipes'
+        ]);
+        break;
+      case 'combo':
+        recommendations['avoid']!.addAll([
+          'Cartas que não avançam o combo', 'Creatures irrelevantes'
+        ]);
+        recommendations['priority']!.addAll([
+          'Tutors', 'Proteção de combo', 'Card draw', 'Fast mana'
+        ]);
+        break;
+      case 'midrange':
+        recommendations['avoid']!.addAll([
+          'Cartas muito situacionais', 'Win-more cards'
+        ]);
+        recommendations['priority']!.addAll([
+          'Valor creatures', 'Flexible removal', 'Card advantage engines'
+        ]);
+        break;
+      default:
+        break;
+    }
+
+    // 5. Buscar staples por categoria (ramp, draw, removal) dinamicamente
+    if (colors.isNotEmpty) {
+      final rampStaples = await staplesService.getStaplesByCategory(
+        format: 'commander',
+        category: 'ramp',
+        colors: colors,
+        limit: 5,
+      );
+      recommendations['staples']!.addAll(rampStaples);
+
+      final drawStaples = await staplesService.getStaplesByCategory(
+        format: 'commander',
+        category: 'draw',
+        colors: colors,
+        limit: 5,
+      );
+      recommendations['staples']!.addAll(drawStaples);
+    }
+
+    // 6. Buscar hate cards para arquétipos comuns (via ArchetypeCountersService)
+    final countersService = ArchetypeCountersService(pool);
+    final commonArchetypes = ['graveyard', 'artifacts', 'combo', 'tokens'];
+    
+    for (final oppArchetype in commonArchetypes) {
+      final hateCards = await countersService.getHateCards(
+        archetype: oppArchetype,
+        colors: colors,
+        priorityMax: 1, // Apenas hate cards essenciais
+      );
+      
+      if (hateCards.isNotEmpty) {
+        recommendations['hate_$oppArchetype'] = hateCards.take(3).toList();
+      }
+    }
+
+    // Remove duplicatas mantendo a ordem
+    recommendations['staples'] = recommendations['staples']!.toSet().toList();
+
+  } catch (e) {
+    print('⚠️ Erro ao buscar recomendações dinâmicas: $e');
+    // Fallback mínimo em caso de erro
     recommendations['staples']!.addAll(['Sol Ring', 'Arcane Signet', 'Command Tower']);
   }
-  
-  // Lógica específica para Infect (que geralmente é Aggro/Combo)
-  if (archetype.toLowerCase().contains('infect')) {
-    // Busca staples de infect dinamicamente
-    final infectStaples = await _fetchScryfallCards('oracle:infect', 15);
-    recommendations['staples']!.addAll(infectStaples);
-    
-    // Busca pump spells se tiver verde
-    if (colors.contains('G')) {
-      final pumpSpells = await _fetchScryfallCards('function:pump-spell color:G', 10);
-      recommendations['priority']!.addAll(pumpSpells);
-    }
-    
-    recommendations['priority']!.addAll([
-      'Protection', 'Evasion (Unblockable/Flying)'
-    ]);
-    recommendations['avoid']!.addAll([
-      'Cartas de lifegain', 'Estratégias lentas', 'Cartas que dependem de dano normal'
-    ]);
-    return recommendations;
-  }
 
-  switch (archetype.toLowerCase()) {
-    case 'aggro':
-      recommendations['staples']!.addAll([
-        'Lightning Greaves', 'Swiftfoot Boots', 
-        'Jeska\'s Will', 'Deflecting Swat'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas com CMC > 5', 'Criaturas defensivas', 'Removal lento'
-      ]);
-      recommendations['priority']!.addAll([
-        'Haste enablers', 'Anthems (+1/+1)', 'Card draw rápido'
-      ]);
-      break;
-    case 'control':
-      recommendations['staples']!.addAll([
-        'Counterspell', 'Swords to Plowshares', 'Path to Exile',
-        'Cyclonic Rift', 'Teferi\'s Protection'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Criaturas vanilla', 'Cartas agressivas sem utilidade'
-      ]);
-      recommendations['priority']!.addAll([
-        'Counters', 'Removal eficiente', 'Card advantage', 'Wipes'
-      ]);
-      break;
-    case 'combo':
-      recommendations['staples']!.addAll([
-        'Demonic Tutor', 'Vampiric Tutor', 'Mystical Tutor',
-        'Rhystic Study', 'Necropotence'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas que não avançam o combo', 'Creatures irrelevantes'
-      ]);
-      recommendations['priority']!.addAll([
-        'Tutors', 'Proteção de combo', 'Card draw', 'Fast mana'
-      ]);
-      break;
-    case 'midrange':
-      recommendations['staples']!.addAll([
-        'Beast Within', 'Chaos Warp', 'Generous Gift',
-        'Skullclamp', 'The Great Henge'
-      ]);
-      recommendations['avoid']!.addAll([
-        'Cartas muito situacionais', 'Win-more cards'
-      ]);
-      recommendations['priority']!.addAll([
-        'Valor creatures', 'Flexible removal', 'Card advantage engines'
-      ]);
-      break;
-    default:
-      break;
-  }
-  
-  // Adicionar staples por cor
-  if (colors.contains('W')) {
-    recommendations['staples']!.addAll(['Swords to Plowshares', 'Path to Exile', 'Esper Sentinel']);
-  }
-  if (colors.contains('U')) {
-    recommendations['staples']!.addAll(['Counterspell', 'Cyclonic Rift', 'Rhystic Study']);
-  }
-  if (colors.contains('B')) {
-    recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge', 'Orcish Bowmasters']);
-  }
-  if (colors.contains('R')) {
-    // Removido Dockside Extortionist (Banido)
-    recommendations['staples']!.addAll(['Jeska\'s Will', 'Ragavan, Nimble Pilferer', 'Deflecting Swat']);
-  }
-  if (colors.contains('G')) {
-    recommendations['staples']!.addAll(['Nature\'s Lore', 'Three Visits', 'Birds of Paradise']);
-  }
-  
   return recommendations;
 }
 
@@ -341,7 +478,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Get Cards with CMC for analysis
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.name, dc.is_commander, c.type_line, c.mana_cost, c.colors,
+        SELECT c.name, dc.is_commander, c.type_line, c.mana_cost, c.colors, 
                COALESCE(
                  (SELECT SUM(
                    CASE 
@@ -352,7 +489,8 @@ Future<Response> onRequest(RequestContext context) async {
                    END
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
-               ) as cmc
+               ) as cmc,
+               c.oracle_text
         FROM deck_cards dc 
         JOIN cards c ON c.id = dc.card_id 
         WHERE dc.deck_id = @id
@@ -373,6 +511,7 @@ Future<Response> onRequest(RequestContext context) async {
       final manaCost = (row[3] as String?) ?? '';
       final colors = (row[4] as List?)?.cast<String>() ?? [];
       final cmc = (row[5] as num?)?.toDouble() ?? 0.0;
+      final oracleText = (row[6] as String?) ?? '';
       
       // Coletar cores do deck
       deckColors.addAll(colors);
@@ -384,6 +523,7 @@ Future<Response> onRequest(RequestContext context) async {
         'colors': colors,
         'cmc': cmc,
         'is_commander': isCmdr,
+        'oracle_text': oracleText,
       };
       
       allCardData.add(cardData);
@@ -391,14 +531,22 @@ Future<Response> onRequest(RequestContext context) async {
       if (isCmdr) {
         commanders.add(name);
       } else {
-        otherCards.add(name);
+        // Incluir texto da carta para a IA analisar sinergia real
+        // Truncar texto muito longo para economizar tokens
+        final cleanText = oracleText.replaceAll('\n', ' ').trim();
+        final truncatedText = cleanText.length > 150 ? '${cleanText.substring(0, 147)}...' : cleanText;
+        
+        if (truncatedText.isNotEmpty) {
+          otherCards.add('$name (Type: $typeLine, Text: $truncatedText)');
+        } else {
+          otherCards.add('$name (Type: $typeLine)');
+        }
+
         if (typeLine.toLowerCase().contains('land')) {
           landCount++;
         }
       }
-    }
-
-    // 1.5 Análise de Arquétipo do Deck
+    }    // 1.5 Análise de Arquétipo do Deck
     final analyzer = DeckArchetypeAnalyzer(allCardData, deckColors.toList());
     final deckAnalysis = analyzer.generateAnalysis();
     final detectedArchetype = deckAnalysis['detected_archetype'] as String;
@@ -407,7 +555,8 @@ Future<Response> onRequest(RequestContext context) async {
     final targetArchetype = archetype;
     final archetypeRecommendations = await getArchetypeRecommendations(
       targetArchetype, 
-      deckColors.toList()
+      deckColors.toList(),
+      pool, // Passar pool para busca dinâmica de staples
     );
 
     // 1.6 Fetch Meta Decks for Context (filtrado por arquétipo)
@@ -462,6 +611,7 @@ Future<Response> onRequest(RequestContext context) async {
     - Arquétipo Detectado: $detectedArchetype
     - CMC Médio: ${deckAnalysis['average_cmc']}
     - Avaliação da Curva: ${deckAnalysis['mana_curve_assessment']}
+    - Avaliação da Base de Mana: ${deckAnalysis['mana_base_assessment']}
     - Confiança na Classificação: ${deckAnalysis['archetype_confidence']}
     - Distribuição de Tipos: ${jsonEncode(deckAnalysis['type_distribution'])}
     
@@ -480,29 +630,29 @@ Future<Response> onRequest(RequestContext context) async {
     LISTA COMPLETA DO MEU DECK:
     ${otherCards.join(', ')}
     
-    SUA MISSÃO (ANÁLISE CONTEXTUAL POR ARQUÉTIPO):
-    1. **Análise de Mana Base:** Verifique se a quantidade de terrenos ($landCount) é adequada para o arquétipo $targetArchetype.
-       - Aggro: ~30-33 terrenos
-       - Midrange: ~34-37 terrenos  
-       - Control: ~37-40 terrenos
-    2. **Staples do Arquétipo:** Verifique se faltam cartas essenciais ESPECÍFICAS para $targetArchetype (listadas acima).
-    3. **Cortes Contextuais:** Remova cartas que NÃO SINERGIZAM com a estratégia $targetArchetype.
-       - Para Aggro: Remova cartas lentas (CMC > 4) que não geram valor imediato
-       - Para Control: Remova criaturas agressivas sem utilidade defensiva
-       - Para Combo: Remova cartas que não avançam a estratégia principal
+    SUA MISSÃO (OTIMIZAÇÃO DEFINITIVA):
+    Você é um consultor "No-Nonsense". Seu objetivo é deixar o deck Competitivo (Tier 1/2).
     
+    1. **Avalie o Nível Atual (0-10):** Quão otimizado este deck está para o arquétipo $targetArchetype?
+    2. **Critério de Parada:** Se o deck for nota 8.5 ou superior, **NÃO SUGIRA MUDANÇAS**. Apenas elogie a construção no "reasoning".
+    3. **Upgrade Estrito (Strict Upgrade):** Só sugira trocar A por B se B for **objetivamente melhor** (mais eficiente, mais rápido ou combo piece). Não sugira trocas laterais (gosto pessoal).
+    4. **Agressividade:** Se o deck estiver fraco (nota < 6), sugira até 15 trocas de uma vez. Se estiver médio (6-8), sugira as 5-8 vitais.
+
     REGRAS CRÍTICAS:
-    - **EQUILÍBRIO NUMÉRICO:** O número de cartas removidas DEVE SER IGUAL ao número de cartas adicionadas.
-    - **FOCO NO ARQUÉTIPO:** Toda sugestão deve ser justificada pelo arquétipo $targetArchetype.
-    - **EXPLICAÇÃO OBRIGATÓRIA:** O campo "reasoning" deve explicar as trocas no CONTEXTO do arquétipo.
-    - **PRESERVAR STAPLES:** NUNCA sugira remover staples de formato (ex: Mana Drain, Fetch Lands, Shock Lands, Tutors, Sol Ring, Mana Crypt) a menos que sejam ilegais no formato.
-    - **SEM DUPLICATAS:** Não sugira remover ou adicionar a mesma carta mais de uma vez.
-    
+    - **SUBSTITUIÇÃO 1:1:** Gere SEMPRE pares exatos.
+    - **PRESERVAR STAPLES:** NUNCA remova staples de formato.
+    - **SEM DUPLICATAS:** Não repita cartas.
+    - **META GAME:** Use o contexto do Meta Deck acima. Se o deck do usuário não tem as "Win Conditions" do meta, sugira adicioná-las.
+
     Formato JSON estrito:
     {
-      "removals": ["Carta Ruim 1", "Carta Ruim 2", ...],
-      "additions": ["Carta Boa 1", "Carta Boa 2", ...],
-      "reasoning": "Explicação focada no arquétipo $targetArchetype..."
+      "score": 8.5, // Nota do deck atual (float)
+      "changes": [
+        // Deixe vazio [] se o deck já estiver excelente.
+        { "remove": "Carta Fraca", "add": "Carta Meta", "reason": "Upgrade estrito de mana/efeito" },
+        ...
+      ],
+      "reasoning": "Seu veredito final. Se não houver mudanças, explique por que o deck está ótimo."
     }
     ''';
 
@@ -542,9 +692,32 @@ Future<Response> onRequest(RequestContext context) async {
       // Validar cartas sugeridas pela IA
       final validationService = CardValidationService(pool);
       
-      // Sanitizar nomes das cartas (corrigir capitalização, etc)
-      final removals = (jsonResponse['removals'] as List?)?.cast<String>() ?? [];
-      final additions = (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
+      List<String> removals = [];
+      List<String> additions = [];
+
+      // Suporte ao novo formato "changes" (pares de troca)
+      if (jsonResponse.containsKey('changes')) {
+        final changes = jsonResponse['changes'] as List;
+        for (var change in changes) {
+           if (change is Map) {
+             removals.add(change['remove'] as String);
+             additions.add(change['add'] as String);
+           }
+        }
+      } else {
+        // Fallback para formato antigo
+        removals = (jsonResponse['removals'] as List?)?.cast<String>() ?? [];
+        additions = (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
+      }
+      
+      // GARANTIR EQUILÍBRIO NUMÉRICO (Regra de Ouro)
+      final minCount = removals.length < additions.length ? removals.length : additions.length;
+      
+      if (removals.length != additions.length) {
+        print('⚠️ [AI Optimize] Ajustando desequilíbrio: -${removals.length} / +${additions.length} -> $minCount');
+        removals = removals.take(minCount).toList();
+        additions = additions.take(minCount).toList();
+      }
       
       final sanitizedRemovals = removals.map(CardValidationService.sanitizeCardName).toList();
       final sanitizedAdditions = additions.map(CardValidationService.sanitizeCardName).toList();
@@ -554,26 +727,107 @@ Future<Response> onRequest(RequestContext context) async {
       final validation = await validationService.validateCardNames(allSuggestions);
       
       // Filtrar apenas cartas válidas e remover duplicatas
-      final validRemovals = sanitizedRemovals.where((name) {
+      var validRemovals = sanitizedRemovals.where((name) {
         return (validation['valid'] as List).any((card) => 
           (card['name'] as String).toLowerCase() == name.toLowerCase()
         );
       }).toSet().toList();
       
-      final validAdditions = sanitizedAdditions.where((name) {
+      var validAdditions = sanitizedAdditions.where((name) {
         return (validation['valid'] as List).any((card) => 
           (card['name'] as String).toLowerCase() == name.toLowerCase()
         );
       }).toSet().toList();
+
+      // Re-aplicar equilíbrio após validação
+      final finalMinCount = validRemovals.length < validAdditions.length ? validRemovals.length : validAdditions.length;
+      if (validRemovals.length != validAdditions.length) {
+         validRemovals = validRemovals.take(finalMinCount).toList();
+         validAdditions = validAdditions.take(finalMinCount).toList();
+      }
       
+      // --- VERIFICAÇÃO PÓS-OTIMIZAÇÃO (Virtual Deck Analysis) ---
+      // Simular o deck como ficaria se as mudanças fossem aplicadas e re-analisar
+      Map<String, dynamic>? postAnalysis;
+      List<String> validationWarnings = [];
+      
+      if (validAdditions.isNotEmpty) {
+        try {
+          // 1. Buscar dados completos das cartas sugeridas (para análise de mana/tipo)
+          final additionsDataResult = await pool.execute(
+            Sql.named('''
+              SELECT name, type_line, mana_cost, colors, 
+                     COALESCE(
+                       (SELECT SUM(
+                         CASE 
+                           WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                           WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                           WHEN m[1] = 'X' THEN 0
+                           ELSE 1
+                         END
+                       ) FROM regexp_matches(mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
+                       0
+                     ) as cmc,
+                     oracle_text
+              FROM cards 
+              WHERE name = ANY(@names)
+            '''),
+            parameters: {'names': validAdditions},
+          );
+          
+          final additionsData = additionsDataResult.map((row) => {
+            'name': row[0] as String,
+            'type_line': row[1] as String,
+            'mana_cost': row[2] as String,
+            'colors': (row[3] as List?)?.cast<String>() ?? [],
+            'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
+            'oracle_text': row[5] as String,
+          }).toList();
+
+          // 2. Criar Deck Virtual (Clone do atual - Remoções + Adições)
+          final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
+          
+          // Remover cartas sugeridas (pelo nome)
+          virtualDeck.removeWhere((c) => validRemovals.contains(c['name']));
+          
+          // Adicionar novas cartas
+          virtualDeck.addAll(additionsData);
+          
+          // 3. Rodar Análise no Deck Virtual
+          final postAnalyzer = DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
+          postAnalysis = postAnalyzer.generateAnalysis();
+          
+          // 4. Comparar Antes vs Depois (Validação Lógica)
+          final preManaIssues = (deckAnalysis['mana_base_assessment'] as String).contains('Falta mana');
+          final postManaIssues = (postAnalysis['mana_base_assessment'] as String).contains('Falta mana');
+          
+          if (!preManaIssues && postManaIssues) {
+            validationWarnings.add('⚠️ ATENÇÃO: As sugestões da IA podem piorar sua base de mana.');
+          }
+          
+          final preCurve = double.parse(deckAnalysis['average_cmc'] as String);
+          final postCurve = double.parse(postAnalysis['average_cmc'] as String);
+          
+          if (targetArchetype.toLowerCase() == 'aggro' && postCurve > preCurve) {
+             validationWarnings.add('⚠️ ATENÇÃO: O deck está ficando mais lento (CMC aumentou), o que é ruim para Aggro.');
+          }
+          
+        } catch (e) {
+          print('Erro na verificação pós-otimização: $e');
+        }
+      }
+
       // Preparar resposta com avisos sobre cartas inválidas
       final invalidCards = validation['invalid'] as List<String>;
       final suggestions = validation['suggestions'] as Map<String, List<String>>;
-      
+
       final responseBody = {
         'removals': validRemovals,
         'additions': validAdditions,
         'reasoning': jsonResponse['reasoning'],
+        'deck_analysis': deckAnalysis,
+        'post_analysis': postAnalysis, // Retorna a análise futura para o front mostrar
+        'validation_warnings': validationWarnings,
       };
       
       // Adicionar avisos se houver cartas inválidas

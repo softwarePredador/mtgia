@@ -1078,6 +1078,7 @@ Fornecer feedback visual e validação de regras para o usuário, garantindo que
   - Utiliza a biblioteca `fl_chart`.
   - **Bar Chart:** Mostra a curva de mana (distribuição de custos 0-7+).
   - **Pie Chart:** Mostra a distribuição de cores (devoção).
+  - **Tabela:** Mostra a sinergia entre cartas (se disponível).
 
 ### 3.18. Módulo 2: O Consultor Criativo (✅ COMPLETO - Atualizado 24/11/2025)
 
@@ -1198,82 +1199,6 @@ Future<bool> applyOptimization({
     return true;
   }
   return false;
-}
-```
-
-#### 4. **Geração de Deck do Zero (`POST /ai/generate`)** ✅
-- Recebe um `prompt` (descrição textual) e `format` (Commander, Standard, etc.).
-- A IA monta um deck completo e legal para o formato, incluindo:
-  - Criaturas, feitiços, artefatos, encantamentos.
-  - Terrenos balanceados (36-38 para Commander).
-  - Total de 100 cartas para Commander, 60 para Standard, etc.
-- **Opcional:** Sistema RAG (Retrieval-Augmented Generation) que busca decks similares no meta (`meta_decks`) para inspirar a IA.
-- **Frontend:** Tela completa de geração (`DeckGenerateScreen`):
-  1. Seletor de formato dropdown.
-  2. Campo de texto multi-linha para o prompt.
-  3. 6 exemplos de prompts clicáveis (chips).
-  4. Botão "Gerar Deck" com loading "A IA está pensando...".
-  5. Preview do deck gerado agrupado por tipo (Creatures, Instants, Lands, etc.).
-  6. Campo para nomear o deck.
-  7. Botão "Salvar Deck" que chama `POST /decks`.
-
-**Código de Exemplo (Backend - `routes/ai/generate/index.dart`):**
-```dart
-final systemPrompt = '''
-You are a world-class Magic: The Gathering deck builder.
-Your goal is to build a competitive, consistent, and legal deck for the format "$format".
-
-Rules:
-1. Return ONLY a JSON object with a "cards" field.
-2. "cards" must be a list of objects with "name" (exact English card name) and "quantity" (integer).
-3. Do not include markdown formatting. Just the raw JSON string.
-4. For Commander, ensure exactly 100 cards (1 Commander + 99 Main).
-5. Ensure a good land count (approx 36-38 for Commander).
-''';
-
-final userMessage = '''
-Build a deck based on this description: "$prompt".
-''';
-
-// Chama OpenAI GPT-4o-mini
-final response = await http.post(
-  Uri.parse('https://api.openai.com/v1/chat/completions'),
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $apiKey',
-  },
-  body: jsonEncode({
-    'model': 'gpt-4o-mini',
-    'messages': [
-      {'role': 'system', 'content': systemPrompt},
-      {'role': 'user', 'content': userMessage},
-    ],
-    'temperature': 0.7,
-  }),
-);
-```
-
-**Código de Exemplo (Frontend - `DeckGenerateScreen`):**
-```dart
-Future<void> _generateDeck() async {
-  setState(() {
-    _isGenerating = true;
-    _generatedDeck = null;
-  });
-
-  try {
-    final result = await context.read<DeckProvider>().generateDeck(
-      prompt: _promptController.text.trim(),
-      format: _selectedFormat,
-    );
-    
-    setState(() {
-      _generatedDeck = result;
-      _isGenerating = false;
-    });
-  } catch (e) {
-    // Error handling...
-  }
 }
 ```
 
@@ -1662,3 +1587,414 @@ ALTER TABLE decks ADD COLUMN IF NOT EXISTS archetype TEXT;
    - Confirmar que cartas removidas são efetivamente removidas
    - Confirmar que cartas adicionadas aparecem no deck
    - Verificar refresh automático da tela
+
+---
+
+### 3.21. Sistema de Staples Dinâmicos (✅ COMPLETO - 25/11/2025)
+
+**Objetivo:**
+Substituir listas hardcoded de staples por um sistema dinâmico que busca dados atualizados do Scryfall API e armazena em cache local no banco de dados.
+
+#### **Problema Original:**
+
+```dart
+// CÓDIGO ANTIGO (hardcoded) - routes/ai/optimize/index.dart
+case 'control':
+  recommendations['staples']!.addAll([
+    'Counterspell', 'Swords to Plowshares', 'Path to Exile',
+    'Cyclonic Rift', 'Teferi\'s Protection'  // E se alguma for banida?
+  ]);
+
+// E se Mana Crypt for banida? Precisa editar código e fazer deploy!
+if (colors.contains('B')) {
+  recommendations['staples']!.addAll(['Demonic Tutor', 'Toxic Deluge', 'Dockside Extortionist']);
+  // Dockside foi banida em 2024! Mas o código não sabe disso.
+}
+```
+
+**Problemas:**
+1. ❌ Listas desatualizadas quando há bans (ex: Mana Crypt, Nadu, Dockside)
+2. ❌ Precisa editar código e fazer deploy para atualizar
+3. ❌ Não considera popularidade atual (EDHREC rank muda)
+4. ❌ Duplicação de código para cada arquétipo/cor
+
+#### **Solução Implementada:**
+
+##### 1. Nova Tabela `format_staples`
+```sql
+CREATE TABLE format_staples (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_name TEXT NOT NULL,              -- Nome exato da carta
+    format TEXT NOT NULL,                  -- 'commander', 'standard', etc.
+    archetype TEXT,                        -- 'aggro', 'control', NULL = universal
+    color_identity TEXT[],                 -- {'W'}, {'U', 'B'}, etc.
+    edhrec_rank INTEGER,                   -- Rank de popularidade
+    category TEXT,                         -- 'ramp', 'draw', 'removal', 'staple'
+    scryfall_id UUID,                      -- Referência ao Scryfall
+    is_banned BOOLEAN DEFAULT FALSE,       -- Atualizado via sync
+    last_synced_at TIMESTAMP,              -- Quando foi atualizado
+    UNIQUE(card_name, format, archetype)
+);
+```
+
+##### 2. Script de Sincronização (`bin/sync_staples.dart`)
+
+**Funcionalidades:**
+- Busca Top 100 staples universais do Scryfall (ordenado por EDHREC)
+- Busca Top 50 staples por arquétipo (aggro, control, combo, etc.)
+- Busca Top 30 staples por cor (W, U, B, R, G)
+- Sincroniza lista de cartas banidas
+- Registra log de sincronização para auditoria
+
+**Uso:**
+```bash
+# Sincronizar apenas Commander
+dart run bin/sync_staples.dart commander
+
+# Sincronizar todos os formatos
+dart run bin/sync_staples.dart ALL
+```
+
+**Configuração de Cron Job (Linux):**
+```bash
+# Sincronizar toda segunda-feira às 3h da manhã
+0 3 * * 1 cd /path/to/server && dart run bin/sync_staples.dart ALL >> /var/log/mtg_sync.log 2>&1
+```
+
+##### 3. Serviço de Staples (`lib/format_staples_service.dart`)
+
+**Classe FormatStaplesService:**
+```dart
+class FormatStaplesService {
+  final Pool _pool;
+  static const int cacheMaxAgeHours = 24;
+  
+  /// Busca staples de duas fontes:
+  /// 1. DB local (cache) - Se dados < 24h
+  /// 2. Scryfall API - Fallback
+  Future<List<Map<String, dynamic>>> getStaples({
+    required String format,
+    List<String>? colors,
+    String? archetype,
+    int limit = 50,
+    bool excludeBanned = true,
+  }) async { ... }
+  
+  /// Verifica se carta está banida
+  Future<bool> isBanned(String cardName, String format) async { ... }
+  
+  /// Retorna recomendações organizadas por categoria
+  Future<Map<String, List<String>>> getRecommendationsForDeck({
+    required String format,
+    required List<String> colors,
+    String? archetype,
+  }) async { ... }
+}
+```
+
+**Exemplo de Uso:**
+```dart
+// Em routes/ai/optimize/index.dart
+
+final staplesService = FormatStaplesService(pool);
+
+// Buscar staples para deck Dimir Control
+final staples = await staplesService.getStaples(
+  format: 'commander',
+  colors: ['U', 'B'],
+  archetype: 'control',
+  limit: 20,
+);
+
+// Verificar se carta está banida
+final isBanned = await staplesService.isBanned('Mana Crypt', 'commander');
+// Retorna TRUE (Mana Crypt foi banida em 2024)
+
+// Obter recomendações completas
+final recommendations = await staplesService.getRecommendationsForDeck(
+  format: 'commander',
+  colors: ['U', 'B', 'G'],
+  archetype: 'combo',
+);
+// Retorna: { 'universal': [...], 'ramp': [...], 'draw': [...], 'removal': [...], 'archetype_specific': [...] }
+```
+
+##### 4. Refatoração do AI Optimize
+
+**Antes (hardcoded):**
+```dart
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors
+) async {
+  // Listas hardcoded que ficam desatualizadas
+  case 'control':
+    recommendations['staples']!.addAll([
+      'Counterspell', 'Swords to Plowshares', 'Path to Exile',
+      'Cyclonic Rift', 'Teferi\'s Protection'  // E se alguma for banida?
+    ]);
+}
+```
+
+**Depois (dinâmico):**
+```dart
+Future<Map<String, List<String>>> getArchetypeRecommendations(
+  String archetype, 
+  List<String> colors,
+  Pool pool,  // Novo parâmetro
+) async {
+  final staplesService = FormatStaplesService(pool);
+  
+  // Buscar staples universais do banco/Scryfall
+  final universalStaples = await staplesService.getStaples(
+    format: 'commander',
+    colors: colors,
+    limit: 20,
+  );
+  
+  // Buscar staples do arquétipo
+  final archetypeStaples = await staplesService.getStaples(
+    format: 'commander',
+    colors: colors,
+    archetype: archetype.toLowerCase(),
+    limit: 15,
+  );
+  
+  recommendations['staples']!.addAll(
+    [...universalStaples, ...archetypeStaples].map((s) => s['name'] as String)
+  );
+  
+  // Remove duplicatas
+  recommendations['staples'] = recommendations['staples']!.toSet().toList();
+}
+```
+
+##### 5. Tabela de Log de Sincronização
+
+```sql
+CREATE TABLE sync_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sync_type TEXT NOT NULL,               -- 'staples', 'banlist', 'meta'
+    format TEXT,                           -- Formato sincronizado
+    records_updated INTEGER DEFAULT 0,
+    records_inserted INTEGER DEFAULT 0,
+    records_deleted INTEGER DEFAULT 0,     -- Cartas banidas
+    status TEXT NOT NULL,                  -- 'success', 'partial', 'failed'
+    error_message TEXT,
+    started_at TIMESTAMP,
+    finished_at TIMESTAMP
+);
+```
+
+**Consultar histórico de sincronização:**
+```sql
+SELECT sync_type, format, status, records_inserted, records_updated, 
+       finished_at - started_at as duration
+FROM sync_log
+ORDER BY started_at DESC
+LIMIT 10;
+```
+
+#### **Fluxo de Dados:**
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    SINCRONIZAÇÃO SEMANAL                           │
+│                    (bin/sync_staples.dart)                         │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                       SCRYFALL API                                 │
+│  - format:commander -is:banned order:edhrec                        │
+│  - Retorna Top 100 cartas mais populares                           │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                    TABELA format_staples                           │
+│  - Cache local de staples por formato/arquétipo/cor                │
+│  - Atualizado semanalmente                                         │
+│  - is_banned = TRUE para cartas banidas                            │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                  FormatStaplesService                              │
+│  1. Verifica cache local (< 24h)                                   │
+│  2. Se cache desatualizado → Fallback Scryfall                     │
+│  3. Filtra por formato/cores/arquétipo                             │
+│  4. Exclui cartas banidas (is_banned = TRUE)                       │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                  AI Optimize Endpoint                              │
+│  - Recebe recomendações dinâmicas                                  │
+│  - Passa para OpenAI no prompt                                     │
+│  - Valida cartas sugeridas antes de aplicar                        │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+#### **Benefícios:**
+
+| Antes (Hardcoded) | Depois (Dinâmico) |
+|-------------------|-------------------|
+| ❌ Listas fixas no código | ✅ Dados do Scryfall (fonte oficial) |
+| ❌ Deploy para atualizar | ✅ Sync automático semanal |
+| ❌ Cartas banidas sugeridas | ✅ Banlist sincronizado |
+| ❌ Popularidade estática | ✅ EDHREC rank atualizado |
+| ❌ Duplicação de código | ✅ Uma fonte de verdade |
+
+#### **Arquivos Modificados/Criados:**
+
+| Arquivo | Tipo | Descrição |
+|---------|------|-----------|
+| `server/database_setup.sql` | Modificado | +Tabelas format_staples e sync_log |
+| `server/bin/sync_staples.dart` | Novo | Script de sincronização |
+| `server/lib/format_staples_service.dart` | Novo | Serviço de staples dinâmicos |
+| `server/routes/ai/optimize/index.dart` | Modificado | Usa FormatStaplesService |
+| `server/lib/ai/prompt.md` | Modificado | Referencia banlist dinâmico |
+| `FORMULARIO_AUDITORIA_ALGORITMO.md` | Modificado | Documentação v1.3 |
+
+#### **Próximos Passos:**
+
+1. **Automatizar Sincronização:** Configurar cron job ou Cloud Scheduler para rodar `sync_staples.dart` semanalmente
+2. **Monitoramento:** Dashboard para visualizar histórico de sincronização
+3. **Alertas:** Notificação quando há novos bans detectados
+4. **Cache Inteligente:** Sincronizar apenas deltas (cartas que mudaram de rank)
+
+---
+
+## 4. Novas Funcionalidades Implementadas
+
+### ✅ **Implementado (Módulo 3: O Simulador de Probabilidade - Parcial)**
+- [x] **Backend:**
+  - **Verificação de Deck Virtual (Post-Optimization Check):**
+    - Antes de retornar sugestões de otimização, o servidor cria uma cópia "virtual" do deck aplicando as mudanças.
+    - Recalcula a análise de mana (Fontes vs Devoção) e Curva de Mana neste deck virtual.
+    - Compara com o deck original.
+    - Se a otimização piorar a base de mana (ex: remover terrenos necessários) ou quebrar a curva (ex: deixar o deck muito lento para Aggro), adiciona um aviso explícito (`validation_warnings`) na resposta.
+    - Garante que a IA não sugira "melhorias" que tornam o deck injogável matematicamente.
+
+**Exemplo de Resposta com Aviso:**
+```json
+{
+  "removals": ["Card Name 1", "Card Name 2"],
+  "additions": ["Card Name A", "Card Name B"],
+  "reasoning": "Justificativa da IA...",
+  "validation_warnings": [
+    "Remover 'Forest' pode deixar o deck sem fontes de mana verde suficientes.",
+    "Adicionar muitas cartas azuis pode atrasar a curva de mana do deck aggro."
+  ]
+}
+```
+
+**Código de Exemplo (Backend - `routes/ai/optimize/index.dart`):**
+```dart
+// 1. Criar deck virtual
+final virtualDeck = Deck.fromJson(originalDeck.toJson());
+
+// 2. Aplicar mudanças (removals/additions)
+for (final removal in removals) {
+  virtualDeck.removeCard(removal);
+}
+for (final addition in additions) {
+  virtualDeck.addCard(addition);
+}
+
+// 3. Recalcular análise de mana e curva
+final manaAnalysis = analyzeMana(virtualDeck);
+final curveAnalysis = analyzeManaCurve(virtualDeck);
+
+// 4. Comparar com o original
+if (manaAnalysis['sourcesVsDevotion'] < 0.8) {
+  warnings.add("A nova base de mana pode não suportar a devoção necessária.");
+}
+if (curveAnalysis['avgCMC'] > originalCurveAnalysis['avgCMC'] + 1) {
+  warnings.add("A curva de mana aumentou muito, o deck pode ficar lento demais.");
+}
+
+// 5. Retornar warnings na resposta
+return Response.json(body: {
+  'removals': removals,
+  'additions': additions,
+  'reasoning': reasoning,
+  'validation_warnings': warnings,
+});
+```
+
+**Notas:**
+- Essa funcionalidade evita que a IA sugira otimizações que, na verdade, pioram o desempenho do deck.
+- A validação é feita em um "sandbox" (cópia virtual do deck), garantindo que o deck original permaneça intacto até a confirmação do usuário.
+
+---
+
+## 5. Documentação Atualizada
+
+### 5.1. API Reference
+
+#### **POST /ai/optimize**
+
+**Request Body:**
+```json
+{
+  "deck_id": "550e8400-e29b-41d4-a716-446655440000",
+  "archetype": "aggro"
+}
+```
+
+**Response:**
+```json
+{
+  "removals": ["Sol Ring", "Mana Crypt"],
+  "additions": ["Lightning Bolt", "Goblin Guide"],
+  "reasoning": "Aumentar agressividade e curva de mana baixa.",
+  "validation_warnings": [
+    "Remover 'Forest' pode deixar o deck sem fontes de mana verde suficientes.",
+    "Adicionar muitas cartas azuis pode atrasar a curva de mana do deck aggro."
+  ]
+}
+```
+
+**Descrição dos Campos:**
+- `removals`: Cartas sugeridas para remoção
+- `additions`: Cartas sugeridas para adição
+- `reasoning`: Justificativa da IA
+- `validation_warnings`: Avisos sobre possíveis problemas na otimização
+
+---
+
+### 5.2. Guia de Estilo e Contribuição
+
+#### **Commit Messages:**
+- Use o tempo verbal imperativo: "Adicionar nova funcionalidade X" ao invés de "Adicionando nova funcionalidade X"
+- Comece com um verbo de ação: "Adicionar", "Remover", "Atualizar", "Fix", "Refactor", "Documentar", etc.
+- Seja breve mas descritivo. Ex: "Fix bug na tela de login" é melhor que "Correção de bug".
+
+#### **Branching Model:**
+- Use branches descritivas: `feature/novo-recurso`, `bugfix/corrigir-bug`, `hotfix/urgente`
+- Para novas funcionalidades, crie uma branch a partir da `develop`.
+- Para correções rápidas, crie uma branch a partir da `main`.
+
+#### **Pull Requests:**
+- Sempre faça PRs para `develop` para novas funcionalidades e correções.
+- PRs devem ter um título descritivo e um corpo explicando as mudanças.
+- Adicione labels apropriadas: `bug`, `feature`, `enhancement`, `documentation`, etc.
+- Solicite revisão de pelo menos uma pessoa antes de mesclar.
+
+#### **Código Limpo e Documentado:**
+- Siga as convenções de nomenclatura do projeto.
+- Mantenha o código modular e reutilizável.
+- Adicione comentários apenas quando necessário. O código deve ser auto-explicativo.
+- Atualize a documentação sempre que uma funcionalidade for alterada ou adicionada.
+
+---
+
+## 6. Considerações Finais
+
+Este documento é um living document e será continuamente atualizado conforme o projeto ManaLoom evolui. Novas funcionalidades, melhorias e correções de bugs serão documentadas aqui para manter todos os colaboradores alinhados e informados.
+
+Para qualquer dúvida ou sugestão sobre o projeto, sinta-se à vontade para abrir uma issue no repositório ou entrar em contato diretamente com os mantenedores.
+
+Obrigado por fazer parte do ManaLoom! Juntos, estamos tecendo a estratégia perfeita.
