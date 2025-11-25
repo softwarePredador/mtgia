@@ -154,3 +154,56 @@ CREATE TABLE IF NOT EXISTS sync_log (
     started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     finished_at TIMESTAMP WITH TIME ZONE
 );
+
+-- 12. Tabela de Counters por Arquétipo (Hate Cards e Counter-Strategies)
+-- Armazena cartas e estratégias para countar arquétipos específicos
+-- Evita hardcoded hate cards e permite atualização dinâmica
+CREATE TABLE IF NOT EXISTS archetype_counters (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    archetype TEXT NOT NULL,               -- 'graveyard', 'artifacts', 'tokens', 'ramp', 'combo'
+    counter_archetype TEXT,                -- Arquétipo que countera (opcional, para matchups)
+    hate_cards TEXT[] NOT NULL,            -- Array de nomes de cartas hate
+    priority INTEGER DEFAULT 1,            -- 1=essencial, 2=bom ter, 3=situacional
+    format TEXT DEFAULT 'commander',       -- Formato aplicável
+    color_identity TEXT[],                 -- Cores que podem usar (NULL = qualquer)
+    notes TEXT,                            -- Notas explicativas (ex: "Usar contra Muldrotha")
+    effectiveness_score INTEGER DEFAULT 5, -- 1-10, quão efetivo é o counter
+    last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para busca eficiente de counters
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_archetype ON archetype_counters (archetype);
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_format ON archetype_counters (format);
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_priority ON archetype_counters (priority);
+
+-- Dados iniciais de hate cards por arquétipo (pode ser expandido via sync)
+INSERT INTO archetype_counters (archetype, hate_cards, priority, notes, effectiveness_score) VALUES
+    ('graveyard', ARRAY['Rest in Peace', 'Grafdigger''s Cage', 'Soul-Guide Lantern', 'Leyline of the Void', 'Bojuka Bog', 'Tormod''s Crypt', 'Relic of Progenitus'], 1, 'Essencial contra Muldrotha, Meren, Karador', 9),
+    ('artifacts', ARRAY['Collector Ouphe', 'Stony Silence', 'Null Rod', 'Vandalblast', 'Kataki, War''s Wage', 'Energy Flux'], 1, 'Essencial contra Urza, Breya, artifact storm', 8),
+    ('tokens', ARRAY['Massacre Wurm', 'Rakdos Charm', 'Illness in the Ranks', 'Virulent Plague', 'Echoing Truth', 'Aetherspouts'], 2, 'Bom contra go-wide strategies', 7),
+    ('ramp', ARRAY['Confiscate', 'Collector Ouphe', 'Blood Moon', 'Back to Basics', 'Stranglehold', 'Aven Mindcensor'], 2, 'Contra decks que dependem de ramp excessivo', 6),
+    ('combo', ARRAY['Rule of Law', 'Deafening Silence', 'Drannith Magistrate', 'Cursed Totem', 'Linvala, Keeper of Silence', 'Torpor Orb'], 1, 'Essencial contra storm e infinite combos', 9),
+    ('enchantments', ARRAY['Tranquil Grove', 'Back to Nature', 'Bane of Progress', 'Aura Shards', 'Primeval Light'], 2, 'Contra enchantress e aura-based strategies', 7),
+    ('planeswalkers', ARRAY['The Immortal Sun', 'Vampire Hexmage', 'Hex Parasite', 'Pithing Needle', 'Sorcerous Spyglass'], 2, 'Contra superfriends', 7),
+    ('voltron', ARRAY['Maze of Ith', 'Fog Bank', 'Ghostly Prison', 'Propaganda', 'Constant Mists', 'Spore Frog'], 2, 'Contra voltron e commander damage', 6),
+    ('control', ARRAY['Cavern of Souls', 'Boseiju, Who Shelters All', 'Destiny Spinner', 'Vexing Shusher', 'Defense Grid'], 2, 'Contra counterspell-heavy decks', 7),
+    ('aggro', ARRAY['Ensnaring Bridge', 'Crawlspace', 'Silent Arbiter', 'Meekstone', 'Sphere of Safety'], 2, 'Contra creature aggro', 6)
+ON CONFLICT DO NOTHING;
+
+-- 13. Tabela de Análise de Fraquezas (Weakness Reports)
+-- Armazena análises de fraquezas identificadas em decks
+CREATE TABLE IF NOT EXISTS deck_weakness_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE CASCADE,
+    weakness_type TEXT NOT NULL,           -- 'graveyard_vulnerability', 'low_removal', 'high_curve'
+    severity TEXT NOT NULL,                -- 'critical', 'high', 'medium', 'low'
+    description TEXT NOT NULL,             -- Descrição legível da fraqueza
+    recommendations TEXT[],                -- Array de cartas/ações recomendadas
+    auto_detected BOOLEAN DEFAULT TRUE,    -- Se foi detectado automaticamente
+    addressed BOOLEAN DEFAULT FALSE,       -- Se já foi tratado pelo usuário
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_weakness_reports_deck ON deck_weakness_reports (deck_id);
+CREATE INDEX IF NOT EXISTS idx_weakness_reports_severity ON deck_weakness_reports (severity);

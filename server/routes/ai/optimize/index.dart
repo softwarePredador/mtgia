@@ -6,6 +6,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_validation_service.dart';
 import '../../../lib/format_staples_service.dart';
+import '../../../lib/archetype_counters_service.dart';
 
 /// Classe para análise de arquétipo do deck
 /// Implementa detecção automática baseada em curva de mana, tipos de cartas e cores
@@ -327,6 +328,22 @@ Future<Map<String, List<String>>> getArchetypeRecommendations(
         limit: 5,
       );
       recommendations['staples']!.addAll(drawStaples);
+    }
+
+    // 6. Buscar hate cards para arquétipos comuns (via ArchetypeCountersService)
+    final countersService = ArchetypeCountersService(pool);
+    final commonArchetypes = ['graveyard', 'artifacts', 'combo', 'tokens'];
+    
+    for (final oppArchetype in commonArchetypes) {
+      final hateCards = await countersService.getHateCards(
+        archetype: oppArchetype,
+        colors: colors,
+        priorityMax: 1, // Apenas hate cards essenciais
+      );
+      
+      if (hateCards.isNotEmpty) {
+        recommendations['hate_$oppArchetype'] = hateCards.take(3).toList();
+      }
     }
 
     // Remove duplicatas mantendo a ordem

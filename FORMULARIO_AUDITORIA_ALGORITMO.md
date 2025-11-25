@@ -1249,10 +1249,23 @@ Assinatura: _______________
 
 _Este formulário deve ser revisado sempre que houver mudanças significativas nos algoritmos de otimização._
 
-**Versão do Formulário:** 1.3  
+**Versão do Formulário:** 1.4  
 **Última Atualização:** 25 de Novembro de 2025  
 
 **Changelog:**
+- v1.4: **MAJOR** - Sistema de Matchup, Análise de Fraquezas e Hate Cards Dinâmicos
+  - ✅ Criada tabela `archetype_counters` para armazenar hate cards por arquétipo
+  - ✅ Criada tabela `deck_weakness_reports` para histórico de fraquezas
+  - ✅ Implementado `ArchetypeCountersService` para busca dinâmica de hate cards
+  - ✅ Implementado endpoint `POST /ai/weakness-analysis` para análise de fraquezas
+  - ✅ Implementado endpoint `POST /ai/simulate-matchup` para simulação de matchup
+  - ✅ Integrado hate cards no `getArchetypeRecommendations()`
+  - ✅ Dados iniciais de hate cards populados (graveyard, artifacts, tokens, etc.)
+  - **Por que essa mudança?**
+    - Sistema anterior não analisava matchups contra decks específicos
+    - Hate cards estavam sugeridos para serem hardcoded (má prática)
+    - Não havia forma de provar eficácia das otimizações
+    - Faltava análise sistemática de pontos fracos do deck
 - v1.3: **MAJOR** - Sistema de Staples Dinâmicos
   - ✅ Criada tabela `format_staples` para armazenar staples por formato/arquétipo/cor
   - ✅ Criada tabela `sync_log` para auditoria de sincronizações
@@ -1282,6 +1295,13 @@ _Este formulário deve ser revisado sempre que houver mudanças significativas n
 - `server/routes/ai/optimize/index.dart` - Usa FormatStaplesService
 - `server/lib/ai/prompt.md` - Banlist dinâmico
 
+**Arquivos Modificados (v1.4):**
+- `server/database_setup.sql` - Tabelas archetype_counters e deck_weakness_reports
+- `server/lib/archetype_counters_service.dart` - Serviço de hate cards dinâmicos (NOVO)
+- `server/routes/ai/weakness-analysis/index.dart` - Análise de fraquezas (NOVO)
+- `server/routes/ai/simulate-matchup/index.dart` - Simulação de matchup (NOVO)
+- `server/routes/ai/optimize/index.dart` - Integração com hate cards
+
 **Arquivos Modificados (v1.2):**
 - `server/routes/import/index.dart` - Validação de comandante
 - `server/routes/decks/[id]/analysis/index.dart` - CMC híbrido
@@ -1298,6 +1318,9 @@ _Este formulário deve ser revisado sempre que houver mudanças significativas n
 - `server/lib/card_validation_service.dart`
 - `server/lib/format_staples_service.dart` (NOVO)
 - `server/bin/sync_staples.dart` (NOVO)
+- `server/lib/archetype_counters_service.dart` (NOVO v1.4)
+- `server/routes/ai/weakness-analysis/index.dart` (NOVO v1.4)
+- `server/routes/ai/simulate-matchup/index.dart` (NOVO v1.4)
 
 **Instruções para Sincronização de Staples:**
 ```bash
@@ -1310,4 +1333,24 @@ dart run bin/sync_staples.dart ALL
 # Configurar cron job para sincronização semanal (Linux)
 # Toda segunda-feira às 3h da manhã:
 0 3 * * 1 cd /path/to/server && dart run bin/sync_staples.dart ALL >> /var/log/mtg_sync.log 2>&1
+```
+
+**Novos Endpoints (v1.4):**
+
+```bash
+# Análise de fraquezas do deck
+POST /ai/weakness-analysis
+{
+  "deck_id": "uuid"
+}
+# Retorna: weaknesses[], statistics, recommendations
+
+# Simulação de matchup entre decks
+POST /ai/simulate-matchup
+{
+  "my_deck_id": "uuid",
+  "opponent_deck_id": "uuid",
+  "simulations": 100
+}
+# Retorna: win_rate, advantages, disadvantages, hate_cards
 ```
