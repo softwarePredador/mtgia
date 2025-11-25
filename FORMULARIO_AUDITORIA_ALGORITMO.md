@@ -71,12 +71,33 @@ final isCommander = item['isCommanderTag'] || (commanderName != null &&
                    dbName.toLowerCase() == commanderName.toLowerCase());
 ```
 
-**⚠️ Possível Bug:** O que acontece se nenhum comandante for detectado? 
-```
-O deck é importado normalmente, mas nenhuma carta terá is_commander = true.
-Isso pode causar problemas na análise de identidade de cor e no endpoint
-/ai/optimize que espera pelo menos um comandante para sugestões contextuais.
-⚠️ BUG POTENCIAL: Não há validação de que Commander decks DEVEM ter um comandante.
+**Tratamento de Comandante Ausente (CORRIGIDO):** 
+```dart
+// routes/import/index.dart - Validação de Comandante
+if (format == 'commander' || format == 'brawl') {
+  final hasCommander = cardsToInsert.any((c) => c['is_commander'] == true);
+  
+  if (!hasCommander) {
+    // Tenta detectar automaticamente um comandante
+    // Procura por Legendary Creature
+    for (final card in cardsToInsert) {
+      final typeLine = (card['type_line'] as String).toLowerCase();
+      final isLegendaryCreature = typeLine.contains('legendary') && 
+                                  typeLine.contains('creature');
+      
+      if (isLegendaryCreature) {
+        card['is_commander'] = true;
+        break;
+      }
+    }
+  }
+}
+
+// Se ainda não encontrar, retorna warning na resposta:
+if (warnings.isNotEmpty) {
+  responseBody['warnings'] = warnings;
+}
+// ✅ CORRIGIDO: Sistema agora tenta detectar e avisa o usuário
 ```
 
 ---
@@ -184,14 +205,14 @@ Onde:
 | Caso Especial | Como é tratado? |
 |---------------|-----------------|
 | Custo `{X}` | ☑ Conta como 0 (continue; no código) |
-| Custo Híbrido `{2/W}` | ⚠️ Conta como 1 no código atual (deveria ser 2 pelas regras MTG) |
+| Custo Híbrido `{2/W}` | ☑ **CORRIGIDO**: Conta como 2 (maior valor entre as partes) |
 | Custo Phyrexian `{B/P}` | ☑ Conta como 1 (cmc += 1) |
 | Terrenos (Land) | ☑ Excluído da curva (continue; se type_line contém 'land') |
 | Custos Alternativos (Evoke, Overload) | ☐ Ignorados (usa apenas mana_cost principal) |
 
 **Código de referência:**
 ```dart
-// routes/decks/[id]/analysis/index.dart linhas 364-406
+// routes/decks/[id]/analysis/index.dart - _parseManaCost()
 ManaAnalysis _parseManaCost(String manaCost) {
   int cmc = 0;
   final colors = <String, int>{};
@@ -203,11 +224,21 @@ ManaAnalysis _parseManaCost(String manaCost) {
     final number = int.tryParse(symbol);
     if (number != null) {
       cmc += number;  // {2} → +2
+    } else if (symbol == 'X') {
+      continue;  // {X} → 0
+    } else if (symbol.contains('/')) {
+      // Híbrido: {2/W} → 2, {B/G} → 1
+      final parts = symbol.split('/');
+      int hybridCmc = 1;
+      for (final part in parts) {
+        final partNumber = int.tryParse(part);
+        if (partNumber != null && partNumber > hybridCmc) {
+          hybridCmc = partNumber;
+        }
+      }
+      cmc += hybridCmc;
     } else {
-      if (symbol == 'X') continue;  // {X} → 0
-      cmc += 1;  // Qualquer símbolo colorido/híbrido → +1
-      // Conta cores para devoção
-      if (symbol.contains('W')) colors['W'] = (colors['W'] ?? 0) + 1;
+      cmc += 1;  // Símbolo simples: {U}, {B}, etc.
       // ... etc
     }
   }
@@ -249,23 +280,22 @@ Exemplo: "Artifact Creature - Golem"
 
 | Estratégia | Implementado? |
 |------------|---------------|
-| Conta +1 para Artifact E +1 para Creature (soma) | ☐ |
+| Conta +1 para Artifact E +1 para Creature (soma) | ☑ **CORRIGIDO** |
 | Conta apenas no tipo principal (Creature) | ☐ |
-| Usa sistema de prioridade (se é X, não conta Y) | ☑ |
+| Usa sistema de prioridade (se é X, não conta Y) | ☐ (removido) |
 
-**Descreva o sistema de prioridade (se aplicável):**
-```
+**Descreva o sistema atual (CORRIGIDO):**
+```dart
 // routes/ai/optimize/index.dart - DeckArchetypeAnalyzer.countCardTypes()
-Prioridade (primeira condição que bater conta):
-1. Land       → Se type_line.contains('land')
-2. Creature   → Se type_line.contains('creature')
-3. Planeswalker → Se type_line.contains('planeswalker')
-4. Instant    → Se type_line.contains('instant')
-5. Sorcery    → Se type_line.contains('sorcery')
-6. Artifact   → Se type_line.contains('artifact')
-7. Enchantment → Se type_line.contains('enchantment')
+// Agora conta TODOS os tipos presentes na carta:
 
-⚠️ CONSEQUÊNCIA: Uma "Artifact Creature" conta APENAS como Creature, não como Artifact.
+if (typeLine.contains('land')) counts['lands']! + 1;
+if (typeLine.contains('creature')) counts['creatures']! + 1;
+if (typeLine.contains('artifact')) counts['artifacts']! + 1;
+// ... etc para cada tipo
+
+// RESULTADO: Uma "Artifact Creature" conta +1 para Creature E +1 para Artifact
+// Isso permite estatísticas mais precisas para análise de arquétipos
 ```
 
 ---
@@ -274,14 +304,14 @@ Prioridade (primeira condição que bater conta):
 
 | Tipo | Substring usada para detecção | Exemplo de carta |
 |------|-------------------------------|------------------|
-| Creature | `typeLine.contains('creature')` | Lightning Greaves é Artifact, não Creature |
+| Creature | `typeLine.contains('creature')` | Ornithopter (Artifact Creature) |
 | Instant | `typeLine.contains('instant')` | Lightning Bolt |
 | Sorcery | `typeLine.contains('sorcery')` | Demonic Tutor |
 | Enchantment | `typeLine.contains('enchantment')` | Rhystic Study |
 | Artifact | `typeLine.contains('artifact')` | Sol Ring |
 | Planeswalker | `typeLine.contains('planeswalker')` | Teferi, Time Raveler |
 | Land | `typeLine.contains('land')` | Command Tower |
-| Battle | ⚠️ **NÃO IMPLEMENTADO** | - |
+| Battle | ☑ **IMPLEMENTADO**: `typeLine.contains('battle')` | Invasion of Ikoria |
 
 ---
 
@@ -383,19 +413,35 @@ weakness_score = edhrec_rank * (cmc > 4 ? 1.5 : 1.0)
 
 **P3.1.2:** Como tratamos **cartas sem dados de rank** (EDHREC rank = null)?
 
-- [x] Assumimos rank máximo (impopular)
+- [ ] Assumimos rank máximo (impopular)
 - [ ] Ignoramos a carta
-- [ ] Usamos média do deck
+- [x] Usamos média do deck (**CORRIGIDO**)
 - [ ] Outro: _______________
 
-**Código de referência:**
+**Código de referência (CORRIGIDO):**
 ```dart
-// lib/ai/otimizacao.dart linha 59
-final rank = (card['edhrec_rank'] as int?) ?? 15000;
-// Se null, assume 15000 (muito impopular = candidata a corte)
+// lib/ai/otimizacao.dart - _calculateEfficiencyScores()
 
-// ⚠️ PROBLEMA: Cartas novas ou de nicho sem dados EDHREC
-// serão marcadas como "fracas" mesmo que sejam boas para o deck.
+// 1. Calcula a mediana do EDHREC rank das cartas que têm rank
+final ranksWithValue = cards
+    .where((c) => c['edhrec_rank'] != null)
+    .map((c) => c['edhrec_rank'] as int)
+    .toList();
+
+// 2. Calcula a mediana do deck (ou usa 5000 como fallback razoável)
+int medianRank = 5000;
+if (ranksWithValue.isNotEmpty) {
+  ranksWithValue.sort();
+  final mid = ranksWithValue.length ~/ 2;
+  medianRank = ranksWithValue.length.isOdd 
+      ? ranksWithValue[mid] 
+      : ((ranksWithValue[mid - 1] + ranksWithValue[mid]) ~/ 2);
+}
+
+// 3. Para cartas sem rank (novas ou de nicho), usa a mediana do deck
+final rank = (card['edhrec_rank'] as int?) ?? medianRank;
+
+// ✅ CORRIGIDO: Cartas novas não são mais penalizadas injustamente
 ```
 
 ---
@@ -1058,28 +1104,35 @@ case 'aggro':
 ### Baseado nas respostas acima, marque possíveis problemas:
 
 - [ ] **Parser não trata DFCs corretamente** (P1.1.3) - ✅ Tratado via fallback LIKE
-- [x] **CMC de cartas híbridas calculado incorretamente** (P2.1.1) - ⚠️ `{2/W}` conta como 1, deveria ser 2
+- [ ] **CMC de cartas híbridas calculado incorretamente** (P2.1.1) - ✅ **CORRIGIDO**: `{2/W}` agora conta como 2
 - [ ] **Terrenos são incluídos no CMC médio** (P2.1.2) - ✅ Excluídos corretamente
-- [x] **Tipos múltiplos são contados uma vez só** (P2.2.1) - ⚠️ Artifact Creature conta só como Creature
-- [x] **Cartas sem EDHREC rank são tratadas como ruins** (P3.1.2) - ⚠️ Assume rank 15000 (muito alto)
+- [ ] **Tipos múltiplos são contados uma vez só** (P2.2.1) - ✅ **CORRIGIDO**: Artifact Creature conta para ambos
+- [ ] **Cartas sem EDHREC rank são tratadas como ruins** (P3.1.2) - ✅ **CORRIGIDO**: Usa mediana do deck
 - [ ] **Staples não são protegidos de corte** (P3.1.3) - ✅ Protegidos via prompt + rank baixo
 - [x] **Cartas de nicho são marcadas como ruins** (P3.2.2) - ⚠️ Depende apenas do EDHREC global
 - [ ] **Cartas banidas podem ser sugeridas** (P4.2.2) - ✅ Dupla verificação (Scryfall + DB)
 - [ ] **IA pode sugerir cartas fora da identidade de cor** (P4.2.3) - ✅ Filtro id<= funciona corretamente
 - [ ] **IA pode inventar cartas que não existem** (P5.2.2) - ✅ Validação pós-IA implementada
 - [x] **Arquétipo pode ser detectado incorretamente** (P6.1.2) - ⚠️ Thresholds rígidos, sem ML
-- [x] **Deck sem comandante não gera erro** (P1.1.2) - ⚠️ Importado sem validação
-- [x] **Battle cards não são detectados** (P2.2.2) - ⚠️ Tipo não implementado
+- [ ] **Deck sem comandante não gera erro** (P1.1.2) - ✅ **CORRIGIDO**: Detecta automaticamente + warning
+- [ ] **Battle cards não são detectados** (P2.2.2) - ✅ **CORRIGIDO**: Tipo Battle implementado
 
-### Bugs Críticos Identificados:
+### Bugs Corrigidos nesta Versão:
+
+| Bug | Severidade | Status | Commit |
+|-----|------------|--------|--------|
+| CMC de híbridos incorreto | Alta | ✅ CORRIGIDO | Parsing correto de `{2/W}` → 2 |
+| Cartas novas sem EDHREC rank são penalizadas | Alta | ✅ CORRIGIDO | Usa mediana do deck |
+| Artifact Creature conta só como Creature | Média | ✅ CORRIGIDO | Contagem múltipla implementada |
+| Deck Commander sem comandante detectado | Média | ✅ CORRIGIDO | Auto-detecta Legendary Creature + warning |
+| Type "Battle" não detectado | Baixa | ✅ CORRIGIDO | Adicionado na contagem de tipos |
+
+### Bugs Pendentes:
 
 | Bug | Severidade | Impacto | Sugestão de Correção |
 |-----|------------|---------|---------------------|
-| CMC de híbridos incorreto | Alta | `{2/W}` conta como 1, distorce curva | Implementar parsing correto de híbridos |
-| Cartas novas sem EDHREC rank são penalizadas | Alta | Cartas boas recém-lançadas aparecem como "ruins" | Usar rank médio do deck ou buscar via API |
-| Artifact Creature conta só como Creature | Média | Distorce estatísticas de arquétipo | Implementar contagem múltipla ou secundária |
-| Deck Commander sem comandante detectado | Média | Análise de sinergia fica genérica | Validar presença de comandante no import |
-| Type "Battle" não detectado | Baixa | Cartas Battle são ignoradas na contagem | Adicionar case no switch |
+| Cartas de nicho marcadas como ruins | Baixa | Score não considera sinergia local | Adicionar análise de sinergia contextual |
+| Detecção de arquétipo rígida | Baixa | Thresholds fixos podem errar | Implementar ML ou ajustar thresholds dinamicamente |
 
 ---
 
@@ -1135,8 +1188,25 @@ Assinatura: _______________
 
 _Este formulário deve ser revisado sempre que houver mudanças significativas nos algoritmos de otimização._
 
-**Versão do Formulário:** 1.1  
+**Versão do Formulário:** 1.2  
 **Última Atualização:** 25 de Novembro de 2025  
+
+**Changelog:**
+- v1.2: Implementação das correções identificadas na auditoria
+  - ✅ CMC híbrido corrigido (`{2/W}` → 2)
+  - ✅ Contagem de tipos múltiplos (Artifact Creature conta para ambos)
+  - ✅ EDHREC rank para cartas novas usa mediana do deck
+  - ✅ Detecção automática de comandante + warning
+  - ✅ Tipo Battle adicionado na contagem
+- v1.1: Preenchimento completo do formulário com dados do codebase
+- v1.0: Template inicial do formulário
+
+**Arquivos Modificados:**
+- `server/routes/import/index.dart` - Validação de comandante
+- `server/routes/decks/[id]/analysis/index.dart` - CMC híbrido
+- `server/routes/ai/optimize/index.dart` - Contagem de tipos + Battle
+- `server/lib/ai/otimizacao.dart` - EDHREC rank mediana
+
 **Arquivos Analisados:**
 - `server/routes/import/index.dart`
 - `server/routes/decks/[id]/analysis/index.dart`
