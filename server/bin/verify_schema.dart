@@ -48,6 +48,9 @@ void main() async {
         'id', 'sync_type', 'format', 'records_updated', 'records_inserted', 
         'records_deleted', 'status', 'error_message', 'started_at', 'finished_at'
       ],
+      'sync_state': [
+        'key', 'value', 'updated_at'
+      ],
       'archetype_counters': [
         'id', 'archetype', 'counter_archetype', 'hate_cards', 'priority', 'format', 
         'color_identity', 'notes', 'effectiveness_score', 'last_synced_at', 'created_at'

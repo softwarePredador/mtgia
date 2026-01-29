@@ -155,6 +155,14 @@ CREATE TABLE IF NOT EXISTS sync_log (
     finished_at TIMESTAMP WITH TIME ZONE
 );
 
+-- 11.1. Sync State (Checkpoint do último sync)
+-- Armazena estado simples (key/value) para sincronizações incrementais.
+CREATE TABLE IF NOT EXISTS sync_state (
+    key TEXT PRIMARY KEY,
+    value TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 12. Tabela de Counters por Arquétipo (Hate Cards e Counter-Strategies)
 -- Armazena cartas e estratégias para countar arquétipos específicos
 -- Evita hardcoded hate cards e permite atualização dinâmica

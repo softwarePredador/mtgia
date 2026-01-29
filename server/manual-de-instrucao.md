@@ -26,8 +26,11 @@ Este documento serve como guia definitivo para o entendimento, manutenção e ex
 - [x] Estrutura de rotas para decks (`routes/decks/`)
 - [x] Scripts utilitários:
   - `bin/fetch_meta.dart` - Download de JSON do MTGJSON
-  - `bin/load_cards.dart` - Importação de cartas para o banco
-  - `bin/load_rules.dart` - Importação de regras oficiais
+  - `bin/seed_database.dart` - Seed de cartas via MTGJSON (AtomicCards.json)
+  - `bin/seed_legalities_optimized.dart` - Seed/atualização de legalidades via AtomicCards.json
+  - `bin/seed_rules.dart` - Importação de regras oficiais
+  - `bin/sync_cards.dart` - Sync idempotente (cartas + legalidades) com checkpoint
+  - `bin/setup_database.dart` - Cria schema inicial
 - [x] Schema do banco de dados completo (`database_setup.sql`)
 
 ### ✅ **Implementado (Frontend - Flutter)**
@@ -233,6 +236,38 @@ dart test
 ```
 
 **Documentação Completa:** Ver `server/test/README.md` para detalhes sobre cada teste.
+
+---
+
+## 🔄 Atualização contínua de cartas (novas coleções)
+
+### Objetivo
+Manter `cards` e `card_legalities` atualizados quando novas coleções/sets são lançados.
+
+### Ferramenta oficial do projeto
+Use o script `bin/sync_cards.dart`:
+- Faz download do `Meta.json` e do `AtomicCards.json` (MTGJSON).
+- Faz **UPSERT** de cartas por `cards.scryfall_id` (Oracle ID).
+- Faz **UPSERT** de legalidades por `(card_id, format)`.
+- Mantém um checkpoint em `sync_state` (`mtgjson_meta_version`, `mtgjson_meta_date`, `cards_last_sync_at`).
+- Registra execução no `sync_log` (quando disponível).
+
+### Rodar manualmente
+```bash
+cd server
+
+# Sync incremental (sets novos desde o último sync)
+dart run bin/sync_cards.dart
+
+# Forçar download + reprocessar tudo
+dart run bin/sync_cards.dart --full --force
+```
+
+### Automatizar (cron)
+Exemplo (Linux/macOS) para rodar 1x/dia às 03:00:
+```cron
+0 3 * * * cd /caminho/para/mtgia/server && /usr/bin/dart run bin/sync_cards.dart >> sync_cards.log 2>&1
+```
 
 **Cobertura Estimada:**
 - `lib/auth_service.dart`: ~90%
