@@ -15,6 +15,11 @@ Este repositório é **full-stack**:
 - **Deep link /decks/:id/search**: “Adicionar carta” deve funcionar mesmo se o deck ainda não foi carregado no provider (garantir `fetchDeckDetails`).
 - **Rate limiting em auth**: em dev/test, limites agressivos podem bloquear QA e a suíte de testes (especialmente quando o identificador cai em `anonymous` por ausência de IP/headers).
 - **IA (OpenAI)**: manter comportamento consistente entre endpoints (fallback/mock em dev quando `OPENAI_API_KEY` não estiver configurada, para não quebrar UI).
+- **Atualização de cartas (novas coleções)**:
+  - Script oficial: `server/bin/sync_cards.dart` (idempotente, usa checkpoint em `sync_state`).
+  - Fluxo recomendado: incremental (`dart run bin/sync_cards.dart`) + cron diário.
+  - Quando não existir checkpoint mas o banco já tiver cartas, usar fallback `--since-days=<N>` (default: 45) ou rodar full (`--full`).
+  - `--full` processa `AtomicCards.json` (grande) — evitar rodar em loops/CI sem necessidade.
 
 ## 1. Objetivo do Projeto
 Desenvolver um aplicativo de Deck Builder de Magic: The Gathering (MTG) revolucionário, focado em inteligência artificial e automação.

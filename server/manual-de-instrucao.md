@@ -259,8 +259,15 @@ cd server
 # Sync incremental (sets novos desde o último sync)
 dart run bin/sync_cards.dart
 
+# Opcional: se não existir checkpoint em `sync_state` (ex.: DB já seeded),
+# o incremental usa uma janela de dias (default: 45) para detectar sets recentes.
+dart run bin/sync_cards.dart --since-days=90
+
 # Forçar download + reprocessar tudo
 dart run bin/sync_cards.dart --full --force
+
+# Ver status do checkpoint/log
+dart run bin/sync_status.dart
 ```
 
 ### Automatizar (cron)
@@ -715,6 +722,10 @@ class Database {
 
 **Por que usamos variáveis de ambiente?**
 No método `connect()`, usamos `DotEnv` para ler `DB_HOST`, `DB_PASS`, etc. Isso segue o princípio de **12-Factor App** (Configuração separada do Código). Isso permite que você mude o banco de dados sem tocar em uma linha de código, apenas alterando o arquivo `.env`.
+
+**SSL do banco (Postgres)**
+- Por padrão: `ENVIRONMENT=production` → `sslMode=require`, senão → `sslMode=disable`.
+- Override explícito: `DB_SSL_MODE=disable|require|verifyFull`.
 
 ### 3.2. Setup Inicial do Banco (`bin/setup_database.dart`)
 

@@ -13,6 +13,7 @@ import '../lib/database.dart';
 /// - `dart run bin/sync_cards.dart`                 -> incremental (sets novos desde o último sync)
 /// - `dart run bin/sync_cards.dart --full`          -> full sync via AtomicCards.json
 /// - `dart run bin/sync_cards.dart --full --force`  -> força download + reprocessa tudo
+/// - `dart run bin/sync_cards.dart --since-days=60` -> fallback de janela (quando não há checkpoint)
 ///
 /// Requisitos:
 /// - `server/.env` configurado (DB_* e ENVIRONMENT)
@@ -37,15 +38,17 @@ Uso:
   dart run bin/sync_cards.dart --full --force Força download e reprocessa tudo
 
 Opções:
-  --full   Executa sincronização completa (AtomicCards.json)
-  --force  Força re-download do AtomicCards.json (modo full)
-  --help   Mostra esta ajuda
+  --full           Executa sincronização completa (AtomicCards.json)
+  --force          Força re-download do AtomicCards.json (modo full) e ignora cache/versão
+  --since-days=<N> Janela (dias) usada como fallback no incremental quando não existe checkpoint (default: 45)
+  --help           Mostra esta ajuda
 ''');
     return;
   }
 
   final force = args.contains('--force') || args.contains('-f');
   final full = args.contains('--full');
+  final sinceDays = _parseSinceDays(args) ?? 45;
 
   final env = DotEnv(includePlatformEnvironment: true)..load();
   final environment = (env['ENVIRONMENT'] ?? Platform.environment['ENVIRONMENT'] ?? 'development').toLowerCase();
@@ -80,8 +83,14 @@ Opções:
     int processedCards;
     int processedLegalities;
 
-    if (full || lastSyncAt == null) {
-      final atomicFile = await _downloadAtomicCards(force: true);
+    final hasExistingBase = beforeCards > 0;
+    final effectiveLastSyncAt = lastSyncAt ??
+        (hasExistingBase && !full
+            ? DateTime.now().subtract(Duration(days: sinceDays))
+            : null);
+
+    if (full || effectiveLastSyncAt == null) {
+      final atomicFile = await _downloadAtomicCards(force: force);
       final decoded = jsonDecode(await atomicFile.readAsString()) as Map<String, dynamic>;
       final cardsMap = decoded['data'] as Map<String, dynamic>;
 
@@ -93,13 +102,13 @@ Opções:
         return _upsertLegalitiesFromAtomic(session, cardsMap);
       });
     } else {
-      final setCodes = await _getNewSetCodesSince(lastSyncAt);
+      final setCodes = await _getNewSetCodesSince(effectiveLastSyncAt);
       if (setCodes.isEmpty) {
-        print('✅ Nenhum set novo detectado desde $lastSyncAtStr. Atualizando apenas checkpoint de versão.');
+        print('✅ Nenhum set novo detectado desde ${effectiveLastSyncAt.toIso8601String()}. Atualizando apenas checkpoint de versão.');
         processedCards = 0;
         processedLegalities = 0;
       } else {
-        print('🆕 Sets novos desde $lastSyncAtStr: ${setCodes.join(', ')}');
+        print('🆕 Sets novos desde ${effectiveLastSyncAt.toIso8601String()}: ${setCodes.join(', ')}');
         processedCards = 0;
         processedLegalities = 0;
 
@@ -168,6 +177,18 @@ Opções:
   } finally {
     await db.close();
   }
+}
+
+int? _parseSinceDays(List<String> args) {
+  for (final arg in args) {
+    if (arg.startsWith('--since-days=')) {
+      final value = arg.split('=').last.trim();
+      final parsed = int.tryParse(value);
+      if (parsed == null || parsed <= 0) return null;
+      return parsed;
+    }
+  }
+  return null;
 }
 
 Future<Map<String, dynamic>> _fetchMtgJsonMeta() async {
@@ -481,12 +502,12 @@ Future<int> _upsertLegalitiesFromAtomic(Session session, Map<String, dynamic> ca
 
   // 2) Montar batch SQL (bem mais rápido do que 1 insert por linha).
   const batchSize = 2500;
-  final buffer = <String>[];
+  final buffer = <String, String>{};
   var processed = 0;
 
   Future<void> flush() async {
     if (buffer.isEmpty) return;
-    final valuesStr = buffer.join(',');
+    final valuesStr = buffer.values.join(',');
     await session.execute(
       Sql.named('''
         INSERT INTO card_legalities (card_id, format, status)
@@ -516,7 +537,7 @@ Future<int> _upsertLegalitiesFromAtomic(Session session, Map<String, dynamic> ca
     for (final entry in legalities.entries) {
       final format = entry.key.toString().replaceAll("'", "''");
       final status = entry.value.toString().toLowerCase().replaceAll("'", "''");
-      buffer.add("('$internalId', '$format', '$status')");
+      buffer['$internalId|$format'] = "('$internalId', '$format', '$status')";
       processed++;
 
       if (buffer.length >= batchSize) {
@@ -543,12 +564,12 @@ Future<int> _upsertLegalitiesFromSet(Session session, List<Map<String, dynamic>>
   }
 
   const batchSize = 2500;
-  final buffer = <String>[];
+  final buffer = <String, String>{};
   var processed = 0;
 
   Future<void> flush() async {
     if (buffer.isEmpty) return;
-    final valuesStr = buffer.join(',');
+    final valuesStr = buffer.values.join(',');
     await session.execute(
       Sql.named('''
         INSERT INTO card_legalities (card_id, format, status)
@@ -573,7 +594,7 @@ Future<int> _upsertLegalitiesFromSet(Session session, List<Map<String, dynamic>>
     for (final entry in legalities.entries) {
       final format = entry.key.toString().replaceAll("'", "''");
       final status = entry.value.toString().toLowerCase().replaceAll("'", "''");
-      buffer.add("('$internalId', '$format', '$status')");
+      buffer['$internalId|$format'] = "('$internalId', '$format', '$status')";
       processed++;
       if (buffer.length >= batchSize) {
         await flush();
