@@ -9,6 +9,7 @@ import 'package:dart_frog/dart_frog.dart';
 import '../routes/index.dart' as index;
 import '../routes/rules/index.dart' as rules_index;
 import '../routes/import/index.dart' as import_index;
+import '../routes/health/index.dart' as health_index;
 import '../routes/decks/index.dart' as decks_index;
 import '../routes/decks/[id]/index.dart' as decks_$id_index;
 import '../routes/decks/[id]/simulate/index.dart' as decks_$id_simulate_index;
@@ -58,6 +59,7 @@ Handler buildRootHandler() {
     ..mount('/decks/<id>/simulate', (context,id,) => buildDecks$idSimulateHandler(id,)(context))
     ..mount('/decks/<id>', (context,id,) => buildDecks$idHandler(id,)(context))
     ..mount('/decks', (context) => buildDecksHandler()(context))
+    ..mount('/health', (context) => buildHealthHandler()(context))
     ..mount('/import', (context) => buildImportHandler()(context))
     ..mount('/rules', (context) => buildRulesHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
@@ -152,6 +154,13 @@ Handler buildDecksHandler() {
   final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
   final router = Router()
     ..all('/', (context) => decks_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildHealthHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/', (context) => health_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 

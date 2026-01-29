@@ -12,8 +12,13 @@ class ApiResponse {
 }
 
 class ApiClient {
+  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
+
   // Retorna a URL correta dependendo do ambiente (Android Emulator vs Outros)
   static String get baseUrl {
+    if (_envBaseUrl.trim().isNotEmpty) {
+      return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
+    }
     if (kIsWeb) {
       return 'http://localhost:8080';
     }

@@ -48,7 +48,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     // 1. RAG: Buscar contexto no Meta (Opcional, mas recomendado)
     // Tenta encontrar decks no meta que tenham palavras-chave do prompt
-    final conn = context.read<Connection>();
+    final pool = context.read<Pool>();
     String metaContext = '';
     
     try {
@@ -59,7 +59,7 @@ Future<Response> onRequest(RequestContext context) async {
           .join(' OR archetype ILIKE ');
 
       if (keywords.isNotEmpty) {
-        final metaResult = await conn.execute(
+        final metaResult = await pool.execute(
           Sql.named('''
             SELECT archetype, card_list 
             FROM meta_decks 
@@ -136,7 +136,6 @@ Future<Response> onRequest(RequestContext context) async {
     final cards = (deckList['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     
     // Validar cartas geradas pela IA
-    final pool = context.read<Pool>();
     final validationService = CardValidationService(pool);
     
     // Extrair nomes das cartas e sanitizar

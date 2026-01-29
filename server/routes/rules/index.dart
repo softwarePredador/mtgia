@@ -22,20 +22,20 @@ Future<Response> _searchRules(RequestContext context) async {
   // Validação básica do limite para evitar abuso
   final safeLimit = (limit > 100) ? 100 : limit;
 
-  final conn = context.read<Connection>();
+  final pool = context.read<Pool>();
 
   try {
     Result result;
 
     if (query == null || query.isEmpty) {
       // Sem busca específica: retorna as primeiras regras (geralmente introdução)
-      result = await conn.execute(
+      result = await pool.execute(
         Sql.named('SELECT id, title, description, category FROM rules ORDER BY title ASC LIMIT @limit'),
         parameters: {'limit': safeLimit},
       );
     } else {
       // Busca textual no título (número da regra) ou descrição
-      result = await conn.execute(
+      result = await pool.execute(
         Sql.named('''
           SELECT id, title, description, category 
           FROM rules 
