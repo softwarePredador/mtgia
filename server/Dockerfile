@@ -18,5 +18,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Easypanel costuma injetar PORT; fallback para 8080.
-CMD ["/bin/sh", "-c", "dart run build/bin/server.dart --hostname 0.0.0.0 --port ${PORT:-8080}"]
-
+CMD ["/bin/sh", "-c", "dart build/bin/server.dart --hostname 0.0.0.0 --port ${PORT:-8080}"]
