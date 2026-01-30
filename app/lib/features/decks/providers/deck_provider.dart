@@ -383,6 +383,30 @@ class DeckProvider extends ChangeNotifier {
     throw Exception('Falha ao adicionar em lote: ${response.statusCode}');
   }
 
+  Future<void> updateDeckStrategy({
+    required String deckId,
+    required String archetype,
+    required int bracket,
+  }) async {
+    final response = await _apiClient.put('/decks/$deckId', {
+      'archetype': archetype,
+      'bracket': bracket,
+    });
+
+    if (response.statusCode != 200) {
+      final data = response.data;
+      final msg =
+          (data is Map && data['error'] != null)
+              ? data['error'].toString()
+              : 'Falha ao salvar estratégia: ${response.statusCode}';
+      throw Exception(msg);
+    }
+
+    // Recarrega detalhes e lista para refletir chips/estado.
+    await fetchDeckDetails(deckId);
+    await fetchDecks();
+  }
+
   /// Valida o deck no servidor (modo estrito: Commander=100 e com comandante).
   Future<Map<String, dynamic>> validateDeck(String deckId) async {
     final response = await _apiClient.post('/decks/$deckId/validate', {});

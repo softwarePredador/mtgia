@@ -4,6 +4,27 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/deck_rules_service.dart';
 
+bool? _hasDeckMetaColumnsCache;
+Future<bool> _hasDeckMetaColumns(Pool pool) async {
+  if (_hasDeckMetaColumnsCache != null) return _hasDeckMetaColumnsCache!;
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'decks'
+          AND column_name IN ('archetype', 'bracket')
+      '''),
+    );
+    final count = (result.first[0] as int?) ?? 0;
+    _hasDeckMetaColumnsCache = count >= 2;
+  } catch (_) {
+    _hasDeckMetaColumnsCache = false;
+  }
+  return _hasDeckMetaColumnsCache!;
+}
+
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.get) {
     return _getDeckById(context, deckId);
@@ -67,11 +88,16 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
 Future<Response> _updateDeck(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();
+  final hasMeta = await _hasDeckMetaColumns(conn);
 
   final body = await context.request.json();
   final name = body['name'] as String?;
   final format = body['format'] as String?;
   final description = body['description'] as String?;
+  final archetype = body['archetype'] as String?;
+  final bracketRaw = body['bracket'];
+  final bracket =
+      bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
   final cards = body['cards'] as List?; // Lista completa e nova de cartas
 
   try {
@@ -79,7 +105,9 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       // 1. Verifica se o deck existe e pertence ao usuário
       final deckCheck = await session.execute(
         Sql.named(
-            'SELECT id, name, format, description FROM decks WHERE id = @deckId AND user_id = @userId'),
+            hasMeta
+                ? 'SELECT id, name, format, description, archetype, bracket FROM decks WHERE id = @deckId AND user_id = @userId'
+                : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket FROM decks WHERE id = @deckId AND user_id = @userId'),
         parameters: {'deckId': deckId, 'userId': userId},
       );
 
@@ -90,23 +118,35 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       final existingName = deckCheck.first[1] as String;
       final existingFormat = deckCheck.first[2] as String;
       final existingDescription = deckCheck.first[3] as String?;
+      final existingArchetype = deckCheck.first[4] as String?;
+      final existingBracket = deckCheck.first[5] as int?;
 
       final nextName = name ?? existingName;
       final nextFormat = format ?? existingFormat;
       final nextDescription = description ?? existingDescription;
+      final nextArchetype = archetype ?? existingArchetype;
+      final nextBracket = bracket ?? existingBracket;
 
       final currentFormat = nextFormat.toLowerCase();
 
       // 2. Atualiza os dados do deck
-      if (name != null || format != null || description != null) {
+      if (name != null ||
+          format != null ||
+          description != null ||
+          archetype != null ||
+          bracket != null) {
         await session.execute(
           Sql.named(
-            'UPDATE decks SET name = @name, format = @format, description = @desc WHERE id = @deckId',
+            hasMeta
+                ? 'UPDATE decks SET name = @name, format = @format, description = @desc, archetype = @archetype, bracket = @bracket WHERE id = @deckId'
+                : 'UPDATE decks SET name = @name, format = @format, description = @desc WHERE id = @deckId',
           ),
           parameters: {
             'name': nextName,
             'format': nextFormat,
             'desc': nextDescription,
+            if (hasMeta) 'archetype': nextArchetype,
+            if (hasMeta) 'bracket': nextBracket,
             'deckId': deckId,
           },
         );
@@ -189,12 +229,15 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 Future<Response> _getDeckById(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();
+  final hasMeta = await _hasDeckMetaColumns(conn);
 
   try {
     // 1. Buscar os detalhes do deck e verificar se pertence ao usuário
     final deckResult = await conn.execute(
       Sql.named(
-        'SELECT id, name, format, description, synergy_score, strengths, weaknesses, created_at FROM decks WHERE id = @deckId AND user_id = @userId',
+        hasMeta
+            ? 'SELECT id, name, format, description, archetype, bracket, synergy_score, strengths, weaknesses, created_at FROM decks WHERE id = @deckId AND user_id = @userId'
+            : 'SELECT id, name, format, description, NULL::text as archetype, NULL::int as bracket, synergy_score, strengths, weaknesses, created_at FROM decks WHERE id = @deckId AND user_id = @userId',
       ),
       parameters: {
         'deckId': deckId,

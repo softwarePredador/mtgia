@@ -5,6 +5,7 @@ class Deck {
   final String format;
   final String? description;
   final String? archetype; // Arquétipo do deck (aggro, control, midrange, combo, etc)
+  final int? bracket; // 1..4 (EDH bracket)
   final int? synergyScore;
   final String? strengths;
   final String? weaknesses;
@@ -18,6 +19,7 @@ class Deck {
     required this.format,
     this.description,
     this.archetype,
+    this.bracket,
     this.synergyScore,
     this.strengths,
     this.weaknesses,
@@ -34,6 +36,7 @@ class Deck {
       format: json['format'] as String,
       description: json['description'] as String?,
       archetype: json['archetype'] as String?,
+      bracket: json['bracket'] as int?,
       synergyScore: json['synergy_score'] as int?,
       strengths: json['strengths'] as String?,
       weaknesses: json['weaknesses'] as String?,
@@ -51,6 +54,7 @@ class Deck {
       'format': format,
       'description': description,
       'archetype': archetype,
+      'bracket': bracket,
       'synergy_score': synergyScore,
       'strengths': strengths,
       'weaknesses': weaknesses,
@@ -67,6 +71,7 @@ class Deck {
     String? format,
     String? description,
     String? archetype,
+    int? bracket,
     int? synergyScore,
     String? strengths,
     String? weaknesses,
@@ -80,6 +85,7 @@ class Deck {
       format: format ?? this.format,
       description: description ?? this.description,
       archetype: archetype ?? this.archetype,
+      bracket: bracket ?? this.bracket,
       synergyScore: synergyScore ?? this.synergyScore,
       strengths: strengths ?? this.strengths,
       weaknesses: weaknesses ?? this.weaknesses,

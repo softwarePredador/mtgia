@@ -90,6 +90,10 @@ CREATE TABLE IF NOT EXISTS decks (
     format TEXT NOT NULL,
     description TEXT,
     is_public BOOLEAN DEFAULT FALSE,
+
+    -- Preferências do usuário (UX)
+    archetype TEXT, -- Ex: "Goblin Tribal", "Voltron", etc.
+    bracket INTEGER, -- 1..4 (EDH bracket / power level)
     
     -- Campos de Análise da IA
     synergy_score INTEGER DEFAULT 0, -- 0 a 100: Quão consolidado/sinérgico é o deck
@@ -99,6 +103,10 @@ CREATE TABLE IF NOT EXISTS decks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP WITH TIME ZONE -- Soft delete
 );
+
+-- Backfill/compat: adiciona colunas se o banco já existir (idempotente)
+ALTER TABLE decks ADD COLUMN IF NOT EXISTS archetype TEXT;
+ALTER TABLE decks ADD COLUMN IF NOT EXISTS bracket INTEGER;
 
 -- 6. Tabela de Itens do Deck (Relacionamento N:N entre Deck e Cartas)
 CREATE TABLE IF NOT EXISTS deck_cards (

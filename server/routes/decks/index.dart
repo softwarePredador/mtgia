@@ -5,6 +5,27 @@ import 'package:postgres/postgres.dart';
 import '../../lib/deck_rules_service.dart';
 import '../../lib/logger.dart';
 
+bool? _hasDeckMetaColumnsCache;
+Future<bool> _hasDeckMetaColumns(Pool pool) async {
+  if (_hasDeckMetaColumnsCache != null) return _hasDeckMetaColumnsCache!;
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT COUNT(*)::int
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'decks'
+          AND column_name IN ('archetype', 'bracket')
+      '''),
+    );
+    final count = (result.first[0] as int?) ?? 0;
+    _hasDeckMetaColumnsCache = count >= 2;
+  } catch (_) {
+    _hasDeckMetaColumnsCache = false;
+  }
+  return _hasDeckMetaColumnsCache!;
+}
+
 Future<Response> onRequest(RequestContext context) async {
   // Este arquivo vai lidar com diferentes métodos HTTP para a rota /decks
   if (context.request.method == HttpMethod.post) {
@@ -31,13 +52,34 @@ Future<Response> _listDecks(RequestContext context) async {
     Log.d('🔌 Conexão com banco obtida.');
 
     Log.d('🔍 Executando query SELECT...');
+    final hasMeta = await _hasDeckMetaColumns(conn);
     final result = await conn.execute(
-      Sql.named('''
+      Sql.named(hasMeta
+          ? '''
         SELECT 
           d.id, 
           d.name, 
           d.format, 
           d.description, 
+          d.archetype,
+          d.bracket,
+          d.synergy_score, 
+          d.created_at,
+          COALESCE(SUM(dc.quantity), 0)::int as card_count
+        FROM decks d
+        LEFT JOIN deck_cards dc ON d.id = dc.deck_id
+        WHERE d.user_id = @userId
+        GROUP BY d.id
+        ORDER BY d.created_at DESC
+      '''
+          : '''
+        SELECT 
+          d.id, 
+          d.name, 
+          d.format, 
+          d.description, 
+          NULL::text as archetype,
+          NULL::int as bracket,
           d.synergy_score, 
           d.created_at,
           COALESCE(SUM(dc.quantity), 0)::int as card_count
@@ -80,6 +122,9 @@ Future<Response> _createDeck(RequestContext context) async {
   final body = await context.request.json();
   final name = body['name'] as String?;
   final format = body['format'] as String?;
+  final archetype = body['archetype'] as String?;
+  final bracketRaw = body['bracket'];
+  final bracket = bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
   final cards = body['cards'] as List? ??
       []; // Ex: [{'card_id': 'uuid', 'quantity': 2, 'is_commander': false}]
 
@@ -91,6 +136,7 @@ Future<Response> _createDeck(RequestContext context) async {
   }
 
   final conn = context.read<Pool>();
+  final hasMeta = await _hasDeckMetaColumns(conn);
 
   // 3. Usar uma transação para garantir a consistência dos dados
   try {
@@ -98,13 +144,17 @@ Future<Response> _createDeck(RequestContext context) async {
       // Insere o deck e obtém o ID gerado
       final deckResult = await session.execute(
         Sql.named(
-          'INSERT INTO decks (user_id, name, format, description) VALUES (@userId, @name, @format, @desc) RETURNING id, name, format, created_at',
+          hasMeta
+              ? 'INSERT INTO decks (user_id, name, format, description, archetype, bracket) VALUES (@userId, @name, @format, @desc, @archetype, @bracket) RETURNING id, name, format, archetype, bracket, created_at'
+              : 'INSERT INTO decks (user_id, name, format, description) VALUES (@userId, @name, @format, @desc) RETURNING id, name, format, created_at',
         ),
         parameters: {
           'userId': userId,
           'name': name,
           'format': format,
           'desc': body['description'] as String?,
+          if (hasMeta) 'archetype': archetype,
+          if (hasMeta) 'bracket': bracket,
         },
       );
 
@@ -112,6 +162,10 @@ Future<Response> _createDeck(RequestContext context) async {
       if (deckMap['created_at'] is DateTime) {
         deckMap['created_at'] =
             (deckMap['created_at'] as DateTime).toIso8601String();
+      }
+      if (!hasMeta) {
+        deckMap['archetype'] = null;
+        deckMap['bracket'] = null;
       }
 
       final newDeckId = deckMap['id'];

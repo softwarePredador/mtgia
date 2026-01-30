@@ -186,7 +186,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       Text(deck.description!),
                       const SizedBox(height: 24),
                     ],
-                    if (deck.commander.isNotEmpty) ...[
+                  if (deck.commander.isNotEmpty) ...[
                       Text('Comandante', style: theme.textTheme.titleMedium),
                       const SizedBox(height: 8),
                       ...deck.commander.map(
@@ -215,6 +215,28 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         ),
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    Text('Estratégia', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        Chip(
+                          label: Text(
+                            (deck.archetype == null ||
+                                    deck.archetype!.trim().isEmpty)
+                                ? 'Não definida'
+                                : deck.archetype!,
+                          ),
+                        ),
+                        Chip(
+                          label: Text(
+                            'Bracket: ${deck.bracket ?? 2}',
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -736,6 +758,12 @@ class _OptimizationSheet extends StatefulWidget {
 class _OptimizationSheetState extends State<_OptimizationSheet> {
   late Future<List<Map<String, dynamic>>> _optionsFuture;
   int _selectedBracket = 2;
+  bool _showAllStrategies = true;
+
+  String? get _currentArchetype {
+    final deck = context.read<DeckProvider>().selectedDeck;
+    return deck?.archetype;
+  }
 
   Future<void> _copyOptimizeDebug({
     required String deckId,
@@ -762,6 +790,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   ) async {
     // Controle do estado do loading para garantir fechamento correto
     bool isLoadingDialogOpen = false;
+    final deckProvider = context.read<DeckProvider>();
 
     /// Helper para fechar o dialog de loading de forma segura
     void closeLoadingDialog() {
@@ -796,7 +825,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
 
     try {
       // 2. Call API to get suggestions
-      final result = await context.read<DeckProvider>().optimizeDeck(
+      final result = await deckProvider.optimizeDeck(
         widget.deckId,
         archetype,
         _selectedBracket,
@@ -980,9 +1009,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       isLoadingDialogOpen = true;
 
       // Aplicar as mudanças via DeckProvider
-              if (mode == 'complete' && additionsDetailed.isNotEmpty) {
+      if (mode == 'complete' && additionsDetailed.isNotEmpty) {
         // Completar deck: adicionar em lote (mais rápido e evita N chamadas).
-        await context.read<DeckProvider>().addCardsBulk(
+        await deckProvider.addCardsBulk(
           deckId: widget.deckId,
           cards: additionsDetailed
               .where((m) => m['card_id'] != null)
@@ -996,12 +1025,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               .toList(),
         );
       } else {
-        await context.read<DeckProvider>().applyOptimization(
+        await deckProvider.applyOptimization(
           deckId: widget.deckId,
           cardsToRemove: removals,
           cardsToAdd: additions,
         );
       }
+
+      // Persistir estratégia/bracket no deck para UX.
+      await deckProvider.updateDeckStrategy(
+        deckId: widget.deckId,
+        archetype: archetype,
+        bracket: _selectedBracket,
+      );
+      if (!context.mounted) return;
 
       closeLoadingDialog();
 
@@ -1031,6 +1068,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   @override
   void initState() {
     super.initState();
+    final deck = context.read<DeckProvider>().selectedDeck;
+    final savedBracket = deck?.bracket;
+    if (savedBracket != null) _selectedBracket = savedBracket;
     _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
       widget.deckId,
     );
@@ -1039,6 +1079,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final savedArchetype = _currentArchetype;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -1089,6 +1130,41 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             ),
           ),
           const SizedBox(height: 16),
+          if (savedArchetype != null && savedArchetype.trim().isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Estratégia atual: $savedArchetype',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() => _showAllStrategies = !_showAllStrategies);
+                    },
+                    child: Text(_showAllStrategies ? 'Ocultar' : 'Trocar'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () => _applyOptimization(context, savedArchetype),
+              icon: const Icon(Icons.auto_fix_high),
+              label: const Text('Otimizar com esta estratégia'),
+            ),
+            const SizedBox(height: 16),
+          ],
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _optionsFuture,
@@ -1135,12 +1211,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                 }
 
                 final options = snapshot.data!;
+                final visibleOptions =
+                    _showAllStrategies ? options : const <Map<String, dynamic>>[];
                 return ListView.separated(
                   controller: widget.scrollController,
-                  itemCount: options.length,
+                  itemCount: visibleOptions.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
-                    final option = options[index];
+                    final option = visibleOptions[index];
                     return Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
@@ -1153,8 +1231,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        onTap:
-                            () => _applyOptimization(context, option['title']),
+                        onTap: () {
+                          final title = (option['title'] ?? '').toString();
+                          if (title.isEmpty) return;
+                          _applyOptimization(context, title);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
