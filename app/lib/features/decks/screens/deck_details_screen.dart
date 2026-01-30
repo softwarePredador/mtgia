@@ -17,7 +17,8 @@ class DeckDetailsScreen extends StatefulWidget {
   State<DeckDetailsScreen> createState() => _DeckDetailsScreenState();
 }
 
-class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTickerProviderStateMixin {
+class _DeckDetailsScreenState extends State<DeckDetailsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -81,7 +82,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: theme.colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(provider.detailsErrorMessage!),
                   const SizedBox(height: 16),
@@ -100,7 +105,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
           }
           final format = deck.format.toLowerCase();
           final isCommanderFormat = format == 'commander' || format == 'brawl';
-          final maxCards = format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
+          final maxCards =
+              format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
           final totalCards = _totalCards(deck);
 
           return TabBarView(
@@ -117,7 +123,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
                     Chip(label: Text(deck.format.toUpperCase())),
                     const SizedBox(height: 8),
                     Text(
-                      maxCards == null ? 'Cartas: $totalCards' : 'Cartas: $totalCards/$maxCards',
+                      maxCards == null
+                          ? 'Cartas: $totalCards'
+                          : 'Cartas: $totalCards/$maxCards',
                       style: theme.textTheme.bodyMedium,
                     ),
                     if (isCommanderFormat && deck.commander.isEmpty) ...[
@@ -125,19 +133,31 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer.withValues(alpha: 0.25),
+                          color: theme.colorScheme.errorContainer.withValues(
+                            alpha: 0.25,
+                          ),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: theme.colorScheme.errorContainer),
+                          border: Border.all(
+                            color: theme.colorScheme.errorContainer,
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: theme.colorScheme.error),
+                            Icon(
+                              Icons.info_outline,
+                              color: theme.colorScheme.error,
+                            ),
                             const SizedBox(width: 10),
                             const Expanded(
-                              child: Text('Selecione um comandante para aplicar regras e filtros de identidade de cor.'),
+                              child: Text(
+                                'Selecione um comandante para aplicar regras e filtros de identidade de cor.',
+                              ),
                             ),
                             TextButton(
-                              onPressed: () => context.go('/decks/${widget.deckId}/search'),
+                              onPressed:
+                                  () => context.go(
+                                    '/decks/${widget.deckId}/search',
+                                  ),
                               child: const Text('Selecionar'),
                             ),
                           ],
@@ -154,16 +174,31 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
                     if (deck.commander.isNotEmpty) ...[
                       Text('Comandante', style: theme.textTheme.titleMedium),
                       const SizedBox(height: 8),
-                      ...deck.commander.map((c) => Card(
-                        child: ListTile(
-                          leading: c.imageUrl != null 
-                              ? Image.network(c.imageUrl!, width: 50) 
-                              : const Icon(Icons.image_not_supported),
-                          title: Text(c.name),
-                          subtitle: Text(c.typeLine),
-                          onTap: () => _showCardDetails(context, c),
+                      ...deck.commander.map(
+                        (c) => Card(
+                          child: ListTile(
+                            leading:
+                                c.imageUrl != null
+                                    ? Image.network(c.imageUrl!, width: 50)
+                                    : const Icon(Icons.image_not_supported),
+                            title: Text(c.name),
+                            subtitle: Text(c.typeLine),
+                            onTap: () => _showCardDetails(context, c),
+                          ),
                         ),
-                      )),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed:
+                              () => context.go(
+                                '/decks/${widget.deckId}/search?mode=commander',
+                              ),
+                          icon: const Icon(Icons.swap_horiz),
+                          label: const Text('Trocar comandante'),
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -195,61 +230,84 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
                             ),
                           ),
                         ),
-                        ...entry.value.map((card) => Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(8),
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: SizedBox(
-                                width: 40,
-                                height: 56,
-                                child: card.imageUrl != null
-                                    ? Image.network(card.imageUrl!, fit: BoxFit.cover)
-                                    : Container(
-                                        color: Colors.grey[800],
-                                        child: const Icon(Icons.image_not_supported, size: 20),
-                                      ),
+                        ...entry.value.map(
+                          (card) => Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(8),
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: SizedBox(
+                                  width: 40,
+                                  height: 56,
+                                  child:
+                                      card.imageUrl != null
+                                          ? Image.network(
+                                            card.imageUrl!,
+                                            fit: BoxFit.cover,
+                                          )
+                                          : Container(
+                                            color: Colors.grey[800],
+                                            child: const Icon(
+                                              Icons.image_not_supported,
+                                              size: 20,
+                                            ),
+                                          ),
+                                ),
                               ),
-                            ),
-                            title: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    '${card.quantity}x',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: theme.colorScheme.onPrimaryContainer,
+                              title: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primaryContainer,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${card.quantity}x',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                theme
+                                                    .colorScheme
+                                                    .onPrimaryContainer,
+                                          ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    card.name,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      card.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    card.typeLine,
+                                    style: theme.textTheme.bodySmall,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 4),
+                                  _ManaCostRow(cost: card.manaCost),
+                                ],
+                              ),
+                              onTap: () => _showCardDetails(context, card),
                             ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 4),
-                                Text(card.typeLine, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                const SizedBox(height: 4),
-                                _ManaCostRow(cost: card.manaCost),
-                              ],
-                            ),
-                            onTap: () => _showCardDetails(context, card),
                           ),
-                        )),
+                        ),
                         const SizedBox(height: 8),
                       ],
                     );
@@ -285,7 +343,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(ok ? '✅ Deck válido!' : 'Deck inválido'),
-          backgroundColor: ok ? Colors.green : Theme.of(context).colorScheme.error,
+          backgroundColor:
+              ok ? Colors.green : Theme.of(context).colorScheme.error,
         ),
       );
     } catch (e) {
@@ -293,16 +352,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
       Navigator.pop(context);
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Deck inválido'),
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Deck inválido'),
+              content: Text(e.toString().replaceFirst('Exception: ', '')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     }
   }
@@ -310,116 +370,137 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
   void _showCardDetails(BuildContext context, DeckCardItem card) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (card.imageUrl != null)
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Image.network(
-                    card.imageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox(
-                      height: 200,
-                      child: Center(child: Icon(Icons.image_not_supported, size: 64)),
-                    ),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (card.imageUrl != null)
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
                       ),
-                    ),
-                    if (card.manaCost != null) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            'Custo: ',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          _ManaCostRow(cost: card.manaCost),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 4),
-                    Text(
-                      card.typeLine,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                    if ((card.setName ?? '').trim().isNotEmpty || (card.setReleaseDate ?? '').trim().isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        [
-                          if ((card.setName ?? '').trim().isNotEmpty) card.setName!,
-                          if ((card.setReleaseDate ?? '').trim().isNotEmpty) card.setReleaseDate!,
-                        ].join(' • '),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[500],
+                      child: Image.network(
+                        card.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => const SizedBox(
+                              height: 200,
+                              child: Center(
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  size: 64,
+                                ),
+                              ),
                             ),
                       ),
-                    ],
-                    
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () => _showAiExplanation(context, card),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.auto_awesome, size: 14, color: Theme.of(context).colorScheme.primary),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Explicar',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                              fontSize: 12,
-                            ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        if (card.manaCost != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                'Custo: ',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              _ManaCostRow(cost: card.manaCost),
+                            ],
                           ),
                         ],
-                      ),
-                    ),
+                        const SizedBox(height: 4),
+                        Text(
+                          card.typeLine,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        if ((card.setName ?? '').trim().isNotEmpty ||
+                            (card.setReleaseDate ?? '').trim().isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            [
+                              if ((card.setName ?? '').trim().isNotEmpty)
+                                card.setName!,
+                              if ((card.setReleaseDate ?? '').trim().isNotEmpty)
+                                card.setReleaseDate!,
+                            ].join(' • '),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey[500]),
+                          ),
+                        ],
 
-                    if (card.oracleText != null) ...[
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      _OracleText(card.oracleText!),
-                    ],
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Fechar'),
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () => _showAiExplanation(context, card),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.auto_awesome,
+                                size: 14,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Explicar',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  decoration: TextDecoration.underline,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (card.oracleText != null) ...[
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          const SizedBox(height: 8),
+                          _OracleText(card.oracleText!),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Fechar'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
-  Future<void> _showAiExplanation(BuildContext context, DeckCardItem card) async {
+  Future<void> _showAiExplanation(
+    BuildContext context,
+    DeckCardItem card,
+  ) async {
     // Mostra loading
     showDialog(
       context: context,
@@ -445,32 +526,35 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
       // Mostra resultado
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: Row(
-            children: [
-              const Icon(Icons.auto_awesome, color: Colors.purple),
-              const SizedBox(width: 8),
-              Expanded(child: Text('Análise da IA: ${card.name}')),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Text(explanation ?? 'Não foi possível gerar uma explicação.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Entendi'),
+        builder:
+            (ctx) => AlertDialog(
+              title: Row(
+                children: [
+                  const Icon(Icons.auto_awesome, color: Colors.purple),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('Análise da IA: ${card.name}')),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Text(
+                  explanation ?? 'Não foi possível gerar uma explicação.',
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Entendi'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     } catch (e) {
       // Garante que o loading fecha em caso de erro
       if (context.mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao explicar carta: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao explicar carta: $e')));
       }
     }
   }
@@ -482,19 +566,20 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen> with SingleTicker
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) => _OptimizationSheet(
-          deckId: widget.deckId,
-          scrollController: scrollController,
-        ),
-      ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.6,
+            minChildSize: 0.4,
+            maxChildSize: 0.9,
+            expand: false,
+            builder:
+                (context, scrollController) => _OptimizationSheet(
+                  deckId: widget.deckId,
+                  scrollController: scrollController,
+                ),
+          ),
     );
   }
-
 }
 
 class _ManaCostRow extends StatelessWidget {
@@ -504,15 +589,16 @@ class _ManaCostRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (cost == null || cost!.isEmpty) return const SizedBox.shrink();
-    
+
     // Regex atualizado para capturar tudo dentro de {}, incluindo barras (ex: {2/W})
     final matches = RegExp(r'\{([^\}]+)\}').allMatches(cost!);
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: matches.map((m) {
-        final symbol = m.group(1)!;
-        return _ManaSymbol(symbol: symbol);
-      }).toList(),
+      children:
+          matches.map((m) {
+            final symbol = m.group(1)!;
+            return _ManaSymbol(symbol: symbol);
+          }).toList(),
     );
   }
 }
@@ -538,7 +624,7 @@ class _ManaSymbol extends StatelessWidget {
   Widget build(BuildContext context) {
     // Sanitiza o símbolo para corresponder ao nome do arquivo (ex: "2/W" -> "2-W")
     final filename = symbol.replaceAll('/', '-');
-    
+
     return Container(
       margin: const EdgeInsets.only(right: 2),
       width: 18,
@@ -580,7 +666,7 @@ class _OracleText extends StatelessWidget {
     final spans = <InlineSpan>[];
     // Regex para capturar símbolos de mana entre chaves, ex: {T}, {1}, {U/R}
     final regex = RegExp(r'\{([^\}]+)\}');
-    
+
     text.splitMapJoin(
       regex,
       onMatch: (Match m) {
@@ -592,8 +678,8 @@ class _OracleText extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 1.0),
               // Ajusta o tamanho para fluir melhor com o texto
               child: SizedBox(
-                width: 16, 
-                height: 16, 
+                width: 16,
+                height: 16,
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: _ManaSymbol(symbol: symbol),
@@ -635,10 +721,13 @@ class _OptimizationSheet extends StatefulWidget {
 class _OptimizationSheetState extends State<_OptimizationSheet> {
   late Future<List<Map<String, dynamic>>> _optionsFuture;
 
-  Future<void> _applyOptimization(BuildContext context, String archetype) async {
+  Future<void> _applyOptimization(
+    BuildContext context,
+    String archetype,
+  ) async {
     // Controle do estado do loading para garantir fechamento correto
     bool isLoadingDialogOpen = false;
-    
+
     /// Helper para fechar o dialog de loading de forma segura
     void closeLoadingDialog() {
       if (context.mounted && isLoadingDialogOpen) {
@@ -646,7 +735,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         isLoadingDialogOpen = false;
       }
     }
-    
+
     // 1. Show Loading
     showDialog(
       context: context,
@@ -657,10 +746,13 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
 
     try {
       // 2. Call API to get suggestions
-      final result = await context.read<DeckProvider>().optimizeDeck(widget.deckId, archetype);
-      
+      final result = await context.read<DeckProvider>().optimizeDeck(
+        widget.deckId,
+        archetype,
+      );
+
       closeLoadingDialog();
-      
+
       if (!context.mounted) return;
 
       final removals = (result['removals'] as List).cast<String>();
@@ -670,51 +762,68 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       // 3. Show confirmation dialog with suggestions
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text('Sugestões para: $archetype'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (reasoning.isNotEmpty) ...[
-                  Text(
-                    reasoning,
-                    style: const TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                ],
-                if (removals.isNotEmpty) ...[
-                  const Text('❌ Remover:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                  ...removals.map((c) => Padding(
-                    padding: const EdgeInsets.only(left: 8, top: 4),
-                    child: Text('• $c'),
-                  )),
-                  const SizedBox(height: 16),
-                ],
-                if (additions.isNotEmpty) ...[
-                  const Text('✅ Adicionar:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-                  ...additions.map((c) => Padding(
-                    padding: const EdgeInsets.only(left: 8, top: 4),
-                    child: Text('• $c'),
-                  )),
-                ],
+        builder:
+            (ctx) => AlertDialog(
+              title: Text('Sugestões para: $archetype'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (reasoning.isNotEmpty) ...[
+                      Text(
+                        reasoning,
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      const SizedBox(height: 8),
+                    ],
+                    if (removals.isNotEmpty) ...[
+                      const Text(
+                        '❌ Remover:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      ...removals.map(
+                        (c) => Padding(
+                          padding: const EdgeInsets.only(left: 8, top: 4),
+                          child: Text('• $c'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (additions.isNotEmpty) ...[
+                      const Text(
+                        '✅ Adicionar:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      ...additions.map(
+                        (c) => Padding(
+                          padding: const EdgeInsets.only(left: 8, top: 4),
+                          child: Text('• $c'),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Aplicar Mudanças'),
+                ),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Aplicar Mudanças'),
-            ),
-          ],
-        ),
       );
 
       if (confirmed != true || !context.mounted) return;
@@ -724,16 +833,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (ctx) => const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Aplicando mudanças...', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-        ),
+        builder:
+            (ctx) => const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Aplicando mudanças...',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
       );
       isLoadingDialogOpen = true;
 
@@ -743,9 +856,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         cardsToRemove: removals,
         cardsToAdd: additions,
       );
-      
+
       closeLoadingDialog();
-      
+
       if (!context.mounted) return;
       Navigator.pop(context); // Close Sheet
 
@@ -755,7 +868,6 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           backgroundColor: Colors.green,
         ),
       );
-
     } catch (e) {
       // Garantir que o loading seja fechado em caso de erro
       closeLoadingDialog();
@@ -773,7 +885,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   @override
   void initState() {
     super.initState();
-    _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(widget.deckId);
+    _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(
+      widget.deckId,
+    );
   }
 
   @override
@@ -800,10 +914,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             children: [
               Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
-              Text(
-                'Otimizar Deck',
-                style: theme.textTheme.headlineSmall,
-              ),
+              Text('Otimizar Deck', style: theme.textTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 8),
@@ -834,14 +945,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text('Erro: ${snapshot.error}'),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              _optionsFuture = context.read<DeckProvider>().fetchOptimizationOptions(widget.deckId);
+                              _optionsFuture = context
+                                  .read<DeckProvider>()
+                                  .fetchOptimizationOptions(widget.deckId);
                             });
                           },
                           child: const Text('Tentar Novamente'),
@@ -863,34 +980,45 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        onTap: () => _applyOptimization(context, option['title']),
+                        onTap:
+                            () => _applyOptimization(context, option['title']),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Text(
                                       option['title'] ?? 'Sem Título',
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.colorScheme.primary,
-                                      ),
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.primary,
+                                          ),
                                     ),
                                   ),
                                   if (option['difficulty'] != null)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: theme.colorScheme.surfaceContainerHighest,
+                                        color:
+                                            theme
+                                                .colorScheme
+                                                .surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -917,7 +1045,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  Icon(Icons.arrow_forward, size: 16, color: theme.colorScheme.primary),
+                                  Icon(
+                                    Icons.arrow_forward,
+                                    size: 16,
+                                    color: theme.colorScheme.primary,
+                                  ),
                                 ],
                               ),
                             ],

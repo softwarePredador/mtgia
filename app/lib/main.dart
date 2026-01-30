@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
@@ -53,7 +53,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         if (location == '/') return null;
 
         final isAuthRoute = location == '/login' || location == '/register';
-        final isProtectedRoute = location.startsWith('/home') || location.startsWith('/decks');
+        final isProtectedRoute =
+            location.startsWith('/home') || location.startsWith('/decks');
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           return '/login';
@@ -66,10 +67,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         return null;
       },
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const SplashScreen(),
-        ),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
 
         GoRoute(
           path: '/login',
@@ -108,7 +106,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                       path: 'search',
                       builder: (context, state) {
                         final id = state.pathParameters['id']!;
-                        return CardSearchScreen(deckId: id);
+                        final mode = state.uri.queryParameters['mode'];
+                        return CardSearchScreen(deckId: id, mode: mode);
                       },
                     ),
                   ],
