@@ -278,6 +278,8 @@ Future<Response> onRequest(RequestContext context) async {
     final body = await context.request.json() as Map<String, dynamic>;
     final deckId = body['deck_id'] as String?;
     final archetype = body['archetype'] as String?;
+    final bracketRaw = body['bracket'];
+    final bracket = bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
 
     if (deckId == null || archetype == null) {
       return Response.json(
@@ -302,7 +304,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Get Cards with CMC for analysis
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.name, dc.is_commander, c.type_line, c.mana_cost, c.colors,
+        SELECT c.name, dc.is_commander, dc.quantity, c.type_line, c.mana_cost, c.colors,
                COALESCE(
                  (SELECT SUM(
                    CASE 
@@ -328,20 +330,25 @@ Future<Response> onRequest(RequestContext context) async {
     final allCardData = <Map<String, dynamic>>[];
     final deckColors = <String>{};
     final commanderColorIdentity = <String>{};
+    var currentTotalCards = 0;
 
     for (final row in cardsResult) {
       final name = row[0] as String;
       final isCmdr = row[1] as bool;
-      final typeLine = (row[2] as String?) ?? '';
-      final manaCost = (row[3] as String?) ?? '';
-      final colors = (row[4] as List?)?.cast<String>() ?? [];
-      final cmc = (row[5] as num?)?.toDouble() ?? 0.0;
-      final oracleText = (row[6] as String?) ?? '';
-      final colorIdentity = (row[7] as List?)?.cast<String>() ?? const <String>[];
+      final quantity = (row[2] as int?) ?? 1;
+      final typeLine = (row[3] as String?) ?? '';
+      final manaCost = (row[4] as String?) ?? '';
+      final colors = (row[5] as List?)?.cast<String>() ?? [];
+      final cmc = (row[6] as num?)?.toDouble() ?? 0.0;
+      final oracleText = (row[7] as String?) ?? '';
+      final colorIdentity =
+          (row[8] as List?)?.cast<String>() ?? const <String>[];
+
+      currentTotalCards += quantity;
       
       // Coletar cores do deck
       deckColors.addAll(colors);
-
+      
       final cardData = {
         'name': name,
         'type_line': typeLine,
@@ -351,6 +358,7 @@ Future<Response> onRequest(RequestContext context) async {
         'cmc': cmc,
         'is_commander': isCmdr,
         'oracle_text': oracleText,
+        'quantity': quantity,
       };
       
       allCardData.add(cardData);
@@ -408,11 +416,41 @@ Future<Response> onRequest(RequestContext context) async {
 
     Map<String, dynamic> jsonResponse;
     try {
-      jsonResponse = await optimizer.optimizeDeck(
-        deckData: deckData,
-        commanders: commanders,
-        targetArchetype: targetArchetype,
-      );
+      final deckFormat = (deckResult.first[1] as String).toLowerCase();
+      final maxTotal =
+          deckFormat == 'commander' ? 100 : (deckFormat == 'brawl' ? 60 : null);
+
+      // Modo auto: se o deck está incompleto e é Commander/Brawl, completar primeiro.
+      if (maxTotal != null && currentTotalCards < maxTotal) {
+        if (commanders.isEmpty) {
+          return Response.json(
+            statusCode: HttpStatus.badRequest,
+            body: {
+              'error':
+                  'Selecione um comandante antes de completar um deck $deckFormat.'
+            },
+          );
+        }
+
+        final targetAdditions = maxTotal - currentTotalCards;
+        jsonResponse = await optimizer.completeDeck(
+          deckData: deckData,
+          commanders: commanders,
+          targetArchetype: targetArchetype,
+          targetAdditions: targetAdditions,
+          bracket: bracket,
+        );
+        jsonResponse['mode'] = 'complete';
+        jsonResponse['target_additions'] = targetAdditions;
+      } else {
+        jsonResponse = await optimizer.optimizeDeck(
+          deckData: deckData,
+          commanders: commanders,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+        );
+        jsonResponse['mode'] = 'optimize';
+      }
     } catch (e) {
       return Response.json(
         statusCode: HttpStatus.internalServerError,
@@ -442,6 +480,12 @@ Future<Response> onRequest(RequestContext context) async {
         removals = (jsonResponse['removals'] as List?)?.cast<String>() ?? [];
         additions = (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
       }
+
+      // Suporte ao modo "complete"
+      if (jsonResponse['mode'] == 'complete') {
+        removals = [];
+        additions = (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
+      }
       
       // GARANTIR EQUILÍBRIO NUMÉRICO (Regra de Ouro)
       final minCount = removals.length < additions.length ? removals.length : additions.length;
@@ -460,6 +504,12 @@ Future<Response> onRequest(RequestContext context) async {
       // Validar todas as cartas sugeridas
       final allSuggestions = [...sanitizedRemovals, ...sanitizedAdditions];
       final validation = await validationService.validateCardNames(allSuggestions);
+      final validList = (validation['valid'] as List).cast<Map<String, dynamic>>();
+      final validByNameLower = <String, Map<String, dynamic>>{};
+      for (final v in validList) {
+        final n = (v['name'] as String).toLowerCase();
+        validByNameLower[n] = v;
+      }
       
       // Filtrar apenas cartas válidas e remover duplicatas
       var validRemovals = sanitizedRemovals.where((name) {
@@ -509,10 +559,14 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Re-aplicar equilíbrio após validação
-      final finalMinCount = validRemovals.length < validAdditions.length ? validRemovals.length : validAdditions.length;
-      if (validRemovals.length != validAdditions.length) {
-         validRemovals = validRemovals.take(finalMinCount).toList();
-         validAdditions = validAdditions.take(finalMinCount).toList();
+      if (jsonResponse['mode'] != 'complete') {
+        final finalMinCount = validRemovals.length < validAdditions.length
+            ? validRemovals.length
+            : validAdditions.length;
+        if (validRemovals.length != validAdditions.length) {
+          validRemovals = validRemovals.take(finalMinCount).toList();
+          validAdditions = validAdditions.take(finalMinCount).toList();
+        }
       }
       
       // --- VERIFICAÇÃO PÓS-OTIMIZAÇÃO (Virtual Deck Analysis) ---
@@ -591,13 +645,26 @@ Future<Response> onRequest(RequestContext context) async {
       final suggestions = validation['suggestions'] as Map<String, List<String>>;
 
       final responseBody = {
+        'mode': jsonResponse['mode'],
         'removals': validRemovals,
         'additions': validAdditions,
         'reasoning': jsonResponse['reasoning'],
         'deck_analysis': deckAnalysis,
         'post_analysis': postAnalysis, // Retorna a análise futura para o front mostrar
         'validation_warnings': validationWarnings,
+        'bracket': bracket,
       };
+
+      responseBody['additions_detailed'] = validAdditions.map((name) {
+        final v = validByNameLower[name.toLowerCase()];
+        if (v == null) return {'name': name};
+        return {'name': v['name'], 'card_id': v['id']};
+      }).toList();
+      responseBody['removals_detailed'] = validRemovals.map((name) {
+        final v = validByNameLower[name.toLowerCase()];
+        if (v == null) return {'name': name};
+        return {'name': v['name'], 'card_id': v['id']};
+      }).toList();
       
       final warnings = <String, dynamic>{};
 

@@ -14,12 +14,14 @@ class DeckProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage; // Erro geral ou de lista
   String? _detailsErrorMessage; // Erro específico de detalhes
+  int? _detailsStatusCode;
 
   List<Deck> get decks => _decks;
   DeckDetails? get selectedDeck => _selectedDeck;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get detailsErrorMessage => _detailsErrorMessage;
+  int? get detailsStatusCode => _detailsStatusCode;
   bool get hasError => _errorMessage != null;
 
   DeckProvider({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
@@ -28,6 +30,7 @@ class DeckProvider extends ChangeNotifier {
   Future<void> fetchDeckDetails(String deckId) async {
     _isLoading = true;
     _detailsErrorMessage = null;
+    _detailsStatusCode = null;
     _selectedDeck = null;
     notifyListeners();
 
@@ -39,9 +42,20 @@ class DeckProvider extends ChangeNotifier {
           response.data as Map<String, dynamic>,
         );
         _detailsErrorMessage = null;
+        _detailsStatusCode = 200;
       } else {
-        _detailsErrorMessage =
-            'Erro ao carregar detalhes do deck: ${response.statusCode}';
+        _detailsStatusCode = response.statusCode;
+        if (response.statusCode == 401) {
+          final data = response.data;
+          final message =
+              (data is Map && data['message'] != null)
+                  ? data['message'].toString()
+                  : 'Sessão expirada. Faça login novamente.';
+          _detailsErrorMessage = message;
+        } else {
+          _detailsErrorMessage =
+              'Erro ao carregar detalhes do deck: ${response.statusCode}';
+        }
       }
     } catch (e) {
       _detailsErrorMessage = 'Erro de conexão: $e';
@@ -295,11 +309,13 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> optimizeDeck(
     String deckId,
     String archetype,
+    [int? bracket]
   ) async {
     try {
       final response = await _apiClient.post('/ai/optimize', {
         'deck_id': deckId,
         'archetype': archetype,
+        if (bracket != null) 'bracket': bracket,
       });
 
       if (response.statusCode == 200) {
@@ -310,6 +326,23 @@ class DeckProvider extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<bool> addCardsBulk({
+    required String deckId,
+    required List<Map<String, dynamic>> cards,
+  }) async {
+    final response = await _apiClient.post('/decks/$deckId/cards/bulk', {
+      'cards': cards,
+    });
+    if (response.statusCode == 200) {
+      await fetchDeckDetails(deckId);
+      return true;
+    }
+    if (response.data is Map && (response.data as Map)['error'] != null) {
+      throw Exception((response.data as Map)['error'].toString());
+    }
+    throw Exception('Falha ao adicionar em lote: ${response.statusCode}');
   }
 
   /// Valida o deck no servidor (modo estrito: Commander=100 e com comandante).
@@ -400,8 +433,9 @@ class DeckProvider extends ChangeNotifier {
       final addFutures = cardsToAdd.map((cardName) async {
         try {
           debugPrint('  🔎 Buscando: $cardName');
+          final encoded = Uri.encodeQueryComponent(cardName);
           final searchResponse = await _apiClient.get(
-            '/cards?name=$cardName&limit=1',
+            '/cards?name=$encoded&limit=1',
           );
 
           if (searchResponse.statusCode == 200) {
@@ -448,8 +482,9 @@ class DeckProvider extends ChangeNotifier {
       final removeFutures = cardsToRemove.map((cardName) async {
         try {
           debugPrint('  🔎 Buscando para remover: $cardName');
+          final encoded = Uri.encodeQueryComponent(cardName);
           final searchResponse = await _apiClient.get(
-            '/cards?name=$cardName&limit=1',
+            '/cards?name=$encoded&limit=1',
           );
 
           if (searchResponse.statusCode == 200) {
@@ -478,8 +513,23 @@ class DeckProvider extends ChangeNotifier {
       final removeResults = await Future.wait(removeFutures);
       cardsToRemoveIds.addAll(removeResults.whereType<String>());
 
+      if (cardsToAdd.isNotEmpty && cardsToAddIds.isEmpty) {
+        throw Exception(
+          'Nenhuma das cartas sugeridas para adicionar foi encontrada no banco. Tente novamente.',
+        );
+      }
+      if (cardsToRemove.isNotEmpty && cardsToRemoveIds.isEmpty) {
+        throw Exception(
+          'Nenhuma das cartas sugeridas para remover foi encontrada no banco. Tente novamente.',
+        );
+      }
+
       // 5. Remover as cartas da lista atual
       debugPrint('✂️ [DeckProvider] Removendo cartas...');
+
+      final beforeSnapshot = currentCards.values
+          .map((c) => '${c['card_id']}::${c['quantity']}::${c['is_commander']}')
+          .toSet();
 
       // Contar quantas cópias de cada ID devem ser removidas
       final removalCounts = <String, int>{};
@@ -548,6 +598,14 @@ class DeckProvider extends ChangeNotifier {
         } else {
           currentCards[cardId] = cardToAdd;
         }
+      }
+
+      final afterSnapshot = currentCards.values
+          .map((c) => '${c['card_id']}::${c['quantity']}::${c['is_commander']}')
+          .toSet();
+      if (beforeSnapshot.length == afterSnapshot.length &&
+          beforeSnapshot.containsAll(afterSnapshot)) {
+        throw Exception('Nenhuma mudança aplicável foi encontrada para este deck.');
       }
 
       // 7. Atualizar o deck via API

@@ -7,6 +7,7 @@ import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
@@ -52,7 +53,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           IconButton(
             icon: const Icon(Icons.verified_outlined),
             tooltip: 'Validar/Finalizar Deck',
-            onPressed: () => _validateDeck(context),
+            onPressed: _validateDeck,
           ),
         ],
         bottom: TabBar(
@@ -78,6 +79,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           }
 
           if (provider.detailsErrorMessage != null) {
+            final isUnauthorized = provider.detailsStatusCode == 401;
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -90,10 +92,20 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   const SizedBox(height: 16),
                   Text(provider.detailsErrorMessage!),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => provider.fetchDeckDetails(widget.deckId),
-                    child: const Text('Tentar Novamente'),
-                  ),
+                  if (isUnauthorized)
+                    ElevatedButton(
+                      onPressed: () async {
+                        await context.read<AuthProvider>().logout();
+                        if (!context.mounted) return;
+                        context.go('/login');
+                      },
+                      child: const Text('Fazer login novamente'),
+                    )
+                  else
+                    ElevatedButton(
+                      onPressed: () => provider.fetchDeckDetails(widget.deckId),
+                      child: const Text('Tentar Novamente'),
+                    ),
                 ],
               ),
             );
@@ -324,7 +336,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
-  Future<void> _validateDeck(BuildContext context) async {
+  Future<void> _validateDeck() async {
     final provider = context.read<DeckProvider>();
     final deckId = widget.deckId;
 
@@ -336,8 +348,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
     try {
       final res = await provider.validateDeck(deckId);
-      if (!context.mounted) return;
-      Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
 
       final ok = res['ok'] == true;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -348,17 +360,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         ),
       );
     } catch (e) {
-      if (!context.mounted) return;
-      Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
       showDialog(
         context: context,
         builder:
-            (_) => AlertDialog(
+            (dialogContext) => AlertDialog(
               title: const Text('Deck inválido'),
               content: Text(e.toString().replaceFirst('Exception: ', '')),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
                   child: const Text('OK'),
                 ),
               ],
@@ -720,6 +732,7 @@ class _OptimizationSheet extends StatefulWidget {
 
 class _OptimizationSheetState extends State<_OptimizationSheet> {
   late Future<List<Map<String, dynamic>>> _optionsFuture;
+  int _selectedBracket = 2;
 
   Future<void> _applyOptimization(
     BuildContext context,
@@ -749,6 +762,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       final result = await context.read<DeckProvider>().optimizeDeck(
         widget.deckId,
         archetype,
+        _selectedBracket,
       );
 
       closeLoadingDialog();
@@ -758,13 +772,37 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       final removals = (result['removals'] as List).cast<String>();
       final additions = (result['additions'] as List).cast<String>();
       final reasoning = result['reasoning'] as String? ?? '';
+      final warnings = (result['warnings'] is Map)
+          ? (result['warnings'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+      final mode = (result['mode'] as String?) ?? 'optimize';
+      final additionsDetailed =
+          (result['additions_detailed'] as List?)
+              ?.whereType<Map>()
+              .map((m) => m.cast<String, dynamic>())
+              .toList() ??
+          const <Map<String, dynamic>>[];
+
+      if (removals.isEmpty && additions.isEmpty) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('A IA não encontrou mudanças para aplicar.'),
+          ),
+        );
+        return;
+      }
 
       // 3. Show confirmation dialog with suggestions
       final confirmed = await showDialog<bool>(
         context: context,
         builder:
             (ctx) => AlertDialog(
-              title: Text('Sugestões para: $archetype'),
+              title: Text(
+                mode == 'complete'
+                    ? 'Completar deck ($archetype)'
+                    : 'Sugestões para: $archetype',
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -778,6 +816,27 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       const SizedBox(height: 16),
                       const Divider(),
                       const SizedBox(height: 8),
+                    ],
+                    if (warnings.isNotEmpty) ...[
+                      const Text(
+                        'Avisos:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      if (warnings['filtered_by_color_identity'] is Map)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '• Algumas adições foram removidas por estarem fora da identidade do comandante.',
+                          ),
+                        ),
+                      if (warnings['invalid_cards'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '• Algumas cartas sugeridas não foram encontradas e foram removidas.',
+                          ),
+                        ),
+                      const SizedBox(height: 16),
                     ],
                     if (removals.isNotEmpty) ...[
                       const Text(
@@ -803,12 +862,22 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                           color: Colors.green,
                         ),
                       ),
-                      ...additions.map(
-                        (c) => Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 4),
-                          child: Text('• $c'),
+                      ...additions
+                          .take(30)
+                          .map(
+                            (c) => Padding(
+                              padding: const EdgeInsets.only(left: 8, top: 4),
+                              child: Text('• $c'),
+                            ),
+                          ),
+                      if (additions.length > 30)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8, top: 8),
+                          child: Text(
+                            '+ ${additions.length - 30} cartas…',
+                            style: const TextStyle(color: Colors.white70),
+                          ),
                         ),
-                      ),
                     ],
                   ],
                 ),
@@ -851,11 +920,28 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       isLoadingDialogOpen = true;
 
       // Aplicar as mudanças via DeckProvider
-      await context.read<DeckProvider>().applyOptimization(
-        deckId: widget.deckId,
-        cardsToRemove: removals,
-        cardsToAdd: additions,
-      );
+      if (mode == 'complete' && additionsDetailed.isNotEmpty) {
+        // Completar deck: adicionar em lote (mais rápido e evita N chamadas).
+        await context.read<DeckProvider>().addCardsBulk(
+          deckId: widget.deckId,
+          cards: additionsDetailed
+              .where((m) => m['card_id'] != null)
+              .map(
+                (m) => {
+                  'card_id': m['card_id'],
+                  'quantity': 1,
+                  'is_commander': false,
+                },
+              )
+              .toList(),
+        );
+      } else {
+        await context.read<DeckProvider>().applyOptimization(
+          deckId: widget.deckId,
+          cardsToRemove: removals,
+          cardsToAdd: additions,
+        );
+      }
 
       closeLoadingDialog();
 
@@ -921,6 +1007,26 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           Text(
             'A IA analisou seu comandante e sugere estes caminhos:',
             style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          InputDecorator(
+            decoration: const InputDecoration(labelText: 'Bracket / Power level'),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<int>(
+                value: _selectedBracket,
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(value: 1, child: Text('1 - Casual')),
+                  DropdownMenuItem(value: 2, child: Text('2 - Mid')),
+                  DropdownMenuItem(value: 3, child: Text('3 - High')),
+                  DropdownMenuItem(value: 4, child: Text('4 - cEDH')),
+                ],
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => _selectedBracket = v);
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
