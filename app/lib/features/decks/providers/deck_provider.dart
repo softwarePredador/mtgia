@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/api_client.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
@@ -312,19 +314,55 @@ class DeckProvider extends ChangeNotifier {
     [int? bracket]
   ) async {
     try {
-      final response = await _apiClient.post('/ai/optimize', {
+      final payload = <String, dynamic>{
         'deck_id': deckId,
         'archetype': archetype,
         if (bracket != null) 'bracket': bracket,
-      });
+      };
+
+      // Debug snapshot (sem token): útil para você colar o JSON de request/response.
+      await _saveOptimizeDebug(request: payload);
+      debugPrint('🧪 [AI Optimize] request=${jsonEncode(payload)}');
+
+      final response = await _apiClient.post('/ai/optimize', payload);
 
       if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
+        final data = (response.data as Map).cast<String, dynamic>();
+        await _saveOptimizeDebug(response: data);
+        debugPrint('🧪 [AI Optimize] response=${jsonEncode(data)}');
+        return data;
       } else {
+        await _saveOptimizeDebug(
+          response: {
+            'statusCode': response.statusCode,
+            'data': response.data,
+          },
+        );
         throw Exception('Falha ao otimizar deck: ${response.statusCode}');
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<void> _saveOptimizeDebug({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? response,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (request != null) {
+        await prefs.setString('debug_last_ai_optimize_request', jsonEncode(request));
+      }
+      if (response != null) {
+        await prefs.setString('debug_last_ai_optimize_response', jsonEncode(response));
+      }
+      await prefs.setString(
+        'debug_last_ai_optimize_at',
+        DateTime.now().toIso8601String(),
+      );
+    } catch (_) {
+      // Silencioso: não deve quebrar fluxo do app.
     }
   }
 

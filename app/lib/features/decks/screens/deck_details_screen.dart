@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/deck_provider.dart';
@@ -734,6 +736,25 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   late Future<List<Map<String, dynamic>>> _optionsFuture;
   int _selectedBracket = 2;
 
+  Future<void> _copyOptimizeDebug({
+    required String deckId,
+    required String archetype,
+    required int bracket,
+    required Map<String, dynamic> result,
+  }) async {
+    final debugJson = {
+      'request': {
+        'deck_id': deckId,
+        'archetype': archetype,
+        'bracket': bracket,
+      },
+      'response': result,
+    };
+    await Clipboard.setData(
+      ClipboardData(text: const JsonEncoder.withIndent('  ').convert(debugJson)),
+    );
+  }
+
   Future<void> _applyOptimization(
     BuildContext context,
     String archetype,
@@ -886,6 +907,21 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
                   child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await _copyOptimizeDebug(
+                      deckId: widget.deckId,
+                      archetype: archetype,
+                      bracket: _selectedBracket,
+                      result: result,
+                    );
+                    if (!ctx.mounted) return;
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Debug copiado')),
+                    );
+                  },
+                  child: const Text('Copiar debug'),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(ctx, true),
