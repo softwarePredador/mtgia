@@ -14,7 +14,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
 Future<Response> _generateRecommendations(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiKey = env['OPENAI_API_KEY'];
 
   if (apiKey == null) {

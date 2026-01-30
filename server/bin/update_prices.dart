@@ -4,7 +4,7 @@ import 'package:postgres/postgres.dart';
 import 'package:dotenv/dotenv.dart';
 
 void main() async {
-  var env = DotEnv(includePlatformEnvironment: true)..load();
+  var env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   
   final connection = await Connection.open(
     Endpoint(

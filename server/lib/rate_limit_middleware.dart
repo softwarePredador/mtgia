@@ -108,7 +108,7 @@ final _aiRateLimiterDev = RateLimiter(
 );
 
 bool _isProduction() {
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final mode = (env['ENVIRONMENT'] ?? Platform.environment['ENVIRONMENT'] ?? 'development').toLowerCase();
   return mode == 'production';
 }

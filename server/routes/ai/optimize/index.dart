@@ -375,7 +375,7 @@ Future<Response> onRequest(RequestContext context) async {
 
 
     // 2. Otimização via DeckOptimizerService (IA + RAG)
-    final env = DotEnv(includePlatformEnvironment: true)..load();
+    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final apiKey = env['OPENAI_API_KEY'];
 
     if (apiKey == null || apiKey.isEmpty) {

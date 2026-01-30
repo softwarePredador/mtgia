@@ -50,7 +50,7 @@ Opções:
   final full = args.contains('--full');
   final sinceDays = _parseSinceDays(args) ?? 45;
 
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final environment = (env['ENVIRONMENT'] ?? Platform.environment['ENVIRONMENT'] ?? 'development').toLowerCase();
   print('🔄 Sync de cartas (ENVIRONMENT=$environment)${full ? ' [FULL]' : ' [INCREMENTAL]'}${force ? ' [FORÇADO]' : ''}');
 

@@ -75,6 +75,10 @@ CREATE TABLE IF NOT EXISTS rules (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Índices para busca rápida de regras
+CREATE INDEX IF NOT EXISTS idx_rules_title ON rules (title);
+CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
+
 -- 5. Tabela de Decks
 CREATE TABLE IF NOT EXISTS decks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

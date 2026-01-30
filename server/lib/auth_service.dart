@@ -18,7 +18,7 @@ class AuthService {
   late final String _jwtSecret;
 
   AuthService._internal() {
-    final env = DotEnv(includePlatformEnvironment: true)..load();
+    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final secret = env['JWT_SECRET'] ?? Platform.environment['JWT_SECRET'];
     
     if (secret == null || secret.isEmpty) {

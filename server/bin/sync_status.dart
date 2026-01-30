@@ -121,4 +121,3 @@ Future<bool> _hasTable(Pool pool, String tableName) async {
     return false;
   }
 }
-

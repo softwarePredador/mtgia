@@ -28,8 +28,9 @@ Este documento serve como guia definitivo para o entendimento, manutenção e ex
   - `bin/fetch_meta.dart` - Download de JSON do MTGJSON
   - `bin/seed_database.dart` - Seed de cartas via MTGJSON (AtomicCards.json)
   - `bin/seed_legalities_optimized.dart` - Seed/atualização de legalidades via AtomicCards.json
-  - `bin/seed_rules.dart` - Importação de regras oficiais
+  - `bin/seed_rules.dart` - Importação de regras oficiais (modo legado via `magicrules.txt`)
   - `bin/sync_cards.dart` - Sync idempotente (cartas + legalidades) com checkpoint
+  - `bin/sync_rules.dart` - Sync idempotente das Comprehensive Rules (baixa o .txt mais recente da Wizards)
   - `bin/setup_database.dart` - Cria schema inicial
 - [x] Schema do banco de dados completo (`database_setup.sql`)
 

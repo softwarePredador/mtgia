@@ -28,7 +28,7 @@ class Database {
     if (_connected) return;
 
     // Carrega as variáveis de ambiente do arquivo .env
-    final env = DotEnv(includePlatformEnvironment: true)..load();
+    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
 
     final host = env['DB_HOST'];
     final port = int.tryParse(env['DB_PORT'] ?? '');

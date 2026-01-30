@@ -24,7 +24,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // Carregar variáveis de ambiente
-    final env = DotEnv(includePlatformEnvironment: true)..load();
+    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final apiKey = env['OPENAI_API_KEY'];
 
     if (apiKey == null || apiKey.isEmpty) {
