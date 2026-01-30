@@ -310,9 +310,9 @@ class DeckProvider extends ChangeNotifier {
   /// Solicita sugestões de otimização para um arquétipo específico
   Future<Map<String, dynamic>> optimizeDeck(
     String deckId,
-    String archetype,
-    [int? bracket]
-  ) async {
+    String archetype, [
+    int? bracket,
+  ]) async {
     try {
       final payload = <String, dynamic>{
         'deck_id': deckId,
@@ -333,10 +333,7 @@ class DeckProvider extends ChangeNotifier {
         return data;
       } else {
         await _saveOptimizeDebug(
-          response: {
-            'statusCode': response.statusCode,
-            'data': response.data,
-          },
+          response: {'statusCode': response.statusCode, 'data': response.data},
         );
         throw Exception('Falha ao otimizar deck: ${response.statusCode}');
       }
@@ -352,10 +349,16 @@ class DeckProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (request != null) {
-        await prefs.setString('debug_last_ai_optimize_request', jsonEncode(request));
+        await prefs.setString(
+          'debug_last_ai_optimize_request',
+          jsonEncode(request),
+        );
       }
       if (response != null) {
-        await prefs.setString('debug_last_ai_optimize_response', jsonEncode(response));
+        await prefs.setString(
+          'debug_last_ai_optimize_response',
+          jsonEncode(response),
+        );
       }
       await prefs.setString(
         'debug_last_ai_optimize_at',
@@ -418,6 +421,52 @@ class DeckProvider extends ChangeNotifier {
       throw Exception((response.data as Map)['error'].toString());
     }
     throw Exception('Falha ao validar deck: ${response.statusCode}');
+  }
+
+  /// Atualiza/gera análise de sinergia (IA) e persiste no deck.
+  /// Endpoint: POST /decks/:id/ai-analysis
+  Future<Map<String, dynamic>> refreshAiAnalysis(
+    String deckId, {
+    bool force = false,
+  }) async {
+    final response = await _apiClient.post('/decks/$deckId/ai-analysis', {
+      'force': force,
+    });
+
+    if (response.statusCode != 200) {
+      final data = response.data;
+      final msg =
+          (data is Map && data['error'] != null)
+              ? data['error'].toString()
+              : 'Falha ao analisar deck: ${response.statusCode}';
+      throw Exception(msg);
+    }
+
+    final data = (response.data as Map).cast<String, dynamic>();
+    final synergyScore = data['synergy_score'] as int?;
+    final strengths = data['strengths'] as String?;
+    final weaknesses = data['weaknesses'] as String?;
+
+    if (_selectedDeck != null && _selectedDeck!.id == deckId) {
+      _selectedDeck = _selectedDeck!.copyWith(
+        synergyScore: synergyScore,
+        strengths: strengths,
+        weaknesses: weaknesses,
+      );
+      notifyListeners();
+    }
+
+    final index = _decks.indexWhere((d) => d.id == deckId);
+    if (index != -1) {
+      _decks[index] = _decks[index].copyWith(
+        synergyScore: synergyScore,
+        strengths: strengths,
+        weaknesses: weaknesses,
+      );
+      notifyListeners();
+    }
+
+    return data;
   }
 
   /// Gera um deck do zero usando IA baseado em um prompt de texto
@@ -589,9 +638,13 @@ class DeckProvider extends ChangeNotifier {
       // 5. Remover as cartas da lista atual
       debugPrint('✂️ [DeckProvider] Removendo cartas...');
 
-      final beforeSnapshot = currentCards.values
-          .map((c) => '${c['card_id']}::${c['quantity']}::${c['is_commander']}')
-          .toSet();
+      final beforeSnapshot =
+          currentCards.values
+              .map(
+                (c) =>
+                    '${c['card_id']}::${c['quantity']}::${c['is_commander']}',
+              )
+              .toSet();
 
       // Contar quantas cópias de cada ID devem ser removidas
       final removalCounts = <String, int>{};
@@ -662,12 +715,18 @@ class DeckProvider extends ChangeNotifier {
         }
       }
 
-      final afterSnapshot = currentCards.values
-          .map((c) => '${c['card_id']}::${c['quantity']}::${c['is_commander']}')
-          .toSet();
+      final afterSnapshot =
+          currentCards.values
+              .map(
+                (c) =>
+                    '${c['card_id']}::${c['quantity']}::${c['is_commander']}',
+              )
+              .toSet();
       if (beforeSnapshot.length == afterSnapshot.length &&
           beforeSnapshot.containsAll(afterSnapshot)) {
-        throw Exception('Nenhuma mudança aplicável foi encontrada para este deck.');
+        throw Exception(
+          'Nenhuma mudança aplicável foi encontrada para este deck.',
+        );
       }
 
       // 7. Atualizar o deck via API

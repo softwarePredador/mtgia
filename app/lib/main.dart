@@ -133,7 +133,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ChangeNotifierProvider.value(value: _cardProvider),
       ],
       child: MaterialApp.router(
-        title: 'ManaLoom - AI Deck Builder',
+        title: 'ManaLoom - Deck Builder',
         theme: AppTheme.darkTheme,
         routerConfig: _router,
         debugShowCheckedModeBanner: false,

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/deck_provider.dart';
 
-/// Tela para gerar decks usando IA a partir de uma descrição em texto
+/// Tela para gerar decks automaticamente a partir de uma descrição em texto
 class DeckGenerateScreen extends StatefulWidget {
   const DeckGenerateScreen({super.key});
 
@@ -87,7 +87,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     final deckName =
         _deckNameController.text.trim().isEmpty
-            ? 'Deck Gerado por IA'
+            ? 'Deck Gerado'
             : _deckNameController.text.trim();
 
     // Show loading
@@ -160,7 +160,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerar Deck com IA'),
+        title: const Text('Gerar Deck'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
@@ -192,7 +192,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'A IA irá criar um deck completo e balanceado baseado na sua descrição.',
+              'O gerador irá criar um deck completo e balanceado baseado na sua descrição.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey[400],
               ),
@@ -285,7 +285,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                       )
                       : const Icon(Icons.auto_awesome),
               label: Text(
-                _isGenerating ? 'A IA está pensando...' : 'Gerar Deck',
+                _isGenerating ? 'Gerando...' : 'Gerar Deck',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -322,7 +322,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 controller: _deckNameController,
                 decoration: InputDecoration(
                   labelText: 'Nome do Deck',
-                  hintText: 'Deck Gerado por IA',
+                  hintText: 'Deck Gerado',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

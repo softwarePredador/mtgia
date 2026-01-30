@@ -50,7 +50,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.auto_fix_high),
-            tooltip: 'Otimizar Deck com IA',
+            tooltip: 'Otimizar deck',
             onPressed: () => _showOptimizationOptions(context),
           ),
           IconButton(
@@ -186,7 +186,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       Text(deck.description!),
                       const SizedBox(height: 24),
                     ],
-                  if (deck.commander.isNotEmpty) ...[
+                    if (deck.commander.isNotEmpty) ...[
                       Text('Comandante', style: theme.textTheme.titleMedium),
                       const SizedBox(height: 8),
                       ...deck.commander.map(
@@ -230,11 +230,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 : deck.archetype!,
                           ),
                         ),
-                        Chip(
-                          label: Text(
-                            'Bracket: ${deck.bracket ?? 2}',
-                          ),
-                        ),
+                        Chip(label: Text('Bracket: ${deck.bracket ?? 2}')),
                       ],
                     ),
                   ],
@@ -569,7 +565,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 children: [
                   const Icon(Icons.auto_awesome, color: Colors.purple),
                   const SizedBox(width: 8),
-                  Expanded(child: Text('Análise da IA: ${card.name}')),
+                  Expanded(child: Text('Análise: ${card.name}')),
                 ],
               ),
               content: SingleChildScrollView(
@@ -780,7 +776,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       'response': result,
     };
     await Clipboard.setData(
-      ClipboardData(text: const JsonEncoder.withIndent('  ').convert(debugJson)),
+      ClipboardData(
+        text: const JsonEncoder.withIndent('  ').convert(debugJson),
+      ),
     );
   }
 
@@ -838,9 +836,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       final removals = (result['removals'] as List).cast<String>();
       final additions = (result['additions'] as List).cast<String>();
       final reasoning = result['reasoning'] as String? ?? '';
-      final warnings = (result['warnings'] is Map)
-          ? (result['warnings'] as Map).cast<String, dynamic>()
-          : const <String, dynamic>{};
+      final warnings =
+          (result['warnings'] is Map)
+              ? (result['warnings'] as Map).cast<String, dynamic>()
+              : const <String, dynamic>{};
       final mode = (result['mode'] as String?) ?? 'optimize';
       final additionsDetailed =
           (result['additions_detailed'] as List?)
@@ -853,7 +852,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('A IA não encontrou mudanças para aplicar.'),
+            content: Text('Nenhuma mudança sugerida para aplicar.'),
           ),
         );
         return;
@@ -1013,16 +1012,17 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         // Completar deck: adicionar em lote (mais rápido e evita N chamadas).
         await deckProvider.addCardsBulk(
           deckId: widget.deckId,
-          cards: additionsDetailed
-              .where((m) => m['card_id'] != null)
-              .map(
-                (m) => {
-                  'card_id': m['card_id'],
-                  'quantity': (m['quantity'] as int?) ?? 1,
-                  'is_commander': false,
-                },
-              )
-              .toList(),
+          cards:
+              additionsDetailed
+                  .where((m) => m['card_id'] != null)
+                  .map(
+                    (m) => {
+                      'card_id': m['card_id'],
+                      'quantity': (m['quantity'] as int?) ?? 1,
+                      'is_commander': false,
+                    },
+                  )
+                  .toList(),
         );
       } else {
         await deckProvider.applyOptimization(
@@ -1106,12 +1106,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            'A IA analisou seu comandante e sugere estes caminhos:',
+            'Sugestões para o seu comandante:',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           InputDecorator(
-            decoration: const InputDecoration(labelText: 'Bracket / Power level'),
+            decoration: const InputDecoration(
+              labelText: 'Bracket / Power level',
+            ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<int>(
                 value: _selectedBracket,
@@ -1212,7 +1214,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
 
                 final options = snapshot.data!;
                 final visibleOptions =
-                    _showAllStrategies ? options : const <Map<String, dynamic>>[];
+                    _showAllStrategies
+                        ? options
+                        : const <Map<String, dynamic>>[];
                 return ListView.separated(
                   controller: widget.scrollController,
                   itemCount: visibleOptions.length,

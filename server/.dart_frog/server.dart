@@ -20,6 +20,7 @@ import '../routes/decks/[id]/recommendations/index.dart' as decks_$id_recommenda
 import '../routes/decks/[id]/cards/index.dart' as decks_$id_cards_index;
 import '../routes/decks/[id]/cards/bulk/index.dart' as decks_$id_cards_bulk_index;
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
+import '../routes/decks/[id]/ai-analysis/index.dart' as decks_$id_ai_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/me.dart' as auth_me;
@@ -60,6 +61,7 @@ Handler buildRootHandler() {
     ..mount('/ai/weakness-analysis', (context) => buildAiWeaknessAnalysisHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
+    ..mount('/decks/<id>/ai-analysis', (context,id,) => buildDecks$idAiAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/cards/bulk', (context,id,) => buildDecks$idCardsBulkHandler(id,)(context))
     ..mount('/decks/<id>/cards', (context,id,) => buildDecks$idCardsHandler(id,)(context))
@@ -130,6 +132,13 @@ Handler buildCardsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => cards_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildDecks$idAiAnalysisHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => decks_$id_ai_analysis_index.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 
