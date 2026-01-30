@@ -17,11 +17,14 @@ import '../routes/decks/[id]/index.dart' as decks_$id_index;
 import '../routes/decks/[id]/validate/index.dart' as decks_$id_validate_index;
 import '../routes/decks/[id]/simulate/index.dart' as decks_$id_simulate_index;
 import '../routes/decks/[id]/recommendations/index.dart' as decks_$id_recommendations_index;
+import '../routes/decks/[id]/pricing/index.dart' as decks_$id_pricing_index;
 import '../routes/decks/[id]/cards/index.dart' as decks_$id_cards_index;
+import '../routes/decks/[id]/cards/replace/index.dart' as decks_$id_cards_replace_index;
 import '../routes/decks/[id]/cards/bulk/index.dart' as decks_$id_cards_bulk_index;
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/decks/[id]/ai-analysis/index.dart' as decks_$id_ai_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
+import '../routes/cards/printings/index.dart' as cards_printings_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/me.dart' as auth_me;
 import '../routes/auth/login.dart' as auth_login;
@@ -60,11 +63,14 @@ Handler buildRootHandler() {
     ..mount('/ai/simulate-matchup', (context) => buildAiSimulateMatchupHandler()(context))
     ..mount('/ai/weakness-analysis', (context) => buildAiWeaknessAnalysisHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
+    ..mount('/cards/printings', (context) => buildCardsPrintingsHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/decks/<id>/ai-analysis', (context,id,) => buildDecks$idAiAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/cards/bulk', (context,id,) => buildDecks$idCardsBulkHandler(id,)(context))
+    ..mount('/decks/<id>/cards/replace', (context,id,) => buildDecks$idCardsReplaceHandler(id,)(context))
     ..mount('/decks/<id>/cards', (context,id,) => buildDecks$idCardsHandler(id,)(context))
+    ..mount('/decks/<id>/pricing', (context,id,) => buildDecks$idPricingHandler(id,)(context))
     ..mount('/decks/<id>/recommendations', (context,id,) => buildDecks$idRecommendationsHandler(id,)(context))
     ..mount('/decks/<id>/simulate', (context,id,) => buildDecks$idSimulateHandler(id,)(context))
     ..mount('/decks/<id>/validate', (context,id,) => buildDecks$idValidateHandler(id,)(context))
@@ -128,6 +134,13 @@ Handler buildAuthHandler() {
   return pipeline.addHandler(router);
 }
 
+Handler buildCardsPrintingsHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/', (context) => cards_printings_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
 Handler buildCardsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
@@ -156,10 +169,24 @@ Handler buildDecks$idCardsBulkHandler(String id,) {
   return pipeline.addHandler(router);
 }
 
+Handler buildDecks$idCardsReplaceHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => decks_$id_cards_replace_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
 Handler buildDecks$idCardsHandler(String id,) {
   final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
   final router = Router()
     ..all('/', (context) => decks_$id_cards_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildDecks$idPricingHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => decks_$id_pricing_index.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 

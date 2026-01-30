@@ -96,9 +96,9 @@ class CardProvider extends ChangeNotifier {
                 [],
             colorIdentity:
                 (json['color_identity'] as List?)
-                        ?.map((e) => e.toString())
-                        .toList() ??
-                    [],
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                [],
             imageUrl: json['image_url'],
             setCode: json['set_code'] ?? '',
             setName: json['set_name'],
@@ -147,5 +147,19 @@ class CardProvider extends ChangeNotifier {
     } catch (e) {
       return 'Erro ao obter explicação: $e';
     }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchPrintingsByName(String name) async {
+    final encoded = Uri.encodeQueryComponent(name.trim());
+    final response = await _apiClient.get(
+      '/cards/printings?name=$encoded&limit=50',
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Falha ao buscar edições: ${response.statusCode}');
+    }
+
+    final data = response.data as Map<String, dynamic>;
+    final list = (data['data'] as List?)?.whereType<Map>().toList() ?? const [];
+    return list.map((m) => m.cast<String, dynamic>()).toList();
   }
 }

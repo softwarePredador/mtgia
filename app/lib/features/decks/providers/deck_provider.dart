@@ -423,6 +423,48 @@ class DeckProvider extends ChangeNotifier {
     throw Exception('Falha ao validar deck: ${response.statusCode}');
   }
 
+  Future<bool> replaceCardEdition({
+    required String deckId,
+    required String oldCardId,
+    required String newCardId,
+  }) async {
+    final response = await _apiClient.post('/decks/$deckId/cards/replace', {
+      'old_card_id': oldCardId,
+      'new_card_id': newCardId,
+    });
+
+    if (response.statusCode != 200) {
+      final data = response.data;
+      final msg =
+          (data is Map && data['error'] != null)
+              ? data['error'].toString()
+              : 'Falha ao trocar edição: ${response.statusCode}';
+      throw Exception(msg);
+    }
+
+    await fetchDeckDetails(deckId);
+    await fetchDecks();
+    return true;
+  }
+
+  Future<Map<String, dynamic>> fetchDeckPricing(
+    String deckId, {
+    bool force = false,
+  }) async {
+    final response = await _apiClient.post('/decks/$deckId/pricing', {
+      'force': force,
+    });
+    if (response.statusCode == 200) {
+      return (response.data as Map).cast<String, dynamic>();
+    }
+    final data = response.data;
+    final msg =
+        (data is Map && data['error'] != null)
+            ? data['error'].toString()
+            : 'Falha ao calcular custo: ${response.statusCode}';
+    throw Exception(msg);
+  }
+
   /// Atualiza/gera análise de sinergia (IA) e persiste no deck.
   /// Endpoint: POST /decks/:id/ai-analysis
   Future<Map<String, dynamic>> refreshAiAnalysis(

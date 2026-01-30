@@ -21,22 +21,28 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 
 -- 2. Tabela de Cartas (Otimizada para busca e dados do MTGJSON)
-CREATE TABLE IF NOT EXISTS cards (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    scryfall_id UUID UNIQUE NOT NULL, -- ID oficial da carta (Oracle ID)
-    name TEXT NOT NULL,
-    mana_cost TEXT,
-    type_line TEXT,
-    oracle_text TEXT,
-    colors TEXT[], -- Array de cores ex: {'W', 'U'}
-    color_identity TEXT[], -- Identidade de cor (Commander), ex: {'W','U'}
-    image_url TEXT, -- URL da imagem na Scryfall
-    set_code TEXT,
-    rarity TEXT,
-    ai_description TEXT, -- Cache de explicações da IA
-    price DECIMAL(10,2), -- Preço da carta (integração Scryfall)
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+	CREATE TABLE IF NOT EXISTS cards (
+	    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	    scryfall_id UUID UNIQUE NOT NULL, -- ID oficial da carta (Oracle ID)
+	    name TEXT NOT NULL,
+	    mana_cost TEXT,
+	    type_line TEXT,
+	    oracle_text TEXT,
+	    colors TEXT[], -- Array de cores ex: {'W', 'U'}
+	    color_identity TEXT[], -- Identidade de cor (Commander), ex: {'W','U'}
+	    image_url TEXT, -- URL da imagem na Scryfall
+	    set_code TEXT,
+	    rarity TEXT,
+	    ai_description TEXT, -- Cache de explicações da IA
+	    price DECIMAL(10,2), -- Preço da carta (integração Scryfall)
+	    price_updated_at TIMESTAMP WITH TIME ZONE,
+	    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+	);
+
+-- Para bancos existentes (idempotente)
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS ai_description TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_updated_at TIMESTAMP WITH TIME ZONE;
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);

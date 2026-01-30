@@ -132,10 +132,26 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       final nextQty = isCommander ? 1 : existingQty + quantity;
 
-      // Limite de cópias (inclui o caso de somar)
-      if (!isBasicLand && nextQty > maxCopies && !isCommander) {
-        throw DeckRulesException(
-            'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.');
+      // Limite de cópias por NOME (para suportar múltiplas edições/printings)
+      if (!isCommander && !isBasicLand) {
+        final byNameResult = await session.execute(
+          Sql.named('''
+            SELECT COALESCE(SUM(dc.quantity), 0)::int
+            FROM deck_cards dc
+            JOIN cards c ON c.id = dc.card_id
+            WHERE dc.deck_id = @deckId
+              AND dc.is_commander = FALSE
+              AND LOWER(c.name) = LOWER(@name)
+          '''),
+          parameters: {'deckId': deckId, 'name': cardName},
+        );
+        final currentNameQty = (byNameResult.first[0] as int?) ?? 0;
+        final nextNameQty = currentNameQty + quantity;
+        if (nextNameQty > maxCopies) {
+          throw DeckRulesException(
+            'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.',
+          );
+        }
       }
 
       // Limite de total de cartas (quando aplicável)

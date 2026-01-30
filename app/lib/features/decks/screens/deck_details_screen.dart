@@ -24,6 +24,8 @@ class DeckDetailsScreen extends StatefulWidget {
 class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Map<String, dynamic>? _pricing;
+  bool _isPricingLoading = false;
 
   @override
   void initState() {
@@ -142,6 +144,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           ? 'Cartas: $totalCards'
                           : 'Cartas: $totalCards/$maxCards',
                       style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    _PricingRow(
+                      pricing: _pricing,
+                      isLoading: _isPricingLoading,
+                      onPressed: () => _loadPricing(force: false),
+                      onForceRefresh: () => _loadPricing(force: true),
+                      onShowDetails:
+                          (_pricing == null)
+                              ? null
+                              : () => _showPricingDetails(),
                     ),
                     if (isCommanderFormat && deck.commander.isEmpty) ...[
                       const SizedBox(height: 12),
@@ -478,6 +491,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Colors.grey[500]),
                           ),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed:
+                                  () => _showEditionPicker(context, card),
+                              icon: const Icon(Icons.collections_bookmark),
+                              label: const Text('Trocar edição'),
+                            ),
+                          ),
                         ],
 
                         const SizedBox(height: 8),
@@ -611,6 +634,345 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   scrollController: scrollController,
                 ),
           ),
+    );
+  }
+
+  Future<void> _showEditionPicker(
+    BuildContext context,
+    DeckCardItem card,
+  ) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Edições disponíveis',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(card.name, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: context.read<CardProvider>().fetchPrintingsByName(
+                    card.name,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'Erro ao buscar edições: ${snapshot.error}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      );
+                    }
+                    final list = snapshot.data ?? const [];
+                    if (list.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text('Nenhuma edição encontrada no banco.'),
+                      );
+                    }
+
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: list.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final it = list[index];
+                          final id = (it['id'] ?? '').toString();
+                          final setName =
+                              (it['set_name'] ?? it['set_code'] ?? '')
+                                  .toString();
+                          final date =
+                              (it['set_release_date'] ?? '').toString();
+                          final rarity = (it['rarity'] ?? '').toString();
+                          final price = it['price'];
+                          final priceText =
+                              (price is num)
+                                  ? '\$${price.toStringAsFixed(2)}'
+                                  : (price is String && price.trim().isNotEmpty)
+                                  ? '\$$price'
+                                  : '—';
+
+                          final isSelected = id == card.id;
+
+                          return ListTile(
+                            leading:
+                                (it['image_url'] != null)
+                                    ? Image.network(
+                                      it['image_url'],
+                                      width: 40,
+                                      fit: BoxFit.cover,
+                                    )
+                                    : const Icon(Icons.image_not_supported),
+                            title: Text(setName),
+                            subtitle: Text(
+                              [
+                                if (date.isNotEmpty) date,
+                                if (rarity.isNotEmpty) rarity,
+                              ].join(' • '),
+                            ),
+                            trailing: Text(
+                              priceText,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            selected: isSelected,
+                            onTap:
+                                isSelected
+                                    ? null
+                                    : () async {
+                                      Navigator.of(sheetContext).pop();
+                                      await _replaceEdition(
+                                        oldCardId: card.id,
+                                        newCardId: id,
+                                      );
+                                    },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _replaceEdition({
+    required String oldCardId,
+    required String newCardId,
+  }) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await context.read<DeckProvider>().replaceCardEdition(
+        deckId: widget.deckId,
+        oldCardId: oldCardId,
+        newCardId: newCardId,
+      );
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Edição atualizada.')));
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
+
+  Future<void> _loadPricing({required bool force}) async {
+    if (_isPricingLoading) return;
+    setState(() => _isPricingLoading = true);
+    try {
+      final res = await context.read<DeckProvider>().fetchDeckPricing(
+        widget.deckId,
+        force: force,
+      );
+      if (!mounted) return;
+      setState(() => _pricing = res);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) setState(() => _isPricingLoading = false);
+    }
+  }
+
+  void _showPricingDetails() {
+    final pricing = _pricing;
+    if (pricing == null) return;
+    final items =
+        (pricing['items'] as List?)?.whereType<Map>().toList() ?? const [];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Custo do deck',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Total estimado: \$${(pricing['estimated_total_usd'] ?? 0)}',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.65,
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final it = items[index].cast<String, dynamic>();
+                      final name = (it['name'] ?? '').toString();
+                      final qty = (it['quantity'] as int?) ?? 0;
+                      final setCode = (it['set_code'] ?? '').toString();
+                      final unit = it['unit_price_usd'];
+                      final unitText =
+                          (unit is num) ? '\$${unit.toStringAsFixed(2)}' : '—';
+                      final line = it['line_total_usd'];
+                      final lineText =
+                          (line is num) ? '\$${line.toStringAsFixed(2)}' : '—';
+
+                      return ListTile(
+                        dense: true,
+                        title: Text('$qty× $name'),
+                        subtitle: Text(
+                          setCode.isEmpty ? '' : setCode.toUpperCase(),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              lineText,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              unitText,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PricingRow extends StatelessWidget {
+  final Map<String, dynamic>? pricing;
+  final bool isLoading;
+  final VoidCallback onPressed;
+  final VoidCallback onForceRefresh;
+  final VoidCallback? onShowDetails;
+
+  const _PricingRow({
+    required this.pricing,
+    required this.isLoading,
+    required this.onPressed,
+    required this.onForceRefresh,
+    this.onShowDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final total = pricing?['estimated_total_usd'];
+    final missing = pricing?['missing_price_cards'];
+
+    String subtitle = 'Calcular custo estimado';
+    if (total is num) {
+      subtitle = 'Estimado: \$${total.toStringAsFixed(2)}';
+      if (missing is num && missing > 0) {
+        subtitle += ' • ${missing.toInt()} sem preço';
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.35,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.attach_money),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Custo', style: theme.textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(subtitle, style: theme.textTheme.bodySmall),
+                if (isLoading) ...[
+                  const SizedBox(height: 8),
+                  const LinearProgressIndicator(),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (pricing != null && onShowDetails != null)
+            TextButton(
+              onPressed: isLoading ? null : onShowDetails,
+              child: const Text('Detalhes'),
+            ),
+          TextButton(
+            onPressed: isLoading ? null : onPressed,
+            child: const Text('Calcular'),
+          ),
+          IconButton(
+            tooltip: 'Atualizar preços',
+            onPressed: isLoading ? null : onForceRefresh,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
     );
   }
 }

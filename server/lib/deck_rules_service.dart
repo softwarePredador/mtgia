@@ -19,6 +19,52 @@ class DeckRulesService {
     final cardsData = await _loadCardsData(cardIds);
     final legalities = await _loadLegalities(cardIds, normalizedFormat);
 
+    // Regras gerais: limite de cópias por NOME (para suportar múltiplas edições)
+    final copiesByName = <String, Map<String, dynamic>>{};
+    for (final item in cards) {
+      final cardId = item['card_id'] as String?;
+      if (cardId == null || cardId.isEmpty) continue;
+
+      final quantity = item['quantity'] as int? ?? 1;
+      final isCommander = item['is_commander'] as bool? ?? false;
+
+      final info = cardsData[cardId];
+      if (info == null) continue;
+
+      // Commander é validado separadamente (quantidade=1).
+      if (isCommander) continue;
+
+      final typeLine = info.typeLine.toLowerCase();
+      final isBasicLand = typeLine.contains('basic land');
+      if (isBasicLand) continue;
+
+      final key = info.name.trim().toLowerCase();
+      final existing = copiesByName[key];
+      if (existing == null) {
+        copiesByName[key] = {'name': info.name.trim(), 'qty': quantity};
+      } else {
+        copiesByName[key] = {
+          'name': existing['name'] as String,
+          'qty': (existing['qty'] as int) + quantity,
+        };
+      }
+    }
+
+    final limit =
+        (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
+            ? 1
+            : 4;
+    for (final entry in copiesByName.entries) {
+      final value = entry.value;
+      final name = value['name'] as String? ?? entry.key;
+      final qty = value['qty'] as int? ?? 0;
+      if (qty > limit) {
+        throw DeckRulesException(
+          'Regra violada: "$name" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
+        );
+      }
+    }
+
     // Regras gerais (limite de cópias + banlist/restrita)
     for (final item in cards) {
       final cardId = item['card_id'] as String?;
