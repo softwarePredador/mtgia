@@ -178,6 +178,13 @@ Future<Response> _listDecks(RequestContext context) async {
         map['pricing_updated_at'] =
             (map['pricing_updated_at'] as DateTime).toIso8601String();
       }
+      // PostgreSQL DECIMAL retorna String, converter para double
+      final rawPricingTotal = map['pricing_total'];
+      if (rawPricingTotal is String) {
+        map['pricing_total'] = double.tryParse(rawPricingTotal);
+      } else if (rawPricingTotal is num) {
+        map['pricing_total'] = rawPricingTotal.toDouble();
+      }
       return map;
     }).toList();
 

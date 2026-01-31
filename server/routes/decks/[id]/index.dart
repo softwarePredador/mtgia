@@ -293,6 +293,13 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       deckInfo['pricing_updated_at'] =
           (deckInfo['pricing_updated_at'] as DateTime).toIso8601String();
     }
+    // PostgreSQL DECIMAL retorna String, converter para double
+    final rawPricingTotal = deckInfo['pricing_total'];
+    if (rawPricingTotal is String) {
+      deckInfo['pricing_total'] = double.tryParse(rawPricingTotal);
+    } else if (rawPricingTotal is num) {
+      deckInfo['pricing_total'] = rawPricingTotal.toDouble();
+    }
 
     // 2. Buscar todas as cartas associadas a esse deck com detalhes
     final cardsResult = await conn.execute(
