@@ -1316,6 +1316,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               .map((m) => m.cast<String, dynamic>())
               .toList() ??
           const <Map<String, dynamic>>[];
+      final removalsDetailed =
+          (result['removals_detailed'] as List?)
+              ?.whereType<Map>()
+              .map((m) => m.cast<String, dynamic>())
+              .toList() ??
+          const <Map<String, dynamic>>[];
 
       if (removals.isEmpty && additions.isEmpty) {
         if (!context.mounted) return;
@@ -1476,9 +1482,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       );
       isLoadingDialogOpen = true;
 
-      // Aplicar as mudanças via DeckProvider
+      // Aplicar as mudanças via DeckProvider (versão otimizada com IDs)
       if (mode == 'complete' && additionsDetailed.isNotEmpty) {
-        // Completar deck: adicionar em lote (mais rápido e evita N chamadas).
+        // Completar deck: adicionar em lote.
         await deckProvider.addCardsBulk(
           deckId: widget.deckId,
           cards:
@@ -1493,7 +1499,15 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   )
                   .toList(),
         );
+      } else if (removalsDetailed.isNotEmpty || additionsDetailed.isNotEmpty) {
+        // Usar versão rápida com IDs (evita N buscas HTTP)
+        await deckProvider.applyOptimizationWithIds(
+          deckId: widget.deckId,
+          removalsDetailed: removalsDetailed,
+          additionsDetailed: additionsDetailed,
+        );
       } else {
+        // Fallback para versão antiga (caso servidor não retorne detailed)
         await deckProvider.applyOptimization(
           deckId: widget.deckId,
           cardsToRemove: removals,

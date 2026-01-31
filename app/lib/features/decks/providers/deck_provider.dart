@@ -843,6 +843,106 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
+  /// Aplica otimização usando IDs diretamente (versão rápida)
+  /// Evita N chamadas HTTP para buscar cartas por nome
+  Future<bool> applyOptimizationWithIds({
+    required String deckId,
+    required List<Map<String, dynamic>> removalsDetailed,
+    required List<Map<String, dynamic>> additionsDetailed,
+  }) async {
+    try {
+      AppLogger.debug('🚀 [DeckProvider] Otimização rápida com IDs diretos');
+
+      // 1. Buscar deck atual
+      if (_selectedDeck == null || _selectedDeck!.id != deckId) {
+        await fetchDeckDetails(deckId);
+      }
+      if (_selectedDeck == null) throw Exception('Deck não encontrado');
+
+      // 2. Construir mapa de cartas atuais
+      final currentCards = <String, Map<String, dynamic>>{};
+      for (final commander in _selectedDeck!.commander) {
+        currentCards[commander.id] = {
+          'card_id': commander.id,
+          'quantity': commander.quantity,
+          'is_commander': true,
+        };
+      }
+      for (final entry in _selectedDeck!.mainBoard.entries) {
+        for (final card in entry.value) {
+          if (!card.isCommander) {
+            currentCards[card.id] = {
+              'card_id': card.id,
+              'quantity': card.quantity,
+              'is_commander': false,
+            };
+          }
+        }
+      }
+
+      // 3. Remover cartas usando IDs diretos
+      for (final removal in removalsDetailed) {
+        final cardId = removal['card_id'] as String?;
+        if (cardId == null) continue;
+        if (currentCards.containsKey(cardId)) {
+          final existing = currentCards[cardId]!;
+          final qty = (existing['quantity'] as int) - 1;
+          if (qty <= 0) {
+            currentCards.remove(cardId);
+          } else {
+            currentCards[cardId] = {...existing, 'quantity': qty};
+          }
+        }
+      }
+
+      // 4. Adicionar cartas usando IDs diretos
+      final format = _selectedDeck?.format.toLowerCase() ?? '';
+      final isCommander = format == 'commander' || format == 'brawl';
+      final defaultLimit = isCommander ? 1 : 4;
+
+      for (final addition in additionsDetailed) {
+        final cardId = addition['card_id'] as String?;
+        if (cardId == null) continue;
+
+        final typeLine = ((addition['type_line'] as String?) ?? '').toLowerCase();
+        final isBasicLand = typeLine.contains('basic land');
+        final limit = isBasicLand ? 99 : defaultLimit;
+
+        if (currentCards.containsKey(cardId)) {
+          final existing = currentCards[cardId]!;
+          final newQty = (existing['quantity'] as int) + 1;
+          if (newQty <= limit) {
+            currentCards[cardId] = {...existing, 'quantity': newQty};
+          }
+        } else {
+          currentCards[cardId] = {
+            'card_id': cardId,
+            'quantity': 1,
+            'is_commander': false,
+          };
+        }
+      }
+
+      // 5. Salvar no servidor
+      AppLogger.debug('💾 [DeckProvider] Salvando...');
+      final response = await _apiClient.put('/decks/$deckId', {
+        'cards': currentCards.values.toList(),
+      });
+
+      if (response.statusCode == 200) {
+        AppLogger.debug('✅ Otimização aplicada!');
+        invalidateDeckCache(deckId);
+        await fetchDeckDetails(deckId);
+        return true;
+      } else {
+        throw Exception('Falha: ${response.statusCode}');
+      }
+    } catch (e) {
+      AppLogger.error('[DeckProvider] Erro na otimização rápida', e);
+      rethrow;
+    }
+  }
+
   /// Limpa o erro
   void clearError() {
     _errorMessage = null;
