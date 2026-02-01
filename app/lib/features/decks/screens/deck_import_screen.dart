@@ -287,9 +287,11 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Importar Deck'),
+        title: const Text('Colar Lista de Cartas'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
@@ -302,7 +304,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
           children: [
             // Instruções
             Card(
-              color: Colors.blue.shade50,
+              color: theme.colorScheme.secondary.withOpacity(0.15),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -310,24 +312,26 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue.shade700),
+                        Icon(Icons.lightbulb_outline, color: theme.colorScheme.secondary),
                         const SizedBox(width: 8),
                         Text(
-                          'Como usar',
+                          'Dica',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
+                            color: theme.colorScheme.secondary,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Cole sua lista de cartas no formato:\n'
+                    Text(
+                      'Cole a lista de cartas copiada de sites como:\n'
+                      'Moxfield, Archidekt, TappedOut, EDHRec...\n\n'
+                      'Formatos aceitos:\n'
                       '• "1 Sol Ring" ou "1x Sol Ring"\n'
-                      '• "4 Lightning Bolt (m10)" - com set code\n'
-                      '• "1 Krenko [Commander]" - marca como comandante',
-                      style: TextStyle(fontSize: 13),
+                      '• "4 Lightning Bolt (m10)" - com set\n'
+                      '• "1 Krenko [Commander]" - marca comandante',
+                      style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withOpacity(0.9)),
                     ),
                   ],
                 ),
@@ -339,11 +343,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Nome do Deck
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Nome do Deck *',
                 hintText: 'Ex: Urza Artifacts',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.title),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.title),
+                filled: true,
+                fillColor: theme.colorScheme.surface,
               ),
             ),
             
@@ -402,6 +408,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Lista de Cartas
             Row(
               children: [
+                Icon(Icons.list_alt, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
                 const Text(
                   'Lista de Cartas *',
                   style: TextStyle(
@@ -412,7 +420,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 const Spacer(),
                 TextButton.icon(
                   onPressed: _pasteExample,
-                  icon: const Icon(Icons.content_paste, size: 18),
+                  icon: const Icon(Icons.auto_fix_high, size: 18),
                   label: const Text('Exemplo'),
                 ),
               ],
@@ -421,15 +429,16 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             TextField(
               controller: _listController,
               decoration: InputDecoration(
-                hintText: '1 Sol Ring\n1 Arcane Signet\n4 Island\n...',
+                hintText: 'Cole sua lista aqui...\n\n1 Sol Ring\n1 Arcane Signet\n4 Island\n...',
                 border: const OutlineInputBorder(),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: theme.colorScheme.surface,
               ),
               maxLines: 15,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 13,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             
@@ -439,7 +448,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             Text(
               '${_listController.text.split('\n').where((l) => l.trim().isNotEmpty).length} linhas',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
                 fontSize: 12,
               ),
             ),
@@ -448,17 +457,17 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             if (_error != null) ...[
               const SizedBox(height: 16),
               Card(
-                color: Colors.red.shade50,
+                color: Colors.red.withOpacity(0.15),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      const Icon(Icons.error, color: Colors.red),
+                      const Icon(Icons.error_outline, color: Colors.redAccent),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.redAccent),
                         ),
                       ),
                     ],
@@ -471,19 +480,22 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
             // Botão Importar
             SizedBox(
-              height: 50,
+              height: 54,
               child: ElevatedButton.icon(
                 onPressed: _isImporting ? null : _importDeck,
                 icon: _isImporting 
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Icon(Icons.upload),
-                label: Text(_isImporting ? 'Importando...' : 'Importar Deck'),
+                    : const Icon(Icons.check_circle_outline),
+                label: Text(
+                  _isImporting ? 'Criando deck...' : 'Criar Deck com esta Lista',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
               ),

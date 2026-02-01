@@ -64,8 +64,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         title: const Text('Detalhes do Deck'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.upload_file),
-            tooltip: 'Importar Lista',
+            icon: const Icon(Icons.content_paste_go),
+            tooltip: 'Colar lista de cartas',
             onPressed: () => _showImportListDialog(context),
           ),
           IconButton(
@@ -993,6 +993,253 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       },
     );
   }
+
+  /// Dialog para importar lista de cartas para o deck existente
+  void _showImportListDialog(BuildContext context) {
+    final listController = TextEditingController();
+    final theme = Theme.of(context);
+    final deckId = widget.deckId; // Captura antes do dialog
+    final parentContext = context; // Salva contexto pai para snackbar
+    bool isImporting = false;
+    bool replaceAll = false;
+    List<String> notFoundLines = [];
+    String? error;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.content_paste_go, color: theme.colorScheme.secondary),
+              const SizedBox(width: 8),
+              const Text('Colar Lista'),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Instruções
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.secondary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '💡 Cole a lista de cartas copiada de outros sites',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.secondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Formatos: "1 Sol Ring", "1x Mana Vault"',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Opção de substituir tudo
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: theme.colorScheme.outline.withOpacity(0.3)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: CheckboxListTile(
+                      value: replaceAll,
+                      onChanged: (value) {
+                        setDialogState(() => replaceAll = value ?? false);
+                      },
+                      title: const Text('Substituir deck inteiro', style: TextStyle(fontSize: 14)),
+                      subtitle: Text(
+                        replaceAll 
+                          ? '⚠️ Cartas atuais serão removidas!'
+                          : 'Adiciona às cartas existentes',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: replaceAll ? Colors.orange : null,
+                        ),
+                      ),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Campo de texto
+                  TextField(
+                    controller: listController,
+                    decoration: InputDecoration(
+                      hintText: 'Cole a lista aqui...\n\n1 Sol Ring\n1 Arcane Signet\n4 Island',
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    maxLines: 12,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  
+                  // Erro
+                  if (error != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              error!,
+                              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  
+                  // Cartas não encontradas
+                  if (notFoundLines.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '⚠️ ${notFoundLines.length} cartas não encontradas:',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          ...notFoundLines.take(5).map((line) => Text(
+                            '• $line',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.orange.shade200,
+                            ),
+                          )),
+                          if (notFoundLines.length > 5)
+                            Text(
+                              '... e mais ${notFoundLines.length - 5}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.orange.shade300,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isImporting ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton.icon(
+              onPressed: isImporting
+                  ? null
+                  : () async {
+                      if (listController.text.trim().isEmpty) {
+                        setDialogState(() => error = 'Cole a lista de cartas');
+                        return;
+                      }
+
+                      setDialogState(() {
+                        isImporting = true;
+                        error = null;
+                        notFoundLines = [];
+                      });
+
+                      final provider = parentContext.read<DeckProvider>();
+                      final result = await provider.importListToDeck(
+                        deckId: deckId,
+                        list: listController.text,
+                        replaceAll: replaceAll,
+                      );
+
+                      if (!ctx.mounted) return;
+
+                      setDialogState(() {
+                        isImporting = false;
+                        notFoundLines = List<String>.from(result['not_found_lines'] ?? []);
+                      });
+
+                      if (result['success'] == true) {
+                        Navigator.pop(ctx);
+                        
+                        final imported = result['cards_imported'] ?? 0;
+                        ScaffoldMessenger.of(parentContext).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              notFoundLines.isEmpty
+                                  ? '$imported cartas importadas!'
+                                  : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
+                            ),
+                            backgroundColor: notFoundLines.isEmpty ? Colors.green : Colors.orange,
+                          ),
+                        );
+                        
+                        // Recarrega o deck
+                        provider.fetchDeckDetails(deckId, forceRefresh: true);
+                      } else {
+                        setDialogState(() {
+                          error = result['error'] ?? 'Erro ao importar';
+                        });
+                      }
+                    },
+              icon: isImporting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.upload),
+              label: Text(isImporting ? 'Importando...' : 'Importar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _PricingRow extends StatelessWidget {
@@ -1802,238 +2049,6 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Dialog para importar lista de cartas para o deck existente
-  void _showImportListDialog(BuildContext context) {
-    final listController = TextEditingController();
-    final theme = Theme.of(context);
-    bool isImporting = false;
-    bool replaceAll = false;
-    List<String> notFoundLines = [];
-    String? error;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.upload_file, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              const Text('Importar Lista'),
-            ],
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Instruções
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Cole a lista de cartas:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '• "1 Sol Ring" ou "1x Sol Ring"\n'
-                          '• "4 Lightning Bolt (m10)"\n'
-                          '• "31 Island"',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue.shade700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Opção de substituir tudo
-                  CheckboxListTile(
-                    value: replaceAll,
-                    onChanged: (value) {
-                      setDialogState(() => replaceAll = value ?? false);
-                    },
-                    title: const Text('Substituir todas as cartas'),
-                    subtitle: const Text(
-                      'Se marcado, remove as cartas atuais e adiciona apenas as da lista',
-                      style: TextStyle(fontSize: 11),
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Campo de texto
-                  TextField(
-                    controller: listController,
-                    decoration: InputDecoration(
-                      hintText: '1 Sol Ring\n1 Arcane Signet\n4 Island\n...',
-                      border: const OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                    ),
-                    maxLines: 12,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                    ),
-                  ),
-                  
-                  // Erro
-                  if (error != null) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error, color: Colors.red, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              error!,
-                              style: const TextStyle(color: Colors.red, fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  
-                  // Cartas não encontradas
-                  if (notFoundLines.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '❓ ${notFoundLines.length} cartas não encontradas:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade800,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          ...notFoundLines.take(5).map((line) => Text(
-                            '• $line',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.orange.shade800,
-                            ),
-                          )),
-                          if (notFoundLines.length > 5)
-                            Text(
-                              '... e mais ${notFoundLines.length - 5}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontStyle: FontStyle.italic,
-                                color: Colors.orange.shade600,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isImporting ? null : () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton.icon(
-              onPressed: isImporting
-                  ? null
-                  : () async {
-                      if (listController.text.trim().isEmpty) {
-                        setDialogState(() => error = 'Cole a lista de cartas');
-                        return;
-                      }
-
-                      setDialogState(() {
-                        isImporting = true;
-                        error = null;
-                        notFoundLines = [];
-                      });
-
-                      final provider = context.read<DeckProvider>();
-                      final result = await provider.importListToDeck(
-                        deckId: widget.deckId,
-                        list: listController.text,
-                        replaceAll: replaceAll,
-                      );
-
-                      if (!context.mounted) return;
-
-                      setDialogState(() {
-                        isImporting = false;
-                        notFoundLines = List<String>.from(result['not_found_lines'] ?? []);
-                      });
-
-                      if (result['success'] == true) {
-                        Navigator.pop(context);
-                        
-                        final imported = result['cards_imported'] ?? 0;
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              notFoundLines.isEmpty
-                                  ? '$imported cartas importadas!'
-                                  : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
-                            ),
-                            backgroundColor: notFoundLines.isEmpty ? Colors.green : Colors.orange,
-                          ),
-                        );
-                        
-                        // Recarrega o deck
-                        provider.fetchDeckDetails(widget.deckId, forceRefresh: true);
-                      } else {
-                        setDialogState(() {
-                          error = result['error'] ?? 'Erro ao importar';
-                        });
-                      }
-                    },
-              icon: isImporting
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.upload),
-              label: Text(isImporting ? 'Importando...' : 'Importar'),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -282,13 +282,14 @@ class _DeckListScreenState extends State<DeckListScreen> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Botão de Importar
-          FloatingActionButton.small(
+          // Botão de Importar Lista
+          FloatingActionButton.extended(
             heroTag: 'import',
             onPressed: () => context.go('/decks/import'),
             backgroundColor: theme.colorScheme.secondary,
-            tooltip: 'Importar Lista',
-            child: const Icon(Icons.upload_file),
+            tooltip: 'Colar lista de cartas de outro site',
+            icon: const Icon(Icons.content_paste_go),
+            label: const Text('Colar Lista'),
           ),
           const SizedBox(height: 12),
           // Botão principal (Novo Deck)
