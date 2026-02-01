@@ -971,4 +971,111 @@ class DeckProvider extends ChangeNotifier {
             : commander.colors;
     return identity.map((e) => e.toUpperCase()).toSet();
   }
+
+  /// Importa um deck a partir de uma lista de texto (ex: "1 Sol Ring")
+  /// Retorna um Map com:
+  /// - 'success': bool
+  /// - 'deck': dados do deck criado (se sucesso)
+  /// - 'cards_imported': quantidade de cartas importadas
+  /// - 'not_found_lines': lista de linhas não encontradas
+  /// - 'warnings': lista de avisos
+  /// - 'error': mensagem de erro (se falhou)
+  Future<Map<String, dynamic>> importDeckFromList({
+    required String name,
+    required String format,
+    required String list,
+    String? description,
+    String? commander,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.post('/import', {
+        'name': name,
+        'format': format,
+        'list': list,
+        if (description != null && description.isNotEmpty) 'description': description,
+        if (commander != null && commander.isNotEmpty) 'commander': commander,
+      });
+
+      _isLoading = false;
+      notifyListeners();
+
+      if (response.statusCode == 200) {
+        // Recarrega a lista de decks
+        await fetchDecks();
+        
+        final data = response.data as Map<String, dynamic>;
+        return {
+          'success': true,
+          'deck': data['deck'],
+          'cards_imported': data['cards_imported'] ?? 0,
+          'not_found_lines': data['not_found_lines'] ?? [],
+          'warnings': data['warnings'] ?? [],
+        };
+      } else {
+        final data = response.data;
+        final error = (data is Map && data['error'] != null)
+            ? data['error'].toString()
+            : 'Erro ao importar deck: ${response.statusCode}';
+        final notFound = (data is Map && data['not_found'] != null)
+            ? List<String>.from(data['not_found'])
+            : <String>[];
+        
+        _errorMessage = error;
+        return {
+          'success': false,
+          'error': error,
+          'not_found_lines': notFound,
+        };
+      }
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'Erro de conexão: $e';
+      notifyListeners();
+      return {
+        'success': false,
+        'error': 'Erro de conexão: $e',
+      };
+    }
+  }
+
+  /// Valida uma lista de cartas sem criar o deck (preview)
+  /// Útil para mostrar ao usuário quais cartas foram encontradas e quais não
+  Future<Map<String, dynamic>> validateImportList({
+    required String format,
+    required String list,
+  }) async {
+    try {
+      final response = await _apiClient.post('/import/validate', {
+        'format': format,
+        'list': list,
+      });
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return {
+          'success': true,
+          'found_cards': data['found_cards'] ?? [],
+          'not_found_lines': data['not_found_lines'] ?? [],
+          'warnings': data['warnings'] ?? [],
+        };
+      } else {
+        final data = response.data;
+        return {
+          'success': false,
+          'error': (data is Map && data['error'] != null)
+              ? data['error'].toString()
+              : 'Erro ao validar lista',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Erro de conexão: $e',
+      };
+    }
+  }
 }

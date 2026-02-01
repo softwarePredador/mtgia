@@ -279,11 +279,27 @@ class _DeckListScreenState extends State<DeckListScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateDeckDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Novo Deck'),
-        backgroundColor: theme.colorScheme.primary,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Botão de Importar
+          FloatingActionButton.small(
+            heroTag: 'import',
+            onPressed: () => context.go('/decks/import'),
+            backgroundColor: theme.colorScheme.secondary,
+            tooltip: 'Importar Lista',
+            child: const Icon(Icons.upload_file),
+          ),
+          const SizedBox(height: 12),
+          // Botão principal (Novo Deck)
+          FloatingActionButton.extended(
+            heroTag: 'create',
+            onPressed: () => _showCreateDeckDialog(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Novo Deck'),
+            backgroundColor: theme.colorScheme.primary,
+          ),
+        ],
       ),
     );
   }

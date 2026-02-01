@@ -64,7 +64,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
     });
   }
 
-  void _addCardToDeck(DeckCardItem card) {
+  void _addCardToDeck(DeckCardItem card) async {
     final deck = context.read<DeckProvider>().selectedDeck;
     final format = deck?.format.toLowerCase();
     final isCommanderFormat = format == 'commander' || format == 'brawl';
@@ -87,7 +87,49 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                 ? isAllowedByCommander
                 : isCommanderEligible);
 
-    // Mostra dialog para escolher quantidade
+    // Verifica se é basic land
+    final isBasicLand = card.typeLine.toLowerCase().contains('basic land');
+
+    // Em Commander/Brawl, se NÃO for basic land E não estiver em modo Commander
+    // (escolhendo o comandante), adiciona direto com quantidade 1 sem modal
+    if (isCommanderFormat && !isBasicLand && !isCommanderMode && !mustPickCommanderFirst) {
+      // Verifica se a carta é permitida pela identidade do comandante
+      if (!canOpenAddDialog) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Esta carta não é permitida pela identidade de cor do comandante'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
+
+      final provider = context.read<DeckProvider>();
+      final success = await provider.addCardToDeck(
+        widget.deckId,
+        card,
+        1, // Commander só permite 1 cópia
+        isCommander: false,
+      );
+
+      if (!context.mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${card.name} adicionada ao deck!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(provider.errorMessage ?? 'Erro ao adicionar carta'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    // Para outros casos (basic land, outros formatos, modo commander), mostra dialog
     showDialog(
       context: context,
       builder:
