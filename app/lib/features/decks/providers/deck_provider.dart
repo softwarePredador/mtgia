@@ -1078,4 +1078,53 @@ class DeckProvider extends ChangeNotifier {
       };
     }
   }
+
+  /// Importa uma lista de cartas para um deck EXISTENTE
+  /// Se replaceAll=true, substitui todas as cartas; senão, adiciona às existentes
+  Future<Map<String, dynamic>> importListToDeck({
+    required String deckId,
+    required String list,
+    bool replaceAll = false,
+  }) async {
+    try {
+      final response = await _apiClient.post('/import/to-deck', {
+        'deck_id': deckId,
+        'list': list,
+        'replace_all': replaceAll,
+      });
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        
+        // Invalida cache do deck
+        invalidateDeckCache(deckId);
+        
+        return {
+          'success': true,
+          'cards_imported': data['cards_imported'] ?? 0,
+          'not_found_lines': data['not_found_lines'] ?? [],
+          'warnings': data['warnings'] ?? [],
+        };
+      } else {
+        final data = response.data;
+        final error = (data is Map && data['error'] != null)
+            ? data['error'].toString()
+            : 'Erro ao importar: ${response.statusCode}';
+        final notFound = (data is Map && data['not_found_lines'] != null)
+            ? List<String>.from(data['not_found_lines'])
+            : <String>[];
+        
+        return {
+          'success': false,
+          'error': error,
+          'not_found_lines': notFound,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Erro de conexão: $e',
+      };
+    }
+  }
 }

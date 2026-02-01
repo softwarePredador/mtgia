@@ -12,6 +12,7 @@ import '../routes/sets/index.dart' as sets_index;
 import '../routes/rules/index.dart' as rules_index;
 import '../routes/import/index.dart' as import_index;
 import '../routes/import/validate/index.dart' as import_validate_index;
+import '../routes/import/to-deck/index.dart' as import_to_deck_index;
 import '../routes/health/index.dart' as health_index;
 import '../routes/health/ready/index.dart' as health_ready_index;
 import '../routes/health/live/index.dart' as health_live_index;
@@ -84,6 +85,7 @@ Handler buildRootHandler() {
     ..mount('/health/live', (context) => buildHealthLiveHandler()(context))
     ..mount('/health/ready', (context) => buildHealthReadyHandler()(context))
     ..mount('/health', (context) => buildHealthHandler()(context))
+    ..mount('/import/to-deck', (context) => buildImportToDeckHandler()(context))
     ..mount('/import/validate', (context) => buildImportValidateHandler()(context))
     ..mount('/import', (context) => buildImportHandler()(context))
     ..mount('/rules', (context) => buildRulesHandler()(context))
@@ -258,6 +260,13 @@ Handler buildHealthHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => health_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildImportToDeckHandler() {
+  final pipeline = const Pipeline().addMiddleware(import_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => import_to_deck_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
