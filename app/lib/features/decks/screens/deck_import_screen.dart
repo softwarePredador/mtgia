@@ -106,13 +106,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
         // Tudo ok, vai direto pro deck
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Expanded(child: Text('✓ $_cardsImported cartas reconhecidas! Abrindo análise...')),
-              ],
-            ),
+            content: Text('Deck importado com $_cardsImported cartas!'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -157,25 +151,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             Row(
               children: [
                 Icon(
-                  success ? Icons.auto_awesome : Icons.psychology_alt,
+                  success ? Icons.check_circle : Icons.warning,
                   color: success ? theme.colorScheme.primary : Colors.orange,
                 ),
                 const SizedBox(width: 8),
-                Text(success ? 'Análise Concluída' : 'Revisão Necessária'),
+                Text(success ? 'Importação Concluída' : 'Atenção'),
               ],
             ),
-            if (success)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  'A IA processou sua lista com sucesso',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                ),
-              ),
           ],
         ),
         content: SingleChildScrollView(
@@ -248,10 +230,10 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               if (warnings.isNotEmpty) ...[
                 Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, size: 18, color: Colors.amber.shade700),
+                    Icon(Icons.info_outline, size: 18, color: Colors.amber.shade700),
                     const SizedBox(width: 6),
                     Text(
-                      'Sugestões da IA:',
+                      'Avisos:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.amber.shade700,
@@ -351,13 +333,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               child: const Text('Ver Decks'),
             ),
             if (deckId != null)
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   context.go('/decks/$deckId');
                 },
-                icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text('Analisar Deck'),
+                child: const Text('Abrir Deck'),
               ),
           ],
         ],
@@ -414,10 +395,10 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.auto_awesome, color: theme.colorScheme.primary, size: 24),
+                      Icon(Icons.content_paste, color: theme.colorScheme.primary, size: 24),
                       const SizedBox(width: 8),
                       Text(
-                        'Reconhecimento Inteligente',
+                        'Importar Lista',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -428,10 +409,10 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Nossa IA reconhece automaticamente cartas de qualquer formato:\n'
-                    '• Listas do Moxfield, Archidekt, EDHRec\n'
-                    '• Formato MTGA/MTGO\n'
-                    '• Nomes parciais e variações',
+                    'Cole sua lista de qualquer fonte:\n'
+                    '• Moxfield, Archidekt, EDHRec\n'
+                    '• MTGA/MTGO\n'
+                    '• Texto simples',
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withOpacity(0.85),
@@ -449,9 +430,9 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nome do Deck',
-                hintText: 'A IA pode sugerir um nome baseado nas cartas...',
+                hintText: 'Ex: Goblins Aggro',
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.auto_fix_high),
+                prefixIcon: const Icon(Icons.edit),
                 filled: true,
                 fillColor: theme.colorScheme.surface,
               ),
@@ -512,11 +493,11 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Lista de Cartas
             Row(
               children: [
-                Icon(Icons.psychology, size: 20, color: theme.colorScheme.secondary),
+                Icon(Icons.list_alt, size: 20, color: theme.colorScheme.secondary),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    'Cole sua lista',
+                    'Lista de Cartas',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -525,8 +506,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 ),
                 TextButton.icon(
                   onPressed: _pasteExample,
-                  icon: Icon(Icons.smart_toy, size: 18, color: theme.colorScheme.tertiary),
-                  label: Text('Demo', style: TextStyle(color: theme.colorScheme.tertiary)),
+                  icon: Icon(Icons.help_outline, size: 18, color: theme.colorScheme.tertiary),
+                  label: Text('Exemplo', style: TextStyle(color: theme.colorScheme.tertiary)),
                 ),
               ],
             ),
@@ -534,7 +515,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             TextField(
               controller: _listController,
               decoration: InputDecoration(
-                hintText: 'Cole aqui a lista copiada de qualquer site...\n\nA IA irá identificar cada carta automaticamente.',
+                hintText: 'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
                 border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: theme.colorScheme.surface,
@@ -616,16 +597,16 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           ),
                           const SizedBox(width: 12),
-                          const Text('Analisando cartas...', style: TextStyle(fontSize: 16)),
+                          const Text('Importando...', style: TextStyle(fontSize: 16)),
                         ],
                       )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.auto_awesome),
+                          const Icon(Icons.upload),
                           const SizedBox(width: 8),
                           const Text(
-                            'Criar Deck com IA',
+                            'Criar Deck',
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -637,7 +618,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             
             // Texto auxiliar
             Text(
-              'A IA irá validar regras, verificar banlist e sugerir melhorias',
+              'Cartas serão validadas automaticamente',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,

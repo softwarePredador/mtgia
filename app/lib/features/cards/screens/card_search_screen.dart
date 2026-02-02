@@ -219,20 +219,15 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
           }
 
           if (provider.searchResults.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.auto_awesome, size: 64, color: Colors.grey.withOpacity(0.5)),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Digite para buscar no banco de cartas',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
+                  Icon(Icons.search, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
                   Text(
-                    'A busca aceita nomes parciais',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.withOpacity(0.6)),
+                    'Digite o nome de uma carta',
+                    style: TextStyle(color: Colors.grey),
                   ),
                 ],
               ),

@@ -41,13 +41,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           (context) => StatefulBuilder(
             builder:
                 (context, setState) => AlertDialog(
-                  title: Row(
-                    children: const [
-                      Icon(Icons.dashboard_customize, size: 22),
-                      SizedBox(width: 8),
-                      Text('Novo Deck'),
-                    ],
-                  ),
+                  title: const Text('Novo Deck'),
                   content: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -57,7 +51,6 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           decoration: const InputDecoration(
                             labelText: 'Nome do Deck',
                             hintText: 'Ex: Goblins Aggro',
-                            prefixIcon: Icon(Icons.edit, size: 20),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -65,7 +58,6 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           initialValue: selectedFormat,
                           decoration: const InputDecoration(
                             labelText: 'Formato',
-                            prefixIcon: Icon(Icons.category, size: 20),
                           ),
                           items:
                               formats
@@ -90,25 +82,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           decoration: const InputDecoration(
                             labelText: 'Descrição (Opcional)',
                             hintText: 'Ex: Deck focado em tokens...',
-                            prefixIcon: Icon(Icons.description, size: 20),
                           ),
                           maxLines: 3,
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Icon(Icons.tips_and_updates, size: 14, color: Theme.of(context).colorScheme.secondary),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                'Após criar, a IA ajudará a montar e otimizar',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
@@ -134,15 +109,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           if (success) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: const [
-                                    Icon(Icons.check_circle, color: Colors.white, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Deck criado! Pronto para análise de IA'),
-                                  ],
-                                ),
-                                backgroundColor: Theme.of(context).colorScheme.primary,
+                              const SnackBar(
+                                content: Text('Deck criado com sucesso!'),
                               ),
                             );
                           } else {
@@ -237,18 +205,18 @@ class _DeckListScreenState extends State<DeckListScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.psychology,
+                    Icons.style_outlined,
                     size: 80,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                    color: theme.colorScheme.secondary.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Bem-vindo ao MTG AI',
+                    'Nenhum deck criado',
                     style: theme.textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Crie um deck manualmente ou deixe a IA\ngerar um baseado na sua descrição',
+                    'Comece criando seu primeiro deck',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: const Color(0xFF94A3B8),
                     ),
@@ -261,7 +229,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                       ElevatedButton.icon(
                         onPressed: () => _showCreateDeckDialog(context),
                         icon: const Icon(Icons.add),
-                        label: const Text('Criar Manual'),
+                        label: const Text('Criar Deck'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -273,7 +241,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                       ElevatedButton.icon(
                         onPressed: () => context.go('/decks/generate'),
                         icon: const Icon(Icons.auto_awesome),
-                        label: const Text('Criar com IA'),
+                        label: const Text('Gerar'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.secondary,
                           foregroundColor: theme.colorScheme.onSecondary,
@@ -320,8 +288,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
             heroTag: 'import',
             onPressed: () => context.go('/decks/import'),
             backgroundColor: theme.colorScheme.secondary,
-            tooltip: 'Importar lista de outro site com reconhecimento automático',
-            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'Importar lista de outro site',
+            icon: const Icon(Icons.content_paste),
             label: const Text('Importar'),
           ),
           const SizedBox(height: 12),
