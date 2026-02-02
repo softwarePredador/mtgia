@@ -527,7 +527,7 @@ class DeckProvider extends ChangeNotifier {
     if (response.data is Map && (response.data as Map)['error'] != null) {
       throw Exception((response.data as Map)['error'].toString());
     }
-    throw Exception('Falha ao adicionar em lote: ${response.statusCode}');
+    throw Exception('Falha ao adicionar em lote : ${response.statusCode}');
   }
 
   Future<void> updateDeckStrategy({
