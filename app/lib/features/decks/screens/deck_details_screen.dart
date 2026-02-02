@@ -550,6 +550,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                                 ? Image.network(
                                                   card.imageUrl!,
                                                   fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (_, __, ___) => Container(
+                                                        color: Colors.grey[800],
+                                                        child: const Icon(
+                                                          Icons
+                                                              .image_not_supported,
+                                                          size: 20,
+                                                        ),
+                                                      ),
                                                 )
                                                 : Container(
                                                   color: Colors.grey[800],
@@ -714,19 +723,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(12),
                       ),
-                      child: Image.network(
-                        card.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (_, __, ___) => const SizedBox(
-                              height: 200,
-                              child: Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 64,
+                      child: AspectRatio(
+                        aspectRatio: 0.714, // MTG card ratio ~ 2.5"x3.5"
+                        child: Image.network(
+                          card.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (_, __, ___) => Container(
+                                color: Colors.grey[900],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    size: 64,
+                                  ),
                                 ),
                               ),
-                            ),
+                        ),
                       ),
                     ),
                   Padding(
@@ -1006,7 +1018,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                     ? Image.network(
                                       it['image_url'],
                                       width: 40,
+                                      height: 56,
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (_, __, ___) => const Icon(
+                                            Icons.image_not_supported,
+                                          ),
                                     )
                                     : const Icon(Icons.image_not_supported),
                             title: Text(setName),
