@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../../../lib/deck_rules_service.dart';
-
 /// POST /decks/:id/cards/set
 ///
 /// Body:
@@ -70,74 +68,31 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       final cardInfo = await session.execute(
         Sql.named(
-          'SELECT name FROM cards WHERE id = @id LIMIT 1',
+          'SELECT name, type_line FROM cards WHERE id = @id LIMIT 1',
         ),
         parameters: {'id': cardId},
       );
       if (cardInfo.isEmpty) {
-        throw DeckRulesException('Carta não encontrada.');
+        return {
+          'error': 'Carta não encontrada.',
+          'status': HttpStatus.badRequest,
+        };
       }
       final cardName = (cardInfo.first[0] as String).trim();
+      final typeLine = (cardInfo.first[1] as String? ?? '').toLowerCase();
+      final isBasicLand = typeLine.contains('basic land');
 
-      // Carrega estado atual do deck (com nome) para construir o "next" e validar.
-      final deckCardsResult = await session.execute(
-        Sql.named('''
-          SELECT
-            dc.card_id::text,
-            dc.quantity::int,
-            dc.is_commander,
-            c.name
-          FROM deck_cards dc
-          JOIN cards c ON c.id = dc.card_id
-          WHERE dc.deck_id = @deckId
-        '''),
-        parameters: {'deckId': deckId},
-      );
-
-      final next = <Map<String, dynamic>>[];
-      final targetLower = cardName.toLowerCase();
-
-      for (final row in deckCardsResult) {
-        final existingCardId = row[0] as String;
-        final existingQty = row[1] as int;
-        final existingIsCommander = row[2] as bool? ?? false;
-        final existingName = (row[3] as String).trim();
-
-        if (existingIsCommander) {
-          next.add({
-            'card_id': existingCardId,
-            'quantity': existingQty,
-            'is_commander': true,
-          });
-          continue;
-        }
-
-        if (replaceSameName && existingName.toLowerCase() == targetLower) {
-          continue;
-        }
-
-        if (existingCardId == cardId) {
-          continue;
-        }
-
-        next.add({
-          'card_id': existingCardId,
-          'quantity': existingQty,
-          'is_commander': false,
-        });
+      // Validação mínima por carta (permite corrigir decks que já estão inválidos)
+      // - Commander/Brawl: nonbasic deve ser exatamente 1.
+      // - Outros formatos: nonbasic não pode exceder 4.
+      final maxCopies = (format == 'commander' || format == 'brawl') ? 1 : 4;
+      if (!isBasicLand && quantity > maxCopies) {
+        return {
+          'error':
+              'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.',
+          'status': HttpStatus.badRequest,
+        };
       }
-
-      next.add({
-        'card_id': cardId,
-        'quantity': quantity,
-        'is_commander': false,
-      });
-
-      await DeckRulesService(session).validateAndThrow(
-        format: format,
-        cards: next,
-        strict: false,
-      );
 
       if (replaceSameName) {
         await session.execute(
@@ -181,12 +136,14 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       };
     });
 
-    return Response.json(body: result);
-  } on DeckRulesException catch (e) {
-    return Response.json(
-      statusCode: HttpStatus.badRequest,
-      body: {'error': e.message},
-    );
+    if (result is Map && result['status'] is int && result['error'] != null) {
+      return Response.json(
+        statusCode: result['status'] as int,
+        body: {'error': result['error']},
+      );
+    }
+
+    return Response.json(body: (result as Map).cast<String, dynamic>());
   } catch (e) {
     return Response.json(
       statusCode: HttpStatus.internalServerError,

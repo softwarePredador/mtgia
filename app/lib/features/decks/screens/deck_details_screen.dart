@@ -447,7 +447,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 confirmDismiss: (direction) async {
                                   if (direction ==
                                       DismissDirection.startToEnd) {
-                                    await _showEditCardDialog(context, card);
+                                    await _showEditCardDialog(
+                                      context,
+                                      card,
+                                      deckFormat: deck.format,
+                                    );
                                     return false;
                                   }
 
@@ -1071,12 +1075,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
   Future<void> _showEditCardDialog(
     BuildContext context,
-    DeckCardItem card,
-  ) async {
+    DeckCardItem card, {
+    required String deckFormat,
+  }) async {
     final theme = Theme.of(context);
     final deckProvider = context.read<DeckProvider>();
     final qtyController = TextEditingController(text: '${card.quantity}');
-    final format = (deckProvider.selectedDeck?.format ?? '').toLowerCase();
+    final format = deckFormat.toLowerCase();
     final consolidateSameName = format == 'commander' || format == 'brawl';
 
     bool isSaving = false;
