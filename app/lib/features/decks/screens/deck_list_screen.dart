@@ -211,15 +211,16 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Nenhum deck criado ainda',
+                    'Nenhum deck criado',
                     style: theme.textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Comece criando seu primeiro deck!',
+                    'Comece criando seu primeiro deck',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: const Color(0xFF94A3B8),
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
                   Row(
@@ -279,11 +280,28 @@ class _DeckListScreenState extends State<DeckListScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateDeckDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Novo Deck'),
-        backgroundColor: theme.colorScheme.primary,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Botão de Importar Lista
+          FloatingActionButton.extended(
+            heroTag: 'import',
+            onPressed: () => context.go('/decks/import'),
+            backgroundColor: theme.colorScheme.secondary,
+            tooltip: 'Importar lista de outro site',
+            icon: const Icon(Icons.content_paste),
+            label: const Text('Importar'),
+          ),
+          const SizedBox(height: 12),
+          // Botão principal (Novo Deck)
+          FloatingActionButton.extended(
+            heroTag: 'create',
+            onPressed: () => _showCreateDeckDialog(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Novo Deck'),
+            backgroundColor: theme.colorScheme.primary,
+          ),
+        ],
       ),
     );
   }

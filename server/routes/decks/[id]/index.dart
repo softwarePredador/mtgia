@@ -225,9 +225,11 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId},
       );
       final deckMap = result.first.toColumnMap();
-      if (deckMap['created_at'] is DateTime) {
-        deckMap['created_at'] =
-            (deckMap['created_at'] as DateTime).toIso8601String();
+      // Converter todos os DateTime para ISO string
+      for (final key in deckMap.keys.toList()) {
+        if (deckMap[key] is DateTime) {
+          deckMap[key] = (deckMap[key] as DateTime).toIso8601String();
+        }
       }
       return deckMap;
     });
@@ -292,6 +294,13 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
     if (deckInfo['pricing_updated_at'] is DateTime) {
       deckInfo['pricing_updated_at'] =
           (deckInfo['pricing_updated_at'] as DateTime).toIso8601String();
+    }
+    // PostgreSQL DECIMAL retorna String, converter para double
+    final rawPricingTotal = deckInfo['pricing_total'];
+    if (rawPricingTotal is String) {
+      deckInfo['pricing_total'] = double.tryParse(rawPricingTotal);
+    } else if (rawPricingTotal is num) {
+      deckInfo['pricing_total'] = rawPricingTotal.toDouble();
     }
 
     // 2. Buscar todas as cartas associadas a esse deck com detalhes

@@ -216,11 +216,17 @@ class DeckArchetypeAnalyzer {
     final detectedArchetype = detectArchetype();
     final manaAnalysis = analyzeManaBase();
     
+    // Calcular total_cards considerando quantity
+    int totalCards = 0;
+    for (final card in cards) {
+      totalCards += (card['quantity'] as int?) ?? 1;
+    }
+    
     return {
       'detected_archetype': detectedArchetype,
       'average_cmc': avgCMC.toStringAsFixed(2),
       'type_distribution': typeCounts,
-      'total_cards': cards.length,
+      'total_cards': totalCards,
       'mana_curve_assessment': _assessManaCurve(avgCMC, detectedArchetype),
       'mana_base_assessment': manaAnalysis['assessment'],
       'archetype_confidence': _calculateConfidence(avgCMC, typeCounts, detectedArchetype),
@@ -740,8 +746,20 @@ Future<Response> onRequest(RequestContext context) async {
       List<String> removals = [];
       List<String> additions = [];
 
-      // Suporte ao novo formato "changes" (pares de troca)
-      if (jsonResponse.containsKey('changes')) {
+      // Suporte ao formato "swaps" (retornado pelo prompt.md)
+      if (jsonResponse.containsKey('swaps')) {
+        final swaps = jsonResponse['swaps'] as List;
+        for (var swap in swaps) {
+           if (swap is Map) {
+             final out = swap['out'] as String?;
+             final inCard = swap['in'] as String?;
+             if (out != null && out.isNotEmpty) removals.add(out);
+             if (inCard != null && inCard.isNotEmpty) additions.add(inCard);
+           }
+        }
+      }
+      // Suporte ao formato "changes" (alternativo)
+      else if (jsonResponse.containsKey('changes')) {
         final changes = jsonResponse['changes'] as List;
         for (var change in changes) {
            if (change is Map) {
@@ -1037,18 +1055,41 @@ Future<Response> onRequest(RequestContext context) async {
         'target_additions': jsonResponse['target_additions'],
       };
       
+      // Gerar additions_detailed apenas para cartas com card_id válido
       responseBody['additions_detailed'] = isComplete
           ? additionsDetailed
-          : validAdditions.map((name) {
-              final v = validByNameLower[name.toLowerCase()];
-              if (v == null) return {'name': name};
-              return {'name': v['name'], 'card_id': v['id'], 'quantity': 1};
-            }).toList();
-      responseBody['removals_detailed'] = validRemovals.map((name) {
-        final v = validByNameLower[name.toLowerCase()];
-        if (v == null) return {'name': name};
-        return {'name': v['name'], 'card_id': v['id']};
-      }).toList();
+          : validAdditions
+              .map((name) {
+                final v = validByNameLower[name.toLowerCase()];
+                if (v == null || v['id'] == null) return null;
+                return {'name': v['name'], 'card_id': v['id'], 'quantity': 1};
+              })
+              .where((e) => e != null)
+              .toList();
+      
+      // Gerar removals_detailed apenas para cartas com card_id válido
+      responseBody['removals_detailed'] = validRemovals
+          .map((name) {
+            final v = validByNameLower[name.toLowerCase()];
+            if (v == null || v['id'] == null) return null;
+            return {'name': v['name'], 'card_id': v['id']};
+          })
+          .where((e) => e != null)
+          .toList();
+      
+      // CRÍTICO: Balancear additions/removals detailed para manter contagem igual
+      final addDet = responseBody['additions_detailed'] as List;
+      final remDet = responseBody['removals_detailed'] as List;
+      if (addDet.length != remDet.length && jsonResponse['mode'] != 'complete') {
+        final minLen = addDet.length < remDet.length ? addDet.length : remDet.length;
+        responseBody['additions_detailed'] = addDet.take(minLen).toList();
+        responseBody['removals_detailed'] = remDet.take(minLen).toList();
+        // Também ajustar as listas simples para UI consistente
+        validRemovals = validRemovals.take(minLen).toList();
+        validAdditions = validAdditions.take(minLen).toList();
+        responseBody['removals'] = validRemovals;
+        responseBody['additions'] = validAdditions;
+      }
       
       final warnings = <String, dynamic>{};
 
@@ -1113,6 +1154,7 @@ Future<Map<String, String>> _loadBasicLandIds(Pool pool, List<String> names) asy
       SELECT name, id::text
       FROM cards
       WHERE name = ANY(@names)
+        AND type_line LIKE 'Basic Land%'
       ORDER BY name ASC
     '''),
     parameters: {'names': names},

@@ -14,6 +14,7 @@ import 'core/widgets/main_scaffold.dart';
 
 import 'features/decks/screens/deck_details_screen.dart';
 import 'features/decks/screens/deck_generate_screen.dart';
+import 'features/decks/screens/deck_import_screen.dart';
 
 import 'features/cards/providers/card_provider.dart';
 import 'features/cards/screens/card_search_screen.dart';
@@ -94,6 +95,10 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                 GoRoute(
                   path: 'generate',
                   builder: (context, state) => const DeckGenerateScreen(),
+                ),
+                GoRoute(
+                  path: 'import',
+                  builder: (context, state) => const DeckImportScreen(),
                 ),
                 GoRoute(
                   path: ':id',

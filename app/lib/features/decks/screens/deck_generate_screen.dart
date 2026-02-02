@@ -160,7 +160,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gerar Deck'),
+        title: const Text('Gerador de Decks'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/decks'),
@@ -182,7 +182,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Descreva o deck dos seus sonhos',
+                    'Gerar Deck',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -192,7 +192,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'O gerador irá criar um deck completo e balanceado baseado na sua descrição.',
+              'Descreva o deck que você quer e ele será gerado automaticamente.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.grey[400],
               ),
@@ -308,7 +308,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   Icon(Icons.preview, color: theme.colorScheme.secondary),
                   const SizedBox(width: 8),
                   Text(
-                    'Preview do Deck Gerado',
+                    'Preview do Deck',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

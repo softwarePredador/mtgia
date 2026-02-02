@@ -10,6 +10,7 @@ import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
+import '../widgets/deck_progress_indicator.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class DeckDetailsScreen extends StatefulWidget {
@@ -62,6 +63,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       appBar: AppBar(
         title: const Text('Detalhes do Deck'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.content_paste_go),
+            tooltip: 'Colar lista de cartas',
+            onPressed: () => _showImportListDialog(context),
+          ),
           IconButton(
             icon: const Icon(Icons.auto_fix_high),
             tooltip: 'Otimizar deck',
@@ -151,23 +157,21 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     Text(deck.name, style: theme.textTheme.headlineMedium),
                     const SizedBox(height: 8),
                     Chip(label: Text(deck.format.toUpperCase())),
-                    const SizedBox(height: 8),
-                    Text(
-                      maxCards == null
-                          ? 'Cartas: $totalCards'
-                          : 'Cartas: $totalCards/$maxCards',
-                      style: theme.textTheme.bodyMedium,
+                    const SizedBox(height: 12),
+                    DeckProgressIndicator(
+                      deck: deck,
+                      totalCards: totalCards,
+                      maxCards: maxCards,
+                      hasCommander: deck.commander.isNotEmpty,
+                      onTap: () => _tabController.animateTo(1), // Vai para tab de cartas
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     _PricingRow(
                       pricing: _pricing,
                       isLoading: _isPricingLoading,
                       onPressed: () => _loadPricing(force: true),
                       onForceRefresh: () => _loadPricing(force: true),
-                      onShowDetails:
-                          (_pricing == null)
-                              ? null
-                              : () => _showPricingDetails(),
+                      onShowDetails: _showPricingDetails,
                     ),
                     if (isCommanderFormat && deck.commander.isEmpty) ...[
                       const SizedBox(height: 12),
@@ -242,23 +246,91 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       ),
                     ],
                     const SizedBox(height: 16),
-                    Text('Estratégia', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                    Row(
                       children: [
-                        Chip(
+                        Expanded(
+                          child: Text('Estratégia', style: theme.textTheme.titleMedium),
+                        ),
+                        TextButton.icon(
+                          onPressed: () => _showOptimizationOptions(context),
+                          icon: const Icon(Icons.tune, size: 18),
                           label: Text(
-                            (deck.archetype == null ||
-                                    deck.archetype!.trim().isEmpty)
-                                ? 'Não definida'
-                                : deck.archetype!,
+                            (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                ? 'Definir'
+                                : 'Alterar',
                           ),
                         ),
-                        Chip(label: Text('Bracket: ${deck.bracket ?? 2}')),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () => _showOptimizationOptions(context),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                              : theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                ? theme.colorScheme.outline.withValues(alpha: 0.3)
+                                : theme.colorScheme.primary.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                  ? Icons.help_outline
+                                  : Icons.psychology,
+                              color: (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                  ? theme.colorScheme.outline
+                                  : theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                        ? 'Não definida'
+                                        : deck.archetype!,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: (deck.archetype == null || deck.archetype!.trim().isEmpty)
+                                          ? theme.colorScheme.outline
+                                          : theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Bracket: ${deck.bracket ?? 2} • ${_bracketLabel(deck.bracket ?? 2)}',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: theme.colorScheme.outline,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (deck.archetype == null || deck.archetype!.trim().isEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Toque para definir a estratégia do deck',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -270,9 +342,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   if (maxCards != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'Total: $totalCards/$maxCards',
-                        style: theme.textTheme.titleMedium,
+                      child: DeckProgressIndicator(
+                        deck: deck,
+                        totalCards: totalCards,
+                        maxCards: maxCards,
+                        hasCommander: deck.commander.isNotEmpty,
                       ),
                     ),
                   ...deck.mainBoard.entries.map((entry) {
@@ -826,7 +900,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     }
   }
 
-  void _showPricingDetails() {
+  Future<void> _showPricingDetails() async {
+    // Se não tem items, precisa carregar do endpoint
+    final hasItems = _pricing != null && 
+        (_pricing!['items'] as List?)?.isNotEmpty == true;
+    
+    if (!hasItems) {
+      // Carregar pricing completo primeiro
+      await _loadPricing(force: false);
+      if (!mounted) return;
+    }
+    
     final pricing = _pricing;
     if (pricing == null) return;
     final items =
@@ -909,6 +993,259 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       },
     );
   }
+
+  /// Dialog para importar lista de cartas para o deck existente
+  void _showImportListDialog(BuildContext context) {
+    final listController = TextEditingController();
+    final theme = Theme.of(context);
+    final deckId = widget.deckId; // Captura antes do dialog
+    final parentContext = context; // Salva contexto pai para snackbar
+    bool isImporting = false;
+    bool replaceAll = false;
+    List<String> notFoundLines = [];
+    String? error;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Importar Lista', style: TextStyle(fontSize: 18)),
+                    Text(
+                      'Adicionar cartas de outra fonte',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Opção de substituir tudo
+                  Container(
+                    decoration: BoxDecoration(
+                      color: replaceAll 
+                        ? Colors.orange.withOpacity(0.1)
+                        : theme.colorScheme.surface,
+                      border: Border.all(
+                        color: replaceAll 
+                          ? Colors.orange.withOpacity(0.5)
+                          : theme.colorScheme.outline.withOpacity(0.3),
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: CheckboxListTile(
+                      value: replaceAll,
+                      onChanged: (value) {
+                        setDialogState(() => replaceAll = value ?? false);
+                      },
+                      title: Row(
+                        children: [
+                          Icon(
+                            replaceAll ? Icons.swap_horiz : Icons.add_circle_outline,
+                            size: 18,
+                            color: replaceAll ? Colors.orange : theme.colorScheme.secondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            replaceAll ? 'Substituir deck' : 'Adicionar cartas',
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                      subtitle: Text(
+                        replaceAll 
+                          ? 'Remove cartas atuais e usa apenas a nova lista'
+                          : 'Mantém cartas existentes e adiciona as novas',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: replaceAll ? Colors.orange : null,
+                        ),
+                      ),
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Campo de texto
+                  TextField(
+                    controller: listController,
+                    decoration: InputDecoration(
+                      hintText: 'Cole sua lista de cartas aqui...\n\nFormato: 1 Sol Ring ou 1x Sol Ring',
+                      hintStyle: TextStyle(
+                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                        fontSize: 12,
+                      ),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                    ),
+                    maxLines: 10,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  
+                  // Erro
+                  if (error != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              error!,
+                              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  
+                  // Cartas não encontradas
+                  if (notFoundLines.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '⚠️ ${notFoundLines.length} cartas não encontradas:',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          ...notFoundLines.take(5).map((line) => Text(
+                            '• $line',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.orange.shade200,
+                            ),
+                          )),
+                          if (notFoundLines.length > 5)
+                            Text(
+                              '... e mais ${notFoundLines.length - 5}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.orange.shade300,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isImporting ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton.icon(
+              onPressed: isImporting
+                  ? null
+                  : () async {
+                      if (listController.text.trim().isEmpty) {
+                        setDialogState(() => error = 'Cole a lista de cartas');
+                        return;
+                      }
+
+                      setDialogState(() {
+                        isImporting = true;
+                        error = null;
+                        notFoundLines = [];
+                      });
+
+                      final provider = parentContext.read<DeckProvider>();
+                      final result = await provider.importListToDeck(
+                        deckId: deckId,
+                        list: listController.text,
+                        replaceAll: replaceAll,
+                      );
+
+                      if (!ctx.mounted) return;
+
+                      setDialogState(() {
+                        isImporting = false;
+                        notFoundLines = List<String>.from(result['not_found_lines'] ?? []);
+                      });
+
+                      if (result['success'] == true) {
+                        Navigator.pop(ctx);
+                        
+                        final imported = result['cards_imported'] ?? 0;
+                        ScaffoldMessenger.of(parentContext).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              notFoundLines.isEmpty
+                                  ? '$imported cartas importadas!'
+                                  : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
+                            ),
+                            backgroundColor: notFoundLines.isEmpty 
+                              ? Theme.of(parentContext).colorScheme.primary 
+                              : Colors.orange,
+                          ),
+                        );
+                        
+                        // Recarrega o deck
+                        provider.fetchDeckDetails(deckId, forceRefresh: true);
+                      } else {
+                        setDialogState(() {
+                          error = result['error'] ?? 'Erro ao importar';
+                        });
+                      }
+                    },
+              icon: isImporting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.upload),
+              label: Text(isImporting ? 'Importando...' : 'Importar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _PricingRow extends StatelessWidget {
@@ -970,7 +1307,7 @@ class _PricingRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          if (pricing != null && onShowDetails != null)
+          if (onShowDetails != null)
             TextButton(
               onPressed: isLoading ? null : onShowDetails,
               child: const Text('Detalhes'),
@@ -1022,6 +1359,21 @@ int _totalCards(DeckDetails deck) {
     }
   }
   return total;
+}
+
+String _bracketLabel(int bracket) {
+  switch (bracket) {
+    case 1:
+      return 'Casual';
+    case 2:
+      return 'Mid-power';
+    case 3:
+      return 'High-power';
+    case 4:
+      return 'cEDH';
+    default:
+      return 'Mid-power';
+  }
 }
 
 class _ManaSymbol extends StatelessWidget {
@@ -1222,6 +1574,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               .map((m) => m.cast<String, dynamic>())
               .toList() ??
           const <Map<String, dynamic>>[];
+      final removalsDetailed =
+          (result['removals_detailed'] as List?)
+              ?.whereType<Map>()
+              .map((m) => m.cast<String, dynamic>())
+              .toList() ??
+          const <Map<String, dynamic>>[];
 
       if (removals.isEmpty && additions.isEmpty) {
         if (!context.mounted) return;
@@ -1382,9 +1740,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       );
       isLoadingDialogOpen = true;
 
-      // Aplicar as mudanças via DeckProvider
+      // Aplicar as mudanças via DeckProvider (versão otimizada com IDs)
       if (mode == 'complete' && additionsDetailed.isNotEmpty) {
-        // Completar deck: adicionar em lote (mais rápido e evita N chamadas).
+        // Completar deck: adicionar em lote.
         await deckProvider.addCardsBulk(
           deckId: widget.deckId,
           cards:
@@ -1399,7 +1757,15 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   )
                   .toList(),
         );
+      } else if (removalsDetailed.isNotEmpty || additionsDetailed.isNotEmpty) {
+        // Usar versão rápida com IDs (evita N buscas HTTP)
+        await deckProvider.applyOptimizationWithIds(
+          deckId: widget.deckId,
+          removalsDetailed: removalsDetailed,
+          additionsDetailed: additionsDetailed,
+        );
       } else {
+        // Fallback para versão antiga (caso servidor não retorne detailed)
         await deckProvider.applyOptimization(
           deckId: widget.deckId,
           cardsToRemove: removals,
@@ -1421,9 +1787,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       Navigator.pop(context); // Close Sheet
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Mudanças aplicadas com sucesso!'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: const Text('Otimização aplicada com sucesso!'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     } catch (e) {
@@ -1432,7 +1798,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao aplicar otimização: $e'),
+            content: Text('Erro ao aplicar: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -1474,14 +1840,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           ),
           Row(
             children: [
-              Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
+              Icon(Icons.tune, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text('Otimizar Deck', style: theme.textTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            'Sugestões para o seu comandante:',
+            'Escolha uma estratégia para otimizar:',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
@@ -1537,8 +1903,8 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: () => _applyOptimization(context, savedArchetype),
-              icon: const Icon(Icons.auto_fix_high),
-              label: const Text('Otimizar com esta estratégia'),
+              icon: const Icon(Icons.check),
+              label: const Text('Aplicar Otimização'),
             ),
             const SizedBox(height: 16),
           ],
