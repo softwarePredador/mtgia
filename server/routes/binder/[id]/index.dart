@@ -4,11 +4,53 @@ import 'package:postgres/postgres.dart';
 
 /// PUT /binder/:id  → Atualiza item do binder
 /// DELETE /binder/:id → Remove item do binder
+/// GET /binder/stats → Estatísticas (caso especial, id == "stats")
 Future<Response> onRequest(RequestContext context, String id) async {
+  // Caso especial: /binder/stats é capturado aqui como id="stats"
+  if (id == 'stats') return _getStats(context);
+
   final method = context.request.method;
   if (method == HttpMethod.put) return _updateBinderItem(context, id);
   if (method == HttpMethod.delete) return _deleteBinderItem(context, id);
   return Response(statusCode: HttpStatus.methodNotAllowed);
+}
+
+/// GET /binder/stats → Estatísticas do fichário do usuário autenticado
+Future<Response> _getStats(RequestContext context) async {
+  if (context.request.method != HttpMethod.get) {
+    return Response(statusCode: HttpStatus.methodNotAllowed);
+  }
+
+  try {
+    final userId = context.read<String>();
+    final pool = context.read<Pool>();
+
+    final result = await pool.execute(Sql.named('''
+      SELECT
+        COALESCE(SUM(quantity), 0) AS total_items,
+        COUNT(*) FILTER (WHERE for_trade = TRUE) AS for_trade_count,
+        COUNT(*) FILTER (WHERE for_sale = TRUE) AS for_sale_count,
+        COALESCE(SUM(CASE WHEN for_sale = TRUE AND price IS NOT NULL THEN price * quantity ELSE 0 END), 0) AS estimated_value,
+        COUNT(DISTINCT card_id) AS unique_cards
+      FROM user_binder_items
+      WHERE user_id = @userId
+    '''), parameters: {'userId': userId});
+
+    final row = result.first.toColumnMap();
+
+    return Response.json(body: {
+      'total_items': row['total_items'] ?? 0,
+      'unique_cards': row['unique_cards'] ?? 0,
+      'for_trade_count': row['for_trade_count'] ?? 0,
+      'for_sale_count': row['for_sale_count'] ?? 0,
+      'estimated_value': double.tryParse(row['estimated_value'].toString()) ?? 0.0,
+    });
+  } catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.internalServerError,
+      body: {'error': 'Erro ao calcular estatísticas: $e'},
+    );
+  }
 }
 
 /// PUT /binder/:id

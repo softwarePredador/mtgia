@@ -10,7 +10,7 @@ Future<void> main() async {
   final port = int.parse(env['DB_PORT'] ?? '5432');
   final db = env['DB_NAME'] ?? 'mtg_db';
   final user = env['DB_USER'] ?? 'postgres';
-  final pass = env['DB_PASSWORD'] ?? 'postgres';
+  final pass = env['DB_PASSWORD'] ?? env['DB_PASS'] ?? 'postgres';
 
   final pool = Pool.withEndpoints([
     Endpoint(host: host, port: port, database: db, username: user, password: pass),

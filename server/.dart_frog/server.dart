@@ -39,13 +39,11 @@ import '../routes/community/users/[id].dart' as community_users_$id;
 import '../routes/community/marketplace/index.dart' as community_marketplace_index;
 import '../routes/community/decks/index.dart' as community_decks_index;
 import '../routes/community/decks/[id].dart' as community_decks_$id;
-import '../routes/community/decks/following/index.dart' as community_decks_following_index;
 import '../routes/community/binders/[userId].dart' as community_binders_$user_id;
 import '../routes/cards/index.dart' as cards_index;
 import '../routes/cards/resolve/index.dart' as cards_resolve_index;
 import '../routes/cards/printings/index.dart' as cards_printings_index;
 import '../routes/binder/index.dart' as binder_index;
-import '../routes/binder/stats/index.dart' as binder_stats_index;
 import '../routes/binder/[id]/index.dart' as binder_$id_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/me.dart' as auth_me;
@@ -90,13 +88,11 @@ Handler buildRootHandler() {
     ..mount('/ai/weakness-analysis', (context) => buildAiWeaknessAnalysisHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/binder/<id>', (context,id,) => buildBinder$idHandler(id,)(context))
-    ..mount('/binder/stats', (context) => buildBinderStatsHandler()(context))
     ..mount('/binder', (context) => buildBinderHandler()(context))
     ..mount('/cards/printings', (context) => buildCardsPrintingsHandler()(context))
     ..mount('/cards/resolve', (context) => buildCardsResolveHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/community/binders', (context) => buildCommunityBindersHandler()(context))
-    ..mount('/community/decks/following', (context) => buildCommunityDecksFollowingHandler()(context))
     ..mount('/community/decks', (context) => buildCommunityDecksHandler()(context))
     ..mount('/community/marketplace', (context) => buildCommunityMarketplaceHandler()(context))
     ..mount('/community/users', (context) => buildCommunityUsersHandler()(context))
@@ -194,13 +190,6 @@ Handler buildBinder$idHandler(String id,) {
   return pipeline.addHandler(router);
 }
 
-Handler buildBinderStatsHandler() {
-  final pipeline = const Pipeline().addMiddleware(binder_middleware.middleware);
-  final router = Router()
-    ..all('/', (context) => binder_stats_index.onRequest(context,));
-  return pipeline.addHandler(router);
-}
-
 Handler buildBinderHandler() {
   final pipeline = const Pipeline().addMiddleware(binder_middleware.middleware);
   final router = Router()
@@ -233,13 +222,6 @@ Handler buildCommunityBindersHandler() {
   final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
   final router = Router()
     ..all('/<userId>', (context,userId,) => community_binders_$user_id.onRequest(context,userId,));
-  return pipeline.addHandler(router);
-}
-
-Handler buildCommunityDecksFollowingHandler() {
-  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
-  final router = Router()
-    ..all('/', (context) => community_decks_following_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 
