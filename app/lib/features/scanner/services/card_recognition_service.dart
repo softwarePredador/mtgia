@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'dart:ui' show Rect;
+import 'dart:ui' show Rect, Size;
+import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import '../models/card_recognition_result.dart';
@@ -741,6 +743,91 @@ class CardRecognitionService {
     }
 
     return result;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // OCR LEVE PARA STREAM CONTÍNUO (sem pré-processamento pesado)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  bool _isProcessingStream = false;
+
+  /// Processa um frame da câmera em tempo real (leve, sem pré-processamento).
+  /// Retorna resultado ou null se nada detectado / frame ignorado.
+  Future<CardRecognitionResult?> recognizeFromCameraImage(
+    CameraImage cameraImage,
+    CameraDescription camera,
+  ) async {
+    if (_isProcessingStream) return null;
+    _isProcessingStream = true;
+
+    try {
+      final inputImage = _cameraImageToInputImage(cameraImage, camera);
+      if (inputImage == null) return null;
+
+      final recognizedText = await _textRecognizer.processImage(inputImage);
+      if (recognizedText.blocks.isEmpty) return null;
+
+      final result = _analyzeRecognizedText(
+        recognizedText,
+        cameraImage.width.toDouble(),
+        cameraImage.height.toDouble(),
+        'live_stream',
+      );
+
+      // Só retorna se confiança mínima
+      if (result.success && result.confidence >= 50) {
+        return result;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[OCR Stream] Erro: $e');
+      return null;
+    } finally {
+      _isProcessingStream = false;
+    }
+  }
+
+  /// Converte CameraImage para InputImage (zero-copy, sem salvar arquivo)
+  InputImage? _cameraImageToInputImage(
+    CameraImage image,
+    CameraDescription camera,
+  ) {
+    final sensorOrientation = camera.sensorOrientation;
+
+    InputImageRotation? rotation;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    }
+    rotation ??= InputImageRotation.rotation0deg;
+
+    // iOS entrega bgra8888, Android entrega nv21 (ou yuv420)
+    final format = InputImageFormatValue.fromRawValue(image.format.raw);
+    if (format == null) return null;
+
+    // Monta os planes
+    final planes = image.planes.map((plane) {
+      return InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        rotation: rotation!,
+        format: format,
+        bytesPerRow: plane.bytesPerRow,
+      );
+    }).toList();
+
+    if (planes.isEmpty) return null;
+
+    // Concatena bytes de todos os planes
+    final allBytes = WriteBuffer();
+    for (final plane in image.planes) {
+      allBytes.putUint8List(plane.bytes);
+    }
+
+    return InputImage.fromBytes(
+      bytes: allBytes.done().buffer.asUint8List(),
+      metadata: planes.first,
+    );
   }
 
   void dispose() {

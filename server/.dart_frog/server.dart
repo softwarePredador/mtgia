@@ -29,6 +29,7 @@ import '../routes/decks/[id]/cards/bulk/index.dart' as decks_$id_cards_bulk_inde
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/decks/[id]/ai-analysis/index.dart' as decks_$id_ai_analysis_index;
 import '../routes/cards/index.dart' as cards_index;
+import '../routes/cards/resolve/index.dart' as cards_resolve_index;
 import '../routes/cards/printings/index.dart' as cards_printings_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/me.dart' as auth_me;
@@ -71,6 +72,7 @@ Handler buildRootHandler() {
     ..mount('/ai/weakness-analysis', (context) => buildAiWeaknessAnalysisHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
     ..mount('/cards/printings', (context) => buildCardsPrintingsHandler()(context))
+    ..mount('/cards/resolve', (context) => buildCardsResolveHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
     ..mount('/decks/<id>/ai-analysis', (context,id,) => buildDecks$idAiAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
@@ -157,6 +159,13 @@ Handler buildCardsPrintingsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => cards_printings_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCardsResolveHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/', (context) => cards_resolve_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 

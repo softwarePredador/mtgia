@@ -2089,6 +2089,154 @@ return Response.json(body: {
 
 Este documento é um living document e será continuamente atualizado conforme o projeto ManaLoom evolui. Novas funcionalidades, melhorias e correções de bugs serão documentadas aqui para manter todos os colaboradores alinhados e informados.
 
+---
+
+## 7. Endpoint POST /cards/resolve — Fallback Scryfall (Self-Healing)
+
+### O Porquê
+O banco local tem ~33k cartas sincronizadas via MTGJSON, mas novas coleções saem com frequência e o OCR do scanner pode reconhecer cartas que ainda não estão no banco. Em vez de retornar "não encontrada" para uma carta que existe no MTG, o sistema agora faz **auto-importação on-demand**: se a carta não está no banco, busca na Scryfall API, insere e retorna.
+
+### Como Funciona (Pipeline de Resolução)
+
+```
+POST /cards/resolve   body: { "name": "Lightning Bolt" }
+         │
+         ▼
+  ┌─────────────────┐
+  │ 1. Busca local   │ → LOWER(name) = LOWER(@name)
+  │    (exato)        │
+  └───────┬─────────┘
+          │ não achou
+          ▼
+  ┌─────────────────┐
+  │ 2. Busca local   │ → name ILIKE %name%
+  │    (fuzzy)        │
+  └───────┬─────────┘
+          │ não achou
+          ▼
+  ┌─────────────────┐
+  │ 3. Scryfall API  │ → GET /cards/named?fuzzy=...
+  │    fuzzy search   │   (aceita erros de OCR!)
+  └───────┬─────────┘
+          │ não achou
+          ▼
+  ┌─────────────────┐
+  │ 4. Scryfall API  │ → GET /cards/search?q=...
+  │    text search    │   (fallback para nomes parciais)
+  └───────┬─────────┘
+          │ encontrou!
+          ▼
+  ┌─────────────────┐
+  │ 5. Importa todas │ → Busca prints_search_uri
+  │    as printings   │   Filtra: paper only, max 30
+  │    + legalities   │   INSERT ON CONFLICT DO UPDATE
+  │    + set info     │
+  └───────┬─────────┘
+          │
+          ▼
+  ┌─────────────────┐
+  │ 6. Retorna       │ → { source: "scryfall", data: [...] }
+  │    resultado      │
+  └─────────────────┘
+```
+
+### Response
+
+```json
+{
+  "source": "local" | "scryfall",
+  "name": "Lightning Bolt",
+  "total_returned": 42,
+  "data": [
+    {
+      "id": "uuid",
+      "scryfall_id": "oracle-uuid",
+      "name": "Lightning Bolt",
+      "mana_cost": "{R}",
+      "type_line": "Instant",
+      "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+      "colors": ["R"],
+      "color_identity": ["R"],
+      "image_url": "https://api.scryfall.com/cards/named?exact=...",
+      "set_code": "clu",
+      "set_name": "Ravnica: Clue Edition",
+      "rarity": "uncommon"
+    }
+  ]
+}
+```
+
+### Integração no Scanner (App)
+
+O fluxo de resolução do scanner agora tem **3 camadas**:
+
+1. **Busca exata** → `GET /cards/printings?name=...`
+2. **Fuzzy local** → `FuzzyCardMatcher` gera variações de OCR e tenta `/cards?name=...`
+3. **Resolve Scryfall** → `POST /cards/resolve` (self-healing, importa carta se existir)
+
+```dart
+// ScannerProvider._resolveBestPrintings():
+//   1) fetchPrintingsByExactName(primary)
+//   2) fetchPrintingsByExactName(alternatives...)
+//   3) fuzzyMatcher.searchWithFuzzy(primary)
+//   4) searchService.resolveCard(primary)  ← NOVO: fallback Scryfall
+```
+
+### Arquivos Envolvidos
+
+| Arquivo | Papel |
+|---------|-------|
+| `server/routes/cards/resolve/index.dart` | Endpoint POST /cards/resolve |
+| `app/lib/features/scanner/services/scanner_card_search_service.dart` | Método `resolveCard()` |
+| `app/lib/features/scanner/providers/scanner_provider.dart` | Integração na pipeline `_resolveBestPrintings()` |
+
+### Rate Limiting
+- Scryfall pede máximo 10 req/s. Como o resolve só é chamado quando todas as buscas locais falharam, o volume é muito baixo.
+- User-Agent: `MTGDeckBuilder/1.0` (obrigatório pela Scryfall).
+
+### Dados Importados da Scryfall
+Para cada carta encontrada, o endpoint importa:
+- **Todas as printings** (paper, max 30) com `INSERT ON CONFLICT DO UPDATE`
+- **Legalities** de todos os formatos (legal, banned, restricted)
+- **Set info** (nome, data, tipo) na tabela `sets`
+- **CMC** (converted mana cost) para análises de curva
+
+---
+
+## 8. Análise MTGJSON vs Campos do Banco
+
+### Campos Disponíveis no MTGJSON (AtomicCards.json) — NÃO usados ainda
+
+| Campo MTGJSON | Tipo | Uso Potencial |
+|---------------|------|---------------|
+| `power` | string | Força da criatura (IA, filtros) |
+| `toughness` | string | Resistência da criatura (IA, filtros) |
+| `keywords` | list | Habilidades-chave (Flying, Trample...) — essencial para IA |
+| `edhrecRank` | int | Ranking EDHREC de popularidade |
+| `edhrecSaltiness` | float | Índice de "salt" (cartas irritantes) |
+| `loyalty` | string | Lealdade de planeswalkers |
+| `layout` | string | Normal, transform, flip, split... |
+| `subtypes` | list | Subtipos (Goblin, Wizard, Vampire...) |
+| `supertypes` | list | Supertipos (Legendary, Basic, Snow...) |
+| `types` | list | Tipos base (Creature, Instant, Sorcery...) |
+| `leadershipSkills` | dict | Se pode ser Commander/Oathbreaker |
+| `purchaseUrls` | dict | Links de compra (TCGPlayer, CardMarket) |
+| `rulings` | list | Rulings oficiais |
+| `firstPrinting` | string | Set da primeira impressão |
+
+### Recomendação de Migração Futura
+Para melhorar a IA e as buscas, adicionar à tabela `cards`:
+```sql
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS edhrec_rank INTEGER;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS loyalty TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT DEFAULT 'normal';
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS subtypes TEXT[];
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS supertypes TEXT[];
+```
+
 Para qualquer dúvida ou sugestão sobre o projeto, sinta-se à vontade para abrir uma issue no repositório ou entrar em contato diretamente com os mantenedores.
 
 Obrigado por fazer parte do ManaLoom! Juntos, estamos tecendo a estratégia perfeita.

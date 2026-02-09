@@ -1,5 +1,4 @@
 ﻿import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,34 +14,28 @@ class ApiResponse {
 class ApiClient {
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
 
-  /// IP do Mac na rede local (Wi-Fi) — atualizar se a rede mudar.
-  /// Usado quando o app roda em dispositivo físico (iPhone/Android real).
-  /// Para descobrir: no terminal do Mac, rode `ipconfig getifaddr en0`
-  static const String _devMachineIp = '192.168.2.46';
+  /// URL do servidor de produção (EasyPanel / Digital Ocean).
+  static const String _productionUrl = 'https://evolution-cartinhas.8ktevp.easypanel.host';
 
   // Retorna a URL correta dependendo do ambiente
   static String get baseUrl {
     if (_envBaseUrl.trim().isNotEmpty) {
       return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
     }
+    // Em produção ou dispositivo físico, usar o servidor remoto.
+    // Em desktop/web local com servidor local, usar localhost.
     if (kIsWeb) {
       return 'http://localhost:8080';
     }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      // 10.0.2.2 é o endereço especial do emulador para acessar o localhost do PC
-      // Em dispositivo físico Android, também precisa do IP real
-      return kDebugMode
-          ? 'http://$_devMachineIp:8080'
-          : 'http://10.0.2.2:8080';
+    if (defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      // Desktop: usar localhost se estiver rodando servidor local,
+      // senão usar produção.
+      return 'http://localhost:8080';
     }
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      // Dispositivo físico iOS: usar IP do Mac na rede Wi-Fi
-      // Para descobrir: no terminal do Mac, rode `ipconfig getifaddr en0`
-      // Se não funcionar via Wi-Fi, rode como macOS desktop (flutter run -d macos)
-      return 'http://$_devMachineIp:8080';
-    }
-    // Para Windows, Linux, macOS (desktop)
-    return 'http://localhost:8080';
+    // Mobile (iOS / Android): sempre usar servidor remoto
+    return _productionUrl;
   }
 
   /// Log da URL base resolvida (chamado uma vez no boot)

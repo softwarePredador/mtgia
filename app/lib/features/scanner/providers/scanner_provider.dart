@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import '../models/card_recognition_result.dart';
 import '../services/card_recognition_service.dart';
@@ -29,6 +30,9 @@ class ScannerProvider extends ChangeNotifier {
   DeckCardItem? _autoSelectedCard;
   String? _errorMessage;
   bool _useFoilMode = false;
+  String? _liveDetectedName;
+  int _liveConfirmCount = 0;
+  static const _liveConfirmThreshold = 2; // frames consecutivos para confirmar
 
   ScannerState get state => _state;
   CardRecognitionResult? get lastResult => _lastResult;
@@ -36,6 +40,7 @@ class ScannerProvider extends ChangeNotifier {
   DeckCardItem? get autoSelectedCard => _autoSelectedCard;
   String? get errorMessage => _errorMessage;
   bool get useFoilMode => _useFoilMode;
+  String? get liveDetectedName => _liveDetectedName;
 
   ScannerProvider({ScannerCardSearchService? searchService})
     : _searchService = searchService ?? ScannerCardSearchService() {
@@ -48,7 +53,80 @@ class ScannerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Processa uma imagem capturada
+  /// Processa um frame da câmera em tempo real (leve)
+  /// Retorna true se detectou e já está buscando.
+  Future<bool> processLiveFrame(
+    CameraImage image,
+    CameraDescription camera,
+  ) async {
+    if (_state != ScannerState.idle) return false;
+
+    final result = await _recognitionService.recognizeFromCameraImage(
+      image,
+      camera,
+    );
+
+    if (result == null || !result.success || result.primaryName == null) {
+      // Reset contagem se perdeu detecção
+      if (_liveDetectedName != null) {
+        _liveConfirmCount = 0;
+        _liveDetectedName = null;
+        notifyListeners();
+      }
+      return false;
+    }
+
+    final detected = result.primaryName!.trim();
+    if (detected.isEmpty) return false;
+
+    // Mesmo nome detectado novamente → incrementa contagem
+    if (detected == _liveDetectedName) {
+      _liveConfirmCount++;
+    } else {
+      _liveDetectedName = detected;
+      _liveConfirmCount = 1;
+      notifyListeners();
+    }
+
+    // Confirmado por N frames consecutivos → busca automática
+    if (_liveConfirmCount >= _liveConfirmThreshold) {
+      debugPrint('[📸 Live] Confirmado: "$detected" (${result.confidence}%)');
+      _liveDetectedName = null;
+      _liveConfirmCount = 0;
+
+      // Usa o resultado para buscar
+      _lastResult = result;
+      _setState(ScannerState.searching);
+      _errorMessage = null;
+      _foundCards = [];
+      _autoSelectedCard = null;
+
+      try {
+        final resolved = await _resolveBestPrintings(result);
+        if (resolved.isNotEmpty) {
+          _foundCards = resolved;
+          _autoSelectedCard = _tryAutoSelectEdition(
+            printings: resolved,
+            setCodeCandidates: result.setCodeCandidates,
+          );
+          _setState(ScannerState.found);
+          return true;
+        }
+
+        _errorMessage =
+            'Carta "${result.primaryName}" não encontrada no banco';
+        _setState(ScannerState.notFound);
+      } catch (e) {
+        _errorMessage = 'Erro ao buscar: $e';
+        _setState(ScannerState.error);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Processa uma imagem capturada (botão manual - processamento completo)
   Future<void> processImage(File imageFile) async {
     _setState(ScannerState.processing);
     _errorMessage = null;
@@ -159,6 +237,31 @@ class ScannerProvider extends ChangeNotifier {
       return fuzzy;
     }
 
+    // 3) Último recurso: resolve via Scryfall (server busca na API externa,
+    //    insere no DB, e retorna). Isso torna o sistema "self-healing" —
+    //    qualquer carta real que não esteja no banco será importada na hora.
+    debugPrint('[🔍 Resolve] Tentando resolver "$primary" via Scryfall...');
+    final resolved = await _searchService.resolveCard(primary);
+    if (resolved.isNotEmpty) {
+      final resolvedName = resolved.first.name.trim();
+      _lastResult = CardRecognitionResult.success(
+        primaryName: resolvedName,
+        alternatives:
+            [
+              if (resolvedName != primary) primary,
+              ...result.alternatives,
+            ].where((x) => x.trim().isNotEmpty && x != resolvedName).toList(),
+        setCodeCandidates: result.setCodeCandidates,
+        confidence: result.confidence * 0.7,
+        allCandidates: result.allCandidates,
+      );
+      debugPrint(
+        '[🔍 Resolve] Encontrou "$resolvedName" via Scryfall '
+        '(${resolved.length} printings)',
+      );
+      return resolved;
+    }
+
     return const [];
   }
 
@@ -190,8 +293,13 @@ class ScannerProvider extends ChangeNotifier {
 
     try {
       final exact = await _searchService.fetchPrintingsByExactName(name);
-      final cards =
+      var cards =
           exact.isNotEmpty ? exact : await _fuzzyMatcher.searchWithFuzzy(name);
+
+      // Se fuzzy também falhou, tenta resolver via Scryfall
+      if (cards.isEmpty) {
+        cards = await _searchService.resolveCard(name);
+      }
 
       if (cards.isNotEmpty) {
         _foundCards = cards;
@@ -217,6 +325,8 @@ class ScannerProvider extends ChangeNotifier {
     _foundCards = [];
     _autoSelectedCard = null;
     _errorMessage = null;
+    _liveDetectedName = null;
+    _liveConfirmCount = 0;
     notifyListeners();
   }
 
