@@ -248,6 +248,7 @@ class DeckProvider extends ChangeNotifier {
     required String format,
     String? description,
     List<Map<String, dynamic>>? cards,
+    bool isPublic = false,
   }) async {
     try {
       final normalizedCards = await _normalizeCreateDeckCards(cards ?? []);
@@ -255,6 +256,7 @@ class DeckProvider extends ChangeNotifier {
         'name': name,
         'format': format,
         'description': description,
+        'is_public': isPublic,
         'cards': normalizedCards,
       });
 

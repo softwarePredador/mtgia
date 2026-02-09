@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../community/screens/community_deck_detail_screen.dart';
+import '../../binder/providers/binder_provider.dart';
 import '../providers/social_provider.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -22,7 +23,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     // Carregar perfil
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SocialProvider>().fetchUserProfile(widget.userId);
@@ -55,6 +56,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       provider.fetchFollowers(widget.userId, reset: true);
     } else if (index == 2) {
       provider.fetchFollowing(widget.userId, reset: true);
+    } else if (index == 3) {
+      context.read<BinderProvider>().fetchPublicBinder(widget.userId, reset: true);
     }
   }
 
@@ -242,6 +245,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             'Decks (${provider.visitedUserDecks.length})'),
                     const Tab(text: 'Seguidores'),
                     const Tab(text: 'Seguindo'),
+                    const Tab(text: 'Fichário'),
                   ],
                 ),
               ),
@@ -255,11 +259,26 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       users: provider.followers,
                       isLoading: provider.isLoadingFollowers,
                       emptyMessage: 'Nenhum seguidor ainda',
+                      hasMore: provider.hasMoreFollowers,
+                      onLoadMore: () => provider.fetchFollowers(widget.userId),
                     ),
                     _UsersListTab(
                       users: provider.following,
                       isLoading: provider.isLoadingFollowing,
                       emptyMessage: 'Não segue ninguém ainda',
+                      hasMore: provider.hasMoreFollowing,
+                      onLoadMore: () => provider.fetchFollowing(widget.userId),
+                    ),
+                    Consumer<BinderProvider>(
+                      builder: (context, binder, _) {
+                        return _PublicBinderTab(
+                          items: binder.publicItems,
+                          isLoading: binder.isLoadingPublic,
+                          hasMore: binder.hasMorePublic,
+                          onLoadMore: () =>
+                              binder.fetchPublicBinder(widget.userId),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -479,26 +498,59 @@ class _DecksTab extends StatelessWidget {
 // Users List Tab (Followers / Following)
 // =====================================================================
 
-class _UsersListTab extends StatelessWidget {
+class _UsersListTab extends StatefulWidget {
   final List<PublicUser> users;
   final bool isLoading;
   final String emptyMessage;
+  final bool hasMore;
+  final VoidCallback? onLoadMore;
 
   const _UsersListTab({
     required this.users,
     required this.isLoading,
     required this.emptyMessage,
+    this.hasMore = false,
+    this.onLoadMore,
   });
 
   @override
+  State<_UsersListTab> createState() => _UsersListTabState();
+}
+
+class _UsersListTabState extends State<_UsersListTab> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (widget.hasMore && !widget.isLoading) {
+        widget.onLoadMore?.call();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading && users.isEmpty) {
+    if (widget.isLoading && widget.users.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: AppTheme.manaViolet),
       );
     }
 
-    if (users.isEmpty) {
+    if (widget.users.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -508,7 +560,7 @@ class _UsersListTab extends StatelessWidget {
                 color: AppTheme.textSecondary.withValues(alpha: 0.5)),
             const SizedBox(height: 12),
             Text(
-              emptyMessage,
+              widget.emptyMessage,
               style:
                   const TextStyle(color: AppTheme.textSecondary, fontSize: 15),
             ),
@@ -518,10 +570,19 @@ class _UsersListTab extends StatelessWidget {
     }
 
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(12),
-      itemCount: users.length,
+      itemCount: widget.users.length + (widget.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
-        final user = users[index];
+        if (index >= widget.users.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            ),
+          );
+        }
+        final user = widget.users[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           color: AppTheme.surfaceSlate,
@@ -575,5 +636,226 @@ class _UsersListTab extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+// =====================================================================
+// Public Binder Tab (4ª tab)
+// =====================================================================
+
+class _PublicBinderTab extends StatefulWidget {
+  final List<BinderItem> items;
+  final bool isLoading;
+  final bool hasMore;
+  final VoidCallback? onLoadMore;
+
+  const _PublicBinderTab({
+    required this.items,
+    required this.isLoading,
+    this.hasMore = false,
+    this.onLoadMore,
+  });
+
+  @override
+  State<_PublicBinderTab> createState() => _PublicBinderTabState();
+}
+
+class _PublicBinderTabState extends State<_PublicBinderTab> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (widget.hasMore && !widget.isLoading) {
+        widget.onLoadMore?.call();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isLoading && widget.items.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      );
+    }
+
+    if (widget.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.collections_bookmark,
+                size: 48,
+                color: AppTheme.textSecondary.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            const Text(
+              'Nenhuma carta disponível',
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(12),
+      itemCount: widget.items.length + (widget.hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= widget.items.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            ),
+          );
+        }
+        final item = widget.items[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          color: AppTheme.surfaceSlate,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: item.cardImageUrl != null
+                      ? Image.network(
+                          item.cardImageUrl!,
+                          width: 42,
+                          height: 58,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 42,
+                            height: 58,
+                            color: AppTheme.surfaceSlate2,
+                            child: const Icon(Icons.style,
+                                color: AppTheme.textSecondary, size: 16),
+                          ),
+                        )
+                      : Container(
+                          width: 42,
+                          height: 58,
+                          color: AppTheme.surfaceSlate2,
+                          child: const Icon(Icons.style,
+                              color: AppTheme.textSecondary, size: 16),
+                        ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.cardName,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          _binderBadge('×${item.quantity}', AppTheme.manaViolet),
+                          const SizedBox(width: 4),
+                          _binderBadge(item.condition, _condColor(item.condition)),
+                          if (item.isFoil) ...[
+                            const SizedBox(width: 4),
+                            Icon(Icons.auto_awesome,
+                                size: 12,
+                                color: AppTheme.mythicGold.withValues(alpha: 0.8)),
+                          ],
+                          if (item.forTrade) ...[
+                            const SizedBox(width: 4),
+                            _binderStatusTag('Troca', AppTheme.loomCyan),
+                          ],
+                          if (item.forSale) ...[
+                            const SizedBox(width: 4),
+                            _binderStatusTag('Venda', AppTheme.mythicGold),
+                          ],
+                        ],
+                      ),
+                      if (item.price != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'R\$ ${item.price!.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: AppTheme.mythicGold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _binderBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Widget _binderStatusTag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Color _condColor(String c) {
+    switch (c) {
+      case 'NM': return Colors.greenAccent;
+      case 'LP': return Colors.lightGreen;
+      case 'MP': return Colors.amber;
+      case 'HP': return Colors.orange;
+      case 'DMG': return Colors.redAccent;
+      default: return AppTheme.textSecondary;
+    }
   }
 }

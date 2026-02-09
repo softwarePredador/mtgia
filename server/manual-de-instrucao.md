@@ -2,7 +2,7 @@
 
 **Nome do Projeto:** ManaLoom - AI-Powered MTG Deck Builder  
 **Tagline:** "Teça sua estratégia perfeita"  
-**Última Atualização:** 22 de Novembro de 2025
+**Última Atualização:** Julho de 2025
 
 Este documento serve como guia definitivo para o entendimento, manutenção e expansão do projeto ManaLoom (Backend e Frontend). Ele é atualizado continuamente conforme o desenvolvimento avança.
 
@@ -3046,3 +3046,78 @@ A `CommunityScreen` foi reescrita com `TabController` de 3 abas:
 - `app/lib/features/community/screens/community_screen.dart` — reescrito com 3 abas
 - `app/lib/features/profile/profile_screen.dart` — label "Nick / Apelido", hint "Ex: Planeswalker42", texto explicativo
 - `app/lib/features/auth/screens/register_screen.dart` — helperText no campo username, ícone `alternate_email`
+
+---
+
+## Épico 2 — Fichário / Binder (Implementado)
+
+### O Porquê
+O Fichário (Binder) permite que jogadores registrem sua coleção pessoal de cartas, com condição, foil, disponibilidade para troca/venda e preço. O Marketplace é a busca global onde qualquer usuário pode encontrar cartas de outros jogadores para trocar ou comprar.
+
+### Arquitetura
+
+#### Backend (Server — Dart Frog)
+
+**Migration:** `server/bin/migrate_binder.dart`
+- Cria tabela `user_binder_items` com colunas: id (UUID PK), user_id, card_id, quantity, condition (NM/LP/MP/HP/DMG), is_foil, for_trade, for_sale, price, currency, notes, language, created_at, updated_at.
+- UNIQUE constraint em `(user_id, card_id, condition, is_foil)` para evitar duplicatas.
+- 4 índices: user_id, card_id, for_trade, for_sale.
+
+**Rotas:**
+| Rota | Método | Auth? | Descrição |
+|------|--------|-------|-----------|
+| `/binder` | GET | JWT | Lista itens do fichário do usuário logado (paginado, filtros: condition, search, for_trade, for_sale) |
+| `/binder` | POST | JWT | Adiciona carta ao fichário (valida existência da carta, duplicata = 409) |
+| `/binder/:id` | PUT | JWT | Atualiza item (dynamic SET builder para partial updates, verifica ownership) |
+| `/binder/:id` | DELETE | JWT | Remove item (verifica ownership) |
+| `/binder/stats` | GET | JWT | Estatísticas: total_items, unique_cards, for_trade_count, for_sale_count, estimated_value |
+| `/community/binders/:userId` | GET | Não | Fichário público de um usuário (só items com for_trade=true OU for_sale=true) |
+| `/community/marketplace` | GET | Não | Busca global de cartas disponíveis. Filtros: search (nome da carta), condition, for_trade, for_sale, set_code, rarity. Inclui dados do dono. |
+
+**Padrão de rotas:** Mesmo padrão de autenticação do `/decks`: `_middleware.dart` com `authMiddleware()`, providers injetados no contexto.
+
+#### Frontend (Flutter)
+
+**Provider:** `app/lib/features/binder/providers/binder_provider.dart`
+- Modelos: `BinderItem`, `BinderStats`, `MarketplaceItem` (extends BinderItem com dados do owner).
+- Métodos: `fetchMyBinder(reset)`, `applyFilters()`, `fetchStats()`, `addItem()`, `updateItem()`, `removeItem()`.
+- Marketplace: `fetchMarketplace(search, condition, forTrade, forSale, reset)`.
+- Public binder: `fetchPublicBinder(userId, reset)`.
+- Paginação: scroll infinito (20 items/page), `_hasMore` flag.
+- Registrado como `ChangeNotifierProvider.value` no `MultiProvider` do `main.dart`.
+
+**Telas:**
+- `BinderScreen` — Tela principal "Meu Fichário" com barra de stats, busca por nome, filtros (condição dropdown, chips Troca/Venda), scroll infinito, RefreshIndicator. Acessível via `/binder` e botão no ProfileScreen.
+- `MarketplaceScreen` — Busca global com filtros. Cada item mostra dados da carta + badges (condition, foil, trade, sale, preço) + avatar/nome do dono (clicável → perfil). Acessível via `/marketplace` e botão no ProfileScreen.
+
+**Widgets:**
+- `BinderItemEditor` — BottomSheet modal para adicionar/editar item. Inclui: quantity ±, condition chips (NM/LP/MP/HP/DMG), foil toggle, trade/sale toggles, preço (visível só quando forSale=true), notas. Botões Remover (com confirmação) e Salvar.
+
+**Integração com CardSearchScreen:**
+- Adicionado `onCardSelectedForBinder` callback e `isBinderMode` getter.
+- Quando `mode == 'binder'`, não faz fetchDeckDetails, não valida identidade do commander, e ao tap na carta chama o callback com dados da carta (id, name, image_url, set_code, etc).
+
+**Perfil público (UserProfileScreen):**
+- TabController alterado de 3 para 4 tabs.
+- 4ª tab "Fichário" usa `_PublicBinderTab` com Consumer de `BinderProvider`.
+- Mostra apenas itens disponíveis para troca/venda do usuário visitado.
+
+### Arquivos Criados/Modificados
+**Server:**
+- `server/bin/migrate_binder.dart` — migration script
+- `server/routes/binder/_middleware.dart` — auth middleware
+- `server/routes/binder/index.dart` — GET + POST
+- `server/routes/binder/[id]/index.dart` — PUT + DELETE
+- `server/routes/binder/stats/index.dart` — GET stats
+- `server/routes/community/binders/[userId].dart` — GET binder público
+- `server/routes/community/marketplace/index.dart` — GET marketplace
+
+**Flutter:**
+- `app/lib/features/binder/providers/binder_provider.dart` — BinderProvider + modelos
+- `app/lib/features/binder/screens/binder_screen.dart` — tela Meu Fichário
+- `app/lib/features/binder/screens/marketplace_screen.dart` — tela Marketplace
+- `app/lib/features/binder/widgets/binder_item_editor.dart` — modal de edição
+- `app/lib/main.dart` — import + provider + rotas + redirect
+- `app/lib/features/cards/screens/card_search_screen.dart` — modo binder
+- `app/lib/features/social/screens/user_profile_screen.dart` — 4ª tab Fichário
+- `app/lib/features/profile/profile_screen.dart` — botões Fichário + Marketplace

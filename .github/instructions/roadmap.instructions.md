@@ -17,22 +17,22 @@ applyTo: '**'
 - Compartilhar deck (share nativo + export texto)
 - CommunityScreen 3 tabs (Explorar / Seguindo / Usuários)
 
-### ⏳ Épico 1 — Polir Existente (~1 dia)
-- [ ] 1.1 Toggle `is_public` no dialog de criação de deck (server já aceita, só Flutter)
-- [ ] 1.2 UI de avatar no perfil (TextField pra URL, `PATCH /users/me`)
-- [ ] 1.3 Fix ALTER TABLE em runtime (`_middleware.dart` → flag estático `_schemaReady`)
-- [ ] 1.4 Paginação em seguidores/seguindo (scroll infinito, hoje limitado a 50)
+### ✅ Épico 1 — Polir Existente (~1 dia)
+- [x] 1.1 Toggle `is_public` no dialog de criação de deck (server já aceita, só Flutter)
+- [x] 1.2 UI de avatar no perfil (TextField pra URL, `PATCH /users/me`)
+- [x] 1.3 Fix ALTER TABLE em runtime (`_middleware.dart` → flag estático `_schemaReady`)
+- [x] 1.4 Paginação em seguidores/seguindo (scroll infinito, hoje limitado a 50)
 
-### ⏳ Épico 2 — Fichário / Binder (~3-4 dias)
-- [ ] 2.1 DB: `user_binder_items` (quantity, condition NM/LP/MP/HP/DMG, is_foil, for_trade, for_sale, price, notes)
-- [ ] 2.2 Server: CRUD `/binder` (GET list, POST add, PUT edit, DELETE, GET stats) — JWT obrigatório
-- [ ] 2.3 Server: `GET /community/binders/:userId` (público, só for_trade/for_sale=true)
-- [ ] 2.4 Server: `GET /community/marketplace` (busca global, filtros por carta/condição/tipo)
-- [ ] 2.5 Flutter: `BinderProvider` (fetchMyBinder, add, update, remove, stats)
-- [ ] 2.6 Flutter: Tela "Meu Fichário" (scroll infinito, filtros, busca)
-- [ ] 2.7 Flutter: Modal editor de item do binder (quantity ±, condition chips, foil, trade/sale toggles, preço, notes)
-- [ ] 2.8 Flutter: Aba "Fichário" no `UserProfileScreen` (4ª tab)
-- [ ] 2.9 Flutter: Tela Marketplace (busca global, filtros, botão "Quero essa carta")
+### ✅ Épico 2 — Fichário / Binder (~3-4 dias)
+- [x] 2.1 DB: `user_binder_items` (quantity, condition NM/LP/MP/HP/DMG, is_foil, for_trade, for_sale, price, notes)
+- [x] 2.2 Server: CRUD `/binder` (GET list, POST add, PUT edit, DELETE, GET stats) — JWT obrigatório
+- [x] 2.3 Server: `GET /community/binders/:userId` (público, só for_trade/for_sale=true)
+- [x] 2.4 Server: `GET /community/marketplace` (busca global, filtros por carta/condição/tipo)
+- [x] 2.5 Flutter: `BinderProvider` (fetchMyBinder, add, update, remove, stats)
+- [x] 2.6 Flutter: Tela "Meu Fichário" (scroll infinito, filtros, busca)
+- [x] 2.7 Flutter: Modal editor de item do binder (quantity ±, condition chips, foil, trade/sale toggles, preço, notes)
+- [x] 2.8 Flutter: Aba "Fichário" no `UserProfileScreen` (4ª tab)
+- [x] 2.9 Flutter: Tela Marketplace (busca global, filtros, botão "Quero essa carta")
 
 ### ⏳ Épico 3 — Trades (~5-7 dias, depende do Épico 2)
 - [ ] 3.1 DB: `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history`

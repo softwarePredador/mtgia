@@ -8,6 +8,9 @@ import 'package:dart_frog/dart_frog.dart';
 
 import '../routes/index.dart' as index;
 import '../routes/users/me/index.dart' as users_me_index;
+import '../routes/users/[id]/following/index.dart' as users_$id_following_index;
+import '../routes/users/[id]/followers/index.dart' as users_$id_followers_index;
+import '../routes/users/[id]/follow/index.dart' as users_$id_follow_index;
 import '../routes/sets/index.dart' as sets_index;
 import '../routes/rules/index.dart' as rules_index;
 import '../routes/market/movers/index.dart' as market_movers_index;
@@ -24,15 +27,26 @@ import '../routes/decks/[id]/validate/index.dart' as decks_$id_validate_index;
 import '../routes/decks/[id]/simulate/index.dart' as decks_$id_simulate_index;
 import '../routes/decks/[id]/recommendations/index.dart' as decks_$id_recommendations_index;
 import '../routes/decks/[id]/pricing/index.dart' as decks_$id_pricing_index;
+import '../routes/decks/[id]/export/index.dart' as decks_$id_export_index;
 import '../routes/decks/[id]/cards/index.dart' as decks_$id_cards_index;
 import '../routes/decks/[id]/cards/set/index.dart' as decks_$id_cards_set_index;
 import '../routes/decks/[id]/cards/replace/index.dart' as decks_$id_cards_replace_index;
 import '../routes/decks/[id]/cards/bulk/index.dart' as decks_$id_cards_bulk_index;
 import '../routes/decks/[id]/analysis/index.dart' as decks_$id_analysis_index;
 import '../routes/decks/[id]/ai-analysis/index.dart' as decks_$id_ai_analysis_index;
+import '../routes/community/users/index.dart' as community_users_index;
+import '../routes/community/users/[id].dart' as community_users_$id;
+import '../routes/community/marketplace/index.dart' as community_marketplace_index;
+import '../routes/community/decks/index.dart' as community_decks_index;
+import '../routes/community/decks/[id].dart' as community_decks_$id;
+import '../routes/community/decks/following/index.dart' as community_decks_following_index;
+import '../routes/community/binders/[userId].dart' as community_binders_$user_id;
 import '../routes/cards/index.dart' as cards_index;
 import '../routes/cards/resolve/index.dart' as cards_resolve_index;
 import '../routes/cards/printings/index.dart' as cards_printings_index;
+import '../routes/binder/index.dart' as binder_index;
+import '../routes/binder/stats/index.dart' as binder_stats_index;
+import '../routes/binder/[id]/index.dart' as binder_$id_index;
 import '../routes/auth/register.dart' as auth_register;
 import '../routes/auth/me.dart' as auth_me;
 import '../routes/auth/login.dart' as auth_login;
@@ -48,6 +62,8 @@ import '../routes/_middleware.dart' as middleware;
 import '../routes/users/_middleware.dart' as users_middleware;
 import '../routes/import/_middleware.dart' as import_middleware;
 import '../routes/decks/_middleware.dart' as decks_middleware;
+import '../routes/community/_middleware.dart' as community_middleware;
+import '../routes/binder/_middleware.dart' as binder_middleware;
 import '../routes/auth/_middleware.dart' as auth_middleware;
 import '../routes/ai/_middleware.dart' as ai_middleware;
 
@@ -73,15 +89,24 @@ Handler buildRootHandler() {
     ..mount('/ai/simulate-matchup', (context) => buildAiSimulateMatchupHandler()(context))
     ..mount('/ai/weakness-analysis', (context) => buildAiWeaknessAnalysisHandler()(context))
     ..mount('/auth', (context) => buildAuthHandler()(context))
+    ..mount('/binder/<id>', (context,id,) => buildBinder$idHandler(id,)(context))
+    ..mount('/binder/stats', (context) => buildBinderStatsHandler()(context))
+    ..mount('/binder', (context) => buildBinderHandler()(context))
     ..mount('/cards/printings', (context) => buildCardsPrintingsHandler()(context))
     ..mount('/cards/resolve', (context) => buildCardsResolveHandler()(context))
     ..mount('/cards', (context) => buildCardsHandler()(context))
+    ..mount('/community/binders', (context) => buildCommunityBindersHandler()(context))
+    ..mount('/community/decks/following', (context) => buildCommunityDecksFollowingHandler()(context))
+    ..mount('/community/decks', (context) => buildCommunityDecksHandler()(context))
+    ..mount('/community/marketplace', (context) => buildCommunityMarketplaceHandler()(context))
+    ..mount('/community/users', (context) => buildCommunityUsersHandler()(context))
     ..mount('/decks/<id>/ai-analysis', (context,id,) => buildDecks$idAiAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/analysis', (context,id,) => buildDecks$idAnalysisHandler(id,)(context))
     ..mount('/decks/<id>/cards/bulk', (context,id,) => buildDecks$idCardsBulkHandler(id,)(context))
     ..mount('/decks/<id>/cards/replace', (context,id,) => buildDecks$idCardsReplaceHandler(id,)(context))
     ..mount('/decks/<id>/cards/set', (context,id,) => buildDecks$idCardsSetHandler(id,)(context))
     ..mount('/decks/<id>/cards', (context,id,) => buildDecks$idCardsHandler(id,)(context))
+    ..mount('/decks/<id>/export', (context,id,) => buildDecks$idExportHandler(id,)(context))
     ..mount('/decks/<id>/pricing', (context,id,) => buildDecks$idPricingHandler(id,)(context))
     ..mount('/decks/<id>/recommendations', (context,id,) => buildDecks$idRecommendationsHandler(id,)(context))
     ..mount('/decks/<id>/simulate', (context,id,) => buildDecks$idSimulateHandler(id,)(context))
@@ -98,6 +123,9 @@ Handler buildRootHandler() {
     ..mount('/market/movers', (context) => buildMarketMoversHandler()(context))
     ..mount('/rules', (context) => buildRulesHandler()(context))
     ..mount('/sets', (context) => buildSetsHandler()(context))
+    ..mount('/users/<id>/follow', (context,id,) => buildUsers$idFollowHandler(id,)(context))
+    ..mount('/users/<id>/followers', (context,id,) => buildUsers$idFollowersHandler(id,)(context))
+    ..mount('/users/<id>/following', (context,id,) => buildUsers$idFollowingHandler(id,)(context))
     ..mount('/users/me', (context) => buildUsersMeHandler()(context))
     ..mount('/', (context) => buildHandler()(context));
   return pipeline.addHandler(router);
@@ -159,6 +187,27 @@ Handler buildAuthHandler() {
   return pipeline.addHandler(router);
 }
 
+Handler buildBinder$idHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(binder_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => binder_$id_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildBinderStatsHandler() {
+  final pipeline = const Pipeline().addMiddleware(binder_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => binder_stats_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildBinderHandler() {
+  final pipeline = const Pipeline().addMiddleware(binder_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => binder_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
 Handler buildCardsPrintingsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
@@ -177,6 +226,41 @@ Handler buildCardsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => cards_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCommunityBindersHandler() {
+  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
+  final router = Router()
+    ..all('/<userId>', (context,userId,) => community_binders_$user_id.onRequest(context,userId,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCommunityDecksFollowingHandler() {
+  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => community_decks_following_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCommunityDecksHandler() {
+  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => community_decks_index.onRequest(context,))..all('/<id>', (context,id,) => community_decks_$id.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCommunityMarketplaceHandler() {
+  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => community_marketplace_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildCommunityUsersHandler() {
+  final pipeline = const Pipeline().addMiddleware(community_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => community_users_index.onRequest(context,))..all('/<id>', (context,id,) => community_users_$id.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 
@@ -219,6 +303,13 @@ Handler buildDecks$idCardsHandler(String id,) {
   final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
   final router = Router()
     ..all('/', (context) => decks_$id_cards_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildDecks$idExportHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(decks_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => decks_$id_export_index.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 
@@ -331,6 +422,27 @@ Handler buildSetsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => sets_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildUsers$idFollowHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(users_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => users_$id_follow_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildUsers$idFollowersHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(users_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => users_$id_followers_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildUsers$idFollowingHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(users_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => users_$id_following_index.onRequest(context,id,));
   return pipeline.addHandler(router);
 }
 

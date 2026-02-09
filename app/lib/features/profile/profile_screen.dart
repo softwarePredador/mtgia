@@ -13,6 +13,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _displayNameController = TextEditingController();
+  final _avatarUrlController = TextEditingController();
   bool _isSaving = false;
 
   @override
@@ -24,20 +25,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final user = auth.user;
       if (!mounted || user == null) return;
       _displayNameController.text = user.displayName ?? '';
+      _avatarUrlController.text = user.avatarUrl ?? '';
     });
   }
 
   @override
   void dispose() {
     _displayNameController.dispose();
+    _avatarUrlController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     setState(() => _isSaving = true);
     final auth = context.read<AuthProvider>();
+    final avatarText = _avatarUrlController.text.trim();
     final ok = await auth.updateProfile(
       displayName: _displayNameController.text.trim(),
+      avatarUrl: avatarText.isEmpty ? null : avatarText,
     );
     if (!mounted) return;
     setState(() => _isSaving = false);
@@ -54,6 +59,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
+  }
+
+  void _showAvatarDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final controller = TextEditingController(text: _avatarUrlController.text);
+        return AlertDialog(
+          title: const Text('Alterar foto de perfil'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Cole a URL de uma imagem (ex: link do Imgur, Gravatar, etc.)',
+                style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: 'URL da imagem',
+                  hintText: 'https://...',
+                  prefixIcon: Icon(Icons.link),
+                ),
+                keyboardType: TextInputType.url,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            if (_avatarUrlController.text.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  _avatarUrlController.clear();
+                  Navigator.pop(ctx);
+                  setState(() {});
+                },
+                child: const Text('Remover foto', style: TextStyle(color: Colors.red)),
+              ),
+            ElevatedButton(
+              onPressed: () {
+                _avatarUrlController.text = controller.text.trim();
+                Navigator.pop(ctx);
+                setState(() {});
+              },
+              child: const Text('Aplicar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -84,22 +143,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
-                    child: CircleAvatar(
-                      radius: 44,
-                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-                      backgroundImage: (user.avatarUrl != null && user.avatarUrl!.trim().isNotEmpty)
-                          ? NetworkImage(user.avatarUrl!)
-                          : null,
-                      child: (user.avatarUrl == null || user.avatarUrl!.trim().isEmpty)
-                          ? Text(
-                              (user.displayName ?? user.username).trim().isNotEmpty
-                                  ? (user.displayName ?? user.username).trim().characters.first.toUpperCase()
-                                  : '?',
-                              style: theme.textTheme.headlineMedium?.copyWith(
-                                color: theme.colorScheme.primary,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 44,
+                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+                          backgroundImage: (user.avatarUrl != null && user.avatarUrl!.trim().isNotEmpty)
+                              ? NetworkImage(user.avatarUrl!)
+                              : null,
+                          child: (user.avatarUrl == null || user.avatarUrl!.trim().isEmpty)
+                              ? Text(
+                                  (user.displayName ?? user.username).trim().isNotEmpty
+                                      ? (user.displayName ?? user.username).trim().characters.first.toUpperCase()
+                                      : '?',
+                                  style: theme.textTheme.headlineMedium?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: theme.scaffoldBackgroundColor, width: 2),
+                            ),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () => _showAvatarDialog(context),
+                              child: const Padding(
+                                padding: EdgeInsets.all(6),
+                                child: Icon(Icons.camera_alt, size: 16, color: Colors.white),
                               ),
-                            )
-                          : null,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -153,6 +235,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           )
                         : const Icon(Icons.save),
                     label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
+                  ),
+                  const SizedBox(height: 32),
+                  const Divider(color: Color(0xFF334155)),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Coleção',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/binder'),
+                          icon: const Icon(Icons.collections_bookmark),
+                          label: const Text('Meu Fichário'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/marketplace'),
+                          icon: const Icon(Icons.store),
+                          label: const Text('Marketplace'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

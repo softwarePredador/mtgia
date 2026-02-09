@@ -5,14 +5,20 @@ import '../lib/database.dart';
 // Instancia o banco de dados uma vez.
 final _db = Database();
 var _connected = false;
+var _schemaReady = false;
 
 Handler middleware(Handler handler) {
   return (context) async {
     // Conecta ao banco de dados apenas na primeira requisição.
     if (!_connected) {
       await _db.connect();
-      await _ensureRuntimeSchema(_db.connection);
       _connected = true;
+    }
+
+    // Executa DDL de compatibilidade apenas UMA VEZ por processo.
+    if (!_schemaReady) {
+      await _ensureRuntimeSchema(_db.connection);
+      _schemaReady = true;
     }
 
     // Fornece a conexão do banco de dados para todas as rotas filhas.

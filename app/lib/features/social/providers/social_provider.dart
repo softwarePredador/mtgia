@@ -119,6 +119,12 @@ class SocialProvider extends ChangeNotifier {
   bool _isLoadingFollowing = false;
   int _followersTotal = 0;
   int _followingTotal = 0;
+  int _followersPage = 1;
+  int _followingPage = 1;
+  bool _hasMoreFollowers = true;
+  bool _hasMoreFollowing = true;
+  String? _currentFollowersUserId;
+  String? _currentFollowingUserId;
 
   List<PublicUser> get followers => _followers;
   List<PublicUser> get following => _following;
@@ -126,6 +132,8 @@ class SocialProvider extends ChangeNotifier {
   bool get isLoadingFollowing => _isLoadingFollowing;
   int get followersTotal => _followersTotal;
   int get followingTotal => _followingTotal;
+  bool get hasMoreFollowers => _hasMoreFollowers;
+  bool get hasMoreFollowing => _hasMoreFollowing;
 
   // --- Feed de seguidos ---
   List<PublicDeckSummary> _followingFeed = [];
@@ -308,26 +316,35 @@ class SocialProvider extends ChangeNotifier {
   // Followers / Following Lists
   // ======================================================================
 
-  /// Lista seguidores de um usuário
+  /// Lista seguidores de um usuário (com paginação incremental)
   Future<void> fetchFollowers(String userId, {bool reset = false}) async {
-    if (reset) {
+    if (reset || userId != _currentFollowersUserId) {
       _followers = [];
       _followersTotal = 0;
+      _followersPage = 1;
+      _hasMoreFollowers = true;
+      _currentFollowersUserId = userId;
     }
+
+    if (!_hasMoreFollowers || _isLoadingFollowers) return;
+
     _isLoadingFollowers = true;
     notifyListeners();
 
     try {
       final response = await _apiClient
-          .get('/users/$userId/followers?page=1&limit=50');
+          .get('/users/$userId/followers?page=$_followersPage&limit=30');
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _followers = list
+        final newUsers = list
             .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
             .toList();
+        _followers.addAll(newUsers);
         _followersTotal = data['total'] as int? ?? _followers.length;
+        _hasMoreFollowers = _followers.length < _followersTotal;
+        _followersPage++;
       }
     } catch (e) {
       debugPrint('[SocialProvider] fetchFollowers error: $e');
@@ -337,26 +354,35 @@ class SocialProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Lista usuários que o alvo segue
+  /// Lista usuários que o alvo segue (com paginação incremental)
   Future<void> fetchFollowing(String userId, {bool reset = false}) async {
-    if (reset) {
+    if (reset || userId != _currentFollowingUserId) {
       _following = [];
       _followingTotal = 0;
+      _followingPage = 1;
+      _hasMoreFollowing = true;
+      _currentFollowingUserId = userId;
     }
+
+    if (!_hasMoreFollowing || _isLoadingFollowing) return;
+
     _isLoadingFollowing = true;
     notifyListeners();
 
     try {
       final response = await _apiClient
-          .get('/users/$userId/following?page=1&limit=50');
+          .get('/users/$userId/following?page=$_followingPage&limit=30');
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _following = list
+        final newUsers = list
             .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
             .toList();
+        _following.addAll(newUsers);
         _followingTotal = data['total'] as int? ?? _following.length;
+        _hasMoreFollowing = _following.length < _followingTotal;
+        _followingPage++;
       }
     } catch (e) {
       debugPrint('[SocialProvider] fetchFollowing error: $e');

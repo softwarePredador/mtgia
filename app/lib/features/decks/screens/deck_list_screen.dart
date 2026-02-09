@@ -25,6 +25,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
     String selectedFormat = 'commander';
+    bool isPublic = false;
     final formats = [
       'commander',
       'standard',
@@ -85,6 +86,14 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           ),
                           maxLines: 3,
                         ),
+                        const SizedBox(height: 16),
+                        SwitchListTile(
+                          title: const Text('Deck público'),
+                          subtitle: const Text('Visível na comunidade'),
+                          value: isPublic,
+                          onChanged: (v) => setState(() => isPublic = v),
+                          contentPadding: EdgeInsets.zero,
+                        ),
                       ],
                     ),
                   ),
@@ -103,6 +112,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                               name: nameController.text,
                               format: selectedFormat,
                               description: descriptionController.text,
+                              isPublic: isPublic,
                             );
 
                         if (context.mounted) {

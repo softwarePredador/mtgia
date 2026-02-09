@@ -10,7 +10,18 @@ class CardSearchScreen extends StatefulWidget {
   final String deckId;
   final String? mode;
 
-  const CardSearchScreen({super.key, required this.deckId, this.mode});
+  /// Callback opcional para modo binder — ao selecionar carta,
+  /// chama essa função ao invés de adicionar ao deck.
+  final void Function(Map<String, dynamic> card)? onCardSelectedForBinder;
+
+  const CardSearchScreen({
+    super.key,
+    required this.deckId,
+    this.mode,
+    this.onCardSelectedForBinder,
+  });
+
+  bool get isBinderMode => mode == 'binder';
 
   @override
   State<CardSearchScreen> createState() => _CardSearchScreenState();
@@ -25,12 +36,14 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final deckProvider = context.read<DeckProvider>();
-      if (deckProvider.selectedDeck?.id != widget.deckId) {
-        await deckProvider.fetchDeckDetails(widget.deckId);
-      }
-    });
+    if (!widget.isBinderMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final deckProvider = context.read<DeckProvider>();
+        if (deckProvider.selectedDeck?.id != widget.deckId) {
+          await deckProvider.fetchDeckDetails(widget.deckId);
+        }
+      });
+    }
   }
 
   @override
@@ -178,13 +191,13 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final deck = context.watch<DeckProvider>().selectedDeck;
+    final deck = widget.isBinderMode ? null : context.watch<DeckProvider>().selectedDeck;
     final format = deck?.format.toLowerCase();
-    final isCommanderFormat = format == 'commander' || format == 'brawl';
+    final isCommanderFormat = !widget.isBinderMode && (format == 'commander' || format == 'brawl');
     final commanderIdentity = _computeCommanderIdentity(deck);
     final mustPickCommanderFirst =
         isCommanderFormat && (deck?.commander.isEmpty ?? true);
-    final isCommanderMode = (widget.mode ?? '').toLowerCase() == 'commander';
+    final isCommanderMode = !widget.isBinderMode && (widget.mode ?? '').toLowerCase() == 'commander';
 
     return Scaffold(
       appBar: AppBar(
@@ -197,9 +210,11 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
               autofocus: true,
               decoration: InputDecoration(
                 hintText:
-                    isCommanderMode
-                        ? 'Buscar comandante...'
-                        : 'Buscar cartas...',
+                    widget.isBinderMode
+                        ? 'Buscar carta para o fichário...'
+                        : isCommanderMode
+                            ? 'Buscar comandante...'
+                            : 'Buscar cartas...',
                 border: InputBorder.none,
                 hintStyle: const TextStyle(color: Colors.white70),
               ),
@@ -209,6 +224,11 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
             if (isCommanderMode)
               const Text(
                 'Modo comandante',
+                style: TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+            if (widget.isBinderMode)
+              const Text(
+                'Modo fichário',
                 style: TextStyle(fontSize: 12, color: Colors.white70),
               ),
           ],
@@ -259,8 +279,9 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                   !isCommanderFormat ||
                   commanderIdentity == null ||
                   _isSubset(card.colorIdentity, commanderIdentity);
-              final canAdd =
-                  isCommanderMode
+              final canAdd = widget.isBinderMode
+                  ? true
+                  : isCommanderMode
                       ? isCommanderEligible
                       : (mustPickCommanderFirst
                           ? isCommanderEligible
@@ -301,9 +322,10 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                     if ((card.setName ?? '').trim().isNotEmpty) card.setName!,
                     if ((card.setReleaseDate ?? '').trim().isNotEmpty)
                       card.setReleaseDate!,
-                    if (mustPickCommanderFirst && !isCommanderEligible)
+                    if (!widget.isBinderMode && mustPickCommanderFirst && !isCommanderEligible)
                       'Selecione um comandante primeiro',
-                    if (!mustPickCommanderFirst &&
+                    if (!widget.isBinderMode &&
+                        !mustPickCommanderFirst &&
                         isCommanderFormat &&
                         commanderIdentity != null &&
                         !allowedByIdentity)
@@ -314,7 +336,23 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.add_circle_outline),
-                  onPressed: canAdd ? () => _addCardToDeck(card) : null,
+                  onPressed: canAdd
+                      ? () {
+                          if (widget.isBinderMode) {
+                            widget.onCardSelectedForBinder?.call({
+                              'id': card.id,
+                              'name': card.name,
+                              'image_url': card.imageUrl,
+                              'set_code': card.setCode,
+                              'mana_cost': card.manaCost,
+                              'rarity': card.rarity,
+                            });
+                            Navigator.pop(context);
+                          } else {
+                            _addCardToDeck(card);
+                          }
+                        }
+                      : null,
                 ),
               );
             },

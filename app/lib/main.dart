@@ -28,6 +28,9 @@ import 'features/community/screens/community_screen.dart';
 import 'features/social/providers/social_provider.dart';
 import 'features/social/screens/user_profile_screen.dart';
 import 'features/social/screens/user_search_screen.dart';
+import 'features/binder/providers/binder_provider.dart';
+import 'features/binder/screens/binder_screen.dart';
+import 'features/binder/screens/marketplace_screen.dart';
 
 void main() {
   runApp(const ManaLoomApp());
@@ -47,6 +50,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final MarketProvider _marketProvider;
   late final CommunityProvider _communityProvider;
   late final SocialProvider _socialProvider;
+  late final BinderProvider _binderProvider;
   late final GoRouter _router;
 
   @override
@@ -58,6 +62,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _marketProvider = MarketProvider();
     _communityProvider = CommunityProvider();
     _socialProvider = SocialProvider();
+    _binderProvider = BinderProvider();
 
     // Log da URL da API no boot
     ApiClient.debugLogBaseUrl();
@@ -87,7 +92,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/decks') ||
             location.startsWith('/market') ||
             location.startsWith('/profile') ||
-            location.startsWith('/community');
+            location.startsWith('/community') ||
+            location.startsWith('/binder') ||
+            location.startsWith('/marketplace');
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -186,6 +193,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
               path: '/profile',
               builder: (context, state) => const ProfileScreen(),
             ),
+            GoRoute(
+              path: '/binder',
+              builder: (context, state) => const BinderScreen(),
+            ),
+            GoRoute(
+              path: '/marketplace',
+              builder: (context, state) => const MarketplaceScreen(),
+            ),
           ],
         ),
       ],
@@ -202,6 +217,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ChangeNotifierProvider.value(value: _marketProvider),
         ChangeNotifierProvider.value(value: _communityProvider),
         ChangeNotifierProvider.value(value: _socialProvider),
+        ChangeNotifierProvider.value(value: _binderProvider),
       ],
       child: MaterialApp.router(
         title: 'ManaLoom - Deck Builder',

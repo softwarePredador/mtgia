@@ -1288,21 +1288,21 @@ Lista com ícone por tipo, título, body, tempo relativo ("há 2h"). Tap navega 
 Marque `[x]` conforme cada task for concluída.
 
 ## Épico 1 — Polir Existente
-- [ ] 1.1 Toggle público na criação de deck
-- [ ] 1.2 UI de avatar no perfil
-- [ ] 1.3 Remover ALTER TABLE em runtime
-- [ ] 1.4 Paginação em seguidores/seguindo
+- [x] 1.1 Toggle público na criação de deck
+- [x] 1.2 UI de avatar no perfil
+- [x] 1.3 Remover ALTER TABLE em runtime
+- [x] 1.4 Paginação em seguidores/seguindo
 
 ## Épico 2 — Fichário (Binder)
-- [ ] 2.1 DB: tabela `user_binder_items`
-- [ ] 2.2 Server: CRUD do binder
-- [ ] 2.3 Server: Binder público
-- [ ] 2.4 Server: Marketplace (busca global)
-- [ ] 2.5 Flutter: Provider do binder
-- [ ] 2.6 Flutter: Tela "Meu Fichário"
-- [ ] 2.7 Flutter: Modal de editar item
-- [ ] 2.8 Flutter: Aba Fichário no perfil público
-- [ ] 2.9 Flutter: Tela de marketplace
+- [x] 2.1 DB: tabela `user_binder_items`
+- [x] 2.2 Server: CRUD do binder
+- [x] 2.3 Server: Binder público
+- [x] 2.4 Server: Marketplace (busca global)
+- [x] 2.5 Flutter: Provider do binder
+- [x] 2.6 Flutter: Tela "Meu Fichário"
+- [x] 2.7 Flutter: Modal de editar item
+- [x] 2.8 Flutter: Aba Fichário no perfil público
+- [x] 2.9 Flutter: Tela de marketplace
 
 ## Épico 3 — Trades
 - [ ] 3.1 DB: tabelas de trades
