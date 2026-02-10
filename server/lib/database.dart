@@ -5,7 +5,7 @@ import 'package:dotenv/dotenv.dart';
 ///
 /// Utiliza o padrão Singleton para garantir uma única instância do Pool de conexões.
 class Database {
-  late final Pool _pool;
+  late Pool _pool;
   bool _connected = false;
 
   // Singleton pattern
@@ -86,8 +86,9 @@ class Database {
 
   /// Tenta criar o pool e validar com `SELECT 1`.
   Future<bool> _tryConnect(Endpoint endpoint, SslMode sslMode) async {
+    Pool? pool;
     try {
-      final pool = Pool.withEndpoints(
+      pool = Pool.withEndpoints(
         [endpoint],
         settings: PoolSettings(
           maxConnectionCount: 10,
@@ -104,6 +105,7 @@ class Database {
       return true;
     } catch (e) {
       print('⚠️  Erro ao conectar (SSL: ${sslMode.name}): $e');
+      try { await pool?.close(); } catch (_) {}
       return false;
     }
   }
