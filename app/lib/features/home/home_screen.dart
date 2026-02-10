@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../auth/providers/auth_provider.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
+import '../market/providers/market_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -85,13 +86,26 @@ class HomeScreen extends StatelessWidget {
                     onTap: () => context.go('/decks/generate'),
                   ),
                 ),
-                const SizedBox(width: 12),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
                 Expanded(
                   child: _QuickAction(
                     icon: Icons.content_paste,
                     label: 'Importar',
                     color: AppTheme.mythicGold,
                     onTap: () => context.go('/decks/import'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _QuickAction(
+                    icon: Icons.collections_bookmark,
+                    label: 'Minha Coleção',
+                    color: AppTheme.loomCyan,
+                    onTap: () => context.go('/collection'),
                   ),
                 ),
               ],
@@ -220,6 +234,11 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ],
+
+            const SizedBox(height: 32),
+
+            // Cotações — Market prices preview
+            _MarketPreviewSection(),
           ],
         ),
       ),
@@ -317,6 +336,124 @@ class _StatTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Seção de cotações (Market) embutida na Home — mostra top gainers resumido.
+class _MarketPreviewSection extends StatefulWidget {
+  @override
+  State<_MarketPreviewSection> createState() => _MarketPreviewSectionState();
+}
+
+class _MarketPreviewSectionState extends State<_MarketPreviewSection> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<MarketProvider>();
+      if (provider.moversData == null && !provider.isLoading) {
+        provider.fetchMovers(limit: 5);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Consumer<MarketProvider>(
+      builder: (context, provider, _) {
+        final gainers = provider.moversData?.gainers.take(3).toList() ?? [];
+        if (gainers.isEmpty && !provider.isLoading) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Cotações',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.go('/market'),
+                  child: const Text('Ver mais'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (provider.isLoading && gainers.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(
+                    color: AppTheme.manaViolet,
+                    strokeWidth: 2,
+                  ),
+                ),
+              )
+            else
+              ...gainers.map((card) {
+                final isUp = card.changePct >= 0;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          card.name,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: AppTheme.fontMd,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '\$${card.priceToday.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: (isUp ? AppTheme.success : AppTheme.error)
+                              .withValues(alpha: 0.15),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusXs),
+                        ),
+                        child: Text(
+                          '${isUp ? '+' : ''}${card.changePct.toStringAsFixed(1)}%',
+                          style: TextStyle(
+                            color: isUp ? AppTheme.success : AppTheme.error,
+                            fontSize: AppTheme.fontXs,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+          ],
+        );
+      },
     );
   }
 }

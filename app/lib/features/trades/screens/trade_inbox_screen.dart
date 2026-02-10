@@ -4,7 +4,91 @@ import '../../../core/theme/app_theme.dart';
 import '../providers/trade_provider.dart';
 import 'trade_detail_screen.dart';
 
-/// Tela principal de Trades — 3 tabs: Recebidas / Enviadas / Finalizadas
+/// Widget embeddable para uso como tab dentro do CollectionScreen.
+/// Contém seu próprio TabBar aninhado (Recebidas / Enviadas / Finalizadas).
+class TradeInboxTabContent extends StatefulWidget {
+  const TradeInboxTabContent({super.key});
+
+  @override
+  State<TradeInboxTabContent> createState() => _TradeInboxTabContentState();
+}
+
+class _TradeInboxTabContentState extends State<TradeInboxTabContent>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  late TabController _tabController;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _loadForTab(_tabController.index);
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadForTab(0));
+  }
+
+  void _loadForTab(int index) {
+    final provider = context.read<TradeProvider>();
+    switch (index) {
+      case 0:
+        provider.fetchTrades(role: 'receiver', status: 'pending');
+        break;
+      case 1:
+        provider.fetchTrades(role: 'sender');
+        break;
+      case 2:
+        provider.fetchTrades(status: 'completed');
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Column(
+      children: [
+        // Sub-tabs dentro da tab Trades
+        Material(
+          color: AppTheme.surfaceSlate2,
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: AppTheme.manaViolet,
+            labelColor: AppTheme.manaViolet,
+            unselectedLabelColor: AppTheme.textSecondary,
+            tabs: const [
+              Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
+              Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
+              Tab(text: 'Finalizadas', icon: Icon(Icons.done_all, size: 18)),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _TradeListView(onRefresh: () => _loadForTab(0)),
+              _TradeListView(onRefresh: () => _loadForTab(1)),
+              _TradeListView(onRefresh: () => _loadForTab(2)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Tela principal de Trades — 3 tabs: Recebidas / Enviadas / Finalizadas (rota standalone)
 class TradeInboxScreen extends StatefulWidget {
   const TradeInboxScreen({super.key});
 

@@ -7,7 +7,248 @@ import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
 import '../../cards/screens/card_search_screen.dart';
 
-/// Tela "Meu Fichário" — coleção pessoal de cartas
+/// Widget embeddable para uso como tab dentro do CollectionScreen.
+/// Não possui Scaffold/AppBar — apenas o body content.
+class BinderTabContent extends StatefulWidget {
+  const BinderTabContent({super.key});
+
+  @override
+  State<BinderTabContent> createState() => _BinderTabContentState();
+}
+
+class _BinderTabContentState extends State<BinderTabContent>
+    with AutomaticKeepAliveClientMixin {
+  final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
+  String? _conditionFilter;
+  bool? _tradeFilter;
+  bool? _saleFilter;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<BinderProvider>();
+      provider.fetchMyBinder(reset: true);
+      provider.fetchStats();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final provider = context.read<BinderProvider>();
+      if (provider.hasMore && !provider.isLoading) {
+        provider.fetchMyBinder();
+      }
+    }
+  }
+
+  void _applyFilters() {
+    context.read<BinderProvider>().applyFilters(
+          search: _searchController.text.trim(),
+          condition: _conditionFilter,
+          forTrade: _tradeFilter,
+          forSale: _saleFilter,
+        );
+  }
+
+  void _openAddCard() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CardSearchScreen(
+          deckId: '',
+          mode: 'binder',
+          onCardSelectedForBinder: (card) {
+            if (!mounted) return;
+            final provider = context.read<BinderProvider>();
+            BinderItemEditor.show(
+              context,
+              cardId: card['id'] as String,
+              cardName: card['name'] as String?,
+              onSave: (data) async {
+                return provider.addItem(
+                  cardId: data['card_id'] as String,
+                  quantity: data['quantity'] as int? ?? 1,
+                  condition: data['condition'] as String? ?? 'NM',
+                  isFoil: data['is_foil'] as bool? ?? false,
+                  forTrade: data['for_trade'] as bool? ?? false,
+                  forSale: data['for_sale'] as bool? ?? false,
+                  price: data['price'] != null
+                      ? (data['price'] as num).toDouble()
+                      : null,
+                  notes: data['notes'] as String?,
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _editItem(BinderItem item) {
+    final provider = context.read<BinderProvider>();
+    BinderItemEditor.show(
+      context,
+      item: item,
+      onSave: (data) => provider.updateItem(item.id, data),
+      onDelete: () => provider.removeItem(item.id),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Consumer<BinderProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          children: [
+            // Stats bar com botão de adicionar integrado
+            if (provider.stats != null)
+              _StatsBar(stats: provider.stats!, onAdd: _openAddCard),
+
+            // Search + filters
+            _SearchFilterBar(
+              searchController: _searchController,
+              conditionFilter: _conditionFilter,
+              tradeFilter: _tradeFilter,
+              saleFilter: _saleFilter,
+              onSearch: _applyFilters,
+              onConditionChanged: (v) {
+                setState(() => _conditionFilter = v);
+                _applyFilters();
+              },
+              onTradeToggle: () {
+                setState(() {
+                  _tradeFilter = _tradeFilter == true ? null : true;
+                });
+                _applyFilters();
+              },
+              onSaleToggle: () {
+                setState(() {
+                  _saleFilter = _saleFilter == true ? null : true;
+                });
+                _applyFilters();
+              },
+            ),
+
+            // List
+            Expanded(child: _buildBinderList(provider)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBinderList(BinderProvider provider) {
+    if (provider.isLoading && provider.items.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      );
+    }
+
+    if (provider.error != null && provider.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline,
+                size: 48, color: AppTheme.textSecondary),
+            const SizedBox(height: 12),
+            Text(provider.error!,
+                style: const TextStyle(color: AppTheme.textSecondary)),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => provider.fetchMyBinder(reset: true),
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (provider.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.collections_bookmark,
+                size: 64,
+                color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+            const SizedBox(height: 16),
+            const Text(
+              'Seu fichário está vazio',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontXl,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Adicione cartas da sua coleção!',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _openAddCard,
+              icon: const Icon(Icons.add),
+              label: const Text('Adicionar carta'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.manaViolet,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await provider.fetchMyBinder(reset: true);
+        await provider.fetchStats();
+      },
+      color: AppTheme.manaViolet,
+      child: ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(12),
+        itemCount: provider.items.length + (provider.hasMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= provider.items.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child:
+                    CircularProgressIndicator(color: AppTheme.manaViolet),
+              ),
+            );
+          }
+          return _BinderItemCard(
+            item: provider.items[index],
+            onTap: () => _editItem(provider.items[index]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Tela "Meu Fichário" — coleção pessoal de cartas (rota standalone)
 class BinderScreen extends StatefulWidget {
   const BinderScreen({super.key});
 
@@ -263,7 +504,8 @@ class _BinderScreenState extends State<BinderScreen> {
 
 class _StatsBar extends StatelessWidget {
   final BinderStats stats;
-  const _StatsBar({required this.stats});
+  final VoidCallback? onAdd;
+  const _StatsBar({required this.stats, this.onAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -271,36 +513,52 @@ class _StatsBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       color: AppTheme.surfaceSlate2,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatChip(
-            icon: Icons.collections_bookmark,
-            label: '${stats.totalItems}',
-            tooltip: 'Total de cartas',
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _StatChip(
+                  icon: Icons.collections_bookmark,
+                  label: '${stats.totalItems}',
+                  tooltip: 'Total de cartas',
+                ),
+                _StatChip(
+                  icon: Icons.style,
+                  label: '${stats.uniqueCards}',
+                  tooltip: 'Cartas únicas',
+                ),
+                _StatChip(
+                  icon: Icons.swap_horiz,
+                  label: '${stats.forTradeCount}',
+                  tooltip: 'Para troca',
+                  color: AppTheme.loomCyan,
+                ),
+                _StatChip(
+                  icon: Icons.sell,
+                  label: '${stats.forSaleCount}',
+                  tooltip: 'Para venda',
+                  color: AppTheme.mythicGold,
+                ),
+                _StatChip(
+                  icon: Icons.attach_money,
+                  label: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
+                  tooltip: 'Valor estimado',
+                  color: AppTheme.mythicGold,
+                ),
+              ],
+            ),
           ),
-          _StatChip(
-            icon: Icons.style,
-            label: '${stats.uniqueCards}',
-            tooltip: 'Cartas únicas',
-          ),
-          _StatChip(
-            icon: Icons.swap_horiz,
-            label: '${stats.forTradeCount}',
-            tooltip: 'Para troca',
-            color: AppTheme.loomCyan,
-          ),
-          _StatChip(
-            icon: Icons.sell,
-            label: '${stats.forSaleCount}',
-            tooltip: 'Para venda',
-            color: AppTheme.mythicGold,
-          ),
-          _StatChip(
-            icon: Icons.attach_money,
-            label: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
-            tooltip: 'Valor estimado',
-            color: AppTheme.mythicGold,
-          ),
+          if (onAdd != null) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.add, color: AppTheme.manaViolet),
+              tooltip: 'Adicionar carta',
+              onPressed: onAdd,
+              constraints: const BoxConstraints(),
+              padding: const EdgeInsets.all(4),
+            ),
+          ],
         ],
       ),
     );

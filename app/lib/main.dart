@@ -34,6 +34,7 @@ import 'features/binder/screens/marketplace_screen.dart';
 import 'features/trades/providers/trade_provider.dart';
 import 'features/trades/screens/trade_inbox_screen.dart';
 import 'features/trades/screens/trade_detail_screen.dart';
+import 'features/collection/screens/collection_screen.dart';
 
 void main() {
   runApp(const ManaLoomApp());
@@ -96,6 +97,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/home') ||
             location.startsWith('/decks') ||
             location.startsWith('/market') ||
+            location.startsWith('/collection') ||
             location.startsWith('/profile') ||
             location.startsWith('/community') ||
             location.startsWith('/binder') ||
@@ -173,6 +175,14 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                   ],
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/collection',
+              builder: (context, state) {
+                final tabStr = state.uri.queryParameters['tab'];
+                final tab = int.tryParse(tabStr ?? '') ?? 0;
+                return CollectionScreen(initialTab: tab);
+              },
             ),
             GoRoute(
               path: '/market',

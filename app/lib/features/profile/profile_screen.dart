@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => context.push('/binder'),
+                          onPressed: () => context.push('/collection?tab=0'),
                           icon: const Icon(Icons.collections_bookmark),
                           label: const Text('Meu Fichário'),
                           style: OutlinedButton.styleFrom(
@@ -262,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => context.push('/marketplace'),
+                          onPressed: () => context.push('/collection?tab=1'),
                           icon: const Icon(Icons.store),
                           label: const Text('Marketplace'),
                           style: OutlinedButton.styleFrom(

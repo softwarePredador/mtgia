@@ -13,9 +13,12 @@ class MainScaffold extends StatelessWidget {
     int currentIndex = 0;
     if (location.startsWith('/decks')) {
       currentIndex = 1;
-    } else if (location.startsWith('/community')) {
+    } else if (location.startsWith('/collection') ||
+        location.startsWith('/binder') ||
+        location.startsWith('/marketplace') ||
+        location.startsWith('/trades')) {
       currentIndex = 2;
-    } else if (location.startsWith('/market')) {
+    } else if (location.startsWith('/community')) {
       currentIndex = 3;
     } else if (location.startsWith('/profile')) {
       currentIndex = 4;
@@ -34,10 +37,10 @@ class MainScaffold extends StatelessWidget {
               context.go('/decks');
               break;
             case 2:
-              context.go('/community');
+              context.go('/collection');
               break;
             case 3:
-              context.go('/market');
+              context.go('/community');
               break;
             case 4:
               context.go('/profile');
@@ -56,14 +59,14 @@ class MainScaffold extends StatelessWidget {
             label: 'Decks',
           ),
           NavigationDestination(
+            icon: Icon(Icons.collections_bookmark_outlined),
+            selectedIcon: Icon(Icons.collections_bookmark),
+            label: 'Coleção',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.public_outlined),
             selectedIcon: Icon(Icons.public),
             label: 'Comunidade',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.trending_up_outlined),
-            selectedIcon: Icon(Icons.trending_up),
-            label: 'Market',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

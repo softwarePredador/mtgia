@@ -6,7 +6,265 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/binder_provider.dart';
 
-/// Tela Marketplace — busca global de cartas para troca/venda
+/// Widget embeddable para uso como tab dentro do CollectionScreen.
+/// Não possui Scaffold/AppBar — apenas o body content.
+class MarketplaceTabContent extends StatefulWidget {
+  const MarketplaceTabContent({super.key});
+
+  @override
+  State<MarketplaceTabContent> createState() => _MarketplaceTabContentState();
+}
+
+class _MarketplaceTabContentState extends State<MarketplaceTabContent>
+    with AutomaticKeepAliveClientMixin {
+  final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
+  String? _conditionFilter;
+  bool _onlyTrade = false;
+  bool _onlySale = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _doSearch();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final provider = context.read<BinderProvider>();
+      if (provider.hasMoreMarket && !provider.isLoadingMarket) {
+        provider.fetchMarketplace(
+          search: _searchController.text.trim(),
+          condition: _conditionFilter,
+          forTrade: _onlyTrade ? true : null,
+          forSale: _onlySale ? true : null,
+        );
+      }
+    }
+  }
+
+  void _doSearch() {
+    context.read<BinderProvider>().fetchMarketplace(
+          search: _searchController.text.trim(),
+          condition: _conditionFilter,
+          forTrade: _onlyTrade ? true : null,
+          forSale: _onlySale ? true : null,
+          reset: true,
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Consumer<BinderProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          children: [
+            // Search bar
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: TextField(
+                controller: _searchController,
+                onSubmitted: (_) => _doSearch(),
+                style: const TextStyle(
+                    color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
+                decoration: InputDecoration(
+                  hintText: 'Buscar carta no marketplace...',
+                  hintStyle:
+                      const TextStyle(color: AppTheme.textSecondary),
+                  prefixIcon: const Icon(Icons.search,
+                      color: AppTheme.textSecondary),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.clear,
+                        color: AppTheme.textSecondary),
+                    onPressed: () {
+                      _searchController.clear();
+                      _doSearch();
+                    },
+                  ),
+                  filled: true,
+                  fillColor: AppTheme.surfaceSlate,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+
+            // Filter chips
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _ConditionDropdown(
+                      value: _conditionFilter,
+                      onChanged: (v) {
+                        setState(() => _conditionFilter = v);
+                        _doSearch();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      label: const Text('Troca'),
+                      selected: _onlyTrade,
+                      onSelected: (v) {
+                        setState(() => _onlyTrade = v);
+                        _doSearch();
+                      },
+                      selectedColor:
+                          AppTheme.loomCyan.withValues(alpha: 0.3),
+                      backgroundColor: AppTheme.surfaceSlate,
+                      labelStyle: TextStyle(
+                        color: _onlyTrade
+                            ? AppTheme.loomCyan
+                            : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                      side: BorderSide(
+                        color: _onlyTrade
+                            ? AppTheme.loomCyan
+                            : AppTheme.outlineMuted,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      label: const Text('Venda'),
+                      selected: _onlySale,
+                      onSelected: (v) {
+                        setState(() => _onlySale = v);
+                        _doSearch();
+                      },
+                      selectedColor:
+                          AppTheme.mythicGold.withValues(alpha: 0.3),
+                      backgroundColor: AppTheme.surfaceSlate,
+                      labelStyle: TextStyle(
+                        color: _onlySale
+                            ? AppTheme.mythicGold
+                            : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                      side: BorderSide(
+                        color: _onlySale
+                            ? AppTheme.mythicGold
+                            : AppTheme.outlineMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // List
+            Expanded(child: _buildMarketList(provider)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMarketList(BinderProvider provider) {
+    if (provider.isLoadingMarket && provider.marketItems.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      );
+    }
+
+    if (provider.marketError != null && provider.marketItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline,
+                size: 48, color: AppTheme.textSecondary),
+            const SizedBox(height: 12),
+            Text(provider.marketError!,
+                style: const TextStyle(color: AppTheme.textSecondary)),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _doSearch,
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (provider.marketItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.store,
+                size: 64,
+                color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+            const SizedBox(height: 16),
+            const Text(
+              'Nenhuma carta encontrada',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontLg,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tente outra busca ou filtro',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(12),
+      itemCount:
+          provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= provider.marketItems.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child:
+                  CircularProgressIndicator(color: AppTheme.manaViolet),
+            ),
+          );
+        }
+        return _MarketplaceCard(
+          item: provider.marketItems[index],
+          onOwnerTap: () {
+            final ownerId = provider.marketItems[index].ownerId;
+            context.push('/community/user/$ownerId');
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Tela Marketplace — busca global de cartas para troca/venda (rota standalone)
 class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
 
