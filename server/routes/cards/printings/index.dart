@@ -59,12 +59,17 @@ Future<Response> onRequest(RequestContext context) async {
   // Se sync=true e encontrou poucas edições, busca do Scryfall
   if (syncFromScryfall && data.length <= 1) {
     try {
+      print('[printings/sync] Starting sync for "$name" (current: ${data.length})');
       final imported = await _syncPrintingsFromScryfall(pool, name);
+      print('[printings/sync] Imported $imported new printings');
       if (imported > 0) {
         // Re-query com as edições importadas
         data = await _queryPrintings(pool, name, safeLimit, hasSets);
+        print('[printings/sync] After re-query: ${data.length} printings');
       }
-    } catch (e) {
+    } catch (e, st) {
+      print('[printings/sync] Erro: $e');
+      print('[printings/sync] Stack: $st');
       stderr.writeln('[printings/sync] Erro: $e');
     }
   }
@@ -185,10 +190,12 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     'User-Agent': 'MTGDeckBuilder/1.0',
   });
 
+  print('[sync] Scryfall response: ${response.statusCode}');
   if (response.statusCode != 200) return 0;
 
   final card = jsonDecode(response.body) as Map<String, dynamic>;
   final printsUri = card['prints_search_uri'] as String?;
+  print('[sync] prints_search_uri: $printsUri');
   if (printsUri == null) return 0;
 
   // 2. Buscar todas as printings
@@ -204,6 +211,7 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
 
   final body = jsonDecode(printsResponse.body) as Map<String, dynamic>;
   final printings = (body['data'] as List?)?.whereType<Map<String, dynamic>>() ?? [];
+  print('[sync] Raw printings from Scryfall: ${printings.length}');
 
   // Filtrar: só paper, sem art_series, sem tokens
   final filtered = printings.where((p) {
@@ -213,11 +221,14 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     return isPaper && layout != 'art_series' && layout != 'token';
   }).take(30).toList();
 
+  print('[sync] Filtered printings: ${filtered.length}');
+
   var imported = 0;
 
   for (final p in filtered) {
-    final oracleId = p['oracle_id'] as String?;
-    if (oracleId == null || oracleId.isEmpty) continue;
+    // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
+    final scryfallId = p['id'] as String?;
+    if (scryfallId == null || scryfallId.isEmpty) continue;
 
     final cardName = p['name']?.toString() ?? '';
     final manaCost = p['mana_cost']?.toString();
@@ -252,14 +263,14 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
                              colors, color_identity, image_url, set_code, rarity, cmc)
           VALUES (
-            @oracle_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
+            @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
             @cmc::decimal
           )
           ON CONFLICT (scryfall_id) DO NOTHING
         '''),
         parameters: {
-          'oracle_id': oracleId,
+          'scryfall_id': scryfallId,
           'name': cardName,
           'mana_cost': manaCost,
           'type_line': typeLine,
