@@ -53,7 +53,11 @@ Handler middleware(Handler handler) {
       print('[ERROR] stack: $st');
       return Response.json(
         statusCode: HttpStatus.internalServerError,
-        body: {'error': 'Erro interno do servidor'},
+        body: {
+          'error': 'Erro interno do servidor',
+          'debug': e.toString(),
+          'stage': !_connected ? 'db_connect' : !_schemaReady ? 'schema' : 'handler',
+        },
         headers: _corsHeaders,
       );
     }
