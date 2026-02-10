@@ -829,9 +829,10 @@ Future<Response> onRequest(RequestContext context) async {
         jsonResponse['mode'] = 'optimize';
       }
     } catch (e) {
+      print('[ERROR] Optimization failed: $e');
       return Response.json(
         statusCode: HttpStatus.internalServerError,
-        body: {'error': 'Optimization failed: $e'},
+        body: {'error': 'Optimization failed'},
       );
     }
 
@@ -1254,6 +1255,7 @@ Future<Response> onRequest(RequestContext context) async {
               '⚠️ ATENÇÃO: O deck está ficando mais lento (CMC aumentou), o que é ruim para Aggro.');
         }
       } catch (e) {
+        print('[ERROR] handler: $e');
         Log.e('Erro na verificação pós-otimização: $e');
       }
     }
@@ -1362,6 +1364,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     return Response.json(body: responseBody);
   } catch (e) {
+    print('[ERROR] handler: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': e.toString()},

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/trade_provider.dart';
-import 'trade_detail_screen.dart';
 
 /// Widget embeddable para uso como tab dentro do CollectionScreen.
 /// Contém seu próprio TabBar aninhado (Recebidas / Enviadas / Finalizadas).
@@ -250,12 +250,7 @@ class _TradeCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => TradeDetailScreen(tradeId: trade.id),
-            ),
-          );
+          context.push('/trades/${trade.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(14),

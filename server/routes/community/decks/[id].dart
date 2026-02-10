@@ -181,9 +181,10 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       'all_cards_flat': cardsList,
     });
   } catch (e) {
+    print('[ERROR] Failed to get public deck: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to get public deck: $e'},
+      body: {'error': 'Failed to get public deck'},
     );
   }
 }
@@ -272,13 +273,14 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
       body: {'success': true, 'deck': newDeck},
     );
   } on Exception catch (e) {
+    print('[ERROR] Failed to copy deck: $e');
     final msg = e.toString();
     if (msg.contains('not found') || msg.contains('not public')) {
       return Response.json(statusCode: 404, body: {'error': msg});
     }
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to copy deck: $e'},
+      body: {'error': 'Failed to copy deck'},
     );
   }
 }
@@ -391,9 +393,10 @@ Future<Response> _getFollowingFeed(RequestContext context) async {
       'total': total,
     });
   } catch (e) {
+    print('[ERROR] Internal server error: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Internal server error', 'details': '$e'},
+      body: {'error': 'Internal server error'},
     );
   }
 }

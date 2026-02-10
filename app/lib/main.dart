@@ -249,8 +249,30 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     if (_authProvider.isAuthenticated) {
       _notificationProvider.startPolling();
     } else {
+      // Parar polling e limpar todo o estado dos providers ao deslogar
       _notificationProvider.stopPolling();
+      _clearAllProvidersState();
     }
+  }
+
+  /// Limpa o estado de todos os providers ao deslogar, evitando dados stale
+  /// entre sessões de diferentes usuários.
+  void _clearAllProvidersState() {
+    _deckProvider.clearAllState();
+    _cardProvider.clearSearch();
+    _marketProvider.clearAllState();
+    _communityProvider.clearAllState();
+    _socialProvider.clearAllState();
+    _binderProvider.clearAllState();
+    _tradeProvider.clearAllState();
+    _messageProvider.clearAllState();
+    _notificationProvider.clearAllState();
+  }
+
+  @override
+  void dispose() {
+    _authProvider.removeListener(_onAuthChanged);
+    super.dispose();
   }
 
   @override

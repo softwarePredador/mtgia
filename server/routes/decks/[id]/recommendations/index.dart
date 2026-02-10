@@ -116,14 +116,16 @@ Future<Response> _generateRecommendations(RequestContext context, String deckId)
       final recommendations = jsonDecode(content);
       return Response.json(body: recommendations);
     } catch (e) {
+      print('[ERROR] Failed to generate recommendations: $e');
       // Fallback se a IA não retornar JSON válido
       return Response.json(body: {'raw_response': content});
     }
 
   } catch (e) {
+    print('[ERROR] Failed to generate recommendations: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to generate recommendations: $e'},
+      body: {'error': 'Failed to generate recommendations'},
     );
   }
 }

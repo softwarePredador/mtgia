@@ -105,9 +105,10 @@ Future<Response> _listBinder(RequestContext context) async {
       'total': total,
     });
   } catch (e) {
+    print('[ERROR] Erro ao listar binder: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao listar binder: $e'},
+      body: {'error': 'Erro ao listar binder'},
     );
   }
 }
@@ -214,9 +215,10 @@ Future<Response> _addToBinder(RequestContext context) async {
       },
     );
   } catch (e) {
+    print('[ERROR] Erro ao adicionar ao binder: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao adicionar ao binder: $e'},
+      body: {'error': 'Erro ao adicionar ao binder'},
     );
   }
 }

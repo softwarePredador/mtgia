@@ -3402,3 +3402,64 @@ Helper estático `NotificationService.create(pool, userId, type, title, body?, r
 - `app/lib/features/notifications/screens/notification_screen.dart` — tela
 - `app/lib/core/widgets/main_scaffold.dart` — badge no sino + ícone chat
 - `app/lib/main.dart` — NotificationProvider + rota /notifications + auth listener
+
+---
+
+## 25. Auditoria de Qualidade — Correções (Junho 2025)
+
+### 25.1 Race Conditions (TOCTOU → Atomic)
+
+**Porquê:** Os endpoints `PUT /trades/:id/respond` e `PUT /trades/:id/status` tinham vulnerabilidade TOCTOU (Time-of-Check-Time-of-Use). Dois requests simultâneos podiam ambos passar a validação de status e corromper dados.
+
+**Como:**
+- **respond.dart** — `UPDATE ... WHERE status = 'pending' AND receiver_id = @userId RETURNING sender_id` (atomic, sem SELECT prévio).
+- **status.dart** — `SELECT ... FOR UPDATE` dentro de `pool.runTx()` para lock exclusivo na row.
+
+### 25.2 Memory Leak & Stale State (Flutter)
+
+**Porquê:** `_authProvider.addListener(_onAuthChanged)` nunca era removido. Após logout, dados de outro usuário persistiam em todos os providers.
+
+**Como:**
+- Adicionado `dispose()` em `_ManaLoomAppState` com `removeListener`.
+- Adicionado `clearAllState()` em **todos 8 providers** (Deck, Market, Community, Social, Binder, Trade, Message, Notification). Chamado automaticamente em `_onAuthChanged` quando `!isAuthenticated`.
+
+### 25.3 Info Leak — Error Responses
+
+**Porquê:** 58 endpoints expunham `$e` (stack traces, queries SQL, paths internos) no body da resposta HTTP.
+
+**Como:**
+- Todas as 58 ocorrências convertidas para: `print('[ERROR] handler: $e')` (server log) + mensagem genérica no body (ex: `'Erro interno ao criar trade'`).
+- Padrões removidos: `'details': '$e'`, `'details': e.toString()`, `': $e'` no fim de strings.
+
+### 25.4 N+1 Queries — Trade Creation
+
+**Porquê:** `POST /trades` fazia 1 query por item na validação (até 20 queries em loop).
+
+**Como:**
+- Substituído por query batch: `SELECT ... WHERE id = ANY(@ids::uuid[]) AND user_id = @userId`.
+- Resultado mapeado por ID para validação individual client-side (qual item falhou).
+
+### 25.5 Navigation (Flutter)
+
+**Porquê:** `_TradeCard.onTap` usava `Navigator.push(MaterialPageRoute(...))` em vez de `context.push('/trades/${trade.id}')`, perdendo o ShellRoute scaffold. Notificação DM usava `_MessageRedirectPlaceholder` que fazia `Navigator.pop` + `context.push` no mesmo frame (race condition).
+
+**Como:**
+- Trade inbox: `context.push('/trades/${trade.id}')`.
+- Notification DM: `context.push('/messages')` direto, removida classe `_MessageRedirectPlaceholder` (código morto).
+
+### 25.6 Cache TTL (MarketProvider)
+
+**Porquê:** `fetchMovers()` fazia request HTTP a cada troca de tab, sem verificar se dados recentes já existiam.
+
+**Como:**
+- Adicionado `_cacheTtl = Duration(minutes: 5)` e getter `_isCacheValid`.
+- `fetchMovers()` agora retorna imediatamente se cache é válido (parâmetro `force: true` para ignorar).
+- `refresh()` chama `fetchMovers(force: true)`.
+
+### 25.7 Dead Code Cleanup
+
+**Porquê:** `BinderScreen` e `MarketplaceScreen` (classes standalone) eram duplicatas de `BinderTabContent` e `MarketplaceTabContent`, nunca instanciadas em nenhum lugar do app. ~1160 linhas de código morto.
+
+**Como:**
+- Removidas as classes standalone de ambos os arquivos.
+- Mantidos os widgets compartilhados (`_StatsBar`, `_BinderItemCard`, `_ConditionDropdown`, `_MarketplaceCard`) que eram usados pela versão TabContent.

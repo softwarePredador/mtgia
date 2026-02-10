@@ -122,12 +122,13 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
         statusCode: HttpStatus
             .noContent); // 204 No Content é a resposta padrão para sucesso em DELETE
   } on Exception catch (e) {
+    print('[ERROR] Failed to delete deck: $e');
     if (e.toString().contains('permission denied')) {
       return Response.json(statusCode: 404, body: {'error': e.toString()});
     }
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to delete deck: $e'},
+      body: {'error': 'Failed to delete deck'},
     );
   }
 }
@@ -270,14 +271,16 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 
     return Response.json(body: {'success': true, 'deck': updatedDeck});
   } on DeckRulesException catch (e) {
+    print('[ERROR] Failed to update deck: $e');
     return Response.json(
         statusCode: HttpStatus.badRequest, body: {'error': e.message});
   } on Exception catch (e) {
+    print('[ERROR] Failed to update deck: $e');
     if (e.toString().contains('permission denied')) {
       return Response.json(statusCode: 404, body: {'error': e.toString()});
     }
     return Response.json(
-        statusCode: 500, body: {'error': 'Failed to update deck: $e'});
+        statusCode: 500, body: {'error': 'Failed to update deck'});
   }
 }
 
@@ -477,9 +480,10 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
 
     return Response.json(body: responseBody);
   } catch (e) {
+    print('[ERROR] Failed to retrieve deck details: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to retrieve deck details: $e'},
+      body: {'error': 'Failed to retrieve deck details'},
     );
   }
 }

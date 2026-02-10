@@ -403,9 +403,10 @@ Future<Response> _importDeck(RequestContext context) async {
 
     return Response.json(body: responseBody);
   } catch (e) {
+    print('[ERROR] Failed to import deck: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to import deck: $e'},
+      body: {'error': 'Failed to import deck'},
     );
   }
 }

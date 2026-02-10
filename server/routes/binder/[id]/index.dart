@@ -46,9 +46,10 @@ Future<Response> _getStats(RequestContext context) async {
       'estimated_value': double.tryParse(row['estimated_value'].toString()) ?? 0.0,
     });
   } catch (e) {
+    print('[ERROR] Erro ao calcular estatísticas: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao calcular estatísticas: $e'},
+      body: {'error': 'Erro ao calcular estatísticas'},
     );
   }
 }
@@ -141,9 +142,10 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
 
     return Response.json(body: {'message': 'Item atualizado', 'id': id});
   } catch (e) {
+    print('[ERROR] Erro ao atualizar item: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao atualizar item: $e'},
+      body: {'error': 'Erro ao atualizar item'},
     );
   }
 }
@@ -169,9 +171,10 @@ Future<Response> _deleteBinderItem(RequestContext context, String id) async {
 
     return Response(statusCode: HttpStatus.noContent);
   } catch (e) {
+    print('[ERROR] Erro ao remover item: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao remover item: $e'},
+      body: {'error': 'Erro ao remover item'},
     );
   }
 }

@@ -91,9 +91,10 @@ Future<Response> onRequest(RequestContext context) async {
       'total_returned': cards.length,
     });
   } catch (e) {
+    print('[ERROR] Erro interno ao buscar cartas: $e');
     return Response.json(
       statusCode: 500,
-      body: {'error': 'Erro interno ao buscar cartas', 'details': e.toString()},
+      body: {'error': 'Erro interno ao buscar cartas'},
     );
   }
 }

@@ -639,4 +639,17 @@ class TradeProvider extends ChangeNotifier {
     _chatTotal = 0;
     notifyListeners();
   }
+
+  /// Limpa todo o estado do provider (chamado no logout)
+  void clearAllState() {
+    _trades = [];
+    _selectedTrade = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _totalTrades = 0;
+    _currentPage = 1;
+    _chatMessages = [];
+    _chatTotal = 0;
+    notifyListeners();
+  }
 }

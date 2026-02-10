@@ -105,9 +105,10 @@ Future<Response> onRequest(RequestContext context) async {
       'data': freshData,
     });
   } catch (e) {
+    print('[ERROR] Erro ao resolver carta: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao resolver carta', 'details': e.toString()},
+      body: {'error': 'Erro ao resolver carta'},
     );
   }
 }
@@ -334,6 +335,7 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
       );
       inserted.add(card);
     } catch (e) {
+      print('[ERROR] handler: $e');
       // Se INSERT falhou (ex: constraint violation), ignora e continua
       // Isso pode acontecer se dois resolves concorrentes tentam a mesma carta
       stderr.writeln('[resolve] Erro ao inserir ${cardName} ($setCode): $e');

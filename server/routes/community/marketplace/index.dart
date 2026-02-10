@@ -124,9 +124,10 @@ Future<Response> onRequest(RequestContext context) async {
       'total': total,
     });
   } catch (e) {
+    print('[ERROR] Erro ao buscar marketplace: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao buscar marketplace: $e'},
+      body: {'error': 'Erro ao buscar marketplace'},
     );
   }
 }

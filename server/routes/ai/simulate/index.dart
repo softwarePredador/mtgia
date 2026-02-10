@@ -110,6 +110,7 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
   } on FormatException catch (e) {
+    print('[ERROR] Invalid JSON: ${e.message}: $e');
     return Response.json(
       body: {'error': 'Invalid JSON: ${e.message}'},
       statusCode: HttpStatus.badRequest,
@@ -193,6 +194,7 @@ Future<void> _saveSimulation({
       );
     }
   } catch (e) {
+    print('[ERROR] handler: $e');
     // Não falha a request se não conseguir salvar
     Log.w('Could not save simulation: $e');
   }

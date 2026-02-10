@@ -51,9 +51,10 @@ Future<Response> _getMe(RequestContext context) async {
       },
     );
   } catch (e) {
+    print('[ERROR] Falha ao buscar perfil: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Falha ao buscar perfil', 'details': e.toString()},
+      body: {'error': 'Falha ao buscar perfil'},
     );
   }
 }
@@ -135,9 +136,10 @@ Future<Response> _patchMe(RequestContext context) async {
       },
     );
   } catch (e) {
+    print('[ERROR] Falha ao atualizar perfil: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Falha ao atualizar perfil', 'details': e.toString()},
+      body: {'error': 'Falha ao atualizar perfil'},
     );
   }
 }

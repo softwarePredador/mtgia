@@ -76,9 +76,10 @@ Future<Response> onRequest(RequestContext context, String cardId) async {
       },
     );
   } catch (e) {
+    print('[ERROR] Erro ao buscar histórico: $e');
     return Response.json(
       statusCode: 500,
-      body: {'error': 'Erro ao buscar histórico', 'details': e.toString()},
+      body: {'error': 'Erro ao buscar histórico'},
     );
   }
 }

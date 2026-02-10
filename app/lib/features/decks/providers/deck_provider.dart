@@ -1339,4 +1339,17 @@ class DeckProvider extends ChangeNotifier {
       return {'success': false, 'error': 'Erro de conexão: $e'};
     }
   }
+
+  /// Limpa todo o estado do provider (chamado no logout)
+  void clearAllState() {
+    _decks = [];
+    _selectedDeck = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _detailsErrorMessage = null;
+    _detailsStatusCode = null;
+    _deckDetailsCache.clear();
+    _deckDetailsCacheTime.clear();
+    notifyListeners();
+  }
 }

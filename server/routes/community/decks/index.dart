@@ -128,9 +128,10 @@ Future<Response> _listPublicDecks(RequestContext context) async {
       'total': total,
     });
   } catch (e) {
+    print('[ERROR] Failed to list public decks: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Failed to list public decks: $e'},
+      body: {'error': 'Failed to list public decks'},
     );
   }
 }

@@ -251,4 +251,17 @@ class MessageProvider extends ChangeNotifier {
   /// Total de mensagens não lidas em todas as conversas
   int get totalUnread =>
       _conversations.fold(0, (sum, c) => sum + c.unreadCount);
+
+  /// Limpa todo o estado do provider (chamado no logout)
+  void clearAllState() {
+    _conversations = [];
+    _messages = [];
+    _isLoading = false;
+    _isLoadingMessages = false;
+    _isSending = false;
+    _error = null;
+    _totalConversations = 0;
+    _totalMessages = 0;
+    notifyListeners();
+  }
 }

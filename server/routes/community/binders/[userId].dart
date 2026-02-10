@@ -109,9 +109,10 @@ Future<Response> onRequest(RequestContext context, String userId) async {
       'total': total,
     });
   } catch (e) {
+    print('[ERROR] Erro ao buscar binder público: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'error': 'Erro ao buscar binder público: $e'},
+      body: {'error': 'Erro ao buscar binder público'},
     );
   }
 }

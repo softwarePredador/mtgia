@@ -500,4 +500,30 @@ class BinderProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Limpa todo o estado do provider (chamado no logout)
+  void clearAllState() {
+    _items = [];
+    _stats = null;
+    _isLoading = false;
+    _error = null;
+    _page = 1;
+    _hasMore = true;
+    _currentFilter = null;
+    _currentSearch = null;
+    _filterForTrade = null;
+    _filterForSale = null;
+    _marketItems = [];
+    _isLoadingMarket = false;
+    _marketError = null;
+    _marketPage = 1;
+    _hasMoreMarket = true;
+    _publicItems = [];
+    _isLoadingPublic = false;
+    _publicError = null;
+    _publicPage = 1;
+    _hasMorePublic = true;
+    _publicOwner = null;
+    notifyListeners();
+  }
 }
