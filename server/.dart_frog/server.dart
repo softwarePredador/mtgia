@@ -11,6 +11,11 @@ import '../routes/users/me/index.dart' as users_me_index;
 import '../routes/users/[id]/following/index.dart' as users_$id_following_index;
 import '../routes/users/[id]/followers/index.dart' as users_$id_followers_index;
 import '../routes/users/[id]/follow/index.dart' as users_$id_follow_index;
+import '../routes/trades/index.dart' as trades_index;
+import '../routes/trades/[id]/status.dart' as trades_$id_status;
+import '../routes/trades/[id]/respond.dart' as trades_$id_respond;
+import '../routes/trades/[id]/messages.dart' as trades_$id_messages;
+import '../routes/trades/[id]/index.dart' as trades_$id_index;
 import '../routes/sets/index.dart' as sets_index;
 import '../routes/rules/index.dart' as rules_index;
 import '../routes/market/movers/index.dart' as market_movers_index;
@@ -58,6 +63,7 @@ import '../routes/ai/archetypes/index.dart' as ai_archetypes_index;
 
 import '../routes/_middleware.dart' as middleware;
 import '../routes/users/_middleware.dart' as users_middleware;
+import '../routes/trades/_middleware.dart' as trades_middleware;
 import '../routes/import/_middleware.dart' as import_middleware;
 import '../routes/decks/_middleware.dart' as decks_middleware;
 import '../routes/community/_middleware.dart' as community_middleware;
@@ -119,6 +125,8 @@ Handler buildRootHandler() {
     ..mount('/market/movers', (context) => buildMarketMoversHandler()(context))
     ..mount('/rules', (context) => buildRulesHandler()(context))
     ..mount('/sets', (context) => buildSetsHandler()(context))
+    ..mount('/trades/<id>', (context,id,) => buildTrades$idHandler(id,)(context))
+    ..mount('/trades', (context) => buildTradesHandler()(context))
     ..mount('/users/<id>/follow', (context,id,) => buildUsers$idFollowHandler(id,)(context))
     ..mount('/users/<id>/followers', (context,id,) => buildUsers$idFollowersHandler(id,)(context))
     ..mount('/users/<id>/following', (context,id,) => buildUsers$idFollowingHandler(id,)(context))
@@ -404,6 +412,20 @@ Handler buildSetsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/', (context) => sets_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildTrades$idHandler(String id,) {
+  final pipeline = const Pipeline().addMiddleware(trades_middleware.middleware);
+  final router = Router()
+    ..all('/status', (context) => trades_$id_status.onRequest(context,id,))..all('/respond', (context) => trades_$id_respond.onRequest(context,id,))..all('/messages', (context) => trades_$id_messages.onRequest(context,id,))..all('/', (context) => trades_$id_index.onRequest(context,id,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildTradesHandler() {
+  final pipeline = const Pipeline().addMiddleware(trades_middleware.middleware);
+  final router = Router()
+    ..all('/', (context) => trades_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 

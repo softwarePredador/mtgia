@@ -1,0 +1,302 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
+import '../providers/trade_provider.dart';
+import 'trade_detail_screen.dart';
+
+/// Tela principal de Trades — 3 tabs: Recebidas / Enviadas / Finalizadas
+class TradeInboxScreen extends StatefulWidget {
+  const TradeInboxScreen({super.key});
+
+  @override
+  State<TradeInboxScreen> createState() => _TradeInboxScreenState();
+}
+
+class _TradeInboxScreenState extends State<TradeInboxScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _loadForTab(_tabController.index);
+      }
+    });
+    // Carregar trades recebidos inicialmente
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadForTab(0));
+  }
+
+  void _loadForTab(int index) {
+    final provider = context.read<TradeProvider>();
+    switch (index) {
+      case 0:
+        provider.fetchTrades(role: 'receiver', status: 'pending');
+        break;
+      case 1:
+        provider.fetchTrades(role: 'sender');
+        break;
+      case 2:
+        provider.fetchTrades(status: 'completed');
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Trades'),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppTheme.manaViolet,
+          labelColor: AppTheme.manaViolet,
+          unselectedLabelColor: const Color(0xFF94A3B8),
+          tabs: const [
+            Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
+            Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
+            Tab(text: 'Finalizadas', icon: Icon(Icons.done_all, size: 18)),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _TradeListView(onRefresh: () => _loadForTab(0)),
+          _TradeListView(onRefresh: () => _loadForTab(1)),
+          _TradeListView(onRefresh: () => _loadForTab(2)),
+        ],
+      ),
+    );
+  }
+}
+
+class _TradeListView extends StatelessWidget {
+  final VoidCallback onRefresh;
+  const _TradeListView({required this.onRefresh});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TradeProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading && provider.trades.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (provider.errorMessage != null) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  provider.errorMessage!,
+                  style: const TextStyle(color: Color(0xFF94A3B8)),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(onPressed: onRefresh, child: const Text('Tentar novamente')),
+              ],
+            ),
+          );
+        }
+        if (provider.trades.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.swap_horiz, size: 64, color: const Color(0xFF334155)),
+                const SizedBox(height: 12),
+                const Text(
+                  'Nenhum trade encontrado',
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }
+        return RefreshIndicator(
+          onRefresh: () async => onRefresh(),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: provider.trades.length,
+            itemBuilder: (context, index) {
+              final trade = provider.trades[index];
+              return _TradeCard(trade: trade);
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _TradeCard extends StatelessWidget {
+  final TradeOffer trade;
+  const _TradeCard({required this.trade});
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = TradeStatusHelper.color(trade.status);
+    final statusIcon = TradeStatusHelper.icon(trade.status);
+    final statusLabel = TradeStatusHelper.label(trade.status);
+    final otherUser = trade.sender.id == trade.receiver.id
+        ? trade.receiver
+        : trade.sender; // simplification — always show the "other side"
+
+    return Card(
+      color: AppTheme.surfaceSlate,
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.4)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TradeDetailScreen(tradeId: trade.id),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: user + status badge
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: const Color(0xFF334155),
+                    child: Text(
+                      otherUser.label[0].toUpperCase(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          otherUser.label,
+                          style: const TextStyle(
+                            color: Color(0xFFF1F5F9),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          _typeLabel(trade.type),
+                          style: const TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(statusIcon, size: 14, color: statusColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          statusLabel,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Info row: items counts + messages
+              Row(
+                children: [
+                  _InfoChip(
+                    icon: Icons.upload,
+                    label: '${trade.offeringCount ?? 0} oferecendo',
+                  ),
+                  const SizedBox(width: 12),
+                  _InfoChip(
+                    icon: Icons.download,
+                    label: '${trade.requestingCount ?? 0} pedindo',
+                  ),
+                  const Spacer(),
+                  if ((trade.messageCount ?? 0) > 0)
+                    _InfoChip(
+                      icon: Icons.chat_bubble_outline,
+                      label: '${trade.messageCount}',
+                    ),
+                ],
+              ),
+              if (trade.message != null && trade.message!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  trade.message!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _typeLabel(String type) {
+    switch (type) {
+      case 'trade':
+        return 'Troca';
+      case 'sale':
+        return 'Compra/Venda';
+      case 'mixed':
+        return 'Misto';
+      default:
+        return type;
+    }
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: const Color(0xFF94A3B8)),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+        ),
+      ],
+    );
+  }
+}

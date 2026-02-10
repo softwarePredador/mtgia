@@ -31,6 +31,9 @@ import 'features/social/screens/user_search_screen.dart';
 import 'features/binder/providers/binder_provider.dart';
 import 'features/binder/screens/binder_screen.dart';
 import 'features/binder/screens/marketplace_screen.dart';
+import 'features/trades/providers/trade_provider.dart';
+import 'features/trades/screens/trade_inbox_screen.dart';
+import 'features/trades/screens/trade_detail_screen.dart';
 
 void main() {
   runApp(const ManaLoomApp());
@@ -51,6 +54,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final CommunityProvider _communityProvider;
   late final SocialProvider _socialProvider;
   late final BinderProvider _binderProvider;
+  late final TradeProvider _tradeProvider;
   late final GoRouter _router;
 
   @override
@@ -63,6 +67,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _communityProvider = CommunityProvider();
     _socialProvider = SocialProvider();
     _binderProvider = BinderProvider();
+    _tradeProvider = TradeProvider();
 
     // Log da URL da API no boot
     ApiClient.debugLogBaseUrl();
@@ -94,7 +99,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/profile') ||
             location.startsWith('/community') ||
             location.startsWith('/binder') ||
-            location.startsWith('/marketplace');
+            location.startsWith('/marketplace') ||
+            location.startsWith('/trades');
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -201,6 +207,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
               path: '/marketplace',
               builder: (context, state) => const MarketplaceScreen(),
             ),
+            GoRoute(
+              path: '/trades',
+              builder: (context, state) => const TradeInboxScreen(),
+              routes: [
+                GoRoute(
+                  path: ':tradeId',
+                  builder: (context, state) {
+                    final tradeId = state.pathParameters['tradeId']!;
+                    return TradeDetailScreen(tradeId: tradeId);
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ],
@@ -218,6 +237,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ChangeNotifierProvider.value(value: _communityProvider),
         ChangeNotifierProvider.value(value: _socialProvider),
         ChangeNotifierProvider.value(value: _binderProvider),
+        ChangeNotifierProvider.value(value: _tradeProvider),
       ],
       child: MaterialApp.router(
         title: 'ManaLoom - Deck Builder',

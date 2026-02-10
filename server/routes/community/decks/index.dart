@@ -45,28 +45,32 @@ Future<Response> _listPublicDecks(RequestContext context) async {
 
     // Build WHERE clauses
     final whereParts = <String>['d.is_public = true'];
-    final sqlParams = <String, dynamic>{
-      'lim': limit,
-      'off': offset,
-    };
+    final filterParams = <String, dynamic>{};
 
     if (search != null && search.isNotEmpty) {
       whereParts.add(
           '(LOWER(d.name) LIKE @search OR LOWER(COALESCE(d.description,\'\')) LIKE @search)');
-      sqlParams['search'] = '%${search.toLowerCase()}%';
+      filterParams['search'] = '%${search.toLowerCase()}%';
     }
     if (format != null && format.isNotEmpty) {
       whereParts.add('LOWER(d.format) = @format');
-      sqlParams['format'] = format;
+      filterParams['format'] = format;
     }
 
     final whereClause = whereParts.join(' AND ');
 
-    // Count total
+    // Count total (only filter params, no lim/off)
     final countResult = await conn.execute(
       Sql.named('SELECT COUNT(*)::int FROM decks d WHERE $whereClause'),
-      parameters: sqlParams,
+      parameters: filterParams,
     );
+
+    // Full params include pagination
+    final sqlParams = <String, dynamic>{
+      ...filterParams,
+      'lim': limit,
+      'off': offset,
+    };
     final total = (countResult.first[0] as int?) ?? 0;
 
     // Fetch decks

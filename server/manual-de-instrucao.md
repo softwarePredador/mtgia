@@ -3121,3 +3121,125 @@ O Fichário (Binder) permite que jogadores registrem sua coleção pessoal de ca
 - `app/lib/features/cards/screens/card_search_screen.dart` — modo binder
 - `app/lib/features/social/screens/user_profile_screen.dart` — 4ª tab Fichário
 - `app/lib/features/profile/profile_screen.dart` — botões Fichário + Marketplace
+
+---
+
+## Épico 3 — Trades (Implementado)
+
+### O Porquê
+O sistema de Trades permite que jogadores proponham trocas, vendas e negociações mistas de cartas do fichário. É o núcleo social-comercial do app, conectando jogadores que querem trocar/comprar/vender cartas.
+
+### Arquitetura
+
+#### Backend (Server — Dart Frog)
+
+**Migration:** `server/bin/migrate_trades.dart`
+- 4 tabelas criadas:
+  - `trade_offers`: proposta principal (sender, receiver, type, status, payment, tracking, timestamps)
+  - `trade_items`: itens da proposta (binder_item_id, direction offering/requesting, quantity, agreed_price)
+  - `trade_messages`: chat dentro do trade (sender_id, message, attachment)
+  - `trade_status_history`: histórico de mudanças de status (old→new, changed_by, notes)
+
+**Rotas:**
+
+| Rota | Método | Auth? | Descrição |
+|------|--------|-------|-----------|
+| `/trades` | GET | JWT | Lista trades do usuário (filtros: role, status, paginação) |
+| `/trades` | POST | JWT | Cria proposta de trade com validações completas |
+| `/trades/:id` | GET | JWT | Detalhe com items, mensagens, histórico |
+| `/trades/:id/respond` | PUT | JWT | Aceitar/Recusar (apenas receiver, apenas pending) |
+| `/trades/:id/status` | PUT | JWT | Transições de estado: shipped→delivered→completed, cancel, dispute |
+| `/trades/:id/messages` | GET | JWT | Chat paginado (apenas participantes) |
+| `/trades/:id/messages` | POST | JWT | Enviar mensagem (apenas participantes, trade não fechado) |
+
+**Validações do POST /trades:**
+- `receiver_id` obrigatório e não pode ser o próprio usuário
+- `type` deve ser 'trade', 'sale' ou 'mixed'
+- Troca pura exige itens de ambos os lados
+- Cada binder_item deve pertencer ao dono correto
+- Cada item deve estar marcado como for_trade ou for_sale
+- Receiver deve existir no sistema
+- Tudo executado em transação
+
+**Fluxo de status:**
+```
+pending → accepted → shipped → delivered → completed
+pending → declined / cancelled
+accepted → cancelled / disputed
+shipped → cancelled / disputed
+delivered → completed / disputed
+```
+
+**Regras de permissão por status:**
+- `shipped`: apenas sender pode marcar
+- `delivered`: apenas receiver pode confirmar
+- `completed/cancelled/disputed`: ambos podem (com validação de transição)
+
+#### Frontend (Flutter)
+
+**TradeProvider** (`app/lib/features/trades/providers/trade_provider.dart`):
+- Models: `TradeOffer`, `TradeItem`, `TradeMessage`, `TradeStatusEntry`, `TradeUser`, `TradeItemCard`
+- `TradeStatusHelper`: cores, ícones e labels por status
+- Métodos: `fetchTrades`, `fetchTradeDetail`, `createTrade`, `respondToTrade`, `updateTradeStatus`, `fetchMessages`, `sendMessage`
+- Polling de chat a cada 10s no detail screen
+
+**TradeInboxScreen** (`trade_inbox_screen.dart`):
+- 3 tabs: Recebidas (role=receiver, status=pending), Enviadas (role=sender), Finalizadas (status=completed)
+- Cards com: avatar, status badge colorido, contadores de items/mensagens, mensagem preview
+- Pull-to-refresh por tab
+
+**CreateTradeScreen** (`create_trade_screen.dart`):
+- Recebe `receiverId` + `receiverName`
+- SegmentedButton para tipo (Troca/Venda/Misto)
+- Carrega binder do usuário (for_trade=true) e binder público do receiver
+- Listas com checkbox para seleção de itens
+- Campos de pagamento (valor + método) quando tipo != trade
+- Campo de mensagem opcional
+
+**TradeDetailScreen** (`trade_detail_screen.dart`):
+- Status header com cor + ícone
+- Participantes (sender ↔ receiver) com avatar
+- Listas de itens (oferecidos / pedidos) com imagem, condição, foil, preço
+- Seção de pagamento (quando aplicável)
+- Código de rastreio (quando aplicável)
+- Timeline visual com dots coloridos por status
+- Ações dinâmicas por status e papel do usuário:
+  - Pending + receiver: Aceitar / Recusar
+  - Pending + sender: Cancelar
+  - Accepted + sender: Marcar como Enviado (dialog com tracking + método)
+  - Shipped + receiver: Confirmar Entrega
+  - Delivered: Finalizar / Disputar
+- Chat com bolhas (estilo WhatsApp), polling a cada 10s
+- Input de mensagem fixo na parte inferior
+
+**GoRouter:** Rota `/trades` (inbox) com sub-rota `/trades/:tradeId` (detalhe)
+
+### Testes de Integração
+**Arquivo:** `server/test/integration_trades_test.dart` — 18 testes, todos passando ✅
+- Login + preparação de carta/binder
+- Segurança: POST sem auth → 401
+- Validações: trade consigo mesmo, sem items, receiver inexistente
+- Listagem: GET com filtros role/status
+- Detalhe: GET trade inexistente → 404
+- Respond: trade inexistente, action inválido
+- Status: trade inexistente, status inválido
+- Messages: trade inexistente, sem conteúdo
+- Limpeza do binder item de teste
+
+### Arquivos Criados/Modificados
+**Server:**
+- `server/bin/migrate_trades.dart` — migration script (4 tabelas)
+- `server/routes/trades/_middleware.dart` — auth middleware
+- `server/routes/trades/index.dart` — POST + GET /trades
+- `server/routes/trades/[id]/index.dart` — GET /trades/:id
+- `server/routes/trades/[id]/respond.dart` — PUT accept/decline
+- `server/routes/trades/[id]/status.dart` — PUT status transitions
+- `server/routes/trades/[id]/messages.dart` — GET + POST messages
+- `server/test/integration_trades_test.dart` — 18 testes de integração
+
+**Flutter:**
+- `app/lib/features/trades/providers/trade_provider.dart` — models + provider
+- `app/lib/features/trades/screens/trade_inbox_screen.dart` — inbox com 3 tabs
+- `app/lib/features/trades/screens/create_trade_screen.dart` — criação de proposta
+- `app/lib/features/trades/screens/trade_detail_screen.dart` — detalhe + chat + ações
+- `app/lib/main.dart` — import + TradeProvider + rotas + redirect

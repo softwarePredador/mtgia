@@ -34,19 +34,19 @@ applyTo: '**'
 - [x] 2.8 Flutter: Aba "Fichário" no `UserProfileScreen` (4ª tab)
 - [x] 2.9 Flutter: Tela Marketplace (busca global, filtros, botão "Quero essa carta")
 
-### ⏳ Épico 3 — Trades (~5-7 dias, depende do Épico 2)
-- [ ] 3.1 DB: `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history`
-- [ ] 3.2 Server: `POST /trades` (criar proposta, validar ownership + disponibilidade)
-- [ ] 3.3 Server: `GET /trades` (listar, filtro status/role/page)
-- [ ] 3.4 Server: `GET /trades/:id` (detalhe completo + items + messages + history)
-- [ ] 3.5 Server: `PUT /trades/:id/respond` (accept/decline, só receiver, só pending)
-- [ ] 3.6 Server: `PUT /trades/:id/status` (shipped→delivered→completed, tracking_code)
-- [ ] 3.7 Server: `POST /trades/:id/messages` + `GET` (chat no trade)
-- [ ] 3.8 Server: Comprovante (MVP: URL externa, não upload binário)
-- [ ] 3.9 Flutter: `TradeProvider` (fetchTrades, create, respond, updateStatus, messages)
-- [ ] 3.10 Flutter: Tela criar proposta (items meus ↔ items dele, tipo, valor, mensagem)
-- [ ] 3.11 Flutter: Trade inbox (tabs Recebidas/Enviadas/Finalizadas, cores por status)
-- [ ] 3.12 Flutter: Trade detail (timeline + chat + ações dinâmicas por status)
+### ✅ Épico 3 — Trades (~5-7 dias, depende do Épico 2)
+- [x] 3.1 DB: `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history`
+- [x] 3.2 Server: `POST /trades` (criar proposta, validar ownership + disponibilidade)
+- [x] 3.3 Server: `GET /trades` (listar, filtro status/role/page)
+- [x] 3.4 Server: `GET /trades/:id` (detalhe completo + items + messages + history)
+- [x] 3.5 Server: `PUT /trades/:id/respond` (accept/decline, só receiver, só pending)
+- [x] 3.6 Server: `PUT /trades/:id/status` (shipped→delivered→completed, tracking_code)
+- [x] 3.7 Server: `POST /trades/:id/messages` + `GET` (chat no trade)
+- [x] 3.8 Server: Comprovante (MVP: URL externa via attachment_url em messages)
+- [x] 3.9 Flutter: `TradeProvider` (fetchTrades, create, respond, updateStatus, messages)
+- [x] 3.10 Flutter: Tela criar proposta (items meus ↔ items dele, tipo, valor, mensagem)
+- [x] 3.11 Flutter: Trade inbox (tabs Recebidas/Enviadas/Finalizadas, cores por status)
+- [x] 3.12 Flutter: Trade detail (timeline + chat + ações dinâmicas por status)
 
 **Fluxo de status:** pending → accepted → shipped → delivered → completed (ou declined/cancelled/disputed)
 
