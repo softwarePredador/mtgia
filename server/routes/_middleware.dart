@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../lib/database.dart';
@@ -9,6 +10,16 @@ var _schemaReady = false;
 
 Handler middleware(Handler handler) {
   return (context) async {
+    // ── CORS ──────────────────────────────────────────────
+    // Responde preflight (OPTIONS) imediatamente e adiciona
+    // headers CORS em todas as respostas.
+    if (context.request.method == HttpMethod.options) {
+      return Response(
+        statusCode: HttpStatus.noContent,
+        headers: _corsHeaders,
+      );
+    }
+
     // Conecta ao banco de dados apenas na primeira requisição.
     if (!_connected) {
       await _db.connect();
@@ -22,10 +33,21 @@ Handler middleware(Handler handler) {
     }
 
     // Fornece a conexão do banco de dados para todas as rotas filhas.
-    // Agora injetamos o Pool, que é compatível com a interface Session/Connection para execuções simples
-    return handler.use(provider<Pool>((_) => _db.connection))(context);
+    final response = await handler.use(provider<Pool>((_) => _db.connection))(context);
+
+    // Adiciona CORS em TODAS as respostas.
+    return response.copyWith(
+      headers: {...response.headers, ..._corsHeaders},
+    );
   };
 }
+
+const _corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
 
 Future<void> _ensureRuntimeSchema(Pool pool) async {
   // Idempotente: garante compatibilidade com bases antigas após deploy.

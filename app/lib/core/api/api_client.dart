@@ -35,19 +35,8 @@ class ApiClient {
     if (_envBaseUrl.trim().isNotEmpty) {
       return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
     }
-    // Em produção ou dispositivo físico, usar o servidor remoto.
-    // Em desktop/web local com servidor local, usar localhost.
-    if (kIsWeb) {
-      return 'http://localhost:8080';
-    }
-    if (defaultTargetPlatform == TargetPlatform.macOS ||
-        defaultTargetPlatform == TargetPlatform.windows ||
-        defaultTargetPlatform == TargetPlatform.linux) {
-      // Desktop: usar localhost se estiver rodando servidor local,
-      // senão usar produção.
-      return 'http://localhost:8080';
-    }
-    // Mobile (iOS / Android): sempre usar servidor remoto
+    // Todas as plataformas usam o servidor de produção (EasyPanel).
+    // Para dev local, passe --dart-define=API_BASE_URL=http://localhost:8080
     return _productionUrl;
   }
 
