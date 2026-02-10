@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../../community/screens/community_deck_detail_screen.dart';
 import '../../binder/providers/binder_provider.dart';
 import '../providers/social_provider.dart';
@@ -394,17 +395,11 @@ class _DecksTab extends StatelessWidget {
               child: Row(
                 children: [
                   // Commander image
-                  ClipRRect(
+                  CachedCardImage(
+                    imageUrl: deck.commanderImageUrl,
+                    width: 50,
+                    height: 70,
                     borderRadius: BorderRadius.circular(8),
-                    child: deck.commanderImageUrl != null
-                        ? Image.network(
-                            deck.commanderImageUrl!,
-                            width: 50,
-                            height: 70,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _deckPlaceholder(),
-                          )
-                        : _deckPlaceholder(),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -478,15 +473,6 @@ class _DecksTab extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _deckPlaceholder() {
-    return Container(
-      width: 50,
-      height: 70,
-      color: AppTheme.surfaceSlate2,
-      child: const Icon(Icons.style, color: AppTheme.textSecondary, size: 20),
     );
   }
 
@@ -736,29 +722,11 @@ class _PublicBinderTabState extends State<_PublicBinderTab> {
             padding: const EdgeInsets.all(10),
             child: Row(
               children: [
-                ClipRRect(
+                CachedCardImage(
+                  imageUrl: item.cardImageUrl,
+                  width: 42,
+                  height: 58,
                   borderRadius: BorderRadius.circular(6),
-                  child: item.cardImageUrl != null
-                      ? Image.network(
-                          item.cardImageUrl!,
-                          width: 42,
-                          height: 58,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 42,
-                            height: 58,
-                            color: AppTheme.surfaceSlate2,
-                            child: const Icon(Icons.style,
-                                color: AppTheme.textSecondary, size: 16),
-                          ),
-                        )
-                      : Container(
-                          width: 42,
-                          height: 58,
-                          color: AppTheme.surfaceSlate2,
-                          child: const Icon(Icons.style,
-                              color: AppTheme.textSecondary, size: 16),
-                        ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -849,13 +817,6 @@ class _PublicBinderTabState extends State<_PublicBinderTab> {
   }
 
   Color _condColor(String c) {
-    switch (c) {
-      case 'NM': return Colors.greenAccent;
-      case 'LP': return Colors.lightGreen;
-      case 'MP': return Colors.amber;
-      case 'HP': return Colors.orange;
-      case 'DMG': return Colors.redAccent;
-      default: return AppTheme.textSecondary;
-    }
+    return AppTheme.conditionColor(c);
   }
 }

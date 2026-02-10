@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import '../models/deck_details.dart';
 
 /// Enum para representar o status de completude do deck
@@ -53,7 +54,7 @@ class DeckProgressIndicator extends StatelessWidget {
     final theme = Theme.of(context);
     switch (status) {
       case DeckStatus.complete:
-        return Colors.green;
+        return AppTheme.success;
       case DeckStatus.incomplete:
         return theme.colorScheme.primary;
       case DeckStatus.invalid:
@@ -137,7 +138,7 @@ class DeckProgressIndicator extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                    color: AppTheme.success,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -216,13 +217,13 @@ class DeckProgressChip extends StatelessWidget {
   Color _getColor() {
     switch (status) {
       case DeckStatus.complete:
-        return Colors.green;
+        return AppTheme.success;
       case DeckStatus.incomplete:
-        return Colors.blue;
+        return AppTheme.loomCyan;
       case DeckStatus.invalid:
-        return Colors.red;
+        return AppTheme.error;
       case DeckStatus.unknown:
-        return Colors.grey;
+        return AppTheme.disabled;
     }
   }
 

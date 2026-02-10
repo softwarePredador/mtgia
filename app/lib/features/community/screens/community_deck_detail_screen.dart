@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../social/screens/user_profile_screen.dart';
 import '../providers/community_provider.dart';
@@ -61,14 +62,14 @@ class _CommunityDeckDetailScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Deck copiado para sua coleção! 🎉'),
-          backgroundColor: Colors.green.shade700,
+          backgroundColor: AppTheme.success,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result['error'] ?? 'Erro ao copiar deck'),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppTheme.error,
         ),
       );
     }
@@ -342,23 +343,12 @@ class _CommunityDeckDetailScreenState
           borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         dense: true,
-        leading: imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  imageUrl,
-                  width: 32,
-                  height: 45,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox(
-                    width: 32,
-                    height: 45,
-                    child: Icon(Icons.image_not_supported,
-                        size: 16, color: AppTheme.textSecondary),
-                  ),
-                ),
-              )
-            : null,
+        leading: CachedCardImage(
+          imageUrl: imageUrl,
+          width: 32,
+          height: 45,
+          borderRadius: BorderRadius.circular(4),
+        ),
         title: Text(
           '${qty}x $name',
           style: const TextStyle(

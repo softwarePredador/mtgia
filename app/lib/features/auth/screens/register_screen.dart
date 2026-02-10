@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -71,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF0A0E14),
+              AppTheme.backgroundAbyss,
               theme.colorScheme.surface,
             ],
           ),
@@ -98,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'Comece sua jornada no ManaLoom',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFF94A3B8),
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 32),

@@ -87,7 +87,6 @@ class DeckProvider extends ChangeNotifier {
 
     invalidateDeckCache(deckId);
     await fetchDeckDetails(deckId);
-    await fetchDecks();
   }
 
   Future<void> updateDeckCardEntry({
@@ -150,7 +149,6 @@ class DeckProvider extends ChangeNotifier {
 
     invalidateDeckCache(deckId);
     await fetchDeckDetails(deckId);
-    await fetchDecks();
   }
 
   /// Busca detalhes de um deck específico (com cache)
@@ -551,7 +549,6 @@ class DeckProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       invalidateDeckCache(deckId);
       await fetchDeckDetails(deckId);
-      await fetchDecks();
       return true;
     }
 
@@ -582,10 +579,9 @@ class DeckProvider extends ChangeNotifier {
       throw Exception(msg);
     }
 
-    // Recarrega detalhes e lista para refletir chips/estado.
+    // Recarrega detalhes para refletir chips/estado.
     invalidateDeckCache(deckId);
     await fetchDeckDetails(deckId);
-    await fetchDecks();
   }
 
   /// Valida o deck no servidor (modo estrito: Commander=100 e com comandante).
@@ -625,7 +621,6 @@ class DeckProvider extends ChangeNotifier {
 
     invalidateDeckCache(deckId);
     await fetchDeckDetails(deckId);
-    await fetchDecks();
     return true;
   }
 

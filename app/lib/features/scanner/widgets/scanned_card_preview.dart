@@ -74,7 +74,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     return SlideTransition(
       position: _slideAnimation,
       child: Container(
-        color: const Color(0xFF0D1117),
+        color: AppTheme.backgroundAbyss,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -134,7 +134,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: const Color(0xFF0D1117),
+      color: AppTheme.backgroundAbyss,
       child: Row(
         children: [
           _RarityDot(rarity: card.rarity),
@@ -206,15 +206,15 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
       width: double.infinity,
       padding: EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8 + bottomPad),
       decoration: const BoxDecoration(
-        color: Color(0xFF161B22),
-        border: Border(top: BorderSide(color: Color(0xFF21262D), width: 0.5)),
+        color: AppTheme.surfaceSlate,
+        border: Border(top: BorderSide(color: AppTheme.outlineMuted, width: 0.5)),
       ),
       child: Row(
         children: [
           // Foil
           if (card.foil == true) ...[
             _badge(Icons.auto_awesome, 'Foil',
-                const Color(0xFFE879F9), const Color(0xFF3B0764)),
+                AppTheme.manaViolet.withValues(alpha: 0.7), AppTheme.manaViolet.withValues(alpha: 0.2)),
             const SizedBox(width: 8),
           ],
           // Condition
@@ -235,7 +235,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
               Icons.layers_outlined,
               card.setCode.toUpperCase(),
               AppTheme.textSecondary,
-              const Color(0xFF21262D),
+              AppTheme.outlineMuted,
               chevron: widget.foundCards.length > 1,
             ),
           ),
@@ -258,8 +258,8 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     return Container(
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: const BoxDecoration(
-        color: Color(0xFF161B22),
-        border: Border(top: BorderSide(color: Color(0xFF21262D), width: 0.5)),
+        color: AppTheme.surfaceSlate,
+        border: Border(top: BorderSide(color: AppTheme.outlineMuted, width: 0.5)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -318,23 +318,23 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
   // ── Helpers ──
 
   Color _confidenceColor(double c) {
-    if (c >= 80) return const Color(0xFF22C55E);
+    if (c >= 80) return AppTheme.success;
     if (c >= 60) return AppTheme.mythicGold;
-    return const Color(0xFFEF4444);
+    return AppTheme.error;
   }
 
   Color _conditionColor(CardCondition c) {
     switch (c) {
       case CardCondition.nm:
-        return const Color(0xFF22C55E);
+        return AppTheme.success;
       case CardCondition.lp:
-        return const Color(0xFF06B6D4);
+        return AppTheme.loomCyan;
       case CardCondition.mp:
-        return const Color(0xFFF59E0B);
+        return AppTheme.mythicGold;
       case CardCondition.hp:
-        return const Color(0xFFF97316);
+        return AppTheme.warning;
       case CardCondition.dmg:
-        return const Color(0xFFEF4444);
+        return AppTheme.error;
     }
   }
 
@@ -367,7 +367,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
 
   Widget _iconBtn(IconData icon, VoidCallback onTap) {
     return Material(
-      color: const Color(0xFF21262D),
+      color: AppTheme.outlineMuted,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
@@ -427,13 +427,13 @@ class _RarityDot extends StatelessWidget {
   Color get _color {
     switch (rarity.toLowerCase()) {
       case 'mythic':
-        return const Color(0xFFE44D2E);
+        return AppTheme.warning;
       case 'rare':
-        return const Color(0xFFF59E0B);
+        return AppTheme.mythicGold;
       case 'uncommon':
-        return const Color(0xFFC0C0C0);
+        return AppTheme.textSecondary;
       default:
-        return const Color(0xFF3B3B3B);
+        return AppTheme.outlineMuted;
     }
   }
 }
@@ -477,13 +477,13 @@ class _ManaCostIcons extends StatelessWidget {
 
   Color _manaColor(String s) {
     switch (s.toUpperCase()) {
-      case 'W': return const Color(0xFFF0F2C0);
-      case 'U': return const Color(0xFFB3CEEA);
-      case 'B': return const Color(0xFF2B2B2B);
-      case 'R': return const Color(0xFFE07A5F);
-      case 'G': return const Color(0xFF81B29A);
-      case 'C': return const Color(0xFFB8C0CC);
-      default:  return const Color(0xFF8B8B8B);
+      case 'W': return AppTheme.manaW;
+      case 'U': return AppTheme.manaU;
+      case 'B': return AppTheme.manaB;
+      case 'R': return AppTheme.manaR;
+      case 'G': return AppTheme.manaG;
+      case 'C': return AppTheme.manaC;
+      default:  return AppTheme.disabled;
     }
   }
 }
@@ -591,10 +591,10 @@ class CardNotFoundWidget extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF991B1B).withValues(alpha: 0.9),
+        color: AppTheme.error.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
         border:
-            Border.all(color: const Color(0xFFDC2626).withValues(alpha: 0.4)),
+            Border.all(color: AppTheme.error.withValues(alpha: 0.4)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

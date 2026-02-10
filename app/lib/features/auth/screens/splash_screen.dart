@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -70,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF0A0E14),
+              AppTheme.backgroundAbyss,
               theme.colorScheme.surface,
               theme.colorScheme.primary.withValues(alpha: 0.3),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../providers/trade_provider.dart';
 import '../../binder/providers/binder_provider.dart';
 
@@ -103,7 +104,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Proposta enviada! ✅'),
-            backgroundColor: Color(0xFF22C55E),
+            backgroundColor: AppTheme.success,
           ),
         );
         Navigator.pop(context, true);
@@ -111,7 +112,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(provider.errorMessage ?? 'Erro ao criar proposta'),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppTheme.error,
           ),
         );
       }
@@ -150,7 +151,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             const Text(
               'Tipo',
               style: TextStyle(
-                color: Color(0xFFF1F5F9),
+                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
@@ -198,7 +199,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               const Text(
                 'Pagamento',
                 style: TextStyle(
-                  color: Color(0xFFF1F5F9),
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -210,7 +211,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     child: TextField(
                       controller: _paymentController,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Color(0xFFF1F5F9)),
+                      style: const TextStyle(color: AppTheme.textPrimary),
                       decoration: const InputDecoration(
                         labelText: 'Valor (R\$)',
                         prefixIcon: Icon(Icons.attach_money),
@@ -240,7 +241,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             TextField(
               controller: _messageController,
               maxLines: 3,
-              style: const TextStyle(color: Color(0xFFF1F5F9)),
+              style: const TextStyle(color: AppTheme.textPrimary),
               decoration: const InputDecoration(
                 labelText: 'Mensagem (opcional)',
                 hintText: 'Ex: Tenho interesse nessas cartas...',
@@ -272,7 +273,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             Text(
               title,
               style: const TextStyle(
-                color: Color(0xFFF1F5F9),
+                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
@@ -280,7 +281,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             const Spacer(),
             Text(
               '${selectedItems.length} selecionados',
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
           ],
         ),
@@ -297,7 +298,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             child: const Center(
               child: Text(
                 'Nenhum item disponível',
-                style: TextStyle(color: Color(0xFF94A3B8)),
+                style: TextStyle(color: AppTheme.textSecondary),
               ),
             ),
           )
@@ -313,7 +314,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               padding: const EdgeInsets.all(8),
               itemCount: items.length,
               separatorBuilder: (_, __) => const Divider(
-                color: Color(0xFF334155),
+                color: AppTheme.outlineMuted,
                 height: 1,
               ),
               itemBuilder: (context, index) {
@@ -325,29 +326,19 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 return ListTile(
                   dense: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  leading: item.cardImageUrl != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: Image.network(
-                            item.cardImageUrl!,
-                            width: 36,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(
-                              Icons.image_not_supported,
-                              size: 36,
-                              color: Color(0xFF334155),
-                            ),
-                          ),
-                        )
-                      : const Icon(Icons.style, size: 36, color: Color(0xFF334155)),
+                  leading: CachedCardImage(
+                    imageUrl: item.cardImageUrl,
+                    width: 36,
+                    height: 50,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                   title: Text(
                     item.cardName,
-                    style: const TextStyle(color: Color(0xFFF1F5F9), fontSize: 14),
+                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
                   ),
                   subtitle: Text(
                     '${item.condition} • x${item.quantity}${item.isFoil ? ' ⭐ Foil' : ''}${item.price != null ? ' • R\$${item.price!.toStringAsFixed(2)}' : ''}',
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
                   trailing: Checkbox(
                     value: isSelected,

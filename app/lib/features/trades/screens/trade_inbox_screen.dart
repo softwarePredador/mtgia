@@ -59,7 +59,7 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
           controller: _tabController,
           indicatorColor: AppTheme.manaViolet,
           labelColor: AppTheme.manaViolet,
-          unselectedLabelColor: const Color(0xFF94A3B8),
+          unselectedLabelColor: AppTheme.textSecondary,
           tabs: const [
             Tab(text: 'Recebidas', icon: Icon(Icons.inbox, size: 18)),
             Tab(text: 'Enviadas', icon: Icon(Icons.send, size: 18)),
@@ -97,7 +97,7 @@ class _TradeListView extends StatelessWidget {
               children: [
                 Text(
                   provider.errorMessage!,
-                  style: const TextStyle(color: Color(0xFF94A3B8)),
+                  style: const TextStyle(color: AppTheme.textSecondary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
@@ -111,11 +111,11 @@ class _TradeListView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.swap_horiz, size: 64, color: const Color(0xFF334155)),
+                Icon(Icons.swap_horiz, size: 64, color: AppTheme.outlineMuted),
                 const SizedBox(height: 12),
                 const Text(
                   'Nenhum trade encontrado',
-                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 16),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
                 ),
               ],
             ),
@@ -177,7 +177,7 @@ class _TradeCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: const Color(0xFF334155),
+                    backgroundColor: AppTheme.outlineMuted,
                     child: Text(
                       otherUser.label[0].toUpperCase(),
                       style: const TextStyle(color: Colors.white),
@@ -191,14 +191,14 @@ class _TradeCard extends StatelessWidget {
                         Text(
                           otherUser.label,
                           style: const TextStyle(
-                            color: Color(0xFFF1F5F9),
+                            color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           _typeLabel(trade.type),
                           style: const TextStyle(
-                            color: Color(0xFF94A3B8),
+                            color: AppTheme.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -256,7 +256,7 @@ class _TradeCard extends StatelessWidget {
                   trade.message!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                 ),
               ],
             ],
@@ -290,11 +290,11 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF94A3B8)),
+        Icon(icon, size: 14, color: AppTheme.textSecondary),
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
         ),
       ],
     );

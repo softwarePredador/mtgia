@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../providers/binder_provider.dart';
 
 /// Tela Marketplace — busca global de cartas para troca/venda
@@ -339,17 +340,11 @@ class _MarketplaceCard extends StatelessWidget {
         child: Row(
           children: [
             // Card image
-            ClipRRect(
+            CachedCardImage(
+              imageUrl: item.cardImageUrl,
+              width: 50,
+              height: 70,
               borderRadius: BorderRadius.circular(6),
-              child: item.cardImageUrl != null
-                  ? Image.network(
-                      item.cardImageUrl!,
-                      width: 50,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _placeholder(),
-                    )
-                  : _placeholder(),
             ),
             const SizedBox(width: 12),
 
@@ -456,15 +451,6 @@ class _MarketplaceCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() {
-    return Container(
-      width: 50,
-      height: 70,
-      color: AppTheme.surfaceSlate2,
-      child: const Icon(Icons.style, color: AppTheme.textSecondary, size: 18),
-    );
-  }
-
   Widget _badge(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -496,19 +482,6 @@ class _MarketplaceCard extends StatelessWidget {
   }
 
   Color _condColor(String c) {
-    switch (c) {
-      case 'NM':
-        return Colors.greenAccent;
-      case 'LP':
-        return Colors.lightGreen;
-      case 'MP':
-        return Colors.amber;
-      case 'HP':
-        return Colors.orange;
-      case 'DMG':
-        return Colors.redAccent;
-      default:
-        return AppTheme.textSecondary;
-    }
+    return AppTheme.conditionColor(c);
   }
 }

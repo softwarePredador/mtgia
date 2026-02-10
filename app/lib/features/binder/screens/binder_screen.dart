@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
 import '../../cards/screens/card_search_screen.dart';
@@ -555,17 +556,11 @@ class _BinderItemCard extends StatelessWidget {
           child: Row(
             children: [
               // Card image
-              ClipRRect(
+              CachedCardImage(
+                imageUrl: item.cardImageUrl,
+                width: 46,
+                height: 64,
                 borderRadius: BorderRadius.circular(6),
-                child: item.cardImageUrl != null
-                    ? Image.network(
-                        item.cardImageUrl!,
-                        width: 46,
-                        height: 64,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _placeholder(),
-                      )
-                    : _placeholder(),
               ),
               const SizedBox(width: 12),
 
@@ -645,15 +640,6 @@ class _BinderItemCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() {
-    return Container(
-      width: 46,
-      height: 64,
-      color: AppTheme.surfaceSlate2,
-      child: const Icon(Icons.style, color: AppTheme.textSecondary, size: 18),
-    );
-  }
-
   Widget _badge(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -683,19 +669,6 @@ class _BinderItemCard extends StatelessWidget {
   }
 
   Color _conditionColor(String c) {
-    switch (c) {
-      case 'NM':
-        return Colors.greenAccent;
-      case 'LP':
-        return Colors.lightGreen;
-      case 'MP':
-        return Colors.amber;
-      case 'HP':
-        return Colors.orange;
-      case 'DMG':
-        return Colors.redAccent;
-      default:
-        return AppTheme.textSecondary;
-    }
+    return AppTheme.conditionColor(c);
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/card_provider.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
@@ -249,11 +251,11 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search, size: 64, color: Colors.grey),
+                  Icon(Icons.search, size: 64, color: AppTheme.disabled),
                   SizedBox(height: 16),
                   Text(
                     'Digite o nome de uma carta',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: AppTheme.textSecondary),
                   ),
                 ],
               ),
@@ -289,30 +291,10 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
               return ListTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(6),
-                  child: SizedBox(
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
                     width: 40,
                     height: 56,
-                    child:
-                        card.imageUrl != null
-                            ? Image.network(
-                              card.imageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (_, __, ___) => Container(
-                                    color: Colors.grey[800],
-                                    child: const Icon(
-                                      Icons.image_not_supported,
-                                      size: 20,
-                                    ),
-                                  ),
-                            )
-                            : Container(
-                              color: Colors.grey[800],
-                              child: const Icon(
-                                Icons.image_not_supported,
-                                size: 20,
-                              ),
-                            ),
                   ),
                 ),
                 title: Text(card.name),

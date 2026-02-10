@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
@@ -133,9 +134,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Deck criado com sucesso!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Deck criado com sucesso!'),
+            backgroundColor: AppTheme.success,
           ),
         );
         context.go('/decks');
@@ -194,7 +195,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             Text(
               'Descreva o deck que você quer e ele será gerado automaticamente.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[400],
+                color: AppTheme.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
@@ -247,7 +248,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             Text(
               'Ou escolha um exemplo:',
               style: theme.textTheme.titleSmall?.copyWith(
-                color: Colors.grey[400],
+                color: AppTheme.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
@@ -347,7 +348,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppTheme.success,
                   foregroundColor: Colors.white,
                 ),
               ),

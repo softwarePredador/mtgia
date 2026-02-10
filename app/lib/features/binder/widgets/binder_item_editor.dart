@@ -156,7 +156,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.error),
             child: const Text('Remover'),
           ),
         ],
@@ -382,8 +382,8 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     child: OutlinedButton.icon(
                       onPressed: _saving ? null : _delete,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.redAccent,
-                        side: const BorderSide(color: Colors.redAccent),
+                        foregroundColor: AppTheme.error,
+                        side: const BorderSide(color: AppTheme.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

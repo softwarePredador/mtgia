@@ -328,7 +328,7 @@ class _MoverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changeColor = isGainer ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final changeColor = isGainer ? AppTheme.success : AppTheme.error;
     final changeIcon = isGainer ? Icons.arrow_upward : Icons.arrow_downward;
     final changePrefix = isGainer ? '+' : '';
 

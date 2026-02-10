@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_card.dart';
 
@@ -130,7 +131,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                                   context.read<DeckProvider>().errorMessage ??
                                       'Erro ao criar deck',
                                 ),
-                                backgroundColor: Colors.red,
+                                backgroundColor: AppTheme.error,
                               ),
                             );
                           }
@@ -223,7 +224,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   Text(
                     'Toque no botão abaixo para começar',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFF94A3B8),
+                      color: AppTheme.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -294,7 +295,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           PopupMenuItem(
             value: 'import',
             child: ListTile(
-              leading: Icon(Icons.content_paste, color: const Color(0xFFF59E0B)),
+              leading: Icon(Icons.content_paste, color: AppTheme.mythicGold),
               title: const Text('Importar Lista'),
               subtitle: const Text('Colar de outro site'),
               contentPadding: EdgeInsets.zero,

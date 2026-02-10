@@ -1,7 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_theme.dart';
 import '../auth/providers/auth_provider.dart';
+import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -10,10 +12,19 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final auth = context.watch<AuthProvider>();
-    final deckProvider = context.watch<DeckProvider>();
-    final username = auth.user?.displayName ?? auth.user?.username ?? 'Planeswalker';
-    final recentDecks = deckProvider.decks.take(3).toList();
+    final auth = context.select<AuthProvider, ({String? displayName, String? username})>(
+      (a) => (displayName: a.user?.displayName, username: a.user?.username),
+    );
+    final recentDecks = context.select<DeckProvider, List<Deck>>(
+      (dp) => dp.decks.take(3).toList(),
+    );
+    final deckStats = context.select<DeckProvider, ({int total, int formats})>(
+      (dp) => (
+        total: dp.decks.length,
+        formats: dp.decks.map((d) => d.format).toSet().length,
+      ),
+    );
+    final username = auth.displayName ?? auth.username ?? 'Planeswalker';
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +53,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Teça sua estratégia perfeita',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: const Color(0xFF94A3B8),
+                color: AppTheme.textSecondary,
               ),
             ),
             const SizedBox(height: 28),
@@ -79,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                   child: _QuickAction(
                     icon: Icons.content_paste,
                     label: 'Importar',
-                    color: const Color(0xFFF59E0B),
+                    color: AppTheme.mythicGold,
                     onTap: () => context.go('/decks/import'),
                   ),
                 ),
@@ -168,7 +179,7 @@ class HomeScreen extends StatelessWidget {
                       'Crie seu primeiro deck ou gere um com IA!',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF94A3B8),
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                   ],
@@ -179,7 +190,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Stats summary
-            if (deckProvider.decks.isNotEmpty) ...[
+            if (deckStats.total > 0) ...[
               Text(
                 'Resumo',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -192,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                   Expanded(
                     child: _StatTile(
                       label: 'Decks',
-                      value: '${deckProvider.decks.length}',
+                      value: '${deckStats.total}',
                       icon: Icons.style,
                       color: theme.colorScheme.primary,
                     ),
@@ -201,7 +212,7 @@ class HomeScreen extends StatelessWidget {
                   Expanded(
                     child: _StatTile(
                       label: 'Formatos',
-                      value: '${deckProvider.decks.map((d) => d.format).toSet().length}',
+                      value: '${deckStats.formats}',
                       icon: Icons.category,
                       color: theme.colorScheme.secondary,
                     ),
@@ -299,7 +310,7 @@ class _StatTile extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF94A3B8),
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],

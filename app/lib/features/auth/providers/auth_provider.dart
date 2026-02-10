@@ -36,6 +36,7 @@ class AuthProvider extends ChangeNotifier {
 
       if (savedToken != null && savedUserJson != null) {
         _token = savedToken;
+        ApiClient.setToken(savedToken);
         _user = User.fromJson(jsonDecode(savedUserJson));
         debugPrint('[🔑 Auth] validando token com backend...');
         final isValid = await _validateTokenWithBackend();
@@ -46,6 +47,7 @@ class AuthProvider extends ChangeNotifier {
           await prefs.remove('user_data');
           _token = null;
           _user = null;
+          ApiClient.setToken(null);
         }
       } else {
         _status = AuthStatus.unauthenticated;
@@ -78,6 +80,7 @@ class AuthProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         _token = data['token'] as String?;
+        ApiClient.setToken(_token);
         debugPrint('[🔑 Auth] token recebido: ${_token != null ? "sim (${_token!.substring(0, 20)}...)" : "NÃO"}');
         _user = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint('[🔑 Auth] user parsed: ${_user?.username}');
@@ -131,6 +134,7 @@ class AuthProvider extends ChangeNotifier {
         final data = response.data as Map<String, dynamic>;
         _token = data['token'] as String?;
         _user = User.fromJson(data['user'] as Map<String, dynamic>);
+        ApiClient.setToken(_token);
         
         await _saveCredentials();
         
@@ -163,6 +167,7 @@ class AuthProvider extends ChangeNotifier {
     
     _token = null;
     _user = null;
+    ApiClient.setToken(null);
     _status = AuthStatus.unauthenticated;
     notifyListeners();
   }

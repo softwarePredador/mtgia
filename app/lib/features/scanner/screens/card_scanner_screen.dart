@@ -358,7 +358,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(deckProvider.errorMessage ?? 'Erro ao adicionar carta'),
-          backgroundColor: const Color(0xFFDC2626),
+          backgroundColor: AppTheme.error,
         ),
       );
     }
@@ -579,7 +579,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             scannerProvider.lastResult != null) ...[
           // Dark overlay covering the camera
           Positioned.fill(
-            child: Container(color: const Color(0xFF0D1117)),
+            child: Container(color: AppTheme.backgroundAbyss),
           ),
           // Card preview anchored to bottom
           Positioned(

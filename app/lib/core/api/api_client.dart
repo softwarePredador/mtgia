@@ -17,6 +17,19 @@ class ApiClient {
   /// URL do servidor de produção (EasyPanel / Digital Ocean).
   static const String _productionUrl = 'https://evolution-cartinhas.8ktevp.easypanel.host';
 
+  // ──────────────────────────────────────────
+  // Cache do token em memória (evita SharedPreferences a cada request)
+  // ──────────────────────────────────────────
+  static String? _cachedToken;
+
+  /// Atualiza o token em memória (chamar no login/register/logout).
+  static void setToken(String? token) {
+    _cachedToken = token;
+  }
+
+  /// Instância singleton do http.Client para reutilizar conexões TCP.
+  static final http.Client _httpClient = http.Client();
+
   // Retorna a URL correta dependendo do ambiente
   static String get baseUrl {
     if (_envBaseUrl.trim().isNotEmpty) {
@@ -44,20 +57,24 @@ class ApiClient {
     debugPrint('[🌐 ApiClient] platform = $defaultTargetPlatform | kIsWeb=$kIsWeb | kDebugMode=$kDebugMode');
   }
 
-  Future<Map<String, String>> _getHeaders() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
+  Map<String, String> _getHeaders() {
     return {
       'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
+      if (_cachedToken != null) 'Authorization': 'Bearer $_cachedToken',
     };
   }
 
+  /// Carrega token do disco para o cache (chamado 1x no boot).
+  static Future<void> loadTokenFromDisk() async {
+    final prefs = await SharedPreferences.getInstance();
+    _cachedToken = prefs.getString('auth_token');
+  }
+
   Future<ApiResponse> get(String endpoint) async {
-    final headers = await _getHeaders();
+    final headers = _getHeaders();
     debugPrint('[🌐 ApiClient] GET $baseUrl$endpoint');
     try {
-      final response = await http.get(
+      final response = await _httpClient.get(
         Uri.parse('$baseUrl$endpoint'),
         headers: headers,
       ).timeout(const Duration(seconds: 15));
@@ -72,9 +89,9 @@ class ApiClient {
   Future<ApiResponse> post(String endpoint, Map<String, dynamic> body) async {
     final url = '$baseUrl$endpoint';
     debugPrint('[🌐 ApiClient] POST $url');
-    final headers = await _getHeaders();
+    final headers = _getHeaders();
     try {
-      final response = await http.post(
+      final response = await _httpClient.post(
         Uri.parse(url),
         headers: headers,
         body: jsonEncode(body),
@@ -88,31 +105,31 @@ class ApiClient {
   }
 
   Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
-    final headers = await _getHeaders();
-    final response = await http.put(
+    final headers = _getHeaders();
+    final response = await _httpClient.put(
       Uri.parse('$baseUrl$endpoint'),
       headers: headers,
       body: jsonEncode(body),
-    );
+    ).timeout(const Duration(seconds: 15));
     return _parseResponse(response);
   }
 
   Future<ApiResponse> patch(String endpoint, Map<String, dynamic> body) async {
-    final headers = await _getHeaders();
-    final response = await http.patch(
+    final headers = _getHeaders();
+    final response = await _httpClient.patch(
       Uri.parse('$baseUrl$endpoint'),
       headers: headers,
       body: jsonEncode(body),
-    );
+    ).timeout(const Duration(seconds: 15));
     return _parseResponse(response);
   }
 
   Future<ApiResponse> delete(String endpoint) async {
-    final headers = await _getHeaders();
-    final response = await http.delete(
+    final headers = _getHeaders();
+    final response = await _httpClient.delete(
       Uri.parse('$baseUrl$endpoint'),
       headers: headers,
-    );
+    ).timeout(const Duration(seconds: 15));
     return _parseResponse(response);
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../auth/providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -73,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const Text(
                 'Cole a URL de uma imagem (ex: link do Imgur, Gravatar, etc.)',
-                style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -99,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Navigator.pop(ctx);
                   setState(() {});
                 },
-                child: const Text('Remover foto', style: TextStyle(color: Colors.red)),
+                child: const Text('Remover foto', style: TextStyle(color: AppTheme.error)),
               ),
             ElevatedButton(
               onPressed: () {
@@ -194,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Center(
                     child: Text(
                       user.email,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF94A3B8)),
+                      style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -219,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Text(
                       'Seu nick público — é como os outros jogadores vão te encontrar na busca e ver nos seus decks. Se não preencher, será usado o nome de usuário (@${user.username}).',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF94A3B8),
+                        color: AppTheme.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -237,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
                   ),
                   const SizedBox(height: 32),
-                  const Divider(color: Color(0xFF334155)),
+                  const Divider(color: AppTheme.outlineMuted),
                   const SizedBox(height: 12),
                   Text(
                     'Coleção',

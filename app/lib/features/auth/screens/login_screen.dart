@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -70,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF0A0E14),
+              AppTheme.backgroundAbyss,
               theme.colorScheme.surface,
             ],
           ),
@@ -106,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Entre na sua conta',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFF94A3B8),
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 48),

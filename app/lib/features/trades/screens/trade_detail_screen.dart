@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/trade_provider.dart';
 
@@ -55,7 +56,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             return Center(
               child: Text(
                 provider.errorMessage ?? 'Trade não encontrado',
-                style: const TextStyle(color: Color(0xFF94A3B8)),
+                style: const TextStyle(color: AppTheme.textSecondary),
               ),
             );
           }
@@ -137,7 +138,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 ),
                 Text(
                   _typeLabel(trade.type),
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                 ),
               ],
             ),
@@ -147,7 +148,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               message: trade.message!,
               child: const Icon(
                 Icons.info_outline,
-                color: Color(0xFF94A3B8),
+                color: AppTheme.textSecondary,
                 size: 20,
               ),
             ),
@@ -163,7 +164,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         _userChip(trade.sender.label, isSender ? 'Você' : 'Remetente'),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Icon(Icons.swap_horiz, color: Color(0xFF94A3B8)),
+          child: Icon(Icons.swap_horiz, color: AppTheme.textSecondary),
         ),
         _userChip(trade.receiver.label, !isSender ? 'Você' : 'Destinatário'),
       ],
@@ -182,7 +183,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: const Color(0xFF334155),
+              backgroundColor: AppTheme.outlineMuted,
               child: Text(
                 name.isNotEmpty ? name[0].toUpperCase() : '?',
                 style: const TextStyle(color: Colors.white, fontSize: 14),
@@ -191,12 +192,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             const SizedBox(height: 4),
             Text(
               name,
-              style: const TextStyle(color: Color(0xFFF1F5F9), fontSize: 13),
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
               overflow: TextOverflow.ellipsis,
             ),
             Text(
               role,
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
             ),
           ],
         ),
@@ -224,31 +225,23 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               Text(
                 '$title (${items.length})',
                 style: const TextStyle(
-                  color: Color(0xFFF1F5F9),
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          const Divider(color: Color(0xFF334155)),
+          const Divider(color: AppTheme.outlineMuted),
           ...items.map((item) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
-                    if (item.card.imageUrl != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: Image.network(
-                          item.card.imageUrl!,
-                          width: 28,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox(width: 28, height: 40),
-                        ),
-                      )
-                    else
-                      const SizedBox(width: 28, height: 40),
+                    CachedCardImage(
+                      imageUrl: item.card.imageUrl,
+                      width: 28,
+                      height: 40,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -257,14 +250,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                           Text(
                             item.card.name,
                             style: const TextStyle(
-                              color: Color(0xFFF1F5F9),
+                              color: AppTheme.textPrimary,
                               fontSize: 13,
                             ),
                           ),
                           Text(
                             '${item.condition ?? "?"} • x${item.quantity}${item.isFoil == true ? ' ⭐' : ''}',
                             style: const TextStyle(
-                              color: Color(0xFF94A3B8),
+                              color: AppTheme.textSecondary,
                               fontSize: 11,
                             ),
                           ),
@@ -275,7 +268,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       Text(
                         'R\$${item.agreedPrice!.toStringAsFixed(2)}',
                         style: const TextStyle(
-                          color: Color(0xFFF59E0B),
+                          color: AppTheme.mythicGold,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -293,13 +286,13 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+        color: AppTheme.mythicGold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+        border: Border.all(color: AppTheme.mythicGold.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.attach_money, color: Color(0xFFF59E0B)),
+          const Icon(Icons.attach_money, color: AppTheme.mythicGold),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -308,7 +301,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 Text(
                   'R\$${trade.paymentAmount!.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    color: Color(0xFFF59E0B),
+                    color: AppTheme.mythicGold,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -316,7 +309,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 if (trade.paymentMethod != null)
                   Text(
                     'via ${trade.paymentMethod}',
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
               ],
             ),
@@ -336,7 +329,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_shipping, color: Color(0xFF8B5CF6), size: 20),
+          const Icon(Icons.local_shipping, color: AppTheme.manaViolet, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -344,12 +337,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               children: [
                 const Text(
                   'Código de rastreio',
-                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                 ),
                 SelectableText(
                   trade.trackingCode!,
                   style: const TextStyle(
-                    color: Color(0xFFF1F5F9),
+                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -362,7 +355,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 trade.deliveryMethod!,
                 style: const TextStyle(fontSize: 11),
               ),
-              backgroundColor: const Color(0xFF334155),
+              backgroundColor: AppTheme.outlineMuted,
             ),
         ],
       ),
@@ -384,18 +377,18 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         children: [
           const Row(
             children: [
-              Icon(Icons.timeline, size: 16, color: Color(0xFF94A3B8)),
+              Icon(Icons.timeline, size: 16, color: AppTheme.textSecondary),
               SizedBox(width: 6),
               Text(
                 'Histórico',
                 style: TextStyle(
-                  color: Color(0xFFF1F5F9),
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          const Divider(color: Color(0xFF334155)),
+          const Divider(color: AppTheme.outlineMuted),
           ...history.asMap().entries.map((entry) {
             final idx = entry.key;
             final h = entry.value;
@@ -423,7 +416,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                           Expanded(
                             child: Container(
                               width: 2,
-                              color: const Color(0xFF334155),
+                              color: AppTheme.outlineMuted,
                             ),
                           ),
                       ],
@@ -448,14 +441,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                             Text(
                               h.notes!,
                               style: const TextStyle(
-                                color: Color(0xFF94A3B8),
+                                color: AppTheme.textSecondary,
                                 fontSize: 12,
                               ),
                             ),
                           Text(
                             _formatDate(h.createdAt),
                             style: const TextStyle(
-                              color: Color(0xFF64748B),
+                              color: AppTheme.textHint,
                               fontSize: 11,
                             ),
                           ),
@@ -488,14 +481,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             _actionButton(
               label: 'Aceitar',
               icon: Icons.check,
-              color: const Color(0xFF22C55E),
+              color: AppTheme.success,
               onTap: () => _respondTrade(provider, trade.id, 'accept'),
             ),
             const SizedBox(width: 8),
             _actionButton(
               label: 'Recusar',
               icon: Icons.close,
-              color: const Color(0xFFEF4444),
+              color: AppTheme.error,
               onTap: () => _respondTrade(provider, trade.id, 'decline'),
             ),
           ]);
@@ -504,7 +497,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           actions.add(_actionButton(
             label: 'Cancelar',
             icon: Icons.block,
-            color: const Color(0xFF6B7280),
+            color: AppTheme.disabled,
             onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
           ));
         }
@@ -522,7 +515,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         actions.add(_actionButton(
           label: 'Cancelar',
           icon: Icons.block,
-          color: const Color(0xFF6B7280),
+          color: AppTheme.disabled,
           onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
         ));
         break;
@@ -532,14 +525,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           actions.add(_actionButton(
             label: 'Confirmar Entrega',
             icon: Icons.inventory_2,
-            color: const Color(0xFF10B981),
+            color: AppTheme.success,
             onTap: () => _updateStatus(provider, trade.id, 'delivered'),
           ));
         }
         actions.add(_actionButton(
           label: 'Disputar',
           icon: Icons.warning_amber,
-          color: const Color(0xFFDC2626),
+          color: AppTheme.error,
           onTap: () => _updateStatus(provider, trade.id, 'disputed'),
         ));
         break;
@@ -549,14 +542,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           _actionButton(
             label: 'Finalizar',
             icon: Icons.check_circle,
-            color: const Color(0xFF22C55E),
+            color: AppTheme.success,
             onTap: () => _updateStatus(provider, trade.id, 'completed'),
           ),
           const SizedBox(width: 8),
           _actionButton(
             label: 'Disputar',
             icon: Icons.warning_amber,
-            color: const Color(0xFFDC2626),
+            color: AppTheme.error,
             onTap: () => _updateStatus(provider, trade.id, 'disputed'),
           ),
         ]);
@@ -599,8 +592,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         SnackBar(
           content: Text(action == 'accept' ? 'Trade aceito!' : 'Trade recusado.'),
           backgroundColor: action == 'accept'
-              ? const Color(0xFF22C55E)
-              : const Color(0xFFEF4444),
+              ? AppTheme.success
+              : AppTheme.error,
         ),
       );
     }
@@ -625,13 +618,13 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceSlate,
-        title: const Text('Informar envio', style: TextStyle(color: Color(0xFFF1F5F9))),
+        title: const Text('Informar envio', style: TextStyle(color: AppTheme.textPrimary)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: trackingController,
-              style: const TextStyle(color: Color(0xFFF1F5F9)),
+              style: const TextStyle(color: AppTheme.textPrimary),
               decoration: const InputDecoration(
                 labelText: 'Código de rastreio (opcional)',
               ),
@@ -690,19 +683,19 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.chat, size: 16, color: Color(0xFF94A3B8)),
+              const Icon(Icons.chat, size: 16, color: AppTheme.textSecondary),
               const SizedBox(width: 6),
               Text(
                 'Chat (${messages.length})',
                 style: const TextStyle(
-                  color: Color(0xFFF1F5F9),
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
           if (messages.isNotEmpty) ...[
-            const Divider(color: Color(0xFF334155)),
+            const Divider(color: AppTheme.outlineMuted),
             ...messages.map((msg) {
               final currentUserId =
                   context.read<AuthProvider>().user?.id;
@@ -721,7 +714,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                   decoration: BoxDecoration(
                     color: isMe
                         ? AppTheme.manaViolet.withValues(alpha: 0.2)
-                        : const Color(0xFF334155),
+                        : AppTheme.outlineMuted,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -742,7 +735,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                         Text(
                           msg.message!,
                           style: const TextStyle(
-                            color: Color(0xFFF1F5F9),
+                            color: AppTheme.textPrimary,
                             fontSize: 13,
                           ),
                         ),
@@ -752,7 +745,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                           child: Text(
                             '📎 ${msg.attachmentType ?? "anexo"}',
                             style: const TextStyle(
-                              color: Color(0xFF94A3B8),
+                              color: AppTheme.textSecondary,
                               fontSize: 11,
                             ),
                           ),
@@ -760,7 +753,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       Text(
                         _formatTime(msg.createdAt),
                         style: const TextStyle(
-                          color: Color(0xFF64748B),
+                          color: AppTheme.textHint,
                           fontSize: 10,
                         ),
                       ),
@@ -774,7 +767,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 'Nenhuma mensagem ainda',
-                style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
             ),
         ],
@@ -793,12 +786,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             Expanded(
               child: TextField(
                 controller: _messageController,
-                style: const TextStyle(color: Color(0xFFF1F5F9)),
+                style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Escrever mensagem...',
-                  hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                  hintStyle: const TextStyle(color: AppTheme.textHint),
                   filled: true,
-                  fillColor: const Color(0xFF0F172A),
+                  fillColor: AppTheme.surfaceSlate2,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,

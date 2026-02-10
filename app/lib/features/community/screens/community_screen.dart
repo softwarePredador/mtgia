@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../providers/community_provider.dart';
 import '../../social/providers/social_provider.dart';
 import '../../social/screens/user_profile_screen.dart';
@@ -637,17 +638,11 @@ class _CommunityDeckCard extends StatelessWidget {
           child: Row(
             children: [
               // Commander image
-              ClipRRect(
+              CachedCardImage(
+                imageUrl: deck.commanderImageUrl,
+                width: 56,
+                height: 78,
                 borderRadius: BorderRadius.circular(8),
-                child: deck.commanderImageUrl != null
-                    ? Image.network(
-                        deck.commanderImageUrl!,
-                        width: 56,
-                        height: 78,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _deckPlaceholder(),
-                      )
-                    : _deckPlaceholder(),
               ),
               const SizedBox(width: 12),
               // Info
@@ -776,15 +771,6 @@ class _CommunityDeckCard extends StatelessWidget {
     );
   }
 
-  Widget _deckPlaceholder() {
-    return Container(
-      width: 56,
-      height: 78,
-      color: AppTheme.surfaceSlate2,
-      child: const Icon(Icons.style, color: AppTheme.textSecondary),
-    );
-  }
-
   String _capitalize(String s) =>
       s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 }
@@ -811,17 +797,11 @@ class _FollowingDeckCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              ClipRRect(
+              CachedCardImage(
+                imageUrl: deck.commanderImageUrl,
+                width: 56,
+                height: 78,
                 borderRadius: BorderRadius.circular(8),
-                child: deck.commanderImageUrl != null
-                    ? Image.network(
-                        deck.commanderImageUrl!,
-                        width: 56,
-                        height: 78,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _deckPlaceholder(),
-                      )
-                    : _deckPlaceholder(),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -893,15 +873,6 @@ class _FollowingDeckCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _deckPlaceholder() {
-    return Container(
-      width: 56,
-      height: 78,
-      color: AppTheme.surfaceSlate2,
-      child: const Icon(Icons.style, color: AppTheme.textSecondary, size: 20),
     );
   }
 

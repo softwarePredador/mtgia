@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck.dart';
 import 'deck_progress_indicator.dart';
 
@@ -38,42 +40,11 @@ class DeckCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (hasCommander) ...[
-                    ClipRRect(
+                    CachedCardImage(
+                      imageUrl: commanderImageUrl,
+                      width: 44,
+                      height: 62,
                       borderRadius: BorderRadius.circular(8),
-                      child: SizedBox(
-                        width: 44,
-                        height: 62,
-                        child:
-                            (commanderImageUrl != null &&
-                                    commanderImageUrl.isNotEmpty)
-                                ? Image.network(
-                                  commanderImageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (_, __, ___) => Container(
-                                        color:
-                                            theme
-                                                .colorScheme
-                                                .surfaceContainerHighest,
-                                        alignment: Alignment.center,
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          size: 18,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                      ),
-                                )
-                                : Container(
-                                  color:
-                                      theme.colorScheme.surfaceContainerHighest,
-                                  alignment: Alignment.center,
-                                  child: Icon(
-                                    Icons.auto_awesome,
-                                    size: 18,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
-                      ),
                     ),
                     const SizedBox(width: 12),
                   ],
@@ -119,7 +90,7 @@ class DeckCard extends StatelessWidget {
                 Text(
                   deck.description!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF94A3B8),
+                    color: AppTheme.textSecondary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -185,9 +156,7 @@ class DeckCard extends StatelessWidget {
   }
 
   Color _getSynergyColor(int score) {
-    if (score >= 80) return const Color(0xFF10B981); // Verde
-    if (score >= 60) return const Color(0xFFF59E0B); // Amarelo
-    return const Color(0xFFEF4444); // Vermelho
+    return AppTheme.scoreColor(score);
   }
 
   int? _getMaxCards(String format) {
@@ -233,7 +202,7 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chipColor = color ?? const Color(0xFF94A3B8);
+    final chipColor = color ?? AppTheme.textSecondary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

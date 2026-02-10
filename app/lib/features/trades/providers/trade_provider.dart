@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/theme/app_theme.dart';
 
 // =====================================================================
 // Models
@@ -289,23 +290,23 @@ class TradeStatusHelper {
   static Color color(String status) {
     switch (status) {
       case 'pending':
-        return const Color(0xFFF59E0B); // mythicGold
+        return AppTheme.mythicGold;
       case 'accepted':
-        return const Color(0xFF06B6D4); // loomCyan
+        return AppTheme.loomCyan;
       case 'shipped':
-        return const Color(0xFF8B5CF6); // manaViolet
+        return AppTheme.manaViolet;
       case 'delivered':
-        return const Color(0xFF10B981); // green
+        return AppTheme.success;
       case 'completed':
-        return const Color(0xFF22C55E); // green bright
+        return AppTheme.success;
       case 'declined':
-        return const Color(0xFFEF4444); // red
+        return AppTheme.error;
       case 'cancelled':
-        return const Color(0xFF6B7280); // gray
+        return AppTheme.disabled;
       case 'disputed':
-        return const Color(0xFFDC2626); // red dark
+        return AppTheme.error;
       default:
-        return const Color(0xFF94A3B8); // textSecondary
+        return AppTheme.textSecondary;
     }
   }
 

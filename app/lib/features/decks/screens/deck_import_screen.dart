@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
 
 class DeckImportScreen extends StatefulWidget {
@@ -152,7 +153,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               children: [
                 Icon(
                   success ? Icons.check_circle : Icons.warning,
-                  color: success ? theme.colorScheme.primary : Colors.orange,
+                  color: success ? theme.colorScheme.primary : AppTheme.warning,
                 ),
                 const SizedBox(width: 8),
                 Text(success ? 'Importação Concluída' : 'Atenção'),
@@ -208,17 +209,17 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: AppTheme.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.redAccent),
+                      Icon(Icons.error_outline, color: AppTheme.error),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           error,
-                          style: const TextStyle(color: Colors.redAccent),
+                          style: TextStyle(color: AppTheme.error),
                         ),
                       ),
                     ],
@@ -230,13 +231,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               if (warnings.isNotEmpty) ...[
                 Row(
                   children: [
-                    Icon(Icons.info_outline, size: 18, color: Colors.amber.shade700),
+                    Icon(Icons.info_outline, size: 18, color: AppTheme.warning),
                     const SizedBox(width: 6),
                     Text(
                       'Avisos:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.amber.shade700,
+                        color: AppTheme.warning,
                       ),
                     ),
                   ],
@@ -557,17 +558,17 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             if (_error != null) ...[
               const SizedBox(height: 16),
               Card(
-                color: Colors.red.withOpacity(0.15),
+                color: AppTheme.error.withOpacity(0.15),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.redAccent),
+                      Icon(Icons.error_outline, color: AppTheme.error),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: Colors.redAccent),
+                          style: TextStyle(color: AppTheme.error),
                         ),
                       ),
                     ],

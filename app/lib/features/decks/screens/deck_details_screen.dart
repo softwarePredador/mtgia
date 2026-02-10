@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 import '../providers/deck_provider.dart';
 import '../models/deck_card_item.dart';
@@ -282,7 +284,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('✅ Deck válido para o formato!'),
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppTheme.success,
                                   ),
                                 );
                               } else {
@@ -309,12 +311,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               ),
                               decoration: BoxDecoration(
                                 color: _validationResult!['ok'] == true
-                                    ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                                    ? AppTheme.success.withValues(alpha: 0.15)
                                     : theme.colorScheme.error.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: _validationResult!['ok'] == true
-                                      ? const Color(0xFF10B981)
+                                      ? AppTheme.success
                                       : theme.colorScheme.error,
                                   width: 0.5,
                                 ),
@@ -328,7 +330,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         : Icons.warning_amber_rounded,
                                     size: 14,
                                     color: _validationResult!['ok'] == true
-                                        ? const Color(0xFF10B981)
+                                        ? AppTheme.success
                                         : theme.colorScheme.error,
                                   ),
                                   const SizedBox(width: 4),
@@ -338,7 +340,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         : 'Inválido',
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       color: _validationResult!['ok'] == true
-                                          ? const Color(0xFF10B981)
+                                          ? AppTheme.success
                                           : theme.colorScheme.error,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -359,13 +361,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: deck.isPublic
-                              ? const Color(0xFF06B6D4).withValues(alpha: 0.15)
-                              : const Color(0xFF64748B).withValues(alpha: 0.15),
+                              ? AppTheme.loomCyan.withValues(alpha: 0.15)
+                              : AppTheme.textHint.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: deck.isPublic
-                                ? const Color(0xFF06B6D4)
-                                : const Color(0xFF64748B),
+                                ? AppTheme.loomCyan
+                                : AppTheme.textHint,
                             width: 0.5,
                           ),
                         ),
@@ -376,16 +378,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               deck.isPublic ? Icons.public : Icons.lock_outline,
                               size: 14,
                               color: deck.isPublic
-                                  ? const Color(0xFF06B6D4)
-                                  : const Color(0xFF94A3B8),
+                                  ? AppTheme.loomCyan
+                                  : AppTheme.textSecondary,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               deck.isPublic ? 'Público' : 'Privado',
                               style: TextStyle(
                                 color: deck.isPublic
-                                    ? const Color(0xFF06B6D4)
-                                    : const Color(0xFF94A3B8),
+                                    ? AppTheme.loomCyan
+                                    : AppTheme.textSecondary,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
                               ),
@@ -505,7 +507,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           child: Text(
                             deck.description!,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF94A3B8),
+                              color: AppTheme.textSecondary,
                             ),
                           ),
                         ),
@@ -561,30 +563,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               ListTile(
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(6),
-                              child: SizedBox(
+                              child: CachedCardImage(
+                                imageUrl: c.imageUrl,
                                 width: 44,
                                 height: 62,
-                                child:
-                                    c.imageUrl != null
-                                        ? Image.network(
-                                          c.imageUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (_, __, ___) => Container(
-                                                color: Colors.grey[800],
-                                                child: const Icon(
-                                                  Icons.image_not_supported,
-                                                  size: 20,
-                                                ),
-                                              ),
-                                        )
-                                        : Container(
-                                          color: Colors.grey[800],
-                                          child: const Icon(
-                                            Icons.image_not_supported,
-                                            size: 20,
-                                          ),
-                                        ),
                               ),
                             ),
                             title: Text(c.name),
@@ -969,31 +951,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                     contentPadding: const EdgeInsets.all(8),
                                     leading: ClipRRect(
                                       borderRadius: BorderRadius.circular(4),
-                                      child: SizedBox(
+                                      child: CachedCardImage(
+                                        imageUrl: card.imageUrl,
                                         width: 40,
                                         height: 56,
-                                        child:
-                                            card.imageUrl != null
-                                                ? Image.network(
-                                                  card.imageUrl!,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder:
-                                                      (_, __, ___) => Container(
-                                                        color: Colors.grey[800],
-                                                        child: const Icon(
-                                                          Icons
-                                                              .image_not_supported,
-                                                          size: 20,
-                                                        ),
-                                                      ),
-                                                )
-                                                : Container(
-                                                  color: Colors.grey[800],
-                                                  child: const Icon(
-                                                    Icons.image_not_supported,
-                                                    size: 20,
-                                                  ),
-                                                ),
                                       ),
                                     ),
                                     title: Row(
@@ -1328,7 +1289,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   : 'Deck agora é privado 🔒')
               : 'Erro ao alterar visibilidade',
         ),
-        backgroundColor: success ? Colors.green.shade700 : Colors.red.shade700,
+        backgroundColor: success ? AppTheme.success : AppTheme.error,
       ),
     );
   }
@@ -1343,7 +1304,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result['error'].toString()),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppTheme.error,
         ),
       );
       return;
@@ -1363,7 +1324,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result['error'].toString()),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppTheme.error,
         ),
       );
       return;
@@ -1374,9 +1335,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Lista de cartas copiada para a área de transferência! 📋'),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: const Text('Lista de cartas copiada para a área de transferência! 📋'),
+        backgroundColor: AppTheme.success,
       ),
     );
   }
@@ -1405,7 +1366,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         SnackBar(
           content: Text(ok ? '✅ Deck válido!' : 'Deck inválido'),
           backgroundColor:
-              ok ? Colors.green : Theme.of(context).colorScheme.error,
+              ok ? AppTheme.success : AppTheme.error,
         ),
       );
     } catch (e) {
@@ -1448,19 +1409,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       ),
                       child: AspectRatio(
                         aspectRatio: 0.714, // MTG card ratio ~ 2.5"x3.5"
-                        child: Image.network(
-                          card.imageUrl!,
+                        child: CachedCardImage(
+                          imageUrl: card.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder:
-                              (_, __, ___) => Container(
-                                color: Colors.grey[900],
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    size: 64,
-                                  ),
-                                ),
-                              ),
                         ),
                       ),
                     ),
@@ -1493,7 +1444,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             context,
                           ).textTheme.bodyMedium?.copyWith(
                             fontStyle: FontStyle.italic,
-                            color: Colors.grey[400],
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                         if ((card.setName ?? '').trim().isNotEmpty ||
@@ -1507,7 +1458,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 card.setReleaseDate!,
                             ].join(' • '),
                             style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Colors.grey[500]),
+                                ?.copyWith(color: AppTheme.textHint),
                           ),
                           const SizedBox(height: 8),
                           Align(
@@ -1604,7 +1555,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             (ctx) => AlertDialog(
               title: Row(
                 children: [
-                  const Icon(Icons.auto_awesome, color: Colors.purple),
+                  const Icon(Icons.auto_awesome, color: AppTheme.manaViolet),
                   const SizedBox(width: 8),
                   Expanded(child: Text('Análise: ${card.name}')),
                 ],
@@ -1736,19 +1687,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           final isSelected = id == card.id;
 
                           return ListTile(
-                            leading:
-                                (it['image_url'] != null)
-                                    ? Image.network(
-                                      it['image_url'],
-                                      width: 40,
-                                      height: 56,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (_, __, ___) => const Icon(
-                                            Icons.image_not_supported,
-                                          ),
-                                    )
-                                    : const Icon(Icons.image_not_supported),
+                            leading: CachedCardImage(
+                              imageUrl: it['image_url'],
+                              width: 40,
+                              height: 56,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                             title: Text(setName),
                             subtitle: Text(
                               [
@@ -2239,12 +2183,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               decoration: BoxDecoration(
                                 color:
                                     replaceAll
-                                        ? Colors.orange.withOpacity(0.1)
+                                        ? AppTheme.warning.withOpacity(0.1)
                                         : theme.colorScheme.surface,
                                 border: Border.all(
                                   color:
                                       replaceAll
-                                          ? Colors.orange.withOpacity(0.5)
+                                          ? AppTheme.warning.withOpacity(0.5)
                                           : theme.colorScheme.outline
                                               .withOpacity(0.3),
                                 ),
@@ -2266,7 +2210,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                       size: 18,
                                       color:
                                           replaceAll
-                                              ? Colors.orange
+                                              ? AppTheme.warning
                                               : theme.colorScheme.secondary,
                                     ),
                                     const SizedBox(width: 8),
@@ -2287,7 +2231,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                       : 'Mantém cartas existentes e adiciona as novas',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: replaceAll ? Colors.orange : null,
+                                    color: replaceAll ? AppTheme.warning : null,
                                   ),
                                 ),
                                 controlAffinity:
@@ -2329,25 +2273,25 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.15),
+                                  color: AppTheme.error.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.redAccent.withOpacity(0.3),
+                                    color: AppTheme.error.withOpacity(0.3),
                                   ),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.error_outline,
-                                      color: Colors.redAccent,
+                                      color: AppTheme.error,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         error!,
-                                        style: const TextStyle(
-                                          color: Colors.redAccent,
+                                        style: TextStyle(
+                                          color: AppTheme.error,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -2363,10 +2307,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.15),
+                                  color: AppTheme.warning.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.orange.withOpacity(0.3),
+                                    color: AppTheme.warning.withOpacity(0.3),
                                   ),
                                 ),
                                 child: Column(
@@ -2374,9 +2318,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   children: [
                                     Text(
                                       '⚠️ ${notFoundLines.length} cartas não encontradas:',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.orange,
+                                        color: AppTheme.warning,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -2388,7 +2332,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                             '• $line',
                                             style: TextStyle(
                                               fontSize: 11,
-                                              color: Colors.orange.shade200,
+                                              color: AppTheme.warning.withOpacity(0.6),
                                             ),
                                           ),
                                         ),
@@ -2398,7 +2342,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontStyle: FontStyle.italic,
-                                          color: Colors.orange.shade300,
+                                          color: AppTheme.warning.withOpacity(0.7),
                                         ),
                                       ),
                                   ],
@@ -2470,7 +2414,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                                 ? Theme.of(
                                                   parentContext,
                                                 ).colorScheme.primary
-                                                : Colors.orange,
+                                                : AppTheme.warning,
                                       ),
                                     );
 
@@ -2607,15 +2551,15 @@ class _PricingRow extends StatelessWidget {
 Color _conditionColor(CardCondition c) {
   switch (c) {
     case CardCondition.nm:
-      return const Color(0xFF22C55E); // green
+      return AppTheme.success;
     case CardCondition.lp:
-      return const Color(0xFF06B6D4); // cyan
+      return AppTheme.loomCyan;
     case CardCondition.mp:
-      return const Color(0xFFF59E0B); // amber
+      return AppTheme.mythicGold;
     case CardCondition.hp:
-      return const Color(0xFFF97316); // orange
+      return AppTheme.warning;
     case CardCondition.dmg:
-      return const Color(0xFFEF4444); // red
+      return AppTheme.error;
   }
 }
 
@@ -2697,7 +2641,7 @@ class _FallbackManaSymbol extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: AppTheme.textSecondary,
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
@@ -2957,11 +2901,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       const SizedBox(height: 16),
                     ],
                     if (removals.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         '❌ Remover:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                          color: AppTheme.error,
                         ),
                       ),
                       ...removals.map(
@@ -2973,11 +2917,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       const SizedBox(height: 16),
                     ],
                     if (additions.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         '✅ Adicionar:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          color: AppTheme.success,
                         ),
                       ),
                       ...additions
@@ -3112,7 +3056,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao aplicar: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.error,
           ),
         );
       }
@@ -3146,7 +3090,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[600],
+                color: AppTheme.textHint,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -3253,10 +3197,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: Colors.red,
+                          color: AppTheme.error,
                         ),
                         const SizedBox(height: 16),
                         Text('Erro: ${snapshot.error}'),

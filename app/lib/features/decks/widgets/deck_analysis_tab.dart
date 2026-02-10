@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../../core/utils/mana_helper.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_details.dart';
@@ -132,7 +133,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
               _AnalysisCard(
                 title: 'Score de sinergia',
                 score: effectiveDeck.synergyScore!,
-                color: Colors.purple,
+                color: AppTheme.manaViolet,
               ),
               const SizedBox(height: 16),
             ],
@@ -197,7 +198,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (group) => Colors.grey[800]!,
+                      getTooltipColor: (group) => AppTheme.surfaceSlate,
                     ),
                   ),
                   titlesData: FlTitlesData(
@@ -299,19 +300,12 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     final total = counts.values.fold(0, (sum, item) => sum + item);
     if (total == 0) return [];
 
-    final colorsMap = {
-      'W': const Color(0xFFF0F2C0), // White (Yellowish)
-      'U': const Color(0xFFB3CEEA), // Blue
-      'B': const Color(0xFFA69F9D), // Black (Greyish)
-      'R': const Color(0xFFEB9F82), // Red
-      'G': const Color(0xFFC4D3CA), // Green
-      'C': const Color(0xFFC7D7E0), // Colorless
-    };
+    final colorsMap = AppTheme.wubrg;
 
     return counts.entries.where((e) => e.value > 0).map((entry) {
       final percentage = (entry.value / total) * 100;
       return PieChartSectionData(
-        color: colorsMap[entry.key] ?? Colors.grey,
+        color: colorsMap[entry.key] ?? AppTheme.disabled,
         value: entry.value.toDouble(),
         title: '${percentage.toStringAsFixed(0)}%',
         radius: 50,
@@ -334,14 +328,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
       'C': 'Incolor',
     };
 
-    final colorsMap = {
-      'W': const Color(0xFFF0F2C0),
-      'U': const Color(0xFFB3CEEA),
-      'B': const Color(0xFFA69F9D),
-      'R': const Color(0xFFEB9F82),
-      'G': const Color(0xFFC4D3CA),
-      'C': const Color(0xFFC7D7E0),
-    };
+    final colorsMap = AppTheme.wubrg;
 
     return counts.entries.where((e) => e.value > 0).map((entry) {
       return Padding(
