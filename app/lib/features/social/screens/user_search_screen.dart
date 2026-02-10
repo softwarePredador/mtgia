@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -195,7 +196,7 @@ class _UserSearchCard extends StatelessWidget {
                 backgroundColor:
                     AppTheme.manaViolet.withValues(alpha: 0.3),
                 backgroundImage: user.avatarUrl != null
-                    ? NetworkImage(user.avatarUrl!)
+                    ? CachedNetworkImageProvider(user.avatarUrl!)
                     : null,
                 child: user.avatarUrl == null
                     ? Text(

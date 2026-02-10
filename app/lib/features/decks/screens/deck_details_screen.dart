@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -188,14 +188,19 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         ),
       ),
       floatingActionButton: _buildAddCardsMenu(context),
-      body: Consumer<DeckProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
+      body: Builder(
+        builder: (context) {
+          final isLoading = context.select<DeckProvider, bool>((p) => p.isLoading);
+          final detailsError = context.select<DeckProvider, String?>((p) => p.detailsErrorMessage);
+          final detailsStatusCode = context.select<DeckProvider, int?>((p) => p.detailsStatusCode);
+          final deck = context.select<DeckProvider, DeckDetails?>((p) => p.selectedDeck);
+
+          if (isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (provider.detailsErrorMessage != null) {
-            final isUnauthorized = provider.detailsStatusCode == 401;
+          if (detailsError != null) {
+            final isUnauthorized = detailsStatusCode == 401;
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -206,7 +211,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     color: theme.colorScheme.error,
                   ),
                   const SizedBox(height: 16),
-                  Text(provider.detailsErrorMessage!),
+                  Text(detailsError!),
                   const SizedBox(height: 16),
                   if (isUnauthorized)
                     ElevatedButton(
@@ -219,7 +224,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     )
                   else
                     ElevatedButton(
-                      onPressed: () => provider.fetchDeckDetails(widget.deckId),
+                      onPressed: () => context.read<DeckProvider>().fetchDeckDetails(widget.deckId),
                       child: const Text('Tentar Novamente'),
                     ),
                 ],
@@ -227,7 +232,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             );
           }
 
-          final deck = provider.selectedDeck;
           if (deck == null) {
             return const Center(child: Text('Deck não encontrado'));
           }
@@ -1033,7 +1037,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: _conditionColor(card.condition)
-                                                      .withOpacity(0.15),
+                                                      .withValues(alpha: 0.15),
                                                   borderRadius:
                                                       BorderRadius.circular(AppTheme.radiusXs),
                                                   border: Border.all(
@@ -2183,14 +2187,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               decoration: BoxDecoration(
                                 color:
                                     replaceAll
-                                        ? AppTheme.warning.withOpacity(0.1)
+                                        ? AppTheme.warning.withValues(alpha: 0.1)
                                         : theme.colorScheme.surface,
                                 border: Border.all(
                                   color:
                                       replaceAll
-                                          ? AppTheme.warning.withOpacity(0.5)
+                                          ? AppTheme.warning.withValues(alpha: 0.5)
                                           : theme.colorScheme.outline
-                                              .withOpacity(0.3),
+                                              .withValues(alpha: 0.3),
                                 ),
                                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                               ),
@@ -2252,7 +2256,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                     'Cole sua lista de cartas aqui...\n\nFormato: 1 Sol Ring ou 1x Sol Ring',
                                 hintStyle: TextStyle(
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.4),
+                                      .withValues(alpha: 0.4),
                                   fontSize: AppTheme.fontSm,
                                 ),
                                 border: const OutlineInputBorder(),
@@ -2273,10 +2277,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.error.withOpacity(0.15),
+                                  color: AppTheme.error.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                                   border: Border.all(
-                                    color: AppTheme.error.withOpacity(0.3),
+                                    color: AppTheme.error.withValues(alpha: 0.3),
                                   ),
                                 ),
                                 child: Row(
@@ -2307,10 +2311,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.warning.withOpacity(0.15),
+                                  color: AppTheme.warning.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                                   border: Border.all(
-                                    color: AppTheme.warning.withOpacity(0.3),
+                                    color: AppTheme.warning.withValues(alpha: 0.3),
                                   ),
                                 ),
                                 child: Column(
@@ -2332,7 +2336,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                             '• $line',
                                             style: TextStyle(
                                               fontSize: AppTheme.fontSm,
-                                              color: AppTheme.warning.withOpacity(0.6),
+                                              color: AppTheme.warning.withValues(alpha: 0.6),
                                             ),
                                           ),
                                         ),
@@ -2342,7 +2346,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         style: TextStyle(
                                           fontSize: AppTheme.fontSm,
                                           fontStyle: FontStyle.italic,
-                                          color: AppTheme.warning.withOpacity(0.7),
+                                          color: AppTheme.warning.withValues(alpha: 0.7),
                                         ),
                                       ),
                                   ],

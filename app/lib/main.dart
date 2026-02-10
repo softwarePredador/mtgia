@@ -29,8 +29,6 @@ import 'features/social/providers/social_provider.dart';
 import 'features/social/screens/user_profile_screen.dart';
 import 'features/social/screens/user_search_screen.dart';
 import 'features/binder/providers/binder_provider.dart';
-import 'features/binder/screens/binder_screen.dart';
-import 'features/binder/screens/marketplace_screen.dart';
 import 'features/trades/providers/trade_provider.dart';
 import 'features/trades/screens/trade_inbox_screen.dart';
 import 'features/trades/screens/trade_detail_screen.dart';
@@ -100,8 +98,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/collection') ||
             location.startsWith('/profile') ||
             location.startsWith('/community') ||
-            location.startsWith('/binder') ||
-            location.startsWith('/marketplace') ||
             location.startsWith('/trades');
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
@@ -208,14 +204,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             GoRoute(
               path: '/profile',
               builder: (context, state) => const ProfileScreen(),
-            ),
-            GoRoute(
-              path: '/binder',
-              builder: (context, state) => const BinderScreen(),
-            ),
-            GoRoute(
-              path: '/marketplace',
-              builder: (context, state) => const MarketplaceScreen(),
             ),
             GoRoute(
               path: '/trades',

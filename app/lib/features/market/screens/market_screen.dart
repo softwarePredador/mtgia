@@ -171,7 +171,7 @@ class _MarketScreenState extends State<MarketScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: AppTheme.mythicGold.withOpacity(0.15),
+              color: AppTheme.mythicGold.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
             child: Text(
@@ -339,8 +339,8 @@ class _MoverCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: rank <= 3
-              ? changeColor.withOpacity(0.3)
-              : AppTheme.outlineMuted.withOpacity(0.3),
+              ? changeColor.withValues(alpha: 0.3)
+              : AppTheme.outlineMuted.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -353,7 +353,7 @@ class _MoverCard extends StatelessWidget {
               height: 28,
               decoration: BoxDecoration(
                 color: rank <= 3
-                    ? changeColor.withOpacity(0.2)
+                    ? changeColor.withValues(alpha: 0.2)
                     : AppTheme.surfaceSlate2,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
@@ -471,7 +471,7 @@ class _MoverCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: changeColor.withOpacity(0.15),
+                    color: changeColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                   child: Row(
@@ -495,7 +495,7 @@ class _MoverCard extends StatelessWidget {
                 Text(
                   '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
                   style: TextStyle(
-                    color: changeColor.withOpacity(0.7),
+                    color: changeColor.withValues(alpha: 0.7),
                     fontSize: AppTheme.fontXs,
                   ),
                 ),
@@ -527,7 +527,7 @@ class _MoverCard extends StatelessWidget {
       case 'mythic':
         return AppTheme.mythicGold;
       case 'rare':
-        return AppTheme.mythicGold.withOpacity(0.7);
+        return AppTheme.mythicGold.withValues(alpha: 0.7);
       case 'uncommon':
         return AppTheme.loomCyan;
       case 'common':

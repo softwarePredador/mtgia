@@ -160,10 +160,15 @@ class _DeckListScreenState extends State<DeckListScreen> {
           ),
         ],
       ),
-      body: Consumer<DeckProvider>(
-        builder: (context, provider, child) {
+      body: Builder(
+        builder: (context) {
+          final deckIsLoading = context.select<DeckProvider, bool>((p) => p.isLoading);
+          final decks = context.select<DeckProvider, List>((p) => p.decks);
+          final hasError = context.select<DeckProvider, bool>((p) => p.hasError);
+          final errorMessage = context.select<DeckProvider, String?>((p) => p.errorMessage);
+
           // Loading (apenas se a lista estiver vazia)
-          if (provider.isLoading && provider.decks.isEmpty) {
+          if (deckIsLoading && decks.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -177,7 +182,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           }
 
           // Error
-          if (provider.hasError && provider.decks.isEmpty) {
+          if (hasError && decks.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -189,13 +194,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    provider.errorMessage ?? 'Erro desconhecido',
+                    errorMessage ?? 'Erro desconhecido',
                     style: theme.textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
-                    onPressed: () => provider.fetchDecks(),
+                    onPressed: () => context.read<DeckProvider>().fetchDecks(),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Tentar Novamente'),
                   ),
@@ -205,7 +210,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           }
 
           // Empty State
-          if (provider.decks.isEmpty) {
+          if (decks.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -236,9 +241,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
           // Lista de Decks
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: provider.decks.length,
+            itemCount: decks.length,
             itemBuilder: (context, index) {
-              final deck = provider.decks[index];
+              final deck = decks[index];
               return DeckCard(
                 deck: deck,
                 onTap: () {
@@ -247,7 +252,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                 onDelete: () async {
                   final confirmed = await _showDeleteDialog(context, deck.name);
                   if (confirmed == true) {
-                    await provider.deleteDeck(deck.id);
+                    await context.read<DeckProvider>().deleteDeck(deck.id);
                   }
                 },
               );

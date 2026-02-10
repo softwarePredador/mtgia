@@ -170,9 +170,9 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -193,7 +193,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                               'Pronto para análise de sinergia',
                               style: TextStyle(
                                 fontSize: AppTheme.fontSm,
-                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                             ),
                           ],
@@ -209,7 +209,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.error.withOpacity(0.1),
+                    color: AppTheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                   child: Row(
@@ -245,7 +245,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 const SizedBox(height: 8),
                 ...warnings.map((w) => Padding(
                   padding: const EdgeInsets.only(left: 8, bottom: 4),
-                  child: Text('• $w', style: TextStyle(fontSize: AppTheme.fontMd, color: theme.colorScheme.onSurface.withOpacity(0.8))),
+                  child: Text('• $w', style: TextStyle(fontSize: AppTheme.fontMd, color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
                 )),
                 const SizedBox(height: 16),
               ],
@@ -270,7 +270,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: theme.colorScheme.outline.withOpacity(0.3)),
+                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
                   ),
                   padding: const EdgeInsets.all(8),
                   child: SingleChildScrollView(
@@ -280,7 +280,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 2),
                         child: Row(
                           children: [
-                            Icon(Icons.help_outline, size: 14, color: theme.colorScheme.error.withOpacity(0.7)),
+                            Icon(Icons.help_outline, size: 14, color: theme.colorScheme.error.withValues(alpha: 0.7)),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -288,7 +288,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                                 style: TextStyle(
                                   fontFamily: 'monospace',
                                   fontSize: AppTheme.fontSm,
-                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
                             ),
@@ -309,7 +309,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                         style: TextStyle(
                           fontSize: AppTheme.fontSm,
                           fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
@@ -380,15 +380,15 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    theme.colorScheme.primary.withOpacity(0.2),
-                    theme.colorScheme.secondary.withOpacity(0.1),
+                    theme.colorScheme.primary.withValues(alpha: 0.2),
+                    theme.colorScheme.secondary.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
-                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -416,7 +416,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                     '• Texto simples',
                     style: TextStyle(
                       fontSize: AppTheme.fontMd,
-                      color: theme.colorScheme.onSurface.withOpacity(0.85),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
                       height: 1.4,
                     ),
                   ),
@@ -532,33 +532,42 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             const SizedBox(height: 8),
             
             // Contador de linhas com feedback inteligente
-            Row(
-              children: [
-                Icon(
-                  _listController.text.split('\n').where((l) => l.trim().isNotEmpty).length > 0 
-                    ? Icons.check_circle_outline 
-                    : Icons.radio_button_unchecked,
-                  size: 14,
-                  color: _listController.text.split('\n').where((l) => l.trim().isNotEmpty).length > 0
-                    ? theme.colorScheme.secondary
-                    : theme.colorScheme.onSurface.withOpacity(0.4),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${_listController.text.split('\n').where((l) => l.trim().isNotEmpty).length} cartas detectadas',
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                    fontSize: AppTheme.fontSm,
-                  ),
-                ),
-              ],
+            Builder(
+              builder: (context) {
+                final detectedCount = _listController.text
+                    .split('\n')
+                    .where((l) => l.trim().isNotEmpty)
+                    .length;
+                final hasCards = detectedCount > 0;
+                return Row(
+                  children: [
+                    Icon(
+                      hasCards
+                          ? Icons.check_circle_outline
+                          : Icons.radio_button_unchecked,
+                      size: 14,
+                      color: hasCards
+                          ? theme.colorScheme.secondary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$detectedCount cartas detectadas',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: AppTheme.fontSm,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
 
             // Erro
             if (_error != null) ...[
               const SizedBox(height: 16),
               Card(
-                color: AppTheme.error.withOpacity(0.15),
+                color: AppTheme.error.withValues(alpha: 0.15),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -623,7 +632,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppTheme.fontSm,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],

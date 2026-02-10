@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../auth/models/user.dart';
 import '../auth/providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -119,8 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final auth = context.watch<AuthProvider>();
-    final user = auth.user;
+    final user = context.select<AuthProvider, User?>((p) => p.user);
 
     return Scaffold(
       appBar: AppBar(
@@ -150,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           radius: 44,
                           backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
                           backgroundImage: (user.avatarUrl != null && user.avatarUrl!.trim().isNotEmpty)
-                              ? NetworkImage(user.avatarUrl!)
+                              ? CachedNetworkImageProvider(user.avatarUrl!)
                               : null,
                           child: (user.avatarUrl == null || user.avatarUrl!.trim().isEmpty)
                               ? Text(

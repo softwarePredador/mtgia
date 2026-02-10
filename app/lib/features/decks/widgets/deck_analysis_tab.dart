@@ -19,6 +19,49 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
   bool _isRefreshingAi = false;
   bool _autoAnalysisTriggered = false;
 
+  // Cached analysis data — recalculated only when deck changes
+  String? _cachedDeckId;
+  int _cachedCardCount = -1;
+  List<int> _cachedManaCurve = List<int>.filled(8, 0);
+  Map<String, int> _cachedColorCounts = {};
+
+  void _recalculateIfNeeded(DeckDetails deck) {
+    final allCards = [
+      ...deck.commander,
+      ...deck.mainBoard.values.expand((l) => l),
+    ];
+    final cardCount = allCards.fold<int>(0, (s, c) => s + c.quantity);
+    if (deck.id == _cachedDeckId && cardCount == _cachedCardCount) return;
+
+    _cachedDeckId = deck.id;
+    _cachedCardCount = cardCount;
+
+    // Mana curve
+    final manaCurve = List<int>.filled(8, 0);
+    for (var card in allCards) {
+      if (card.typeLine.toLowerCase().contains('land')) continue;
+      final cmc = ManaHelper.calculateCMC(card.manaCost);
+      final index = cmc >= 7 ? 7 : cmc;
+      manaCurve[index] += card.quantity;
+    }
+    _cachedManaCurve = manaCurve;
+
+    // Color distribution
+    final colorCounts = <String, int>{
+      'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'C': 0,
+    };
+    for (var card in allCards) {
+      if (card.typeLine.toLowerCase().contains('land')) continue;
+      final pips = ManaHelper.countColorPips(card.manaCost);
+      pips.forEach((color, count) {
+        if (colorCounts.containsKey(color)) {
+          colorCounts[color] = (colorCounts[color] ?? 0) + (count * card.quantity);
+        }
+      });
+    }
+    _cachedColorCounts = colorCounts;
+  }
+
   Future<void> _refreshAi({bool force = false}) async {
     if (_isRefreshingAi) return;
     setState(() => _isRefreshingAi = true);
@@ -61,44 +104,10 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
       });
     }
 
-    // Prepara dados
-    final allCards = [
-      ...effectiveDeck.commander,
-      ...effectiveDeck.mainBoard.values.expand((l) => l),
-    ];
-
-    // 1. Curva de Mana
-    final manaCurve = List<int>.filled(8, 0); // 0 a 7+
-    for (var card in allCards) {
-      // Terrenos geralmente não contam na curva de mana para "jogar", mas têm CMC 0.
-      // Vamos excluir terrenos da curva visual para focar em spells?
-      // Padrão MTG Arena: Exclui terrenos.
-      if (card.typeLine.toLowerCase().contains('land')) continue;
-
-      final cmc = ManaHelper.calculateCMC(card.manaCost);
-      final index = cmc >= 7 ? 7 : cmc;
-      manaCurve[index] += card.quantity;
-    }
-
-    // 2. Distribuição de Cores (Pips)
-    final colorCounts = <String, int>{
-      'W': 0,
-      'U': 0,
-      'B': 0,
-      'R': 0,
-      'G': 0,
-      'C': 0,
-    };
-    for (var card in allCards) {
-      if (card.typeLine.toLowerCase().contains('land')) continue;
-      final pips = ManaHelper.countColorPips(card.manaCost);
-      pips.forEach((color, count) {
-        if (colorCounts.containsKey(color)) {
-          colorCounts[color] =
-              (colorCounts[color] ?? 0) + (count * card.quantity);
-        }
-      });
-    }
+    // Use cached mana curve & color distribution (recalculated only when deck changes)
+    _recalculateIfNeeded(effectiveDeck);
+    final manaCurve = _cachedManaCurve;
+    final colorCounts = _cachedColorCounts;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -71,116 +72,112 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer<BinderProvider>(
-      builder: (context, provider, _) {
-        return Column(
-          children: [
-            // Search bar
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: TextField(
-                controller: _searchController,
-                onSubmitted: (_) => _doSearch(),
-                style: const TextStyle(
-                    color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
-                decoration: InputDecoration(
-                  hintText: 'Buscar carta no marketplace...',
-                  hintStyle:
-                      const TextStyle(color: AppTheme.textSecondary),
-                  prefixIcon: const Icon(Icons.search,
-                      color: AppTheme.textSecondary),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear,
-                        color: AppTheme.textSecondary),
-                    onPressed: () {
-                      _searchController.clear();
-                      _doSearch();
-                    },
-                  ),
-                  filled: true,
-                  fillColor: AppTheme.surfaceSlate,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+    return Column(
+      children: [
+        // Search bar (local state only — no provider rebuild needed)
+        Padding(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: TextField(
+            controller: _searchController,
+            onSubmitted: (_) => _doSearch(),
+            style: const TextStyle(
+                color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
+            decoration: InputDecoration(
+              hintText: 'Buscar carta no marketplace...',
+              hintStyle:
+                  const TextStyle(color: AppTheme.textSecondary),
+              prefixIcon: const Icon(Icons.search,
+                  color: AppTheme.textSecondary),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.clear,
+                    color: AppTheme.textSecondary),
+                onPressed: () {
+                  _searchController.clear();
+                  _doSearch();
+                },
+              ),
+              filled: true,
+              fillColor: AppTheme.surfaceSlate,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                borderSide: BorderSide.none,
               ),
             ),
+          ),
+        ),
 
-            // Filter chips
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _ConditionDropdown(
-                      value: _conditionFilter,
-                      onChanged: (v) {
-                        setState(() => _conditionFilter = v);
-                        _doSearch();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    FilterChip(
-                      label: const Text('Troca'),
-                      selected: _onlyTrade,
-                      onSelected: (v) {
-                        setState(() => _onlyTrade = v);
-                        _doSearch();
-                      },
-                      selectedColor:
-                          AppTheme.loomCyan.withValues(alpha: 0.3),
-                      backgroundColor: AppTheme.surfaceSlate,
-                      labelStyle: TextStyle(
-                        color: _onlyTrade
-                            ? AppTheme.loomCyan
-                            : AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                      side: BorderSide(
-                        color: _onlyTrade
-                            ? AppTheme.loomCyan
-                            : AppTheme.outlineMuted,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    FilterChip(
-                      label: const Text('Venda'),
-                      selected: _onlySale,
-                      onSelected: (v) {
-                        setState(() => _onlySale = v);
-                        _doSearch();
-                      },
-                      selectedColor:
-                          AppTheme.mythicGold.withValues(alpha: 0.3),
-                      backgroundColor: AppTheme.surfaceSlate,
-                      labelStyle: TextStyle(
-                        color: _onlySale
-                            ? AppTheme.mythicGold
-                            : AppTheme.textSecondary,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                      side: BorderSide(
-                        color: _onlySale
-                            ? AppTheme.mythicGold
-                            : AppTheme.outlineMuted,
-                      ),
-                    ),
-                  ],
+        // Filter chips (local state only)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _ConditionDropdown(
+                  value: _conditionFilter,
+                  onChanged: (v) {
+                    setState(() => _conditionFilter = v);
+                    _doSearch();
+                  },
                 ),
-              ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Troca'),
+                  selected: _onlyTrade,
+                  onSelected: (v) {
+                    setState(() => _onlyTrade = v);
+                    _doSearch();
+                  },
+                  selectedColor:
+                      AppTheme.loomCyan.withValues(alpha: 0.3),
+                  backgroundColor: AppTheme.surfaceSlate,
+                  labelStyle: TextStyle(
+                    color: _onlyTrade
+                        ? AppTheme.loomCyan
+                        : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  side: BorderSide(
+                    color: _onlyTrade
+                        ? AppTheme.loomCyan
+                        : AppTheme.outlineMuted,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Venda'),
+                  selected: _onlySale,
+                  onSelected: (v) {
+                    setState(() => _onlySale = v);
+                    _doSearch();
+                  },
+                  selectedColor:
+                      AppTheme.mythicGold.withValues(alpha: 0.3),
+                  backgroundColor: AppTheme.surfaceSlate,
+                  labelStyle: TextStyle(
+                    color: _onlySale
+                        ? AppTheme.mythicGold
+                        : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  side: BorderSide(
+                    color: _onlySale
+                        ? AppTheme.mythicGold
+                        : AppTheme.outlineMuted,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
+          ),
+        ),
+        const SizedBox(height: 4),
 
-            // List
-            Expanded(child: _buildMarketList(provider)),
-          ],
-        );
-      },
+        // List — only this part needs provider data
+        Expanded(child: _buildMarketList(context.watch<BinderProvider>())),
+      ],
     );
   }
 
@@ -674,7 +671,7 @@ class _MarketplaceCard extends StatelessWidget {
                           backgroundColor:
                               AppTheme.manaViolet.withValues(alpha: 0.3),
                           backgroundImage: item.ownerAvatarUrl != null
-                              ? NetworkImage(item.ownerAvatarUrl!)
+                              ? CachedNetworkImageProvider(item.ownerAvatarUrl!)
                               : null,
                           child: item.ownerAvatarUrl == null
                               ? Text(

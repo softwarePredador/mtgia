@@ -35,36 +35,46 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   }
 
   @override
+  void deactivate() {
+    context.read<TradeProvider>().clearSelectedTrade();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _pollTimer?.cancel();
     _messageController.dispose();
     _scrollController.dispose();
-    context.read<TradeProvider>().clearSelectedTrade();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final tradeData = context.select<TradeProvider, ({bool isLoading, TradeOffer? trade, String? error})>(
+      (p) => (isLoading: p.isLoading, trade: p.selectedTrade, error: p.errorMessage),
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('Detalhes do Trade')),
-      body: Consumer<TradeProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading && provider.selectedTrade == null) {
+      body: Builder(
+        builder: (context) {
+          if (tradeData.isLoading && tradeData.trade == null) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (provider.selectedTrade == null) {
+          if (tradeData.trade == null) {
             return Center(
               child: Text(
-                provider.errorMessage ?? 'Trade não encontrado',
+                tradeData.error ?? 'Trade não encontrado',
                 style: const TextStyle(color: AppTheme.textSecondary),
               ),
             );
           }
 
-          final trade = provider.selectedTrade!;
+          final trade = tradeData.trade!;
           final currentUserId = context.read<AuthProvider>().user?.id;
           final isSender = trade.sender.id == currentUserId;
           final isReceiver = trade.receiver.id == currentUserId;
+          final provider = context.read<TradeProvider>();
 
           return Column(
             children: [
@@ -93,11 +103,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                     const SizedBox(height: 16),
                     _buildActions(trade, isSender, isReceiver, provider),
                     const SizedBox(height: 16),
-                    _buildChat(provider),
+                    // Chat section — isolated rebuild via its own Selector
+                    _TradeChat(tradeId: widget.tradeId),
                   ],
                 ),
               ),
-              // Input de mensagem
+              // Input de mensagem — isolated rebuild
               if (!['declined', 'cancelled'].contains(trade.status))
                 _buildMessageInput(provider),
             ],
@@ -668,113 +679,6 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     );
   }
 
-  // ─── Chat ───────────────────────────────────────────────────
-  Widget _buildChat(TradeProvider provider) {
-    final messages = provider.chatMessages;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.chat, size: 16, color: AppTheme.textSecondary),
-              const SizedBox(width: 6),
-              Text(
-                'Chat (${messages.length})',
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          if (messages.isNotEmpty) ...[
-            const Divider(color: AppTheme.outlineMuted),
-            ...messages.map((msg) {
-              final currentUserId =
-                  context.read<AuthProvider>().user?.id;
-              final isMe = msg.senderId == currentUserId;
-
-              return Align(
-                alignment:
-                    isMe ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.65,
-                  ),
-                  margin: const EdgeInsets.symmetric(vertical: 3),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: isMe
-                        ? AppTheme.manaViolet.withValues(alpha: 0.2)
-                        : AppTheme.outlineMuted,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: isMe
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      if (!isMe)
-                        Text(
-                          msg.senderUsername ?? '',
-                          style: TextStyle(
-                            color: AppTheme.loomCyan,
-                            fontSize: AppTheme.fontSm,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      if (msg.message != null)
-                        Text(
-                          msg.message!,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: AppTheme.fontMd,
-                          ),
-                        ),
-                      if (msg.attachmentUrl != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            '📎 ${msg.attachmentType ?? "anexo"}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
-                            ),
-                          ),
-                        ),
-                      Text(
-                        _formatTime(msg.createdAt),
-                        style: const TextStyle(
-                          color: AppTheme.textHint,
-                          fontSize: AppTheme.fontXs,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ] else
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                'Nenhuma mensagem ainda',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   // ─── Input de Mensagem ──────────────────────────────────────
   Widget _buildMessageInput(TradeProvider provider) {
     return Container(
@@ -838,6 +742,126 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   }
 
   String _formatTime(DateTime dt) {
+    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+/// Widget isolado para o chat do trade — só reconstrói quando chatMessages mudam.
+/// Evita reconstruir status/items/timeline a cada polling de 10s.
+class _TradeChat extends StatelessWidget {
+  final String tradeId;
+  const _TradeChat({required this.tradeId});
+
+  @override
+  Widget build(BuildContext context) {
+    final messages = context.select<TradeProvider, List<TradeMessage>>(
+      (p) => p.chatMessages,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.chat, size: 16, color: AppTheme.textSecondary),
+              const SizedBox(width: 6),
+              Text(
+                'Chat (${messages.length})',
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          if (messages.isNotEmpty) ...[
+            const Divider(color: AppTheme.outlineMuted),
+            ...messages.map((msg) {
+              final currentUserId =
+                  context.read<AuthProvider>().user?.id;
+              final isMe = msg.senderId == currentUserId;
+
+              return Align(
+                alignment:
+                    isMe ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.65,
+                  ),
+                  margin: const EdgeInsets.symmetric(vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? AppTheme.manaViolet.withValues(alpha: 0.2)
+                        : AppTheme.outlineMuted,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isMe
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      if (!isMe)
+                        Text(
+                          msg.senderUsername ?? '',
+                          style: const TextStyle(
+                            color: AppTheme.loomCyan,
+                            fontSize: AppTheme.fontSm,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      if (msg.message != null)
+                        Text(
+                          msg.message!,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontMd,
+                          ),
+                        ),
+                      if (msg.attachmentUrl != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            '📎 ${msg.attachmentType ?? "anexo"}',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: AppTheme.fontSm,
+                            ),
+                          ),
+                        ),
+                      Text(
+                        _formatTime(msg.createdAt),
+                        style: const TextStyle(
+                          color: AppTheme.textHint,
+                          fontSize: AppTheme.fontXs,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ] else
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                'Nenhuma mensagem ainda',
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatTime(DateTime dt) {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 }

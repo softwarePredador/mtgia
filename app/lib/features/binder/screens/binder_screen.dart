@@ -113,44 +113,42 @@ class _BinderTabContentState extends State<BinderTabContent>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer<BinderProvider>(
-      builder: (context, provider, _) {
-        return Column(
-          children: [
-            // Stats bar com botão de adicionar integrado
-            if (provider.stats != null)
-              _StatsBar(stats: provider.stats!, onAdd: _openAddCard),
+    final stats = context.select<BinderProvider, BinderStats?>((p) => p.stats);
 
-            // Search + filters
-            _SearchFilterBar(
-              searchController: _searchController,
-              conditionFilter: _conditionFilter,
-              tradeFilter: _tradeFilter,
-              saleFilter: _saleFilter,
-              onSearch: _applyFilters,
-              onConditionChanged: (v) {
-                setState(() => _conditionFilter = v);
-                _applyFilters();
-              },
-              onTradeToggle: () {
-                setState(() {
-                  _tradeFilter = _tradeFilter == true ? null : true;
-                });
-                _applyFilters();
-              },
-              onSaleToggle: () {
-                setState(() {
-                  _saleFilter = _saleFilter == true ? null : true;
-                });
-                _applyFilters();
-              },
-            ),
+    return Column(
+      children: [
+        // Stats bar com botão de adicionar integrado
+        if (stats != null)
+          _StatsBar(stats: stats, onAdd: _openAddCard),
 
-            // List
-            Expanded(child: _buildBinderList(provider)),
-          ],
-        );
-      },
+        // Search + filters (local state only — no provider rebuild needed)
+        _SearchFilterBar(
+          searchController: _searchController,
+          conditionFilter: _conditionFilter,
+          tradeFilter: _tradeFilter,
+          saleFilter: _saleFilter,
+          onSearch: _applyFilters,
+          onConditionChanged: (v) {
+            setState(() => _conditionFilter = v);
+            _applyFilters();
+          },
+          onTradeToggle: () {
+            setState(() {
+              _tradeFilter = _tradeFilter == true ? null : true;
+            });
+            _applyFilters();
+          },
+          onSaleToggle: () {
+            setState(() {
+              _saleFilter = _saleFilter == true ? null : true;
+            });
+            _applyFilters();
+          },
+        ),
+
+        // List — uses Consumer scoped to list data only
+        Expanded(child: _buildBinderList(context.watch<BinderProvider>())),
+      ],
     );
   }
 

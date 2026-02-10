@@ -193,7 +193,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final deck = widget.isBinderMode ? null : context.watch<DeckProvider>().selectedDeck;
+    final deck = widget.isBinderMode ? null : context.select<DeckProvider, DeckDetails?>((p) => p.selectedDeck);
     final format = deck?.format.toLowerCase();
     final isCommanderFormat = !widget.isBinderMode && (format == 'commander' || format == 'brawl');
     final commanderIdentity = _computeCommanderIdentity(deck);
