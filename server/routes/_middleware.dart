@@ -37,14 +37,9 @@ Handler middleware(Handler handler) {
         await handler.use(provider<Pool>((_) => _db.connection))(context);
 
     // ── Adiciona CORS nas respostas ──────────────────────
-    // Lê o body como string e reconstrói a Response com headers merged.
-    final bodyStr = await response.body();
+    // Evita materializar o body (performance/streaming).
     final merged = <String, Object>{...response.headers, ..._corsHeaders};
-    return Response(
-      statusCode: response.statusCode,
-      body: bodyStr,
-      headers: merged,
-    );
+    return response.copyWith(headers: merged);
   };
 }
 

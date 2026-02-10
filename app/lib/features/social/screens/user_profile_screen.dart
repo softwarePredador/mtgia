@@ -54,10 +54,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     if (mounted) setState(() => _isToggling = false);
   }
 
-  Future<void> _openChat(BuildContext context, String userId) async {
+  Future<void> _openChat(String userId) async {
     final msgProvider = context.read<MessageProvider>();
     final conv = await msgProvider.getOrCreateConversation(userId);
-    if (conv != null && mounted) {
+    if (!mounted || conv == null) return;
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -67,7 +68,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           ),
         ),
       );
-    }
   }
 
   void _loadTab(int index) {
@@ -254,7 +254,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                           SizedBox(
                             height: 40,
                             child: OutlinedButton.icon(
-                              onPressed: () => _openChat(context, widget.userId),
+                              onPressed: () => _openChat(widget.userId),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppTheme.textPrimary,
                                 side: const BorderSide(color: AppTheme.outlineMuted),

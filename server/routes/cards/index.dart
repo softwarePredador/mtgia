@@ -48,10 +48,12 @@ Future<Response> onRequest(RequestContext context) async {
   // Paginação
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
   final page = int.tryParse(params['page'] ?? '1') ?? 1;
-  final offset = (page - 1) * limit;
+  final safeLimit = limit.clamp(1, 200);
+  final safePage = page < 1 ? 1 : page;
+  final offset = (safePage - 1) * safeLimit;
 
   try {
-    final query = _buildQuery(nameFilter, setFilter, limit, offset,
+    final query = _buildQuery(nameFilter, setFilter, safeLimit, offset,
         includeSetInfo: hasSets);
 
     final queryResult = await conn.execute(
@@ -86,8 +88,8 @@ Future<Response> onRequest(RequestContext context) async {
 
     return Response.json(body: {
       'data': cards,
-      'page': page,
-      'limit': limit,
+      'page': safePage,
+      'limit': safeLimit,
       'total_returned': cards.length,
     });
   } catch (e) {

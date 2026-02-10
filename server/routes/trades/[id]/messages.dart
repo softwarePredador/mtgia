@@ -20,7 +20,9 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     final params = context.request.uri.queryParameters;
     final page = int.tryParse(params['page'] ?? '1') ?? 1;
     final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
-    final offset = (page - 1) * limit;
+    final safeLimit = limit.clamp(1, 200);
+    final safePage = page < 1 ? 1 : page;
+    final offset = (safePage - 1) * safeLimit;
 
     // Verificar que o usuário participa do trade
     final tradeResult = await pool.execute(Sql.named('''
@@ -57,7 +59,7 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       WHERE tm.trade_offer_id = @id
       ORDER BY tm.created_at ASC
       LIMIT @lim OFFSET @off
-    '''), parameters: {'id': id, 'lim': limit, 'off': offset});
+    '''), parameters: {'id': id, 'lim': safeLimit, 'off': offset});
 
     final messages = msgResult.map((row) {
       final m = row.toColumnMap();
@@ -76,8 +78,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
 
     return Response.json(body: {
       'data': messages,
-      'page': page,
-      'limit': limit,
+      'page': safePage,
+      'limit': safeLimit,
       'total': total,
     });
   } catch (e) {

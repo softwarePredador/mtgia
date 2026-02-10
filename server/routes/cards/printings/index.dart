@@ -41,6 +41,7 @@ Future<Response> onRequest(RequestContext context) async {
   final params = context.request.uri.queryParameters;
   final name = params['name']?.trim();
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
+  final safeLimit = limit.clamp(1, 200);
 
   if (name == null || name.isEmpty) {
     return Response.json(
@@ -100,7 +101,7 @@ Future<Response> onRequest(RequestContext context) async {
 
   final result = await pool.execute(
     Sql.named(sql),
-    parameters: {'name': name, 'limit': limit},
+    parameters: {'name': name, 'limit': safeLimit},
   );
 
   final data = result.map((row) {

@@ -89,6 +89,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final deckProvider = context.read<DeckProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -467,7 +468,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         TextButton.icon(
                           onPressed:
                               () => _showEditDescriptionDialog(
-                                context,
                                 deck.description,
                               ),
                           icon: Icon(
@@ -492,7 +492,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       InkWell(
                         onTap:
                             () => _showEditDescriptionDialog(
-                              context,
                               deck.description,
                             ),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -519,8 +518,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     else
                       InkWell(
                         onTap:
-                            () =>
-                                _showEditDescriptionDialog(context, null),
+                            () => _showEditDescriptionDialog(null),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                         child: Container(
                           width: double.infinity,
@@ -893,16 +891,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                     }
 
                                     try {
-                                      await context
-                                          .read<DeckProvider>()
-                                          .removeCardFromDeck(
-                                            deckId: widget.deckId,
-                                            cardId: card.id,
-                                          );
+                                      await deckProvider.removeCardFromDeck(
+                                        deckId: widget.deckId,
+                                        cardId: card.id,
+                                      );
                                       if (!mounted) return true;
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
+                                      if (!context.mounted) return true;
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             'Carta removida: ${card.name}',
@@ -917,9 +912,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         setState(
                                           () => _hiddenCardIds.remove(card.id),
                                         );
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
+                                        if (!context.mounted) return false;
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               'Erro ao remover: $e',
@@ -1124,10 +1118,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
-  Future<void> _showEditDescriptionDialog(
-    BuildContext context,
-    String? currentDescription,
-  ) async {
+  Future<void> _showEditDescriptionDialog(String? currentDescription) async {
     final controller = TextEditingController(
       text: currentDescription?.trim() ?? '',
     );
@@ -1166,7 +1157,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           ),
     );
 
-    if (result == null || !mounted) return;
+    if (!mounted) return;
+    if (result == null) return;
 
     // Update via PUT
     try {

@@ -59,8 +59,9 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
 
   void _onScroll() {
     final provider = context.read<CardProvider>();
-    if (!provider.hasMore || provider.isLoading || provider.isLoadingMore)
+    if (!provider.hasMore || provider.isLoading || provider.isLoadingMore) {
       return;
+    }
     final position = _scrollController.position;
     if (!position.hasPixels) return;
     if (position.pixels >= position.maxScrollExtent - 240) {
@@ -134,7 +135,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
         isCommander: false,
       );
 
-      if (!context.mounted) return;
+      if (!mounted) return;
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -155,13 +156,15 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
     showDialog(
       context: context,
       builder:
-          (context) => _AddCardDialog(
+          (dialogContext) => _AddCardDialog(
             card: card,
             deckFormat: format,
             hasCommanderSelected: (deck?.commander.isNotEmpty ?? false),
             forceCommander: mustPickCommanderFirst || isCommanderMode,
             canAddByCommanderIdentity: canOpenAddDialog,
             onConfirm: (quantity, isCommander) async {
+              Navigator.pop(dialogContext);
+
               final provider = context.read<DeckProvider>();
               final success = await provider.addCardToDeck(
                 widget.deckId,
@@ -170,8 +173,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                 isCommander: isCommander,
               );
 
-              if (!context.mounted) return;
-              Navigator.pop(context);
+              if (!mounted) return;
 
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
