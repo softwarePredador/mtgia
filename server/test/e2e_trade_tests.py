@@ -1123,7 +1123,7 @@ class TestRunner:
 
         if not self.setup():
             print("\n💀 SETUP FALHOU! Abortando testes.")
-            return
+            return False
 
         self.test_auth()
         self.test_binder()
@@ -1137,7 +1137,7 @@ class TestRunner:
         self.test_edge_cases()
         self.test_notifications()
 
-        self.print_summary()
+        return self.print_summary()
 
     def print_summary(self):
         print("\n" + "═" * 65)
