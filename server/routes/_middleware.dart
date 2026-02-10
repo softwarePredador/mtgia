@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import '../lib/database.dart';
 
 // Instancia o banco de dados uma vez.
@@ -9,42 +9,29 @@ var _connected = false;
 var _schemaReady = false;
 
 Handler middleware(Handler handler) {
-  return (context) async {
-    // ── CORS ──────────────────────────────────────────────
-    // Responde preflight (OPTIONS) imediatamente.
-    if (context.request.method == HttpMethod.options) {
-      return Response(
-        statusCode: HttpStatus.noContent,
-        headers: _corsHeaders,
-      );
-    }
+  // shelf_cors_headers cuida de OPTIONS + headers em todas as respostas,
+  // sem substituir os headers originais (faz merge correto).
+  return handler
+      .use(_dbMiddleware)
+      .use(fromShelfMiddleware(corsHeaders()));
+}
 
-    // Conecta ao banco de dados apenas na primeira requisição.
+/// Middleware que conecta ao banco, roda DDL e injeta Pool no contexto.
+Middleware _dbMiddleware(Handler handler) {
+  return (context) async {
     if (!_connected) {
       await _db.connect();
       _connected = true;
     }
 
-    // Executa DDL de compatibilidade apenas UMA VEZ por processo.
     if (!_schemaReady) {
       await _ensureRuntimeSchema(_db.connection);
       _schemaReady = true;
     }
 
-    // Fornece a conexão do banco de dados para todas as rotas filhas.
-    final response = await handler.use(provider<Pool>((_) => _db.connection))(context);
-
-    // Adiciona CORS em TODAS as respostas via copyWith (só headers, sem tocar no body).
-    return response.copyWith(headers: _corsHeaders);
+    return handler.use(provider<Pool>((_) => _db.connection))(context);
   };
 }
-
-const _corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Max-Age': '86400',
-};
 
 Future<void> _ensureRuntimeSchema(Pool pool) async {
   // Idempotente: garante compatibilidade com bases antigas após deploy.
