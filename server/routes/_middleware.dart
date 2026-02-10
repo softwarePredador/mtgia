@@ -96,9 +96,13 @@ Future<void> _ensureRuntimeSchema(Pool pool) async {
       user_b_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       last_message_at TIMESTAMP WITH TIME ZONE,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT uq_conversation UNIQUE (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id)),
       CONSTRAINT chk_no_self_chat CHECK (user_a_id != user_b_id)
     )
+  '''));
+  // Unique funcional: garante apenas 1 conversa por par de usuários (ordem irrelevante).
+  await pool.execute(Sql.named('''
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_pair
+    ON conversations (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id))
   '''));
   await pool.execute(Sql.named('''
     CREATE TABLE IF NOT EXISTS direct_messages (
