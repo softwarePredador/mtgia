@@ -3685,3 +3685,136 @@ Adicionada dentro do grupo `/trades`, antes da rota `:tradeId` para evitar confl
 7. Envia proposta → cria trade via API → aparece na Trade Inbox do Usuário B
 8. Usuário B aceita/recusa → fluxo normal de trade (shipped → delivered → completed)
 
+---
+
+## 29. Correção de Duplicatas em Endpoints de Cartas (Fevereiro 2026)
+
+### 29.1 Problema Identificado
+
+O banco de dados contém cartas de múltiplas fontes (MTGJSON, Scryfall) onde uma mesma carta pode ter várias **variantes** (normal, foil, borderless, extended art, etc.) da mesma edição. Isso causava retornos com duplicatas nos endpoints:
+
+**Exemplo - Lightning Bolt:**
+- **Antes:** 31 resultados, com SLD aparecendo 11 vezes, 2XM aparecendo 3 vezes
+- **Depois:** 14 resultados, um por edição única
+
+**Exemplo - Cyclonic Rift:**
+- **Antes:** 13 resultados com duplicatas
+- **Depois:** 7 resultados (sets únicos)
+
+### 29.2 Causa Raiz
+
+1. **Variantes de carta**: Uma mesma carta na mesma edição pode ter múltiplos registros (normal, foil, showcase, etc.)
+2. **Inconsistência de case**: Alguns set_codes estão em maiúsculo (`2XM`) e outros em minúsculo (`2xm`)
+3. **scryfall_id único**: Cada registro TEM scryfall_id único (esperado), mas o mesmo (name + set_code) pode ter múltiplos
+
+### 29.3 Solução Implementada
+
+#### Endpoint `/cards/printings` (`routes/cards/printings/index.dart`)
+
+```sql
+SELECT DISTINCT ON (LOWER(c.set_code))
+  c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+  c.oracle_text, c.colors, c.image_url, 
+  LOWER(c.set_code) AS set_code, c.rarity,
+  s.name AS set_name,
+  s.release_date AS set_release_date
+FROM cards c
+LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+WHERE c.name ILIKE @name
+ORDER BY LOWER(c.set_code), s.release_date DESC NULLS LAST
+```
+
+**Pontos chave:**
+- `DISTINCT ON (LOWER(c.set_code))` - Retorna apenas uma carta por set (case-insensitive)
+- `LOWER()` no JOIN e no DISTINCT - Resolve inconsistências de case (2xm vs 2XM)
+- `ORDER BY ... release_date DESC NULLS LAST` - Prioriza impressão mais recente de cada set
+
+#### Endpoint `/cards` (`routes/cards/index.dart`)
+
+Adicionado parâmetro opcional `dedupe` (default: `true`):
+
+```dart
+final deduplicate = params['dedupe']?.toLowerCase() != 'false';
+```
+
+Quando `dedupe=true` (padrão), usa query com deduplicação:
+
+```sql
+SELECT * FROM (
+  SELECT DISTINCT ON (c.name, LOWER(c.set_code))
+    c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+    c.oracle_text, c.colors, c.color_identity, c.image_url,
+    LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
+    s.name AS set_name,
+    s.release_date AS set_release_date
+  FROM cards c
+  LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+  WHERE ...
+  ORDER BY c.name, LOWER(c.set_code), s.release_date DESC NULLS LAST
+) AS deduped
+ORDER BY name ASC, set_code ASC
+LIMIT @limit OFFSET @offset
+```
+
+**Para obter todas as variantes**, use `?dedupe=false`:
+```
+GET /cards?name=Lightning%20Bolt&dedupe=false
+```
+
+### 29.4 Script de Auditoria de Integridade
+
+Criado `bin/audit_data_integrity.dart` para verificar:
+
+1. **Duplicatas por scryfall_id** (não deveria haver)
+2. **Duplicatas por (name, set_code)** (esperado por variantes)
+3. **Inconsistências de case em set_code** (2xm vs 2XM)
+4. **Integridade de foreign keys** (orphan records)
+
+**Uso:**
+```bash
+dart run bin/audit_data_integrity.dart
+```
+
+**Resultados típicos:**
+```
+=== CARDS INTEGRITY ===
+Total cards: 33,519
+Unique scryfall_ids: 33,519 ✓
+
+=== DUPLICATES BY (name, set_code) ===
+Top 5:
+  Sol Ring [sld]: 13 duplicates
+  Lightning Bolt [sld]: 12 duplicates
+  ...
+
+=== CASE INCONSISTENCIES ===
+  2x2 and 2X2
+  8ed and 8ED
+  ...
+```
+
+### 29.5 Resultados Após Correção
+
+| Endpoint | Carta | Antes | Depois |
+|----------|-------|-------|--------|
+| `/cards` | Lightning Bolt | 31 | 14 |
+| `/cards` | Sol Ring | ~50 | 12 |
+| `/cards/printings` | Cyclonic Rift | 13 | 7 |
+
+### 29.6 Considerações Futuras
+
+1. **Migração de normalização de case**: Considerar rodar `UPDATE cards SET set_code = LOWER(set_code)` para normalizar todos os set_codes
+2. **Índice funcional**: Criar índice em `LOWER(set_code)` para performance
+3. **Tabela follows**: Auditoria identificou que a tabela `follows` não existe - criar se funcionalidade social for necessária
+
+### 29.7 Deploy
+
+As alterações foram deployadas via:
+1. SCP do arquivo atualizado para `/tmp/` no servidor
+2. `docker cp` para o container ativo
+3. `dart_frog build` dentro do container
+4. `docker commit` para criar imagem com o build atualizado
+5. `docker service update --image` para aplicar a nova imagem
+
+**Imagem atual:** `easypanel/evolution/cartinhas:fixed-v2`
+

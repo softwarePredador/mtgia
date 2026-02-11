@@ -44,6 +44,9 @@ Future<Response> onRequest(RequestContext context) async {
   final params = context.request.uri.queryParameters;
   final nameFilter = params['name'];
   final setFilter = params['set']?.trim();
+  // Deduplicar por padrão para evitar variantes duplicadas
+  // Use ?dedupe=false para obter todas as variantes
+  final deduplicate = params['dedupe']?.toLowerCase() != 'false';
 
   // Paginação
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
@@ -53,8 +56,11 @@ Future<Response> onRequest(RequestContext context) async {
   final offset = (safePage - 1) * safeLimit;
 
   try {
-    final query = _buildQuery(nameFilter, setFilter, safeLimit, offset,
-        includeSetInfo: hasSets);
+    final query = _buildQuery(
+      nameFilter, setFilter, safeLimit, offset,
+      includeSetInfo: hasSets, 
+      deduplicate: deduplicate,
+    );
 
     final queryResult = await conn.execute(
       Sql.named(query.sql),
@@ -109,35 +115,82 @@ class _QueryBuilder {
 
 _QueryBuilder _buildQuery(
     String? nameFilter, String? setFilter, int limit, int offset,
-    {required bool includeSetInfo}) {
-  var sql = includeSetInfo
-      ? '''
-    SELECT
-      c.*,
-      s.name AS set_name,
-      s.release_date AS set_release_date
-    FROM cards c
-    LEFT JOIN sets s ON s.code = c.set_code
-  '''
-      : 'SELECT c.* FROM cards c';
+    {required bool includeSetInfo, bool deduplicate = false}) {
+  
   final params = <String, dynamic>{};
   final conditions = <String>[];
-
+  
   if (nameFilter != null && nameFilter.isNotEmpty) {
     conditions.add('c.name ILIKE @name');
     params['name'] = '%$nameFilter%';
   }
 
   if (setFilter != null && setFilter.isNotEmpty) {
-    conditions.add('c.set_code = @set');
+    // Usar LOWER para comparação case-insensitive
+    conditions.add('LOWER(c.set_code) = LOWER(@set)');
     params['set'] = setFilter;
   }
 
-  if (conditions.isNotEmpty) {
-    sql += ' WHERE ${conditions.join(' AND ')}';
+  final whereClause = conditions.isNotEmpty 
+      ? 'WHERE ${conditions.join(' AND ')}' 
+      : '';
+
+  String sql;
+  
+  if (deduplicate) {
+    // Deduplicar por (name, LOWER(set_code)) para evitar variantes e inconsistências de case
+    sql = includeSetInfo
+        ? '''
+          SELECT * FROM (
+            SELECT DISTINCT ON (c.name, LOWER(c.set_code))
+              c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+              c.oracle_text, c.colors, c.color_identity, c.image_url,
+              LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
+              s.name AS set_name,
+              s.release_date AS set_release_date
+            FROM cards c
+            LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+            $whereClause
+            ORDER BY c.name, LOWER(c.set_code), s.release_date DESC NULLS LAST
+          ) AS deduped
+          ORDER BY name ASC, set_code ASC
+          LIMIT @limit OFFSET @offset
+        '''
+        : '''
+          SELECT * FROM (
+            SELECT DISTINCT ON (c.name, LOWER(c.set_code))
+              c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+              c.oracle_text, c.colors, c.color_identity, c.image_url,
+              LOWER(c.set_code) AS set_code, c.rarity, c.cmc
+            FROM cards c
+            $whereClause
+            ORDER BY c.name, LOWER(c.set_code)
+          ) AS deduped
+          ORDER BY name ASC, set_code ASC
+          LIMIT @limit OFFSET @offset
+        ''';
+  } else {
+    // Query normal sem deduplicação
+    sql = includeSetInfo
+        ? '''
+          SELECT
+            c.*,
+            s.name AS set_name,
+            s.release_date AS set_release_date
+          FROM cards c
+          LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+          $whereClause
+          ORDER BY c.name ASC
+          LIMIT @limit OFFSET @offset
+        '''
+        : '''
+          SELECT c.* FROM cards c
+          $whereClause
+          ORDER BY c.name ASC
+          LIMIT @limit OFFSET @offset
+        ''';
   }
 
-  sql += ' ORDER BY c.name ASC LIMIT @limit OFFSET @offset';
   params['limit'] = limit;
   params['offset'] = offset;
 
