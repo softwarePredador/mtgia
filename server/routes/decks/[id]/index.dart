@@ -212,6 +212,12 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
             .map((m) => m.cast<String, dynamic>())
             .toList();
         
+        // DEBUG: Log cartas recebidas
+        print('[DEBUG] PUT /decks/$deckId - Cartas recebidas: ${normalized.length}');
+        for (final card in normalized) {
+          print('[DEBUG]   card_id=${card['card_id']}, qty=${card['quantity']}, is_commander=${card['is_commander']}');
+        }
+        
         // Deduplicar por card_id (evita duplicatas acidentais do cliente)
         // Prioriza is_commander: true se houver conflito
         final deduped = <String, Map<String, dynamic>>{};
@@ -233,6 +239,12 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           }
         }
         final dedupedList = deduped.values.toList();
+        
+        // DEBUG: Log após deduplicação
+        print('[DEBUG] PUT /decks/$deckId - Após dedup: ${dedupedList.length} cartas');
+        for (final card in dedupedList) {
+          print('[DEBUG]   dedup: card_id=${card['card_id']}, qty=${card['quantity']}, is_commander=${card['is_commander']}');
+        }
         
         await DeckRulesService(session).validateAndThrow(
           format: currentFormat,
