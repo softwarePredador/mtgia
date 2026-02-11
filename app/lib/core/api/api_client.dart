@@ -112,12 +112,16 @@ class ApiClient {
     }
   }
 
-  Future<ApiResponse> post(String endpoint, Map<String, dynamic> body) async {
+  Future<ApiResponse> post(String endpoint, Map<String, dynamic> body, {Duration? timeout}) async {
     final url = '$baseUrl$endpoint';
     final headers = _getHeaders();
     final metric = _createMetric(url, HttpMethod.Post);
     final stopwatch = Stopwatch()..start();
     final bodyBytes = utf8.encode(jsonEncode(body));
+    
+    // Endpoints de IA têm timeout maior (2 minutos)
+    final isAiEndpoint = endpoint.startsWith('/ai/');
+    final effectiveTimeout = timeout ?? (isAiEndpoint ? const Duration(minutes: 2) : const Duration(seconds: 15));
     
     debugPrint('[🌐 ApiClient] POST $url');
     
@@ -129,7 +133,7 @@ class ApiClient {
         Uri.parse(url),
         headers: headers,
         body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(effectiveTimeout);
       
       stopwatch.stop();
       

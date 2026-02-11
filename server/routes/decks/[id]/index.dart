@@ -211,9 +211,32 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
             .whereType<Map>()
             .map((m) => m.cast<String, dynamic>())
             .toList();
+        
+        // Deduplicar por card_id (evita duplicatas acidentais do cliente)
+        // Prioriza is_commander: true se houver conflito
+        final deduped = <String, Map<String, dynamic>>{};
+        for (final card in normalized) {
+          final cardId = card['card_id'] as String?;
+          if (cardId == null || cardId.isEmpty) continue;
+          
+          final existing = deduped[cardId];
+          if (existing == null) {
+            deduped[cardId] = card;
+          } else {
+            // Se já existe, mantém o que tem is_commander: true
+            final existingIsCmd = existing['is_commander'] as bool? ?? false;
+            final newIsCmd = card['is_commander'] as bool? ?? false;
+            if (newIsCmd && !existingIsCmd) {
+              deduped[cardId] = card;
+            }
+            // Caso contrário, mantém o existente
+          }
+        }
+        final dedupedList = deduped.values.toList();
+        
         await DeckRulesService(session).validateAndThrow(
           format: currentFormat,
-          cards: normalized,
+          cards: dedupedList,
           strict: false,
         );
 
@@ -224,14 +247,14 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         );
 
         // Insere as novas cartas usando Batch Insert (MUITO MAIS RÁPIDO)
-        if (cards.isNotEmpty) {
+        if (dedupedList.isNotEmpty) {
           // Construir query dinâmica para inserção em lote
           // INSERT INTO deck_cards (...) VALUES ($1, $2...), ($5, $6...), ...
           final values = <String>[];
           final params = <String, dynamic>{'deckId': deckId};
 
-          for (var i = 0; i < cards.length; i++) {
-            final card = cards[i];
+          for (var i = 0; i < dedupedList.length; i++) {
+            final card = dedupedList[i];
             final pId = 'c$i';
             final pQty = 'q$i';
             final pCmdr = 'cmd$i';

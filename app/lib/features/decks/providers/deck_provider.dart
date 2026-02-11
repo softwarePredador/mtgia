@@ -1015,22 +1015,29 @@ class DeckProvider extends ChangeNotifier {
 
       // 2. Construir mapa de cartas atuais
       final currentCards = <String, Map<String, dynamic>>{};
+      
+      // Primeiro: adicionar commanders
+      final commanderIds = <String>{};
       for (final commander in _selectedDeck!.commander) {
+        commanderIds.add(commander.id);
         currentCards[commander.id] = {
           'card_id': commander.id,
           'quantity': commander.quantity,
           'is_commander': true,
         };
       }
+      
+      // Segundo: adicionar mainBoard, mas NUNCA sobrescrever commanders
       for (final entry in _selectedDeck!.mainBoard.entries) {
         for (final card in entry.value) {
-          if (!card.isCommander) {
-            currentCards[card.id] = {
-              'card_id': card.id,
-              'quantity': card.quantity,
-              'is_commander': false,
-            };
-          }
+          // Pular se já é commander (evita duplicatas)
+          if (commanderIds.contains(card.id)) continue;
+          
+          currentCards[card.id] = {
+            'card_id': card.id,
+            'quantity': card.quantity,
+            'is_commander': false,
+          };
         }
       }
 

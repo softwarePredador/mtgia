@@ -3179,6 +3179,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   return const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         CircularProgressIndicator(),
                         SizedBox(height: 16),
@@ -3192,6 +3193,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.error_outline,
