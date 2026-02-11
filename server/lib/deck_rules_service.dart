@@ -93,7 +93,10 @@ class DeckRulesService {
           (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
               ? 1
               : 4;
-      if (!isBasicLand && quantity > limit) {
+      
+      // Commanders são validados separadamente pela regra quantity == 1
+      // Aqui só validamos cartas normais
+      if (!isBasicLand && !isCommander && quantity > limit) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" excede o limite de $limit cópia(s) para o formato $normalizedFormat.',
           cardName: info.name,
