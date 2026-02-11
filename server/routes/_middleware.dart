@@ -132,4 +132,8 @@ Future<void> _ensureRuntimeSchema(Pool pool) async {
       'CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications (user_id, created_at DESC)'));
   await pool.execute(Sql.named(
       'CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications (user_id) WHERE read_at IS NULL'));
+
+  // Push Notifications: FCM token
+  await pool.execute(Sql.named(
+      'ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT'));
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
@@ -39,7 +40,18 @@ import 'features/messages/screens/message_inbox_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializa Firebase para push notifications.
+  // Se Firebase não estiver configurado (sem google-services.json),
+  // o app continua funcionando normalmente sem push.
+  try {
+    await PushNotificationService().init();
+  } catch (e) {
+    debugPrint('[Main] Firebase não configurado, push desabilitado: $e');
+  }
+
   runApp(const ManaLoomApp());
 }
 
@@ -257,10 +269,17 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     if (_authProvider.isAuthenticated) {
       _notificationProvider.startPolling();
       _messageProvider.startPolling();
+
+      // Registra FCM token para push notifications
+      PushNotificationService().requestPermissionAndRegister();
     } else {
       // Parar polling e limpar todo o estado dos providers ao deslogar
       _notificationProvider.stopPolling();
       _messageProvider.stopPolling();
+
+      // Remove FCM token do server (para de receber push)
+      PushNotificationService().unregister();
+
       _clearAllProvidersState();
     }
   }
