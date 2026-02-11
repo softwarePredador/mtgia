@@ -29,6 +29,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    // Listener para mudanças de aba (swipe ou tap)
+    _tabController.addListener(_onTabChange);
     // Carregar perfil
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SocialProvider>().fetchUserProfile(widget.userId);
@@ -37,8 +39,16 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChange);
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _onTabChange() {
+    // Só carrega quando a animação termina (evita chamadas duplicadas)
+    if (!_tabController.indexIsChanging) {
+      _loadTab(_tabController.index);
+    }
   }
 
   Future<void> _toggleFollow() async {
@@ -278,7 +288,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 color: AppTheme.surfaceSlate2,
                 child: TabBar(
                   controller: _tabController,
-                  onTap: _loadTab,
                   indicatorColor: AppTheme.manaViolet,
                   labelColor: AppTheme.textPrimary,
                   unselectedLabelColor: AppTheme.textSecondary,

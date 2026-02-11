@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
 import 'core/services/push_notification_service.dart';
+import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
@@ -52,6 +53,13 @@ void main() async {
     debugPrint('[Main] Firebase não configurado, push desabilitado: $e');
   }
 
+  // Inicializa Firebase Performance Monitoring
+  try {
+    await PerformanceService.instance.init();
+  } catch (e) {
+    debugPrint('[Main] Performance monitoring não disponível: $e');
+  }
+
   runApp(const ManaLoomApp());
 }
 
@@ -98,6 +106,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _router = GoRouter(
       initialLocation: '/',
       refreshListenable: _authProvider,
+      observers: [PerformanceNavigatorObserver()],
       redirect: (context, state) {
         final location = state.matchedLocation;
         final status = _authProvider.status;

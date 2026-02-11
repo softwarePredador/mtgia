@@ -3818,3 +3818,136 @@ As alterações foram deployadas via:
 
 **Imagem atual:** `easypanel/evolution/cartinhas:fixed-v2`
 
+---
+
+## 30. Firebase Performance Monitoring
+
+### 30.1 Objetivo
+
+Monitorar automaticamente a performance do app Flutter, identificando:
+- Telas lentas (tempo de permanência e carregamento)
+- Requisições HTTP lentas (tempo de resposta por endpoint)
+- Operações críticas que demoram mais que o esperado
+
+### 30.2 Dependências
+
+```yaml
+# app/pubspec.yaml
+dependencies:
+  firebase_performance: ^0.10.0+10
+```
+
+### 30.3 Arquitetura
+
+#### PerformanceService (`app/lib/core/services/performance_service.dart`)
+
+Singleton que gerencia todos os traces de performance:
+
+```dart
+// Inicialização (feita no main.dart)
+await PerformanceService.instance.init();
+
+// Medir operação assíncrona
+await PerformanceService.instance.traceAsync('fetch_decks', () async {
+  return await apiClient.get('/decks');
+});
+
+// Medir operação manual
+PerformanceService.instance.startTrace('analyze_deck');
+// ... fazer operação ...
+PerformanceService.instance.stopTrace('analyze_deck', 
+  attributes: {'deck_format': 'commander'},
+  metrics: {'card_count': 100},
+);
+```
+
+#### PerformanceNavigatorObserver
+
+Observer integrado ao GoRouter que rastreia automaticamente:
+- PUSH de telas (início do trace)
+- POP de telas (fim do trace + log do tempo)
+- REPLACE de telas
+
+```dart
+// Configurado no main.dart
+_router = GoRouter(
+  observers: [PerformanceNavigatorObserver()],
+  // ...
+);
+```
+
+#### ApiClient com HTTP Metrics
+
+Todas as requisições HTTP são automaticamente rastreadas:
+
+```dart
+// GET, POST, PUT, PATCH, DELETE - todos rastreados
+final response = await apiClient.get('/decks');
+// Logs: [🌐 ApiClient] GET /decks → 200 (145ms)
+// Se > 2000ms: [⚠️ SLOW REQUEST] GET /decks demorou 3500ms
+```
+
+### 30.4 O Que é Rastreado
+
+| Categoria | Trace Name | Descrição |
+|-----------|------------|-----------|
+| Telas | `screen_home` | Tempo na HomeScreen |
+| Telas | `screen_decks_123` | Tempo na DeckDetailsScreen |
+| Telas | `screen_community` | Tempo na CommunityScreen |
+| HTTP | Auto | Todas as requisições com tempo, status, payload size |
+| Custom | `fetch_decks` | Operações específicas que você medir |
+
+### 30.5 Logs de Debug
+
+Durante desenvolvimento, você verá no console:
+
+```
+[📱 Screen] → PUSH: home
+[🌐 ApiClient] GET /decks → 200 (145ms)
+[📱 Screen] → PUSH: decks_abc123
+[🌐 ApiClient] GET /decks/abc123 → 200 (89ms)
+[📱 Screen] ← POP: decks_abc123 (5230ms)
+[⚠️ SLOW SCREEN] decks_abc123 demorou 5s
+```
+
+### 30.6 Firebase Console
+
+Para ver as métricas em produção:
+
+1. Acesse [console.firebase.google.com](https://console.firebase.google.com)
+2. Selecione o projeto ManaLoom
+3. Vá em **Performance** no menu lateral
+4. Aba **Traces** mostra todas as telas e operações
+5. Aba **Network** mostra todas as requisições HTTP
+
+**Métricas disponíveis:**
+- Tempo médio, P50, P90, P99
+- Amostras por dia/hora
+- Distribuição por versão do app
+- Filtros por país, dispositivo, etc.
+
+### 30.7 Estatísticas Locais (Debug)
+
+Para debug durante desenvolvimento:
+
+```dart
+// Em qualquer lugar do app
+PerformanceService.instance.printLocalStats();
+```
+
+Output:
+```
+[📊 Performance] ═══════════════════════════════════════
+[📊 Performance] screen_home:
+    count=15 | avg=120ms | p50=95ms | p90=250ms | max=450ms
+[📊 Performance] fetch_decks:
+    count=8 | avg=180ms | p50=150ms | p90=320ms | max=500ms
+[📊 Performance] ═══════════════════════════════════════
+```
+
+### 30.8 Próximos Passos (Opcional)
+
+1. **Alertas de Threshold**: Configurar alertas no Firebase quando P90 > 2s
+2. **Custom Traces em Providers**: Adicionar `traceAsync` nos providers críticos
+3. **Métricas de Negócio**: Adicionar contadores como `decks_created`, `cards_searched`
+
