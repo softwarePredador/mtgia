@@ -1628,7 +1628,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 Text(card.name, style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 12),
                 FutureBuilder<List<Map<String, dynamic>>>(
-                  future: context.read<CardProvider>().fetchPrintingsByName(
+                  future: context.read<CardProvider>().resolveAndFetchPrintings(
                     card.name,
                   ),
                   builder: (context, snapshot) {
@@ -1823,7 +1823,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       FutureBuilder<List<Map<String, dynamic>>>(
                         future: context
                             .read<CardProvider>()
-                            .fetchPrintingsByName(card.name),
+                            .resolveAndFetchPrintings(card.name),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState !=
                               ConnectionState.done) {

@@ -262,8 +262,9 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
   final inserted = <Map<String, dynamic>>[];
 
   for (final card in allPrintings) {
-    final cardOracleId = card['oracle_id'] as String?;
-    if (cardOracleId == null || cardOracleId.isEmpty) continue;
+    // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
+    final scryfallUniqueId = card['id'] as String?;
+    if (scryfallUniqueId == null || scryfallUniqueId.isEmpty) continue;
 
     final cardName = card['name']?.toString() ?? '';
     final manaCost = card['mana_cost']?.toString();
@@ -308,19 +309,10 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
             @cmc::decimal
           )
-          ON CONFLICT (scryfall_id) DO UPDATE SET
-            name = EXCLUDED.name,
-            mana_cost = EXCLUDED.mana_cost,
-            type_line = EXCLUDED.type_line,
-            oracle_text = EXCLUDED.oracle_text,
-            colors = EXCLUDED.colors,
-            color_identity = EXCLUDED.color_identity,
-            image_url = EXCLUDED.image_url,
-            set_code = EXCLUDED.set_code,
-            rarity = EXCLUDED.rarity
+          ON CONFLICT (scryfall_id) DO NOTHING
         '''),
         parameters: {
-          'oracle_id': cardOracleId,
+          'oracle_id': scryfallUniqueId,
           'name': cardName,
           'mana_cost': manaCost,
           'type_line': typeLine,
@@ -342,8 +334,10 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
     }
   }
 
-  // Também insere/atualiza o set se não existir
-  await _ensureSet(pool, scryfallCard);
+  // Também insere/atualiza os sets de todas as printings
+  for (final card in allPrintings) {
+    await _ensureSet(pool, card);
+  }
 
   return inserted;
 }
@@ -393,14 +387,14 @@ Future<void> _insertLegalities(
   final legalities = scryfallCard['legalities'] as Map<String, dynamic>?;
   if (legalities == null || legalities.isEmpty) return;
 
-  // Pega o oracle_id para buscar o card_id no banco
-  final oracleId = scryfallCard['oracle_id'] as String?;
-  if (oracleId == null) return;
+  // Busca o card_id pelo nome (scryfall_id agora é único por printing, não oracle_id)
+  final cardName = scryfallCard['name'] as String?;
+  if (cardName == null) return;
 
-  // Busca o card_id principal (primeiro do oracle_id)
+  // Busca o card_id principal (primeiro match pelo nome)
   final cardResult = await pool.execute(
-    Sql.named('SELECT id::text FROM cards WHERE scryfall_id = @oid::uuid LIMIT 1'),
-    parameters: {'oid': oracleId},
+    Sql.named('SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1'),
+    parameters: {'name': cardName},
   );
   if (cardResult.isEmpty) return;
 

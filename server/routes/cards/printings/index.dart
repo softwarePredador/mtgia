@@ -59,17 +59,11 @@ Future<Response> onRequest(RequestContext context) async {
   // Se sync=true e encontrou poucas edições, busca do Scryfall
   if (syncFromScryfall && data.length <= 1) {
     try {
-      print('[printings/sync] Starting sync for "$name" (current: ${data.length})');
       final imported = await _syncPrintingsFromScryfall(pool, name);
-      print('[printings/sync] Imported $imported new printings');
       if (imported > 0) {
-        // Re-query com as edições importadas
         data = await _queryPrintings(pool, name, safeLimit, hasSets);
-        print('[printings/sync] After re-query: ${data.length} printings');
       }
-    } catch (e, st) {
-      print('[printings/sync] Erro: $e');
-      print('[printings/sync] Stack: $st');
+    } catch (e) {
       stderr.writeln('[printings/sync] Erro: $e');
     }
   }
@@ -190,12 +184,10 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     'User-Agent': 'MTGDeckBuilder/1.0',
   });
 
-  print('[sync] Scryfall response: ${response.statusCode}');
   if (response.statusCode != 200) return 0;
 
   final card = jsonDecode(response.body) as Map<String, dynamic>;
   final printsUri = card['prints_search_uri'] as String?;
-  print('[sync] prints_search_uri: $printsUri');
   if (printsUri == null) return 0;
 
   // 2. Buscar todas as printings
@@ -211,8 +203,6 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
 
   final body = jsonDecode(printsResponse.body) as Map<String, dynamic>;
   final printings = (body['data'] as List?)?.whereType<Map<String, dynamic>>() ?? [];
-  print('[sync] Raw printings from Scryfall: ${printings.length}');
-
   // Filtrar: só paper, sem art_series, sem tokens
   final filtered = printings.where((p) {
     final games = p['games'] as List?;
@@ -220,8 +210,6 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     final layout = p['layout']?.toString() ?? '';
     return isPaper && layout != 'art_series' && layout != 'token';
   }).take(30).toList();
-
-  print('[sync] Filtered printings: ${filtered.length}');
 
   var imported = 0;
 
