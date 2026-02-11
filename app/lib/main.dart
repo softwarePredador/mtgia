@@ -256,9 +256,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   void _onAuthChanged() {
     if (_authProvider.isAuthenticated) {
       _notificationProvider.startPolling();
+      _messageProvider.startPolling();
     } else {
       // Parar polling e limpar todo o estado dos providers ao deslogar
       _notificationProvider.stopPolling();
+      _messageProvider.stopPolling();
       _clearAllProvidersState();
     }
   }

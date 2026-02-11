@@ -81,9 +81,9 @@ class _TradeInboxTabContentState extends State<TradeInboxTabContent>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _TradeListView(onRefresh: () => _loadForTab(0)),
-              _TradeListView(onRefresh: () => _loadForTab(1)),
-              _TradeListView(onRefresh: () => _loadForTab(2)),
+              _TradeListView(onRefresh: () => _loadForTab(0), role: 'receiver', status: 'pending'),
+              _TradeListView(onRefresh: () => _loadForTab(1), role: 'sender'),
+              _TradeListView(onRefresh: () => _loadForTab(2), status: 'completed'),
             ],
           ),
         ),
@@ -161,9 +161,9 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _TradeListView(onRefresh: () => _loadForTab(0)),
-          _TradeListView(onRefresh: () => _loadForTab(1)),
-          _TradeListView(onRefresh: () => _loadForTab(2)),
+          _TradeListView(onRefresh: () => _loadForTab(0), role: 'receiver', status: 'pending'),
+          _TradeListView(onRefresh: () => _loadForTab(1), role: 'sender'),
+          _TradeListView(onRefresh: () => _loadForTab(2), status: 'completed'),
         ],
       ),
     );
@@ -172,7 +172,9 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
 
 class _TradeListView extends StatefulWidget {
   final VoidCallback onRefresh;
-  const _TradeListView({required this.onRefresh});
+  final String role;
+  final String? status;
+  const _TradeListView({required this.onRefresh, this.role = 'all', this.status});
 
   @override
   State<_TradeListView> createState() => _TradeListViewState();
@@ -200,9 +202,10 @@ class _TradeListViewState extends State<_TradeListView> {
       final provider = context.read<TradeProvider>();
       if (!provider.isLoading &&
           provider.trades.length < provider.totalTrades) {
-        // Load next page — the parent tab needs to call with correct filters
-        // For now we just trigger the onRefresh which reloads from page 1
-        // TODO: improve with per-tab page tracking
+        provider.fetchMoreTrades(
+          role: widget.role,
+          status: widget.status,
+        );
       }
     }
   }
