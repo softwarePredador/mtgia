@@ -317,7 +317,6 @@ DeckThemeProfile _detectThemeProfile(
   final commanderLower = commanders.map((e) => e.toLowerCase()).toSet();
 
   var totalNonLands = 0;
-  var eldraziCount = 0;
   var artifactCount = 0;
   var enchantmentCount = 0;
   var instantSorceryCount = 0;
@@ -331,13 +330,14 @@ DeckThemeProfile _detectThemeProfile(
 
   // Tribal: track creature subtypes for tribe concentration
   final creatureSubtypes = <String, int>{};
+  
+  // Armazenar dados das cartas para análise de impacto posterior
+  final cardData = <Map<String, dynamic>>[];
 
-  final core = <String, String>{}; // lower -> original
-
+  // PRIMEIRA PASSAGEM: contar temas e coletar dados
   for (final c in cards) {
     final name = (c['name'] as String?) ?? '';
     if (name.isEmpty) continue;
-    final nameLower = name.toLowerCase();
     final typeLine = ((c['type_line'] as String?) ?? '').toLowerCase();
     final oracle = ((c['oracle_text'] as String?) ?? '').toLowerCase();
     final q = qty(c);
@@ -345,11 +345,14 @@ DeckThemeProfile _detectThemeProfile(
     final isLand = typeLine.contains('land');
     if (!isLand) totalNonLands += q;
 
-    // --- Eldrazi (type_line based, not hardcoded names) ---
-    if (!isLand && typeLine.contains('eldrazi')) {
-      eldraziCount += q;
-      core.putIfAbsent(nameLower, () => name);
-    }
+    // Guardar para análise de impacto
+    cardData.add({
+      'name': name,
+      'typeLine': typeLine,
+      'oracle': oracle,
+      'quantity': q,
+      'isLand': isLand,
+    });
 
     // --- Tipo-based counts ---
     if (!isLand && typeLine.contains('artifact')) artifactCount += q;
@@ -364,8 +367,6 @@ DeckThemeProfile _detectThemeProfile(
       tokenReferences += q;
     }
     if (oracle.contains('populate') ||
-        oracle.contains('doubling season') ||
-        oracle.contains('parallel lives') ||
         (oracle.contains('whenever') && oracle.contains('token'))) {
       tokenReferences += q;
     }
@@ -381,7 +382,6 @@ DeckThemeProfile _detectThemeProfile(
     // --- Aristocrats theme (sacrifice + death triggers) ---
     if ((oracle.contains('sacrifice') && (oracle.contains('whenever') || oracle.contains('you may'))) ||
         (oracle.contains('when') && oracle.contains('dies')) ||
-        oracle.contains('blood artist') ||
         oracle.contains('drain')) {
       aristocratReferences += q;
     }
@@ -405,15 +405,12 @@ DeckThemeProfile _detectThemeProfile(
     // --- Wheels theme (discard hand + draw) ---
     if ((oracle.contains('each player') && oracle.contains('discards') && oracle.contains('draws')) ||
         (oracle.contains('discard') && oracle.contains('hand') && oracle.contains('draw')) ||
-        oracle.contains('wheel of fortune') ||
         (oracle.contains('whenever') && oracle.contains('draws a card'))) {
       wheelReferences += q;
     }
 
     // --- Stax theme (tax, restrict, slow down) ---
     if (oracle.contains('each opponent') && (oracle.contains('can\'t') || oracle.contains('pays') || oracle.contains('sacrifices')) ||
-        oracle.contains('winter orb') ||
-        oracle.contains('static orb') ||
         (oracle.contains('nonland permanent') && oracle.contains('doesn\'t untap')) ||
         (oracle.contains('players can\'t') && (oracle.contains('cast') || oracle.contains('search')))) {
       staxReferences += q;
@@ -421,7 +418,6 @@ DeckThemeProfile _detectThemeProfile(
 
     // --- Tribal: track creature subtypes ---
     if (typeLine.contains('creature')) {
-      // Extract subtypes after " — " (em dash separator in type_line)
       final dashIndex = typeLine.indexOf('—');
       if (dashIndex != -1) {
         final subtypes = typeLine.substring(dashIndex + 1).trim().split(RegExp(r'\s+'));
@@ -432,11 +428,6 @@ DeckThemeProfile _detectThemeProfile(
         }
       }
     }
-  }
-
-  // Comandantes sempre são core
-  for (final cmd in commanders) {
-    core.putIfAbsent(cmd.toLowerCase(), () => cmd);
   }
 
   // Determine dominant creature tribe
@@ -458,11 +449,6 @@ DeckThemeProfile _detectThemeProfile(
   } else {
     // Score each theme and pick the strongest
     final themeScores = <String, double>{
-      'eldrazi': eldraziCount >= 8
-          ? eldraziCount / totalNonLands
-          : (eldraziCount / totalNonLands >= 0.15
-              ? eldraziCount / totalNonLands
-              : 0.0),
       'artifacts': artifactCount / totalNonLands >= 0.30
           ? artifactCount / totalNonLands
           : 0.0,
@@ -517,15 +503,179 @@ DeckThemeProfile _detectThemeProfile(
       ? 'alta'
       : (score >= 0.20 ? 'média' : (score >= 0.10 ? 'baixa' : 'baixa'));
 
-  final coreCards = core.values.toList()
-    ..sort((a, b) {
-      final al = a.toLowerCase();
-      final bl = b.toLowerCase();
-      final aIsCommander = commanderLower.contains(al);
-      final bIsCommander = commanderLower.contains(bl);
-      if (aIsCommander != bIsCommander) return aIsCommander ? -1 : 1;
-      return a.compareTo(b);
-    });
+  // SEGUNDA PASSAGEM: Análise de IMPACTO para identificar core_cards
+  // Core = cartas que, se removidas, enfraquecem significativamente o tema
+  final core = <String, int>{}; // name -> impact score
+
+  for (final c in cardData) {
+    final name = c['name'] as String;
+    final nameLower = name.toLowerCase();
+    final typeLine = c['typeLine'] as String;
+    final oracle = c['oracle'] as String;
+    final q = c['quantity'] as int;
+    final isLand = c['isLand'] as bool;
+
+    if (isLand) continue;
+
+    var impactScore = 0;
+
+    // 1. Comandantes = sempre core (impacto máximo)
+    if (commanderLower.contains(nameLower)) {
+      impactScore += 100;
+    }
+
+    // 2. 4 cópias = usuário priorizou esta carta
+    if (q >= 4) {
+      impactScore += 15;
+    }
+
+    // 3. LORD/ANTHEM: dá bonus para OUTROS do mesmo tipo
+    // Detecta padrões como "other X get +1/+1", "X you control get +1/+1"
+    if (oracle.contains('get +') || oracle.contains('gets +')) {
+      // Verifica se menciona o tipo tribal dominante
+      if (dominantTribe != null && oracle.contains(dominantTribe)) {
+        impactScore += 40; // Lord do tribal = alto impacto
+      }
+      // Ou se é um anthem genérico para criaturas
+      if (oracle.contains('creatures you control') && oracle.contains('+')) {
+        impactScore += 25;
+      }
+    }
+
+    // 4. PAYOFF: carta que escala com o tema
+    // Tokens: "whenever a token", "for each token"
+    if (theme.contains('token')) {
+      if (oracle.contains('whenever') && oracle.contains('token')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('for each') && oracle.contains('token')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('double') && oracle.contains('token')) {
+        impactScore += 50; // Doubling Season effect
+      }
+    }
+
+    // Aristocrats: "whenever a creature dies", "whenever you sacrifice"
+    if (theme == 'aristocrats') {
+      if (oracle.contains('whenever') && oracle.contains('dies')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('whenever') && oracle.contains('sacrifice')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('drain') || oracle.contains('each opponent loses')) {
+        impactScore += 30;
+      }
+    }
+
+    // Reanimator: "return from graveyard", "reanimate"
+    if (theme == 'reanimator') {
+      if (oracle.contains('return') && oracle.contains('graveyard') && oracle.contains('battlefield')) {
+        impactScore += 35;
+      }
+    }
+
+    // Spellslinger: "whenever you cast", "copy", "storm"
+    if (theme == 'spellslinger') {
+      if (oracle.contains('whenever you cast') && (oracle.contains('instant') || oracle.contains('sorcery'))) {
+        impactScore += 35;
+      }
+      if (oracle.contains('copy') && oracle.contains('spell')) {
+        impactScore += 30;
+      }
+      if (oracle.contains('storm')) {
+        impactScore += 40;
+      }
+    }
+
+    // Landfall: "landfall", "whenever a land enters"
+    if (theme == 'landfall') {
+      if (oracle.contains('landfall')) {
+        impactScore += 35;
+      }
+    }
+
+    // Voltron: equipment matters, aura matters
+    if (theme == 'voltron') {
+      if (oracle.contains('equipped creature') && oracle.contains('+')) {
+        impactScore += 30;
+      }
+      if (oracle.contains('enchanted creature') && oracle.contains('+')) {
+        impactScore += 30;
+      }
+      if (oracle.contains('double strike') || oracle.contains('hexproof')) {
+        impactScore += 25;
+      }
+    }
+
+    // 5. TRIBAL: carta É do tipo dominante + tem habilidade tribal
+    if (theme.startsWith('tribal-') && dominantTribe != null) {
+      final isTribalType = typeLine.contains(dominantTribe);
+      final mentionsTribe = oracle.contains(dominantTribe);
+      
+      if (isTribalType && mentionsTribe) {
+        // É do tipo E menciona o tipo no texto = alto valor tribal
+        impactScore += 35;
+      } else if (mentionsTribe && !isTribalType) {
+        // Não é do tipo mas menciona = suporte tribal (ex: Kindred spells)
+        impactScore += 25;
+      }
+      
+      // Cartas que dizem "choose a creature type" ou similar
+      if (oracle.contains('creature type') && oracle.contains('choose')) {
+        impactScore += 20;
+      }
+    }
+
+    // 6. Artifacts matter
+    if (theme == 'artifacts') {
+      if (oracle.contains('whenever') && oracle.contains('artifact')) {
+        impactScore += 30;
+      }
+      if (oracle.contains('for each artifact')) {
+        impactScore += 35;
+      }
+    }
+
+    // 7. Enchantments matter
+    if (theme == 'enchantments') {
+      if (oracle.contains('whenever') && oracle.contains('enchantment')) {
+        impactScore += 30;
+      }
+      if (oracle.contains('constellation')) {
+        impactScore += 35;
+      }
+    }
+
+    // 8. Wheels
+    if (theme == 'wheels') {
+      if (oracle.contains('whenever') && oracle.contains('draws')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('discard') && oracle.contains('hand') && oracle.contains('draw')) {
+        impactScore += 40;
+      }
+    }
+
+    // 9. Stax: key pieces
+    if (theme == 'stax') {
+      if (oracle.contains('can\'t') || oracle.contains('doesn\'t untap')) {
+        impactScore += 30;
+      }
+    }
+
+    // Threshold: só adiciona ao core se impacto >= 25
+    if (impactScore >= 25) {
+      core[name] = impactScore;
+    }
+  }
+
+  // Ordenar core por impacto (maior primeiro), pegar top 10
+  final sortedCore = core.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  
+  final coreCards = sortedCore.take(10).map((e) => e.key).toList();
 
   return DeckThemeProfile(
     theme: theme,
