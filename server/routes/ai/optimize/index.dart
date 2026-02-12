@@ -689,7 +689,7 @@ Future<Response> onRequest(RequestContext context) async {
       });
     }
 
-    final optimizer = DeckOptimizerService(apiKey);
+    final optimizer = DeckOptimizerService(apiKey, db: pool);
 
     // Preparar dados para o otimizador
     final deckData = {

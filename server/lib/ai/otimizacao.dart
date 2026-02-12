@@ -15,7 +15,7 @@ class DeckOptimizerService {
   final AiLogService? _logService;
   final MLKnowledgeService? _mlService;
 
-  DeckOptimizerService(this.openAiKey, {Connection? db})
+  DeckOptimizerService(this.openAiKey, {dynamic db})
       : synergyEngine = SynergyEngine(),
         edhrecService = EdhrecService(),
         _logService = db != null ? AiLogService(db) : null,
