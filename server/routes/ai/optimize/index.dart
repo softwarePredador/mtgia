@@ -194,7 +194,8 @@ class DeckArchetypeAnalyzer {
   }
 
   String _assessManaBase(Map<String, int> symbols, Map<String, int> sources) {
-    final totalSymbols = symbols.values.reduce((a, b) => a + b);
+    if (symbols.isEmpty) return 'N/A';
+    final totalSymbols = symbols.values.fold<int>(0, (a, b) => a + b);
     if (totalSymbols == 0) return 'N/A';
 
     final issues = <String>[];
