@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import '../logger.dart';
 import 'goldfish_simulator.dart';
 
 /// Motor de Validação Pós-Otimização
@@ -127,14 +128,23 @@ class OptimizationValidator {
         final hand = shuffled.take(7).toList();
         final handSize = 7 - attempt; // Commander: free first, then -1 each
 
-        // Heurística de keep
+        // Heurística de keep melhorada:
+        // Mana rocks contam como "meios terrenos" para avaliar keepability
         final landsInHand = hand.where(_isLand).length;
+        final manaRocksInHand = hand.where((c) {
+          if (_isLand(c)) return false;
+          final t = ((c['type_line'] as String?) ?? '').toLowerCase();
+          final o = ((c['oracle_text'] as String?) ?? '').toLowerCase();
+          return t.contains('artifact') && o.contains('add') && _getCmc(c) <= 2;
+        }).length;
+        // effectiveLands = terras reais + (mana rocks × 0.5)
+        final effectiveLands = landsInHand + (manaRocksInHand * 0.5);
         final hasEarlyPlay = hand.any(
           (c) => !_isLand(c) && _getCmc(c) <= 3,
         );
 
-        // Keep se: 2-5 lands E tem jogada early (ou hand size <= 5)
-        final shouldKeep = (landsInHand >= 2 && landsInHand <= 5 && hasEarlyPlay) ||
+        // Keep se: 2-5 effective lands E tem jogada early (ou hand size <= 5)
+        final shouldKeep = (effectiveLands >= 1.5 && effectiveLands <= 5.5 && hasEarlyPlay) ||
             handSize <= 5; // Keep at 5 cards regardless
 
         if (shouldKeep || attempt == 3) {
@@ -288,7 +298,7 @@ class OptimizationValidator {
     // Card draw
     if (oracle.contains('draw') ||
         oracle.contains('look at the top') ||
-        oracle.contains('scry') && oracle.contains('draw')) {
+        (oracle.contains('scry') && oracle.contains('draw'))) {
       return 'draw';
     }
 
@@ -296,22 +306,22 @@ class OptimizationValidator {
     if (oracle.contains('destroy target') ||
         oracle.contains('exile target') ||
         oracle.contains('counter target') ||
-        oracle.contains('return target') && oracle.contains('to its owner')) {
+        (oracle.contains('return target') && oracle.contains('to its owner'))) {
       return 'removal';
     }
 
     // Board wipe
     if (oracle.contains('destroy all') ||
         oracle.contains('exile all') ||
-        oracle.contains('each creature') && oracle.contains('damage')) {
+        (oracle.contains('each creature') && oracle.contains('damage'))) {
       return 'wipe';
     }
 
     // Ramp
     if (oracle.contains('add {') ||
-        oracle.contains('search your library for a') && oracle.contains('land') ||
+        (oracle.contains('search your library for a') && oracle.contains('land')) ||
         oracle.contains('mana of any') ||
-        typeLine.contains('artifact') && oracle.contains('add')) {
+        (typeLine.contains('artifact') && oracle.contains('add'))) {
       return 'ramp';
     }
 
@@ -404,10 +414,10 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
             as Map<String, dynamic>;
       }
 
-      print('[WARN] Critic AI failed: HTTP ${response.statusCode}');
+      Log.w('Critic AI failed: HTTP ${response.statusCode}');
       return null;
     } catch (e) {
-      print('[WARN] Critic AI error: $e');
+      Log.w('Critic AI error: $e');
       return null;
     }
   }

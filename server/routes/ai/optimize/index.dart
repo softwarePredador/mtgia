@@ -314,23 +314,21 @@ DeckThemeProfile _detectThemeProfile(
 
   final commanderLower = commanders.map((e) => e.toLowerCase()).toSet();
 
-  final anchorLower = <String>{
-    'hullbreaker horror',
-    'void winnower',
-    'kozilek, butcher of truth',
-    'kozilek, the great distortion',
-    'ulamog, the infinite gyre',
-    'ulamog, the ceaseless hunger',
-    'ulamog, the defiler',
-    'emrakul, the promised end',
-    'emrakul, the aeons torn',
-  };
-
   var totalNonLands = 0;
   var eldraziCount = 0;
   var artifactCount = 0;
   var enchantmentCount = 0;
   var instantSorceryCount = 0;
+  var tokenReferences = 0;
+  var reanimatorReferences = 0;
+  var aristocratReferences = 0;
+  var voltronReferences = 0;
+  var landfallReferences = 0;
+  var wheelReferences = 0;
+  var staxReferences = 0;
+
+  // Tribal: track creature subtypes for tribe concentration
+  final creatureSubtypes = <String, int>{};
 
   final core = <String, String>{}; // lower -> original
 
@@ -339,15 +337,19 @@ DeckThemeProfile _detectThemeProfile(
     if (name.isEmpty) continue;
     final nameLower = name.toLowerCase();
     final typeLine = ((c['type_line'] as String?) ?? '').toLowerCase();
+    final oracle = ((c['oracle_text'] as String?) ?? '').toLowerCase();
     final q = qty(c);
 
     final isLand = typeLine.contains('land');
     if (!isLand) totalNonLands += q;
 
+    // --- Eldrazi (type_line based, not hardcoded names) ---
     if (!isLand && typeLine.contains('eldrazi')) {
       eldraziCount += q;
       core.putIfAbsent(nameLower, () => name);
     }
+
+    // --- Tipo-based counts ---
     if (!isLand && typeLine.contains('artifact')) artifactCount += q;
     if (!isLand && typeLine.contains('enchantment')) enchantmentCount += q;
     if (!isLand &&
@@ -355,11 +357,78 @@ DeckThemeProfile _detectThemeProfile(
       instantSorceryCount += q;
     }
 
-    if (anchorLower.contains(nameLower) ||
-        nameLower.contains('kozilek') ||
-        nameLower.contains('ulamog') ||
-        nameLower.contains('emrakul')) {
-      core.putIfAbsent(nameLower, () => name);
+    // --- Token theme ---
+    if (oracle.contains('create') && oracle.contains('token')) {
+      tokenReferences += q;
+    }
+    if (oracle.contains('populate') ||
+        oracle.contains('doubling season') ||
+        oracle.contains('parallel lives') ||
+        (oracle.contains('whenever') && oracle.contains('token'))) {
+      tokenReferences += q;
+    }
+
+    // --- Reanimator theme ---
+    if ((oracle.contains('return') && oracle.contains('from') && oracle.contains('graveyard')) ||
+        oracle.contains('reanimate') ||
+        oracle.contains('unearth') ||
+        (oracle.contains('put') && oracle.contains('graveyard') && oracle.contains('onto the battlefield'))) {
+      reanimatorReferences += q;
+    }
+
+    // --- Aristocrats theme (sacrifice + death triggers) ---
+    if ((oracle.contains('sacrifice') && (oracle.contains('whenever') || oracle.contains('you may'))) ||
+        (oracle.contains('when') && oracle.contains('dies')) ||
+        oracle.contains('blood artist') ||
+        oracle.contains('drain')) {
+      aristocratReferences += q;
+    }
+
+    // --- Voltron theme (auras, equipment, commander damage focus) ---
+    if (typeLine.contains('equipment') ||
+        (typeLine.contains('aura') && oracle.contains('enchant creature')) ||
+        oracle.contains('double strike') ||
+        oracle.contains('hexproof') ||
+        (oracle.contains('equipped creature') && oracle.contains('+')) ||
+        (oracle.contains('enchanted creature') && oracle.contains('+'))) {
+      voltronReferences += q;
+    }
+
+    // --- Landfall theme ---
+    if (oracle.contains('landfall') ||
+        (oracle.contains('whenever') && oracle.contains('land') && oracle.contains('enters'))) {
+      landfallReferences += q;
+    }
+
+    // --- Wheels theme (discard hand + draw) ---
+    if ((oracle.contains('each player') && oracle.contains('discards') && oracle.contains('draws')) ||
+        (oracle.contains('discard') && oracle.contains('hand') && oracle.contains('draw')) ||
+        oracle.contains('wheel of fortune') ||
+        (oracle.contains('whenever') && oracle.contains('draws a card'))) {
+      wheelReferences += q;
+    }
+
+    // --- Stax theme (tax, restrict, slow down) ---
+    if (oracle.contains('each opponent') && (oracle.contains('can\'t') || oracle.contains('pays') || oracle.contains('sacrifices')) ||
+        oracle.contains('winter orb') ||
+        oracle.contains('static orb') ||
+        (oracle.contains('nonland permanent') && oracle.contains('doesn\'t untap')) ||
+        (oracle.contains('players can\'t') && (oracle.contains('cast') || oracle.contains('search')))) {
+      staxReferences += q;
+    }
+
+    // --- Tribal: track creature subtypes ---
+    if (typeLine.contains('creature')) {
+      // Extract subtypes after " — " (em dash separator in type_line)
+      final dashIndex = typeLine.indexOf('—');
+      if (dashIndex != -1) {
+        final subtypes = typeLine.substring(dashIndex + 1).trim().split(RegExp(r'\s+'));
+        for (final st in subtypes) {
+          if (st.isNotEmpty && st != 'creature') {
+            creatureSubtypes[st] = (creatureSubtypes[st] ?? 0) + q;
+          }
+        }
+      }
     }
   }
 
@@ -368,27 +437,78 @@ DeckThemeProfile _detectThemeProfile(
     core.putIfAbsent(cmd.toLowerCase(), () => cmd);
   }
 
+  // Determine dominant creature tribe
+  String? dominantTribe;
+  int tribalCount = 0;
+  if (creatureSubtypes.isNotEmpty) {
+    final sorted = creatureSubtypes.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    dominantTribe = sorted.first.key;
+    tribalCount = sorted.first.value;
+  }
+
   String theme;
   double score;
 
   if (totalNonLands <= 0) {
     theme = 'generic';
     score = 0.0;
-  } else if (eldraziCount >= 8 || (eldraziCount / totalNonLands) >= 0.15) {
-    theme = 'eldrazi';
-    score = eldraziCount / totalNonLands;
-  } else if ((artifactCount / totalNonLands) >= 0.30) {
-    theme = 'artifacts';
-    score = artifactCount / totalNonLands;
-  } else if ((enchantmentCount / totalNonLands) >= 0.30) {
-    theme = 'enchantments';
-    score = enchantmentCount / totalNonLands;
-  } else if ((instantSorceryCount / totalNonLands) >= 0.35) {
-    theme = 'spellslinger';
-    score = instantSorceryCount / totalNonLands;
   } else {
-    theme = 'generic';
-    score = 0.0;
+    // Score each theme and pick the strongest
+    final themeScores = <String, double>{
+      'eldrazi': eldraziCount >= 8
+          ? eldraziCount / totalNonLands
+          : (eldraziCount / totalNonLands >= 0.15
+              ? eldraziCount / totalNonLands
+              : 0.0),
+      'artifacts': artifactCount / totalNonLands >= 0.30
+          ? artifactCount / totalNonLands
+          : 0.0,
+      'enchantments': enchantmentCount / totalNonLands >= 0.30
+          ? enchantmentCount / totalNonLands
+          : 0.0,
+      'spellslinger': instantSorceryCount / totalNonLands >= 0.35
+          ? instantSorceryCount / totalNonLands
+          : 0.0,
+      'tokens': tokenReferences / totalNonLands >= 0.15
+          ? tokenReferences / totalNonLands
+          : 0.0,
+      'reanimator': reanimatorReferences / totalNonLands >= 0.12
+          ? reanimatorReferences / totalNonLands
+          : 0.0,
+      'aristocrats': aristocratReferences / totalNonLands >= 0.12
+          ? aristocratReferences / totalNonLands
+          : 0.0,
+      'voltron': voltronReferences / totalNonLands >= 0.15
+          ? voltronReferences / totalNonLands
+          : 0.0,
+      'landfall': landfallReferences / totalNonLands >= 0.10
+          ? landfallReferences / totalNonLands
+          : 0.0,
+      'wheels': wheelReferences / totalNonLands >= 0.10
+          ? wheelReferences / totalNonLands
+          : 0.0,
+      'stax': staxReferences / totalNonLands >= 0.10
+          ? staxReferences / totalNonLands
+          : 0.0,
+      'tribal': tribalCount / totalNonLands >= 0.25
+          ? tribalCount / totalNonLands
+          : 0.0,
+    };
+
+    // Pick highest scoring theme
+    final best = themeScores.entries.reduce(
+        (a, b) => a.value >= b.value ? a : b);
+
+    if (best.value > 0.0) {
+      theme = best.key == 'tribal' && dominantTribe != null
+          ? 'tribal-$dominantTribe'
+          : best.key;
+      score = best.value;
+    } else {
+      theme = 'generic';
+      score = 0.0;
+    }
   }
 
   final confidence = score >= 0.35
@@ -802,9 +922,9 @@ Future<Response> onRequest(RequestContext context) async {
           final landsNeeded = (idealLands - currentLands).clamp(0, missing);
           final spellsNeeded = missing - landsNeeded;
           
-          print('[DEBUG] Complete fallback inteligente:');
-          print('[DEBUG]   Cartas faltando: $missing | Lands atuais: $currentLands | Ideal: $idealLands');
-          print('[DEBUG]   Lands a adicionar: $landsNeeded | Spells a adicionar: $spellsNeeded');
+          Log.d('Complete fallback inteligente:');
+          Log.d('  Cartas faltando: $missing | Lands atuais: $currentLands | Ideal: $idealLands');
+          Log.d('  Lands a adicionar: $landsNeeded | Spells a adicionar: $spellsNeeded');
           
           // Adicionar spells primeiro (via busca no DB por cartas sinérgicas)
           if (spellsNeeded > 0) {
@@ -853,9 +973,9 @@ Future<Response> onRequest(RequestContext context) async {
                   'cmc': 0.0,
                 });
               }
-              print('[DEBUG]   Spells sinérgicas adicionadas: ${synergySpells.length}');
+              Log.d('  Spells sinérgicas adicionadas: ${synergySpells.length}');
             } catch (e) {
-              print('[WARN] Falha ao buscar spells sinérgicas: $e');
+              Log.w('Falha ao buscar spells sinérgicas: $e');
             }
           }
           
@@ -922,7 +1042,7 @@ Future<Response> onRequest(RequestContext context) async {
         jsonResponse['mode'] = 'optimize';
       }
     } catch (e) {
-      print('[ERROR] Optimization failed: $e');
+      Log.e('Optimization failed: $e');
       return Response.json(
         statusCode: HttpStatus.internalServerError,
         body: {'error': 'Optimization failed'},
@@ -1007,10 +1127,10 @@ Future<Response> onRequest(RequestContext context) async {
       final swaps = jsonResponse['swaps'] as List;
       for (var swap in swaps) {
         if (swap is Map) {
-          final out = swap['out'] as String?;
-          final inCard = swap['in'] as String?;
-          if (out != null && out.isNotEmpty) removals.add(out);
-          if (inCard != null && inCard.isNotEmpty) additions.add(inCard);
+          final out = (swap['out'] as String?) ?? '';
+          final inCard = (swap['in'] as String?) ?? '';
+          if (out.isNotEmpty) removals.add(out);
+          if (inCard.isNotEmpty) additions.add(inCard);
         }
       }
     }
@@ -1019,8 +1139,22 @@ Future<Response> onRequest(RequestContext context) async {
       final changes = jsonResponse['changes'] as List;
       for (var change in changes) {
         if (change is Map) {
-          removals.add(change['remove'] as String);
-          additions.add(change['add'] as String);
+          final rem = (change['remove'] as String?) ?? '';
+          final add = (change['add'] as String?) ?? '';
+          if (rem.isNotEmpty) removals.add(rem);
+          if (add.isNotEmpty) additions.add(add);
+        }
+      }
+    }
+    // Suporte ao formato "suggestions" (fallback genérico)
+    else if (jsonResponse.containsKey('suggestions')) {
+      final suggestions = jsonResponse['suggestions'] as List;
+      for (var sug in suggestions) {
+        if (sug is Map) {
+          final out = (sug['out'] ?? sug['remove'] ?? '') as String;
+          final inCard = (sug['in'] ?? sug['add'] ?? '') as String;
+          if (out.isNotEmpty) removals.add(out);
+          if (inCard.isNotEmpty) additions.add(inCard);
         }
       }
     } else {
@@ -1029,8 +1163,13 @@ Future<Response> onRequest(RequestContext context) async {
       additions = (jsonResponse['additions'] as List?)?.cast<String>() ?? [];
     }
 
-    // Suporte ao modo "complete"
+    // WARN: Se parsing resultou em listas vazias, logar para diagnóstico
     final isComplete = jsonResponse['mode'] == 'complete';
+    if (removals.isEmpty && additions.isEmpty && !isComplete) {
+      Log.w('⚠️ [AI Optimize] IA retornou formato não reconhecido. Keys: ${jsonResponse.keys.toList()}');
+    }
+
+    // Suporte ao modo "complete"
     if (isComplete) {
       removals = [];
       // Quando veio do loop, preferimos additions_detailed.
@@ -1143,9 +1282,9 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // DEBUG: Log quantidades antes dos filtros avançados
-    print('[DEBUG] Antes dos filtros de cor/bracket:');
-    print('[DEBUG]   validRemovals.length = ${validRemovals.length}');
-    print('[DEBUG]   validAdditions.length = ${validAdditions.length}');
+    Log.d('Antes dos filtros de cor/bracket:');
+    Log.d('  validRemovals.length = ${validRemovals.length}');
+    Log.d('  validAdditions.length = ${validAdditions.length}');
     
     // Filtrar adições ilegais para Commander/Brawl (identidade de cor do comandante).
     // Observação: para colorless commander (identity vazia), apenas cartas colorless passam.
@@ -1273,13 +1412,13 @@ Future<Response> onRequest(RequestContext context) async {
     // FILOSOFIA: Quando additions < removals, a IA deve SUGERIR NOVAS CARTAS
     // de sinergia — NÃO preencher com lands genéricos. O propósito é OTIMIZAR.
     if (!isComplete && validRemovals.length != validAdditions.length) {
-      print('[DEBUG] Re-balanceamento pós-filtros:');
-      print('[DEBUG]   Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
+      Log.d('Re-balanceamento pós-filtros:');
+      Log.d('  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
       
       if (validAdditions.length < validRemovals.length) {
         // CORREÇÃO REAL: Re-consultar a IA para cartas substitutas
         final missingCount = validRemovals.length - validAdditions.length;
-        print('[DEBUG]   Faltam $missingCount adições - consultando IA para substitutas sinérgicas');
+        Log.d('  Faltam $missingCount adições - consultando IA para substitutas sinérgicas');
         
         // Montar lista de cartas a excluir (já existentes + já sugeridas + filtradas)
         final excludeNames = <String>{
@@ -1318,13 +1457,13 @@ Future<Response> onRequest(RequestContext context) async {
                 'name': name,
               };
             }
-            print('[DEBUG]   IA sugeriu ${replacementResult.length} substitutas sinérgicas');
+            Log.d('  IA sugeriu ${replacementResult.length} substitutas sinérgicas');
           }
           
           // Se AINDA faltar (IA não conseguiu preencher tudo), agora sim fallback com basics
           if (validAdditions.length < validRemovals.length) {
             final stillMissing = validRemovals.length - validAdditions.length;
-            print('[DEBUG]   Ainda faltam $stillMissing - fallback com básicos');
+            Log.d('  Ainda faltam $stillMissing - fallback com básicos');
             final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
             final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
             if (basicsWithIds.isNotEmpty) {
@@ -1346,7 +1485,7 @@ Future<Response> onRequest(RequestContext context) async {
             }
           }
         } catch (e) {
-          print('[WARN] Falha ao buscar substitutas IA: $e - usando fallback');
+          Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
           // Fallback: truncar remoções para não perder cartas
           validRemovals = validRemovals.take(validAdditions.length).toList();
         }
@@ -1355,7 +1494,7 @@ Future<Response> onRequest(RequestContext context) async {
         validAdditions = validAdditions.take(validRemovals.length).toList();
       }
       
-      print('[DEBUG]   Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
+      Log.d('  Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
     }
 
     // --- VERIFICAÇÃO PÓS-OTIMIZAÇÃO (Virtual Deck Analysis) ---
@@ -1502,13 +1641,12 @@ Future<Response> onRequest(RequestContext context) async {
                 '🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: ${validationReport.score}/100).');
           }
 
-          print('[DEBUG] Validation score: ${validationReport.score}/100 verdict: ${validationReport.verdict}');
+          Log.d('Validation score: ${validationReport.score}/100 verdict: ${validationReport.verdict}');
         } catch (validationError) {
-          print('[WARN] Validation failed (non-blocking): $validationError');
+          Log.w('Validation failed (non-blocking): $validationError');
           // Validação é enhancement, não deve bloquear a resposta
         }
       } catch (e) {
-        print('[ERROR] handler: $e');
         Log.e('Erro na verificação pós-otimização: $e');
       }
     }
@@ -1561,20 +1699,20 @@ Future<Response> onRequest(RequestContext context) async {
     final remDet = responseBody['removals_detailed'] as List;
     
     // DEBUG: Log detalhado para rastrear desbalanceamentos
-    print('[DEBUG] Balanceamento final:');
-    print('[DEBUG]   validAdditions.length = ${validAdditions.length}');
-    print('[DEBUG]   validRemovals.length = ${validRemovals.length}');
-    print('[DEBUG]   additions_detailed.length = ${addDet.length}');
-    print('[DEBUG]   removals_detailed.length = ${remDet.length}');
-    print('[DEBUG]   mode = ${jsonResponse['mode']}');
+    Log.d('Balanceamento final:');
+    Log.d('  validAdditions.length = ${validAdditions.length}');
+    Log.d('  validRemovals.length = ${validRemovals.length}');
+    Log.d('  additions_detailed.length = ${addDet.length}');
+    Log.d('  removals_detailed.length = ${remDet.length}');
+    Log.d('  mode = ${jsonResponse['mode']}');
     
     // Verificar cartas que NÃO foram mapeadas para card_id
     if (addDet.length != validAdditions.length) {
-      print('[WARN] Algumas adições não foram mapeadas para card_id!');
+      Log.w('Algumas adições não foram mapeadas para card_id!');
       for (final name in validAdditions) {
         final v = validByNameLower[name.toLowerCase()];
         if (v == null || v['id'] == null) {
-          print('[WARN]   Carta sem card_id: "$name" (key: "${name.toLowerCase()}")');
+          Log.w('  Carta sem card_id: "$name" (key: "${name.toLowerCase()}")');
         }
       }
     }
@@ -1583,7 +1721,7 @@ Future<Response> onRequest(RequestContext context) async {
     // pós re-chamada à IA. Este bloco só age se o detailed ainda tiver gap.
     if (addDet.length < remDet.length && !isComplete) {
       final missingDetailed = remDet.length - addDet.length;
-      print('[DEBUG]   Gap em detailed: faltam $missingDetailed - construindo de validAdditions');
+      Log.d('  Gap em detailed: faltam $missingDetailed - construindo de validAdditions');
       
       // Tentar construir detailed para adições que ainda não estão nele
       final existingNames = addDet.map((e) => (e as Map)['name']?.toString().toLowerCase() ?? '').toSet();
@@ -1611,7 +1749,7 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody['removals'] = validRemovals.take(finalAddDet2.length).toList();
       }
     } else if (addDet.length > remDet.length && !isComplete) {
-      print('[DEBUG]   Truncando adições extras');
+      Log.d('  Truncando adições extras');
       responseBody['additions_detailed'] = addDet.take(remDet.length).toList();
       responseBody['additions'] = validAdditions.take(remDet.length).toList();
     }
@@ -1619,7 +1757,7 @@ Future<Response> onRequest(RequestContext context) async {
     // Log final
     final finalAddDet = responseBody['additions_detailed'] as List;
     final finalRemDet = responseBody['removals_detailed'] as List;
-    print('[DEBUG]   Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
+    Log.d('  Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
 
     final warnings = <String, dynamic>{};
 
@@ -1667,7 +1805,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     return Response.json(body: responseBody);
   } catch (e) {
-    print('[ERROR] handler: $e');
+    Log.e('handler: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': e.toString()},
@@ -1756,7 +1894,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
       functionalNeeds.add('draw');
     } else if (oracle.contains('destroy') || oracle.contains('exile') || oracle.contains('counter')) {
       functionalNeeds.add('removal');
-    } else if (oracle.contains('add') && oracle.contains('mana') || typeLine.contains('land')) {
+    } else if ((oracle.contains('add') && oracle.contains('mana')) || typeLine.contains('land')) {
       functionalNeeds.add('ramp');
     } else if (typeLine.contains('creature')) {
       functionalNeeds.add('creature');
@@ -1780,7 +1918,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
       FROM cards c
       LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
       WHERE (cl.status IS NULL OR cl.status = 'legal' OR cl.status = 'restricted')
-        AND c.name NOT IN (SELECT unnest(@exclude::text[]))
+        AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
         AND c.type_line NOT LIKE 'Basic Land%'
         AND (
           c.color_identity <@ @identity::text[]

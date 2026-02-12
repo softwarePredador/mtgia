@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../ai_log_service.dart';
+import '../logger.dart';
 import 'sinergia.dart';
 
 class DeckOptimizerService {
@@ -32,7 +33,11 @@ class DeckOptimizerService {
     // 1. ANÁLISE QUANTITATIVA (O que a IA "acha" vs O que os dados dizem)
     // Classificamos as cartas atuais por "Score de Eficiência"
     // Score = (Popularidade EDHREC) / (CMC + 1) -> Cartas populares e baratas têm score alto
-    final scoredCards = _calculateEfficiencyScores(currentCards);
+    //
+    // CORREÇÃO: Agora considera sinergia com o comandante.
+    // Cartas que compartilham keywords mecânicos com o commander recebem bônus.
+    final commanderKeywords = _extractMechanicKeywords(commanders, currentCards);
+    final scoredCards = _calculateEfficiencyScores(currentCards, commanderKeywords);
 
     // Identifica as 15 cartas estatisticamente mais fracas (Candidatas a corte)
     // Isso ajuda a IA a não tentar tirar staples
@@ -110,9 +115,51 @@ class DeckOptimizerService {
     return completionResult;
   }
 
+  /// Extrai keywords mecânicos do commander para detecção de sinergia.
+  /// Analisa o oracle_text do commander e retorna keywords relevantes.
+  Set<String> _extractMechanicKeywords(
+      List<String> commanders, List<dynamic> currentCards) {
+    final keywords = <String>{};
+    for (final cmdr in commanders) {
+      final cmdrCard = currentCards.firstWhere(
+        (c) =>
+            (c['name'] as String?)?.toLowerCase() == cmdr.toLowerCase(),
+        orElse: () => null,
+      );
+      if (cmdrCard == null) continue;
+      final oracle =
+          ((cmdrCard['oracle_text'] as String?) ?? '').toLowerCase();
+      final typeLine =
+          ((cmdrCard['type_line'] as String?) ?? '').toLowerCase();
+
+      // Mecânicas comuns — keywords de sinergia
+      const mechanicPatterns = [
+        'artifact', 'enchantment', 'token', 'sacrifice', 'graveyard',
+        'counter', 'draw', 'discard', 'exile', 'mill', 'scry',
+        'flying', 'trample', 'lifelink', 'deathtouch',
+        'enter', 'leaves', 'dies', 'cast', 'noncreature',
+        'instant', 'sorcery', 'equipment', 'aura', 'creature',
+        '+1/+1', 'proliferate', 'energy', 'treasure', 'food', 'clue',
+        'landfall', 'land', 'historic', 'legendary',
+      ];
+
+      for (final pattern in mechanicPatterns) {
+        if (oracle.contains(pattern) || typeLine.contains(pattern)) {
+          keywords.add(pattern);
+        }
+      }
+    }
+    return keywords;
+  }
+
   /// Calcula um score heurístico para identificar cartas suspeitas de serem ruins.
-  /// Baseado no Rank EDHREC (se tiver no DB) e CMC.
-  List<Map<String, dynamic>> _calculateEfficiencyScores(List<dynamic> cards) {
+  /// Baseado no Rank EDHREC (se tiver no DB), CMC e sinergia com o commander.
+  ///
+  /// MELHORIA v2: Cartas que compartilham keywords mecânicos com o commander
+  /// recebem bônus de sinergia (score ÷2), evitando que peças sinérgicas
+  /// sejam erroneamente marcadas como "fracas" só por serem impopulares globalmente.
+  List<Map<String, dynamic>> _calculateEfficiencyScores(
+      List<dynamic> cards, Set<String> commanderKeywords) {
     // Primeiro, calcula a mediana do EDHREC rank das cartas que têm rank
     final ranksWithValue = cards
         .where((c) => c['edhrec_rank'] != null)
@@ -146,7 +193,24 @@ class DeckOptimizerService {
 
       final score =
           rank * (cmc > 4 ? 1.5 : 1.0); // Penaliza cartas caras impopulares
-      return {'name': card['name'], 'weakness_score': score};
+
+      // BÔNUS DE SINERGIA: se a carta compartilha keywords com o commander,
+      // ela provavelmente está no deck por uma razão — reduz o score de fraqueza.
+      final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
+      final typeLine2 = ((card['type_line'] as String?) ?? '').toLowerCase();
+      var synergyHits = 0;
+      for (final kw in commanderKeywords) {
+        if (oracle.contains(kw) || typeLine2.contains(kw)) synergyHits++;
+      }
+      // 2+ keywords em comum → score ÷2 (forte sinergia)
+      // 1 keyword → score ×0.7
+      final adjustedScore = synergyHits >= 2
+          ? score / 2
+          : synergyHits == 1
+              ? score * 0.7
+              : score;
+
+      return {'name': card['name'], 'weakness_score': adjustedScore};
     }).toList();
 
     // Ordena do maior score (pior carta) para o menor
@@ -297,10 +361,10 @@ class DeckOptimizerService {
         return file.readAsStringSync();
       }
 
-      print('⚠️ Aviso: Arquivo prompt.md não encontrado em ${file.path}');
+      Log.w('Arquivo prompt.md não encontrado em ${file.path}');
       return "Você é um especialista em otimização de decks de Magic: The Gathering.";
     } catch (e) {
-      print('❌ Erro ao ler prompt.md: $e');
+      Log.e('Erro ao ler prompt.md: $e');
       return "Você é um especialista em otimização de decks de Magic: The Gathering.";
     }
   }
