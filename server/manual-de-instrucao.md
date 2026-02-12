@@ -3951,3 +3951,106 @@ Output:
 2. **Custom Traces em Providers**: Adicionar `traceAsync` nos providers críticos
 3. **Métricas de Negócio**: Adicionar contadores como `decks_created`, `cards_searched`
 
+---
+
+## 31. Correção do Bug de Balanceamento na Otimização (Deck com 99 Cartas)
+
+**Data:** Fevereiro 2026  
+**Arquivo Modificado:** `server/routes/ai/optimize/index.dart`  
+**Commit:** `b3b1de7`
+
+### 31.1 O Problema
+
+Quando a IA sugeria cartas para swap (remoções + adições), algumas adições eram filtradas por:
+- **Identidade de cor**: Carta fora das cores do Commander
+- **Bracket policy**: Carta acima do nível do deck
+- **Validação**: Carta inexistente ou nome incorreto
+
+O código anterior simplesmente truncava para o mínimo entre remoções e adições:
+
+```dart
+// CÓDIGO ANTIGO (problemático)
+final minCount = removals.length < additions.length 
+    ? removals.length 
+    : additions.length;
+removals = removals.take(minCount).toList();
+additions = additions.take(minCount).toList();
+```
+
+**Exemplo do bug:**
+- IA sugere 3 remoções e 3 adições
+- Filtro de cor remove 2 adições (cartas vermelhas em deck mono-azul)
+- Código trunca para 1 remoção e 1 adição
+- Deck fica com 99 cartas (perdeu 2 cartas)
+
+### 31.2 A Solução
+
+Em vez de truncar, **preencher com terrenos básicos** da identidade de cor do Commander:
+
+```dart
+// CÓDIGO NOVO (corrigido)
+if (validAdditions.length < validRemovals.length) {
+  final missingCount = validRemovals.length - validAdditions.length;
+  
+  // Obter básicos compatíveis com identidade do Commander
+  final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
+  final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
+  
+  if (basicsWithIds.isNotEmpty) {
+    final keys = basicsWithIds.keys.toList();
+    var i = 0;
+    for (var j = 0; j < missingCount; j++) {
+      final name = keys[i % keys.length];
+      validAdditions.add(name);
+      // Registrar no mapa para additions_detailed funcionar
+      validByNameLower[name.toLowerCase()] = {
+        'id': basicsWithIds[name],
+        'name': name,
+      };
+      i++;
+    }
+  }
+}
+```
+
+### 31.3 Mapeamento de Básicos por Identidade
+
+```dart
+List<String> _basicLandNamesForIdentity(Set<String> identity) {
+  if (identity.isEmpty) return const ['Wastes'];  // Commander colorless
+  final names = <String>[];
+  if (identity.contains('W')) names.add('Plains');
+  if (identity.contains('U')) names.add('Island');
+  if (identity.contains('B')) names.add('Swamp');
+  if (identity.contains('R')) names.add('Mountain');
+  if (identity.contains('G')) names.add('Forest');
+  return names.isEmpty ? const ['Wastes'] : names;
+}
+```
+
+### 31.4 Cenários de Teste Validados
+
+| Cenário | Antes | Depois |
+|---------|-------|--------|
+| 3 remoções, 1 adição válida | Deck = 99 cartas | Deck = 100 (2 Islands adicionadas) |
+| Deck com 99 cartas (mode complete) | Retorna 0 adições | Retorna 1 adição (Blast Zone) |
+| Deck com 100 cartas (mode optimize) | 5 remoções ≠ adições | 5 remoções = 5 adições |
+| Commander colorless | Cartas azuis permitidas ❌ | Apenas colorless/Wastes |
+
+### 31.5 Regras de MTG Implementadas
+
+**Regras de Formato Commander:**
+- Deck: Exatamente 100 cartas (incluindo Commander)
+- Cópias: Máximo 1 de cada carta (exceto básicos)
+- Identidade de Cor: Cartas devem estar dentro da identidade do Commander
+- Commander: Deve ser Legendary Creature (ou ter "can be your commander")
+- Partner: Dois commanders com Partner são permitidos
+- Background: "Choose a Background" + Background enchantment é válido
+
+**Validações Aplicadas na Otimização:**
+1. ✅ Remoções existem no deck
+2. ✅ Commander nunca é removido
+3. ✅ Adições respeitam identidade de cor
+4. ✅ Adições não são cartas já existentes no deck
+5. ✅ Balanceamento: removals.length == additions.length
+6. ✅ Preenchimento com básicos quando há shortage
