@@ -1068,6 +1068,8 @@ Future<Response> onRequest(RequestContext context) async {
 
       final ids = additionsDetailed.map((e) => e['card_id'] as String).toList();
       final namesById = <String, String>{};
+      Map<String, dynamic>? postAnalysisComplete;
+      
       if (ids.isNotEmpty) {
         final r = await pool.execute(
           Sql.named('SELECT id::text, name FROM cards WHERE id = ANY(@ids)'),
@@ -1075,6 +1077,64 @@ Future<Response> onRequest(RequestContext context) async {
         );
         for (final row in r) {
           namesById[row[0] as String] = row[1] as String;
+        }
+        
+        // === Gerar post_analysis para modo complete ===
+        try {
+          // 1. Buscar dados completos das cartas adicionadas
+          final additionsDataResult = await pool.execute(
+            Sql.named('''
+              SELECT name, type_line, mana_cost, colors, 
+                     COALESCE(
+                       (SELECT SUM(
+                         CASE 
+                           WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                           WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                           WHEN m[1] = 'X' THEN 0
+                           ELSE 1
+                         END
+                       ) FROM regexp_matches(mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
+                       0
+                     ) as cmc,
+                     oracle_text
+              FROM cards 
+              WHERE id = ANY(@ids)
+            '''),
+            parameters: {'ids': ids},
+          );
+          
+          final additionsData = additionsDataResult
+              .map((row) => {
+                    'name': (row[0] as String?) ?? '',
+                    'type_line': (row[1] as String?) ?? '',
+                    'mana_cost': (row[2] as String?) ?? '',
+                    'colors': (row[3] as List?)?.cast<String>() ?? [],
+                    'cmc': (row[4] as num?)?.toDouble() ?? 0.0,
+                    'oracle_text': (row[5] as String?) ?? '',
+                  })
+              .toList();
+          
+          // 2. Criar deck virtual (original + adições)
+          final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
+          
+          // Expandir adições pelo quantity
+          for (final add in additionsDetailed) {
+            final cardId = add['card_id'] as String;
+            final qty = add['quantity'] as int;
+            final data = additionsData.firstWhere(
+              (d) => (d['name'] as String).toLowerCase() == (namesById[cardId] ?? '').toLowerCase(),
+              orElse: () => {'name': namesById[cardId] ?? '', 'type_line': '', 'mana_cost': '', 'colors': <String>[], 'cmc': 0.0, 'oracle_text': ''},
+            );
+            for (var i = 0; i < qty; i++) {
+              virtualDeck.add(data);
+            }
+          }
+          
+          // 3. Rodar análise no deck virtual
+          final postAnalyzer = DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
+          postAnalysisComplete = postAnalyzer.generateAnalysis();
+        } catch (e) {
+          Log.w('Falha ao gerar post_analysis para modo complete: $e');
         }
       }
 
@@ -1101,7 +1161,7 @@ Future<Response> onRequest(RequestContext context) async {
         'removals_detailed': const <Map<String, dynamic>>[],
         'reasoning': jsonResponse['reasoning'] ?? '',
         'deck_analysis': deckAnalysis,
-        'post_analysis': null,
+        'post_analysis': postAnalysisComplete,
         'validation_warnings': const <String>[],
       };
 

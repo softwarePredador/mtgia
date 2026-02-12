@@ -459,22 +459,60 @@ class E2EDebateSuite {
     }
   }
 
+  // Rastrear commanders já usados para garantir variabilidade
+  final _usedCommanders = <String>{};
+  
   Future<Map<String, dynamic>> fetchRandomCommander() async {
-    // Lista de commanders temáticos para testes variados
+    // Lista expandida de commanders temáticos para testes variados
     final commanders = [
+      // Grindy/Recursion
       'Muldrotha, the Gravetide',
+      'Meren of Clan Nel Toth',
+      'Karador, Ghost Chieftain',
+      // Superfriends/Counters
       'Atraxa, Praetors\' Voice',
+      'Sisay, Weatherlight Captain',
+      // Tribal
       'Edgar Markov',
-      'Korvold, Fae-Cursed King',
-      'Yuriko, the Tiger\'s Shadow',
-      'Krenko, Mob Boss',
-      'Omnath, Locus of Creation',
       'The Ur-Dragon',
-      'Kaalia of the Vast',
+      'Sliver Overlord',
+      // Value/Sacrifice
+      'Korvold, Fae-Cursed King',
       'Prosper, Tome-Bound',
+      'Teysa Karlov',
+      // Stealth/Combat
+      'Yuriko, the Tiger\'s Shadow',
+      'Najeela, the Blade-Blossom',
+      // Aggro/Tokens
+      'Krenko, Mob Boss',
+      'Purphoros, God of the Forge',
+      'Jetmir, Nexus of Revels',
+      // Landfall/Ramp
+      'Omnath, Locus of Creation',
+      'Lord Windgrace',
+      'Tatyova, Benthic Druid',
+      // Big Creatures
+      'Kaalia of the Vast',
+      'Mayael the Anima',
+      // Spellslinger
+      'Kess, Dissident Mage',
+      'Isochron Scepter',
+      // Artifacts
+      'Breya, Etherium Shaper',
+      'Urza, Lord High Artificer',
+      // Control
+      'Oloro, Ageless Ascetic',
+      'Grand Arbiter Augustin IV',
     ];
     
-    final name = commanders[random.nextInt(commanders.length)];
+    // Filtrar commanders já usados nesta bateria
+    final available = commanders.where((c) => !_usedCommanders.contains(c)).toList();
+    
+    // Se todos já foram usados, resetar (para baterias > commanders disponíveis)
+    final pool = available.isNotEmpty ? available : commanders;
+    
+    final name = pool[random.nextInt(pool.length)];
+    _usedCommanders.add(name);
     
     final res = await http.get(
       Uri.parse('$apiUrl/cards?name=${Uri.encodeComponent(name)}&limit=1'),
