@@ -160,12 +160,149 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
     }
   }
   
+  // Inferir arquétipo se ausente ou genérico
+  var archetype = deck['archetype'] as String? ?? '';
+  if (archetype.isEmpty || archetype == 'unknown') {
+    archetype = _inferArchetypeFromCards(cards.keys.toList());
+  }
+  
   return {
     ...deck,
+    'archetype': archetype, // Sobrescreve com inferido
     'parsed_cards': cards,
     'sideboard': sideboardCards,
     'total_cards': cards.values.fold<int>(0, (a, b) => a + b),
   };
+}
+
+/// Infere o arquétipo do deck baseado nas cartas
+String _inferArchetypeFromCards(List<String> cardNames) {
+  final lower = cardNames.map((c) => c.toLowerCase()).toSet();
+  
+  // Contadores por categoria
+  var controlScore = 0;
+  var aggroScore = 0;
+  var comboScore = 0;
+  var midrangeScore = 0;
+  var rampartScore = 0; // ramp/value
+  var tribalScore = 0;
+  var aristocratsScore = 0;
+  var tokensScore = 0;
+  
+  // Keywords de controle
+  const controlKeywords = ['counterspell', 'negate', 'mana leak', 'force of will', 
+    'force of negation', 'cryptic command', 'supreme verdict', 'wrath of god',
+    'damnation', 'cyclonic rift', 'teferi', 'jace', 'narset', 'dovin\'s veto',
+    'archmage\'s charm', 'mystic confluence', 'fierce guardianship'];
+  
+  // Keywords de aggro
+  const aggroKeywords = ['lightning bolt', 'goblin guide', 'monastery swiftspear',
+    'ragavan', 'eidolon of the great revel', 'lava spike', 'chain lightning',
+    'goblin', 'haste', 'sligh', 'burn', 'zurgo', 'najeela', 'winota'];
+  
+  // Keywords de combo
+  const comboKeywords = ['thassa\'s oracle', 'demonic consultation', 'tainted pact',
+    'doomsday', 'ad nauseam', 'aetherflux reservoir', 'isochron scepter',
+    'dramatic reversal', 'infinite', 'thoracle', 'underworld breach', 'brain freeze',
+    'grinding station', 'basalt monolith', 'rings of brighthearth'];
+  
+  // Keywords de ramp/value
+  const rampKeywords = ['sol ring', 'mana crypt', 'arcane signet', 'cultivate',
+    'kodama\'s reach', 'rampant growth', 'three visits', 'nature\'s lore',
+    'signets', 'talismans', 'dockside extortionist', 'smothering tithe'];
+  
+  // Keywords de aristocrats
+  const aristocratsKeywords = ['blood artist', 'zulaport cutthroat', 'viscera seer',
+    'carrion feeder', 'phyrexian altar', 'ashnod\'s altar', 'grave pact',
+    'dictate of erebos', 'pitiless plunderer', 'teysa', 'korvold', 'prossh'];
+  
+  // Keywords de tokens
+  const tokensKeywords = ['anointed procession', 'doubling season', 'parallel lives',
+    'second harvest', 'populate', 'divine visitation', 'krenko', 'adeline',
+    'rabble rousing', 'rhys the redeemed', 'tendershoot dryad', 'avenger of zendikar'];
+  
+  // Keywords tribais
+  const tribalKeywords = ['lord', 'kindred', 'coat of arms', 'metallic mimic',
+    'icon of ancestry', 'vanquisher\'s banner', 'herald\'s horn'];
+    
+  for (final card in lower) {
+    // Control
+    for (final kw in controlKeywords) {
+      if (card.contains(kw)) controlScore += 2;
+    }
+    if (card.contains('counter') && !card.contains('+1/+1')) controlScore++;
+    if (card.contains('wrath') || card.contains('verdict')) controlScore += 2;
+    
+    // Aggro
+    for (final kw in aggroKeywords) {
+      if (card.contains(kw)) aggroScore += 2;
+    }
+    if (card.contains('bolt') || card.contains('burn')) aggroScore++;
+    
+    // Combo
+    for (final kw in comboKeywords) {
+      if (card.contains(kw)) comboScore += 3; // Combo pieces são muito indicativos
+    }
+    
+    // Ramp
+    for (final kw in rampKeywords) {
+      if (card.contains(kw)) rampartScore++;
+    }
+    if (card.contains('signet') || card.contains('talisman')) rampartScore++;
+    
+    // Aristocrats
+    for (final kw in aristocratsKeywords) {
+      if (card.contains(kw)) aristocratsScore += 2;
+    }
+    if (card.contains('sacrifice') || card.contains('dies')) aristocratsScore++;
+    
+    // Tokens
+    for (final kw in tokensKeywords) {
+      if (card.contains(kw)) tokensScore += 2;
+    }
+    if (card.contains('token') || card.contains('create')) tokensScore++;
+    
+    // Tribal
+    for (final kw in tribalKeywords) {
+      if (card.contains(kw)) tribalScore += 2;
+    }
+    // Detectar tribos específicas
+    if (card.contains('goblin') || card.contains('elf') || card.contains('merfolk') ||
+        card.contains('zombie') || card.contains('vampire') || card.contains('dragon') ||
+        card.contains('angel') || card.contains('wizard') || card.contains('sliver')) {
+      tribalScore++;
+    }
+  }
+  
+  // Midrange é o "fallback" quando tem ramp mas sem combo forte
+  midrangeScore = rampartScore ~/ 2;
+  
+  // Encontrar o maior score
+  final scores = {
+    'control': controlScore,
+    'aggro': aggroScore,
+    'combo': comboScore,
+    'midrange': midrangeScore,
+    'ramp': rampartScore,
+    'aristocrats': aristocratsScore,
+    'tokens': tokensScore,
+    'tribal': tribalScore,
+  };
+  
+  final sorted = scores.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  
+  // Se o maior score é muito baixo, retornar 'value' como genérico
+  if (sorted.first.value < 3) {
+    return 'value';
+  }
+  
+  // Se combo + control são altos, é control-combo
+  if (comboScore >= 6 && controlScore >= 4) {
+    return 'combo-control';
+  }
+  
+  return sorted.first.key;
 }
 
 /// Extrai insights de cartas individuais
@@ -177,10 +314,9 @@ Map<String, Map<String, dynamic>> _extractCardInsights(
   
   for (var i = 0; i < parsedDecks.length; i++) {
     final deck = parsedDecks[i];
-    final raw = rawDecks[i];
     final cards = deck['parsed_cards'] as Map<String, int>;
-    final format = raw['format'] as String;
-    final archetype = raw['archetype'] as String;
+    final format = deck['format'] as String; // Agora pega do deck parseado
+    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
     
     for (final cardName in cards.keys) {
       insights.putIfAbsent(cardName, () => {
@@ -262,17 +398,16 @@ String _inferCardRole(String cardName) {
 /// Detecta pacotes de sinergia (cartas que frequentemente aparecem juntas)
 List<Map<String, dynamic>> _detectSynergies(
   List<Map<String, dynamic>> parsedDecks,
-  List<Map<String, dynamic>> rawDecks,
+  List<Map<String, dynamic>> rawDecks, // Mantido para compatibilidade
 ) {
   final pairCounts = <String, Map<String, dynamic>>{};
   final trioCounts = <String, Map<String, dynamic>>{};
   
   for (var i = 0; i < parsedDecks.length; i++) {
     final deck = parsedDecks[i];
-    final raw = rawDecks[i];
     final cards = (deck['parsed_cards'] as Map<String, int>).keys.toList();
-    final archetype = raw['archetype'] as String;
-    final format = raw['format'] as String;
+    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
+    final format = deck['format'] as String;
     
     // Pares de cartas
     for (var j = 0; j < cards.length; j++) {
@@ -361,15 +496,14 @@ List<Map<String, dynamic>> _detectSynergies(
 /// Extrai padrões de construção por arquétipo
 List<Map<String, dynamic>> _extractArchetypePatterns(
   List<Map<String, dynamic>> parsedDecks,
-  List<Map<String, dynamic>> rawDecks,
+  List<Map<String, dynamic>> rawDecks, // Mantido para compatibilidade
 ) {
   final patterns = <String, Map<String, dynamic>>{};
   
   for (var i = 0; i < parsedDecks.length; i++) {
     final deck = parsedDecks[i];
-    final raw = rawDecks[i];
-    final archetype = raw['archetype'] as String;
-    final format = raw['format'] as String;
+    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
+    final format = deck['format'] as String;
     final key = '$archetype|$format';
     
     patterns.putIfAbsent(key, () => {
