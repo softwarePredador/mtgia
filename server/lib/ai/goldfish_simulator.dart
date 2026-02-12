@@ -106,7 +106,7 @@ class GoldfishResult {
           'turn_2_play': double.parse(turn2PlayRate.toStringAsFixed(3)),
           'turn_3_play': double.parse(turn3PlayRate.toStringAsFixed(3)),
           'turn_4_play': double.parse(turn4PlayRate.toStringAsFixed(3)),
-          'cmc_distribution': cmcDistribution,
+          'cmc_distribution': cmcDistribution.map((k, v) => MapEntry(k.toString(), v)),
         },
         'recommendations': recommendations,
       };
