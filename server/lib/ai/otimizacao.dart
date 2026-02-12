@@ -121,11 +121,13 @@ class DeckOptimizerService {
       List<String> commanders, List<dynamic> currentCards) {
     final keywords = <String>{};
     for (final cmdr in commanders) {
-      final cmdrCard = currentCards.firstWhere(
-        (c) =>
-            (c['name'] as String?)?.toLowerCase() == cmdr.toLowerCase(),
-        orElse: () => null,
-      );
+      Map<String, dynamic>? cmdrCard;
+      for (final c in currentCards) {
+        if ((c['name'] as String?)?.toLowerCase() == cmdr.toLowerCase()) {
+          cmdrCard = c as Map<String, dynamic>;
+          break;
+        }
+      }
       if (cmdrCard == null) continue;
       final oracle =
           ((cmdrCard['oracle_text'] as String?) ?? '').toLowerCase();
