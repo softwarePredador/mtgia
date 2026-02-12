@@ -1049,6 +1049,11 @@ Future<Response> onRequest(RequestContext context) async {
       validAdditions = validAdditions.toSet().toList();
     }
 
+    // DEBUG: Log quantidades antes dos filtros avançados
+    print('[DEBUG] Antes dos filtros de cor/bracket:');
+    print('[DEBUG]   validRemovals.length = ${validRemovals.length}');
+    print('[DEBUG]   validAdditions.length = ${validAdditions.length}');
+    
     // Filtrar adições ilegais para Commander/Brawl (identidade de cor do comandante).
     // Observação: para colorless commander (identity vazia), apenas cartas colorless passam.
     final filteredByColorIdentity = <String>[];
@@ -1171,14 +1176,17 @@ Future<Response> onRequest(RequestContext context) async {
           additionsDetailed.map((e) => e['name'] as String).toList();
     }
 
-    // Re-aplicar equilíbrio após validação
-    if (jsonResponse['mode'] != 'complete') {
+    // Re-aplicar equilíbrio após validação (SEMPRE, não apenas em optimize)
+    {
       final finalMinCount = validRemovals.length < validAdditions.length
           ? validRemovals.length
           : validAdditions.length;
       if (validRemovals.length != validAdditions.length) {
+        print('[DEBUG] Re-balanceamento pós-filtros:');
+        print('[DEBUG]   Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
         validRemovals = validRemovals.take(finalMinCount).toList();
         validAdditions = validAdditions.take(finalMinCount).toList();
+        print('[DEBUG]   Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
       }
     }
 
@@ -1308,9 +1316,32 @@ Future<Response> onRequest(RequestContext context) async {
     // CRÍTICO: Balancear additions/removals detailed para manter contagem igual
     final addDet = responseBody['additions_detailed'] as List;
     final remDet = responseBody['removals_detailed'] as List;
-    if (addDet.length != remDet.length && jsonResponse['mode'] != 'complete') {
+    
+    // DEBUG: Log detalhado para rastrear desbalanceamentos
+    print('[DEBUG] Balanceamento final:');
+    print('[DEBUG]   validAdditions.length = ${validAdditions.length}');
+    print('[DEBUG]   validRemovals.length = ${validRemovals.length}');
+    print('[DEBUG]   additions_detailed.length = ${addDet.length}');
+    print('[DEBUG]   removals_detailed.length = ${remDet.length}');
+    print('[DEBUG]   mode = ${jsonResponse['mode']}');
+    
+    // Verificar cartas que NÃO foram mapeadas para card_id
+    if (addDet.length != validAdditions.length) {
+      print('[WARN] Algumas adições não foram mapeadas para card_id!');
+      for (final name in validAdditions) {
+        final v = validByNameLower[name.toLowerCase()];
+        if (v == null || v['id'] == null) {
+          print('[WARN]   Carta sem card_id: "$name" (key: "${name.toLowerCase()}")');
+        }
+      }
+    }
+    
+    // BALANCEAMENTO - Aplicar em TODOS os modos (não apenas optimize)
+    // Isso garante que removals e additions sempre sejam equilibrados
+    if (addDet.length != remDet.length) {
       final minLen =
           addDet.length < remDet.length ? addDet.length : remDet.length;
+      print('[DEBUG]   Aplicando truncamento para minLen=$minLen');
       responseBody['additions_detailed'] = addDet.take(minLen).toList();
       responseBody['removals_detailed'] = remDet.take(minLen).toList();
       // Também ajustar as listas simples para UI consistente
@@ -1318,6 +1349,7 @@ Future<Response> onRequest(RequestContext context) async {
       validAdditions = validAdditions.take(minLen).toList();
       responseBody['removals'] = validRemovals;
       responseBody['additions'] = validAdditions;
+      print('[DEBUG]   Após balanceamento: removals=${validRemovals.length}, additions=${validAdditions.length}');
     }
 
     final warnings = <String, dynamic>{};
