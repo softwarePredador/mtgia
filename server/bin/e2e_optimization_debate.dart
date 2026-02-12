@@ -496,7 +496,7 @@ class E2EDebateSuite {
       'Mayael the Anima',
       // Spellslinger
       'Kess, Dissident Mage',
-      'Isochron Scepter',
+      'Niv-Mizzet, Parun',
       // Artifacts
       'Breya, Etherium Shaper',
       'Urza, Lord High Artificer',
