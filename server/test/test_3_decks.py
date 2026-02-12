@@ -6,7 +6,7 @@ import json
 import time
 
 API = "https://evolution-cartinhas.8ktevp.easypanel.host"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTVjNzRjNi04ZTJlLTQ2ZDktODc1ZC0yMzY5ZmE3ZmMyNGYiLCJ1c2VybmFtZSI6ImRlY2t0ZXN0MTczOSIsImlhdCI6MTc3MDkyNDM0MiwiZXhwIjoxNzcxMDEwNzQyfQ.tEgJdsGI_OxXMac6UpAww_00Ch3cJbQ-FPxL5DiWHRA"
+TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxOGRmMDE4OC05ZjI3LTRlMjAtODRmZS1hOWZhMmMzOTk1MWMiLCJ1c2VybmFtZSI6InJhZmEiLCJpYXQiOjE3NzA5Mjk4MjMsImV4cCI6MTc3MTAxNjIyM30.D_z6_dyOvnfMBmGSLd3fb73NHBQVLaU06BSHC7ajZRs"
 
 headers = {
     "Authorization": f"Bearer {TOKEN}",

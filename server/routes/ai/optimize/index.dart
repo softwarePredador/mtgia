@@ -551,7 +551,7 @@ Future<DeckThemeProfile> _detectThemeProfile(
       final archetypes = insight['common_archetypes'] as List<String>;
       final learnedRole = insight['learned_role'] as String;
       
-      // Uso alto no meta = carta forte (escala logarítmica: 36 usos → ~35 pts)
+      // Uso alto no meta = carta forte (escala: clamped 5-40)
       if (usageCount > 0) {
         impactScore += (usageCount * 1.0).clamp(5, 40).round();
       }
