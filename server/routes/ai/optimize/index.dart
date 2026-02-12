@@ -1562,7 +1562,7 @@ Future<Response> onRequest(RequestContext context) async {
       
       if (!themeMatch) {
         validationWarnings.add(
-          '💡 Tema detectado "$targetArchetype" não corresponde aos temas populares do EDHREC (${edhrecValidationData.themes.take(3).join(", ")}). Considere ajustar a estratégia.');
+          '� Tema detectado "$targetArchetype" não corresponde aos temas populares do EDHREC (${edhrecValidationData.themes.take(3).join(", ")}). O sistema está usando abordagem HÍBRIDA: 70% cartas EDHREC + 30% cartas do seu tema para respeitar sua ideia.');
       }
     }
 

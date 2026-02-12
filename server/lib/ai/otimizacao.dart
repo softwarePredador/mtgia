@@ -61,14 +61,54 @@ class DeckOptimizerService {
 
     // 2. BUSCA DE SINERGIA CONTEXTUAL (RAG + EDHREC)
     // Prioriza dados EDHREC (co-ocorrência real), com fallback para Scryfall
+    // HÍBRIDO: Se tema detectado não bate com EDHREC, mistura 70% EDHREC + 30% tema
     List<String> synergyCards;
+    bool themeMatchesEdhrec = false;
+    
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
-      // Usa top cartas do EDHREC com synergy > 0.15 (comprovadamente sinérgicas)
-      synergyCards = edhrecService
-          .getHighSynergyCards(edhrecData, minSynergy: 0.15, limit: 40)
-          .map((c) => c.name)
-          .toList();
-      Log.i('EDHREC synergy pool: ${synergyCards.length} cartas');
+      // Verificar se tema detectado corresponde aos temas EDHREC
+      final edhrecThemesLower = edhrecData.themes.map((t) => t.toLowerCase()).toList();
+      final targetLower = targetArchetype.toLowerCase();
+      
+      for (final edhrecTheme in edhrecThemesLower) {
+        if (targetLower.contains(edhrecTheme) || edhrecTheme.contains(targetLower)) {
+          themeMatchesEdhrec = true;
+          break;
+        }
+      }
+      
+      if (themeMatchesEdhrec) {
+        // Tema bate: usar 100% EDHREC
+        synergyCards = edhrecService
+            .getHighSynergyCards(edhrecData, minSynergy: 0.15, limit: 40)
+            .map((c) => c.name)
+            .toList();
+        Log.i('EDHREC synergy pool (theme match): ${synergyCards.length} cartas');
+      } else {
+        // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
+        final edhrecCards = edhrecService
+            .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 30)
+            .map((c) => c.name)
+            .toList();
+        
+        // Buscar cartas do tema do usuário (Scryfall/archetype)
+        final themeCards = await synergyEngine.fetchCommanderSynergies(
+          commanderName: commanders.first,
+          colors: colors,
+          archetype: targetArchetype,
+        );
+        
+        // Misturar: 70% EDHREC + 30% tema (sem duplicatas)
+        final edhrecPortion = (edhrecCards.length * 0.7).round();
+        final themePortion = (themeCards.length * 0.3).round().clamp(0, 15);
+        
+        synergyCards = [
+          ...edhrecCards.take(edhrecPortion),
+          ...themeCards.where((c) => !edhrecCards.contains(c)).take(themePortion),
+        ];
+        
+        Log.i('HYBRID synergy pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas');
+      }
     } else {
       // Fallback: busca no Scryfall
       synergyCards = await synergyEngine.fetchCommanderSynergies(
@@ -117,16 +157,56 @@ class DeckOptimizerService {
     final List<String> colors = List<String>.from(deckData['colors']);
 
     // Busca dados EDHREC para sugestões mais precisas
+    // HÍBRIDO: Se tema detectado não bate com EDHREC, mistura 70% EDHREC + 30% tema
     final edhrecData = await edhrecService.fetchCommanderData(commanders.first);
     
     List<String> synergyCards;
+    bool themeMatchesEdhrec = false;
+    
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
-      // Prioriza cartas com alta sinergia do EDHREC
-      synergyCards = edhrecService
-          .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 60)
-          .map((c) => c.name)
-          .toList();
-      Log.i('EDHREC complete pool: ${synergyCards.length} cartas');
+      // Verificar se tema detectado corresponde aos temas EDHREC
+      final edhrecThemesLower = edhrecData.themes.map((t) => t.toLowerCase()).toList();
+      final targetLower = targetArchetype.toLowerCase();
+      
+      for (final edhrecTheme in edhrecThemesLower) {
+        if (targetLower.contains(edhrecTheme) || edhrecTheme.contains(targetLower)) {
+          themeMatchesEdhrec = true;
+          break;
+        }
+      }
+      
+      if (themeMatchesEdhrec) {
+        // Tema bate: usar 100% EDHREC
+        synergyCards = edhrecService
+            .getHighSynergyCards(edhrecData, minSynergy: 0.1, limit: 60)
+            .map((c) => c.name)
+            .toList();
+        Log.i('EDHREC complete pool (theme match): ${synergyCards.length} cartas');
+      } else {
+        // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
+        final edhrecCards = edhrecService
+            .getHighSynergyCards(edhrecData, minSynergy: 0.08, limit: 45)
+            .map((c) => c.name)
+            .toList();
+        
+        // Buscar cartas do tema do usuário (Scryfall/archetype)
+        final themeCards = await synergyEngine.fetchCommanderSynergies(
+          commanderName: commanders.first,
+          colors: colors,
+          archetype: targetArchetype,
+        );
+        
+        // Misturar: 70% EDHREC + 30% tema (sem duplicatas)
+        final edhrecPortion = (edhrecCards.length * 0.7).round();
+        final themePortion = (themeCards.length * 0.3).round().clamp(0, 20);
+        
+        synergyCards = [
+          ...edhrecCards.take(edhrecPortion),
+          ...themeCards.where((c) => !edhrecCards.contains(c)).take(themePortion),
+        ];
+        
+        Log.i('HYBRID complete pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas');
+      }
     } else {
       // Fallback para Scryfall
       synergyCards = await synergyEngine.fetchCommanderSynergies(
