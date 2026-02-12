@@ -308,11 +308,36 @@ class DeckThemeProfile {
       };
 }
 
-DeckThemeProfile _detectThemeProfile(
+Future<DeckThemeProfile> _detectThemeProfile(
   List<Map<String, dynamic>> cards, {
   required List<String> commanders,
-}) {
+  required Pool pool,
+}) async {
   int qty(Map<String, dynamic> c) => (c['quantity'] as int?) ?? 1;
+  
+  // Buscar insights do meta para todas as cartas do deck (batch query)
+  final cardNames = cards.map((c) => c['name'] as String? ?? '').where((n) => n.isNotEmpty).toList();
+  final metaInsights = <String, Map<String, dynamic>>{};
+  
+  if (cardNames.isNotEmpty) {
+    try {
+      final result = await pool.execute(
+        Sql.named('SELECT card_name, usage_count, common_archetypes, learned_role FROM card_meta_insights WHERE LOWER(card_name) IN (${List.generate(cardNames.length, (i) => 'LOWER(@name$i)').join(', ')})'),
+        parameters: {for (var i = 0; i < cardNames.length; i++) 'name$i': cardNames[i]},
+      );
+      for (final row in result) {
+        final name = (row[0] as String).toLowerCase();
+        metaInsights[name] = {
+          'usage_count': row[1] as int? ?? 0,
+          'common_archetypes': row[2] is List ? (row[2] as List).cast<String>() : <String>[],
+          'learned_role': row[3] as String? ?? '',
+        };
+      }
+    } catch (e) {
+      // Se falhar, continua com heurísticas
+      print('[_detectThemeProfile] Falha ao buscar meta insights: $e');
+    }
+  }
 
   final commanderLower = commanders.map((e) => e.toLowerCase()).toSet();
 
@@ -518,6 +543,36 @@ DeckThemeProfile _detectThemeProfile(
     if (isLand) continue;
 
     var impactScore = 0;
+
+    // 0. META INSIGHTS: dados reais de uso em decks competitivos
+    final insight = metaInsights[nameLower];
+    if (insight != null) {
+      final usageCount = insight['usage_count'] as int;
+      final archetypes = insight['common_archetypes'] as List<String>;
+      final learnedRole = insight['learned_role'] as String;
+      
+      // Uso alto no meta = carta forte (escala logarítmica: 36 usos → ~35 pts)
+      if (usageCount > 0) {
+        impactScore += (usageCount * 1.0).clamp(5, 40).round();
+      }
+      
+      // Se a carta é comum no arquétipo que o deck está usando = boost
+      final themeSimplified = theme.replaceAll('tribal-', '');
+      for (final arch in archetypes) {
+        if (arch.contains(themeSimplified) || themeSimplified.contains(arch)) {
+          impactScore += 20;
+          break;
+        }
+      }
+      
+      // Role específico que combina com o tema
+      if ((theme == 'spellslinger' && learnedRole.contains('counter')) ||
+          (theme == 'reanimator' && learnedRole.contains('reanimate')) ||
+          (theme == 'artifacts' && learnedRole.contains('artifact')) ||
+          (theme.startsWith('tribal') && learnedRole.contains('tribal'))) {
+        impactScore += 15;
+      }
+    }
 
     // 1. Comandantes = sempre core (impacto máximo)
     if (commanderLower.contains(nameLower)) {
@@ -812,9 +867,10 @@ Future<Response> onRequest(RequestContext context) async {
     // 1.5 Análise de Arquétipo e Tema do Deck
     final analyzer = DeckArchetypeAnalyzer(allCardData, deckColors.toList());
     final deckAnalysis = analyzer.generateAnalysis();
-    final themeProfile = _detectThemeProfile(
+    final themeProfile = await _detectThemeProfile(
       allCardData,
       commanders: commanders,
+      pool: pool,
     );
 
     // Usar arquétipo passado pelo usuário

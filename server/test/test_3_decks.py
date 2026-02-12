@@ -37,6 +37,13 @@ def test_deck(deck_id, archetype, name):
         print(f"  CMC médio: {analysis.get('average_cmc')}")
         print(f"  Total cartas: {analysis.get('total_cards')}")
         print(f"  Tema: {data.get('theme')}")
+        
+        # Mostrar core_cards
+        theme = data.get('theme', {})
+        if isinstance(theme, dict):
+            core = theme.get('core_cards', [])
+            print(f"  Core Cards: {core if core else '(nenhum)'}")
+        
         print(f"  Removals: {len(data.get('removals', []))} cartas")
         print(f"  Additions: {len(data.get('additions', []))} cartas")
         
