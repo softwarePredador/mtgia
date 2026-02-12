@@ -1018,20 +1018,27 @@ class DeckProvider extends ChangeNotifier {
       
       // Primeiro: adicionar commanders
       final commanderIds = <String>{};
+      AppLogger.debug('👑 [DeckProvider] Commanders no deck: ${_selectedDeck!.commander.length}');
       for (final commander in _selectedDeck!.commander) {
+        AppLogger.debug('  Commander: ${commander.name} (id=${commander.id}, qty=${commander.quantity})');
         commanderIds.add(commander.id);
+        // Commander SEMPRE deve ter quantity=1
         currentCards[commander.id] = {
           'card_id': commander.id,
-          'quantity': commander.quantity,
+          'quantity': 1, // Forçar 1, independente do valor original
           'is_commander': true,
         };
       }
       
       // Segundo: adicionar mainBoard, mas NUNCA sobrescrever commanders
+      AppLogger.debug('🃏 [DeckProvider] MainBoard entries: ${_selectedDeck!.mainBoard.length}');
       for (final entry in _selectedDeck!.mainBoard.entries) {
         for (final card in entry.value) {
           // Pular se já é commander (evita duplicatas)
-          if (commanderIds.contains(card.id)) continue;
+          if (commanderIds.contains(card.id)) {
+            AppLogger.debug('  ⚠️ SKIP (é commander): ${card.name} (id=${card.id})');
+            continue;
+          }
           
           currentCards[card.id] = {
             'card_id': card.id,
@@ -1087,6 +1094,14 @@ class DeckProvider extends ChangeNotifier {
 
       // 5. Salvar no servidor
       AppLogger.debug('💾 [DeckProvider] Salvando...');
+      
+      // DEBUG: Log todas as cartas que serão enviadas
+      AppLogger.debug('📦 [DeckProvider] Total de cartas a enviar: ${currentCards.length}');
+      for (final entry in currentCards.entries) {
+        final v = entry.value;
+        AppLogger.debug('  📌 ${entry.key}: qty=${v['quantity']}, is_commander=${v['is_commander']}');
+      }
+      
       final response = await _apiClient.put('/decks/$deckId', {
         'cards': currentCards.values.toList(),
       });
