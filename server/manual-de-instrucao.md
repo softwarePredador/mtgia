@@ -4363,3 +4363,130 @@ Uma auditoria completa do fluxo de otimização identificou 13 falhas potenciais
 ### 34.5 Bug Encontrado no Deploy
 
 `_extractMechanicKeywords()` usava `List<dynamic>.firstWhere(orElse: () => null)` que causa `type '() => Null' is not a subtype of type '(() => Map<String, dynamic>)?'` em runtime. Corrigido com loop manual `for`/`break`.
+---
+
+## 35. Integração EDHREC (Fevereiro 2026)
+
+### 35.1 Motivação
+
+A seleção de cartas pela IA dependia de heurísticas internas (keywords, oracle text parsing) e rankings globais do Scryfall. Isso causava dois problemas:
+
+1. **Cartas sinérgicas específicas** eram cortadas por serem "impopulares globalmente"
+2. **Sugestões genéricas** não consideravam co-ocorrências reais com o commander
+
+**Solução:** Integrar dados do EDHREC, que possui estatísticas de **milhões de decklists reais** de Commander.
+
+### 35.2 Arquitetura
+
+Novo serviço: `lib/ai/edhrec_service.dart`
+
+```dart
+class EdhrecService {
+  // Cache em memória (6h) para evitar requests repetidos
+  static final Map<String, _CachedResult> _cache = {};
+  
+  // Busca dados de co-ocorrência para o commander
+  Future<EdhrecCommanderData?> fetchCommanderData(String commanderName) async;
+  
+  // Converte nome para slug EDHREC
+  // "Jin-Gitaxias // The Great Synthesis" → "jin-gitaxias"
+  String _toSlug(String name);
+  
+  // Retorna cartas com synergy > threshold
+  List<EdhrecCard> getHighSynergyCards(data, {minSynergy: 0.15, limit: 40});
+}
+```
+
+### 35.3 Dados Retornados pelo EDHREC
+
+```json
+{
+  "commanderName": "Jin-Gitaxias",
+  "deckCount": 3847,           // Número de decks analisados
+  "themes": ["Draw", "Artifacts", "Voltron"],
+  "topCards": [
+    {
+      "name": "Rhystic Study",
+      "synergy": 0.42,         // -1.0 a 1.0 (1.0 = só aparece neste deck)
+      "inclusion": 0.89,       // 89% dos decks usam
+      "numDecks": 3424,
+      "category": "card_draw"
+    }
+  ]
+}
+```
+
+### 35.4 Integração no Fluxo de Otimização
+
+**Arquivo:** `lib/ai/otimizacao.dart`
+
+1. **Antes do scoring:** Busca dados EDHREC para o commander
+2. **Efficiency Scoring:** Novo método `_calculateEfficiencyScoresWithEdhrec()`:
+   - Se carta está no EDHREC com synergy > 0.3 → score ÷4 (protegida)
+   - Se synergy > 0.15 → score ÷2.5
+   - Se synergy > 0 → score ÷1.5
+   - Se carta NÃO está no EDHREC → fallback para keywords
+3. **Synergy Pool:** Top 40 cartas com synergy > 0.15 do EDHREC
+
+```dart
+// No optimizeDeck():
+final edhrecData = await edhrecService.fetchCommanderData(commanders.first);
+
+final scoredCards = _calculateEfficiencyScoresWithEdhrec(
+  currentCards,
+  commanderKeywords,
+  edhrecData,  // Novo parâmetro
+);
+
+List<String> synergyCards;
+if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
+  synergyCards = edhrecService
+      .getHighSynergyCards(edhrecData, minSynergy: 0.15, limit: 40)
+      .map((c) => c.name)
+      .toList();
+} else {
+  synergyCards = await synergyEngine.fetchCommanderSynergies(...);  // Fallback
+}
+```
+
+### 35.5 Headers Anti-Bloqueio
+
+EDHREC bloqueia User-Agents genéricos. Headers implementados:
+
+```dart
+headers: {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+  'Accept': 'application/json, text/plain, */*',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Referer': 'https://edhrec.com/',
+}
+```
+
+### 35.6 Tratamento de Flip Cards
+
+Cartas dupla face (MDFCs, Transform) são suportadas:
+
+```dart
+// "Jin-Gitaxias // The Great Synthesis" → "jin-gitaxias"
+for (final separator in [' // ', '//', ' / ']) {
+  if (cleanName.contains(separator)) {
+    cleanName = cleanName.split(separator).first.trim();
+    break;
+  }
+}
+```
+
+### 35.7 Impacto na Qualidade
+
+**Antes:** Sugestões baseadas em popularidade global + heurísticas de keywords.
+
+**Depois:** Sugestões baseadas em **co-ocorrência real** de milhões de decks.
+
+Exemplo prático: Para Jin-Gitaxias, agora cartas como "Mystic Remora" e "Curiosity" (que têm alta sinergia específica com ele) são priorizadas sobre staples genéricos.
+
+### 35.8 Fallback
+
+Se EDHREC retornar erro (403, 404, timeout):
+- Log de warning
+- Usa Scryfall como fallback (comportamento anterior)
+- Não quebra o fluxo de otimização
