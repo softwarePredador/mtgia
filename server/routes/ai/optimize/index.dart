@@ -1193,11 +1193,11 @@ Future<Response> onRequest(RequestContext context) async {
         );
         jsonResponse['mode'] = 'optimize';
       }
-    } catch (e) {
-      Log.e('Optimization failed: $e');
+    } catch (e, stackTrace) {
+      Log.e('Optimization failed: $e\nStack trace:\n$stackTrace');
       return Response.json(
         statusCode: HttpStatus.internalServerError,
-        body: {'error': 'Optimization failed'},
+        body: {'error': 'Optimization failed', 'details': e.toString()},
       );
     }
 
