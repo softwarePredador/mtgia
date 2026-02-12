@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:postgres/postgres.dart';
 import '../ai_log_service.dart';
 import '../logger.dart';
 import '../ml_knowledge_service.dart';
