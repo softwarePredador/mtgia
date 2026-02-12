@@ -767,22 +767,114 @@ Future<Response> onRequest(RequestContext context) async {
           if (addedThisIter == 0) break;
         }
 
-        // Fallback final: completa o resto com básicos
+        // Fallback final: INTELIGENTE — calcula quantos terrenos vs spells faltam
+        // Em vez de simplesmente jogar lands, analisa a proporção ideal
         if (virtualTotal < maxTotal) {
           var missing = maxTotal - virtualTotal;
-          final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
-          final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
-          if (basicsWithIds.isNotEmpty) {
-            final keys = basicsWithIds.keys.toList();
-            var i = 0;
-            while (missing > 0) {
-              final name = keys[i % keys.length];
-              final id = basicsWithIds[name]!;
-              virtualCountsById[id] = (virtualCountsById[id] ?? 0) + 1;
-              addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
-              virtualTotal += 1;
-              missing--;
-              i++;
+          
+          // Calcular terrenos atuais no deck virtual
+          var currentLands = 0;
+          for (final c in virtualDeck) {
+            final typeLine = ((c['type_line'] as String?) ?? '').toLowerCase();
+            if (typeLine.contains('land')) {
+              currentLands += (c['quantity'] as int?) ?? 1;
+            }
+          }
+          
+          // Proporção ideal de terrenos: ~36-38 para Commander
+          // Ajustar por CMC médio do deck
+          final nonLandCards = virtualDeck.where((c) {
+            final t = ((c['type_line'] as String?) ?? '').toLowerCase();
+            return !t.contains('land');
+          }).toList();
+          
+          double avgCmc = 0;
+          if (nonLandCards.isNotEmpty) {
+            avgCmc = nonLandCards.fold<double>(0, (sum, c) {
+              return sum + ((c['cmc'] as num?)?.toDouble() ?? 0.0);
+            }) / nonLandCards.length;
+          }
+          
+          // Terrenos ideais baseados no CMC médio:
+          // CMC < 2.0 → 32 lands | CMC 2.0-3.0 → 35 | CMC 3.0-4.0 → 37 | CMC > 4.0 → 39
+          final idealLands = avgCmc < 2.0 ? 32 : (avgCmc < 3.0 ? 35 : (avgCmc < 4.0 ? 37 : 39));
+          final landsNeeded = (idealLands - currentLands).clamp(0, missing);
+          final spellsNeeded = missing - landsNeeded;
+          
+          print('[DEBUG] Complete fallback inteligente:');
+          print('[DEBUG]   Cartas faltando: $missing | Lands atuais: $currentLands | Ideal: $idealLands');
+          print('[DEBUG]   Lands a adicionar: $landsNeeded | Spells a adicionar: $spellsNeeded');
+          
+          // Adicionar spells primeiro (via busca no DB por cartas sinérgicas)
+          if (spellsNeeded > 0) {
+            try {
+              final existingNames = virtualDeck
+                  .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+                  .toSet();
+              
+              final synergySpells = await _findSynergyReplacements(
+                pool: pool,
+                optimizer: optimizer,
+                commanders: commanders,
+                commanderColorIdentity: commanderColorIdentity,
+                targetArchetype: targetArchetype,
+                bracket: bracket,
+                keepTheme: keepTheme,
+                detectedTheme: themeProfile.theme,
+                coreCards: themeProfile.coreCards,
+                missingCount: spellsNeeded,
+                removedCards: const [], // não estamos substituindo, estamos adicionando
+                excludeNames: existingNames,
+                allCardData: virtualDeck,
+              );
+              
+              for (final spell in synergySpells) {
+                if (virtualTotal >= maxTotal) break;
+                final id = spell['id'] as String;
+                final name = spell['name'] as String;
+                
+                if ((virtualCountsById[id] ?? 0) > 0) continue; // já existe
+                
+                virtualCountsById[id] = 1;
+                addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
+                virtualTotal += 1;
+                
+                virtualDeck.add({
+                  'card_id': id,
+                  'name': name,
+                  'type_line': '',
+                  'oracle_text': '',
+                  'colors': <String>[],
+                  'color_identity': <String>[],
+                  'quantity': 1,
+                  'is_commander': false,
+                  'mana_cost': '',
+                  'cmc': 0.0,
+                });
+              }
+              print('[DEBUG]   Spells sinérgicas adicionadas: ${synergySpells.length}');
+            } catch (e) {
+              print('[WARN] Falha ao buscar spells sinérgicas: $e');
+            }
+          }
+          
+          // Depois adicionar lands para o restante
+          if (virtualTotal < maxTotal) {
+            var landsToAdd = maxTotal - virtualTotal;
+            final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
+            final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
+            if (basicsWithIds.isNotEmpty) {
+              final keys = basicsWithIds.keys.toList();
+              var i = 0;
+              while (landsToAdd > 0) {
+                final name = keys[i % keys.length];
+                final id = basicsWithIds[name]!;
+                virtualCountsById[id] = (virtualCountsById[id] ?? 0) + 1;
+                addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
+                virtualTotal += 1;
+                landsToAdd--;
+                i++;
+              }
             }
           }
         }
@@ -802,7 +894,7 @@ Future<Response> onRequest(RequestContext context) async {
           'iterations': iterations,
           'additions_detailed': additionsDetailed,
           'reasoning': (virtualTotal >= maxTotal)
-              ? 'Deck completado com base no arquétipo e bracket.'
+              ? 'Deck completado com cartas sinérgicas ao arquétipo $targetArchetype, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.'
               : 'Deck parcialmente completado; algumas sugestões foram bloqueadas/filtradas.',
           'warnings': {
             if (invalidAll.isNotEmpty) 'invalid_cards': invalidAll,
@@ -1177,38 +1269,84 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // Re-aplicar equilíbrio após validação
-    // CRÍTICO: Em vez de truncar, preencher com básicos quando additions < removals
+    // FILOSOFIA: Quando additions < removals, a IA deve SUGERIR NOVAS CARTAS
+    // de sinergia — NÃO preencher com lands genéricos. O propósito é OTIMIZAR.
     if (!isComplete && validRemovals.length != validAdditions.length) {
       print('[DEBUG] Re-balanceamento pós-filtros:');
       print('[DEBUG]   Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
       
       if (validAdditions.length < validRemovals.length) {
-        // CORREÇÃO: Preencher com básicos em vez de truncar remoções
+        // CORREÇÃO REAL: Re-consultar a IA para cartas substitutas
         final missingCount = validRemovals.length - validAdditions.length;
-        print('[DEBUG]   Faltam $missingCount adições - preenchendo com básicos');
+        print('[DEBUG]   Faltam $missingCount adições - consultando IA para substitutas sinérgicas');
         
-        final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
-        final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
+        // Montar lista de cartas a excluir (já existentes + já sugeridas + filtradas)
+        final excludeNames = <String>{
+          ...deckNamesLower,
+          ...validAdditions.map((n) => n.toLowerCase()),
+          ...filteredByColorIdentity.map((n) => n.toLowerCase()),
+        };
         
-        if (basicsWithIds.isNotEmpty) {
-          final keys = basicsWithIds.keys.toList();
-          var i = 0;
-          for (var j = 0; j < missingCount; j++) {
-            final name = keys[i % keys.length];
-            validAdditions.add(name);
-            // Adicionar ao validByNameLower para que additions_detailed funcione
-            if (!validByNameLower.containsKey(name.toLowerCase())) {
+        // Categorias das cartas removidas para pedir substitutas do mesmo tipo funcional
+        final removedButUnmatched = validRemovals.sublist(validAdditions.length);
+        
+        try {
+          final replacementResult = await _findSynergyReplacements(
+            pool: pool,
+            optimizer: optimizer,
+            commanders: commanders,
+            commanderColorIdentity: commanderColorIdentity,
+            targetArchetype: targetArchetype,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            detectedTheme: themeProfile.theme,
+            coreCards: themeProfile.coreCards,
+            missingCount: missingCount,
+            removedCards: removedButUnmatched,
+            excludeNames: excludeNames,
+            allCardData: allCardData,
+          );
+          
+          if (replacementResult.isNotEmpty) {
+            for (final replacement in replacementResult) {
+              final name = replacement['name'] as String;
+              final id = replacement['id'] as String;
+              validAdditions.add(name);
               validByNameLower[name.toLowerCase()] = {
-                'id': basicsWithIds[name],
+                'id': id,
                 'name': name,
               };
             }
-            i++;
+            print('[DEBUG]   IA sugeriu ${replacementResult.length} substitutas sinérgicas');
           }
-          print('[DEBUG]   Adicionados $missingCount básicos: ${validAdditions.sublist(validAdditions.length - missingCount)}');
-        } else {
-          // Fallback: truncar se não houver básicos disponíveis
-          print('[WARNING] Não foi possível encontrar básicos - truncando remoções');
+          
+          // Se AINDA faltar (IA não conseguiu preencher tudo), agora sim fallback com basics
+          if (validAdditions.length < validRemovals.length) {
+            final stillMissing = validRemovals.length - validAdditions.length;
+            print('[DEBUG]   Ainda faltam $stillMissing - fallback com básicos');
+            final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
+            final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
+            if (basicsWithIds.isNotEmpty) {
+              final keys = basicsWithIds.keys.toList();
+              var i = 0;
+              for (var j = 0; j < stillMissing; j++) {
+                final name = keys[i % keys.length];
+                validAdditions.add(name);
+                if (!validByNameLower.containsKey(name.toLowerCase())) {
+                  validByNameLower[name.toLowerCase()] = {
+                    'id': basicsWithIds[name],
+                    'name': name,
+                  };
+                }
+                i++;
+              }
+            } else {
+              validRemovals = validRemovals.take(validAdditions.length).toList();
+            }
+          }
+        } catch (e) {
+          print('[WARN] Falha ao buscar substitutas IA: $e - usando fallback');
+          // Fallback: truncar remoções para não perder cartas
           validRemovals = validRemovals.take(validAdditions.length).toList();
         }
       } else {
@@ -1273,9 +1411,9 @@ Future<Response> onRequest(RequestContext context) async {
             DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
         postAnalysis = postAnalyzer.generateAnalysis();
 
-        // 4. Comparar Antes vs Depois (Validação Lógica)
+        // 4. Comparar Antes vs Depois — VALIDAÇÃO QUALITATIVA REAL
         final preManaAssessment = deckAnalysis['mana_base_assessment'] as String? ?? '';
-        final postManaAssessment = postAnalysis?['mana_base_assessment'] as String? ?? '';
+        final postManaAssessment = postAnalysis['mana_base_assessment'] as String? ?? '';
         final preManaIssues = preManaAssessment.contains('Falta mana');
         final postManaIssues = postManaAssessment.contains('Falta mana');
 
@@ -1285,13 +1423,47 @@ Future<Response> onRequest(RequestContext context) async {
         }
 
         final preAvgCmc = deckAnalysis['average_cmc'] as String? ?? '0';
-        final postAvgCmc = postAnalysis?['average_cmc'] as String? ?? '0';
+        final postAvgCmc = postAnalysis['average_cmc'] as String? ?? '0';
         final preCurve = double.tryParse(preAvgCmc) ?? 0.0;
         final postCurve = double.tryParse(postAvgCmc) ?? 0.0;
 
         if (targetArchetype.toLowerCase() == 'aggro' && postCurve > preCurve) {
           validationWarnings.add(
               '⚠️ ATENÇÃO: O deck está ficando mais lento (CMC aumentou), o que é ruim para Aggro.');
+        }
+
+        // 5. ANÁLISE DE QUALIDADE DAS TROCAS (Power Level Assessment)
+        final preTypes = deckAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
+        final postTypes = postAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
+        
+        // Verificar se a otimização não desbalanceou a distribuição de tipos
+        final preLands = (preTypes['lands'] as int?) ?? 0;
+        final postLands = (postTypes['lands'] as int?) ?? 0;
+        if (postLands < preLands - 3) {
+          validationWarnings.add(
+            '⚠️ A otimização removeu muitos terrenos ($preLands → $postLands). Isso pode causar problemas de mana.');
+        }
+        
+        // Verificar se a curva melhorou para o arquétipo
+        if (targetArchetype.toLowerCase() == 'control' && postCurve < preCurve - 0.5) {
+          validationWarnings.add(
+            '💡 O CMC médio diminuiu significativamente ($preAvgCmc → $postAvgCmc). Para Control, isso pode remover respostas de custo alto que são importantes.');
+        }
+        
+        // Gerar resumo de melhoria
+        final improvements = <String>[];
+        if (postCurve < preCurve && targetArchetype.toLowerCase() != 'control') {
+          improvements.add('CMC médio otimizado: $preAvgCmc → $postAvgCmc');
+        }
+        if (preManaIssues && !postManaIssues) {
+          improvements.add('Base de mana corrigida');
+        }
+        if ((postTypes['instants'] as int? ?? 0) > (preTypes['instants'] as int? ?? 0)) {
+          improvements.add('Mais interação instant-speed adicionada');
+        }
+        
+        if (improvements.isNotEmpty) {
+          postAnalysis['improvements'] = improvements;
         }
       } catch (e) {
         print('[ERROR] handler: $e');
@@ -1365,42 +1537,38 @@ Future<Response> onRequest(RequestContext context) async {
       }
     }
     
-    // BALANCEAMENTO FINAL - Preservar quantidades, preencher com básicos se faltar
+    // BALANCEAMENTO FINAL (detailed) - Agora as listas já devem estar equilibradas
+    // pós re-chamada à IA. Este bloco só age se o detailed ainda tiver gap.
     if (addDet.length < remDet.length && !isComplete) {
-      // Faltam adições - adicionar básicos ao additions_detailed
       final missingDetailed = remDet.length - addDet.length;
-      print('[DEBUG]   Faltam $missingDetailed adições em detailed - adicionando básicos');
+      print('[DEBUG]   Gap em detailed: faltam $missingDetailed - construindo de validAdditions');
       
-      final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
-      final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
-      
-      if (basicsWithIds.isNotEmpty) {
-        final keys = basicsWithIds.keys.toList();
-        var i = 0;
-        final newBasics = <Map<String, dynamic>>[];
-        for (var j = 0; j < missingDetailed; j++) {
-          final name = keys[i % keys.length];
-          newBasics.add({
-            'name': name,
-            'card_id': basicsWithIds[name],
+      // Tentar construir detailed para adições que ainda não estão nele
+      final existingNames = addDet.map((e) => (e as Map)['name']?.toString().toLowerCase() ?? '').toSet();
+      final newDetailed = <Map<String, dynamic>>[];
+      for (final name in validAdditions) {
+        if (existingNames.contains(name.toLowerCase())) continue;
+        final v = validByNameLower[name.toLowerCase()];
+        if (v != null && v['id'] != null) {
+          newDetailed.add({
+            'name': v['name'] ?? name,
+            'card_id': v['id'],
             'quantity': 1,
           });
-          if (!validAdditions.contains(name)) {
-            validAdditions.add(name);
-          }
-          i++;
+          existingNames.add(name.toLowerCase());
         }
-        responseBody['additions_detailed'] = [...addDet, ...newBasics];
-        responseBody['additions'] = validAdditions;
-        print('[DEBUG]   Adicionados $missingDetailed básicos ao detailed');
-      } else {
-        // Fallback: truncar remoções
-        print('[WARN] Não foi possível encontrar básicos - truncando remoções');
-        responseBody['removals_detailed'] = remDet.take(addDet.length).toList();
-        responseBody['removals'] = validRemovals.take(addDet.length).toList();
+      }
+      if (newDetailed.isNotEmpty) {
+        responseBody['additions_detailed'] = [...addDet, ...newDetailed];
+      }
+      
+      // Se AINDA faltar, truncar remoções como último recurso
+      final finalAddDet2 = responseBody['additions_detailed'] as List;
+      if (finalAddDet2.length < remDet.length) {
+        responseBody['removals_detailed'] = remDet.take(finalAddDet2.length).toList();
+        responseBody['removals'] = validRemovals.take(finalAddDet2.length).toList();
       }
     } else if (addDet.length > remDet.length && !isComplete) {
-      // Mais adições que remoções: truncar adições
       print('[DEBUG]   Truncando adições extras');
       responseBody['additions_detailed'] = addDet.take(remDet.length).toList();
       responseBody['additions'] = validAdditions.take(remDet.length).toList();
@@ -1496,4 +1664,166 @@ Future<Map<String, String>> _loadBasicLandIds(
     map[n] = id;
   }
   return map;
+}
+
+/// Busca cartas substitutas sinérgicas quando filtros de cor/bracket
+/// removeram adições sugeridas pela IA.
+///
+/// FILOSOFIA: A otimização existe para MELHORAR o deck.
+/// Quando uma carta é filtrada, o correto é pedir à IA outra carta
+/// que cumpra o mesmo papel funcional, não preencher com lands.
+///
+/// Fluxo:
+/// 1. Contexto: quais cartas foram removidas do deck (e suas categorias)
+/// 2. Query ao DB: buscar cartas dentro da identidade de cor, com sinergia
+/// 3. Fallback: re-consultar a IA se o DB não tiver boas opções
+Future<List<Map<String, dynamic>>> _findSynergyReplacements({
+  required Pool pool,
+  required DeckOptimizerService optimizer,
+  required List<String> commanders,
+  required Set<String> commanderColorIdentity,
+  required String targetArchetype,
+  required int? bracket,
+  required bool keepTheme,
+  required String? detectedTheme,
+  required List<String>? coreCards,
+  required int missingCount,
+  required List<String> removedCards,
+  required Set<String> excludeNames,
+  required List<Map<String, dynamic>> allCardData,
+}) async {
+  final results = <Map<String, dynamic>>[];
+  
+  // Passo 1: Analisar os tipos funcionais das cartas que foram removidas
+  // para saber QUE TIPO de carta precisamos substituir
+  final removedTypesResult = await pool.execute(
+    Sql.named('''
+      SELECT name, type_line, oracle_text, color_identity
+      FROM cards
+      WHERE name = ANY(@names)
+    '''),
+    parameters: {'names': removedCards},
+  );
+  
+  final functionalNeeds = <String>[]; // ex: 'draw', 'removal', 'ramp', etc.
+  for (final row in removedTypesResult) {
+    final oracle = ((row[2] as String?) ?? '').toLowerCase();
+    final typeLine = ((row[1] as String?) ?? '').toLowerCase();
+    
+    if (oracle.contains('draw') || oracle.contains('cards')) {
+      functionalNeeds.add('draw');
+    } else if (oracle.contains('destroy') || oracle.contains('exile') || oracle.contains('counter')) {
+      functionalNeeds.add('removal');
+    } else if (oracle.contains('add') && oracle.contains('mana') || typeLine.contains('land')) {
+      functionalNeeds.add('ramp');
+    } else if (typeLine.contains('creature')) {
+      functionalNeeds.add('creature');
+    } else if (typeLine.contains('artifact')) {
+      functionalNeeds.add('artifact');
+    } else {
+      functionalNeeds.add('utility');
+    }
+  }
+  
+  // Passo 2: Buscar cartas do DB que combinem com o commander e preencham o gap
+  // Priorizamos cartas populares (por rank EDHREC implícito na query) dentro da identidade
+  final colorIdentityArr = commanderColorIdentity.toList();
+  
+  // Query inteligente: buscar cartas dentro da identidade de cor,
+  // que não estejam no deck nem na lista de exclusão,
+  // legais em commander, ordenadas por popularidade
+  final candidatesResult = await pool.execute(
+    Sql.named('''
+      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.color_identity
+      FROM cards c
+      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+      WHERE (cl.status IS NULL OR cl.status = 'legal' OR cl.status = 'restricted')
+        AND c.name NOT IN (SELECT unnest(@exclude::text[]))
+        AND c.type_line NOT LIKE 'Basic Land%'
+        AND (
+          c.color_identity <@ @identity::text[]
+          OR c.color_identity = '{}'
+          OR c.color_identity IS NULL
+        )
+      ORDER BY c.edhrec_rank ASC NULLS LAST
+      LIMIT 50
+    '''),
+    parameters: {
+      'exclude': excludeNames.toList(),
+      'identity': colorIdentityArr,
+    },
+  );
+  
+  // Filtrar e selecionar as melhores cartas baseado nas necessidades funcionais
+  final candidatePool = <Map<String, dynamic>>[];
+  for (final row in candidatesResult) {
+    final id = row[0] as String;
+    final name = row[1] as String;
+    final typeLine = ((row[2] as String?) ?? '').toLowerCase();
+    final oracle = ((row[3] as String?) ?? '').toLowerCase();
+    final identity = (row[4] as List?)?.cast<String>() ?? const <String>[];
+    
+    // Verificar identidade de cor (double check)
+    if (!isWithinCommanderIdentity(
+      cardIdentity: identity,
+      commanderIdentity: commanderColorIdentity,
+    )) continue;
+    
+    candidatePool.add({
+      'id': id,
+      'name': name,
+      'type_line': typeLine,
+      'oracle_text': oracle,
+    });
+  }
+  
+  // Passo 3: Selecionar as melhores cartas priorizando as necessidades funcionais
+  final usedNames = <String>{};
+  
+  // Primeiro: tentar preencher necessidades funcionais específicas
+  for (var i = 0; i < missingCount && i < functionalNeeds.length; i++) {
+    final need = functionalNeeds[i];
+    Map<String, dynamic>? best;
+    
+    for (final candidate in candidatePool) {
+      final name = (candidate['name'] as String).toLowerCase();
+      if (usedNames.contains(name)) continue;
+      
+      final oracle = candidate['oracle_text'] as String;
+      final typeLine = candidate['type_line'] as String;
+      
+      final matches = switch (need) {
+        'draw' => oracle.contains('draw') || oracle.contains('cards'),
+        'removal' => oracle.contains('destroy') || oracle.contains('exile') || oracle.contains('counter'),
+        'ramp' => oracle.contains('add') && oracle.contains('mana') || typeLine.contains('land'),
+        'creature' => typeLine.contains('creature'),
+        'artifact' => typeLine.contains('artifact'),
+        _ => true, // utility: qualquer carta boa serve
+      };
+      
+      if (matches) {
+        best = candidate;
+        break;
+      }
+    }
+    
+    if (best != null) {
+      results.add({'id': best['id'], 'name': best['name']});
+      usedNames.add((best['name'] as String).toLowerCase());
+    }
+  }
+  
+  // Se ainda faltam cartas, pegar as próximas melhores do pool (por EDHREC rank)
+  if (results.length < missingCount) {
+    for (final candidate in candidatePool) {
+      if (results.length >= missingCount) break;
+      final name = (candidate['name'] as String).toLowerCase();
+      if (usedNames.contains(name)) continue;
+      
+      results.add({'id': candidate['id'], 'name': candidate['name']});
+      usedNames.add(name);
+    }
+  }
+  
+  return results;
 }
