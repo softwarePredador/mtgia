@@ -37,7 +37,7 @@ class LifeCounterScreen extends StatefulWidget {
 
 class _LifeCounterScreenState extends State<LifeCounterScreen> {
   int _playerCount = 2;
-  int _startingLife = 40;
+  int _startingLife = 20;
 
   late List<int> _lives;
   late List<int> _poison;
@@ -207,33 +207,18 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         playerCount: _playerCount,
         playerColor: _playerColors[playerIndex],
         playerLabel: _playerLabels[playerIndex],
-        poison: _poison[playerIndex],
-        energy: _energy[playerIndex],
-        experience: _experience[playerIndex],
-        commanderDamage: _commanderDamage[playerIndex],
+        initialPoison: _poison[playerIndex],
+        initialEnergy: _energy[playerIndex],
+        initialExperience: _experience[playerIndex],
+        initialCommanderDamage: List.of(_commanderDamage[playerIndex]),
         playerColors: _playerColors,
         playerLabels: _playerLabels,
-        onPoisonChanged: (delta) {
-          _changePoison(playerIndex, delta);
-          // Rebuild the sheet
-          Navigator.pop(ctx);
-          _showCountersSheet(playerIndex);
-        },
-        onEnergyChanged: (delta) {
-          _changeEnergy(playerIndex, delta);
-          Navigator.pop(ctx);
-          _showCountersSheet(playerIndex);
-        },
-        onExperienceChanged: (delta) {
-          _changeExperience(playerIndex, delta);
-          Navigator.pop(ctx);
-          _showCountersSheet(playerIndex);
-        },
-        onCommanderDamageChanged: (source, delta) {
-          _changeCommanderDamage(playerIndex, source, delta);
-          Navigator.pop(ctx);
-          _showCountersSheet(playerIndex);
-        },
+        onPoisonChanged: (delta) => _changePoison(playerIndex, delta),
+        onEnergyChanged: (delta) => _changeEnergy(playerIndex, delta),
+        onExperienceChanged: (delta) =>
+            _changeExperience(playerIndex, delta),
+        onCommanderDamageChanged: (source, delta) =>
+            _changeCommanderDamage(playerIndex, source, delta),
       ),
     );
   }
@@ -618,15 +603,15 @@ class _CountersButton extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // Counters Bottom Sheet (poison, commander damage, energy, experience)
 // ---------------------------------------------------------------------------
-class _CountersSheet extends StatelessWidget {
+class _CountersSheet extends StatefulWidget {
   final int playerIndex;
   final int playerCount;
   final Color playerColor;
   final String playerLabel;
-  final int poison;
-  final int energy;
-  final int experience;
-  final List<int> commanderDamage; // indexed by source player
+  final int initialPoison;
+  final int initialEnergy;
+  final int initialExperience;
+  final List<int> initialCommanderDamage;
   final List<Color> playerColors;
   final List<String> playerLabels;
   final ValueChanged<int> onPoisonChanged;
@@ -639,10 +624,10 @@ class _CountersSheet extends StatelessWidget {
     required this.playerCount,
     required this.playerColor,
     required this.playerLabel,
-    required this.poison,
-    required this.energy,
-    required this.experience,
-    required this.commanderDamage,
+    required this.initialPoison,
+    required this.initialEnergy,
+    required this.initialExperience,
+    required this.initialCommanderDamage,
     required this.playerColors,
     required this.playerLabels,
     required this.onPoisonChanged,
@@ -650,6 +635,53 @@ class _CountersSheet extends StatelessWidget {
     required this.onExperienceChanged,
     required this.onCommanderDamageChanged,
   });
+
+  @override
+  State<_CountersSheet> createState() => _CountersSheetState();
+}
+
+class _CountersSheetState extends State<_CountersSheet> {
+  late int _poison;
+  late int _energy;
+  late int _experience;
+  late List<int> _cmdDamage;
+
+  @override
+  void initState() {
+    super.initState();
+    _poison = widget.initialPoison;
+    _energy = widget.initialEnergy;
+    _experience = widget.initialExperience;
+    _cmdDamage = List.of(widget.initialCommanderDamage);
+  }
+
+  void _updatePoison(int delta) {
+    setState(() {
+      _poison = (_poison + delta).clamp(0, 99);
+    });
+    widget.onPoisonChanged(delta);
+  }
+
+  void _updateEnergy(int delta) {
+    setState(() {
+      _energy = (_energy + delta).clamp(0, 999);
+    });
+    widget.onEnergyChanged(delta);
+  }
+
+  void _updateExperience(int delta) {
+    setState(() {
+      _experience = (_experience + delta).clamp(0, 999);
+    });
+    widget.onExperienceChanged(delta);
+  }
+
+  void _updateCmdDamage(int source, int delta) {
+    setState(() {
+      _cmdDamage[source] = (_cmdDamage[source] + delta).clamp(0, 99);
+    });
+    widget.onCommanderDamageChanged(source, delta);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -665,7 +697,7 @@ class _CountersSheet extends StatelessWidget {
         child: ListView(
           controller: scrollController,
           children: [
-            // Header
+            // Handle
             Center(
               child: Container(
                 width: 40,
@@ -678,9 +710,9 @@ class _CountersSheet extends StatelessWidget {
               ),
             ),
             Text(
-              'Contadores — $playerLabel',
+              'Contadores — ${widget.playerLabel}',
               style: theme.textTheme.titleMedium?.copyWith(
-                color: playerColor,
+                color: widget.playerColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -690,12 +722,12 @@ class _CountersSheet extends StatelessWidget {
             _CounterRow(
               icon: Icons.coronavirus,
               label: 'Veneno (Poison)',
-              sublabel: poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
-              value: poison,
+              sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
+              value: _poison,
               color: const Color(0xFF10B981),
-              isLethal: poison >= 10,
-              onIncrement: () => onPoisonChanged(1),
-              onDecrement: () => onPoisonChanged(-1),
+              isLethal: _poison >= 10,
+              onIncrement: () => _updatePoison(1),
+              onDecrement: () => _updatePoison(-1),
             ),
             const SizedBox(height: 12),
 
@@ -715,20 +747,22 @@ class _CountersSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            ...List.generate(playerCount, (sourceIdx) {
-              if (sourceIdx == playerIndex) return const SizedBox.shrink();
-              final dmg = commanderDamage[sourceIdx];
+            ...List.generate(widget.playerCount, (sourceIdx) {
+              if (sourceIdx == widget.playerIndex) {
+                return const SizedBox.shrink();
+              }
+              final dmg = _cmdDamage[sourceIdx];
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: _CounterRow(
                   icon: Icons.shield,
-                  label: 'De ${playerLabels[sourceIdx]}',
+                  label: 'De ${widget.playerLabels[sourceIdx]}',
                   sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
                   value: dmg,
-                  color: playerColors[sourceIdx],
+                  color: widget.playerColors[sourceIdx],
                   isLethal: dmg >= 21,
-                  onIncrement: () => onCommanderDamageChanged(sourceIdx, 1),
-                  onDecrement: () => onCommanderDamageChanged(sourceIdx, -1),
+                  onIncrement: () => _updateCmdDamage(sourceIdx, 1),
+                  onDecrement: () => _updateCmdDamage(sourceIdx, -1),
                 ),
               );
             }),
@@ -738,10 +772,10 @@ class _CountersSheet extends StatelessWidget {
             _CounterRow(
               icon: Icons.bolt,
               label: 'Energia (Energy)',
-              value: energy,
+              value: _energy,
               color: AppTheme.mythicGold,
-              onIncrement: () => onEnergyChanged(1),
-              onDecrement: () => onEnergyChanged(-1),
+              onIncrement: () => _updateEnergy(1),
+              onDecrement: () => _updateEnergy(-1),
             ),
             const SizedBox(height: 12),
 
@@ -749,10 +783,10 @@ class _CountersSheet extends StatelessWidget {
             _CounterRow(
               icon: Icons.star,
               label: 'Experiência (Experience)',
-              value: experience,
+              value: _experience,
               color: AppTheme.loomCyan,
-              onIncrement: () => onExperienceChanged(1),
-              onDecrement: () => onExperienceChanged(-1),
+              onIncrement: () => _updateExperience(1),
+              onDecrement: () => _updateExperience(-1),
             ),
             const SizedBox(height: 24),
           ],
