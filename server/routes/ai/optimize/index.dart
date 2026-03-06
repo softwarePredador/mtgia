@@ -1494,7 +1494,7 @@ Future<Response> onRequest(RequestContext context) async {
                   continue;
                 }
                 
-                virtualCountsById[id] = 1;
+                virtualCountsById[id] = (virtualCountsById[id] ?? 0) + 1;
                 virtualCountsByName[nameLower] =
                     (virtualCountsByName[nameLower] ?? 0) + 1;
                 addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
@@ -2459,29 +2459,13 @@ Future<Response> onRequest(RequestContext context) async {
             Log.d('  IA sugeriu ${replacementResult.length} substitutas sinérgicas');
           }
           
-          // Se AINDA faltar (IA não conseguiu preencher tudo), agora sim fallback com basics
+          // Se AINDA faltar (IA não conseguiu preencher tudo), TRUNCAR remoções
+          // para manter equilíbrio. NÃO preencher com básicos em modo optimize —
+          // trocar spells por lands é degradação, não otimização.
           if (validAdditions.length < validRemovals.length) {
             final stillMissing = validRemovals.length - validAdditions.length;
-            Log.d('  Ainda faltam $stillMissing - fallback com básicos');
-            final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
-            final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
-            if (basicsWithIds.isNotEmpty) {
-              final keys = basicsWithIds.keys.toList();
-              var i = 0;
-              for (var j = 0; j < stillMissing; j++) {
-                final name = keys[i % keys.length];
-                validAdditions.add(name);
-                if (!validByNameLower.containsKey(name.toLowerCase())) {
-                  validByNameLower[name.toLowerCase()] = {
-                    'id': basicsWithIds[name],
-                    'name': name,
-                  };
-                }
-                i++;
-              }
-            } else {
-              validRemovals = validRemovals.take(validAdditions.length).toList();
-            }
+            Log.d('  Ainda faltam $stillMissing - truncando remoções (não preencher com básicos em optimize)');
+            validRemovals = validRemovals.take(validAdditions.length).toList();
           }
         } catch (e) {
           Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
@@ -2607,11 +2591,26 @@ Future<Response> onRequest(RequestContext context) async {
             .toList();
 
         // 2. Criar Deck Virtual (Clone do atual - Remoções + Adições)
-        final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
+        final virtualDeck = List<Map<String, dynamic>>.from(
+          allCardData.map((c) => Map<String, dynamic>.from(c)),
+        );
 
         // Remover cartas sugeridas (pelo nome, case-insensitive)
-        final removalNamesLower = validRemovals.map((n) => n.toLowerCase()).toSet();
-        virtualDeck.removeWhere((c) => removalNamesLower.contains(((c['name'] as String?) ?? '').toLowerCase()));
+        // Usar contagem precisa: cada nome na lista de remoções remove exatamente 1 cópia
+        final removalCountsByName = <String, int>{};
+        for (final name in validRemovals) {
+          final lower = name.toLowerCase();
+          removalCountsByName[lower] = (removalCountsByName[lower] ?? 0) + 1;
+        }
+        virtualDeck.removeWhere((c) {
+          final name = ((c['name'] as String?) ?? '').toLowerCase();
+          final remaining = removalCountsByName[name] ?? 0;
+          if (remaining > 0) {
+            removalCountsByName[name] = remaining - 1;
+            return true;
+          }
+          return false;
+        });
 
         // Adicionar novas cartas
         virtualDeck.addAll(additionsData);
@@ -2926,6 +2925,93 @@ Future<Response> onRequest(RequestContext context) async {
     final finalAddDet = responseBody['additions_detailed'] as List;
     final finalRemDet = responseBody['removals_detailed'] as List;
     Log.d('  Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
+
+    // ═══════════════════════════════════════════════════════════
+    // VALIDAÇÃO FINAL: Garantir integridade do deck resultante
+    // ═══════════════════════════════════════════════════════════
+    if (!isComplete) {
+      // 1. Verificar que nenhuma adição é de carta que já existe no deck (exceto basics em formatos não-Commander)
+      final additionsDetailedFinal = responseBody['additions_detailed'] as List;
+      final removalsDetailedFinal = responseBody['removals_detailed'] as List;
+      final removalNamesFinal = removalsDetailedFinal
+          .whereType<Map>()
+          .map((e) => (e['name']?.toString() ?? '').toLowerCase())
+          .where((n) => n.isNotEmpty)
+          .toSet();
+
+      final filteredAdditions = <dynamic>[];
+      final filteredAdditionNames = <String>[];
+      final filteredRemovalsToKeep = <dynamic>[];
+      final filteredRemovalNames = <String>[];
+
+      for (final add in additionsDetailedFinal) {
+        if (add is! Map) continue;
+        final name = (add['name']?.toString() ?? '').toLowerCase();
+        if (name.isEmpty) continue;
+
+        final isBasic = _isBasicLandName(name);
+        final alreadyInDeck = deckNamesLower.contains(name);
+        final beingRemoved = removalNamesFinal.contains(name);
+
+        // Em Commander/Brawl, não-básicos só podem ter 1 cópia.
+        // Se a carta já está no deck e não está sendo removida, é inválida.
+        if (alreadyInDeck && !beingRemoved && !isBasic &&
+            (deckFormat == 'commander' || deckFormat == 'brawl')) {
+          Log.w('  Validação final: removendo adição duplicada "$name" (já existe no deck)');
+          continue;
+        }
+
+        filteredAdditions.add(add);
+        filteredAdditionNames.add(add['name']?.toString() ?? name);
+      }
+
+      // 2. Rebalancear após filtrar adições inválidas
+      if (filteredAdditions.length < additionsDetailedFinal.length) {
+        Log.d('  Validação final: ${additionsDetailedFinal.length - filteredAdditions.length} adições removidas por duplicidade');
+
+        // Truncar remoções para manter equilíbrio
+        for (var i = 0; i < removalsDetailedFinal.length && filteredRemovalsToKeep.length < filteredAdditions.length; i++) {
+          filteredRemovalsToKeep.add(removalsDetailedFinal[i]);
+          final rem = removalsDetailedFinal[i];
+          if (rem is Map) {
+            filteredRemovalNames.add(rem['name']?.toString() ?? '');
+          }
+        }
+
+        responseBody['additions_detailed'] = filteredAdditions;
+        responseBody['additions'] = filteredAdditionNames;
+        responseBody['removals_detailed'] = filteredRemovalsToKeep;
+        responseBody['removals'] = filteredRemovalNames;
+
+        // Rebuild recommendations
+        responseBody['recommendations'] = [
+          ...filteredRemovalsToKeep,
+          ...filteredAdditions,
+        ];
+
+        Log.d('  Validação final pós-rebalanceamento: ${filteredAdditions.length} adições, ${filteredRemovalsToKeep.length} remoções');
+      }
+
+      // 3. Verificar que o deck resultante teria o tamanho correto
+      final maxTotal = deckFormat == 'commander' ? 100 : (deckFormat == 'brawl' ? 60 : null);
+      if (maxTotal != null) {
+        final finalAdditions = responseBody['additions_detailed'] as List;
+        final finalRemovals = responseBody['removals_detailed'] as List;
+        final resultingTotal = currentTotalCards - finalRemovals.length + finalAdditions.length;
+        if (resultingTotal != currentTotalCards) {
+          Log.w('  Validação final: deck resultante teria $resultingTotal cartas (original: $currentTotalCards), ajustando');
+          // Em optimize mode, o total deve permanecer o mesmo
+          final excess = finalAdditions.length - finalRemovals.length;
+          if (excess > 0) {
+            responseBody['additions_detailed'] = finalAdditions.take(finalRemovals.length).toList();
+            responseBody['additions'] = (responseBody['additions'] as List).take(finalRemovals.length).toList();
+          } else if (excess < 0) {
+            responseBody['removals_detailed'] = finalRemovals.take(finalAdditions.length).toList();
+            responseBody['removals'] = (responseBody['removals'] as List).take(finalAdditions.length).toList();
+          }
+        }
+      }
+    }
 
     final warnings = <String, dynamic>{};
 
@@ -3586,8 +3672,10 @@ int _maxCopiesForFormat({
   final normalizedType = typeLine.toLowerCase();
   final normalizedName = name.trim().toLowerCase();
 
+  // Check both type_line AND name for basic land detection.
+  // This handles cases where type_line is empty (e.g., from fallback pools).
   final isBasicLand = _isBasicLandTypeLine(normalizedType) ||
-      normalizedName == 'wastes';
+      _isBasicLandName(normalizedName);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
