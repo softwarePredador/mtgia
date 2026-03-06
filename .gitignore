@@ -22,3 +22,4 @@ build/
 # Cache do server (dados baixados/gerados)
 server/cache/
 .credentials.env
+wget-log
