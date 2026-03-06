@@ -7458,6 +7458,13 @@ Revisão completa do app sob a perspectiva de um jogador de MTG. Foram identific
 - Haptic feedback nos toques
 - Bottom sheet de configurações
 - Cores distintas por jogador
+- **Poison counters**: Rastreio de veneno por jogador (10 = derrota). Badge verde aparece no painel quando > 0, com indicador visual de "LETAL" quando ≥ 10
+- **Commander damage**: Rastreio de dano de comandante por oponente. Mostra qual jogador causou o dano. Badge dourado no painel quando > 0, com indicador "LETAL" quando ≥ 21 de uma mesma fonte
+- **Energy counters**: Rastreio de contadores de energia (Kaladesh, etc.)
+- **Experience counters**: Rastreio de contadores de experiência (Commander 2015, etc.)
+- **Undo / Histórico**: Até 50 snapshots de estado. Botão desfazer na AppBar permite reverter qualquer alteração
+- **Bottom sheet de contadores**: Ao tocar no ícone de contadores (canto inferior direito de cada painel), abre sheet arrastável com todos os contadores do jogador (poison, commander damage por oponente, energy, experience)
+- **Indicadores visuais**: Badges compactos no painel principal mostram totais de poison e commander damage. Ficam vermelhos quando atingem limite letal
 
 ### 88.3 Alterações em Telas Existentes
 
