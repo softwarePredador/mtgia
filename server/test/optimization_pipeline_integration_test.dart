@@ -292,6 +292,9 @@ void main() {
       expect(result['balanced'], isTrue);
       expect(result['removals'], hasLength(2));
       expect(result['additions'], hasLength(2));
+      // Verify the first 2 removals are retained (deterministic truncation)
+      expect(result['removals'], equals(['Gilder Bairn', 'Astral Cornucopia']));
+      expect(result['additions'], equals(['Luminarch Aspirant', 'Grateful Apparition']));
       // Verify no basic lands in additions
       for (final name in result['additions'] as List) {
         expect(_isBasicLandName(name as String), isFalse,

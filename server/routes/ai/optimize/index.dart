@@ -2013,7 +2013,10 @@ Future<Response> onRequest(RequestContext context) async {
             .map((e) => {
                   'card_id': e['card_id'],
                   'quantity': e['quantity'],
-              'name': e['name'],
+                  'name': e['name'],
+                  'is_basic_land': e['is_basic_land'] ??
+                      _isBasicLandName(
+                          ((e['name'] as String?) ?? '').trim()),
                 })
             .toList(),
         'removals': const <String>[],
@@ -2994,23 +2997,19 @@ Future<Response> onRequest(RequestContext context) async {
         Log.d('  Validação final pós-rebalanceamento: ${filteredAdditions.length} adições, ${filteredRemovalsToKeep.length} remoções');
       }
 
-      // 3. Verificar que o deck resultante teria o tamanho correto
-      final maxTotal = deckFormat == 'commander' ? 100 : (deckFormat == 'brawl' ? 60 : null);
-      if (maxTotal != null) {
+      // 3. Safety net: ensure additions and removals are exactly balanced
+      {
         final finalAdditions = responseBody['additions_detailed'] as List;
         final finalRemovals = responseBody['removals_detailed'] as List;
-        final resultingTotal = currentTotalCards - finalRemovals.length + finalAdditions.length;
-        if (resultingTotal != currentTotalCards) {
-          Log.w('  Validação final: deck resultante teria $resultingTotal cartas (original: $currentTotalCards), ajustando');
-          // Em optimize mode, o total deve permanecer o mesmo
-          final excess = finalAdditions.length - finalRemovals.length;
-          if (excess > 0) {
-            responseBody['additions_detailed'] = finalAdditions.take(finalRemovals.length).toList();
-            responseBody['additions'] = (responseBody['additions'] as List).take(finalRemovals.length).toList();
-          } else if (excess < 0) {
-            responseBody['removals_detailed'] = finalRemovals.take(finalAdditions.length).toList();
-            responseBody['removals'] = (responseBody['removals'] as List).take(finalAdditions.length).toList();
-          }
+        if (finalAdditions.length != finalRemovals.length) {
+          Log.w('  Safety net: additions(${finalAdditions.length}) != removals(${finalRemovals.length}), rebalancing');
+          final minLen = finalAdditions.length < finalRemovals.length
+              ? finalAdditions.length
+              : finalRemovals.length;
+          responseBody['additions_detailed'] = finalAdditions.take(minLen).toList();
+          responseBody['additions'] = (responseBody['additions'] as List).take(minLen).toList();
+          responseBody['removals_detailed'] = finalRemovals.take(minLen).toList();
+          responseBody['removals'] = (responseBody['removals'] as List).take(minLen).toList();
         }
       }
     }
