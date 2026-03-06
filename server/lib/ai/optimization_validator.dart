@@ -236,9 +236,13 @@ class OptimizationValidator {
       final addedCmc = _getCmc(addedCard);
       final cmcDelta = addedCmc - removedCmc;
 
-      // Verificar se o papel foi preservado
+      // Verificar se o papel foi preservado.
+      // Regra: role preservado quando os papéis são iguais OU ambos são 'utility'
+      // (que representa cartas sem papel funcional claro).
+      // ATENÇÃO: a condição anterior era `(removedRole == 'utility' || addedRole == 'utility')`,
+      // o que avaliava como verdadeiro sempre que QUALQUER card fosse 'utility' — bug de precedência.
       final rolePreserved = removedRole == addedRole ||
-          (removedRole == 'utility' || addedRole == 'utility');
+          (removedRole == 'utility' && addedRole == 'utility');
 
       // Gerar veredito
       String verdict;
@@ -274,7 +278,7 @@ class OptimizationValidator {
     final addedRoles = swapAnalysis.map((s) => s.addedRole).toList();
 
     final roleDelta = <String, int>{};
-    for (final role in ['draw', 'removal', 'ramp', 'creature', 'artifact', 'enchantment', 'land', 'utility']) {
+    for (final role in ['draw', 'removal', 'ramp', 'creature', 'artifact', 'enchantment', 'land', 'utility', 'wipe', 'tutor', 'protection']) {
       final lost = removedRoles.where((r) => r == role).length;
       final gained = addedRoles.where((r) => r == role).length;
       roleDelta[role] = gained - lost;
@@ -308,7 +312,12 @@ class OptimizationValidator {
     if (oracle.contains('destroy target') ||
         oracle.contains('exile target') ||
         oracle.contains('counter target') ||
-        (oracle.contains('return target') && oracle.contains('to its owner'))) {
+        (oracle.contains('return target') && oracle.contains('to its owner')) ||
+        // Damage-based removal: "deals X damage to target creature/planeswalker"
+        (oracle.contains('deals') && oracle.contains('damage') &&
+            (oracle.contains('target creature') ||
+                oracle.contains('target planeswalker') ||
+                oracle.contains('any target')))) {
       return 'removal';
     }
 
@@ -487,11 +496,15 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     score += functional.sidegrades * 1;
     score -= functional.questionable * 5;
 
-    // Role preservation: perder removal ou draw é muito ruim
+    // Role preservation: perder removal, draw, wipe ou ramp é muito ruim
     final lostRemoval = (functional.roleDelta['removal'] ?? 0) < 0;
     final lostDraw = (functional.roleDelta['draw'] ?? 0) < 0;
+    final lostWipe = (functional.roleDelta['wipe'] ?? 0) < 0;
+    final lostRamp = (functional.roleDelta['ramp'] ?? 0) < 0;
     if (lostRemoval) score -= 8;
     if (lostDraw) score -= 6;
+    if (lostWipe) score -= 5;
+    if (lostRamp) score -= 4;
 
     // Critic AI bonus/penalty
     if (critic != null) {
@@ -522,6 +535,12 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     }
     if (lostDraw) {
       warnings.add('O deck perdeu card draw. Pode perder gás no late game.');
+    }
+    if (lostWipe) {
+      warnings.add('O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas.');
+    }
+    if (lostRamp) {
+      warnings.add('O deck perdeu cartas de ramp. Pode ficar lento no early game.');
     }
     if (functional.questionable > 0) {
       warnings.add('${functional.questionable} troca(s) questionável(is) — mudou função E ficou mais cara.');
