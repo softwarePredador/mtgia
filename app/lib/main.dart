@@ -43,7 +43,6 @@ import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
 import 'features/home/life_counter_screen.dart';
-import 'features/cards/screens/card_detail_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

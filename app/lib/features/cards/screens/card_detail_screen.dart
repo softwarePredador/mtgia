@@ -8,8 +8,8 @@ import '../../decks/models/deck_card_item.dart';
 class CardDetailScreen extends StatelessWidget {
   final DeckCardItem card;
 
-  /// Standard MTG card proportion: 88mm tall × 63mm wide.
-  static const double _mtgCardAspectRatio = 88 / 63;
+  /// Standard MTG card proportion: 63mm wide × 88mm tall → width/height.
+  static const double _mtgCardAspectRatio = 63 / 88;
   static final RegExp _manaSymbolRegex = RegExp(r'\{([^\}]+)\}');
 
   const CardDetailScreen({super.key, required this.card});
