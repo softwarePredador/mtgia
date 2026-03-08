@@ -1274,7 +1274,7 @@ Future<Response> onRequest(RequestContext context) async {
             final id = c['card_id'] as String;
             final name = c['name'] as String;
             final typeLine = (c['type_line'] as String).toLowerCase();
-            final isBasic = typeLine.contains('basic land');
+            final isBasic = _isBasicLandTypeLine(typeLine);
             final nameLower = name.toLowerCase();
             final maxCopies = _maxCopiesForFormat(
               deckFormat: deckFormat,
@@ -1494,7 +1494,7 @@ Future<Response> onRequest(RequestContext context) async {
                   continue;
                 }
                 
-                virtualCountsById[id] = 1;
+                virtualCountsById[id] = (virtualCountsById[id] ?? 0) + 1;
                 virtualCountsByName[nameLower] =
                     (virtualCountsByName[nameLower] ?? 0) + 1;
                 addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
@@ -1926,6 +1926,8 @@ Future<Response> onRequest(RequestContext context) async {
                   'card_id': e['card_id'],
                   'quantity': e['quantity'],
                   'name': e['name'],
+                  'is_basic_land': _isBasicLandName(
+                      ((e['name'] as String?) ?? '').trim()),
                 })
             .toList();
         
@@ -2011,7 +2013,10 @@ Future<Response> onRequest(RequestContext context) async {
             .map((e) => {
                   'card_id': e['card_id'],
                   'quantity': e['quantity'],
-              'name': e['name'],
+                  'name': e['name'],
+                  'is_basic_land': e['is_basic_land'] ??
+                      _isBasicLandName(
+                          ((e['name'] as String?) ?? '').trim()),
                 })
             .toList(),
         'removals': const <String>[],
@@ -2459,29 +2464,13 @@ Future<Response> onRequest(RequestContext context) async {
             Log.d('  IA sugeriu ${replacementResult.length} substitutas sinérgicas');
           }
           
-          // Se AINDA faltar (IA não conseguiu preencher tudo), agora sim fallback com basics
+          // Se AINDA faltar (IA não conseguiu preencher tudo), TRUNCAR remoções
+          // para manter equilíbrio. NÃO preencher com básicos em modo optimize —
+          // trocar spells por lands é degradação, não otimização.
           if (validAdditions.length < validRemovals.length) {
             final stillMissing = validRemovals.length - validAdditions.length;
-            Log.d('  Ainda faltam $stillMissing - fallback com básicos');
-            final basicNames = _basicLandNamesForIdentity(commanderColorIdentity);
-            final basicsWithIds = await _loadBasicLandIds(pool, basicNames);
-            if (basicsWithIds.isNotEmpty) {
-              final keys = basicsWithIds.keys.toList();
-              var i = 0;
-              for (var j = 0; j < stillMissing; j++) {
-                final name = keys[i % keys.length];
-                validAdditions.add(name);
-                if (!validByNameLower.containsKey(name.toLowerCase())) {
-                  validByNameLower[name.toLowerCase()] = {
-                    'id': basicsWithIds[name],
-                    'name': name,
-                  };
-                }
-                i++;
-              }
-            } else {
-              validRemovals = validRemovals.take(validAdditions.length).toList();
-            }
+            Log.d('  Ainda faltam $stillMissing - truncando remoções (não preencher com básicos em optimize)');
+            validRemovals = validRemovals.take(validAdditions.length).toList();
           }
         } catch (e) {
           Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
@@ -2607,11 +2596,26 @@ Future<Response> onRequest(RequestContext context) async {
             .toList();
 
         // 2. Criar Deck Virtual (Clone do atual - Remoções + Adições)
-        final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
+        final virtualDeck = List<Map<String, dynamic>>.from(
+          allCardData.map((c) => Map<String, dynamic>.from(c)),
+        );
 
         // Remover cartas sugeridas (pelo nome, case-insensitive)
-        final removalNamesLower = validRemovals.map((n) => n.toLowerCase()).toSet();
-        virtualDeck.removeWhere((c) => removalNamesLower.contains(((c['name'] as String?) ?? '').toLowerCase()));
+        // Usar contagem precisa: cada nome na lista de remoções remove exatamente 1 cópia
+        final removalCountsByName = <String, int>{};
+        for (final name in validRemovals) {
+          final lower = name.toLowerCase();
+          removalCountsByName[lower] = (removalCountsByName[lower] ?? 0) + 1;
+        }
+        virtualDeck.removeWhere((c) {
+          final name = ((c['name'] as String?) ?? '').toLowerCase();
+          final remaining = removalCountsByName[name] ?? 0;
+          if (remaining > 0) {
+            removalCountsByName[name] = remaining - 1;
+            return true;
+          }
+          return false;
+        });
 
         // Adicionar novas cartas
         virtualDeck.addAll(additionsData);
@@ -2926,6 +2930,89 @@ Future<Response> onRequest(RequestContext context) async {
     final finalAddDet = responseBody['additions_detailed'] as List;
     final finalRemDet = responseBody['removals_detailed'] as List;
     Log.d('  Final: additions_detailed=${finalAddDet.length}, removals_detailed=${finalRemDet.length}');
+
+    // ═══════════════════════════════════════════════════════════
+    // VALIDAÇÃO FINAL: Garantir integridade do deck resultante
+    // ═══════════════════════════════════════════════════════════
+    if (!isComplete) {
+      // 1. Verificar que nenhuma adição é de carta que já existe no deck (exceto basics em formatos não-Commander)
+      final additionsDetailedFinal = responseBody['additions_detailed'] as List;
+      final removalsDetailedFinal = responseBody['removals_detailed'] as List;
+      final removalNamesFinal = removalsDetailedFinal
+          .whereType<Map>()
+          .map((e) => (e['name']?.toString() ?? '').toLowerCase())
+          .where((n) => n.isNotEmpty)
+          .toSet();
+
+      final filteredAdditions = <dynamic>[];
+      final filteredAdditionNames = <String>[];
+      final filteredRemovalsToKeep = <dynamic>[];
+      final filteredRemovalNames = <String>[];
+
+      for (final add in additionsDetailedFinal) {
+        if (add is! Map) continue;
+        final name = (add['name']?.toString() ?? '').toLowerCase();
+        if (name.isEmpty) continue;
+
+        final isBasic = _isBasicLandName(name);
+        final alreadyInDeck = deckNamesLower.contains(name);
+        final beingRemoved = removalNamesFinal.contains(name);
+
+        // Em Commander/Brawl, não-básicos só podem ter 1 cópia.
+        // Se a carta já está no deck e não está sendo removida, é inválida.
+        if (alreadyInDeck && !beingRemoved && !isBasic &&
+            (deckFormat == 'commander' || deckFormat == 'brawl')) {
+          Log.w('  Validação final: removendo adição duplicada "$name" (já existe no deck)');
+          continue;
+        }
+
+        filteredAdditions.add(add);
+        filteredAdditionNames.add(add['name']?.toString() ?? name);
+      }
+
+      // 2. Rebalancear após filtrar adições inválidas
+      if (filteredAdditions.length < additionsDetailedFinal.length) {
+        Log.d('  Validação final: ${additionsDetailedFinal.length - filteredAdditions.length} adições removidas por duplicidade');
+
+        // Truncar remoções para manter equilíbrio
+        for (var i = 0; i < removalsDetailedFinal.length && filteredRemovalsToKeep.length < filteredAdditions.length; i++) {
+          filteredRemovalsToKeep.add(removalsDetailedFinal[i]);
+          final rem = removalsDetailedFinal[i];
+          if (rem is Map) {
+            filteredRemovalNames.add(rem['name']?.toString() ?? '');
+          }
+        }
+
+        responseBody['additions_detailed'] = filteredAdditions;
+        responseBody['additions'] = filteredAdditionNames;
+        responseBody['removals_detailed'] = filteredRemovalsToKeep;
+        responseBody['removals'] = filteredRemovalNames;
+
+        // Rebuild recommendations
+        responseBody['recommendations'] = [
+          ...filteredRemovalsToKeep,
+          ...filteredAdditions,
+        ];
+
+        Log.d('  Validação final pós-rebalanceamento: ${filteredAdditions.length} adições, ${filteredRemovalsToKeep.length} remoções');
+      }
+
+      // 3. Safety net: ensure additions and removals are exactly balanced
+      {
+        final finalAdditions = responseBody['additions_detailed'] as List;
+        final finalRemovals = responseBody['removals_detailed'] as List;
+        if (finalAdditions.length != finalRemovals.length) {
+          Log.w('  Safety net: additions(${finalAdditions.length}) != removals(${finalRemovals.length}), rebalancing');
+          final minLen = finalAdditions.length < finalRemovals.length
+              ? finalAdditions.length
+              : finalRemovals.length;
+          responseBody['additions_detailed'] = finalAdditions.take(minLen).toList();
+          responseBody['additions'] = (responseBody['additions'] as List).take(minLen).toList();
+          responseBody['removals_detailed'] = finalRemovals.take(minLen).toList();
+          responseBody['removals'] = (responseBody['removals'] as List).take(minLen).toList();
+        }
+      }
+    }
 
     final warnings = <String, dynamic>{};
 
@@ -3364,12 +3451,14 @@ Map<String, dynamic> _buildRecommendationDetail({
   final confidenceScore = _confidenceScoreFromLevel(confidenceLevel);
   final action = type == 'add' ? 'entrada' : 'saída';
   final curveDelta = (cmcAfter - cmcBefore).toStringAsFixed(2);
+  final isBasicLand = _isBasicLandName(name);
 
   return {
     'type': type,
     'name': name,
     'card_id': cardId,
     'quantity': quantity,
+    'is_basic_land': isBasicLand,
     'reason':
         'Sugestão de $action para alinhar o deck ao plano ${targetArchetype.toLowerCase()} e melhorar consistência geral.',
     'confidence': {
@@ -3562,7 +3651,19 @@ bool _isBasicLandName(String name) {
       normalized == 'swamp' ||
       normalized == 'mountain' ||
       normalized == 'forest' ||
-      normalized == 'wastes';
+      normalized == 'wastes' ||
+      normalized == 'snow-covered plains' ||
+      normalized == 'snow-covered island' ||
+      normalized == 'snow-covered swamp' ||
+      normalized == 'snow-covered mountain' ||
+      normalized == 'snow-covered forest';
+}
+
+/// Verifica se um type_line (já em minúsculas) representa um terreno básico.
+/// Cobre normais ("Basic Land — Island") e Snow-Covered ("Basic Snow Land — Island").
+bool _isBasicLandTypeLine(String typeLineLower) {
+  return typeLineLower.contains('basic land') ||
+      typeLineLower.contains('basic snow land');
 }
 
 int _maxCopiesForFormat({
@@ -3574,8 +3675,10 @@ int _maxCopiesForFormat({
   final normalizedType = typeLine.toLowerCase();
   final normalizedName = name.trim().toLowerCase();
 
-  final isBasicLand =
-      normalizedType.contains('basic land') || normalizedName == 'wastes';
+  // Check both type_line AND name for basic land detection.
+  // This handles cases where type_line is empty (e.g., from fallback pools).
+  final isBasicLand = _isBasicLandTypeLine(normalizedType) ||
+      _isBasicLandName(normalizedName);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
@@ -3604,7 +3707,7 @@ Future<Map<String, String>> _loadBasicLandIds(
       SELECT name, id::text
       FROM cards
       WHERE name = ANY(@names)
-        AND type_line LIKE 'Basic Land%'
+        AND (type_line LIKE 'Basic Land%' OR type_line LIKE 'Basic Snow Land%')
       ORDER BY name ASC
     '''),
     parameters: {'names': names},
@@ -4754,6 +4857,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
       WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
         AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
         AND c.type_line NOT LIKE 'Basic Land%'
+        AND c.type_line NOT LIKE 'Basic Snow Land%'
         AND c.name NOT LIKE 'A-%'
         AND c.name NOT LIKE '\_%' ESCAPE '\\'
         AND c.name NOT LIKE '%World Champion%'
