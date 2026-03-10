@@ -289,12 +289,36 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
       }
     }
 
-    // Image URL: preferir Scryfall redirect
-    final encodedName = Uri.encodeQueryComponent(cardName);
-    final setParam =
-        setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
-    final imageUrl =
-        'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
+    // Image URL: preferir URL direta do Scryfall (image_uris.normal)
+    // Fallback para card_faces[0] em cartas double-faced
+    String? imageUrl;
+    final imageUris = card['image_uris'] as Map<String, dynamic>?;
+    if (imageUris != null && imageUris['normal'] != null) {
+      imageUrl = imageUris['normal'].toString();
+    } else {
+      final cardFaces = card['card_faces'] as List?;
+      if (cardFaces != null && cardFaces.isNotEmpty) {
+        final firstFace = cardFaces[0] as Map<String, dynamic>?;
+        final faceImageUris = firstFace?['image_uris'] as Map<String, dynamic>?;
+        if (faceImageUris != null && faceImageUris['normal'] != null) {
+          imageUrl = faceImageUris['normal'].toString();
+        }
+      }
+    }
+    // Se ainda não temos URL, usa ID-based redirect
+    if (imageUrl == null || imageUrl.isEmpty) {
+      final cardId = card['id']?.toString();
+      if (cardId != null && cardId.isNotEmpty) {
+        imageUrl = 'https://api.scryfall.com/cards/$cardId?format=image&version=normal';
+      } else {
+        // Último fallback: name-based (menos confiável)
+        final encodedName = Uri.encodeQueryComponent(cardName);
+        final setParam =
+            setCode != null && setCode.isNotEmpty ? '&set=$setCode' : '';
+        imageUrl =
+            'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
+      }
+    }
 
     // CMC
     final cmc = card['cmc']?.toString();
