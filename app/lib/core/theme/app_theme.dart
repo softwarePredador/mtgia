@@ -1,62 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// ManaLoom Theme: "Arcane Weaver" Color Palette
-/// Inspired by weaving mana threads with technology
+/// ManaLoom Theme: "Calm Abyss" Color Palette
+/// Neutral dark gaming interface — card artwork is the visual focus.
 ///
-/// COLOR BUDGET (24 tokens):
-///   10 brand/layout + 5 semantic + 6 WUBRG + 1 hint + 2 format extras = 24
-///   (formatPioneer + formatLegacy are the 2 new additions beyond the original 22)
+/// DESIGN PHILOSOPHY:
+///   Single primary accent (violet). Neutral surfaces. Semantic colors for
+///   feedback, rarity and mana identity only. Gradients reserved for hero
+///   sections and primary action buttons.
+///
+/// COLOR BUDGET (25 tokens, 10 unique brand/layout + 2 aliases + 5 semantic + 6 WUBRG + 2 format extras):
+///   Aliases (surfaceElevated, loomCyan) point to existing tokens.
 ///   Qualquer cor fora deste arquivo é violação.
 ///
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
 /// FONT SCALE:   fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
   // ── Brand palette (layout) ──────────────────────────────────
-  static const Color backgroundAbyss = Color(0xFF0A0E14);
-  static const Color surfaceSlate = Color(0xFF1E293B);
-  static const Color surfaceSlate2 = Color(0xFF0F172A);
-  static const Color manaViolet = Color(0xFF8B5CF6);   // Primary
-  static const Color loomCyan = Color(0xFF06B6D4);     // Secondary
-  static const Color mythicGold = Color(0xFFF59E0B);   // Accent / Tertiary
+  static const Color backgroundAbyss = Color(0xFF0B0F1A);
+  static const Color surfaceSlate = Color(0xFF141B2D);
+  static const Color surfaceSlate2 = Color(0xFF1C2438);
+  /// Alias for [surfaceSlate2] — clearer name for elevated surface level.
+  static const Color surfaceElevated = surfaceSlate2;
+  static const Color manaViolet = Color(0xFF7C3AED);    // Primary
+  /// Softer variant of [manaViolet] for secondary accents & hover states.
+  static const Color primarySoft = Color(0xFFA78BFA);
+  @Deprecated('Cyan accent removed. Use primarySoft instead.')
+  static const Color loomCyan = primarySoft;
+  static const Color mythicGold = Color(0xFFF59E0B);    // Semantic accent (scores, rarity)
 
-  static const Color textPrimary = Color(0xFFF1F5F9);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textHint = Color(0xFF64748B);     // Hints, placeholders
-  static const Color outlineMuted = Color(0xFF334155);
+  static const Color textPrimary = Color(0xFFE5E7EB);
+  static const Color textSecondary = Color(0xFF9CA3AF);
+  static const Color textHint = Color(0xFF6B7280);      // Hints, placeholders
+  static const Color outlineMuted = Color(0xFF2A3552);
 
   // ── Semantic (feedback) ─────────────────────────────────────
   static const Color success = Color(0xFF22C55E);
   static const Color error = Color(0xFFEF4444);
-  static const Color warning = Color(0xFFF97316);
+  static const Color warning = Color(0xFFF59E0B);
   static const Color disabled = Color(0xFF6B7280);
 
-  // ── Gradients (MTG atmospheric feel) ─────────────────────
+  // ── Gradients ────────────────────────────────────────────
+  // USAGE RULE: gradients are reserved for hero sections and primary action
+  // buttons only. Cards, lists and scanners must use flat neutral surfaces.
+
+  /// Subtle vertical gradient for the scaffold background.
   static const LinearGradient scaffoldGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [backgroundAbyss, Color(0xFF0C1020), Color(0xFF0A0D1A)],
+    colors: [backgroundAbyss, Color(0xFF0D1121), backgroundAbyss],
     stops: [0.0, 0.55, 1.0],
   );
 
+  /// Hero / splash gradient — the only place a strong atmospheric tint is OK.
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF1A0A2E), Color(0xFF0F172A), backgroundAbyss],
+    colors: [Color(0xFF150B2E), Color(0xFF111827), backgroundAbyss],
   );
 
+  /// Violet gradient for primary action buttons and CTAs.
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [manaViolet, Color(0xFF6D28D9)],
   );
 
+  /// Card / list-item background — intentionally flat (same start & end color)
+  /// so that card artwork remains the visual focus. Existing consumers use this
+  /// as a gradient; new code should prefer `surfaceSlate` directly as a solid
+  /// color and avoid `BoxDecoration(gradient: ...)` for card surfaces.
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [surfaceSlate, surfaceSlate2],
+    colors: [surfaceSlate, surfaceSlate],
   );
 
+  /// Gold accent gradient — kept for backward compat but prefer flat warning.
   static const LinearGradient goldAccentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -98,7 +118,7 @@ class AppTheme {
 
   // ── Format accent colors (deck card frames) ───────────────
   static const Color formatCommander = mythicGold;
-  static const Color formatStandard = loomCyan;
+  static const Color formatStandard = primarySoft;
   static const Color formatModern = manaViolet;
   static const Color formatPioneer = Color(0xFF34D399);  // Emerald green
   static const Color formatLegacy = Color(0xFFEC4899);   // Rose pink
@@ -111,7 +131,7 @@ class AppTheme {
   static Color conditionColor(String condition) {
     switch (condition.toUpperCase()) {
       case 'NM': return success;
-      case 'LP': return loomCyan;
+      case 'LP': return primarySoft;
       case 'MP': return mythicGold;
       case 'HP': return warning;
       case 'DMG': return error;
@@ -162,10 +182,10 @@ class AppTheme {
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
       primary: manaViolet,
-      secondary: loomCyan,
+      secondary: primarySoft,
       tertiary: mythicGold,
       surface: surfaceSlate,
-      surfaceContainerHighest: surfaceSlate2,
+      surfaceContainerHighest: surfaceElevated,
       outline: outlineMuted,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
@@ -174,7 +194,7 @@ class AppTheme {
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
     appBarTheme: AppBarTheme(
-      backgroundColor: surfaceSlate2,
+      backgroundColor: surfaceElevated,
       foregroundColor: textPrimary,
       elevation: 0,
       centerTitle: true,
@@ -228,7 +248,7 @@ class AppTheme {
       ),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: surfaceSlate2,
+      backgroundColor: surfaceElevated,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusLg),
         side: const BorderSide(color: outlineMuted, width: 0.5),
@@ -236,7 +256,7 @@ class AppTheme {
       elevation: 12,
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: surfaceSlate2,
+      backgroundColor: surfaceElevated,
       indicatorColor: manaViolet.withValues(alpha: 0.2),
       indicatorShape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusSm),
