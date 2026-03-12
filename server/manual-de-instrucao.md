@@ -1,3 +1,69 @@
+## 2026-03-12 — Fix pipeline de otimização IA: timeout, quality gate parcial e UX
+
+### O Porquê
+- O endpoint `POST /ai/optimize` no modo `complete` retornava 422 (`COMPLETE_QUALITY_PARTIAL`) quando a IA adicionava menos cartas que o alvo (ex: 8 de 37).
+- Causas raiz identificadas:
+  1. **Timeout de 8s na OpenAI** — insuficiente para o prompt de `completeDeck` que envia deck inteiro + synergy pool + staples; GPT-4o precisa de 15-30s.
+  2. **Quality gate bloqueante** — `PARTIAL` retornava 422 **sem** incluir as adições que foram encontradas, desperdiçando o trabalho da IA e dos 7 estágios de fallback.
+  3. **Cliente tratava 422 como erro genérico** — mostrava "Falha ao otimizar deck: 422" sem explicação.
+
+### O Como
+1. **`server/lib/ai/otimizacao.dart`**: Aumento do timeout de ambas as chamadas OpenAI (`_callOpenAIComplete` e `_callOpenAI`) de 8s → 30s.
+2. **`server/routes/ai/optimize/index.dart`**: `COMPLETE_QUALITY_PARTIAL` rebaixado de `quality_error` (422 bloqueante) para `quality_warning` (200 com aviso). As adições parciais agora são retornadas normalmente, permitindo que o cliente aplique e re-chame para completar o restante. `BASIC_OVERFLOW` e `DEGENERATE` continuam como 422 (qualidade genuinamente ruim).
+3. **`app/lib/features/decks/providers/deck_provider.dart`**: Tratamento de 422 com extração da mensagem real do `quality_error`.
+4. **`app/lib/features/decks/screens/deck_details_screen.dart`**: Banner dourado de `quality_warning` no dialog de confirmação, informando o jogador que o complete foi parcial e pode ser re-chamado.
+
+### Pipeline completo do `/ai/optimize` (modo complete) — documentação de referência
+
+```
+Estágio 1: PRE-SEED
+  → Cache do commander (commander_reference_profiles)
+  → EDHREC average-deck seed (até 140 nomes)
+  → Competitive priorities de meta_decks (até 120 nomes)
+  → Top cards do profile (até 80 nomes)
+  → Fallback: EDHREC live fetch (até 180 nomes)
+  → Tudo acumula em aiSuggestedNames
+
+Estágio 2: AI LOOP (máx 4 iterações)
+  → optimizer.completeDeck() → chama OpenAI com prompt_complete.md
+  → Valida nomes no DB → Filtra por color identity do commander
+  → Filtra por bracket → Adiciona ao deck virtual (1 cópia non-basic)
+
+Estágio 3: FALLBACK SPELLS (se deck ainda incompleto)
+  → _findSynergyReplacements (IA + RAG)
+  → _loadUniversalCommanderFallbacks (Sol Ring, Arcane Signet, etc)
+  → _loadPreferredNameFillers (usa aiSuggestedNames)
+  → _loadBroadCommanderNonLandFillers (identity-safe do DB)
+  → _loadIdentitySafeNonLandFillers (emergency identity-safe)
+
+Estágio 4: BASIC LANDS (proporcional à identity)
+  → Calcula ideal baseado em CMC médio (28-42 lands)
+  → Cap de maxBasicAdditions = recommended + 6
+
+Estágio 5: FALLBACK GARANTIDO
+  → _loadGuaranteedNonBasicFillers (deterministic slot fillers)
+  → _loadEmergencyNonBasicFillers (last resort, qualquer non-land legal)
+  → Garantia final com basics até maxTotal
+
+Quality Gate:
+  → PARTIAL: agora retorna 200 + quality_warning (antes: 422)
+  → BASIC_OVERFLOW: 422 (excesso de básicos)
+  → DEGENERATE: 422 (só básicos)
+```
+
+### Arquivos alterados
+- `server/lib/ai/otimizacao.dart` — timeout 8s → 30s
+- `server/routes/ai/optimize/index.dart` — PARTIAL rebaixado para warning
+- `app/lib/features/decks/providers/deck_provider.dart` — tratamento 422
+- `app/lib/features/decks/screens/deck_details_screen.dart` — banner quality_warning
+
+### Impacto esperado
+- Otimizações parciais agora são utilizáveis pelo jogador (aplica e re-chama)
+- Timeout mais generoso = mais cartas sugeridas pela IA por iteração
+- UX clara: banner dourado explica que o complete foi parcial
+
+---
+
 ## 2026-03-09 — Fix de build Docker sem `pubspec.lock`
 
 ### O Porquê

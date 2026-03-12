@@ -558,6 +558,7 @@ class DeckProvider extends ChangeNotifier {
     String archetype, {
     int? bracket,
     bool keepTheme = true,
+    void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
     try {
       final payload = <String, dynamic>{
@@ -588,6 +589,36 @@ class DeckProvider extends ChangeNotifier {
           },
         );
         return data;
+      } else if (response.statusCode == 202) {
+        // Async job: servidor processará em background
+        final data = (response.data as Map).cast<String, dynamic>();
+        final jobId = data['job_id'] as String;
+        final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
+        AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
+        onProgress?.call(
+          'Iniciando otimização...',
+          0,
+          data['total_stages'] as int? ?? 6,
+        );
+        return await _pollOptimizeJob(
+          jobId,
+          pollInterval: pollInterval,
+          onProgress: onProgress,
+        );
+      } else if (response.statusCode == 422) {
+        // Quality gate: servidor retornou erro de qualidade no modo complete
+        final data = (response.data is Map)
+            ? (response.data as Map).cast<String, dynamic>()
+            : <String, dynamic>{};
+        await _saveOptimizeDebug(
+          response: {'statusCode': 422, 'data': data},
+        );
+        final errorMsg = data['error'] as String? ??
+            data['quality_error']?['message'] as String? ??
+            'A otimização não atingiu a qualidade mínima.';
+        final code = data['quality_error']?['code'] as String? ?? 'QUALITY_ERROR';
+        AppLogger.warning('⚠️ [AI Optimize] quality gate: $code — $errorMsg');
+        throw Exception(errorMsg);
       } else {
         await _saveOptimizeDebug(
           response: {'statusCode': response.statusCode, 'data': response.data},
@@ -624,6 +655,51 @@ class DeckProvider extends ChangeNotifier {
     } catch (_) {
       // Silencioso: não deve quebrar fluxo do app.
     }
+  }
+
+  /// Faz polling no job de otimização até completar ou falhar.
+  Future<Map<String, dynamic>> _pollOptimizeJob(
+    String jobId, {
+    int pollInterval = 2000,
+    void Function(String stage, int stageNumber, int totalStages)? onProgress,
+  }) async {
+    const maxPolls = 150; // 150 × 2s = 5 min timeout
+    for (var i = 0; i < maxPolls; i++) {
+      await Future.delayed(Duration(milliseconds: pollInterval));
+      final response = await _apiClient.get('/ai/optimize/jobs/$jobId');
+      if (response.statusCode == 200) {
+        final data = (response.data as Map).cast<String, dynamic>();
+        final status = data['status'] as String?;
+        if (status == 'completed') {
+          final result = data['result'];
+          final resultMap = (result is Map)
+              ? result.cast<String, dynamic>()
+              : <String, dynamic>{};
+          await _saveOptimizeDebug(response: resultMap);
+          AppLogger.debug(
+            '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
+          );
+          return resultMap;
+        } else if (status == 'failed') {
+          final errorMsg =
+              data['error'] as String? ?? 'Otimização falhou no servidor.';
+          AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $errorMsg');
+          throw Exception(errorMsg);
+        } else {
+          // Still processing — update progress
+          onProgress?.call(
+            data['stage'] as String? ?? 'Processando...',
+            data['stage_number'] as int? ?? 0,
+            data['total_stages'] as int? ?? 6,
+          );
+        }
+      } else if (response.statusCode == 404) {
+        throw Exception('Job de otimização expirou ou não foi encontrado.');
+      }
+    }
+    throw Exception(
+      'Timeout: a otimização demorou mais de 5 minutos.',
+    );
   }
 
   Future<bool> addCardsBulk({

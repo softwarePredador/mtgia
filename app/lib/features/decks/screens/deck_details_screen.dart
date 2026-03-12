@@ -205,32 +205,35 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           if (detailsError != null) {
             final isUnauthorized = detailsStatusCode == 401;
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(detailsError),
-                  const SizedBox(height: 16),
-                  if (isUnauthorized)
-                    ElevatedButton(
-                      onPressed: () async {
-                        await context.read<AuthProvider>().logout();
-                        if (!context.mounted) return;
-                        context.go('/login');
-                      },
-                      child: const Text('Fazer login novamente'),
-                    )
-                  else
-                    ElevatedButton(
-                      onPressed: () => context.read<DeckProvider>().fetchDeckDetails(widget.deckId),
-                      child: const Text('Tentar Novamente'),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: theme.colorScheme.error,
                     ),
-                ],
+                    const SizedBox(height: 16),
+                    Text(detailsError),
+                    const SizedBox(height: 16),
+                    if (isUnauthorized)
+                      ElevatedButton(
+                        onPressed: () async {
+                          await context.read<AuthProvider>().logout();
+                          if (!context.mounted) return;
+                          context.go('/login');
+                        },
+                        child: const Text('Fazer login novamente'),
+                      )
+                    else
+                      ElevatedButton(
+                        onPressed: () => context.read<DeckProvider>().fetchDeckDetails(widget.deckId),
+                        child: const Text('Tentar Novamente'),
+                      ),
+                  ],
+                ),
               ),
             );
           }
@@ -2804,21 +2807,35 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       }
     }
 
-    // 1. Show Loading
+    // 1. Show Loading (progress-aware for async jobs)
+    final progressStage = ValueNotifier<String>('Gerando sugestões...');
+    final progressValue = ValueNotifier<double>(0);
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
-          (ctx) => const Center(
+          (ctx) => Center(
             child: Card(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    LinearProgressIndicator(),
-                    SizedBox(height: 12),
-                    Text('Gerando sugestões...'),
+                    ValueListenableBuilder<double>(
+                      valueListenable: progressValue,
+                      builder: (_, value, __) => LinearProgressIndicator(
+                        value: value > 0 ? value : null,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ValueListenableBuilder<String>(
+                      valueListenable: progressStage,
+                      builder: (_, stage, __) => Text(
+                        stage,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -2828,12 +2845,18 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     isLoadingDialogOpen = true;
 
     try {
-      // 2. Call API to get suggestions
+      // 2. Call API to get suggestions (with progress callback for async jobs)
       final result = await deckProvider.optimizeDeck(
         widget.deckId,
         archetype,
         bracket: _selectedBracket,
         keepTheme: _keepTheme,
+        onProgress: (stage, stageNumber, totalStages) {
+          progressStage.value = stage;
+          if (totalStages > 0) {
+            progressValue.value = stageNumber / totalStages;
+          }
+        },
       );
 
       closeLoadingDialog();
@@ -2884,6 +2907,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             ? additionsDetailed
             : additions.map((name) => {'name': name}).toList();
 
+        // Extrair quality_warning (complete parcial — 200 com aviso)
+        final qualityWarning =
+            (result['quality_warning'] is Map)
+                ? (result['quality_warning'] as Map).cast<String, dynamic>()
+                : null;
+
       if (removals.isEmpty && additions.isEmpty) {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -2927,6 +2956,37 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       const SizedBox(height: 16),
                       const Divider(),
                       const SizedBox(height: 8),
+                    ],
+                    // Aviso de complete parcial
+                    if (qualityWarning != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.mythicGold.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppTheme.mythicGold.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.info_outline, color: AppTheme.mythicGold, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                qualityWarning['message'] as String? ??
+                                    'Otimização parcial.',
+                                style: const TextStyle(
+                                  color: AppTheme.mythicGold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                     ],
                     if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
                       const Text(
@@ -3340,29 +3400,34 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
 
                 if (snapshot.hasError) {
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: AppTheme.error,
-                        ),
-                        const SizedBox(height: 16),
-                        Text('Erro: ${snapshot.error}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _optionsFuture = context
-                                  .read<DeckProvider>()
-                                  .fetchOptimizationOptions(widget.deckId);
-                            });
-                          },
-                          child: const Text('Tentar Novamente'),
-                        ),
-                      ],
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: AppTheme.error,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Erro: ${snapshot.error}',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _optionsFuture = context
+                                    .read<DeckProvider>()
+                                    .fetchOptimizationOptions(widget.deckId);
+                              });
+                            },
+                            child: const Text('Tentar Novamente'),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }
