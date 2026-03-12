@@ -9,8 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 ///   feedback, rarity and mana identity only. Gradients reserved for hero
 ///   sections and primary action buttons.
 ///
-/// COLOR BUDGET (25 tokens):
-///   11 brand/layout + 5 semantic + 6 WUBRG + 1 hint + 2 format extras = 25
+/// COLOR BUDGET (25 tokens, 10 unique brand/layout + 2 aliases + 5 semantic + 6 WUBRG + 2 format extras):
+///   Aliases (surfaceElevated, loomCyan) point to existing tokens.
 ///   Qualquer cor fora deste arquivo é violação.
 ///
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
@@ -25,7 +25,8 @@ class AppTheme {
   static const Color manaViolet = Color(0xFF7C3AED);    // Primary
   /// Softer variant of [manaViolet] for secondary accents & hover states.
   static const Color primarySoft = Color(0xFFA78BFA);
-  static const Color loomCyan = primarySoft;             // ← redirected; cyan removed
+  @Deprecated('Cyan accent removed. Use primarySoft instead.')
+  static const Color loomCyan = primarySoft;
   static const Color mythicGold = Color(0xFFF59E0B);    // Semantic accent (scores, rarity)
 
   static const Color textPrimary = Color(0xFFE5E7EB);
@@ -65,8 +66,10 @@ class AppTheme {
     colors: [manaViolet, Color(0xFF6D28D9)],
   );
 
-  /// Card / list-item background — intentionally flat (same color both ends)
-  /// so that card artwork remains the visual focus.
+  /// Card / list-item background — intentionally flat (same start & end color)
+  /// so that card artwork remains the visual focus. Existing consumers use this
+  /// as a gradient; new code should prefer `surfaceSlate` directly as a solid
+  /// color and avoid `BoxDecoration(gradient: ...)` for card surfaces.
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -115,7 +118,7 @@ class AppTheme {
 
   // ── Format accent colors (deck card frames) ───────────────
   static const Color formatCommander = mythicGold;
-  static const Color formatStandard = loomCyan;
+  static const Color formatStandard = primarySoft;
   static const Color formatModern = manaViolet;
   static const Color formatPioneer = Color(0xFF34D399);  // Emerald green
   static const Color formatLegacy = Color(0xFFEC4899);   // Rose pink
@@ -128,7 +131,7 @@ class AppTheme {
   static Color conditionColor(String condition) {
     switch (condition.toUpperCase()) {
       case 'NM': return success;
-      case 'LP': return loomCyan;
+      case 'LP': return primarySoft;
       case 'MP': return mythicGold;
       case 'HP': return warning;
       case 'DMG': return error;
