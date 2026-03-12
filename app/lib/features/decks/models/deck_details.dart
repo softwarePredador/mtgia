@@ -67,7 +67,13 @@ class DeckDetails extends Deck {
       ];
       final computed = <String>{};
       for (final card in allCards) {
-        computed.addAll(card.colorIdentity);
+        // Prefere color_identity; se vazio, usa colors (fallback para servidor
+        // de produção que ainda não retorna color_identity por carta)
+        if (card.colorIdentity.isNotEmpty) {
+          computed.addAll(card.colorIdentity);
+        } else if (card.colors.isNotEmpty) {
+          computed.addAll(card.colors);
+        }
       }
       if (computed.isNotEmpty) {
         colorIdentity = computed.toList();

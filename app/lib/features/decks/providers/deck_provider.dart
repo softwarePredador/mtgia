@@ -24,7 +24,7 @@ class DeckProvider extends ChangeNotifier {
   final Map<String, DateTime> _deckDetailsCacheTime = {};
   static const _cacheDuration = Duration(minutes: 5);
 
-  List<Deck> get decks => _decks;
+  List<Deck> get decks => List.unmodifiable(_decks);
   DeckDetails? get selectedDeck => _selectedDeck;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -230,6 +230,57 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
+  /// Aplica color identity do cache de detalhes para todos os decks na lista
+  /// que ainda não possuem essa informação.
+  void _applyCachedColorIdentities() {
+    for (var i = 0; i < _decks.length; i++) {
+      if (_decks[i].colorIdentity.isEmpty) {
+        final cached = _deckDetailsCache[_decks[i].id];
+        if (cached != null && cached.colorIdentity.isNotEmpty) {
+          _decks[i] = _decks[i].copyWith(colorIdentity: cached.colorIdentity);
+        }
+      }
+    }
+  }
+
+  /// Busca color identity em background para decks que ainda não a possuem.
+  /// Carrega os detalhes de cada deck sem color_identity e propaga para a lista.
+  Future<void> fetchMissingColorIdentities() async {
+    final missing = _decks.where((d) => d.colorIdentity.isEmpty && d.cardCount > 0).toList();
+    if (missing.isEmpty) return;
+
+    debugPrint('[DeckProvider] Fetching color identity for ${missing.length} deck(s)...');
+    var enriched = 0;
+
+    for (final deck in missing) {
+      try {
+        final response = await _apiClient.get('/decks/${deck.id}');
+        if (response.statusCode == 200) {
+          final details = DeckDetails.fromJson(
+            response.data as Map<String, dynamic>,
+          );
+          // Cache
+          _deckDetailsCache[deck.id] = details;
+          _deckDetailsCacheTime[deck.id] = DateTime.now();
+          // Sync to list
+          if (details.colorIdentity.isNotEmpty) {
+            _syncColorIdentityToList(deck.id, details.colorIdentity);
+            enriched++;
+          }
+          debugPrint('[DeckProvider] Deck "${deck.name}" → colors: ${details.colorIdentity}');
+        }
+      } catch (e) {
+        debugPrint('[DeckProvider] Failed to fetch colors for "${deck.name}": $e');
+      }
+    }
+    debugPrint('[DeckProvider] Color enrichment done: $enriched/${missing.length} decks.');
+    if (enriched > 0) {
+      // Cria nova referência de lista para que context.select detecte a mudança
+      _decks = List<Deck>.from(_decks);
+      notifyListeners();
+    }
+  }
+
   /// Busca todos os decks do usuário
   Future<void> fetchDecks() async {
     _isLoading = true;
@@ -246,6 +297,14 @@ class DeckProvider extends ChangeNotifier {
                 .map((json) => Deck.fromJson(json as Map<String, dynamic>))
                 .toList();
         _errorMessage = null;
+
+        // Aplica color identity do cache de detalhes para decks que o servidor
+        // ainda não retorna color_identity (até deploy da nova rota)
+        _applyCachedColorIdentities();
+
+        // Busca color identity em background para decks que ainda não a possuem
+        // (não bloqueia a UI — roda em paralelo)
+        fetchMissingColorIdentities();
       } else if (response.statusCode == 401) {
         _errorMessage = 'Sessão expirada. Faça login novamente.';
       } else {

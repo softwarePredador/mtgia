@@ -133,24 +133,35 @@ class DeckCard extends StatelessWidget {
                           // Format chip + color identity + public icon
                           Row(
                             children: [
-                              _FormatChip(
-                                format: deck.format,
-                                accentColor: accentColor,
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _FormatChip(
+                                        format: deck.format,
+                                        accentColor: accentColor,
+                                      ),
+                                      if (deck.colorIdentity.isNotEmpty) ...[
+                                        const SizedBox(width: 8),
+                                        _ColorIdentityRow(
+                                          colors: deck.colorIdentity,
+                                        ),
+                                      ],
+                                      if (deck.isPublic) ...[
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.public,
+                                          size: 14,
+                                          color: AppTheme.textHint,
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ),
-                              if (deck.colorIdentity.isNotEmpty) ...[
-                                const SizedBox(width: 8),
-                                _ColorIdentityRow(
-                                  colors: deck.colorIdentity,
-                                ),
-                              ],
-                              if (deck.isPublic) ...[
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.public,
-                                  size: 14,
-                                  color: AppTheme.textHint,
-                                ),
-                              ],
                             ],
                           ),
                         ],
