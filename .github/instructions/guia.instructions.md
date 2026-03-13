@@ -397,7 +397,6 @@ Para garantir consistência, consulte sempre as colunas existentes antes de cria
 
 | Limitação | Impacto | Workaround |
 |-----------|---------|------------|
-| `format_staples` vazia (0 rows) | Staples sync nunca executado | Queries usam fallback |
 | `cards.edhrec_rank` não existe | — | Queries usam fallback (median 5000) |
 | Duplicatas em `cards` | 33.7k cards, 33.5k nomes únicos | Usar `DISTINCT ON` |
 

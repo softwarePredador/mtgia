@@ -8,6 +8,7 @@ import '../logger.dart';
 import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
 import 'edhrec_service.dart';
+import 'format_staples_service.dart';
 import 'sinergia.dart';
 
 class DeckOptimizerService {
@@ -16,12 +17,14 @@ class DeckOptimizerService {
   final EdhrecService edhrecService;
   final AiLogService? _logService;
   final MLKnowledgeService? _mlService;
+  final FormatStaplesService? _staplesService;
 
   DeckOptimizerService(this.openAiKey, {dynamic db})
       : synergyEngine = SynergyEngine(),
         edhrecService = EdhrecService(),
         _logService = db != null ? AiLogService(db) : null,
-        _mlService = db != null ? MLKnowledgeService(db) : null;
+        _mlService = db != null ? MLKnowledgeService(db) : null,
+        _staplesService = db != null ? FormatStaplesService(db) : null;
 
   /// O fluxo principal de otimização
   Future<Map<String, dynamic>> optimizeDeck({
@@ -489,13 +492,41 @@ class DeckOptimizerService {
     return scored;
   }
 
+  /// Busca staples de formato prioritizando banco local (mais rápido e filtrado por arquétipo).
+  /// Fallback para Scryfall se banco não tiver dados.
   Future<List<String>> _fetchFormatStaples(
       List<String> colors, String archetype) async {
-    // Busca staples genéricas das cores do deck (ordenadas por EDHREC rank via _searchScryfall)
+    // 1. Tentar buscar do banco local (format_staples) - ~10x mais rápido
+    if (_staplesService != null) {
+      final hasData = await _staplesService!.hasData();
+      if (hasData) {
+        // Busca staples do arquétipo + genéricos
+        final archetypeStaples = await _staplesService!.getStaples(
+          colors: colors,
+          archetype: archetype,
+          limit: 25,
+        );
+        final genericStaples = await _staplesService!.getGenericStaples(
+          colors: colors,
+          limit: 25,
+        );
+        
+        // Combina sem duplicatas
+        final combined = <String>{};
+        combined.addAll(archetypeStaples);
+        combined.addAll(genericStaples);
+        
+        if (combined.isNotEmpty) {
+          Log.i('FormatStaples (DB): ${archetypeStaples.length} $archetype + ${genericStaples.length} generic = ${combined.length} total');
+          return combined.toList();
+        }
+      }
+    }
+    
+    // 2. Fallback: buscar do Scryfall (mais lento)
+    Log.i('FormatStaples: fallback para Scryfall');
     final colorQuery = colors.isEmpty ? "c:c" : "id<=${colors.join('')}";
-    // Ex: "format:commander -is:banned id<=UB"
     final query = "format:commander -is:banned $colorQuery";
-
     return await synergyEngine.searchScryfall(query);
   }
 
