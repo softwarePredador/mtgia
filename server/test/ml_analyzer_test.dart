@@ -11,26 +11,26 @@ import 'package:test/test.dart';
 // Simulação das classes do sistema (para testes isolados)
 // Em produção, importar de '../routes/ai/optimize/index.dart'
 
-/// Calcula média de CMC
+/// Calcula média de CMC (CORRIGIDO: respeita quantity)
 double calculateAverageCMC(List<Map<String, dynamic>> cards) {
   if (cards.isEmpty) return 0.0;
 
-  final nonLandCards = cards.where((c) {
-    final typeLine = (c['type_line'] as String?) ?? '';
-    return !typeLine.toLowerCase().contains('land');
-  }).toList();
-
-  if (nonLandCards.isEmpty) return 0.0;
-
   double totalCMC = 0;
-  for (final card in nonLandCards) {
-    totalCMC += (card['cmc'] as num?)?.toDouble() ?? 0.0;
+  int totalNonLandCopies = 0;
+
+  for (final card in cards) {
+    final typeLine = (card['type_line'] as String?) ?? '';
+    if (typeLine.toLowerCase().contains('land')) continue;
+    final qty = (card['quantity'] as int?) ?? 1;
+    totalCMC += ((card['cmc'] as num?)?.toDouble() ?? 0.0) * qty;
+    totalNonLandCopies += qty;
   }
 
-  return totalCMC / nonLandCards.length;
+  if (totalNonLandCopies == 0) return 0.0;
+  return totalCMC / totalNonLandCopies;
 }
 
-/// Conta cartas por tipo
+/// Conta cartas por tipo (CORRIGIDO: respeita quantity)
 Map<String, int> countCardTypes(List<Map<String, dynamic>> cards) {
   final counts = <String, int>{
     'creatures': 0,
@@ -44,14 +44,15 @@ Map<String, int> countCardTypes(List<Map<String, dynamic>> cards) {
 
   for (final card in cards) {
     final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    final qty = (card['quantity'] as int?) ?? 1;
 
-    if (typeLine.contains('land')) counts['lands'] = counts['lands']! + 1;
-    if (typeLine.contains('creature')) counts['creatures'] = counts['creatures']! + 1;
-    if (typeLine.contains('planeswalker')) counts['planeswalkers'] = counts['planeswalkers']! + 1;
-    if (typeLine.contains('instant')) counts['instants'] = counts['instants']! + 1;
-    if (typeLine.contains('sorcery')) counts['sorceries'] = counts['sorceries']! + 1;
-    if (typeLine.contains('artifact')) counts['artifacts'] = counts['artifacts']! + 1;
-    if (typeLine.contains('enchantment')) counts['enchantments'] = counts['enchantments']! + 1;
+    if (typeLine.contains('land')) counts['lands'] = counts['lands']! + qty;
+    if (typeLine.contains('creature')) counts['creatures'] = counts['creatures']! + qty;
+    if (typeLine.contains('planeswalker')) counts['planeswalkers'] = counts['planeswalkers']! + qty;
+    if (typeLine.contains('instant')) counts['instants'] = counts['instants']! + qty;
+    if (typeLine.contains('sorcery')) counts['sorceries'] = counts['sorceries']! + qty;
+    if (typeLine.contains('artifact')) counts['artifacts'] = counts['artifacts']! + qty;
+    if (typeLine.contains('enchantment')) counts['enchantments'] = counts['enchantments']! + qty;
   }
 
   return counts;
@@ -61,7 +62,8 @@ Map<String, int> countCardTypes(List<Map<String, dynamic>> cards) {
 String detectArchetype(List<Map<String, dynamic>> cards) {
   final avgCMC = calculateAverageCMC(cards);
   final typeCounts = countCardTypes(cards);
-  final totalNonLands = cards.length - (typeCounts['lands'] ?? 0);
+  final totalCards = cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+  final totalNonLands = totalCards - (typeCounts['lands'] ?? 0);
 
   if (totalNonLands == 0) return 'unknown';
 

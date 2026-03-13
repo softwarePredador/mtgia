@@ -47,26 +47,28 @@ class DeckArchetypeAnalyzer {
   DeckArchetypeAnalyzer(this.cards, this.colors);
 
   /// Calcula a curva de mana média (CMC - Converted Mana Cost)
+  /// CORRIGIDO: agora multiplica pelo `quantity` de cada entry.
   double calculateAverageCMC() {
     if (cards.isEmpty) return 0.0;
 
-    final nonLandCards = cards.where((c) {
-      final typeLine = (c['type_line'] as String?) ?? '';
-      return !typeLine.toLowerCase().contains('land');
-    }).toList();
-
-    if (nonLandCards.isEmpty) return 0.0;
-
     double totalCMC = 0;
-    for (final card in nonLandCards) {
-      totalCMC += (card['cmc'] as num?)?.toDouble() ?? 0.0;
+    int totalNonLandCopies = 0;
+
+    for (final card in cards) {
+      final typeLine = (card['type_line'] as String?) ?? '';
+      if (typeLine.toLowerCase().contains('land')) continue;
+      final qty = (card['quantity'] as int?) ?? 1;
+      totalCMC += ((card['cmc'] as num?)?.toDouble() ?? 0.0) * qty;
+      totalNonLandCopies += qty;
     }
 
-    return totalCMC / nonLandCards.length;
+    if (totalNonLandCopies == 0) return 0.0;
+    return totalCMC / totalNonLandCopies;
   }
 
-  /// Conta cartas por tipo
-  /// Agora conta tipos múltiplos (ex: Artifact Creature conta para ambos)
+  /// Conta cartas por tipo (multiplicando por `quantity`)
+  /// Conta tipos múltiplos (ex: Artifact Creature conta para ambos)
+  /// CORRIGIDO: Island x30 agora conta como 30 lands, não 1.
   Map<String, int> countCardTypes() {
     final counts = <String, int>{
       'creatures': 0,
@@ -81,32 +83,33 @@ class DeckArchetypeAnalyzer {
 
     for (final card in cards) {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+      final qty = (card['quantity'] as int?) ?? 1;
 
       // Conta TODOS os tipos presentes na carta (não apenas o principal)
       // Isso permite estatísticas mais precisas para arquétipos
       if (typeLine.contains('land')) {
-        counts['lands'] = counts['lands']! + 1;
+        counts['lands'] = counts['lands']! + qty;
       }
       if (typeLine.contains('creature')) {
-        counts['creatures'] = counts['creatures']! + 1;
+        counts['creatures'] = counts['creatures']! + qty;
       }
       if (typeLine.contains('planeswalker')) {
-        counts['planeswalkers'] = counts['planeswalkers']! + 1;
+        counts['planeswalkers'] = counts['planeswalkers']! + qty;
       }
       if (typeLine.contains('instant')) {
-        counts['instants'] = counts['instants']! + 1;
+        counts['instants'] = counts['instants']! + qty;
       }
       if (typeLine.contains('sorcery')) {
-        counts['sorceries'] = counts['sorceries']! + 1;
+        counts['sorceries'] = counts['sorceries']! + qty;
       }
       if (typeLine.contains('artifact')) {
-        counts['artifacts'] = counts['artifacts']! + 1;
+        counts['artifacts'] = counts['artifacts']! + qty;
       }
       if (typeLine.contains('enchantment')) {
-        counts['enchantments'] = counts['enchantments']! + 1;
+        counts['enchantments'] = counts['enchantments']! + qty;
       }
       if (typeLine.contains('battle')) {
-        counts['battles'] = counts['battles']! + 1;
+        counts['battles'] = counts['battles']! + qty;
       }
     }
 
@@ -118,7 +121,9 @@ class DeckArchetypeAnalyzer {
   String detectArchetype() {
     final avgCMC = calculateAverageCMC();
     final typeCounts = countCardTypes();
-    final totalNonLands = cards.length - (typeCounts['lands'] ?? 0);
+    // totalCards com quantity para cálculos de ratio corretos
+    final totalCards = cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalNonLands = totalCards - (typeCounts['lands'] ?? 0);
 
     if (totalNonLands == 0) return 'unknown';
 
@@ -168,17 +173,21 @@ class DeckArchetypeAnalyzer {
     final landSources = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'Any': 0};
 
     // 1. Contar símbolos de mana nas cartas (Devotion)
+    // CORRIGIDO: multiplica por quantity (ex: Island x30 = 30 fontes)
     for (final card in cards) {
       final manaCost = (card['mana_cost'] as String?) ?? '';
+      final qty = (card['quantity'] as int?) ?? 1;
       for (final color in manaSymbols.keys) {
         manaSymbols[color] =
-            manaSymbols[color]! + manaCost.split(color).length - 1;
+            manaSymbols[color]! + (manaCost.split(color).length - 1) * qty;
       }
     }
 
     // 2. Contar fontes de mana nos terrenos (Heurística melhorada via Oracle Text)
+    // CORRIGIDO: multiplica por quantity
     for (final card in cards) {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+      final qty = (card['quantity'] as int?) ?? 1;
       if (typeLine.contains('land')) {
         final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];
         final oracleText =
@@ -187,7 +196,7 @@ class DeckArchetypeAnalyzer {
         // Detecção de Rainbow Lands via texto (sem hardcode de nomes)
         if (oracleText.contains('add one mana of any color') ||
             oracleText.contains('add one mana of any type')) {
-          landSources['Any'] = landSources['Any']! + 1;
+          landSources['Any'] = landSources['Any']! + qty;
         }
         // Detecção de Fetch Lands (simplificada)
         else if (oracleText.contains('search your library for') &&
@@ -200,7 +209,7 @@ class DeckArchetypeAnalyzer {
           // e evitar complexidade excessiva, vamos considerar como "Any" se buscar 2+ tipos,
           // ou contar especificamente se for simples.
           // Por segurança, Fetchs genéricas contam como Any no contexto de correção de cor.
-          landSources['Any'] = landSources['Any']! + 1;
+          landSources['Any'] = landSources['Any']! + qty;
         } else {
           // FIX: Lands no DB sempre têm colors=[] (cor é do card, lands não têm custo de mana).
           // Precisamos parsear oracle_text para detectar que mana o terreno produz.
@@ -210,14 +219,14 @@ class DeckArchetypeAnalyzer {
           if (detectedColors.isNotEmpty) {
             for (final color in detectedColors) {
               if (landSources.containsKey(color)) {
-                landSources[color] = landSources[color]! + 1;
+                landSources[color] = landSources[color]! + qty;
               }
             }
           } else if (cardColors.isNotEmpty) {
             // Fallback para cards que têm colors preenchido (raro em lands)
             for (final color in cardColors) {
               if (landSources.containsKey(color)) {
-                landSources[color] = landSources[color]! + 1;
+                landSources[color] = landSources[color]! + qty;
               }
             }
           }
@@ -328,7 +337,8 @@ class DeckArchetypeAnalyzer {
   String _calculateConfidence(
       double avgCMC, Map<String, int> counts, String archetype) {
     // Confidence baseada em quão bem o deck se encaixa no arquétipo
-    final totalNonLands = cards.length - (counts['lands'] ?? 0);
+    final totalCards = cards.fold<int>(0, (s, c) => s + ((c['quantity'] as int?) ?? 1));
+    final totalNonLands = totalCards - (counts['lands'] ?? 0);
     if (totalNonLands < 20) return 'baixa';
 
     final creatureRatio = (counts['creatures'] ?? 0) / totalNonLands;
@@ -1742,6 +1752,42 @@ Future<Response> onRequest(RequestContext context) async {
     // Re-aplicar equilíbrio após validação
     // FILOSOFIA: Quando additions < removals, a IA deve SUGERIR NOVAS CARTAS
     // de sinergia — NÃO preencher com lands genéricos. O propósito é OTIMIZAR.
+
+    // ═══════════════════════════════════════════════════════════
+    // PROTEÇÃO DE TERRENOS (sync optimize): impedir remoção de lands quando
+    // o deck já tem poucos terrenos. Sem isso, um deck com 24 lands pode ficar com 20.
+    // ═══════════════════════════════════════════════════════════
+    if (!isComplete) {
+      final currentLandCount = allCardData.fold<int>(0, (sum, c) {
+        final type = ((c['type_line'] as String?) ?? '').toLowerCase();
+        if (!type.contains('land')) return sum;
+        return sum + ((c['quantity'] as int?) ?? 1);
+      });
+      const minSafeLands = 28;
+
+      if (currentLandCount <= minSafeLands + 3) {
+        // Bloquear remoções de terrenos
+        final landRemovalsBefore = validRemovals.length;
+        final landNamesInDeck = <String, String>{};
+        for (final card in allCardData) {
+          final type = ((card['type_line'] as String?) ?? '').toLowerCase();
+          if (type.contains('land')) {
+            landNamesInDeck[((card['name'] as String?) ?? '').toLowerCase()] =
+                (card['type_line'] as String?) ?? '';
+          }
+        }
+
+        validRemovals = validRemovals.where((name) {
+          return !landNamesInDeck.containsKey(name.toLowerCase());
+        }).toList();
+
+        final landBlockedCount = landRemovalsBefore - validRemovals.length;
+        if (landBlockedCount > 0) {
+          Log.d('⛔ Land protection: bloqueou $landBlockedCount remoções de terrenos (deck tem $currentLandCount lands, mínimo seguro=$minSafeLands)');
+        }
+      }
+    }
+
     if (!isComplete && validRemovals.length != validAdditions.length) {
       Log.d('Re-balanceamento pós-filtros:');
       Log.d('  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
@@ -1928,21 +1974,32 @@ Future<Response> onRequest(RequestContext context) async {
         );
 
         // Remover cartas sugeridas (pelo nome, case-insensitive)
-        // Usar contagem precisa: cada nome na lista de remoções remove exatamente 1 cópia
+        // CORRIGIDO: decrementa `quantity` em vez de remover o entry inteiro.
+        // Antes: Island x30 era removido inteiro quando a IA pedia 1 remoção.
         final removalCountsByName = <String, int>{};
         for (final name in validRemovals) {
           final lower = name.toLowerCase();
           removalCountsByName[lower] = (removalCountsByName[lower] ?? 0) + 1;
         }
-        virtualDeck.removeWhere((c) {
-          final name = ((c['name'] as String?) ?? '').toLowerCase();
-          final remaining = removalCountsByName[name] ?? 0;
-          if (remaining > 0) {
-            removalCountsByName[name] = remaining - 1;
-            return true;
+        for (final entry in removalCountsByName.entries) {
+          final nameLower = entry.key;
+          var toRemove = entry.value;
+          for (var i = virtualDeck.length - 1; i >= 0 && toRemove > 0; i--) {
+            final cardName = ((virtualDeck[i]['name'] as String?) ?? '').toLowerCase();
+            if (cardName != nameLower) continue;
+            final qty = (virtualDeck[i]['quantity'] as int?) ?? 1;
+            if (qty <= toRemove) {
+              virtualDeck.removeAt(i);
+              toRemove -= qty;
+            } else {
+              virtualDeck[i] = {
+                ...virtualDeck[i],
+                'quantity': qty - toRemove,
+              };
+              toRemove = 0;
+            }
           }
-          return false;
-        });
+        }
 
         // Adicionar novas cartas
         virtualDeck.addAll(additionsData);
@@ -4739,37 +4796,45 @@ Future<List<Map<String, dynamic>>> _loadBroadCommanderNonLandFillers({
   final identity = commanderColorIdentity.toList();
   Log.d(
       '  [broad] start limit=$limit identity=${identity.join(',')} exclude=${excludeNames.length}');
+  // CORRIGIDO: DISTINCT ON + card_meta_insights para popularidade em vez de ordem alfabética
   final result = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
-      FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-        AND c.oracle_text IS NOT NULL
-        AND (
-          (
-            c.color_identity IS NOT NULL
-            AND (
-              c.color_identity <@ @identity::text[]
-              OR c.color_identity = '{}'
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity,
+          COALESCE(cmi.usage_count, 0) AS pop_score
+        FROM cards c
+        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
+          AND c.type_line NOT ILIKE '%land%'
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+          AND c.oracle_text IS NOT NULL
+          AND (
+            (
+              c.color_identity IS NOT NULL
+              AND (
+                c.color_identity <@ @identity::text[]
+                OR c.color_identity = '{}'
+              )
+            )
+            OR (
+              c.color_identity IS NULL
+              AND (
+                c.colors <@ @identity::text[]
+                OR c.colors = '{}'
+                OR c.colors IS NULL
+              )
             )
           )
-          OR (
-            c.color_identity IS NULL
-            AND (
-              c.colors <@ @identity::text[]
-              OR c.colors = '{}'
-              OR c.colors IS NULL
-            )
-          )
-        )
-      ORDER BY c.name ASC
+        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+      ) sub
+      ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
     parameters: {
@@ -4919,38 +4984,45 @@ Future<List<Map<String, dynamic>>> _loadCompetitiveNonLandFillers({
   if (limit <= 0) return const [];
 
   final identity = commanderColorIdentity.toList();
+  // CORRIGIDO: DISTINCT ON + popularidade em vez de ordem alfabética
   final result = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
-      FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\_%' ESCAPE '\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-        AND c.oracle_text IS NOT NULL
-        -- Removido filtro de LENGTH para permitir cartas com texto curto
-        AND (
-          (
-            c.color_identity IS NOT NULL
-            AND (
-              c.color_identity <@ @identity::text[]
-              OR c.color_identity = '{}'
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity,
+          COALESCE(cmi.usage_count, 0) AS pop_score
+        FROM cards c
+        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
+          AND c.type_line NOT ILIKE '%land%'
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+          AND c.oracle_text IS NOT NULL
+          AND (
+            (
+              c.color_identity IS NOT NULL
+              AND (
+                c.color_identity <@ @identity::text[]
+                OR c.color_identity = '{}'
+              )
+            )
+            OR (
+              c.color_identity IS NULL
+              AND (
+                c.colors <@ @identity::text[]
+                OR c.colors = '{}'
+                OR c.colors IS NULL
+              )
             )
           )
-          OR (
-            c.color_identity IS NULL
-            AND (
-              c.colors <@ @identity::text[]
-              OR c.colors = '{}'
-              OR c.colors IS NULL
-            )
-          )
-        )
-      ORDER BY c.name ASC
+        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+      ) sub
+      ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 600
     '''),
     parameters: {
@@ -5064,19 +5136,27 @@ Future<List<Map<String, dynamic>>> _loadEmergencyNonBasicFillers({
 }) async {
   if (limit <= 0) return const [];
 
+  // CORRIGIDO: DISTINCT ON + popularidade em vez de ordem alfabética
   final result = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
-      FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-      ORDER BY c.name ASC
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity,
+          COALESCE(cmi.usage_count, 0) AS pop_score
+        FROM cards c
+        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
+          AND c.type_line NOT ILIKE '%land%'
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+      ) sub
+      ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT @limit
     '''),
     parameters: {
@@ -5134,18 +5214,26 @@ Future<List<Map<String, dynamic>>> _loadIdentitySafeNonLandFillers({
   Log.d(
       '  [identity-safe] start limit=$limit identity=${commanderColorIdentity.join(',')} exclude=${excludeNames.length}');
 
+  // CORRIGIDO: DISTINCT ON + popularidade em vez de ordem alfabética
   final result = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity
-      FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND c.type_line NOT ILIKE '%land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-      ORDER BY c.name ASC
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text, c.name, c.type_line, c.oracle_text, c.colors, c.color_identity,
+          COALESCE(cmi.usage_count, 0) AS pop_score
+        FROM cards c
+        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND c.type_line NOT ILIKE '%land%'
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+      ) sub
+      ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 4000
     '''),
   );
@@ -5331,33 +5419,37 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   }
   
   // Passo 2: Buscar cartas do DB que combinem com o commander e preencham o gap
-  // Priorizamos cartas populares (por rank EDHREC implícito na query) dentro da identidade
+  // CORRIGIDO: DISTINCT ON + popularidade em vez de ordem alfabética
   final colorIdentityArr = commanderColorIdentity.toList();
   
-  // Query inteligente: buscar cartas dentro da identidade de cor,
-  // que não estejam no deck nem na lista de exclusão,
-  // legais em commander, ordenadas por popularidade
   final candidatesResult = await pool.execute(
     Sql.named('''
-      SELECT c.id::text, c.name, c.type_line, c.oracle_text, c.color_identity
-      FROM cards c
-      LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
-        AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
-        AND c.type_line NOT LIKE 'Basic Land%'
-        AND c.type_line NOT LIKE 'Basic Snow Land%'
-        AND c.name NOT LIKE 'A-%'
-        AND c.name NOT LIKE '\_%' ESCAPE '\\'
-        AND c.name NOT LIKE '%World Champion%'
-        AND c.name NOT LIKE '%Heroes of the Realm%'
-        AND c.oracle_text IS NOT NULL
-        AND LENGTH(TRIM(c.oracle_text)) > 0
-        AND (
-          c.color_identity <@ @identity::text[]
-          OR c.color_identity = '{}'
-          OR c.color_identity IS NULL
-        )
-      ORDER BY c.name ASC
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.color_identity
+      FROM (
+        SELECT DISTINCT ON (LOWER(c.name))
+          c.id::text, c.name, c.type_line, c.oracle_text, c.color_identity,
+          COALESCE(cmi.usage_count, 0) AS pop_score
+        FROM cards c
+        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
+        LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
+          AND c.type_line NOT LIKE 'Basic Land%'
+          AND c.type_line NOT LIKE 'Basic Snow Land%'
+          AND c.name NOT LIKE 'A-%'
+          AND c.name NOT LIKE '\_%' ESCAPE '\\'
+          AND c.name NOT LIKE '%World Champion%'
+          AND c.name NOT LIKE '%Heroes of the Realm%'
+          AND c.oracle_text IS NOT NULL
+          AND LENGTH(TRIM(c.oracle_text)) > 0
+          AND (
+            c.color_identity <@ @identity::text[]
+            OR c.color_identity = '{}'
+            OR c.color_identity IS NULL
+          )
+        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+      ) sub
+      ORDER BY sub.pop_score DESC, RANDOM()
       LIMIT 300
     '''),
     parameters: {

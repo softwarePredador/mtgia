@@ -156,12 +156,14 @@ def analyze_result(data, deck_info):
         mode = result.get("mode", mode)
         summary["mode"] = mode
 
-    additions = result.get("additions", [])
+    additions = result.get("additions_detailed", [])
     if not additions:
-        additions = result.get("additions_detailed", [])
+        additions = result.get("additions", [])
     if not isinstance(additions, list):
         additions = []
-    removals = result.get("removals", [])
+    removals = result.get("removals_detailed", [])
+    if not removals:
+        removals = result.get("removals", [])
     if not isinstance(removals, list):
         removals = []
     
@@ -184,13 +186,14 @@ def analyze_result(data, deck_info):
     # Mana analysis
     post = result.get("post_analysis", {})
     if post:
-        summary["lands"] = post.get("land_count", "?")
+        type_dist = post.get("type_distribution", {})
+        land_count = type_dist.get("lands", 0) if isinstance(type_dist, dict) else 0
+        summary["lands"] = land_count
         summary["avg_cmc"] = post.get("average_cmc", "?")
-        summary["creature_pct"] = post.get("creature_percentage", "?")
-        
-        mana = post.get("mana_analysis", {})
-        summary["mana_verdict"] = mana.get("verdict", "?")
-        summary["mana_sources"] = mana.get("sources_by_color", {})
+        summary["total_cards_post"] = post.get("total_cards", "?")
+        summary["mana_curve"] = post.get("mana_curve_assessment", "?")
+        summary["mana_base"] = post.get("mana_base_assessment", "?")
+        summary["type_distribution"] = type_dist
     
     # Stages used
     meta = result.get("pipeline_metadata", result.get("metadata", {}))
@@ -217,7 +220,8 @@ def analyze_result(data, deck_info):
             summary["qty_check"] = f"✗ {expected_final} cartas (esperado {target})"
         
         # Lands should be 35-40 for commander
-        lands = post.get("land_count", 0) if post else 0
+        type_dist = post.get("type_distribution", {}) if post else {}
+        lands = type_dist.get("lands", 0) if isinstance(type_dist, dict) else 0
         if isinstance(lands, (int, float)):
             if 33 <= lands <= 42:
                 summary["land_check"] = f"✓ {lands} lands (ideal)"
@@ -254,13 +258,16 @@ def print_summary(deck_info, summary, elapsed, polls):
         print(f"  Lands: {summary['lands']}")
     if "avg_cmc" in summary:
         print(f"  CMC médio: {summary['avg_cmc']}")
-    if "mana_verdict" in summary:
-        print(f"  Mana: {summary['mana_verdict']}")
-    if "mana_sources" in summary:
-        srcs = summary["mana_sources"]
-        if srcs:
-            parts = [f"{k}:{v}" for k,v in sorted(srcs.items())]
-            print(f"  Fontes por cor: {', '.join(parts)}")
+    if "mana_curve" in summary:
+        print(f"  Curva de mana: {summary['mana_curve']}")
+    if "mana_base" in summary:
+        print(f"  Base de mana: {summary['mana_base']}")
+    if "total_cards_post" in summary:
+        print(f"  Total (post_analysis): {summary['total_cards_post']}")
+    if "type_distribution" in summary:
+        td = summary["type_distribution"]
+        parts = [f"{k}:{v}" for k, v in sorted(td.items()) if v > 0]
+        print(f"  Distribuição: {', '.join(parts)}")
     
     if "qty_check" in summary:
         print(f"  [Qty] {summary['qty_check']}")
@@ -280,9 +287,15 @@ def print_summary(deck_info, summary, elapsed, polls):
     
     warns = summary.get("warnings", [])
     if warns:
-        print(f"  ⚠ Warnings ({len(warns)}):")
-        for w in warns[:5]:
-            print(f"    - {w}")
+        if isinstance(warns, dict):
+            print(f"  ⚠ Warnings:")
+            for k, v in warns.items():
+                desc = str(v)[:150]
+                print(f"    - {k}: {desc}")
+        elif isinstance(warns, list):
+            print(f"  ⚠ Warnings ({len(warns)}):")
+            for w in warns[:5]:
+                print(f"    - {w}")
     
     print()
 
