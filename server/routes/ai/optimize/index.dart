@@ -201,15 +201,28 @@ class DeckArchetypeAnalyzer {
           // ou contar especificamente se for simples.
           // Por segurança, Fetchs genéricas contam como Any no contexto de correção de cor.
           landSources['Any'] = landSources['Any']! + 1;
-        } else if (cardColors.isEmpty) {
-          // Terrenos incolores que não são rainbow nem fetch (ex: Reliquary Tower)
-          // Não contam para cores.
         } else {
-          for (final color in cardColors) {
-            if (landSources.containsKey(color)) {
-              landSources[color] = landSources[color]! + 1;
+          // FIX: Lands no DB sempre têm colors=[] (cor é do card, lands não têm custo de mana).
+          // Precisamos parsear oracle_text para detectar que mana o terreno produz.
+          // Ex: Plains → oracle_text: "({T}: Add {W}.)" → produz W.
+          // Ex: Drowned Catacomb → "{T}: Add {U} or {B}." → produz U e B.
+          final detectedColors = _detectManaColorsFromOracleText(oracleText);
+          if (detectedColors.isNotEmpty) {
+            for (final color in detectedColors) {
+              if (landSources.containsKey(color)) {
+                landSources[color] = landSources[color]! + 1;
+              }
+            }
+          } else if (cardColors.isNotEmpty) {
+            // Fallback para cards que têm colors preenchido (raro em lands)
+            for (final color in cardColors) {
+              if (landSources.containsKey(color)) {
+                landSources[color] = landSources[color]! + 1;
+              }
             }
           }
+          // Se detectedColors vazio E cardColors vazio → terreno incolor (ex: Reliquary Tower)
+          // Não conta para nenhuma cor.
         }
       }
     }
@@ -219,6 +232,25 @@ class DeckArchetypeAnalyzer {
       'sources': landSources,
       'assessment': _assessManaBase(manaSymbols, landSources),
     };
+  }
+
+  /// Detecta quais cores de mana um terreno produz parseando o oracle_text.
+  /// Procura padrões como "{W}", "{U}", "{B}", "{R}", "{G}" no texto.
+  /// Também detecta padrões textuais como "add {W} or {B}" e "add {W}, {U}, or {B}".
+  static Set<String> _detectManaColorsFromOracleText(String oracleText) {
+    final colors = <String>{};
+    final colorMap = {
+      'w': 'W', 'u': 'U', 'b': 'B', 'r': 'R', 'g': 'G',
+    };
+    // Pattern: {W}, {U}, {B}, {R}, {G} no oracle_text
+    final manaSymbolPattern = RegExp(r'\{([wubrgWUBRG])\}');
+    for (final match in manaSymbolPattern.allMatches(oracleText)) {
+      final symbol = match.group(1)!.toLowerCase();
+      if (colorMap.containsKey(symbol)) {
+        colors.add(colorMap[symbol]!);
+      }
+    }
+    return colors;
   }
 
   String _assessManaBase(Map<String, int> symbols, Map<String, int> sources) {
@@ -2685,6 +2717,12 @@ Future<void> _processCompleteModeAsync({
         virtualTotal += 1;
         addedThisIter += 1;
 
+        // FIX #3: Rastrear basics adicionados pelo AI loop para que o fallback
+        // não re-adicione além do budget.
+        if (isBasic) {
+          basicAddedDuringBuild += 1;
+        }
+
         final existingIndex = virtualDeck.indexWhere(
           (e) => (e['card_id'] as String?) == id,
         );
@@ -2712,6 +2750,88 @@ Future<void> _processCompleteModeAsync({
 
       // Sem progresso => para e deixa fallback completar (básicos)
       if (addedThisIter == 0) break;
+    }
+
+    // === FIX #2: LAND REBALANCING ===
+    // Após AI loop, verificar se o deck tem lands suficientes.
+    // Se não, remover spells excedentes (os últimos adicionados pela AI)
+    // para abrir espaço para lands no fallback.
+    {
+      // Contar lands atuais no virtualDeck
+      var rebalLands = 0;
+      for (final c in virtualDeck) {
+        final t = ((c['type_line'] as String?) ?? '').toLowerCase();
+        if (t.contains('land')) {
+          rebalLands += (c['quantity'] as int?) ?? 1;
+        }
+      }
+      
+      // Calcular ideal de lands
+      final rebalNonLandCards = virtualDeck.where((c) {
+        final t = ((c['type_line'] as String?) ?? '').toLowerCase();
+        return !t.contains('land');
+      }).toList();
+      double rebalAvgCmc = 0;
+      if (rebalNonLandCards.isNotEmpty) {
+        rebalAvgCmc = rebalNonLandCards.fold<double>(0, (sum, c) {
+          return sum + ((c['cmc'] as num?)?.toDouble() ?? 0.0);
+        }) / rebalNonLandCards.length;
+      }
+      final rebalIdeal = (commanderRecommendedLands ??
+          (rebalAvgCmc < 2.0
+            ? 32
+            : (rebalAvgCmc < 3.0 ? 35 : (rebalAvgCmc < 4.0 ? 37 : 39))))
+        .clamp(28, 42);
+      
+      final landDeficit = rebalIdeal - rebalLands;
+      final slotsAvailable = maxTotal - virtualTotal;
+      
+      // Se déficit de lands > slots disponíveis, precisamos liberar slots
+      // removendo spells adicionados pela AI (não do deck original)
+      if (landDeficit > slotsAvailable && landDeficit > 0) {
+        final slotsToFree = landDeficit - slotsAvailable;
+        Log.d('Land rebalancing: deficit=$landDeficit, available=$slotsAvailable, freeing=$slotsToFree slots');
+        
+        // Remover spells não-terreno adicionados pela AI (últimos primeiro)
+        var freed = 0;
+        for (var i = virtualDeck.length - 1; i >= 0 && freed < slotsToFree; i--) {
+          final card = virtualDeck[i];
+          final cardId = card['card_id'] as String?;
+          if (cardId == null) continue;
+          
+          // Só remover cartas que foram ADICIONADAS (estão em addedCountsById)
+          if (!addedCountsById.containsKey(cardId)) continue;
+          
+          // Não remover lands
+          final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+          if (typeLine.contains('land')) continue;
+          
+          // Não remover cartas is_commander
+          if (card['is_commander'] == true) continue;
+          
+          final qty = (card['quantity'] as int?) ?? 1;
+          final addedQty = addedCountsById[cardId] ?? 0;
+          if (addedQty <= 0) continue;
+          
+          // Remover 1 cópia
+          final removeQty = 1;
+          addedCountsById[cardId] = addedQty - removeQty;
+          if (addedCountsById[cardId]! <= 0) addedCountsById.remove(cardId);
+          
+          virtualCountsById[cardId] = (virtualCountsById[cardId] ?? 1) - removeQty;
+          final nameLower = ((card['name'] as String?) ?? '').toLowerCase();
+          virtualCountsByName[nameLower] = (virtualCountsByName[nameLower] ?? 1) - removeQty;
+          virtualTotal -= removeQty;
+          
+          if (qty <= removeQty) {
+            virtualDeck.removeAt(i);
+          } else {
+            virtualDeck[i] = {...card, 'quantity': qty - removeQty};
+          }
+          freed += removeQty;
+        }
+        Log.d('Land rebalancing: freed $freed slots for lands');
+      }
     }
 
     // Fallback final: INTELIGENTE — calcula quantos terrenos vs spells faltam
@@ -2930,10 +3050,35 @@ Future<void> _processCompleteModeAsync({
             final name = keys[i % keys.length];
             final id = basicsWithIds[name]!;
             virtualCountsById[id] = (virtualCountsById[id] ?? 0) + 1;
+            virtualCountsByName[name.toLowerCase()] =
+                (virtualCountsByName[name.toLowerCase()] ?? 0) + 1;
             addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
             virtualTotal += 1;
             landsToAdd--;
             basicAddedDuringBuild += 1;
+
+            // FIX #4a: Adicionar ao virtualDeck para manter consistência
+            final existIdx = virtualDeck.indexWhere((e) => (e['card_id'] as String?) == id);
+            if (existIdx == -1) {
+              virtualDeck.add({
+                'card_id': id,
+                'name': name,
+                'type_line': 'Basic Land',
+                'oracle_text': '',
+                'colors': <String>[],
+                'color_identity': <String>[],
+                'quantity': 1,
+                'is_commander': false,
+                'mana_cost': '',
+                'cmc': 0.0,
+              });
+            } else {
+              final existing = virtualDeck[existIdx];
+              virtualDeck[existIdx] = {
+                ...existing,
+                'quantity': (existing['quantity'] as int? ?? 1) + 1,
+              };
+            }
             i++;
           }
         }
@@ -3092,6 +3237,29 @@ Future<void> _processCompleteModeAsync({
             addedCountsById[id] = (addedCountsById[id] ?? 0) + 1;
             virtualTotal += 1;
             basicAddedDuringBuild += 1;
+
+            // FIX #4b: Adicionar ao virtualDeck para manter consistência
+            final existIdx = virtualDeck.indexWhere((e) => (e['card_id'] as String?) == id);
+            if (existIdx == -1) {
+              virtualDeck.add({
+                'card_id': id,
+                'name': name,
+                'type_line': 'Basic Land',
+                'oracle_text': '',
+                'colors': <String>[],
+                'color_identity': <String>[],
+                'quantity': 1,
+                'is_commander': false,
+                'mana_cost': '',
+                'cmc': 0.0,
+              });
+            } else {
+              final existing = virtualDeck[existIdx];
+              virtualDeck[existIdx] = {
+                ...existing,
+                'quantity': (existing['quantity'] as int? ?? 1) + 1,
+              };
+            }
             i++;
           }
         }

@@ -1,0 +1,237 @@
+{
+  "timestamp": "2026-03-13T11:49:38.407454",
+  "total_elapsed_s": 411.0,
+  "ok_count": 7,
+  "fail_count": 2,
+  "results": [
+    {
+      "deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
+      "deck_name": "jin (completo 100)",
+      "deck_qty": 100,
+      "elapsed_s": 2.6,
+      "polls": 0,
+      "summary": {
+        "ok": true,
+        "mode": "optimize",
+        "additions_count": 7,
+        "removals_count": 7,
+        "additions_qty": 7,
+        "removals_qty": 7,
+        "expected_final": 100,
+        "lands": "?",
+        "avg_cmc": "3.11",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": {
+          "blocked_by_theme": {
+            "message": "Algumas remo\u00e7\u00f5es sugeridas foram bloqueadas para preservar o tema do deck.",
+            "keep_theme": true,
+            "blocked_removals": [
+              "Ponder"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
+      "deck_name": "jin (completo 100)",
+      "deck_qty": 100,
+      "elapsed_s": 0,
+      "polls": 0,
+      "summary": {
+        "ok": false,
+        "error": "slice(None, 5, None)"
+      }
+    },
+    {
+      "deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
+      "deck_name": "goblins (completo 100)",
+      "deck_qty": 100,
+      "elapsed_s": 2.3,
+      "polls": 0,
+      "summary": {
+        "ok": true,
+        "mode": "optimize",
+        "additions_count": 7,
+        "removals_count": 7,
+        "additions_qty": 7,
+        "removals_qty": 7,
+        "expected_final": 100,
+        "lands": "?",
+        "avg_cmc": "2.52",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": []
+      }
+    },
+    {
+      "deck_id": "d5e25e80-5c22-42b2-8eb8-59624b1f149a",
+      "deck_name": "Meu Deck Commander (94 cards)",
+      "deck_qty": 94,
+      "elapsed_s": 43.2,
+      "polls": 21,
+      "summary": {
+        "ok": true,
+        "mode": "complete",
+        "additions_count": 4,
+        "removals_count": 0,
+        "additions_qty": 4,
+        "removals_qty": 0,
+        "expected_final": 98,
+        "lands": "?",
+        "avg_cmc": "2.71",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": [],
+        "qty_check": "\u2717 98 cartas (esperado 100)",
+        "land_check": "\u2717 0 lands (fora do range)",
+        "mana_check": "? ?"
+      }
+    },
+    {
+      "deck_id": "786f4956-9bca-49e7-afa7-0c0d36548f6e",
+      "deck_name": "Debate #7 Atraxa (74 cards)",
+      "deck_qty": 74,
+      "elapsed_s": 39.6,
+      "polls": 19,
+      "summary": {
+        "ok": true,
+        "mode": "complete",
+        "additions_count": 5,
+        "removals_count": 0,
+        "additions_qty": 5,
+        "removals_qty": 0,
+        "expected_final": 79,
+        "lands": "?",
+        "avg_cmc": "3.67",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": [],
+        "qty_check": "\u2717 79 cartas (esperado 100)",
+        "land_check": "\u2717 0 lands (fora do range)",
+        "mana_check": "? ?"
+      }
+    },
+    {
+      "deck_id": "872edb81-93fd-4373-aaab-5f189a4197eb",
+      "deck_name": "Debate #3 Atraxa (44 cards)",
+      "deck_qty": 44,
+      "elapsed_s": 61.6,
+      "polls": 30,
+      "summary": {
+        "ok": true,
+        "mode": "complete",
+        "additions_count": 38,
+        "removals_count": 0,
+        "additions_qty": 38,
+        "removals_qty": 0,
+        "expected_final": 82,
+        "lands": "?",
+        "avg_cmc": "3.27",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": [],
+        "qty_check": "\u2717 82 cartas (esperado 100)",
+        "land_check": "\u2717 0 lands (fora do range)",
+        "mana_check": "? ?"
+      }
+    },
+    {
+      "deck_id": "88887282-d112-4e3d-876c-d3faf209ab29",
+      "deck_name": "Debate #8 Krenko (25 cards)",
+      "deck_qty": 25,
+      "elapsed_s": 101.7,
+      "polls": 50,
+      "summary": {
+        "ok": true,
+        "mode": "complete",
+        "additions_count": 56,
+        "removals_count": 0,
+        "additions_qty": 56,
+        "removals_qty": 0,
+        "expected_final": 81,
+        "lands": "?",
+        "avg_cmc": "2.62",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": [],
+        "qty_check": "\u2717 81 cartas (esperado 100)",
+        "land_check": "\u2717 0 lands (fora do range)",
+        "mana_check": "? ?"
+      }
+    },
+    {
+      "deck_id": "0b163477-2e8a-488a-8883-774fcd05281f",
+      "deck_name": "Jin/Atraxa (apenas commander)",
+      "deck_qty": 1,
+      "elapsed_s": 160.0,
+      "polls": 79,
+      "summary": {
+        "ok": true,
+        "mode": "complete",
+        "additions_count": 70,
+        "removals_count": 0,
+        "additions_qty": 70,
+        "removals_qty": 0,
+        "expected_final": 71,
+        "lands": "?",
+        "avg_cmc": "3.53",
+        "creature_pct": "?",
+        "mana_verdict": "?",
+        "mana_sources": {},
+        "warnings": {
+          "invalid_cards": [
+            "Teferi's Ageless Insight",
+            "Propaganda",
+            "Sea Gate Restoration",
+            "Tidal Barrage",
+            "Teferi's Ageless Insight",
+            "Teferi's Ageless Insight"
+          ],
+          "filtered_by_color_identity": {
+            "removed_additions": [
+              "Thrun, the Last Troll",
+              "Tamiyo, Collector of Tales",
+              "Tainted Pact",
+              "Sigil of the Empty Throne",
+              "Sphinx of the Steel Wind",
+              "Phyrexian Arena",
+              "Toxic Deluge",
+              "Teferi's Protection",
+              "Swords to Plowshares",
+              "Sphinx's Revelation",
+              "Doomsday",
+              "Drown in the Loch",
+              "Tezzeret, Master of the Bridge",
+              "Tainted Pact",
+              "Phyrexian Arena",
+              "Toxic Deluge",
+              "Sphinx's Revelation"
+            ]
+          }
+        },
+        "qty_check": "\u2717 71 cartas (esperado 100)",
+        "land_check": "\u2717 0 lands (fora do range)",
+        "mana_check": "? ?"
+      }
+    },
+    {
+      "deck_id": "0b163477-2e8a-488a-8883-774fcd05281f",
+      "deck_name": "Jin/Atraxa (apenas commander)",
+      "deck_qty": 1,
+      "elapsed_s": 0,
+      "polls": 0,
+      "summary": {
+        "ok": false,
+        "error": "slice(None, 5, None)"
+      }
+    }
+  ]
+}
