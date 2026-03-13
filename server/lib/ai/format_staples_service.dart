@@ -46,10 +46,13 @@ class FormatStaplesService {
     }
     
     final sql = '''
-      SELECT DISTINCT card_name
-      FROM format_staples
-      WHERE $whereClause
-      ORDER BY COALESCE(edhrec_rank, 99999) ASC
+      SELECT card_name FROM (
+        SELECT DISTINCT ON (LOWER(card_name)) card_name, COALESCE(edhrec_rank, 99999) as rank_order
+        FROM format_staples
+        WHERE $whereClause
+        ORDER BY LOWER(card_name), COALESCE(edhrec_rank, 99999) ASC
+      ) sub
+      ORDER BY rank_order ASC
       LIMIT @limit
     ''';
     params['limit'] = limit;

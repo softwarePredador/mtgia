@@ -133,7 +133,11 @@ class HateCardsService {
         ''',
       );
       
-      return result.map((row) => row[0] as String).toList();
+      final names = <String>[];
+      for (final row in result) {
+        names.add(row[0] as String);
+      }
+      return names;
     } catch (e) {
       // Fallback: retornar todas as cartas (melhor do que nenhuma)
       print('HateCardsService filter error: $e');
