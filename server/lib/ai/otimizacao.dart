@@ -9,6 +9,7 @@ import '../ml_knowledge_service.dart';
 import '../openai_runtime_config.dart';
 import 'edhrec_service.dart';
 import 'format_staples_service.dart';
+import 'hate_cards_service.dart';
 import 'sinergia.dart';
 
 class DeckOptimizerService {
@@ -18,13 +19,15 @@ class DeckOptimizerService {
   final AiLogService? _logService;
   final MLKnowledgeService? _mlService;
   final FormatStaplesService? _staplesService;
+  final HateCardsService? _hateService;
 
   DeckOptimizerService(this.openAiKey, {dynamic db})
       : synergyEngine = SynergyEngine(),
         edhrecService = EdhrecService(),
         _logService = db != null ? AiLogService(db) : null,
         _mlService = db != null ? MLKnowledgeService(db) : null,
-        _staplesService = db != null ? FormatStaplesService(db) : null;
+        _staplesService = db != null ? FormatStaplesService(db) : null,
+        _hateService = db != null ? HateCardsService(db) : null;
 
   /// O fluxo principal de otimização
   Future<Map<String, dynamic>> optimizeDeck({
@@ -150,8 +153,31 @@ class DeckOptimizerService {
       }
     }
 
+    // 3.6. BUSCAR HATE CARDS ANTI-META
+    // Sugere cartas de resposta contra arquétipos comuns
+    String? hateContext;
+    if (_hateService != null) {
+      try {
+        final hateCards = await _hateService!.getRelevantHateCards(
+          deckColors: colors,
+          detectedThemes: [targetArchetype], // Não sugerir hate do próprio tema
+        );
+        if (hateCards.isNotEmpty) {
+          hateContext = _hateService!.generatePromptContext(hateCards);
+          Log.i('Hate Cards: ${hateCards.length} categorias de hate disponíveis');
+        }
+      } catch (e) {
+        Log.w('Hate Cards error (continuando sem): $e');
+      }
+    }
+
     // 4. CONSTRUÇÃO DO PROMPT RICO
     // Juntamos tudo para enviar à IA
+    final combinedMlContext = [
+      if (mlContext != null) mlContext,
+      if (hateContext != null) hateContext,
+    ].join('\n');
+    
     final optimizationResult = await _callOpenAI(
       deckList: currentCards.map((c) => c['name'].toString()).toList(),
       commanders: commanders,
@@ -165,7 +191,7 @@ class DeckOptimizerService {
       coreCards: coreCards,
       userId: userId,
       deckId: deckId,
-      mlContext: mlContext,
+      mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
     );
 
     return optimizationResult;
@@ -266,6 +292,28 @@ class DeckOptimizerService {
       }
     }
 
+    // BUSCAR HATE CARDS ANTI-META para complete
+    String? hateContext;
+    if (_hateService != null) {
+      try {
+        final hateCards = await _hateService!.getRelevantHateCards(
+          deckColors: colors,
+          detectedThemes: [targetArchetype],
+        );
+        if (hateCards.isNotEmpty) {
+          hateContext = _hateService!.generatePromptContext(hateCards);
+          Log.i('Hate Cards (complete): ${hateCards.length} categorias');
+        }
+      } catch (e) {
+        Log.w('Hate Cards error (continuando sem): $e');
+      }
+    }
+
+    final combinedMlContext = [
+      if (mlContext != null) mlContext,
+      if (hateContext != null) hateContext,
+    ].join('\n');
+
     final completionResult = await _callOpenAIComplete(
       deckList: currentCards.map((c) => c['name'].toString()).toList(),
       commanders: commanders,
@@ -279,7 +327,7 @@ class DeckOptimizerService {
       coreCards: coreCards,
       userId: userId,
       deckId: deckId,
-      mlContext: mlContext,
+      mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
     );
 
     return completionResult;
