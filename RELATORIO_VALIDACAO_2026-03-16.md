@@ -55,7 +55,7 @@ Foram corrigidos e validados os seguintes pontos:
 
 - `app/flutter analyze`: sem issues.
 - `app/flutter test`: passando.
-- `server/dart analyze`: 8 warnings preexistentes, sem erros.
+- `server/dart analyze`: sem issues.
 - Testes direcionados do backend: passando.
 - `server/dart test` completo: passando.
 
@@ -66,3 +66,12 @@ Foram corrigidos e validados os seguintes pontos:
 - Efeito pratico:
   - o caso `TC052` voltou a diferenciar deck inconsistente de deck corrigido;
   - `server/dart test` completo passou a fechar sem falhas.
+
+## Limpeza final
+
+- Foram removidos os 8 warnings restantes do backend apontados pelo `dart analyze`.
+- Resultado final consolidado:
+  - `app/flutter analyze`: ok
+  - `app/flutter test`: ok
+  - `server/dart analyze`: ok
+  - `server/dart test`: ok
