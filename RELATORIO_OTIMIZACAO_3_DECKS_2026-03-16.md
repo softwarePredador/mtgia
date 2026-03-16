@@ -1,6 +1,6 @@
 # Relatorio de Otimizacao Real - 3 Decks Commander
 
-- Gerado em: `2026-03-16T14:44:34.412584`
+- Gerado em: `2026-03-16T15:24:57.622710`
 - API: `http://127.0.0.1:8080`
 - Artefatos: `test/artifacts/optimization_validation_three_decks`
 - Total: `3`
@@ -14,7 +14,7 @@
 ### Auntie Ool, Cursewretch
 
 - Source deck: `8c22deb9-80bd-489f-8e87-1344eabac698`
-- Clone deck: `0795b065-8648-4630-85ff-e72ab528c537`
+- Clone deck: `3612e213-171b-4754-b1dc-363ff879fc59`
 - Tipo de resultado: `protected_rejection`
 - Archetype usado: `aggro`
 - Optimize status: `422`
@@ -29,14 +29,16 @@
 
 Avisos:
 - Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
-- A validação final não fechou como "aprovado" (score 62/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
-- Score final abaixo do mínimo para aceitar a otimização com sucesso (62/100; mínimo 70).
+- A validação final não fechou como "aprovado" (score 48/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
+- Score final abaixo do mínimo para aceitar a otimização com sucesso (48/100; mínimo 70).
+- A segunda revisão crítica da IA rejeitou a proposta (approval_score 45/100).
+- As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano.
 - A otimizacao sugerida nao passou no gate final de qualidade.
 
 ### Talrand, Sky Summoner
 
 - Source deck: `df780797-bcc4-47cb-82d6-08d01ae3b03b`
-- Clone deck: `d60bd592-d79d-4993-810b-6b78a004908e`
+- Clone deck: `2d5df44f-652c-454d-9016-94ed58ba4c72`
 - Tipo de resultado: `protected_rejection`
 - Archetype usado: `midrange`
 - Optimize status: `422`
@@ -50,16 +52,13 @@ Avisos:
 - Status final: `PASSOU`
 
 Avisos:
-- Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
-- A validação final não fechou como "aprovado" (score 58/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
-- Score final abaixo do mínimo para aceitar a otimização com sucesso (58/100; mínimo 70).
-- A base de mana continua com problema crítico após a otimização.
-- A otimizacao sugerida nao passou no gate final de qualidade.
+- Rejeicao protegida pelo gate de qualidade: As trocas sugeridas pioravam funcao, curva ou consistencia do deck.
+- Nenhuma troca segura restou apos o gate de qualidade da otimizacao.
 
 ### Jin-Gitaxias // The Great Synthesis
 
 - Source deck: `f2a2a34a-4561-4a77-886d-7067b672ac85`
-- Clone deck: `a6682383-311e-4938-a7c0-c44027b90765`
+- Clone deck: `9abeacae-51b3-4ffc-bd62-50f5235e3460`
 - Tipo de resultado: `protected_rejection`
 - Archetype usado: `midrange`
 - Optimize status: `422`
@@ -74,8 +73,7 @@ Avisos:
 
 Avisos:
 - Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
-- A validação final não fechou como "aprovado" (score 47/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
-- Score final abaixo do mínimo para aceitar a otimização com sucesso (47/100; mínimo 70).
-- Foram detectadas 2 trocas questionáveis.
+- A validação final não fechou como "aprovado" (score 50/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
+- Score final abaixo do mínimo para aceitar a otimização com sucesso (50/100; mínimo 70).
 - A otimizacao sugerida nao passou no gate final de qualidade.
 

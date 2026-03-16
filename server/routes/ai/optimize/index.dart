@@ -1655,6 +1655,9 @@ Future<Response> onRequest(RequestContext context) async {
           removedCards: fallbackRemovalCandidates,
           excludeNames: deckNamesLower,
           allCardData: allCardData,
+          preferredNames: optimizeCommanderPriorityNames
+              .map((name) => name.toLowerCase())
+              .toSet(),
         );
         emptySuggestionFallbackReplacementCount = replacements.length;
 
@@ -2029,6 +2032,9 @@ Future<Response> onRequest(RequestContext context) async {
             removedCards: removedButUnmatched,
             excludeNames: excludeNames,
             allCardData: allCardData,
+            preferredNames: optimizeCommanderPriorityNames
+                .map((name) => name.toLowerCase())
+                .toSet(),
           );
 
           if (replacementResult.isNotEmpty) {
@@ -3680,6 +3686,7 @@ Future<void> _processCompleteModeAsync({
             removedCards: const [], // não estamos substituindo, estamos adicionando
             excludeNames: existingNames,
             allCardData: virtualDeck,
+            preferredNames: aiSuggestedNames,
           );
 
           var selectedSpells = synergySpells;
@@ -6140,6 +6147,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   required List<String> removedCards,
   required Set<String> excludeNames,
   required List<Map<String, dynamic>> allCardData,
+  Set<String> preferredNames = const <String>{},
 }) async {
   final results = <Map<String, dynamic>>[];
 
@@ -6202,10 +6210,21 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   // Passo 2: Buscar cartas do DB que combinem com o commander e preencham o gap
   // CORRIGIDO: DISTINCT ON + popularidade em vez de ordem alfabética
   final colorIdentityArr = commanderColorIdentity.toList();
+  final normalizedPreferredNames = preferredNames
+      .map((name) => name.trim().toLowerCase())
+      .where((name) => name.isNotEmpty)
+      .toSet();
+  final commanderName = commanders.isNotEmpty ? commanders.first.trim() : '';
+  final rejectedAdditionCounts = commanderName.isEmpty
+      ? const <String, int>{}
+      : await _loadRejectedOptimizeAdditionCounts(
+          pool: pool,
+          commanderName: commanderName,
+        );
 
   final candidatesResult = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.color_identity
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.color_identity, sub.pop_score
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
           c.id::text, c.name, c.type_line, c.oracle_text, c.color_identity,
@@ -6247,6 +6266,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
     final typeLine = ((row[2] as String?) ?? '').toLowerCase();
     final oracle = ((row[3] as String?) ?? '').toLowerCase();
     final identity = (row[4] as List?)?.cast<String>() ?? const <String>[];
+    final popScore = (row[5] as num?)?.toInt() ?? 0;
 
     // Verificar identidade de cor (double check)
     if (!isWithinCommanderIdentity(
@@ -6259,6 +6279,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
       'name': name,
       'type_line': typeLine,
       'oracle_text': oracle,
+      'pop_score': popScore,
     });
   }
 
@@ -6273,34 +6294,29 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   for (var i = 0; i < missingCount && i < needs.length; i++) {
     final need = needs[i];
     Map<String, dynamic>? best;
+    var bestScore = -0x7fffffff;
 
     for (final candidate in candidatePool) {
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
+      final score = scoreOptimizeReplacementCandidate(
+        functionalNeed: need,
+        cardName: candidate['name'] as String? ?? '',
+        typeLine: candidate['type_line'] as String? ?? '',
+        oracleText: candidate['oracle_text'] as String? ?? '',
+        popScore: (candidate['pop_score'] as int?) ?? 0,
+        preferredNames: normalizedPreferredNames,
+        rejectedAdditionCounts: rejectedAdditionCounts,
+      );
+      final matches = matchesFunctionalNeed(
+        need,
+        oracleText: candidate['oracle_text'] as String? ?? '',
+        typeLine: candidate['type_line'] as String? ?? '',
+      );
 
-      final oracle = candidate['oracle_text'] as String;
-      final typeLine = candidate['type_line'] as String;
-
-      final matches = switch (need) {
-        'draw' => oracle.contains('draw') || oracle.contains('cards'),
-        'removal' => oracle.contains('destroy') ||
-            oracle.contains('exile') ||
-            oracle.contains('counter'),
-        'ramp' => oracle.contains('add') && oracle.contains('mana') ||
-            typeLine.contains('land'),
-        'tutor' =>
-          oracle.contains('search your library') && !oracle.contains('land'),
-        'protection' => oracle.contains('hexproof') ||
-            oracle.contains('indestructible') ||
-            oracle.contains('ward'),
-        'creature' => typeLine.contains('creature'),
-        'artifact' => typeLine.contains('artifact'),
-        _ => true, // utility: qualquer carta boa serve
-      };
-
-      if (matches) {
+      if (matches && score > bestScore) {
         best = candidate;
-        break;
+        bestScore = score;
       }
     }
 
@@ -6312,7 +6328,37 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
 
   // Se ainda faltam cartas, pegar as próximas melhores do pool (por EDHREC rank)
   if (results.length < missingCount) {
-    for (final candidate in candidatePool) {
+    final rankedRemaining = candidatePool.where((candidate) {
+      final name = (candidate['name'] as String).toLowerCase();
+      return !usedNames.contains(name);
+    }).toList()
+      ..sort((a, b) {
+        final scoreA = scoreOptimizeReplacementCandidate(
+          functionalNeed: 'utility',
+          cardName: a['name'] as String? ?? '',
+          typeLine: a['type_line'] as String? ?? '',
+          oracleText: a['oracle_text'] as String? ?? '',
+          popScore: (a['pop_score'] as int?) ?? 0,
+          preferredNames: normalizedPreferredNames,
+          rejectedAdditionCounts: rejectedAdditionCounts,
+        );
+        final scoreB = scoreOptimizeReplacementCandidate(
+          functionalNeed: 'utility',
+          cardName: b['name'] as String? ?? '',
+          typeLine: b['type_line'] as String? ?? '',
+          oracleText: b['oracle_text'] as String? ?? '',
+          popScore: (b['pop_score'] as int?) ?? 0,
+          preferredNames: normalizedPreferredNames,
+          rejectedAdditionCounts: rejectedAdditionCounts,
+        );
+        final byScore = scoreB.compareTo(scoreA);
+        if (byScore != 0) return byScore;
+        final nameA = (a['name'] as String? ?? '').toLowerCase();
+        final nameB = (b['name'] as String? ?? '').toLowerCase();
+        return nameA.compareTo(nameB);
+      });
+
+    for (final candidate in rankedRemaining) {
       if (results.length >= missingCount) break;
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
@@ -6323,4 +6369,103 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   }
 
   return results;
+}
+
+bool matchesFunctionalNeed(
+  String need, {
+  required String oracleText,
+  required String typeLine,
+}) {
+  final oracle = oracleText.toLowerCase();
+  final type = typeLine.toLowerCase();
+
+  return switch (need) {
+    'draw' => oracle.contains('draw') || oracle.contains('cards'),
+    'removal' => oracle.contains('destroy') ||
+        oracle.contains('exile') ||
+        oracle.contains('counter'),
+    'ramp' => (oracle.contains('add') && oracle.contains('mana')) ||
+        oracle.contains('search your library for a land'),
+    'tutor' =>
+      oracle.contains('search your library') && !oracle.contains('land'),
+    'protection' => oracle.contains('hexproof') ||
+        oracle.contains('indestructible') ||
+        oracle.contains('ward') ||
+        oracle.contains('phase out') ||
+        oracle.contains('phases out'),
+    'creature' => type.contains('creature'),
+    'artifact' => type.contains('artifact'),
+    _ => true,
+  };
+}
+
+int scoreOptimizeReplacementCandidate({
+  required String functionalNeed,
+  required String cardName,
+  required String typeLine,
+  required String oracleText,
+  required int popScore,
+  required Set<String> preferredNames,
+  required Map<String, int> rejectedAdditionCounts,
+}) {
+  final normalizedName = cardName.trim().toLowerCase();
+  final matchesNeed = matchesFunctionalNeed(
+    functionalNeed,
+    oracleText: oracleText,
+    typeLine: typeLine,
+  );
+  final needScore = matchesNeed ? 160 : (functionalNeed == 'utility' ? 40 : 0);
+  final preferredScore = preferredNames.contains(normalizedName) ? 120 : 0;
+  final popularityScore = (popScore ~/ 10).clamp(0, 90);
+  final rejectionPenalty =
+      ((rejectedAdditionCounts[normalizedName] ?? 0) * 35).clamp(0, 175);
+  final protectionBonus = functionalNeed == 'protection' &&
+          oracleText.toLowerCase().contains('free')
+      ? 15
+      : 0;
+
+  return needScore +
+      preferredScore +
+      popularityScore +
+      protectionBonus -
+      rejectionPenalty;
+}
+
+Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({
+  required Pool pool,
+  required String commanderName,
+}) async {
+  if (commanderName.trim().isEmpty) return const <String, int>{};
+
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          LOWER(value) AS card_name,
+          COUNT(*)::int AS reject_count
+        FROM optimization_analysis_logs oal
+        CROSS JOIN LATERAL jsonb_array_elements_text(
+          COALESCE(oal.additions_list, '[]'::jsonb)
+        ) AS value
+        WHERE oal.operation_mode = 'optimize'
+          AND LOWER(oal.commander_name) = LOWER(@commander_name)
+          AND COALESCE(oal.decisions_reasoning->>'status_code', '0') <> '200'
+          AND oal.created_at > NOW() - INTERVAL '180 days'
+        GROUP BY LOWER(value)
+        ORDER BY reject_count DESC, card_name ASC
+        LIMIT 200
+      '''),
+      parameters: {
+        'commander_name': commanderName,
+      },
+    );
+
+    return {
+      for (final row in result)
+        (row[0] as String?) ?? '': (row[1] as int?) ?? 0,
+    }..removeWhere((key, value) => key.trim().isEmpty || value <= 0);
+  } catch (e) {
+    Log.w('Falha ao carregar penalidades historicas de optimize: $e');
+    return const <String, int>{};
+  }
 }

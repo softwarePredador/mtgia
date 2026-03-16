@@ -1,9 +1,9 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "a6682383-311e-4938-a7c0-c44027b90765",
+  "clone_deck_id": "9abeacae-51b3-4ffc-bd62-50f5235e3460",
   "optimize_request": {
-    "deck_id": "a6682383-311e-4938-a7c0-c44027b90765",
+    "deck_id": "9abeacae-51b3-4ffc-bd62-50f5235e3460",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -15,12 +15,11 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 47/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (47/100; mínimo 70).",
-        "Foram detectadas 2 trocas questionáveis."
+        "A validação final não fechou como \"aprovado\" (score 50/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (50/100; mínimo 70)."
       ],
       "validation": {
-        "validation_score": 47,
+        "validation_score": 50,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -28,16 +27,16 @@
             "consistency_score": 89,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.153,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.83
+              "screw_rate": 0.167,
+              "flood_rate": 0.021,
+              "keepable_rate": 0.812
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.755,
-              "turn_2_play": 0.926,
-              "turn_3_play": 0.984,
-              "turn_4_play": 0.994,
+              "turn_1_play": 0.737,
+              "turn_2_play": 0.931,
+              "turn_3_play": 0.977,
+              "turn_4_play": 0.989,
               "cmc_distribution": {
                 "1": 15,
                 "3": 13,
@@ -51,7 +50,7 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (15.3%). Considere adicionar 2-4 terrenos."
+              "Alta taxa de mana screw (16.7%). Considere adicionar 2-4 terrenos."
             ]
           },
           "after": {
@@ -59,21 +58,21 @@
             "consistency_score": 89,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.138,
-              "flood_rate": 0.015,
-              "keepable_rate": 0.847
+              "screw_rate": 0.155,
+              "flood_rate": 0.02,
+              "keepable_rate": 0.825
             },
             "curve_analysis": {
-              "avg_cmc": 3.1,
-              "turn_1_play": 0.716,
-              "turn_2_play": 0.896,
-              "turn_3_play": 0.975,
-              "turn_4_play": 0.991,
+              "avg_cmc": 3.08,
+              "turn_1_play": 0.722,
+              "turn_2_play": 0.921,
+              "turn_3_play": 0.981,
+              "turn_4_play": 0.997,
               "cmc_distribution": {
                 "1": 15,
-                "3": 15,
+                "3": 14,
+                "2": 11,
                 "7": 3,
-                "2": 10,
                 "10": 4,
                 "5": 3,
                 "4": 5,
@@ -82,34 +81,34 @@
               }
             },
             "recommendations": [
-              "Deck bem balanceado! Métricas dentro do ideal para Commander."
+              "Alta taxa de mana screw (15.5%). Considere adicionar 2-4 terrenos."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.908,
-            "keep_at_6": 0.084,
-            "keep_at_5": 0.008,
+            "avg_mulligans": 0.13,
+            "keep_at_7": 0.882,
+            "keep_at_6": 0.104,
+            "keep_at_5": 0.014,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.912
+            "keepable_after_mull": 0.896
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.12,
-            "keep_at_7": 0.894,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.01,
+            "avg_mulligans": 0.13,
+            "keep_at_7": 0.884,
+            "keep_at_6": 0.1,
+            "keep_at_5": 0.016,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.89
+            "keepable_after_mull": 0.944
           },
           "deltas": {
             "consistency_score": 0,
-            "screw_rate_delta": -0.015,
-            "flood_rate_delta": -0.002,
-            "keepable_rate_delta": 0.017,
-            "turn2_play_delta": -0.03,
-            "mulligan_keep7_delta": -0.014
+            "screw_rate_delta": -0.012,
+            "flood_rate_delta": -0.001,
+            "keepable_rate_delta": 0.013,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": 0.002
           }
         },
         "functional_analysis": {
@@ -122,15 +121,6 @@
               "role_preserved": false,
               "cmc_delta": 0,
               "verdict": "tradeoff"
-            },
-            {
-              "removed": "Lightning Greaves",
-              "added": "Flux Channeler",
-              "removed_role": "protection",
-              "added_role": "creature",
-              "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
             },
             {
               "removed": "Isochron Scepter",
@@ -146,57 +136,51 @@
             "upgrades": 0,
             "sidegrades": 0,
             "tradeoffs": 1,
-            "questionable": 2
+            "questionable": 1
           },
           "role_delta": {
             "draw": 1,
             "removal": 0,
             "ramp": 0,
-            "creature": 2,
+            "creature": 1,
             "artifact": -1,
             "enchantment": 0,
             "land": 0,
             "utility": -1,
             "wipe": 0,
             "tutor": 0,
-            "protection": -1
+            "protection": 0
           }
         },
         "critic_ai": {
-          "approval_score": 65,
+          "approval_score": 60,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode ser um tradeoff, mas a perda de um efeito de remoção em massa é significativa.",
-            "A substituição de Lightning Greaves por Flux Channeler reduz a proteção do comandante, o que pode ser arriscado em um ambiente competitivo.",
-            "Trocar Isochron Scepter por Laboratory Maniac pode comprometer a consistência do deck em gerar valor, especialmente se o foco for em controle."
+            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode comprometer a remoção de permanentes problemáticos, já que All Is Dust é uma remoção em massa eficaz.",
+            "Laboratory Maniac pode não ser a melhor escolha em um deck midrange, pois depende de condições específicas para vencer, o que pode ser arriscado.",
+            "A perda de Isochron Scepter reduz a capacidade de gerar valor contínuo com feitiços instantâneos, o que pode afetar a consistência do deck."
           ],
           "strong_swaps": [],
           "weak_swaps": [
             {
-              "swap": "OUT: Lightning Greaves → IN: Flux Channeler",
-              "justificativa": "A perda de proteção para o comandante pode ser crítica, especialmente em um deck midrange que depende de permanentes."
-            },
-            {
-              "swap": "OUT: Isochron Scepter → IN: Laboratory Maniac",
-              "justificativa": "Laboratory Maniac pode não ser uma adição confiável em um deck que não foca em ganhar por meio de compra de cartas, tornando essa troca questionável."
+              "swap": "Isochron Scepter → Laboratory Maniac",
+              "justification": "Laboratory Maniac é uma carta de vitória condicional e pode não se alinhar bem com a estratégia geral do deck, enquanto Isochron Scepter oferece mais consistência e valor ao longo do jogo."
             }
           ],
-          "overall_assessment": "As trocas propostas apresentam riscos que podem comprometer a eficácia do deck, especialmente em termos de proteção e remoção."
+          "overall_assessment": "As trocas propostas apresentam riscos que podem comprometer a eficácia do deck, especialmente em termos de remoção e consistência."
         },
         "warnings": [
-          "2 troca(s) questionável(is) — mudou função E ficou mais cara."
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara."
         ]
       }
     },
     "mode": "optimize",
     "removals": [
       "All Is Dust",
-      "Lightning Greaves",
       "Isochron Scepter"
     ],
     "additions": [
       "Jin-Gitaxias, Progress Tyrant",
-      "Flux Channeler",
       "Laboratory Maniac"
     ],
     "deck_analysis": {
@@ -219,13 +203,13 @@
     },
     "post_analysis": {
       "detected_archetype": "control",
-      "average_cmc": "3.10",
+      "average_cmc": "3.08",
       "type_distribution": {
-        "creatures": 13,
+        "creatures": 12,
         "instants": 17,
         "sorceries": 7,
         "enchantments": 5,
-        "artifacts": 22,
+        "artifacts": 23,
         "planeswalkers": 0,
         "lands": 40,
         "battles": 0
@@ -235,7 +219,7 @@
       "mana_base_assessment": "Base de mana equilibrada",
       "archetype_confidence": "média",
       "validation": {
-        "validation_score": 47,
+        "validation_score": 50,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -243,16 +227,16 @@
             "consistency_score": 89,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.153,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.83
+              "screw_rate": 0.167,
+              "flood_rate": 0.021,
+              "keepable_rate": 0.812
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.755,
-              "turn_2_play": 0.926,
-              "turn_3_play": 0.984,
-              "turn_4_play": 0.994,
+              "turn_1_play": 0.737,
+              "turn_2_play": 0.931,
+              "turn_3_play": 0.977,
+              "turn_4_play": 0.989,
               "cmc_distribution": {
                 "1": 15,
                 "3": 13,
@@ -266,7 +250,7 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (15.3%). Considere adicionar 2-4 terrenos."
+              "Alta taxa de mana screw (16.7%). Considere adicionar 2-4 terrenos."
             ]
           },
           "after": {
@@ -274,21 +258,21 @@
             "consistency_score": 89,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.138,
-              "flood_rate": 0.015,
-              "keepable_rate": 0.847
+              "screw_rate": 0.155,
+              "flood_rate": 0.02,
+              "keepable_rate": 0.825
             },
             "curve_analysis": {
-              "avg_cmc": 3.1,
-              "turn_1_play": 0.716,
-              "turn_2_play": 0.896,
-              "turn_3_play": 0.975,
-              "turn_4_play": 0.991,
+              "avg_cmc": 3.08,
+              "turn_1_play": 0.722,
+              "turn_2_play": 0.921,
+              "turn_3_play": 0.981,
+              "turn_4_play": 0.997,
               "cmc_distribution": {
                 "1": 15,
-                "3": 15,
+                "3": 14,
+                "2": 11,
                 "7": 3,
-                "2": 10,
                 "10": 4,
                 "5": 3,
                 "4": 5,
@@ -297,34 +281,34 @@
               }
             },
             "recommendations": [
-              "Deck bem balanceado! Métricas dentro do ideal para Commander."
+              "Alta taxa de mana screw (15.5%). Considere adicionar 2-4 terrenos."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.908,
-            "keep_at_6": 0.084,
-            "keep_at_5": 0.008,
+            "avg_mulligans": 0.13,
+            "keep_at_7": 0.882,
+            "keep_at_6": 0.104,
+            "keep_at_5": 0.014,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.912
+            "keepable_after_mull": 0.896
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.12,
-            "keep_at_7": 0.894,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.01,
+            "avg_mulligans": 0.13,
+            "keep_at_7": 0.884,
+            "keep_at_6": 0.1,
+            "keep_at_5": 0.016,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.89
+            "keepable_after_mull": 0.944
           },
           "deltas": {
             "consistency_score": 0,
-            "screw_rate_delta": -0.015,
-            "flood_rate_delta": -0.002,
-            "keepable_rate_delta": 0.017,
-            "turn2_play_delta": -0.03,
-            "mulligan_keep7_delta": -0.014
+            "screw_rate_delta": -0.012,
+            "flood_rate_delta": -0.001,
+            "keepable_rate_delta": 0.013,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": 0.002
           }
         },
         "functional_analysis": {
@@ -337,15 +321,6 @@
               "role_preserved": false,
               "cmc_delta": 0,
               "verdict": "tradeoff"
-            },
-            {
-              "removed": "Lightning Greaves",
-              "added": "Flux Channeler",
-              "removed_role": "protection",
-              "added_role": "creature",
-              "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
             },
             {
               "removed": "Isochron Scepter",
@@ -361,53 +336,51 @@
             "upgrades": 0,
             "sidegrades": 0,
             "tradeoffs": 1,
-            "questionable": 2
+            "questionable": 1
           },
           "role_delta": {
             "draw": 1,
             "removal": 0,
             "ramp": 0,
-            "creature": 2,
+            "creature": 1,
             "artifact": -1,
             "enchantment": 0,
             "land": 0,
             "utility": -1,
             "wipe": 0,
             "tutor": 0,
-            "protection": -1
+            "protection": 0
           }
         },
         "critic_ai": {
-          "approval_score": 65,
+          "approval_score": 60,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode ser um tradeoff, mas a perda de um efeito de remoção em massa é significativa.",
-            "A substituição de Lightning Greaves por Flux Channeler reduz a proteção do comandante, o que pode ser arriscado em um ambiente competitivo.",
-            "Trocar Isochron Scepter por Laboratory Maniac pode comprometer a consistência do deck em gerar valor, especialmente se o foco for em controle."
+            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode comprometer a remoção de permanentes problemáticos, já que All Is Dust é uma remoção em massa eficaz.",
+            "Laboratory Maniac pode não ser a melhor escolha em um deck midrange, pois depende de condições específicas para vencer, o que pode ser arriscado.",
+            "A perda de Isochron Scepter reduz a capacidade de gerar valor contínuo com feitiços instantâneos, o que pode afetar a consistência do deck."
           ],
           "strong_swaps": [],
           "weak_swaps": [
             {
-              "swap": "OUT: Lightning Greaves → IN: Flux Channeler",
-              "justificativa": "A perda de proteção para o comandante pode ser crítica, especialmente em um deck midrange que depende de permanentes."
-            },
-            {
-              "swap": "OUT: Isochron Scepter → IN: Laboratory Maniac",
-              "justificativa": "Laboratory Maniac pode não ser uma adição confiável em um deck que não foca em ganhar por meio de compra de cartas, tornando essa troca questionável."
+              "swap": "Isochron Scepter → Laboratory Maniac",
+              "justification": "Laboratory Maniac é uma carta de vitória condicional e pode não se alinhar bem com a estratégia geral do deck, enquanto Isochron Scepter oferece mais consistência e valor ao longo do jogo."
             }
           ],
-          "overall_assessment": "As trocas propostas apresentam riscos que podem comprometer a eficácia do deck, especialmente em termos de proteção e remoção."
+          "overall_assessment": "As trocas propostas apresentam riscos que podem comprometer a eficácia do deck, especialmente em termos de remoção e consistência."
         },
         "warnings": [
-          "2 troca(s) questionável(is) — mudou função E ficou mais cara."
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara."
         ]
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
-      "🔒 Basalt Monolith -> Experimental Augury removida pelo gate: papel ramp -> draw, delta CMC -1.",
-      "🔒 Pongify -> Narset, Parter of Veils removida pelo gate: papel removal -> draw, delta CMC +2.",
-      "2 troca(s) questionável(is) — mudou função E ficou mais cara."
+      "🔒 Gate de qualidade removeu 4 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Basalt Monolith -> Swiftfoot Boots removida pelo gate: papel ramp -> protection, delta CMC -1.",
+      "🔒 Lightning Greaves -> Tezzeret's Gambit removida pelo gate: papel protection -> draw, delta CMC +2.",
+      "🔒 Pongify -> Experimental Augury removida pelo gate: papel removal -> draw, delta CMC +1.",
+      "🔒 Expedition Map -> Jace, Wielder of Mysteries removida pelo gate: papel ramp -> draw, delta CMC +3.",
+      "1 troca(s) questionável(is) — mudou função E ficou mais cara."
     ]
   }
 }

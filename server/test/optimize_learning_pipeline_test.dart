@@ -115,4 +115,49 @@ void main() {
       expect(acceptedPairs.first['add'], equals('Force of Will'));
     });
   });
+
+  group('scoreOptimizeReplacementCandidate', () {
+    test(
+        'boosts commander-priority cards and penalizes historically rejected cards',
+        () {
+      final preferredScore = optimize_route.scoreOptimizeReplacementCandidate(
+        functionalNeed: 'draw',
+        cardName: 'Mystic Remora',
+        typeLine: 'Enchantment',
+        oracleText:
+            'Cumulative upkeep {1}. Whenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}.',
+        popScore: 420,
+        preferredNames: const {'mystic remora'},
+        rejectedAdditionCounts: const {},
+      );
+
+      final penalizedScore = optimize_route.scoreOptimizeReplacementCandidate(
+        functionalNeed: 'draw',
+        cardName: 'Chart a Course',
+        typeLine: 'Sorcery',
+        oracleText: 'Draw two cards. Then discard a card unless you attacked.',
+        popScore: 420,
+        preferredNames: const {},
+        rejectedAdditionCounts: const {'chart a course': 3},
+      );
+
+      expect(preferredScore, greaterThan(penalizedScore));
+      expect(
+        optimize_route.matchesFunctionalNeed(
+          'draw',
+          oracleText: 'Draw two cards.',
+          typeLine: 'Sorcery',
+        ),
+        isTrue,
+      );
+      expect(
+        optimize_route.matchesFunctionalNeed(
+          'protection',
+          oracleText: 'Target permanent phases out.',
+          typeLine: 'Instant',
+        ),
+        isTrue,
+      );
+    });
+  });
 }
