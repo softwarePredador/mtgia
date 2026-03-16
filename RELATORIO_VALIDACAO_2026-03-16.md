@@ -60,6 +60,12 @@ Foram corrigidos e validados os seguintes pontos:
   - geracao Commander falha sem `commander`;
   - geracao Commander falha quando cartas nao resolvidas quebram o tamanho exato do deck.
 
+- `server/test/ai_generate_create_optimize_flow_test.dart` agora valida:
+  - `POST /ai/generate` gera um deck utilizavel;
+  - o deck gerado pode ser salvo via `POST /decks`;
+  - o deck salvo passa em `POST /decks/:id/validate`;
+  - o deck salvo entra em `POST /ai/optimize` e retorna contrato valido em fluxo real.
+
 ## Comandos executados
 
 - `app/flutter analyze`
@@ -73,6 +79,7 @@ Foram corrigidos e validados os seguintes pontos:
 - `server/dart test test/decks_crud_test.dart` com `RUN_INTEGRATION_TESTS=1`
 - `server/dart test`
 - `server/dart test test/generated_deck_validation_service_test.dart`
+- `server/dart test test/ai_generate_create_optimize_flow_test.dart` com `RUN_INTEGRATION_TESTS=1`
 - `server/dart run bin/migrate.dart`
 - validacao manual de `POST /cards/resolve`
 - validacao manual de `POST /cards/resolve/batch`
@@ -90,6 +97,8 @@ Foram corrigidos e validados os seguintes pontos:
 - `POST /cards/resolve/batch` com nome ambiguo: retorna `ambiguous` sem resolver incorretamente.
 - `/ai/optimize/jobs/:id`: permaneceu acessivel com `200` apos reinicio do `dart_frog dev`.
 - `POST /ai/generate`: quando a IA devolveu deck ilegal de Commander, a rota respondeu `422` com `validation.errors`, `invalid_cards` e deck resolvido parcial para diagnostico.
+- `AI generate -> create -> validate`: passou contra backend local com `RUN_INTEGRATION_TESTS=1`.
+- `AI generate -> create -> optimize`: passou contra backend local com `RUN_INTEGRATION_TESTS=1`.
 
 ## Ajuste adicional apos o relatorio inicial
 
