@@ -66,6 +66,11 @@ Foram corrigidos e validados os seguintes pontos:
   - o deck salvo passa em `POST /decks/:id/validate`;
   - o deck salvo entra em `POST /ai/optimize` e retorna contrato valido em fluxo real.
 
+- `server/test/optimization_goal_validation_test.dart` valida o resultado final da otimizacao por objetivo de arquétipo:
+  - `aggro`: curva mais baixa, mais pressao early e consistencia melhor;
+  - `control`: base de mana corrigida, mais interacao e sem piorar `draw`/`removal`;
+  - `midrange`: curva equilibrada, consistencia melhor e sem piorar `ramp`/`removal`.
+
 ## Comandos executados
 
 - `app/flutter analyze`
@@ -80,6 +85,7 @@ Foram corrigidos e validados os seguintes pontos:
 - `server/dart test`
 - `server/dart test test/generated_deck_validation_service_test.dart`
 - `server/dart test test/ai_generate_create_optimize_flow_test.dart` com `RUN_INTEGRATION_TESTS=1`
+- `server/dart test test/optimization_goal_validation_test.dart`
 - `server/dart run bin/migrate.dart`
 - validacao manual de `POST /cards/resolve`
 - validacao manual de `POST /cards/resolve/batch`
@@ -99,6 +105,7 @@ Foram corrigidos e validados os seguintes pontos:
 - `POST /ai/generate`: quando a IA devolveu deck ilegal de Commander, a rota respondeu `422` com `validation.errors`, `invalid_cards` e deck resolvido parcial para diagnostico.
 - `AI generate -> create -> validate`: passou contra backend local com `RUN_INTEGRATION_TESTS=1`.
 - `AI generate -> create -> optimize`: passou contra backend local com `RUN_INTEGRATION_TESTS=1`.
+- `Optimization goal validation`: passou e confirmou melhora real orientada ao arquétipo em `aggro`, `control` e `midrange`.
 
 ## Ajuste adicional apos o relatorio inicial
 
@@ -132,3 +139,11 @@ Foram corrigidos e validados os seguintes pontos:
   - o deck final passa por `DeckRulesService` em modo estrito;
   - `200` so acontece quando o deck final e legal para o formato;
   - `422` agora explica o motivo exato da rejeicao.
+
+## Fechamento da lacuna de otimizacao
+
+- A validacao de `/ai/optimize` nao fica mais limitada a `202` ou `200`.
+- Agora existe cobertura explicita para o produto final otimizado:
+  - contrato e fluxo: endpoint, job assincrono, polling e persistencia;
+  - legalidade: deck gerado e salvo precisa continuar valido;
+  - qualidade final: o deck otimizado precisa melhorar os indicadores esperados do arquétipo analisado.
