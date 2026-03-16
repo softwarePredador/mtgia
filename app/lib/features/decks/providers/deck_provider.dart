@@ -8,9 +8,19 @@ import '../models/deck.dart';
 import '../models/deck_details.dart';
 import '../models/deck_card_item.dart';
 
+typedef ActivationEventTracker =
+    Future<void> Function(
+      String eventName, {
+      String? format,
+      String? deckId,
+      String source,
+      Map<String, dynamic>? metadata,
+    });
+
 /// Provider para gerenciar estado da listagem de decks
 class DeckProvider extends ChangeNotifier {
   final ApiClient _apiClient;
+  final ActivationEventTracker _trackActivationEvent;
 
   List<Deck> _decks = [];
   DeckDetails? _selectedDeck;
@@ -32,7 +42,12 @@ class DeckProvider extends ChangeNotifier {
   int? get detailsStatusCode => _detailsStatusCode;
   bool get hasError => _errorMessage != null;
 
-  DeckProvider({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
+  DeckProvider({
+    ApiClient? apiClient,
+    ActivationEventTracker? trackActivationEvent,
+  }) : _apiClient = apiClient ?? ApiClient(),
+       _trackActivationEvent =
+           trackActivationEvent ?? ActivationFunnelService.instance.track;
 
   Map<String, Map<String, dynamic>> _buildCurrentCardsMap(DeckDetails deck) {
     final currentCards = <String, Map<String, dynamic>>{};
@@ -246,10 +261,15 @@ class DeckProvider extends ChangeNotifier {
   /// Busca color identity em background para decks que ainda não a possuem.
   /// Carrega os detalhes de cada deck sem color_identity e propaga para a lista.
   Future<void> fetchMissingColorIdentities() async {
-    final missing = _decks.where((d) => d.colorIdentity.isEmpty && d.cardCount > 0).toList();
+    final missing =
+        _decks
+            .where((d) => d.colorIdentity.isEmpty && d.cardCount > 0)
+            .toList();
     if (missing.isEmpty) return;
 
-    debugPrint('[DeckProvider] Fetching color identity for ${missing.length} deck(s)...');
+    debugPrint(
+      '[DeckProvider] Fetching color identity for ${missing.length} deck(s)...',
+    );
     var enriched = 0;
 
     for (final deck in missing) {
@@ -267,13 +287,19 @@ class DeckProvider extends ChangeNotifier {
             _syncColorIdentityToList(deck.id, details.colorIdentity);
             enriched++;
           }
-          debugPrint('[DeckProvider] Deck "${deck.name}" → colors: ${details.colorIdentity}');
+          debugPrint(
+            '[DeckProvider] Deck "${deck.name}" → colors: ${details.colorIdentity}',
+          );
         }
       } catch (e) {
-        debugPrint('[DeckProvider] Failed to fetch colors for "${deck.name}": $e');
+        debugPrint(
+          '[DeckProvider] Failed to fetch colors for "${deck.name}": $e',
+        );
       }
     }
-    debugPrint('[DeckProvider] Color enrichment done: $enriched/${missing.length} decks.');
+    debugPrint(
+      '[DeckProvider] Color enrichment done: $enriched/${missing.length} decks.',
+    );
     if (enriched > 0) {
       // Cria nova referência de lista para que context.select detecte a mudança
       _decks = List<Deck>.from(_decks);
@@ -339,7 +365,7 @@ class DeckProvider extends ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchDecks(); // Recarrega a lista
-        await ActivationFunnelService.instance.track(
+        await _trackActivationEvent(
           'deck_created',
           format: format,
           source: 'deck_provider.createDeck',
@@ -347,10 +373,10 @@ class DeckProvider extends ChangeNotifier {
         return true;
       }
 
-      String msg = 'Erro ao criar deck: ${response.statusCode}';
-      if (response.data is Map && response.data['error'] != null) {
-        msg = response.data['error'];
-      }
+      final msg = _extractApiError(
+        response.data,
+        fallback: 'Erro ao criar deck: ${response.statusCode}',
+      );
       _errorMessage = msg;
       notifyListeners();
       return false;
@@ -366,20 +392,36 @@ class DeckProvider extends ChangeNotifier {
   ) async {
     if (cards.isEmpty) return const [];
 
-    final hasCardId = cards.any((c) => c['card_id'] != null);
-    final hasName = cards.any((c) => c['name'] != null);
-
-    if (hasCardId && !hasName) {
-      return cards;
-    }
-
+    final aggregatedByCardId = <String, Map<String, dynamic>>{};
     final aggregatedByName = <String, Map<String, dynamic>>{};
-    for (final card in cards) {
-      final name = (card['name'] as String?)?.trim();
-      if (name == null || name.isEmpty) continue;
 
+    for (final card in cards) {
       final quantity = (card['quantity'] as int?) ?? 1;
       final isCommander = (card['is_commander'] as bool?) ?? false;
+      final cardId = (card['card_id'] as String?)?.trim();
+      final name = (card['name'] as String?)?.trim();
+
+      if (cardId != null && cardId.isNotEmpty) {
+        final key = '$cardId::$isCommander';
+        final existing = aggregatedByCardId[key];
+        if (existing == null) {
+          aggregatedByCardId[key] = {
+            'card_id': cardId,
+            'quantity': quantity,
+            'is_commander': isCommander,
+          };
+        } else {
+          aggregatedByCardId[key] = {
+            ...existing,
+            'quantity': (existing['quantity'] as int) + quantity,
+          };
+        }
+        continue;
+      }
+
+      if (name == null || name.isEmpty) {
+        throw Exception('Cada carta precisa de card_id ou name.');
+      }
 
       final key = '${name.toLowerCase()}::$isCommander';
       final existing = aggregatedByName[key];
@@ -397,24 +439,40 @@ class DeckProvider extends ChangeNotifier {
       }
     }
 
-    final names = aggregatedByName.values
-        .map((card) => (card['name'] as String).trim())
-        .where((name) => name.isNotEmpty)
-        .toSet()
-        .toList();
+    final normalized =
+        aggregatedByCardId.values
+            .map((card) => Map<String, dynamic>.from(card))
+            .toList();
 
-    if (names.isEmpty) return const [];
+    if (aggregatedByName.isEmpty) {
+      return normalized;
+    }
+
+    final names =
+        aggregatedByName.values
+            .map((card) => (card['name'] as String).trim())
+            .where((name) => name.isNotEmpty)
+            .toSet()
+            .toList();
+
+    if (names.isEmpty) return normalized;
 
     final response = await _apiClient.post('/cards/resolve/batch', {
       'names': names,
     });
 
     if (response.statusCode != 200 || response.data is! Map) {
-      return const [];
+      throw Exception(
+        _extractApiError(
+          response.data,
+          fallback: 'Falha ao resolver cartas antes de criar o deck.',
+        ),
+      );
     }
 
     final payload = response.data as Map<String, dynamic>;
     final resolvedList = (payload['data'] as List?) ?? const [];
+    final unresolvedList = (payload['unresolved'] as List?) ?? const [];
 
     final cardIdByInputName = <String, String>{};
     for (final item in resolvedList) {
@@ -426,13 +484,21 @@ class DeckProvider extends ChangeNotifier {
       cardIdByInputName[inputName.toLowerCase()] = cardId;
     }
 
-    final normalized = <Map<String, dynamic>>[];
+    final unresolvedNames =
+        unresolvedList
+            .map((item) => item.toString().trim())
+            .where((name) => name.isNotEmpty)
+            .toSet();
+
     for (final card in aggregatedByName.values) {
       final name = (card['name'] as String?)?.trim();
       if (name == null || name.isEmpty) continue;
 
       final cardId = cardIdByInputName[name.toLowerCase()];
-      if (cardId == null || cardId.isEmpty) continue;
+      if (cardId == null || cardId.isEmpty) {
+        unresolvedNames.add(name);
+        continue;
+      }
 
       normalized.add({
         'card_id': cardId,
@@ -441,7 +507,26 @@ class DeckProvider extends ChangeNotifier {
       });
     }
 
+    if (unresolvedNames.isNotEmpty) {
+      final sortedNames = unresolvedNames.toList()..sort();
+      throw Exception(
+        'Nao foi possivel resolver todas as cartas antes de criar o deck: '
+        '${sortedNames.join(', ')}.',
+      );
+    }
+
     return normalized;
+  }
+
+  String _extractApiError(dynamic data, {required String fallback}) {
+    if (data is Map) {
+      final error = data['error'] ?? data['message'];
+      if (error != null) {
+        final text = error.toString().trim();
+        if (text.isNotEmpty) return text;
+      }
+    }
+    return fallback;
   }
 
   /// Deleta um deck
@@ -607,16 +692,17 @@ class DeckProvider extends ChangeNotifier {
         );
       } else if (response.statusCode == 422) {
         // Quality gate: servidor retornou erro de qualidade no modo complete
-        final data = (response.data is Map)
-            ? (response.data as Map).cast<String, dynamic>()
-            : <String, dynamic>{};
-        await _saveOptimizeDebug(
-          response: {'statusCode': 422, 'data': data},
-        );
-        final errorMsg = data['error'] as String? ??
+        final data =
+            (response.data is Map)
+                ? (response.data as Map).cast<String, dynamic>()
+                : <String, dynamic>{};
+        await _saveOptimizeDebug(response: {'statusCode': 422, 'data': data});
+        final errorMsg =
+            data['error'] as String? ??
             data['quality_error']?['message'] as String? ??
             'A otimização não atingiu a qualidade mínima.';
-        final code = data['quality_error']?['code'] as String? ?? 'QUALITY_ERROR';
+        final code =
+            data['quality_error']?['code'] as String? ?? 'QUALITY_ERROR';
         AppLogger.warning('⚠️ [AI Optimize] quality gate: $code — $errorMsg');
         throw Exception(errorMsg);
       } else {
@@ -673,9 +759,10 @@ class DeckProvider extends ChangeNotifier {
         final status = data['status'] as String?;
         if (status == 'completed') {
           final result = data['result'];
-          final resultMap = (result is Map)
-              ? result.cast<String, dynamic>()
-              : <String, dynamic>{};
+          final resultMap =
+              (result is Map)
+                  ? result.cast<String, dynamic>()
+                  : <String, dynamic>{};
           await _saveOptimizeDebug(response: resultMap);
           AppLogger.debug(
             '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
@@ -698,9 +785,7 @@ class DeckProvider extends ChangeNotifier {
         throw Exception('Job de otimização expirou ou não foi encontrado.');
       }
     }
-    throw Exception(
-      'Timeout: a otimização demorou mais de 5 minutos.',
-    );
+    throw Exception('Timeout: a otimização demorou mais de 5 minutos.');
   }
 
   Future<bool> addCardsBulk({
@@ -1204,12 +1289,16 @@ class DeckProvider extends ChangeNotifier {
 
       // 2. Construir mapa de cartas atuais
       final currentCards = <String, Map<String, dynamic>>{};
-      
+
       // Primeiro: adicionar commanders
       final commanderIds = <String>{};
-      AppLogger.debug('👑 [DeckProvider] Commanders no deck: ${_selectedDeck!.commander.length}');
+      AppLogger.debug(
+        '👑 [DeckProvider] Commanders no deck: ${_selectedDeck!.commander.length}',
+      );
       for (final commander in _selectedDeck!.commander) {
-        AppLogger.debug('  Commander: ${commander.name} (id=${commander.id}, qty=${commander.quantity})');
+        AppLogger.debug(
+          '  Commander: ${commander.name} (id=${commander.id}, qty=${commander.quantity})',
+        );
         commanderIds.add(commander.id);
         // Commander SEMPRE deve ter quantity=1
         currentCards[commander.id] = {
@@ -1218,17 +1307,21 @@ class DeckProvider extends ChangeNotifier {
           'is_commander': true,
         };
       }
-      
+
       // Segundo: adicionar mainBoard, mas NUNCA sobrescrever commanders
-      AppLogger.debug('🃏 [DeckProvider] MainBoard entries: ${_selectedDeck!.mainBoard.length}');
+      AppLogger.debug(
+        '🃏 [DeckProvider] MainBoard entries: ${_selectedDeck!.mainBoard.length}',
+      );
       for (final entry in _selectedDeck!.mainBoard.entries) {
         for (final card in entry.value) {
           // Pular se já é commander (evita duplicatas)
           if (commanderIds.contains(card.id)) {
-            AppLogger.debug('  ⚠️ SKIP (é commander): ${card.name} (id=${card.id})');
+            AppLogger.debug(
+              '  ⚠️ SKIP (é commander): ${card.name} (id=${card.id})',
+            );
             continue;
           }
-          
+
           currentCards[card.id] = {
             'card_id': card.id,
             'quantity': card.quantity,
@@ -1259,9 +1352,17 @@ class DeckProvider extends ChangeNotifier {
 
       // Basic land names for fallback detection when type_line is not available
       const basicLandNames = {
-        'plains', 'island', 'swamp', 'mountain', 'forest', 'wastes',
-        'snow-covered plains', 'snow-covered island', 'snow-covered swamp',
-        'snow-covered mountain', 'snow-covered forest',
+        'plains',
+        'island',
+        'swamp',
+        'mountain',
+        'forest',
+        'wastes',
+        'snow-covered plains',
+        'snow-covered island',
+        'snow-covered swamp',
+        'snow-covered mountain',
+        'snow-covered forest',
       };
 
       for (final addition in additionsDetailed) {
@@ -1272,8 +1373,10 @@ class DeckProvider extends ChangeNotifier {
         final isBasicFromServer = addition['is_basic_land'] as bool? ?? false;
         final typeLine =
             ((addition['type_line'] as String?) ?? '').toLowerCase();
-        final cardName = ((addition['name'] as String?) ?? '').toLowerCase().trim();
-        final isBasicLand = isBasicFromServer ||
+        final cardName =
+            ((addition['name'] as String?) ?? '').toLowerCase().trim();
+        final isBasicLand =
+            isBasicFromServer ||
             typeLine.contains('basic land') ||
             basicLandNames.contains(cardName);
         final limit = isBasicLand ? 99 : defaultLimit;
@@ -1295,14 +1398,18 @@ class DeckProvider extends ChangeNotifier {
 
       // 5. Salvar no servidor
       AppLogger.debug('💾 [DeckProvider] Salvando...');
-      
+
       // DEBUG: Log todas as cartas que serão enviadas
-      AppLogger.debug('📦 [DeckProvider] Total de cartas a enviar: ${currentCards.length}');
+      AppLogger.debug(
+        '📦 [DeckProvider] Total de cartas a enviar: ${currentCards.length}',
+      );
       for (final entry in currentCards.entries) {
         final v = entry.value;
-        AppLogger.debug('  📌 ${entry.key}: qty=${v['quantity']}, is_commander=${v['is_commander']}');
+        AppLogger.debug(
+          '  📌 ${entry.key}: qty=${v['quantity']}, is_commander=${v['is_commander']}',
+        );
       }
-      
+
       final response = await _apiClient.put('/decks/$deckId', {
         'cards': currentCards.values.toList(),
       });
@@ -1404,8 +1511,8 @@ class DeckProvider extends ChangeNotifier {
                 : <String>[];
 
         _errorMessage = error;
-              _isLoading = false;
-              notifyListeners();
+        _isLoading = false;
+        notifyListeners();
         return {'success': false, 'error': error, 'not_found_lines': notFound};
       }
     } catch (e) {
@@ -1530,9 +1637,7 @@ class DeckProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         return Map<String, dynamic>.from(response.data);
       }
-      return {
-        'error': 'Falha ao exportar deck: ${response.statusCode}',
-      };
+      return {'error': 'Falha ao exportar deck: ${response.statusCode}'};
     } catch (e) {
       return {'error': 'Erro de conexão: $e'};
     }
@@ -1541,22 +1646,17 @@ class DeckProvider extends ChangeNotifier {
   /// Copia um deck público para a conta do usuário autenticado
   Future<Map<String, dynamic>> copyPublicDeck(String deckId) async {
     try {
-      final response = await _apiClient.post(
-        '/community/decks/$deckId',
-        {},
-      );
+      final response = await _apiClient.post('/community/decks/$deckId', {});
       if (response.statusCode == 201 && response.data is Map) {
         // Recarrega lista de decks do usuário
         await fetchDecks();
-        return {
-          'success': true,
-          'deck': response.data['deck'],
-        };
+        return {'success': true, 'deck': response.data['deck']};
       }
       final data = response.data;
-      final error = (data is Map && data['error'] != null)
-          ? data['error'].toString()
-          : 'Falha ao copiar deck: ${response.statusCode}';
+      final error =
+          (data is Map && data['error'] != null)
+              ? data['error'].toString()
+              : 'Falha ao copiar deck: ${response.statusCode}';
       return {'success': false, 'error': error};
     } catch (e) {
       return {'success': false, 'error': 'Erro de conexão: $e'};

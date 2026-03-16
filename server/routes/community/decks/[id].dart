@@ -3,47 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/auth_service.dart';
-
-String? _normalizeScryfallImageUrl(String? url) {
-  if (url == null) return null;
-  var normalized = url.trim();
-  if (normalized.isEmpty) return null;
-
-  if (normalized.startsWith('ttps://')) {
-    normalized = 'h$normalized';
-  } else if (normalized.startsWith('//api.scryfall.com/')) {
-    normalized = 'https:$normalized';
-  } else if (normalized.startsWith('api.scryfall.com/')) {
-    normalized = 'https://$normalized';
-  } else if (normalized.startsWith('http://api.scryfall.com/')) {
-    normalized = normalized.replaceFirst(
-      'http://api.scryfall.com/',
-      'https://api.scryfall.com/',
-    );
-  }
-
-  final parsed = Uri.tryParse(normalized);
-  final isScryfall =
-      parsed != null && parsed.host.toLowerCase() == 'api.scryfall.com';
-  if (!isScryfall) return normalized;
-
-  try {
-    final uri = Uri.parse(normalized);
-    final qp = Map<String, String>.from(uri.queryParameters);
-    if (qp['set'] != null) qp['set'] = qp['set']!.toLowerCase();
-    final exact = qp['exact'];
-    if (uri.path == '/cards/named' && exact != null && exact.contains('//')) {
-      final left = exact.split('//').first.trim();
-      if (left.isNotEmpty) qp['exact'] = left;
-    }
-    return uri.replace(queryParameters: qp).toString().replaceAll('+', '%20');
-  } catch (_) {
-    return normalized.replaceAllMapped(
-      RegExp(r'([?&]set=)([^&]+)', caseSensitive: false),
-      (m) => '${m.group(1)}${(m.group(2) ?? '').toLowerCase()}',
-    );
-  }
-}
+import '../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   // Caso especial: /community/decks/following é capturado como id="following"
@@ -118,7 +78,7 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
 
     final cardsList = cardsResult.map((row) {
       final m = row.toColumnMap();
-      m['image_url'] = _normalizeScryfallImageUrl(m['image_url']?.toString());
+      m['image_url'] = normalizeScryfallImageUrl(m['image_url']?.toString());
       return m;
     }).toList();
 
@@ -156,7 +116,12 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
 
     final manaCurve = <String, int>{};
     final colorDistribution = <String, int>{
-      'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'C': 0
+      'W': 0,
+      'U': 0,
+      'B': 0,
+      'R': 0,
+      'G': 0,
+      'C': 0
     };
 
     for (final card in cardsList) {
@@ -413,7 +378,7 @@ Future<Response> _getFollowingFeed(RequestContext context) async {
         m['created_at'] = (m['created_at'] as DateTime).toIso8601String();
       }
       m['commander_image_url'] =
-          _normalizeScryfallImageUrl(m['commander_image_url']?.toString());
+          normalizeScryfallImageUrl(m['commander_image_url']?.toString());
       return m;
     }).toList();
 

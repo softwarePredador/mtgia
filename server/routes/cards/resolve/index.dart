@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import '../../../lib/scryfall_image_url.dart';
 
 /// POST /cards/resolve
 ///
@@ -79,7 +80,8 @@ Future<Response> onRequest(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {
-          'error': 'Carta "$name" não encontrada nem localmente nem no Scryfall',
+          'error':
+              'Carta "$name" não encontrada nem localmente nem no Scryfall',
         },
       );
     }
@@ -168,7 +170,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       'oracle_text': m['oracle_text'],
       'colors': m['colors'],
       'color_identity': m['color_identity'],
-      'image_url': _normalizeScryfallImageUrl(m['image_url']?.toString()),
+      'image_url': normalizeScryfallImageUrl(m['image_url']?.toString()),
       'set_code': m['set_code'],
       if (m.containsKey('set_name')) 'set_name': m['set_name'],
       if (m.containsKey('set_release_date'))
@@ -198,7 +200,10 @@ Future<Map<String, dynamic>?> _fetchFromScryfall(String name) async {
   try {
     final response = await http.get(
       Uri.parse(url),
-      headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'MTGDeckBuilder/1.0'
+      },
     );
 
     if (response.statusCode == 200) {
@@ -219,12 +224,16 @@ Future<Map<String, dynamic>?> _fetchFromScryfall(String name) async {
 /// Fallback: busca textual na Scryfall (para nomes parciais/com erro)
 Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
   final encoded = Uri.encodeQueryComponent(name);
-  final url = 'https://api.scryfall.com/cards/search?q=$encoded&order=name&unique=cards';
+  final url =
+      'https://api.scryfall.com/cards/search?q=$encoded&order=name&unique=cards';
 
   try {
     final response = await http.get(
       Uri.parse(url),
-      headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'MTGDeckBuilder/1.0'
+      },
     );
 
     if (response.statusCode != 200) return null;
@@ -309,7 +318,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
     if (imageUrl == null || imageUrl.isEmpty) {
       final cardId = card['id']?.toString();
       if (cardId != null && cardId.isNotEmpty) {
-        imageUrl = 'https://api.scryfall.com/cards/$cardId?format=image&version=normal';
+        imageUrl =
+            'https://api.scryfall.com/cards/$cardId?format=image&version=normal';
       } else {
         // Último fallback: name-based (menos confiável)
         final encodedName = Uri.encodeQueryComponent(cardName);
@@ -377,7 +387,10 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
   try {
     final response = await http.get(
       Uri.parse(printsUri),
-      headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'MTGDeckBuilder/1.0'
+      },
     );
 
     if (response.statusCode != 200) return [scryfallCard];
@@ -387,14 +400,18 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
     if (data == null || data.isEmpty) return [scryfallCard];
 
     // Filtra: apenas paper, não digital-only, não art-series
-    final filtered = data.whereType<Map<String, dynamic>>().where((card) {
-      final games = card['games'] as List?;
-      final isPaper = games?.contains('paper') ?? false;
-      final layout = card['layout']?.toString() ?? '';
-      final isArtSeries = layout == 'art_series';
-      final isToken = layout == 'token';
-      return isPaper && !isArtSeries && !isToken;
-    }).take(30).toList();
+    final filtered = data
+        .whereType<Map<String, dynamic>>()
+        .where((card) {
+          final games = card['games'] as List?;
+          final isPaper = games?.contains('paper') ?? false;
+          final layout = card['layout']?.toString() ?? '';
+          final isArtSeries = layout == 'art_series';
+          final isToken = layout == 'token';
+          return isPaper && !isArtSeries && !isToken;
+        })
+        .take(30)
+        .toList();
 
     return filtered.isEmpty ? [scryfallCard] : filtered;
   } catch (_) {
@@ -417,7 +434,8 @@ Future<void> _insertLegalities(
 
   // Busca o card_id principal (primeiro match pelo nome)
   final cardResult = await pool.execute(
-    Sql.named('SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1'),
+    Sql.named(
+        'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1'),
     parameters: {'name': cardName},
   );
   if (cardResult.isEmpty) return;
@@ -488,50 +506,6 @@ Future<void> _ensureSet(Pool pool, Map<String, dynamic> scryfallCard) async {
 // ───────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ───────────────────────────────────────────────────────────────────────────────
-
-String? _normalizeScryfallImageUrl(String? url) {
-  if (url == null) return null;
-  var normalized = url.trim();
-  if (normalized.isEmpty) return null;
-
-  if (normalized.startsWith('ttps://')) {
-    normalized = 'h$normalized';
-  } else if (normalized.startsWith('//api.scryfall.com/')) {
-    normalized = 'https:$normalized';
-  } else if (normalized.startsWith('api.scryfall.com/')) {
-    normalized = 'https://$normalized';
-  } else if (normalized.startsWith('http://api.scryfall.com/')) {
-    normalized = normalized.replaceFirst(
-      'http://api.scryfall.com/',
-      'https://api.scryfall.com/',
-    );
-  }
-
-  final parsed = Uri.tryParse(normalized);
-  final isScryfall =
-      parsed != null && parsed.host.toLowerCase() == 'api.scryfall.com';
-  if (!isScryfall) return normalized;
-
-  try {
-    final uri = Uri.parse(normalized);
-    final qp = Map<String, String>.from(uri.queryParameters);
-
-    if (qp['set'] != null) qp['set'] = qp['set']!.toLowerCase();
-
-    final exact = qp['exact'];
-    if (uri.path == '/cards/named' && exact != null && exact.contains('//')) {
-      final left = exact.split('//').first.trim();
-      if (left.isNotEmpty) qp['exact'] = left;
-    }
-
-    return uri.replace(queryParameters: qp).toString().replaceAll('+', '%20');
-  } catch (_) {
-    return normalized.replaceAllMapped(
-      RegExp(r'([?&]set=)([^&]+)', caseSensitive: false),
-      (m) => '${m.group(1)}${(m.group(2) ?? '').toLowerCase()}',
-    );
-  }
-}
 
 Future<bool> _hasTable(Pool pool, String tableName) async {
   try {
