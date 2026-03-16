@@ -1,9 +1,9 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "81a95e44-ee04-43c6-83b5-452b508bc7dd",
+  "clone_deck_id": "0032eaf2-8e4c-4935-a3c9-aa8abd0f9285",
   "optimize_request": {
-    "deck_id": "81a95e44-ee04-43c6-83b5-452b508bc7dd",
+    "deck_id": "0032eaf2-8e4c-4935-a3c9-aa8abd0f9285",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -15,30 +15,29 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 48/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (48/100; mínimo 70).",
-        "A segunda revisão crítica da IA rejeitou a proposta (approval_score 45/100).",
-        "As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano."
+        "A validação final não fechou como \"aprovado\" (score 46/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (46/100; mínimo 70).",
+        "A segunda revisão crítica da IA rejeitou a proposta (approval_score 45/100)."
       ],
       "validation": {
-        "validation_score": 48,
+        "validation_score": 46,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
-            "consistency_score": 68,
+            "consistency_score": 70,
             "mana_analysis": {
               "land_count": 24,
-              "screw_rate": 0.451,
+              "screw_rate": 0.424,
               "flood_rate": 0.0,
-              "keepable_rate": 0.549
+              "keepable_rate": 0.576
             },
             "curve_analysis": {
               "avg_cmc": 2.43,
-              "turn_1_play": 0.446,
-              "turn_2_play": 0.746,
-              "turn_3_play": 0.821,
-              "turn_4_play": 0.874,
+              "turn_1_play": 0.455,
+              "turn_2_play": 0.76,
+              "turn_3_play": 0.838,
+              "turn_4_play": 0.878,
               "cmc_distribution": {
                 "3": 23,
                 "2": 29,
@@ -48,25 +47,25 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (45.1%). Considere adicionar 2-4 terrenos.",
+              "Alta taxa de mana screw (42.4%). Considere adicionar 2-4 terrenos.",
               "Apenas 24 terrenos. Commander geralmente precisa de 35-38."
             ]
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 68,
+            "consistency_score": 65,
             "mana_analysis": {
               "land_count": 24,
-              "screw_rate": 0.446,
-              "flood_rate": 0.001,
-              "keepable_rate": 0.553
+              "screw_rate": 0.486,
+              "flood_rate": 0.0,
+              "keepable_rate": 0.514
             },
             "curve_analysis": {
               "avg_cmc": 2.41,
-              "turn_1_play": 0.466,
-              "turn_2_play": 0.737,
-              "turn_3_play": 0.83,
-              "turn_4_play": 0.871,
+              "turn_1_play": 0.458,
+              "turn_2_play": 0.726,
+              "turn_3_play": 0.802,
+              "turn_4_play": 0.849,
               "cmc_distribution": {
                 "3": 22,
                 "2": 29,
@@ -76,35 +75,35 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (44.6%). Considere adicionar 2-4 terrenos.",
+              "Alta taxa de mana screw (48.6%). Considere adicionar 2-4 terrenos.",
               "Apenas 24 terrenos. Commander geralmente precisa de 35-38."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.39,
-            "keep_at_7": 0.708,
-            "keep_at_6": 0.192,
-            "keep_at_5": 0.1,
+            "avg_mulligans": 0.47,
+            "keep_at_7": 0.652,
+            "keep_at_6": 0.222,
+            "keep_at_5": 0.126,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.754
+            "keepable_after_mull": 0.778
           },
           "mulligan_after": {
             "runs": 500,
             "avg_mulligans": 0.44,
             "keep_at_7": 0.668,
-            "keep_at_6": 0.228,
-            "keep_at_5": 0.104,
+            "keep_at_6": 0.226,
+            "keep_at_5": 0.106,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.776
+            "keepable_after_mull": 0.78
           },
           "deltas": {
-            "consistency_score": 0,
-            "screw_rate_delta": -0.005,
-            "flood_rate_delta": 0.001,
-            "keepable_rate_delta": 0.004,
-            "turn2_play_delta": -0.009,
-            "mulligan_keep7_delta": -0.04
+            "consistency_score": -5,
+            "screw_rate_delta": 0.062,
+            "flood_rate_delta": 0.0,
+            "keepable_rate_delta": -0.062,
+            "turn2_play_delta": -0.034,
+            "mulligan_keep7_delta": 0.016
           }
         },
         "functional_analysis": {
@@ -143,17 +142,23 @@
           "approval_score": 45,
           "verdict": "reprovado",
           "concerns": [
-            "A troca de Boggart Shenanigans por Dark Ritual resulta em uma diminuição significativa na taxa de mulligan free keep, o que pode afetar a consistência do deck.",
-            "Embora Dark Ritual forneça um impulso de mana inicial, a perda de Boggart Shenanigans, que pode gerar dano ao longo do tempo, pode comprometer a estratégia de aggro do deck.",
-            "A diferença na taxa de jogadas no T2 é mínima, mas a redução na taxa de mulligan free keep sugere que o deck se torna menos confiável."
+            "A troca resultou em uma diminuição na consistência do deck, o que é crítico para um deck aggro.",
+            "A taxa de mana screw aumentou significativamente, o que pode comprometer a jogabilidade.",
+            "A perda de um encantamento como Boggart Shenanigans pode impactar a sinergia do deck com outras cartas que interagem com encantamentos."
           ],
           "strong_swaps": [],
           "weak_swaps": [
-            "Boggart Shenanigans → Dark Ritual: A troca não oferece um upgrade claro e resulta em uma perda de consistência e potencial de dano contínuo."
+            {
+              "swap": "Boggart Shenanigans → Dark Ritual",
+              "justification": "A troca não apenas piorou a consistência geral do deck, mas também não trouxe benefícios claros que justificassem a perda de um encantamento que poderia gerar valor ao longo do jogo."
+            }
           ],
-          "overall_assessment": "A troca proposta não é benéfica, pois compromete a consistência do deck sem oferecer um ganho significativo em ramp."
+          "overall_assessment": "A troca proposta não é vantajosa, pois compromete a consistência e a estratégia do deck aggro."
         },
-        "warnings": []
+        "warnings": [
+          "Consistência do deck diminuiu (70 → 65)",
+          "Risco de mana screw aumentou significativamente."
+        ]
       }
     },
     "mode": "optimize",
@@ -203,24 +208,24 @@
         "Mais interação instant-speed adicionada"
       ],
       "validation": {
-        "validation_score": 48,
+        "validation_score": 46,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
-            "consistency_score": 68,
+            "consistency_score": 70,
             "mana_analysis": {
               "land_count": 24,
-              "screw_rate": 0.451,
+              "screw_rate": 0.424,
               "flood_rate": 0.0,
-              "keepable_rate": 0.549
+              "keepable_rate": 0.576
             },
             "curve_analysis": {
               "avg_cmc": 2.43,
-              "turn_1_play": 0.446,
-              "turn_2_play": 0.746,
-              "turn_3_play": 0.821,
-              "turn_4_play": 0.874,
+              "turn_1_play": 0.455,
+              "turn_2_play": 0.76,
+              "turn_3_play": 0.838,
+              "turn_4_play": 0.878,
               "cmc_distribution": {
                 "3": 23,
                 "2": 29,
@@ -230,25 +235,25 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (45.1%). Considere adicionar 2-4 terrenos.",
+              "Alta taxa de mana screw (42.4%). Considere adicionar 2-4 terrenos.",
               "Apenas 24 terrenos. Commander geralmente precisa de 35-38."
             ]
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 68,
+            "consistency_score": 65,
             "mana_analysis": {
               "land_count": 24,
-              "screw_rate": 0.446,
-              "flood_rate": 0.001,
-              "keepable_rate": 0.553
+              "screw_rate": 0.486,
+              "flood_rate": 0.0,
+              "keepable_rate": 0.514
             },
             "curve_analysis": {
               "avg_cmc": 2.41,
-              "turn_1_play": 0.466,
-              "turn_2_play": 0.737,
-              "turn_3_play": 0.83,
-              "turn_4_play": 0.871,
+              "turn_1_play": 0.458,
+              "turn_2_play": 0.726,
+              "turn_3_play": 0.802,
+              "turn_4_play": 0.849,
               "cmc_distribution": {
                 "3": 22,
                 "2": 29,
@@ -258,35 +263,35 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (44.6%). Considere adicionar 2-4 terrenos.",
+              "Alta taxa de mana screw (48.6%). Considere adicionar 2-4 terrenos.",
               "Apenas 24 terrenos. Commander geralmente precisa de 35-38."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.39,
-            "keep_at_7": 0.708,
-            "keep_at_6": 0.192,
-            "keep_at_5": 0.1,
+            "avg_mulligans": 0.47,
+            "keep_at_7": 0.652,
+            "keep_at_6": 0.222,
+            "keep_at_5": 0.126,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.754
+            "keepable_after_mull": 0.778
           },
           "mulligan_after": {
             "runs": 500,
             "avg_mulligans": 0.44,
             "keep_at_7": 0.668,
-            "keep_at_6": 0.228,
-            "keep_at_5": 0.104,
+            "keep_at_6": 0.226,
+            "keep_at_5": 0.106,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.776
+            "keepable_after_mull": 0.78
           },
           "deltas": {
-            "consistency_score": 0,
-            "screw_rate_delta": -0.005,
-            "flood_rate_delta": 0.001,
-            "keepable_rate_delta": 0.004,
-            "turn2_play_delta": -0.009,
-            "mulligan_keep7_delta": -0.04
+            "consistency_score": -5,
+            "screw_rate_delta": 0.062,
+            "flood_rate_delta": 0.0,
+            "keepable_rate_delta": -0.062,
+            "turn2_play_delta": -0.034,
+            "mulligan_keep7_delta": 0.016
           }
         },
         "functional_analysis": {
@@ -325,24 +330,31 @@
           "approval_score": 45,
           "verdict": "reprovado",
           "concerns": [
-            "A troca de Boggart Shenanigans por Dark Ritual resulta em uma diminuição significativa na taxa de mulligan free keep, o que pode afetar a consistência do deck.",
-            "Embora Dark Ritual forneça um impulso de mana inicial, a perda de Boggart Shenanigans, que pode gerar dano ao longo do tempo, pode comprometer a estratégia de aggro do deck.",
-            "A diferença na taxa de jogadas no T2 é mínima, mas a redução na taxa de mulligan free keep sugere que o deck se torna menos confiável."
+            "A troca resultou em uma diminuição na consistência do deck, o que é crítico para um deck aggro.",
+            "A taxa de mana screw aumentou significativamente, o que pode comprometer a jogabilidade.",
+            "A perda de um encantamento como Boggart Shenanigans pode impactar a sinergia do deck com outras cartas que interagem com encantamentos."
           ],
           "strong_swaps": [],
           "weak_swaps": [
-            "Boggart Shenanigans → Dark Ritual: A troca não oferece um upgrade claro e resulta em uma perda de consistência e potencial de dano contínuo."
+            {
+              "swap": "Boggart Shenanigans → Dark Ritual",
+              "justification": "A troca não apenas piorou a consistência geral do deck, mas também não trouxe benefícios claros que justificassem a perda de um encantamento que poderia gerar valor ao longo do jogo."
+            }
           ],
-          "overall_assessment": "A troca proposta não é benéfica, pois compromete a consistência do deck sem oferecer um ganho significativo em ramp."
+          "overall_assessment": "A troca proposta não é vantajosa, pois compromete a consistência e a estratégia do deck aggro."
         },
-        "warnings": []
+        "warnings": [
+          "Consistência do deck diminuiu (70 → 65)",
+          "Risco de mana screw aumentou significativamente."
+        ]
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 3 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
       "🔒 Chandra's Ignition -> Blasphemous Act removida pelo gate: papel removal -> wipe, delta CMC +4.",
-      "🔒 Rakdos Signet -> Deflecting Swat removida pelo gate: papel ramp -> utility, delta CMC +1.",
-      "🔒 Brightstone Ritual -> Necromancy removida pelo gate: papel ramp -> enchantment, delta CMC +2."
+      "🔒 Rakdos Signet -> Gamble removida pelo gate: papel ramp -> tutor, delta CMC -1.",
+      "Consistência do deck diminuiu (70 → 65)",
+      "Risco de mana screw aumentou significativamente."
     ]
   }
 }

@@ -1,26 +1,351 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "47d949b2-bd8d-4475-87f0-3487c0133921",
+  "clone_deck_id": "49ccefcb-8b5b-466b-8f3b-7700beb091cc",
   "optimize_request": {
-    "deck_id": "47d949b2-bd8d-4475-87f0-3487c0133921",
+    "deck_id": "49ccefcb-8b5b-466b-8f3b-7700beb091cc",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
+    "error": "A otimizacao sugerida nao passou no gate final de qualidade.",
     "quality_error": {
-      "code": "OPTIMIZE_NO_SAFE_SWAPS",
-      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
-      "dropped_swaps": [
-        "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
-        "🔒 Wastes -> Arcane Signet removida pelo gate: papel land -> ramp, delta CMC +2."
-      ]
+      "code": "OPTIMIZE_QUALITY_REJECTED",
+      "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
+      "reasons": [
+        "A validação final não fechou como \"aprovado\" (score 55/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (55/100; mínimo 70).",
+        "A base de mana continua com problema crítico após a otimização."
+      ],
+      "validation": {
+        "validation_score": 55,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 10,
+            "mana_analysis": {
+              "land_count": 99,
+              "screw_rate": 0.0,
+              "flood_rate": 1.0,
+              "keepable_rate": 0.0
+            },
+            "curve_analysis": {
+              "avg_cmc": 4.0,
+              "turn_1_play": 0.0,
+              "turn_2_play": 0.0,
+              "turn_3_play": 0.0,
+              "turn_4_play": 0.0,
+              "cmc_distribution": {
+                "4": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
+              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
+              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
+              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 14,
+            "mana_analysis": {
+              "land_count": 98,
+              "screw_rate": 0.0,
+              "flood_rate": 0.998,
+              "keepable_rate": 0.002
+            },
+            "curve_analysis": {
+              "avg_cmc": 3.0,
+              "turn_1_play": 0.0,
+              "turn_2_play": 0.076,
+              "turn_3_play": 0.088,
+              "turn_4_play": 0.099,
+              "cmc_distribution": {
+                "4": 1,
+                "2": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana flood (99.8%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
+              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
+              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 2.0,
+            "keep_at_7": 0.0,
+            "keep_at_6": 0.0,
+            "keep_at_5": 1.0,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.0
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 1.99,
+            "keep_at_7": 0.004,
+            "keep_at_6": 0.004,
+            "keep_at_5": 0.992,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.012
+          },
+          "deltas": {
+            "consistency_score": 4,
+            "screw_rate_delta": 0.0,
+            "flood_rate_delta": -0.002,
+            "keepable_rate_delta": 0.002,
+            "turn2_play_delta": 0.076,
+            "mulligan_keep7_delta": 0.004
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Wastes",
+              "added": "Arcane Signet",
+              "removed_role": "land",
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": 2,
+              "verdict": "questionável"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 0,
+            "questionable": 1
+          },
+          "role_delta": {
+            "draw": 0,
+            "removal": 0,
+            "ramp": 1,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": -1,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
+            "Embora a taxa de jogadas no T2 tenha melhorado, a perda de uma land pode impactar a curva de mana em jogos mais longos."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Wastes → Arcane Signet",
+              "justification": "A inclusão de um artefato de mana pode ser benéfica, mas a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência em termos de jogadas iniciais, mas a perda de uma land pode ser arriscada para a estabilidade do deck a longo prazo."
+        },
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara."
+        ]
+      }
     },
     "mode": "optimize",
-    "removals": [],
-    "additions": []
+    "removals": [
+      "Wastes"
+    ],
+    "additions": [
+      "Arcane Signet"
+    ],
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.00",
+      "type_distribution": {
+        "creatures": 1,
+        "instants": 0,
+        "sorceries": 0,
+        "enchantments": 0,
+        "artifacts": 0,
+        "planeswalkers": 0,
+        "lands": 99,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "Falta mana U (Tem 0 fontes, ideal > 15)",
+      "archetype_confidence": "baixa"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "3.00",
+      "type_distribution": {
+        "creatures": 1,
+        "instants": 0,
+        "sorceries": 0,
+        "enchantments": 0,
+        "artifacts": 1,
+        "planeswalkers": 0,
+        "lands": 98,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Falta mana U (Tem 0 fontes, ideal > 15)",
+      "archetype_confidence": "baixa",
+      "improvements": [
+        "CMC médio otimizado: 4.00 → 3.00"
+      ],
+      "validation": {
+        "validation_score": 55,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 10,
+            "mana_analysis": {
+              "land_count": 99,
+              "screw_rate": 0.0,
+              "flood_rate": 1.0,
+              "keepable_rate": 0.0
+            },
+            "curve_analysis": {
+              "avg_cmc": 4.0,
+              "turn_1_play": 0.0,
+              "turn_2_play": 0.0,
+              "turn_3_play": 0.0,
+              "turn_4_play": 0.0,
+              "cmc_distribution": {
+                "4": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
+              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
+              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
+              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 14,
+            "mana_analysis": {
+              "land_count": 98,
+              "screw_rate": 0.0,
+              "flood_rate": 0.998,
+              "keepable_rate": 0.002
+            },
+            "curve_analysis": {
+              "avg_cmc": 3.0,
+              "turn_1_play": 0.0,
+              "turn_2_play": 0.076,
+              "turn_3_play": 0.088,
+              "turn_4_play": 0.099,
+              "cmc_distribution": {
+                "4": 1,
+                "2": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana flood (99.8%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
+              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
+              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 2.0,
+            "keep_at_7": 0.0,
+            "keep_at_6": 0.0,
+            "keep_at_5": 1.0,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.0
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 1.99,
+            "keep_at_7": 0.004,
+            "keep_at_6": 0.004,
+            "keep_at_5": 0.992,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.012
+          },
+          "deltas": {
+            "consistency_score": 4,
+            "screw_rate_delta": 0.0,
+            "flood_rate_delta": -0.002,
+            "keepable_rate_delta": 0.002,
+            "turn2_play_delta": 0.076,
+            "mulligan_keep7_delta": 0.004
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Wastes",
+              "added": "Arcane Signet",
+              "removed_role": "land",
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": 2,
+              "verdict": "questionável"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 0,
+            "questionable": 1
+          },
+          "role_delta": {
+            "draw": 0,
+            "removal": 0,
+            "ramp": 1,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": -1,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
+            "Embora a taxa de jogadas no T2 tenha melhorado, a perda de uma land pode impactar a curva de mana em jogos mais longos."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Wastes → Arcane Signet",
+              "justification": "A inclusão de um artefato de mana pode ser benéfica, mas a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência em termos de jogadas iniciais, mas a perda de uma land pode ser arriscada para a estabilidade do deck a longo prazo."
+        },
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara."
+        ]
+      }
+    },
+    "validation_warnings": [
+      "1 troca(s) questionável(is) — mudou função E ficou mais cara."
+    ]
   }
 }

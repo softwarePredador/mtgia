@@ -29,6 +29,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   final safeRemovals = <String>[];
   final safeAdditions = <String>[];
   final droppedReasons = <String>[];
+  final structuralRecoveryScenario =
+      _isStructuralRecoveryScenario(originalDeck);
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -53,6 +55,15 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     final criticalRoles = _criticalRolesForArchetype(archetype);
     final losingCriticalRole =
         criticalRoles.contains(removedRole) && !rolePreserved;
+    final structuralRecoveryUpgrade = structuralRecoveryScenario &&
+        _isStructuralRecoveryUpgrade(
+          removedCard: removedCard,
+          addedCard: addedCard,
+          removedRole: removedRole,
+          addedRole: addedRole,
+          archetype: archetype,
+          cmcDelta: cmcDelta,
+        );
 
     final shouldDrop = losingCriticalRole ||
         (!rolePreserved && cmcDelta > 1) ||
@@ -63,7 +74,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           archetype: archetype,
         );
 
-    if (shouldDrop) {
+    if (shouldDrop && !structuralRecoveryUpgrade) {
       droppedReasons.add(
         '$removalName -> $additionName removida pelo gate: '
         'papel $removedRole -> $addedRole, delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta.',
@@ -80,6 +91,82 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
     additions: safeAdditions,
     droppedReasons: droppedReasons,
   );
+}
+
+bool _isStructuralRecoveryScenario(List<Map<String, dynamic>> originalDeck) {
+  var totalCards = 0;
+  var landCount = 0;
+  var nonLandCount = 0;
+  var colorProducingLandCount = 0;
+
+  for (final card in originalDeck) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    totalCards += qty;
+
+    if (typeLine.contains('land')) {
+      landCount += qty;
+      if (_landLooksColorProducing(card)) {
+        colorProducingLandCount += qty;
+      }
+    } else {
+      nonLandCount += qty;
+    }
+  }
+
+  if (totalCards == 0) return false;
+
+  final landRatio = landCount / totalCards;
+  return landRatio >= 0.65 ||
+      landCount >= 50 ||
+      nonLandCount <= 20 ||
+      (landCount >= 40 && colorProducingLandCount <= 8);
+}
+
+bool _isStructuralRecoveryUpgrade({
+  required Map<String, dynamic> removedCard,
+  required Map<String, dynamic> addedCard,
+  required String removedRole,
+  required String addedRole,
+  required String archetype,
+  required int cmcDelta,
+}) {
+  final removedIsLand = ((removedCard['type_line'] as String?) ?? '')
+      .toLowerCase()
+      .contains('land');
+  if (!removedIsLand || removedRole != 'land') return false;
+
+  final addedAllowedRoles = switch (archetype.trim().toLowerCase()) {
+    'control' => {'ramp', 'draw', 'removal', 'wipe', 'protection', 'utility'},
+    'midrange' => {
+        'ramp',
+        'draw',
+        'removal',
+        'creature',
+        'protection',
+        'utility'
+      },
+    'aggro' => {'ramp', 'removal', 'creature', 'protection', 'utility'},
+    _ => {'ramp', 'draw', 'removal', 'protection', 'utility'},
+  };
+
+  if (!addedAllowedRoles.contains(addedRole)) return false;
+  if (cmcDelta > 3) return false;
+
+  final addedOracle =
+      ((addedCard['oracle_text'] as String?) ?? '').toLowerCase();
+  final addedTypeLine =
+      ((addedCard['type_line'] as String?) ?? '').toLowerCase();
+  if (addedTypeLine.contains('land')) return true;
+
+  return addedOracle.contains('draw') ||
+      addedOracle.contains('counter target') ||
+      addedOracle.contains('destroy target') ||
+      addedOracle.contains('exile target') ||
+      addedOracle.contains('add {') ||
+      addedOracle.contains('mana of any') ||
+      addedTypeLine.contains('creature') ||
+      addedTypeLine.contains('artifact');
 }
 
 List<String> buildOptimizationRejectionReasons({
@@ -335,6 +422,28 @@ int _getCmc(Map<String, dynamic> card) {
   if (cmc is int) return cmc;
   if (cmc is double) return cmc.toInt();
   return int.tryParse(cmc.toString()) ?? 0;
+}
+
+bool _landLooksColorProducing(Map<String, dynamic> card) {
+  final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+  if (!typeLine.contains('land')) return false;
+
+  final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
+  final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
+  final colorIdentity =
+      (card['color_identity'] as List?)?.cast<String>() ?? const <String>[];
+
+  if (colors.isNotEmpty || colorIdentity.isNotEmpty) return true;
+  if (oracle.contains('mana of any color') ||
+      oracle.contains('mana of any type')) {
+    return true;
+  }
+
+  return oracle.contains('{w}') ||
+      oracle.contains('{u}') ||
+      oracle.contains('{b}') ||
+      oracle.contains('{r}') ||
+      oracle.contains('{g}');
 }
 
 Map<String, dynamic> _findCardByName(

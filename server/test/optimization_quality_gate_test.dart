@@ -226,6 +226,50 @@ void main() {
 
       expect(reasons, isEmpty);
     });
+
+    test('keeps structural recovery swaps for degenerate mana bases', () {
+      final originalDeck = [
+        _card(
+          name: 'Wastes',
+          typeLine: 'Basic Land',
+          manaCost: '',
+          cmc: 0,
+          oracleText: '{T}: Add {C}.',
+          quantity: 99,
+        ),
+        _card(
+          name: 'Talrand, Sky Summoner',
+          typeLine: 'Legendary Creature',
+          manaCost: '{2}{U}{U}',
+          cmc: 4,
+          oracleText:
+              'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+        ),
+      ];
+
+      final additions = [
+        _card(
+          name: 'Arcane Signet',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText:
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Wastes'],
+        additions: const ['Arcane Signet'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, equals(const ['Wastes']));
+      expect(result.additions, equals(const ['Arcane Signet']));
+      expect(result.droppedReasons, isEmpty);
+    });
   });
 }
 
@@ -235,6 +279,7 @@ Map<String, dynamic> _card({
   required String manaCost,
   required double cmc,
   required String oracleText,
+  int quantity = 1,
 }) {
   return {
     'name': name,
@@ -242,6 +287,7 @@ Map<String, dynamic> _card({
     'mana_cost': manaCost,
     'cmc': cmc,
     'oracle_text': oracleText,
+    'quantity': quantity,
   };
 }
 
