@@ -1079,6 +1079,7 @@ Future<Response> onRequest(RequestContext context) async {
         commanders.isNotEmpty ? commanders.first.trim() : 'unknown';
     var optimizeCommanderPrioritySource = 'none';
     final optimizeCommanderPriorityNames = <String>[];
+    final deterministicSwapCandidates = <Map<String, dynamic>>[];
 
     Future<Response> respondWithOptimizeTelemetry({
       required int statusCode,
@@ -1124,6 +1125,7 @@ Future<Response> onRequest(RequestContext context) async {
         blockedByBracket: blockedByBracketOverride,
         commanderPriorityNames: optimizeCommanderPriorityNames,
         commanderPrioritySource: optimizeCommanderPrioritySource,
+        deterministicSwapCandidates: deterministicSwapCandidates,
         cacheKey: cacheKey,
         executionTimeMs: requestStopwatch.elapsedMilliseconds,
       );
@@ -1239,6 +1241,30 @@ Future<Response> onRequest(RequestContext context) async {
       }
     }
 
+    try {
+      deterministicSwapCandidates.addAll(
+        await _buildDeterministicOptimizeSwapCandidates(
+          pool: pool,
+          allCardData: allCardData,
+          commanders: commanders,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          detectedTheme: themeProfile.theme,
+          coreCards: themeProfile.coreCards,
+          commanderPriorityNames: optimizeCommanderPriorityNames,
+        ),
+      );
+      if (deterministicSwapCandidates.isNotEmpty) {
+        Log.d(
+          'Optimize deterministic shortlist carregado: ${deterministicSwapCandidates.length} swap(s)',
+        );
+      }
+    } catch (e) {
+      Log.w('Falha ao montar shortlist deterministico do optimize: $e');
+    }
+
     Map<String, dynamic> jsonResponse;
 
     // ================================================================
@@ -1318,6 +1344,7 @@ Future<Response> onRequest(RequestContext context) async {
         commanders: commanders,
         targetArchetype: targetArchetype,
         priorityPool: optimizeCommanderPriorityNames,
+        deterministicSwapCandidates: deterministicSwapCandidates,
         bracket: bracket,
         keepTheme: keepTheme,
         detectedTheme: themeProfile.theme,
@@ -1643,7 +1670,6 @@ Future<Response> onRequest(RequestContext context) async {
       if (fallbackRemovalCandidates.isNotEmpty) {
         final replacements = await _findSynergyReplacements(
           pool: pool,
-          optimizer: optimizer,
           commanders: commanders,
           commanderColorIdentity: commanderColorIdentity,
           targetArchetype: targetArchetype,
@@ -2020,7 +2046,6 @@ Future<Response> onRequest(RequestContext context) async {
         try {
           final replacementResult = await _findSynergyReplacements(
             pool: pool,
-            optimizer: optimizer,
             commanders: commanders,
             commanderColorIdentity: commanderColorIdentity,
             targetArchetype: targetArchetype,
@@ -2942,6 +2967,7 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required List<Map<String, dynamic>> blockedByBracket,
   required List<String> commanderPriorityNames,
   required String commanderPrioritySource,
+  required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
 }) {
@@ -3022,6 +3048,9 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
       'commander_priority_pool_size': commanderPriorityNames.length,
       'commander_priority_pool_sample':
           commanderPriorityNames.take(25).toList(),
+      'deterministic_swap_candidate_count': deterministicSwapCandidates.length,
+      'deterministic_swap_candidate_sample':
+          deterministicSwapCandidates.take(10).toList(),
     },
     'swap_analysis': {
       'accepted_pairs': acceptedPairs,
@@ -3081,6 +3110,7 @@ Future<void> _recordOptimizeAnalysisOutcome({
   required List<Map<String, dynamic>> blockedByBracket,
   required List<String> commanderPriorityNames,
   required String commanderPrioritySource,
+  required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
 }) async {
@@ -3106,6 +3136,7 @@ Future<void> _recordOptimizeAnalysisOutcome({
       blockedByBracket: blockedByBracket,
       commanderPriorityNames: commanderPriorityNames,
       commanderPrioritySource: commanderPrioritySource,
+      deterministicSwapCandidates: deterministicSwapCandidates,
       cacheKey: cacheKey,
       executionTimeMs: executionTimeMs,
     );
@@ -3674,7 +3705,6 @@ Future<void> _processCompleteModeAsync({
 
           final synergySpells = await _findSynergyReplacements(
             pool: pool,
-            optimizer: optimizer,
             commanders: commanders,
             commanderColorIdentity: commanderColorIdentity,
             targetArchetype: targetArchetype,
@@ -5314,10 +5344,7 @@ String _inferFunctionalRole({
   return 'utility';
 }
 
-Map<String, int> _buildSlotNeedsForDeck({
-  required List<Map<String, dynamic>> currentDeckCards,
-  required String targetArchetype,
-}) {
+Map<String, int> _buildRoleTargetProfile(String targetArchetype) {
   final archetype = targetArchetype.toLowerCase();
   final baseTargets = <String, int>{
     'ramp': 10,
@@ -5345,6 +5372,15 @@ Map<String, int> _buildSlotNeedsForDeck({
     baseTargets['interaction'] = 8;
     baseTargets['wincon'] = 5;
   }
+
+  return baseTargets;
+}
+
+Map<String, int> _buildSlotNeedsForDeck({
+  required List<Map<String, dynamic>> currentDeckCards,
+  required String targetArchetype,
+}) {
+  final baseTargets = _buildRoleTargetProfile(targetArchetype);
 
   final current = <String, int>{
     'ramp': 0,
@@ -5458,6 +5494,130 @@ Future<List<Map<String, dynamic>>> _loadDeterministicSlotFillers({
       'color_identity': e['color_identity'],
     };
   }).toList();
+}
+
+Future<List<Map<String, dynamic>>> _buildDeterministicOptimizeSwapCandidates({
+  required Pool pool,
+  required List<Map<String, dynamic>> allCardData,
+  required List<String> commanders,
+  required Set<String> commanderColorIdentity,
+  required String targetArchetype,
+  required int? bracket,
+  required bool keepTheme,
+  required String? detectedTheme,
+  required List<String>? coreCards,
+  required List<String> commanderPriorityNames,
+}) async {
+  if (allCardData.isEmpty) return const [];
+
+  final commanderLower =
+      commanders.map((name) => name.trim().toLowerCase()).toSet();
+  final coreLower = (coreCards ?? const <String>[])
+      .map((name) => name.trim().toLowerCase())
+      .toSet();
+  final preferredNames =
+      commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
+  final currentRoleCounts = <String, int>{};
+  final roleTargets = _buildRoleTargetProfile(targetArchetype);
+
+  for (final card in allCardData) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    final role = _inferFunctionalRole(
+      name: (card['name'] as String?) ?? '',
+      typeLine: (card['type_line'] as String?) ?? '',
+      oracleText: (card['oracle_text'] as String?) ?? '',
+    );
+    currentRoleCounts[role] = (currentRoleCounts[role] ?? 0) + qty;
+  }
+
+  final removalCandidates = <Map<String, dynamic>>[];
+  for (final card in allCardData) {
+    final name = ((card['name'] as String?) ?? '').trim();
+    if (name.isEmpty) continue;
+    final lower = name.toLowerCase();
+    if (commanderLower.contains(lower)) continue;
+    if (keepTheme && coreLower.contains(lower)) continue;
+
+    final typeLine = (card['type_line'] as String?) ?? '';
+    if (typeLine.toLowerCase().contains('land')) continue;
+
+    final role = _inferFunctionalRole(
+      name: name,
+      typeLine: typeLine,
+      oracleText: (card['oracle_text'] as String?) ?? '',
+    );
+    final currentRole = currentRoleCounts[role] ?? 0;
+    final targetRole = roleTargets[role] ?? 0;
+    final surplus = (currentRole - targetRole).clamp(0, 99);
+    final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+    final preferredPenalty = preferredNames.contains(lower) ? 220 : 0;
+    final score = surplus * 100 + (cmc * 12).round() - preferredPenalty;
+
+    removalCandidates.add({
+      'name': name,
+      'role': role,
+      'cmc': cmc,
+      'score': score,
+      'type_line': typeLine,
+      'oracle_text': (card['oracle_text'] as String?) ?? '',
+    });
+  }
+
+  removalCandidates.sort((a, b) {
+    final byScore = (b['score'] as int).compareTo(a['score'] as int);
+    if (byScore != 0) return byScore;
+    return ((a['name'] as String)).compareTo(b['name'] as String);
+  });
+
+  final removalList = removalCandidates
+      .where((candidate) => (candidate['score'] as int) > 0)
+      .take(6)
+      .map((candidate) => candidate['name'] as String)
+      .toList();
+  if (removalList.isEmpty) return const [];
+
+  final deckNamesLower = allCardData
+      .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+      .where((n) => n.isNotEmpty)
+      .toSet();
+  final replacements = await _findSynergyReplacements(
+    pool: pool,
+    commanders: commanders,
+    commanderColorIdentity: commanderColorIdentity,
+    targetArchetype: targetArchetype,
+    bracket: bracket,
+    keepTheme: keepTheme,
+    detectedTheme: detectedTheme,
+    coreCards: coreCards,
+    missingCount: removalList.length,
+    removedCards: removalList,
+    excludeNames: deckNamesLower,
+    allCardData: allCardData,
+    preferredNames: preferredNames,
+  );
+
+  final pairCount = removalList.length < replacements.length
+      ? removalList.length
+      : replacements.length;
+  final pairs = <Map<String, dynamic>>[];
+  for (var i = 0; i < pairCount; i++) {
+    final removalName = removalList[i];
+    final replacement = replacements[i];
+    final removalMeta = removalCandidates.firstWhere(
+      (candidate) => candidate['name'] == removalName,
+      orElse: () => const <String, dynamic>{},
+    );
+
+    pairs.add({
+      'remove': removalName,
+      'add': replacement['name'],
+      'remove_role': removalMeta['role'],
+      'reason':
+          'swap deterministico priorizando funcao ${removalMeta['role'] ?? 'utility'} e pool competitivo do comandante',
+    });
+  }
+
+  return pairs;
 }
 
 Future<List<Map<String, dynamic>>> _loadMetaInsightFillers({
@@ -6135,7 +6295,6 @@ Future<List<Map<String, dynamic>>> _loadPreferredNameFillers({
 /// 3. Fallback: re-consultar a IA se o DB não tiver boas opções
 Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   required Pool pool,
-  required DeckOptimizerService optimizer,
   required List<String> commanders,
   required Set<String> commanderColorIdentity,
   required String targetArchetype,

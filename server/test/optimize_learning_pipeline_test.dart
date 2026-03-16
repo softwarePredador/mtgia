@@ -88,6 +88,12 @@ void main() {
           'Rhystic Study',
         ],
         commanderPrioritySource: 'competitive_meta',
+        deterministicSwapCandidates: const [
+          {
+            'remove': 'Cancel',
+            'add': 'Force of Will',
+          },
+        ],
         cacheKey: 'cache-key-1',
         executionTimeMs: 1450,
       );
@@ -105,6 +111,7 @@ void main() {
       expect(
           decisions['commander_priority_source'], equals('competitive_meta'));
       expect(decisions['commander_priority_pool_size'], equals(3));
+      expect(decisions['deterministic_swap_candidate_count'], equals(1));
 
       final swapAnalysis =
           (entry['swap_analysis'] as Map).cast<String, dynamic>();

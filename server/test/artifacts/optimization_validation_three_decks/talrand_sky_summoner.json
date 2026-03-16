@@ -1,9 +1,9 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "2d5df44f-652c-454d-9016-94ed58ba4c72",
+  "clone_deck_id": "a4d9dbc7-cbd9-454e-ad33-af0aef35f6f2",
   "optimize_request": {
-    "deck_id": "2d5df44f-652c-454d-9016-94ed58ba4c72",
+    "deck_id": "a4d9dbc7-cbd9-454e-ad33-af0aef35f6f2",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true

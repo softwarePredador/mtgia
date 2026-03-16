@@ -35,6 +35,7 @@ class DeckOptimizerService {
     required List<String> commanders,
     required String targetArchetype,
     List<String> priorityPool = const [],
+    List<Map<String, dynamic>> deterministicSwapCandidates = const [],
     int? bracket,
     bool keepTheme = true,
     String? detectedTheme,
@@ -202,6 +203,7 @@ class DeckOptimizerService {
       weakCandidates: weakCandidates.map((c) => c['name'].toString()).toList(),
       synergyPool: prioritizedSynergyCards,
       priorityPool: priorityPool,
+      deterministicSwapCandidates: deterministicSwapCandidates,
       staplesPool: formatStaples,
       archetype: targetArchetype,
       bracket: bracket,
@@ -639,6 +641,7 @@ class DeckOptimizerService {
     required List<String> weakCandidates,
     required List<String> synergyPool,
     required List<String> priorityPool,
+    required List<Map<String, dynamic>> deterministicSwapCandidates,
     required List<String> staplesPool,
     required String archetype,
     int? bracket,
@@ -697,6 +700,7 @@ class DeckOptimizerService {
         "high_synergy_options":
             synergyPool, // A IA vai escolher daqui para adicionar
         "commander_priority_options": priorityPool,
+        "deterministic_swap_candidates": deterministicSwapCandidates,
         "format_staples": staplesPool,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
