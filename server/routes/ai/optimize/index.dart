@@ -385,6 +385,112 @@ class DeckThemeProfile {
       };
 }
 
+List<Map<String, dynamic>> buildOptimizeAdditionEntries({
+  required List<String> requestedAdditions,
+  required List<Map<String, dynamic>> additionsData,
+}) {
+  final requestedCountsByName = <String, int>{};
+  for (final addition in requestedAdditions) {
+    final normalized = addition.trim().toLowerCase();
+    if (normalized.isEmpty) continue;
+    requestedCountsByName[normalized] =
+        (requestedCountsByName[normalized] ?? 0) + 1;
+  }
+
+  final canonicalByName = <String, Map<String, dynamic>>{};
+  for (final card in additionsData) {
+    final name = ((card['name'] as String?) ?? '').trim();
+    if (name.isEmpty) continue;
+    canonicalByName.putIfAbsent(
+      name.toLowerCase(),
+      () => Map<String, dynamic>.from(card),
+    );
+  }
+
+  final entries = <Map<String, dynamic>>[];
+  for (final entry in requestedCountsByName.entries) {
+    final card = canonicalByName[entry.key];
+    if (card == null) continue;
+    entries.add({
+      ...card,
+      'quantity': entry.value,
+    });
+  }
+
+  return entries;
+}
+
+List<Map<String, dynamic>> buildVirtualDeckForAnalysis({
+  required List<Map<String, dynamic>> originalDeck,
+  List<String> removals = const [],
+  List<Map<String, dynamic>> additions = const [],
+}) {
+  final virtualDeck =
+      originalDeck.map((card) => Map<String, dynamic>.from(card)).toList();
+
+  final removalCountsByName = <String, int>{};
+  for (final removal in removals) {
+    final normalized = removal.trim().toLowerCase();
+    if (normalized.isEmpty) continue;
+    removalCountsByName[normalized] =
+        (removalCountsByName[normalized] ?? 0) + 1;
+  }
+
+  for (final entry in removalCountsByName.entries) {
+    final nameLower = entry.key;
+    var toRemove = entry.value;
+
+    for (var i = virtualDeck.length - 1; i >= 0 && toRemove > 0; i--) {
+      final currentName =
+          ((virtualDeck[i]['name'] as String?) ?? '').trim().toLowerCase();
+      if (currentName != nameLower) continue;
+
+      final quantity = (virtualDeck[i]['quantity'] as int?) ?? 1;
+      if (quantity <= toRemove) {
+        virtualDeck.removeAt(i);
+        toRemove -= quantity;
+      } else {
+        virtualDeck[i] = {
+          ...virtualDeck[i],
+          'quantity': quantity - toRemove,
+        };
+        toRemove = 0;
+      }
+    }
+  }
+
+  for (final addition in additions) {
+    final normalized =
+        ((addition['name'] as String?) ?? '').trim().toLowerCase();
+    if (normalized.isEmpty) continue;
+
+    final incoming = Map<String, dynamic>.from(addition);
+    final incomingQty = (incoming['quantity'] as int?) ?? 1;
+    final existingIndex = virtualDeck.indexWhere(
+      (card) =>
+          ((card['name'] as String?) ?? '').trim().toLowerCase() == normalized,
+    );
+
+    if (existingIndex == -1) {
+      virtualDeck.add({
+        ...incoming,
+        'quantity': incomingQty,
+      });
+      continue;
+    }
+
+    final existing = virtualDeck[existingIndex];
+    final existingQty = (existing['quantity'] as int?) ?? 1;
+    virtualDeck[existingIndex] = {
+      ...existing,
+      ...incoming,
+      'quantity': existingQty + incomingQty,
+    };
+  }
+
+  return virtualDeck;
+}
+
 Future<DeckThemeProfile> _detectThemeProfile(
   List<Map<String, dynamic>> cards, {
   required List<String> commanders,
@@ -1538,12 +1644,7 @@ Future<Response> onRequest(RequestContext context) async {
                     })
                 .toList();
 
-            // 2. Criar deck virtual (original + adições)
-            final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
-
-            // Expandir adições pelo quantity
-            for (final add in additionsDetailed) {
-              final qty = add['quantity'] as int;
+            final additionsForAnalysis = additionsDetailed.map((add) {
               final data = additionsData.firstWhere(
                 (d) =>
                     (d['name'] as String).toLowerCase() ==
@@ -1554,13 +1655,18 @@ Future<Response> onRequest(RequestContext context) async {
                   'mana_cost': '',
                   'colors': <String>[],
                   'cmc': 0.0,
-                  'oracle_text': ''
+                  'oracle_text': '',
                 },
               );
-              for (var i = 0; i < qty; i++) {
-                virtualDeck.add(data);
-              }
-            }
+              return {
+                ...data,
+                'quantity': (add['quantity'] as int?) ?? 1,
+              };
+            }).toList();
+            final virtualDeck = buildVirtualDeckForAnalysis(
+              originalDeck: allCardData,
+              additions: additionsForAnalysis,
+            );
 
             // 3. Rodar análise no deck virtual
             final postAnalyzer =
@@ -2238,7 +2344,8 @@ Future<Response> onRequest(RequestContext context) async {
           }).toList();
           final additionsDataResult = await pool.execute(
             Sql.named('''
-              SELECT name, type_line, mana_cost, colors, 
+              SELECT DISTINCT ON (LOWER(name))
+                     name, type_line, mana_cost, colors, 
                      COALESCE(
                        (SELECT SUM(
                          CASE 
@@ -2253,6 +2360,7 @@ Future<Response> onRequest(RequestContext context) async {
                      oracle_text
               FROM cards 
               WHERE LOWER(name) = ANY(@names)
+              ORDER BY LOWER(name), name
             '''),
             parameters: {
               'names':
@@ -2343,42 +2451,15 @@ Future<Response> onRequest(RequestContext context) async {
             }
           }
 
-          // 2. Criar Deck Virtual (Clone do atual - Remoções + Adições)
-          final virtualDeck = List<Map<String, dynamic>>.from(
-            allCardData.map((c) => Map<String, dynamic>.from(c)),
+          final additionsForAnalysis = buildOptimizeAdditionEntries(
+            requestedAdditions: validAdditions,
+            additionsData: additionsData,
           );
-
-          // Remover cartas sugeridas (pelo nome, case-insensitive)
-          // CORRIGIDO: decrementa `quantity` em vez de remover o entry inteiro.
-          // Antes: Island x30 era removido inteiro quando a IA pedia 1 remoção.
-          final removalCountsByName = <String, int>{};
-          for (final name in validRemovals) {
-            final lower = name.toLowerCase();
-            removalCountsByName[lower] = (removalCountsByName[lower] ?? 0) + 1;
-          }
-          for (final entry in removalCountsByName.entries) {
-            final nameLower = entry.key;
-            var toRemove = entry.value;
-            for (var i = virtualDeck.length - 1; i >= 0 && toRemove > 0; i--) {
-              final cardName =
-                  ((virtualDeck[i]['name'] as String?) ?? '').toLowerCase();
-              if (cardName != nameLower) continue;
-              final qty = (virtualDeck[i]['quantity'] as int?) ?? 1;
-              if (qty <= toRemove) {
-                virtualDeck.removeAt(i);
-                toRemove -= qty;
-              } else {
-                virtualDeck[i] = {
-                  ...virtualDeck[i],
-                  'quantity': qty - toRemove,
-                };
-                toRemove = 0;
-              }
-            }
-          }
-
-          // Adicionar novas cartas
-          virtualDeck.addAll(additionsData);
+          final virtualDeck = buildVirtualDeckForAnalysis(
+            originalDeck: allCardData,
+            removals: validRemovals,
+            additions: additionsForAnalysis,
+          );
 
           // 3. Rodar Análise no Deck Virtual
           final postAnalyzer =
@@ -4419,12 +4500,7 @@ Future<void> _processCompleteModeAsync({
                   })
               .toList();
 
-          // 2. Criar deck virtual (original + adições)
-          final virtualDeck = List<Map<String, dynamic>>.from(allCardData);
-
-          // Expandir adições pelo quantity
-          for (final add in additionsDetailed) {
-            final qty = add['quantity'] as int;
+          final additionsForAnalysis = additionsDetailed.map((add) {
             final data = additionsData.firstWhere(
               (d) =>
                   (d['name'] as String).toLowerCase() ==
@@ -4435,13 +4511,18 @@ Future<void> _processCompleteModeAsync({
                 'mana_cost': '',
                 'colors': <String>[],
                 'cmc': 0.0,
-                'oracle_text': ''
+                'oracle_text': '',
               },
             );
-            for (var i = 0; i < qty; i++) {
-              virtualDeck.add(data);
-            }
-          }
+            return {
+              ...data,
+              'quantity': (add['quantity'] as int?) ?? 1,
+            };
+          }).toList();
+          final virtualDeck = buildVirtualDeckForAnalysis(
+            originalDeck: allCardData,
+            additions: additionsForAnalysis,
+          );
 
           // 3. Rodar análise no deck virtual
           final postAnalyzer =

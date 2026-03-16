@@ -1,9 +1,9 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "15d06cb5-d214-4221-81d1-bf81084f0522",
+  "clone_deck_id": "0cb0a8d7-68f2-4332-a693-03d4d9807166",
   "optimize_request": {
-    "deck_id": "15d06cb5-d214-4221-81d1-bf81084f0522",
+    "deck_id": "0cb0a8d7-68f2-4332-a693-03d4d9807166",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -15,12 +15,11 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 45/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (45/100; mínimo 70).",
-        "As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano."
+        "A validação final não fechou como \"aprovado\" (score 53/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (53/100; mínimo 70)."
       ],
       "validation": {
-        "validation_score": 45,
+        "validation_score": 53,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -28,16 +27,16 @@
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.157,
-              "flood_rate": 0.014,
-              "keepable_rate": 0.829
+              "screw_rate": 0.147,
+              "flood_rate": 0.016,
+              "keepable_rate": 0.837
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.732,
-              "turn_2_play": 0.938,
-              "turn_3_play": 0.978,
-              "turn_4_play": 0.99,
+              "turn_1_play": 0.756,
+              "turn_2_play": 0.928,
+              "turn_3_play": 0.989,
+              "turn_4_play": 0.997,
               "cmc_distribution": {
                 "1": 15,
                 "3": 13,
@@ -51,29 +50,29 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (15.7%). Considere adicionar 2-4 terrenos."
+              "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 81,
+            "consistency_score": 90,
             "mana_analysis": {
-              "land_count": 40,
-              "screw_rate": 0.294,
-              "flood_rate": 0.005,
-              "keepable_rate": 0.701
+              "land_count": 41,
+              "screw_rate": 0.158,
+              "flood_rate": 0.016,
+              "keepable_rate": 0.826
             },
             "curve_analysis": {
-              "avg_cmc": 2.72,
-              "turn_1_play": 0.627,
-              "turn_2_play": 0.885,
-              "turn_3_play": 0.956,
-              "turn_4_play": 0.97,
+              "avg_cmc": 2.98,
+              "turn_1_play": 0.728,
+              "turn_2_play": 0.939,
+              "turn_3_play": 0.984,
+              "turn_4_play": 0.995,
               "cmc_distribution": {
-                "3": 14,
-                "7": 3,
-                "1": 15,
-                "2": 41,
+                "1": 16,
+                "3": 13,
+                "7": 2,
+                "2": 11,
                 "10": 4,
                 "5": 3,
                 "4": 5,
@@ -82,142 +81,125 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (29.4%). Considere adicionar 2-4 terrenos."
+              "Alta taxa de mana screw (15.8%). Considere adicionar 2-4 terrenos.",
+              "41 terrenos é acima do ideal. Considere trocar alguns por mana rocks."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.11,
-            "keep_at_7": 0.898,
-            "keep_at_6": 0.092,
+            "avg_mulligans": 0.09,
+            "keep_at_7": 0.916,
+            "keep_at_6": 0.074,
             "keep_at_5": 0.01,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.912
+            "keepable_after_mull": 0.924
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.27,
-            "keep_at_7": 0.772,
-            "keep_at_6": 0.182,
-            "keep_at_5": 0.046,
+            "avg_mulligans": 0.1,
+            "keep_at_7": 0.908,
+            "keep_at_6": 0.086,
+            "keep_at_5": 0.006,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.868
+            "keepable_after_mull": 0.94
           },
           "deltas": {
-            "consistency_score": -9,
-            "screw_rate_delta": 0.137,
-            "flood_rate_delta": -0.009,
-            "keepable_rate_delta": -0.128,
-            "turn2_play_delta": -0.053,
-            "mulligan_keep7_delta": -0.126
+            "consistency_score": 0,
+            "screw_rate_delta": 0.011,
+            "flood_rate_delta": 0.0,
+            "keepable_rate_delta": -0.011,
+            "turn2_play_delta": 0.011,
+            "mulligan_keep7_delta": -0.008
           }
         },
         "functional_analysis": {
           "swaps": [
             {
               "removed": "All Is Dust",
-              "added": "Jin-Gitaxias, Progress Tyrant",
+              "added": "Swiftfoot Boots",
               "removed_role": "utility",
-              "added_role": "creature",
+              "added_role": "protection",
               "role_preserved": false,
-              "cmc_delta": 0,
+              "cmc_delta": -5,
               "verdict": "tradeoff"
             },
             {
               "removed": "Lightning Greaves",
-              "added": "Counterspell",
+              "added": "Brainstorm",
               "removed_role": "protection",
-              "added_role": "removal",
+              "added_role": "draw",
               "role_preserved": false,
-              "cmc_delta": 0,
+              "cmc_delta": -1,
               "verdict": "tradeoff"
             },
             {
               "removed": "Isochron Scepter",
-              "added": "Laboratory Maniac",
+              "added": "Command Tower",
               "removed_role": "artifact",
-              "added_role": "draw",
+              "added_role": "land",
               "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
-            },
-            {
-              "removed": "Ponder",
-              "added": "Brainstorm",
-              "removed_role": "draw",
-              "added_role": "draw",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "cmc_delta": -2,
+              "verdict": "tradeoff"
             }
           ],
           "summary": {
-            "upgrades": 1,
+            "upgrades": 0,
             "sidegrades": 0,
-            "tradeoffs": 2,
-            "questionable": 1
+            "tradeoffs": 3,
+            "questionable": 0
           },
           "role_delta": {
             "draw": 1,
-            "removal": 1,
+            "removal": 0,
             "ramp": 0,
-            "creature": 1,
+            "creature": 0,
             "artifact": -1,
             "enchantment": 0,
-            "land": 0,
+            "land": 1,
             "utility": -1,
             "wipe": 0,
             "tutor": 0,
-            "protection": -1
+            "protection": 0
           }
         },
         "critic_ai": {
           "approval_score": 60,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode comprometer a utilidade do deck em situações de controle de mesa.",
-            "A substituição de Lightning Greaves por Counterspell diminui a proteção do comandante, o que pode ser crítico em um ambiente competitivo.",
-            "A troca de Isochron Scepter por Laboratory Maniac é questionável, pois o Scepter oferece versatilidade e potencial de sinergia que o Maniac não necessariamente traz.",
-            "A diminuição na taxa de keep sem mulligan e o aumento no mana screw indicam uma piora na consistência do deck."
+            "A troca de All Is Dust por Swiftfoot Boots pode comprometer a capacidade de lidar com múltiplas ameaças no campo.",
+            "Substituir Lightning Greaves por Brainstorm reduz a proteção do comandante, o que pode ser crítico em um ambiente competitivo.",
+            "A troca de Isochron Scepter por Command Tower melhora a mana, mas a perda de um artefato que pode gerar valor contínuo é preocupante."
           ],
-          "strong_swaps": [
-            "A troca de Ponder por Brainstorm é um upgrade claro, pois Brainstorm oferece mais flexibilidade e sinergia com o uso de fetch lands."
-          ],
+          "strong_swaps": [],
           "weak_swaps": [
             {
-              "swap": "OUT: All Is Dust → IN: Jin-Gitaxias, Progress Tyrant",
-              "justification": "A perda de uma remoção em massa pode ser crítica em situações onde o controle de mesa é necessário."
+              "swap": "OUT: All Is Dust → IN: Swiftfoot Boots",
+              "justificativa": "All Is Dust é uma remoção em massa poderosa, enquanto Swiftfoot Boots oferece proteção limitada."
             },
             {
-              "swap": "OUT: Lightning Greaves → IN: Counterspell",
-              "justification": "A proteção do comandante é essencial, e Counterspell não oferece a mesma segurança."
+              "swap": "OUT: Lightning Greaves → IN: Brainstorm",
+              "justificativa": "A perda de proteção para o comandante pode ser crítica, especialmente em um deck que depende de sua presença."
             },
             {
-              "swap": "OUT: Isochron Scepter → IN: Laboratory Maniac",
-              "justification": "Laboratory Maniac não oferece a mesma versatilidade que Isochron Scepter, que pode ser usado para repetir feitiços importantes."
+              "swap": "OUT: Isochron Scepter → IN: Command Tower",
+              "justificativa": "Embora Command Tower melhore a mana, Isochron Scepter pode gerar valor significativo ao longo do jogo."
             }
           ],
-          "overall_assessment": "As trocas propostas apresentam riscos significativos à consistência e proteção do deck, embora algumas melhorias pontuais sejam observadas."
+          "overall_assessment": "As trocas propostas apresentam tradeoffs que podem comprometer a eficácia do deck, especialmente em termos de proteção e controle de mesa."
         },
-        "warnings": [
-          "Consistência do deck diminuiu (90 → 81)",
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "Risco de mana screw aumentou significativamente."
-        ]
+        "warnings": []
       }
     },
     "mode": "optimize",
     "removals": [
       "All Is Dust",
       "Lightning Greaves",
-      "Isochron Scepter",
-      "Ponder"
+      "Isochron Scepter"
     ],
     "additions": [
-      "Jin-Gitaxias, Progress Tyrant",
-      "Counterspell",
-      "Laboratory Maniac",
-      "Brainstorm"
+      "Swiftfoot Boots",
+      "Brainstorm",
+      "Command Tower"
     ],
     "deck_analysis": {
       "detected_archetype": "control",
@@ -239,27 +221,27 @@
     },
     "post_analysis": {
       "detected_archetype": "combo",
-      "average_cmc": "2.72",
+      "average_cmc": "2.98",
       "type_distribution": {
-        "creatures": 12,
-        "instants": 49,
-        "sorceries": 6,
+        "creatures": 10,
+        "instants": 18,
+        "sorceries": 7,
         "enchantments": 5,
-        "artifacts": 22,
+        "artifacts": 23,
         "planeswalkers": 0,
-        "lands": 40,
+        "lands": 41,
         "battles": 0
       },
-      "total_cards": 130,
+      "total_cards": 100,
       "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
       "mana_base_assessment": "Base de mana equilibrada",
       "archetype_confidence": "média",
       "improvements": [
-        "CMC médio otimizado: 3.07 → 2.72",
+        "CMC médio otimizado: 3.07 → 2.98",
         "Mais interação instant-speed adicionada"
       ],
       "validation": {
-        "validation_score": 45,
+        "validation_score": 53,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -267,16 +249,16 @@
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.157,
-              "flood_rate": 0.014,
-              "keepable_rate": 0.829
+              "screw_rate": 0.147,
+              "flood_rate": 0.016,
+              "keepable_rate": 0.837
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.732,
-              "turn_2_play": 0.938,
-              "turn_3_play": 0.978,
-              "turn_4_play": 0.99,
+              "turn_1_play": 0.756,
+              "turn_2_play": 0.928,
+              "turn_3_play": 0.989,
+              "turn_4_play": 0.997,
               "cmc_distribution": {
                 "1": 15,
                 "3": 13,
@@ -290,29 +272,29 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (15.7%). Considere adicionar 2-4 terrenos."
+              "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 81,
+            "consistency_score": 90,
             "mana_analysis": {
-              "land_count": 40,
-              "screw_rate": 0.294,
-              "flood_rate": 0.005,
-              "keepable_rate": 0.701
+              "land_count": 41,
+              "screw_rate": 0.158,
+              "flood_rate": 0.016,
+              "keepable_rate": 0.826
             },
             "curve_analysis": {
-              "avg_cmc": 2.72,
-              "turn_1_play": 0.627,
-              "turn_2_play": 0.885,
-              "turn_3_play": 0.956,
-              "turn_4_play": 0.97,
+              "avg_cmc": 2.98,
+              "turn_1_play": 0.728,
+              "turn_2_play": 0.939,
+              "turn_3_play": 0.984,
+              "turn_4_play": 0.995,
               "cmc_distribution": {
-                "3": 14,
-                "7": 3,
-                "1": 15,
-                "2": 41,
+                "1": 16,
+                "3": 13,
+                "7": 2,
+                "2": 11,
                 "10": 4,
                 "5": 3,
                 "4": 5,
@@ -321,137 +303,120 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (29.4%). Considere adicionar 2-4 terrenos."
+              "Alta taxa de mana screw (15.8%). Considere adicionar 2-4 terrenos.",
+              "41 terrenos é acima do ideal. Considere trocar alguns por mana rocks."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.11,
-            "keep_at_7": 0.898,
-            "keep_at_6": 0.092,
+            "avg_mulligans": 0.09,
+            "keep_at_7": 0.916,
+            "keep_at_6": 0.074,
             "keep_at_5": 0.01,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.912
+            "keepable_after_mull": 0.924
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.27,
-            "keep_at_7": 0.772,
-            "keep_at_6": 0.182,
-            "keep_at_5": 0.046,
+            "avg_mulligans": 0.1,
+            "keep_at_7": 0.908,
+            "keep_at_6": 0.086,
+            "keep_at_5": 0.006,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.868
+            "keepable_after_mull": 0.94
           },
           "deltas": {
-            "consistency_score": -9,
-            "screw_rate_delta": 0.137,
-            "flood_rate_delta": -0.009,
-            "keepable_rate_delta": -0.128,
-            "turn2_play_delta": -0.053,
-            "mulligan_keep7_delta": -0.126
+            "consistency_score": 0,
+            "screw_rate_delta": 0.011,
+            "flood_rate_delta": 0.0,
+            "keepable_rate_delta": -0.011,
+            "turn2_play_delta": 0.011,
+            "mulligan_keep7_delta": -0.008
           }
         },
         "functional_analysis": {
           "swaps": [
             {
               "removed": "All Is Dust",
-              "added": "Jin-Gitaxias, Progress Tyrant",
+              "added": "Swiftfoot Boots",
               "removed_role": "utility",
-              "added_role": "creature",
+              "added_role": "protection",
               "role_preserved": false,
-              "cmc_delta": 0,
+              "cmc_delta": -5,
               "verdict": "tradeoff"
             },
             {
               "removed": "Lightning Greaves",
-              "added": "Counterspell",
+              "added": "Brainstorm",
               "removed_role": "protection",
-              "added_role": "removal",
+              "added_role": "draw",
               "role_preserved": false,
-              "cmc_delta": 0,
+              "cmc_delta": -1,
               "verdict": "tradeoff"
             },
             {
               "removed": "Isochron Scepter",
-              "added": "Laboratory Maniac",
+              "added": "Command Tower",
               "removed_role": "artifact",
-              "added_role": "draw",
+              "added_role": "land",
               "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
-            },
-            {
-              "removed": "Ponder",
-              "added": "Brainstorm",
-              "removed_role": "draw",
-              "added_role": "draw",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "cmc_delta": -2,
+              "verdict": "tradeoff"
             }
           ],
           "summary": {
-            "upgrades": 1,
+            "upgrades": 0,
             "sidegrades": 0,
-            "tradeoffs": 2,
-            "questionable": 1
+            "tradeoffs": 3,
+            "questionable": 0
           },
           "role_delta": {
             "draw": 1,
-            "removal": 1,
+            "removal": 0,
             "ramp": 0,
-            "creature": 1,
+            "creature": 0,
             "artifact": -1,
             "enchantment": 0,
-            "land": 0,
+            "land": 1,
             "utility": -1,
             "wipe": 0,
             "tutor": 0,
-            "protection": -1
+            "protection": 0
           }
         },
         "critic_ai": {
           "approval_score": 60,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de All Is Dust por Jin-Gitaxias, Progress Tyrant pode comprometer a utilidade do deck em situações de controle de mesa.",
-            "A substituição de Lightning Greaves por Counterspell diminui a proteção do comandante, o que pode ser crítico em um ambiente competitivo.",
-            "A troca de Isochron Scepter por Laboratory Maniac é questionável, pois o Scepter oferece versatilidade e potencial de sinergia que o Maniac não necessariamente traz.",
-            "A diminuição na taxa de keep sem mulligan e o aumento no mana screw indicam uma piora na consistência do deck."
+            "A troca de All Is Dust por Swiftfoot Boots pode comprometer a capacidade de lidar com múltiplas ameaças no campo.",
+            "Substituir Lightning Greaves por Brainstorm reduz a proteção do comandante, o que pode ser crítico em um ambiente competitivo.",
+            "A troca de Isochron Scepter por Command Tower melhora a mana, mas a perda de um artefato que pode gerar valor contínuo é preocupante."
           ],
-          "strong_swaps": [
-            "A troca de Ponder por Brainstorm é um upgrade claro, pois Brainstorm oferece mais flexibilidade e sinergia com o uso de fetch lands."
-          ],
+          "strong_swaps": [],
           "weak_swaps": [
             {
-              "swap": "OUT: All Is Dust → IN: Jin-Gitaxias, Progress Tyrant",
-              "justification": "A perda de uma remoção em massa pode ser crítica em situações onde o controle de mesa é necessário."
+              "swap": "OUT: All Is Dust → IN: Swiftfoot Boots",
+              "justificativa": "All Is Dust é uma remoção em massa poderosa, enquanto Swiftfoot Boots oferece proteção limitada."
             },
             {
-              "swap": "OUT: Lightning Greaves → IN: Counterspell",
-              "justification": "A proteção do comandante é essencial, e Counterspell não oferece a mesma segurança."
+              "swap": "OUT: Lightning Greaves → IN: Brainstorm",
+              "justificativa": "A perda de proteção para o comandante pode ser crítica, especialmente em um deck que depende de sua presença."
             },
             {
-              "swap": "OUT: Isochron Scepter → IN: Laboratory Maniac",
-              "justification": "Laboratory Maniac não oferece a mesma versatilidade que Isochron Scepter, que pode ser usado para repetir feitiços importantes."
+              "swap": "OUT: Isochron Scepter → IN: Command Tower",
+              "justificativa": "Embora Command Tower melhore a mana, Isochron Scepter pode gerar valor significativo ao longo do jogo."
             }
           ],
-          "overall_assessment": "As trocas propostas apresentam riscos significativos à consistência e proteção do deck, embora algumas melhorias pontuais sejam observadas."
+          "overall_assessment": "As trocas propostas apresentam tradeoffs que podem comprometer a eficácia do deck, especialmente em termos de proteção e controle de mesa."
         },
-        "warnings": [
-          "Consistência do deck diminuiu (90 → 81)",
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "Risco de mana screw aumentou significativamente."
-        ]
+        "warnings": []
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
-      "🔒 Basalt Monolith -> Swiftfoot Boots removida pelo gate: papel ramp -> protection, delta CMC -1.",
-      "🔒 Expedition Map -> Command Tower removida pelo gate: papel ramp -> land, delta CMC -1.",
-      "Consistência do deck diminuiu (90 → 81)",
-      "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-      "Risco de mana screw aumentou significativamente."
+      "🔒 Gate de qualidade removeu 3 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Basalt Monolith -> Tezzeret's Gambit removida pelo gate: papel ramp -> draw, delta CMC +1.",
+      "🔒 Ponder -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel draw -> creature, delta CMC +6.",
+      "🔒 Expedition Map -> Consecrated Sphinx removida pelo gate: papel ramp -> draw, delta CMC +5."
     ]
   }
 }
