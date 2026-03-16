@@ -57,11 +57,12 @@ Foram corrigidos e validados os seguintes pontos:
 - `app/flutter test`: passando.
 - `server/dart analyze`: 8 warnings preexistentes, sem erros.
 - Testes direcionados do backend: passando.
-- `server/dart test` completo: ainda falha em `server/test/optimization_rules_test.dart` no caso `TC052`.
+- `server/dart test` completo: passando.
 
-## Pendencia restante fora deste escopo
+## Ajuste adicional apos o relatorio inicial
 
-- `server/test/optimization_rules_test.dart:918`
-  - expectativa atual exige score `> 100`;
-  - implementacao atual retorna `100`;
-  - falha continua preexistente e nao tem relacao com auth, rate limit, importacao ou criacao de deck.
+- Foi corrigido o calculo de `consistencyScore` em `server/lib/ai/goldfish_simulator.dart`.
+- O score estava sendo multiplicado por `100` duas vezes, saturando quase qualquer deck em `100`.
+- Efeito pratico:
+  - o caso `TC052` voltou a diferenciar deck inconsistente de deck corrigido;
+  - `server/dart test` completo passou a fechar sem falhas.
