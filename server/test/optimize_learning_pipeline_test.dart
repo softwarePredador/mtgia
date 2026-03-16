@@ -193,6 +193,54 @@ void main() {
     });
   });
 
+  group('shouldRetryOptimizeWithAiFallback', () {
+    test('retries only for deterministic-first quality rejections', () {
+      expect(
+        optimize_route.shouldRetryOptimizeWithAiFallback(
+          deterministicFirstEnabled: true,
+          fallbackAlreadyAttempted: false,
+          strategySource: 'deterministic_first',
+          qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS',
+          isComplete: false,
+        ),
+        isTrue,
+      );
+
+      expect(
+        optimize_route.shouldRetryOptimizeWithAiFallback(
+          deterministicFirstEnabled: true,
+          fallbackAlreadyAttempted: false,
+          strategySource: 'deterministic_first',
+          qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
+          isComplete: false,
+        ),
+        isTrue,
+      );
+
+      expect(
+        optimize_route.shouldRetryOptimizeWithAiFallback(
+          deterministicFirstEnabled: true,
+          fallbackAlreadyAttempted: true,
+          strategySource: 'deterministic_first',
+          qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
+          isComplete: false,
+        ),
+        isFalse,
+      );
+
+      expect(
+        optimize_route.shouldRetryOptimizeWithAiFallback(
+          deterministicFirstEnabled: true,
+          fallbackAlreadyAttempted: false,
+          strategySource: 'ai_primary',
+          qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
+          isComplete: false,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('buildDeterministicOptimizeRemovalCandidates', () {
     test('does not count lands as ramp surplus when ranking nonland removals',
         () {
