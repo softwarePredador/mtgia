@@ -14,7 +14,8 @@ import '../routes/ai/optimize/index.dart' as optimize_route;
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
 const _artifactDirPath = 'test/artifacts/optimization_validation_three_decks';
-const _summaryJsonPath = 'test/artifacts/optimization_validation_three_decks/latest_summary.json';
+const _summaryJsonPath =
+    'test/artifacts/optimization_validation_three_decks/latest_summary.json';
 const _summaryMdPath = '../RELATORIO_OTIMIZACAO_3_DECKS_2026-03-16.md';
 
 class SourceDeckCandidate {
@@ -42,17 +43,20 @@ class SourceDeckCandidate {
     final detected = _normalizeArchetype(sourceArchetype);
     if (detected != null) return detected;
     final analysis =
-        optimize_route.DeckArchetypeAnalyzer(cards, commanderColors).generateAnalysis();
-    final byAnalysis = _normalizeArchetype(analysis['detected_archetype']?.toString());
+        optimize_route.DeckArchetypeAnalyzer(cards, commanderColors)
+            .generateAnalysis();
+    final byAnalysis =
+        _normalizeArchetype(analysis['detected_archetype']?.toString());
     return byAnalysis ?? 'midrange';
   }
 
-  int get totalCards =>
-      cards.fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  int get totalCards => cards.fold<int>(
+      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
 }
 
 class DeckRunResult {
   DeckRunResult({
+    required this.resultKind,
     required this.commanderName,
     required this.sourceDeckId,
     required this.sourceDeckName,
@@ -81,6 +85,7 @@ class DeckRunResult {
     required this.optimizeResponse,
   });
 
+  final String resultKind;
   final String commanderName;
   final String sourceDeckId;
   final String sourceDeckName;
@@ -111,6 +116,7 @@ class DeckRunResult {
   bool get passed => failedChecks.isEmpty;
 
   Map<String, dynamic> toJson() => {
+        'result_kind': resultKind,
         'commander_name': commanderName,
         'source_deck_id': sourceDeckId,
         'source_deck_name': sourceDeckName,
@@ -184,7 +190,8 @@ Future<void> main() async {
 
     for (final candidate in selected) {
       print('');
-      print('=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===');
+      print(
+          '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===');
       final result = await _runOptimizationForDeck(
         apiBaseUrl: apiBaseUrl,
         token: token,
@@ -193,6 +200,7 @@ Future<void> main() async {
       results.add(result);
       print(
         '${result.passed ? 'PASSOU' : 'FALHOU'} | '
+        '${result.resultKind} | '
         'score local ${result.localValidationScore}/100 | '
         'veredito ${result.localValidationVerdict}',
       );
@@ -204,6 +212,10 @@ Future<void> main() async {
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
       'total': results.length,
+      'accepted_optimizations':
+          results.where((r) => r.resultKind == 'accepted_optimization').length,
+      'protected_rejections':
+          results.where((r) => r.resultKind == 'protected_rejection').length,
       'passed': results.where((r) => r.passed).length,
       'failed': results.where((r) => !r.passed).length,
       'results': results.map((r) => r.toJson()).toList(),
@@ -323,6 +335,7 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
       WHERE d.deleted_at IS NULL
         AND LOWER(d.format) = 'commander'
         AND stats.total_cards = 100
+        AND d.name NOT LIKE 'Optimization Validation - %'
       ORDER BY d.created_at DESC NULLS LAST
       LIMIT 120
     '''),
@@ -337,7 +350,8 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
     final bracket = row[3] as int?;
     final commanderCardId = row[4] as String;
     final commanderName = row[5] as String;
-    final commanderColors = (row[6] as List?)?.cast<String>() ?? const <String>[];
+    final commanderColors =
+        (row[6] as List?)?.cast<String>() ?? const <String>[];
 
     final cards = await _loadDeckCards(pool, deckId);
     if (cards.isEmpty) continue;
@@ -366,7 +380,8 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
   return candidates;
 }
 
-Future<List<Map<String, dynamic>>> _loadDeckCards(Pool pool, String deckId) async {
+Future<List<Map<String, dynamic>>> _loadDeckCards(
+    Pool pool, String deckId) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT
@@ -477,7 +492,17 @@ Future<DeckRunResult> _runOptimizationForDeck({
   );
 
   if (optimizeResponse.statusCode != 200) {
+    final qualityError = optimizeBody['quality_error'] as Map<String, dynamic>?;
+    final qualityCode = qualityError?['code']?.toString() ?? '';
+    final protectedRejection = optimizeResponse.statusCode == 422 &&
+        {
+          'OPTIMIZE_NO_SAFE_SWAPS',
+          'OPTIMIZE_QUALITY_REJECTED',
+          'OPTIMIZE_NO_ACTIONABLE_SWAPS',
+        }.contains(qualityCode);
+
     return DeckRunResult(
+      resultKind: protectedRejection ? 'protected_rejection' : 'failure',
       commanderName: candidate.commanderName,
       sourceDeckId: candidate.deckId,
       sourceDeckName: candidate.deckName,
@@ -487,9 +512,10 @@ Future<DeckRunResult> _runOptimizationForDeck({
       optimizeStatus: optimizeResponse.statusCode,
       optimizeMode: optimizeBody['mode']?.toString() ?? 'unknown',
       savedArtifactPath: artifactPath,
-      savedDeckValid: false,
+      savedDeckValid: protectedRejection,
       localValidationScore: 0,
-      localValidationVerdict: 'reprovado',
+      localValidationVerdict:
+          protectedRejection ? 'quality_rejected' : 'reprovado',
       responseValidationScore: null,
       responseValidationVerdict: null,
       beforeAverageCmc: 0,
@@ -500,9 +526,21 @@ Future<DeckRunResult> _runOptimizationForDeck({
       afterInteraction: 0,
       beforeConsistency: 0,
       afterConsistency: 0,
-      expectedChecks: const [],
-      failedChecks: ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
-      warnings: [_extractMessage(optimizeBody)],
+      expectedChecks: protectedRejection
+          ? const [
+              'o backend recusou a otimizacao insegura em vez de retornar sucesso ruim'
+            ]
+          : const [],
+      failedChecks: protectedRejection
+          ? const []
+          : ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
+      warnings: [
+        if (protectedRejection)
+          'Rejeicao protegida pelo gate de qualidade: ${qualityError?['message'] ?? qualityCode}',
+        ...((qualityError?['reasons'] as List?)?.map((item) => '$item') ??
+            const Iterable<String>.empty()),
+        _extractMessage(optimizeBody),
+      ],
       optimizeResponse: optimizeBody,
     );
   }
@@ -533,12 +571,12 @@ Future<DeckRunResult> _runOptimizationForDeck({
     headers: _authHeaders(token),
   );
 
-  final preAnalysis =
-      optimize_route.DeckArchetypeAnalyzer(candidate.cards, candidate.commanderColors)
-          .generateAnalysis();
-  final postAnalysis =
-      optimize_route.DeckArchetypeAnalyzer(optimizedCards, candidate.commanderColors)
-          .generateAnalysis();
+  final preAnalysis = optimize_route.DeckArchetypeAnalyzer(
+          candidate.cards, candidate.commanderColors)
+      .generateAnalysis();
+  final postAnalysis = optimize_route.DeckArchetypeAnalyzer(
+          optimizedCards, candidate.commanderColors)
+      .generateAnalysis();
 
   final validator = OptimizationValidator();
   final localValidation = await validator.validate(
@@ -550,9 +588,8 @@ Future<DeckRunResult> _runOptimizationForDeck({
     archetype: candidate.resolvedArchetype,
   );
 
-  final responseValidation =
-      (optimizeBody['post_analysis'] as Map<String, dynamic>?)?['validation']
-          as Map<String, dynamic>?;
+  final responseValidation = (optimizeBody['post_analysis']
+      as Map<String, dynamic>?)?['validation'] as Map<String, dynamic>?;
 
   final expectedChecks = <String>[];
   final failedChecks = <String>[];
@@ -586,10 +623,16 @@ Future<DeckRunResult> _runOptimizationForDeck({
       putResponse.statusCode == 200);
   expectCheck('POST /decks/:id/validate aprovou o deck salvo',
       validateResponse.statusCode == 200);
-  expectCheck('Validation local nao reprovou', localValidation.verdict != 'reprovado');
+  expectCheck('Validation local fechou como aprovado',
+      localValidation.verdict == 'aprovado');
+  expectCheck('Validation local score >= 70', localValidation.score >= 70);
   expectCheck(
-    'Validation retornada pela rota nao reprovou',
-    (responseValidation?['verdict']?.toString() ?? 'aprovado') != 'reprovado',
+    'Validation retornada pela rota fechou como aprovado',
+    (responseValidation?['verdict']?.toString() ?? '') == 'aprovado',
+  );
+  expectCheck(
+    'Validation retornada pela rota score >= 70',
+    ((responseValidation?['validation_score'] as num?)?.toInt() ?? 0) >= 70,
   );
   expectCheck(
     'Consistencia nao piorou',
@@ -598,7 +641,8 @@ Future<DeckRunResult> _runOptimizationForDeck({
 
   switch (candidate.resolvedArchetype) {
     case 'aggro':
-      expectCheck('Aggro reduz ou mantem a curva media', afterAverageCmc <= beforeAverageCmc);
+      expectCheck('Aggro reduz ou mantem a curva media',
+          afterAverageCmc <= beforeAverageCmc);
       expectCheck(
         'Aggro melhora turn2 play rate',
         localValidation.monteCarlo.after.turn2PlayRate >=
@@ -616,7 +660,8 @@ Future<DeckRunResult> _runOptimizationForDeck({
       );
       break;
     case 'midrange':
-      expectCheck('Midrange reduz ou mantem a curva media', afterAverageCmc <= beforeAverageCmc);
+      expectCheck('Midrange reduz ou mantem a curva media',
+          afterAverageCmc <= beforeAverageCmc);
       expectCheck(
         'Midrange preserva ramp/removal',
         (localValidation.functional.roleDelta['ramp'] ?? 0) >= 0 &&
@@ -632,6 +677,7 @@ Future<DeckRunResult> _runOptimizationForDeck({
   }
 
   return DeckRunResult(
+    resultKind: 'accepted_optimization',
     commanderName: candidate.commanderName,
     sourceDeckId: candidate.deckId,
     sourceDeckName: candidate.deckName,
@@ -644,8 +690,7 @@ Future<DeckRunResult> _runOptimizationForDeck({
     savedDeckValid: validateResponse.statusCode == 200,
     localValidationScore: localValidation.score,
     localValidationVerdict: localValidation.verdict,
-    responseValidationScore:
-        responseValidation?['validation_score'] as int?,
+    responseValidationScore: responseValidation?['validation_score'] as int?,
     responseValidationVerdict: responseValidation?['verdict']?.toString(),
     beforeAverageCmc: beforeAverageCmc,
     afterAverageCmc: afterAverageCmc,
@@ -661,7 +706,8 @@ Future<DeckRunResult> _runOptimizationForDeck({
       ...localValidation.warnings,
       ...((optimizeBody['validation_warnings'] as List?)?.map((e) => '$e') ??
           const Iterable<String>.empty()),
-      if (putResponse.statusCode != 200) 'Falha ao salvar deck: ${putResponse.body}',
+      if (putResponse.statusCode != 200)
+        'Falha ao salvar deck: ${putResponse.body}',
       if (validateResponse.statusCode != 200)
         'Falha no validate: ${validateResponse.body}',
     ],
@@ -700,7 +746,8 @@ Future<String> _createDeckClone({
   }
 
   final body = _decodeJson(response);
-  final deckId = body['id']?.toString() ?? (body['deck']?['id']?.toString() ?? '');
+  final deckId =
+      body['id']?.toString() ?? (body['deck']?['id']?.toString() ?? '');
   if (deckId.isEmpty) {
     throw Exception('Resposta sem id do deck clonado: ${response.body}');
   }
@@ -778,17 +825,17 @@ List<Map<String, dynamic>> _applyRecommendations({
   required List<Map<String, dynamic>> originalCards,
   required Map<String, dynamic> responseBody,
 }) {
-  final next = originalCards
-      .map((card) => Map<String, dynamic>.from(card))
-      .toList();
+  final next =
+      originalCards.map((card) => Map<String, dynamic>.from(card)).toList();
 
   final removalsDetailed =
       (responseBody['removals_detailed'] as List?)?.whereType<Map>().toList() ??
           const <Map>[];
 
-  final additionsDetailed =
-      (responseBody['additions_detailed'] as List?)?.whereType<Map>().toList() ??
-          const <Map>[];
+  final additionsDetailed = (responseBody['additions_detailed'] as List?)
+          ?.whereType<Map>()
+          .toList() ??
+      const <Map>[];
 
   final removalCounts = <String, int>{};
   for (final raw in removalsDetailed) {
@@ -849,7 +896,10 @@ List<Map<String, dynamic>> _applyRecommendations({
 
 List<String> _extractNames(Object? raw) {
   if (raw is! List) return const <String>[];
-  return raw.map((item) => item.toString()).where((item) => item.isNotEmpty).toList();
+  return raw
+      .map((item) => item.toString())
+      .where((item) => item.isNotEmpty)
+      .toList();
 }
 
 double _parseDouble(Object? value) {
@@ -859,7 +909,8 @@ double _parseDouble(Object? value) {
 
 int _countInteraction(Map<String, dynamic> analysis) {
   final types = (analysis['type_distribution'] as Map<String, dynamic>?) ?? {};
-  return ((types['instants'] as int?) ?? 0) + ((types['sorceries'] as int?) ?? 0);
+  return ((types['instants'] as int?) ?? 0) +
+      ((types['sorceries'] as int?) ?? 0);
 }
 
 String? _normalizeArchetype(String? archetype) {
@@ -905,6 +956,29 @@ String _extractMessage(Map<String, dynamic> body) {
 String _buildMarkdownReport(Map<String, dynamic> summary) {
   final results =
       (summary['results'] as List).whereType<Map<String, dynamic>>().toList();
+  String formatValidation(Map<String, dynamic> result, bool isLocal) {
+    final resultKind = result['result_kind']?.toString() ?? '';
+    if (resultKind == 'protected_rejection') {
+      return isLocal ? 'n/d - quality_rejected' : 'n/d';
+    }
+
+    final scoreKey =
+        isLocal ? 'local_validation_score' : 'response_validation_score';
+    final verdictKey =
+        isLocal ? 'local_validation_verdict' : 'response_validation_verdict';
+    final score = result[scoreKey];
+    final verdict = result[verdictKey];
+    if (score == null || verdict == null) return 'n/d';
+    return '$score/100 - $verdict';
+  }
+
+  String formatPair(
+      Map<String, dynamic> result, String beforeKey, String afterKey) {
+    final resultKind = result['result_kind']?.toString() ?? '';
+    if (resultKind == 'protected_rejection') return 'n/d';
+    return '${result[beforeKey]} -> ${result[afterKey]}';
+  }
+
   final buffer = StringBuffer()
     ..writeln('# Relatorio de Otimizacao Real - 3 Decks Commander')
     ..writeln()
@@ -912,6 +986,8 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
     ..writeln('- API: `${summary['api_base_url']}`')
     ..writeln('- Artefatos: `${summary['artifact_dir']}`')
     ..writeln('- Total: `${summary['total']}`')
+    ..writeln('- Otimizacoes aceitas: `${summary['accepted_optimizations']}`')
+    ..writeln('- Rejeicoes protegidas: `${summary['protected_rejections']}`')
     ..writeln('- Passaram: `${summary['passed']}`')
     ..writeln('- Falharam: `${summary['failed']}`')
     ..writeln()
@@ -924,16 +1000,21 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
       ..writeln()
       ..writeln('- Source deck: `${result['source_deck_id']}`')
       ..writeln('- Clone deck: `${result['clone_deck_id']}`')
+      ..writeln('- Tipo de resultado: `${result['result_kind']}`')
       ..writeln('- Archetype usado: `${result['archetype']}`')
       ..writeln('- Optimize status: `${result['optimize_status']}`')
       ..writeln('- Deck salvo valido: `${result['saved_deck_valid']}`')
-      ..writeln('- Validation local: `${result['local_validation_score']}/100 - ${result['local_validation_verdict']}`')
-      ..writeln('- Validation da rota: `${result['response_validation_score'] ?? 'n/d'}/100 - ${result['response_validation_verdict'] ?? 'n/d'}`')
-      ..writeln('- CMC medio: `${result['before_average_cmc']} -> ${result['after_average_cmc']}`')
-      ..writeln('- Interacao: `${result['before_interaction']} -> ${result['after_interaction']}`')
-      ..writeln('- Consistencia: `${result['before_consistency']} -> ${result['after_consistency']}`')
+      ..writeln('- Validation local: `${formatValidation(result, true)}`')
+      ..writeln('- Validation da rota: `${formatValidation(result, false)}`')
+      ..writeln(
+          '- CMC medio: `${formatPair(result, 'before_average_cmc', 'after_average_cmc')}`')
+      ..writeln(
+          '- Interacao: `${formatPair(result, 'before_interaction', 'after_interaction')}`')
+      ..writeln(
+          '- Consistencia: `${formatPair(result, 'before_consistency', 'after_consistency')}`')
       ..writeln('- Artifact: `${result['saved_artifact_path']}`')
-      ..writeln('- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`')
+      ..writeln(
+          '- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`')
       ..writeln();
 
     final failedChecks =

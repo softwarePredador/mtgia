@@ -630,7 +630,7 @@ class DeckOptimizerService {
         if (detectedTheme != null) "deck_theme": detectedTheme,
         if (coreCards != null && coreCards.isNotEmpty) "core_cards": coreCards,
         "notes":
-            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover).",
+            "Se keep_theme=true: NÃO mude o plano/tema do deck; preserve as core_cards (nunca remover). Preserve o papel funcional das trocas. Se não houver upgrade seguro, retorne MENOS swaps em vez de forçar sugestões ruins.",
       },
       "context": {
         "statistically_weak_cards":

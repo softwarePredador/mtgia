@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/card_validation_service.dart';
 import '../../../lib/ai/otimizacao.dart';
+import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
@@ -1904,6 +1905,27 @@ Future<Response> onRequest(RequestContext context) async {
           '  Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
     }
 
+    if (!isComplete && (validRemovals.isEmpty || validAdditions.isEmpty)) {
+      return Response.json(
+        statusCode: HttpStatus.unprocessableEntity,
+        body: {
+          'error':
+              'A otimizacao nao encontrou trocas acionaveis apos os filtros de seguranca.',
+          'quality_error': {
+            'code': 'OPTIMIZE_NO_ACTIONABLE_SWAPS',
+            'message':
+                'As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.',
+            'blocked_by_theme': blockedByTheme,
+            'blocked_by_bracket': blockedByBracket,
+          },
+          'mode': 'optimize',
+          'removals': validRemovals,
+          'additions': validAdditions,
+          'deck_analysis': deckAnalysis,
+        },
+      );
+    }
+
     // --- VERIFICAÇÃO PÓS-OTIMIZAÇÃO (Virtual Deck Analysis) ---
     // Simular o deck como ficaria se as mudanças fossem aplicadas e re-analisar
     Map<String, dynamic>? postAnalysis;
@@ -1978,6 +2000,9 @@ Future<Response> onRequest(RequestContext context) async {
       }
     }
 
+    ValidationReport? optimizationValidationReport;
+    final qualityGateWarnings = <String>[];
+
     if (validAdditions.isNotEmpty) {
       try {
         // 1. Buscar dados completos das cartas sugeridas (para análise de mana/tipo)
@@ -2009,7 +2034,7 @@ Future<Response> onRequest(RequestContext context) async {
           },
         );
 
-        final additionsData = additionsDataResult
+        var additionsData = additionsDataResult
             .map((row) => {
                   'name': (row[0] as String?) ?? '',
                   'type_line': (row[1] as String?) ?? '',
@@ -2019,6 +2044,53 @@ Future<Response> onRequest(RequestContext context) async {
                   'oracle_text': (row[5] as String?) ?? '',
                 })
             .toList();
+
+        if (!isComplete) {
+          final gateResult = filterUnsafeOptimizeSwapsByCardData(
+            removals: validRemovals,
+            additions: validAdditions,
+            originalDeck: allCardData,
+            additionsData: additionsData,
+            archetype: targetArchetype,
+          );
+
+          if (gateResult.changed) {
+            validRemovals = gateResult.removals;
+            validAdditions = gateResult.additions;
+            qualityGateWarnings.add(
+              '🔒 Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
+            );
+            qualityGateWarnings.addAll(
+              gateResult.droppedReasons.map((reason) => '🔒 $reason'),
+            );
+
+            final safeAdditionNames =
+                validAdditions.map((name) => name.toLowerCase()).toSet();
+            additionsData = additionsData.where((card) {
+              final name = (card['name'] as String?)?.toLowerCase() ?? '';
+              return safeAdditionNames.contains(name);
+            }).toList();
+          }
+
+          if (validRemovals.isEmpty || validAdditions.isEmpty) {
+            return Response.json(
+              statusCode: HttpStatus.unprocessableEntity,
+              body: {
+                'error':
+                    'Nenhuma troca segura restou apos o gate de qualidade da otimizacao.',
+                'quality_error': {
+                  'code': 'OPTIMIZE_NO_SAFE_SWAPS',
+                  'message':
+                      'As trocas sugeridas pioravam funcao, curva ou consistencia do deck.',
+                  'dropped_swaps': qualityGateWarnings,
+                },
+                'mode': 'optimize',
+                'removals': validRemovals,
+                'additions': validAdditions,
+              },
+            );
+          }
+        }
 
         // 2. Criar Deck Virtual (Clone do atual - Remoções + Adições)
         final virtualDeck = List<Map<String, dynamic>>.from(
@@ -2139,6 +2211,7 @@ Future<Response> onRequest(RequestContext context) async {
           );
 
           postAnalysis['validation'] = validationReport.toJson();
+          optimizationValidationReport = validationReport;
 
           // Adicionar warnings do validador
           for (final w in validationReport.warnings) {
@@ -2154,11 +2227,90 @@ Future<Response> onRequest(RequestContext context) async {
           Log.d(
               'Validation score: ${validationReport.score}/100 verdict: ${validationReport.verdict}');
         } catch (validationError) {
-          Log.w('Validation failed (non-blocking): $validationError');
-          // Validação é enhancement, não deve bloquear a resposta
+          Log.e('Validation failed: $validationError');
+          return Response.json(
+            statusCode: HttpStatus.internalServerError,
+            body: {
+              'error':
+                  'Falha interna ao validar a qualidade final da otimizacao.',
+              'quality_error': {
+                'code': 'OPTIMIZE_VALIDATION_FAILED',
+                'message':
+                    'A validacao automatica da otimizacao falhou. A resposta foi bloqueada para evitar retornar um resultado nao verificado.',
+                'details': '$validationError',
+              },
+              'mode': 'optimize',
+              'removals': validRemovals,
+              'additions': validAdditions,
+              'deck_analysis': deckAnalysis,
+              'post_analysis': postAnalysis,
+              'validation_warnings': validationWarnings,
+            },
+          );
         }
       } catch (e) {
         Log.e('Erro na verificação pós-otimização: $e');
+        return Response.json(
+          statusCode: HttpStatus.internalServerError,
+          body: {
+            'error': 'Falha interna durante a verificacao final da otimizacao.',
+            'quality_error': {
+              'code': 'OPTIMIZE_POST_ANALYSIS_FAILED',
+              'message':
+                  'A verificacao final falhou e a resposta foi bloqueada para evitar retornar uma otimizacao sem checagem completa.',
+              'details': '$e',
+            },
+            'mode': 'optimize',
+            'removals': validRemovals,
+            'additions': validAdditions,
+            'deck_analysis': deckAnalysis,
+            'post_analysis': postAnalysis,
+            'validation_warnings': validationWarnings,
+          },
+        );
+      }
+    }
+
+    if (qualityGateWarnings.isNotEmpty) {
+      validationWarnings.insertAll(0, qualityGateWarnings);
+    }
+
+    if (!isComplete && optimizationValidationReport != null) {
+      final postAnalysisMap = postAnalysis ?? const <String, dynamic>{};
+      final rejectionReasons = buildOptimizationRejectionReasons(
+        validationReport: optimizationValidationReport,
+        archetype: targetArchetype,
+        preCurve:
+            double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0,
+        postCurve:
+            double.tryParse('${postAnalysisMap['average_cmc'] ?? '0'}') ?? 0.0,
+        preManaAssessment:
+            deckAnalysis['mana_base_assessment']?.toString() ?? '',
+        postManaAssessment:
+            postAnalysisMap['mana_base_assessment']?.toString() ?? '',
+      );
+
+      if (rejectionReasons.isNotEmpty) {
+        return Response.json(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: {
+            'error':
+                'A otimizacao sugerida nao passou no gate final de qualidade.',
+            'quality_error': {
+              'code': 'OPTIMIZE_QUALITY_REJECTED',
+              'message':
+                  'As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.',
+              'reasons': rejectionReasons,
+              'validation': optimizationValidationReport.toJson(),
+            },
+            'mode': 'optimize',
+            'removals': validRemovals,
+            'additions': validAdditions,
+            'deck_analysis': deckAnalysis,
+            'post_analysis': postAnalysis,
+            'validation_warnings': validationWarnings,
+          },
+        );
       }
     }
 
@@ -3916,7 +4068,7 @@ String _buildOptimizeCacheKey({
     keepTheme ? 'keep' : 'free',
     deckSignature,
   ].join('::');
-  return 'v4:${_stableHash(base)}';
+  return 'v6:${_stableHash(base)}';
 }
 
 String _stableHash(String value) {

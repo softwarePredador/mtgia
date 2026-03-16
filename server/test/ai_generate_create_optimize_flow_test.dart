@@ -356,10 +356,24 @@ void main() {
         final body = decodeJson(optimizeResponse);
         if (optimizeResponse.statusCode == 200) {
           final mode = body['mode'] as String?;
+          final postAnalysis = body['post_analysis'] as Map<String, dynamic>?;
+          final validation =
+              postAnalysis?['validation'] as Map<String, dynamic>?;
           expect(mode, anyOf(equals('optimize'), equals('complete')));
           expect(
             body['reasoning'] != null || body['analysis'] != null,
             isTrue,
+            reason: optimizeResponse.body,
+          );
+          expect(validation, isNotNull, reason: optimizeResponse.body);
+          expect(
+            validation?['verdict'],
+            equals('aprovado'),
+            reason: optimizeResponse.body,
+          );
+          expect(
+            (validation?['validation_score'] as num?)?.toInt() ?? 0,
+            greaterThanOrEqualTo(70),
             reason: optimizeResponse.body,
           );
         } else {

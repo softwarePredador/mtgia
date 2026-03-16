@@ -1,86 +1,80 @@
 # Relatorio de Otimizacao Real - 3 Decks Commander
 
-- Gerado em: `2026-03-16T12:00:37.209441`
+- Gerado em: `2026-03-16T12:45:28.353227`
 - API: `http://127.0.0.1:8080`
 - Artefatos: `test/artifacts/optimization_validation_three_decks`
 - Total: `3`
-- Passaram: `1`
-- Falharam: `2`
+- Otimizacoes aceitas: `0`
+- Rejeicoes protegidas: `3`
+- Passaram: `3`
+- Falharam: `0`
 
 ## Resultado por deck
 
 ### Auntie Ool, Cursewretch
 
 - Source deck: `8c22deb9-80bd-489f-8e87-1344eabac698`
-- Clone deck: `fb3a7353-ad05-406a-9248-e0c2d136a519`
+- Clone deck: `06c45551-4aa6-4eff-8d23-e0ca4871a521`
+- Tipo de resultado: `protected_rejection`
 - Archetype usado: `aggro`
-- Optimize status: `200`
+- Optimize status: `422`
 - Deck salvo valido: `true`
-- Validation local: `43/100 - reprovado`
-- Validation da rota: `39/100 - reprovado`
-- CMC medio: `1.88 -> 1.75`
-- Interacao: `22 -> 18`
-- Consistencia: `70.0 -> 74.0`
+- Validation local: `n/d - quality_rejected`
+- Validation da rota: `n/d`
+- CMC medio: `n/d`
+- Interacao: `n/d`
+- Consistencia: `n/d`
 - Artifact: `test/artifacts/optimization_validation_three_decks/auntie_ool_cursewretch.json`
-- Status final: `FALHOU`
-
-Falhas:
-- Validation local nao reprovou
-- Validation retornada pela rota nao reprovou
+- Status final: `PASSOU`
 
 Avisos:
-- O deck perdeu cartas de remoção. Pode ficar vulnerável.
-- O deck perdeu cartas de ramp. Pode ficar lento no early game.
-- 🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: 39/100).
-- ⚠️ ATENÇÃO: O deck está ficando mais lento (CMC aumentou), o que é ruim para Aggro.
-- O deck perdeu cartas de remoção. Pode ficar vulnerável.
-- O deck perdeu cartas de ramp. Pode ficar lento no early game.
-- 3 troca(s) questionável(is) — mudou função E ficou mais cara.
+- Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
+- A validação final não fechou como "aprovado" (score 65/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
+- Score final abaixo do mínimo para aceitar a otimização com sucesso (65/100; mínimo 70).
+- A otimizacao sugerida nao passou no gate final de qualidade.
 
 ### Talrand, Sky Summoner
 
 - Source deck: `df780797-bcc4-47cb-82d6-08d01ae3b03b`
-- Clone deck: `be408e73-2801-4b1f-9c69-17c9c0877cad`
+- Clone deck: `86f8df73-549d-441b-a19b-d1bdee8cf981`
+- Tipo de resultado: `protected_rejection`
 - Archetype usado: `midrange`
-- Optimize status: `200`
+- Optimize status: `422`
 - Deck salvo valido: `true`
-- Validation local: `52/100 - aprovado_com_ressalvas`
-- Validation da rota: `58/100 - aprovado_com_ressalvas`
-- CMC medio: `3.0 -> 1.5`
-- Interacao: `0 -> 0`
-- Consistencia: `10.0 -> 14.0`
+- Validation local: `n/d - quality_rejected`
+- Validation da rota: `n/d`
+- CMC medio: `n/d`
+- Interacao: `n/d`
+- Consistencia: `n/d`
 - Artifact: `test/artifacts/optimization_validation_three_decks/talrand_sky_summoner.json`
 - Status final: `PASSOU`
 
 Avisos:
-- ⚠️ 1 (100%) das cartas sugeridas NÃO aparecem nos dados EDHREC de Talrand, Sky Summoner. Isso pode indicar baixa sinergia: Evolving Wilds
+- Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
+- A validação final não fechou como "aprovado" (score 58/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
+- Score final abaixo do mínimo para aceitar a otimização com sucesso (58/100; mínimo 70).
+- A base de mana continua com problema crítico após a otimização.
+- A otimizacao sugerida nao passou no gate final de qualidade.
 
 ### Jin-Gitaxias // The Great Synthesis
 
 - Source deck: `f2a2a34a-4561-4a77-886d-7067b672ac85`
-- Clone deck: `6d3adc16-8c69-437b-a800-abf9c591f2b4`
+- Clone deck: `f6217fe5-d143-4421-97e4-b982ea13544b`
+- Tipo de resultado: `protected_rejection`
 - Archetype usado: `midrange`
-- Optimize status: `200`
+- Optimize status: `422`
 - Deck salvo valido: `true`
-- Validation local: `41/100 - reprovado`
-- Validation da rota: `25/100 - reprovado`
-- CMC medio: `1.57 -> 1.48`
-- Interacao: `25 -> 23`
-- Consistencia: `93.0 -> 92.0`
+- Validation local: `n/d - quality_rejected`
+- Validation da rota: `n/d`
+- CMC medio: `n/d`
+- Interacao: `n/d`
+- Consistencia: `n/d`
 - Artifact: `test/artifacts/optimization_validation_three_decks/jin_gitaxias_the_great_synthesis.json`
-- Status final: `FALHOU`
-
-Falhas:
-- Validation local nao reprovou
-- Validation retornada pela rota nao reprovou
-- Consistencia nao piorou
-- Midrange preserva ramp/removal
+- Status final: `PASSOU`
 
 Avisos:
-- O deck perdeu cartas de remoção. Pode ficar vulnerável.
-- O deck perdeu cartas de ramp. Pode ficar lento no early game.
-- 🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: 25/100).
-- O deck perdeu cartas de remoção. Pode ficar vulnerável.
-- O deck perdeu cartas de ramp. Pode ficar lento no early game.
-- 4 troca(s) questionável(is) — mudou função E ficou mais cara.
+- Rejeicao protegida pelo gate de qualidade: As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.
+- A validação final não fechou como "aprovado" (score 55/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.
+- Score final abaixo do mínimo para aceitar a otimização com sucesso (55/100; mínimo 70).
+- A otimizacao sugerida nao passou no gate final de qualidade.
 
