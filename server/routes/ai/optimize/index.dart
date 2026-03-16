@@ -1121,7 +1121,8 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      final jobId = OptimizeJobStore.create(
+      final jobId = await OptimizeJobStore.create(
+        pool: pool,
         deckId: deckId,
         archetype: targetArchetype,
         userId: userId,
@@ -2586,7 +2587,7 @@ Future<void> _processCompleteModeAsync({
   required bool hasKeepThemeOverride,
 }) async {
   try {
-    OptimizeJobStore.progress(jobId,
+    await OptimizeJobStore.progress(pool, jobId,
         stage: 'Preparando referências do commander...', stageNumber: 1);
 
     Map<String, dynamic> jsonResponse;
@@ -2692,7 +2693,7 @@ Future<void> _processCompleteModeAsync({
       }
     }
 
-    OptimizeJobStore.progress(jobId,
+    await OptimizeJobStore.progress(pool, jobId,
         stage: 'Consultando IA para sugestões...', stageNumber: 2);
 
     var iterations = 0;
@@ -3234,7 +3235,7 @@ Future<void> _processCompleteModeAsync({
 
       // Se ainda faltar após atingir alvo de lands, preencher com cartas não-terreno
 
-      OptimizeJobStore.progress(jobId,
+      await OptimizeJobStore.progress(pool, jobId,
           stage: 'Preenchendo com cartas sinérgicas...', stageNumber: 3);
 
       // competitivas do banco (evita deck degenerado de básicos).
@@ -3367,7 +3368,7 @@ Future<void> _processCompleteModeAsync({
 
       // Garantia local de fechamento do tamanho do deck.
 
-      OptimizeJobStore.progress(jobId,
+      await OptimizeJobStore.progress(pool, jobId,
           stage: 'Ajustando base de mana...', stageNumber: 4);
 
       // Se ainda faltar, completa com básicos dentro da identidade.
@@ -3532,7 +3533,7 @@ Future<void> _processCompleteModeAsync({
       defaultMode: 'optimize',
     );
 
-    OptimizeJobStore.progress(jobId,
+    await OptimizeJobStore.progress(pool, jobId,
         stage: 'Processando resultado final...', stageNumber: 6);
 
     // Post-processing: validar qualidade e construir resposta
@@ -3540,8 +3541,12 @@ Future<void> _processCompleteModeAsync({
         jsonResponse['additions_detailed'] is List) {
       final qualityError = jsonResponse['quality_error'];
       if (qualityError is Map) {
-        OptimizeJobStore.fail(jobId,
-            error: 'Complete mode não atingiu qualidade mínima.');
+        await OptimizeJobStore.fail(
+          pool,
+          jobId,
+          error: 'Complete mode não atingiu qualidade mínima.',
+          qualityError: qualityError.cast<String, dynamic>(),
+        );
         return;
       }
 
@@ -3727,14 +3732,14 @@ Future<void> _processCompleteModeAsync({
         responseBody['warnings'] = warnings;
       }
 
-      OptimizeJobStore.complete(jobId, result: responseBody);
+      await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
       // Fallback: se por algum motivo não veio como complete
-      OptimizeJobStore.complete(jobId, result: jsonResponse);
+      await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
     }
   } catch (e, stackTrace) {
     Log.e('Background optimize job $jobId failed: $e\n$stackTrace');
-    OptimizeJobStore.fail(jobId, error: e.toString());
+    await OptimizeJobStore.fail(pool, jobId, error: e.toString());
   }
 }
 

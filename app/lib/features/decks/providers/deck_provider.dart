@@ -473,6 +473,7 @@ class DeckProvider extends ChangeNotifier {
     final payload = response.data as Map<String, dynamic>;
     final resolvedList = (payload['data'] as List?) ?? const [];
     final unresolvedList = (payload['unresolved'] as List?) ?? const [];
+    final ambiguousList = (payload['ambiguous'] as List?) ?? const [];
 
     final cardIdByInputName = <String, String>{};
     for (final item in resolvedList) {
@@ -489,6 +490,24 @@ class DeckProvider extends ChangeNotifier {
             .map((item) => item.toString().trim())
             .where((name) => name.isNotEmpty)
             .toSet();
+    final ambiguousNames = <String>{};
+
+    for (final item in ambiguousList) {
+      if (item is! Map) continue;
+      final inputName = item['input_name']?.toString().trim();
+      if (inputName == null || inputName.isEmpty) continue;
+      final candidates =
+          (item['candidates'] as List?)
+              ?.map((candidate) => candidate.toString().trim())
+              .where((candidate) => candidate.isNotEmpty)
+              .toList() ??
+          const <String>[];
+      if (candidates.isEmpty) {
+        ambiguousNames.add(inputName);
+      } else {
+        ambiguousNames.add('$inputName (${candidates.join(', ')})');
+      }
+    }
 
     for (final card in aggregatedByName.values) {
       final name = (card['name'] as String?)?.trim();
@@ -507,8 +526,9 @@ class DeckProvider extends ChangeNotifier {
       });
     }
 
-    if (unresolvedNames.isNotEmpty) {
-      final sortedNames = unresolvedNames.toList()..sort();
+    if (unresolvedNames.isNotEmpty || ambiguousNames.isNotEmpty) {
+      final sortedNames =
+          {...unresolvedNames, ...ambiguousNames}.toList()..sort();
       throw Exception(
         'Nao foi possivel resolver todas as cartas antes de criar o deck: '
         '${sortedNames.join(', ')}.',

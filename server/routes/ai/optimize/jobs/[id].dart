@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:postgres/postgres.dart';
 
 import '../../../../lib/ai/optimize_job.dart';
 
@@ -22,8 +23,20 @@ Future<Response> onRequest(RequestContext context, String id) async {
     );
   }
 
-  final job = OptimizeJobStore.get(id);
+  final userId = context.read<String>();
+  final pool = context.read<Pool>();
+  final job = await OptimizeJobStore.get(pool, id);
   if (job == null) {
+    return Response.json(
+      statusCode: HttpStatus.notFound,
+      body: {
+        'error': 'Job não encontrado ou expirado.',
+        'job_id': id,
+      },
+    );
+  }
+
+  if (job.userId != null && job.userId != userId) {
     return Response.json(
       statusCode: HttpStatus.notFound,
       body: {

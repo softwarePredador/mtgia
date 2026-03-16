@@ -90,6 +90,42 @@ void main() {
       expect(apiClient.postCalls, equals(['/cards/resolve/batch']));
     });
 
+    test('fails when batch resolve returns ambiguous names', () async {
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/cards/resolve/batch':
+              (_) => ApiResponse(200, {
+                'data': const [],
+                'unresolved': const [],
+                'ambiguous': const [
+                  {
+                    'input_name': 'Lightning',
+                    'candidates': ['Lightning Bolt', 'Lightning Helix'],
+                  },
+                ],
+                'total_input': 1,
+                'total_resolved': 0,
+                'total_ambiguous': 1,
+              }),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      final created = await provider.createDeck(
+        name: 'Test Deck',
+        format: 'commander',
+        cards: const [
+          {'name': 'Lightning', 'quantity': 1, 'is_commander': false},
+        ],
+      );
+
+      expect(created, isFalse);
+      expect(provider.errorMessage, contains('Lightning'));
+      expect(provider.errorMessage, contains('Lightning Bolt'));
+      expect(provider.errorMessage, contains('Lightning Helix'));
+      expect(apiClient.postCalls, equals(['/cards/resolve/batch']));
+    });
+
     test(
       'keeps direct card ids and resolved names when creating deck',
       () async {

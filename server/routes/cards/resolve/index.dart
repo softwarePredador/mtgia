@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import '../../../lib/card_resolution_support.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 /// POST /cards/resolve
@@ -63,15 +64,36 @@ Future<Response> onRequest(RequestContext context) async {
       });
     }
 
-    // ─── 2) Busca local (ILIKE fuzzy) ───
-    final localFuzzy = await _searchLocal(pool, name, exact: false);
-    if (localFuzzy.isNotEmpty) {
+    // ─── 2) Busca local com resolução controlada (prefix/contains únicos) ───
+    final localDecision = await _resolveLocalCandidate(pool, name);
+    if (localDecision.isResolved) {
+      final localFuzzy = await _searchLocal(
+        pool,
+        localDecision.matchedName!,
+        exact: true,
+      );
       return Response.json(body: {
         'source': 'local',
         'name': localFuzzy.first['name'],
         'total_returned': localFuzzy.length,
+        'resolution': {
+          'input_name': name,
+          'matched_name': localDecision.matchedName,
+          'strategy': localDecision.strategy,
+        },
         'data': localFuzzy,
       });
+    }
+
+    if (localDecision.isAmbiguous) {
+      return Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'Nome de carta ambiguo. Refine a busca antes de continuar.',
+          'input_name': name,
+          'candidates': localDecision.candidateNames,
+        },
+      );
     }
 
     // ─── 3) Fallback: Scryfall fuzzy search ───
@@ -184,6 +206,39 @@ Future<List<Map<String, dynamic>>> _searchLocal(
           (m['price_updated_at'] as DateTime?)?.toIso8601String(),
     };
   }).toList();
+}
+
+Future<CardResolutionDecision> _resolveLocalCandidate(
+  Pool pool,
+  String inputName,
+) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT candidate_name
+      FROM (
+        SELECT DISTINCT ON (c.name)
+          c.name AS candidate_name,
+          CASE
+            WHEN LOWER(c.name) = LOWER(@name) THEN 0
+            WHEN LOWER(c.name) LIKE LOWER(@name) || '%' THEN 1
+            ELSE 2
+          END AS rank
+        FROM cards c
+        WHERE c.name ILIKE '%' || @name || '%'
+        ORDER BY c.name, rank ASC, c.id ASC
+      ) ranked
+      ORDER BY rank ASC, candidate_name ASC
+      LIMIT 5
+    '''),
+    parameters: {'name': inputName},
+  );
+
+  final candidateNames = result
+      .map((row) => (row[0] as String?)?.trim() ?? '')
+      .where((name) => name.isNotEmpty)
+      .toList();
+
+  return resolveCardCandidateNames(inputName, candidateNames);
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
