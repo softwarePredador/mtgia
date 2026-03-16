@@ -271,6 +271,43 @@ void main() {
       expect(result.droppedReasons, isEmpty);
     });
 
+    test('treats all is dust as wipe and blocks wipe to creature downgrade',
+        () {
+      final originalDeck = [
+        _card(
+          name: 'All Is Dust',
+          typeLine: 'Tribal Sorcery — Eldrazi',
+          manaCost: '{7}',
+          cmc: 7,
+          oracleText:
+              'Each player sacrifices all colored permanents they control.',
+        ),
+      ];
+
+      final additions = [
+        _card(
+          name: 'Laboratory Maniac',
+          typeLine: 'Creature — Human Wizard',
+          manaCost: '{2}{U}',
+          cmc: 3,
+          oracleText:
+              'If you would draw a card while your library has no cards in it, you win the game instead.',
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['All Is Dust'],
+        additions: const ['Laboratory Maniac'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'control',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('papel wipe ->'));
+    });
+
     test('drops temporary ritual swaps and non-structural land swaps in aggro',
         () {
       final originalDeck = [

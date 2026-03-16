@@ -2640,8 +2640,18 @@ Future<Response> onRequest(RequestContext context) async {
           postManaAssessment:
               postAnalysisMap['mana_base_assessment']?.toString() ?? '',
         );
+        final hardQualityRejected =
+            optimizationValidationReport.verdict != 'aprovado' ||
+                optimizationValidationReport.score < 70;
+        final effectiveRejectionReasons = rejectionReasons.isNotEmpty
+            ? rejectionReasons
+            : (hardQualityRejected
+                ? <String>[
+                    'A validação final não fechou como "aprovado" (score ${optimizationValidationReport.score}/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
+                  ]
+                : const <String>[]);
 
-        if (rejectionReasons.isNotEmpty) {
+        if (hardQualityRejected || effectiveRejectionReasons.isNotEmpty) {
           if (shouldRetryOptimizeWithAiFallback(
             deterministicFirstEnabled: deterministicFirstEnabled,
             fallbackAlreadyAttempted: optimizeFallbackAttempted,
@@ -2671,8 +2681,69 @@ Future<Response> onRequest(RequestContext context) async {
                 'code': 'OPTIMIZE_QUALITY_REJECTED',
                 'message':
                     'As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.',
-                'reasons': rejectionReasons,
+                'reasons': effectiveRejectionReasons,
                 'validation': optimizationValidationReport.toJson(),
+              },
+              'mode': 'optimize',
+              'removals': validRemovals,
+              'additions': validAdditions,
+              'deck_analysis': deckAnalysis,
+              'post_analysis': postAnalysis,
+              'validation_warnings': validationWarnings,
+            },
+            postAnalysisOverride: postAnalysis,
+            validationReport: optimizationValidationReport,
+            removalsOverride: validRemovals,
+            additionsOverride: validAdditions,
+            validationWarningsOverride: validationWarnings,
+            blockedByColorIdentityOverride: filteredByColorIdentity,
+            blockedByBracketOverride: blockedByBracket,
+          );
+        }
+      }
+
+      final responseValidationJson =
+          (postAnalysis?['validation'] as Map?)?.cast<String, dynamic>();
+      if (!isComplete && responseValidationJson != null) {
+        final responseValidationScore =
+            (responseValidationJson['validation_score'] as num?)?.toInt() ?? 0;
+        final responseValidationVerdict =
+            responseValidationJson['verdict']?.toString() ?? '';
+
+        if (responseValidationVerdict != 'aprovado' ||
+            responseValidationScore < 70) {
+          final serializedValidationReasons = optimizationValidationReport !=
+                  null
+              ? buildOptimizationRejectionReasons(
+                  validationReport: optimizationValidationReport,
+                  archetype: effectiveOptimizeArchetype,
+                  preCurve: double.tryParse(
+                        '${deckAnalysis['average_cmc'] ?? '0'}',
+                      ) ??
+                      0.0,
+                  postCurve: double.tryParse(
+                          '${postAnalysis?['average_cmc'] ?? '0'}') ??
+                      0.0,
+                  preManaAssessment:
+                      deckAnalysis['mana_base_assessment']?.toString() ?? '',
+                  postManaAssessment:
+                      postAnalysis?['mana_base_assessment']?.toString() ?? '',
+                )
+              : <String>[
+                  'A validação final não fechou como "aprovado" (score $responseValidationScore/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
+                ];
+
+          return respondWithOptimizeTelemetry(
+            statusCode: HttpStatus.unprocessableEntity,
+            body: {
+              'error':
+                  'A otimizacao sugerida nao passou no gate final de qualidade.',
+              'quality_error': {
+                'code': 'OPTIMIZE_QUALITY_REJECTED',
+                'message':
+                    'As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.',
+                'reasons': serializedValidationReasons,
+                'validation': responseValidationJson,
               },
               'mode': 'optimize',
               'removals': validRemovals,
@@ -5580,6 +5651,7 @@ bool _looksLikeBoardWipe(String oracleText) {
       oracle.contains('exile all') ||
       oracle.contains('each creature') ||
       oracle.contains('each player sacrifices') ||
+      oracle.contains('all colored permanents') ||
       oracle.contains('all creatures get');
 }
 
@@ -5643,8 +5715,11 @@ String _inferOptimizeFunctionalNeed({
     return 'protection';
   }
 
-  if (_looksLikeBoardWipe(oracleText) ||
-      oracle.contains('destroy target') ||
+  if (_looksLikeBoardWipe(oracleText)) {
+    return 'wipe';
+  }
+
+  if (oracle.contains('destroy target') ||
       oracle.contains('exile target') ||
       oracle.contains('counter target')) {
     return 'removal';
@@ -5711,6 +5786,174 @@ bool _landProducesCommanderColors({
   return false;
 }
 
+bool isOptimizeStructuralRecoveryScenario({
+  required List<Map<String, dynamic>> allCardData,
+  required Set<String> commanderColorIdentity,
+}) {
+  var totalCards = 0;
+  var landCount = 0;
+  var nonLandCount = 0;
+  var colorProducingLandCount = 0;
+
+  for (final card in allCardData) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    totalCards += qty;
+
+    if (typeLine.contains('land')) {
+      landCount += qty;
+      if (_landProducesCommanderColors(
+        card: card,
+        commanderColorIdentity: commanderColorIdentity,
+      )) {
+        colorProducingLandCount += qty;
+      }
+    } else {
+      nonLandCount += qty;
+    }
+  }
+
+  if (totalCards == 0) return false;
+
+  final landRatio = landCount / totalCards;
+  return landRatio >= 0.65 ||
+      landCount >= 50 ||
+      nonLandCount <= 20 ||
+      (landCount >= 40 && colorProducingLandCount <= 8);
+}
+
+int computeOptimizeStructuralRecoverySwapTarget({
+  required List<Map<String, dynamic>> allCardData,
+  required Set<String> commanderColorIdentity,
+  required String targetArchetype,
+}) {
+  if (!isOptimizeStructuralRecoveryScenario(
+    allCardData: allCardData,
+    commanderColorIdentity: commanderColorIdentity,
+  )) {
+    return 6;
+  }
+
+  var landCount = 0;
+  var nonLandCount = 0;
+  for (final card in allCardData) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (typeLine.contains('land')) {
+      landCount += qty;
+    } else {
+      nonLandCount += qty;
+    }
+  }
+
+  final recommendedLandCount =
+      _recommendedLandCountForOptimizeArchetype(targetArchetype);
+  final excessLands = (landCount - recommendedLandCount).clamp(0, 99);
+  final missingNonLands = (58 - nonLandCount).clamp(0, 99);
+
+  return [12, excessLands, missingNonLands]
+      .reduce((a, b) => a < b ? a : b)
+      .clamp(6, 12);
+}
+
+List<String> buildStructuralRecoveryFunctionalNeeds({
+  required List<Map<String, dynamic>> allCardData,
+  required String targetArchetype,
+  required int limit,
+}) {
+  if (limit <= 0) return const [];
+
+  final archetype = targetArchetype.trim().toLowerCase();
+  final targetProfile = switch (archetype) {
+    'control' => const <String, int>{
+        'draw': 14,
+        'ramp': 12,
+        'removal': 10,
+        'wipe': 4,
+        'protection': 4,
+        'utility': 14,
+      },
+    'combo' => const <String, int>{
+        'draw': 14,
+        'ramp': 12,
+        'tutor': 8,
+        'protection': 6,
+        'utility': 18,
+      },
+    'aggro' => const <String, int>{
+        'creature': 18,
+        'ramp': 8,
+        'draw': 8,
+        'removal': 8,
+        'protection': 4,
+        'utility': 14,
+      },
+    _ => const <String, int>{
+        'draw': 12,
+        'ramp': 10,
+        'removal': 8,
+        'creature': 8,
+        'protection': 4,
+        'utility': 16,
+      },
+  };
+
+  final currentCounts = <String, int>{};
+  for (final card in allCardData) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (typeLine.contains('land')) continue;
+
+    final role = _inferOptimizeFunctionalNeed(
+      name: (card['name'] as String?) ?? '',
+      typeLine: (card['type_line'] as String?) ?? '',
+      oracleText: (card['oracle_text'] as String?) ?? '',
+    );
+    currentCounts[role] = (currentCounts[role] ?? 0) + qty;
+  }
+
+  final deficits = <MapEntry<String, int>>[];
+  for (final entry in targetProfile.entries) {
+    final deficit = entry.value - (currentCounts[entry.key] ?? 0);
+    if (deficit > 0) {
+      deficits.add(MapEntry(entry.key, deficit));
+    }
+  }
+
+  deficits.sort((a, b) {
+    final byDeficit = b.value.compareTo(a.value);
+    if (byDeficit != 0) return byDeficit;
+    return a.key.compareTo(b.key);
+  });
+
+  final sequence = <String>[];
+  while (sequence.length < limit && deficits.isNotEmpty) {
+    var addedInRound = false;
+    for (var i = 0; i < deficits.length && sequence.length < limit; i++) {
+      final entry = deficits[i];
+      if (entry.value <= 0) continue;
+      sequence.add(entry.key);
+      deficits[i] = MapEntry(entry.key, entry.value - 1);
+      addedInRound = true;
+    }
+    if (!addedInRound) break;
+  }
+
+  if (sequence.length < limit) {
+    final fallbackNeed = switch (archetype) {
+      'control' => 'draw',
+      'combo' => 'draw',
+      'aggro' => 'creature',
+      _ => 'utility',
+    };
+    while (sequence.length < limit) {
+      sequence.add(fallbackNeed);
+    }
+  }
+
+  return sequence;
+}
+
 List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required List<Map<String, dynamic>> allCardData,
   required List<String> commanders,
@@ -5734,6 +5977,16 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
     final currentRoleCounts = <String, int>{};
     final roleTargets = _buildRoleTargetProfile(targetArchetype);
+    final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
+      allCardData: allCardData,
+      commanderColorIdentity: commanderColorIdentity,
+    );
+    final structuralRecoverySwapTarget =
+        computeOptimizeStructuralRecoverySwapTarget(
+      allCardData: allCardData,
+      commanderColorIdentity: commanderColorIdentity,
+      targetArchetype: targetArchetype,
+    );
     var landCount = 0;
 
     for (final card in allCardData) {
@@ -5819,8 +6072,13 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         final basicPenalty = isBasic ? 30 : 0;
         final score =
             excessLands * 100 + colorlessPenalty + basicPenalty + tappedPenalty;
-        final copies =
-            ((card['quantity'] as int?) ?? 1).clamp(1, excessLands.clamp(1, 6));
+        final copies = ((card['quantity'] as int?) ?? 1).clamp(
+          1,
+          excessLands.clamp(
+            1,
+            structuralRecoveryScenario ? structuralRecoverySwapTarget : 6,
+          ),
+        );
 
         for (var i = 0; i < copies; i++) {
           removalCandidates.add({
@@ -5843,7 +6101,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
 
     return removalCandidates
         .where((candidate) => (candidate['score'] as int) > 0)
-        .take(6)
+        .take(structuralRecoveryScenario ? structuralRecoverySwapTarget : 6)
         .toList();
   }
 
@@ -5874,7 +6132,18 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     if (merged.length >= 6) break;
   }
 
-  return merged.take(6).toList();
+  final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
+    allCardData: allCardData,
+    commanderColorIdentity: commanderColorIdentity,
+  );
+  final takeCount = structuralRecoveryScenario
+      ? computeOptimizeStructuralRecoverySwapTarget(
+          allCardData: allCardData,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+        )
+      : 6;
+  return merged.take(takeCount).toList();
 }
 
 Map<String, int> _buildRoleTargetProfile(String targetArchetype) {
@@ -6045,6 +6314,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
 
   final preferredNames =
       commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
+  final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
+    allCardData: allCardData,
+    commanderColorIdentity: commanderColorIdentity,
+  );
   final removalCandidates = buildDeterministicOptimizeRemovalCandidates(
     allCardData: allCardData,
     commanders: commanders,
@@ -6058,6 +6331,13 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       .map((candidate) => candidate['name'] as String)
       .toList();
   if (removalList.isEmpty) return const [];
+  final functionalNeedsOverride = structuralRecoveryScenario
+      ? buildStructuralRecoveryFunctionalNeeds(
+          allCardData: allCardData,
+          targetArchetype: targetArchetype,
+          limit: removalList.length,
+        )
+      : null;
 
   final deckNamesLower = allCardData
       .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
@@ -6074,9 +6354,11 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     coreCards: coreCards,
     missingCount: removalList.length,
     removedCards: removalList,
+    functionalNeedsOverride: functionalNeedsOverride,
     excludeNames: deckNamesLower,
     allCardData: allCardData,
     preferredNames: preferredNames,
+    preferLowCurve: structuralRecoveryScenario,
   );
   if (replacements.length < removalList.length) {
     final usedReplacementNames = replacements
@@ -6817,9 +7099,11 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   required List<String>? coreCards,
   required int missingCount,
   required List<String> removedCards,
+  List<String>? functionalNeedsOverride,
   required Set<String> excludeNames,
   required List<Map<String, dynamic>> allCardData,
   Set<String> preferredNames = const <String>{},
+  bool preferLowCurve = false,
 }) async {
   final results = <Map<String, dynamic>>[];
 
@@ -6901,10 +7185,10 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
 
   final candidatesResult = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.color_identity, sub.pop_score
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.color_identity, sub.pop_score
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
-          c.id::text, c.name, c.type_line, c.oracle_text, c.color_identity,
+          c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.color_identity,
           COALESCE(cmi.usage_count, 0) AS pop_score
         FROM cards c
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
@@ -6941,8 +7225,9 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
     final name = row[1] as String;
     final typeLine = ((row[2] as String?) ?? '').toLowerCase();
     final oracle = ((row[3] as String?) ?? '').toLowerCase();
-    final identity = (row[4] as List?)?.cast<String>() ?? const <String>[];
-    final popScore = (row[5] as num?)?.toInt() ?? 0;
+    final manaCost = (row[4] as String?) ?? '';
+    final identity = (row[5] as List?)?.cast<String>() ?? const <String>[];
+    final popScore = (row[6] as num?)?.toInt() ?? 0;
 
     // Verificar identidade de cor (double check)
     if (!isWithinCommanderIdentity(
@@ -6955,6 +7240,7 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
       'name': name,
       'type_line': typeLine,
       'oracle_text': oracle,
+      'mana_cost': manaCost,
       'pop_score': popScore,
     });
   }
@@ -6962,9 +7248,12 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
   // Passo 3: Selecionar as melhores cartas priorizando as necessidades funcionais
   final usedNames = <String>{};
 
-  final needs = functionalNeeds.isNotEmpty
-      ? functionalNeeds
-      : defaultNeedsForArchetype(targetArchetype);
+  final needs =
+      (functionalNeedsOverride != null && functionalNeedsOverride.isNotEmpty)
+          ? functionalNeedsOverride
+          : functionalNeeds.isNotEmpty
+              ? functionalNeeds
+              : defaultNeedsForArchetype(targetArchetype);
 
   // Primeiro: tentar preencher necessidades funcionais específicas
   for (var i = 0; i < missingCount && i < needs.length; i++) {
@@ -6980,9 +7269,11 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
         cardName: candidate['name'] as String? ?? '',
         typeLine: candidate['type_line'] as String? ?? '',
         oracleText: candidate['oracle_text'] as String? ?? '',
+        manaCost: candidate['mana_cost'] as String? ?? '',
         popScore: (candidate['pop_score'] as int?) ?? 0,
         preferredNames: normalizedPreferredNames,
         rejectedAdditionCounts: rejectedAdditionCounts,
+        preferLowCurve: preferLowCurve,
       );
       final matches = matchesFunctionalNeed(
         need,
@@ -7014,18 +7305,22 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
           cardName: a['name'] as String? ?? '',
           typeLine: a['type_line'] as String? ?? '',
           oracleText: a['oracle_text'] as String? ?? '',
+          manaCost: a['mana_cost'] as String? ?? '',
           popScore: (a['pop_score'] as int?) ?? 0,
           preferredNames: normalizedPreferredNames,
           rejectedAdditionCounts: rejectedAdditionCounts,
+          preferLowCurve: preferLowCurve,
         );
         final scoreB = scoreOptimizeReplacementCandidate(
           functionalNeed: 'utility',
           cardName: b['name'] as String? ?? '',
           typeLine: b['type_line'] as String? ?? '',
           oracleText: b['oracle_text'] as String? ?? '',
+          manaCost: b['mana_cost'] as String? ?? '',
           popScore: (b['pop_score'] as int?) ?? 0,
           preferredNames: normalizedPreferredNames,
           rejectedAdditionCounts: rejectedAdditionCounts,
+          preferLowCurve: preferLowCurve,
         );
         final byScore = scoreB.compareTo(scoreA);
         if (byScore != 0) return byScore;
@@ -7060,6 +7355,7 @@ bool matchesFunctionalNeed(
     'removal' => oracle.contains('destroy') ||
         oracle.contains('exile') ||
         oracle.contains('counter'),
+    'wipe' => _looksLikeBoardWipe(oracleText),
     'ramp' => (oracle.contains('add') && oracle.contains('mana')) ||
         oracle.contains('search your library for a land'),
     'tutor' =>
@@ -7080,13 +7376,16 @@ int scoreOptimizeReplacementCandidate({
   required String cardName,
   required String typeLine,
   required String oracleText,
+  required String manaCost,
   required int popScore,
   required Set<String> preferredNames,
   required Map<String, int> rejectedAdditionCounts,
+  bool preferLowCurve = false,
 }) {
   final normalizedName = cardName.trim().toLowerCase();
   final normalizedType = typeLine.toLowerCase();
   final normalizedOracle = oracleText.toLowerCase();
+  final estimatedCmc = _estimateManaCostCmc(manaCost);
   final matchesNeed = matchesFunctionalNeed(
     functionalNeed,
     oracleText: oracleText,
@@ -7110,15 +7409,43 @@ int scoreOptimizeReplacementCandidate({
   )
       ? (functionalNeed == 'ramp' ? 70 : 160)
       : 0;
+  final lowCurveBonus = preferLowCurve
+      ? ((4 - estimatedCmc).clamp(0, 4) * 18).round()
+      : ((3 - estimatedCmc).clamp(0, 3) * 6).round();
+  final expensiveSpellPenalty = preferLowCurve && estimatedCmc > 4
+      ? ((estimatedCmc - 4) * 20).round()
+      : 0;
 
   return needScore +
       preferredScore +
       popularityScore +
-      protectionBonus -
+      protectionBonus +
+      lowCurveBonus -
       rejectionPenalty -
       offNeedPenalty -
       landPenalty -
-      temporaryManaPenalty;
+      temporaryManaPenalty -
+      expensiveSpellPenalty;
+}
+
+double _estimateManaCostCmc(String manaCost) {
+  if (manaCost.trim().isEmpty) return 0;
+
+  final matches = RegExp(r'\{([^}]+)\}').allMatches(manaCost);
+  var total = 0.0;
+
+  for (final match in matches) {
+    final symbol = (match.group(1) ?? '').trim().toUpperCase();
+    if (symbol.isEmpty || symbol == 'X') continue;
+    final numeric = int.tryParse(symbol);
+    if (numeric != null) {
+      total += numeric;
+      continue;
+    }
+    total += 1;
+  }
+
+  return total;
 }
 
 Future<Map<String, int>> _loadRejectedOptimizeAdditionCounts({

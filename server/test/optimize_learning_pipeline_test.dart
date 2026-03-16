@@ -133,6 +133,7 @@ void main() {
         typeLine: 'Enchantment',
         oracleText:
             'Cumulative upkeep {1}. Whenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}.',
+        manaCost: '{U}',
         popScore: 420,
         preferredNames: const {'mystic remora'},
         rejectedAdditionCounts: const {},
@@ -143,6 +144,7 @@ void main() {
         cardName: 'Chart a Course',
         typeLine: 'Sorcery',
         oracleText: 'Draw two cards. Then discard a card unless you attacked.',
+        manaCost: '{1}{U}',
         popScore: 420,
         preferredNames: const {},
         rejectedAdditionCounts: const {'chart a course': 3},
@@ -176,6 +178,7 @@ void main() {
         typeLine: 'Artifact',
         oracleText:
             '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '{2}',
         popScore: 420,
         preferredNames: const {},
         rejectedAdditionCounts: const {},
@@ -186,6 +189,7 @@ void main() {
         cardName: 'Dark Ritual',
         typeLine: 'Instant',
         oracleText: 'Add {B}{B}{B}.',
+        manaCost: '{B}',
         popScore: 420,
         preferredNames: const {},
         rejectedAdditionCounts: const {},
@@ -197,6 +201,7 @@ void main() {
         typeLine: 'Land',
         oracleText:
             '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '',
         popScore: 420,
         preferredNames: const {},
         rejectedAdditionCounts: const {},
@@ -402,6 +407,56 @@ void main() {
       expect(removals, isNotEmpty);
       expect(removals.first['role'], equals('land'));
       expect(removals.first['name'], equals('Wastes'));
+    });
+  });
+
+  group('structural recovery helpers', () {
+    final talrandDegenerateDeck = const [
+      {
+        'name': 'Talrand, Sky Summoner',
+        'type_line': 'Legendary Creature',
+        'oracle_text':
+            'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+        'quantity': 1,
+        'cmc': 4.0,
+      },
+      {
+        'name': 'Wastes',
+        'type_line': 'Basic Land - Wastes',
+        'oracle_text': '({T}: Add {C}.)',
+        'quantity': 99,
+        'cmc': 0.0,
+      },
+    ];
+
+    test('detects structural recovery scenarios', () {
+      expect(
+        optimize_route.isOptimizeStructuralRecoveryScenario(
+          allCardData: talrandDegenerateDeck,
+          commanderColorIdentity: const {'U'},
+        ),
+        isTrue,
+      );
+    });
+
+    test('expands swap target and functional needs for structural recovery',
+        () {
+      final target = optimize_route.computeOptimizeStructuralRecoverySwapTarget(
+        allCardData: talrandDegenerateDeck,
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'control',
+      );
+      final needs = optimize_route.buildStructuralRecoveryFunctionalNeeds(
+        allCardData: talrandDegenerateDeck,
+        targetArchetype: 'control',
+        limit: target,
+      );
+
+      expect(target, equals(12));
+      expect(needs, hasLength(12));
+      expect(needs, contains('draw'));
+      expect(needs, contains('ramp'));
+      expect(needs, contains('removal'));
     });
   });
 }

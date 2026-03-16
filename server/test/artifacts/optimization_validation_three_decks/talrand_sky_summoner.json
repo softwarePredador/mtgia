@@ -1,9 +1,9 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "1256028a-a2bd-47af-98dc-d866c5130b2e",
+  "clone_deck_id": "95a4f2eb-9b06-4c47-8411-ee5d33591147",
   "optimize_request": {
-    "deck_id": "1256028a-a2bd-47af-98dc-d866c5130b2e",
+    "deck_id": "95a4f2eb-9b06-4c47-8411-ee5d33591147",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -15,12 +15,12 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 64/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (64/100; mínimo 70).",
+        "A validação final não fechou como \"aprovado\" (score 63/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (63/100; mínimo 70).",
         "A base de mana continua com problema crítico após a otimização."
       ],
       "validation": {
-        "validation_score": 64,
+        "validation_score": 63,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -139,14 +139,14 @@
           }
         },
         "critic_ai": {
-          "approval_score": 90,
+          "approval_score": 85,
           "verdict": "aprovado",
           "concerns": [],
           "strong_swaps": [
             "OUT: Wastes → IN: Command Tower"
           ],
           "weak_swaps": [],
-          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem desvantagens significativas."
+          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem impactos negativos nas métricas de desempenho do deck."
         },
         "warnings": []
       }
@@ -194,7 +194,7 @@
       "mana_base_assessment": "Falta mana U (Tem 1 fontes, ideal > 15)",
       "archetype_confidence": "baixa",
       "validation": {
-        "validation_score": 64,
+        "validation_score": 63,
         "verdict": "aprovado_com_ressalvas",
         "monte_carlo": {
           "before": {
@@ -313,14 +313,14 @@
           }
         },
         "critic_ai": {
-          "approval_score": 90,
+          "approval_score": 85,
           "verdict": "aprovado",
           "concerns": [],
           "strong_swaps": [
             "OUT: Wastes → IN: Command Tower"
           ],
           "weak_swaps": [],
-          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem desvantagens significativas."
+          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem impactos negativos nas métricas de desempenho do deck."
         },
         "warnings": []
       }
