@@ -1,175 +1,59 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "188bbb82-396a-45fa-9702-44ccfb223e2e",
+  "clone_deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
   "optimize_request": {
-    "deck_id": "188bbb82-396a-45fa-9702-44ccfb223e2e",
+    "deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "A otimizacao sugerida nao passou no gate final de qualidade.",
+    "error": "O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.",
     "quality_error": {
-      "code": "OPTIMIZE_QUALITY_REJECTED",
-      "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
+      "code": "OPTIMIZE_NEEDS_REPAIR",
+      "message": "O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.",
       "reasons": [
-        "Validação automática reprovou as trocas (score 34/100).",
-        "A validação final não fechou como \"aprovado\" (score 34/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (34/100; mínimo 70).",
-        "A base de mana continua com problema crítico após a otimização."
+        "O deck está com 99 terrenos, muito acima do intervalo saudável para commander.",
+        "O deck tem apenas 1 não-terrenos, insuficiente para sustainar o plano do comandante.",
+        "A base de mana ainda não cobre as cores exigidas pelo comandante.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "O comandante pede instants/sorceries, mas o deck só tem 0 cartas desse tipo.",
+        "O deck ainda não tem massa crítica suficiente para o arquétipo detectado."
       ],
-      "validation": {
-        "validation_score": 34,
-        "deck_health_score": 6,
-        "improvement_score": 76,
-        "verdict": "reprovado",
-        "monte_carlo": {
-          "before": {
-            "simulations": 1000,
-            "consistency_score": 10,
-            "mana_analysis": {
-              "land_count": 99,
-              "screw_rate": 0.0,
-              "flood_rate": 1.0,
-              "keepable_rate": 0.0
-            },
-            "curve_analysis": {
-              "avg_cmc": 4.0,
-              "turn_1_play": 0.0,
-              "turn_2_play": 0.0,
-              "turn_3_play": 0.0,
-              "turn_4_play": 0.0,
-              "cmc_distribution": {
-                "4": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
-              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
-              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
-              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
-            ]
-          },
-          "after": {
-            "simulations": 1000,
-            "consistency_score": 14,
-            "mana_analysis": {
-              "land_count": 98,
-              "screw_rate": 0.0,
-              "flood_rate": 0.996,
-              "keepable_rate": 0.004
-            },
-            "curve_analysis": {
-              "avg_cmc": 3.0,
-              "turn_1_play": 0.0,
-              "turn_2_play": 0.084,
-              "turn_3_play": 0.098,
-              "turn_4_play": 0.11,
-              "cmc_distribution": {
-                "4": 1,
-                "2": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana flood (99.6%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
-              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
-              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
-            ]
-          },
-          "mulligan_before": {
-            "runs": 500,
-            "avg_mulligans": 2.0,
-            "keep_at_7": 0.0,
-            "keep_at_6": 0.0,
-            "keep_at_5": 1.0,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.0
-          },
-          "mulligan_after": {
-            "runs": 500,
-            "avg_mulligans": 1.99,
-            "keep_at_7": 0.002,
-            "keep_at_6": 0.002,
-            "keep_at_5": 0.996,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.006
-          },
-          "deltas": {
-            "consistency_score": 4,
-            "screw_rate_delta": 0.0,
-            "flood_rate_delta": -0.004,
-            "keepable_rate_delta": 0.004,
-            "turn2_play_delta": 0.084,
-            "mulligan_keep7_delta": 0.002
-          }
+      "recommended_mode": "repair",
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [
+          "Cortar aproximadamente 63 terrenos excedentes antes de avaliar upgrades finos.",
+          "Trocar terrenos incolores por fontes U até estabilizar a base.",
+          "Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.",
+          "Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações."
+        ],
+        "role_targets": {
+          "instants_or_sorceries_to_add": 24
         },
-        "functional_analysis": {
-          "swaps": [
-            {
-              "removed": "Wastes",
-              "added": "Arcane Signet",
-              "removed_role": "land",
-              "added_role": "ramp",
-              "role_preserved": false,
-              "cmc_delta": 2,
-              "verdict": "questionável"
-            }
-          ],
-          "summary": {
-            "upgrades": 0,
-            "sidegrades": 0,
-            "tradeoffs": 0,
-            "questionable": 1
-          },
-          "role_delta": {
-            "draw": 0,
-            "removal": 0,
-            "ramp": 1,
-            "creature": 0,
-            "artifact": 0,
-            "enchantment": 0,
-            "land": -1,
-            "utility": 0,
-            "wipe": 0,
-            "tutor": 0,
-            "protection": 0
-          }
-        },
-        "critic_ai": {
-          "approval_score": 75,
-          "verdict": "aprovado_com_ressalvas",
-          "concerns": [
-            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
-            "Wastes pode ser útil em situações específicas, como para evitar ser afetado por efeitos que interagem com tipos de terreno."
-          ],
-          "strong_swaps": [],
-          "weak_swaps": [
-            {
-              "swap": "Wastes → Arcane Signet",
-              "justification": "Embora Arcane Signet melhore a consistência de mana e a capacidade de jogar no T2, a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
-            }
-          ],
-          "overall_assessment": "A troca melhora a consistência de jogadas, mas a perda de uma land pode ser arriscada e deve ser considerada com cautela."
-        },
-        "warnings": [
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "Saúde absoluta do deck final ainda está baixa (6/100)."
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
         ]
       }
     },
+    "next_action": {
+      "type": "rebuild_guided",
+      "endpoint": "/ai/rebuild",
+      "payload": {
+        "deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
+        "bracket": 2,
+        "archetype": "midrange",
+        "theme": "tokens",
+        "rebuild_scope": "auto",
+        "save_mode": "draft_clone"
+      }
+    },
     "mode": "optimize",
-    "removals": [
-      "Wastes"
-    ],
-    "additions": [
-      "Arcane Signet"
-    ],
     "deck_analysis": {
       "detected_archetype": "midrange",
       "average_cmc": "4.00",
@@ -188,173 +72,45 @@
       "mana_base_assessment": "Terrenos em excesso (Tem 99, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
       "archetype_confidence": "baixa"
     },
-    "post_analysis": {
-      "detected_archetype": "midrange",
-      "average_cmc": "3.00",
-      "type_distribution": {
-        "creatures": 1,
-        "instants": 0,
-        "sorceries": 0,
-        "enchantments": 0,
-        "artifacts": 1,
-        "planeswalkers": 0,
-        "lands": 98,
-        "battles": 0
-      },
-      "total_cards": 100,
-      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
-      "mana_base_assessment": "Terrenos em excesso (Tem 98, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
-      "archetype_confidence": "baixa",
-      "improvements": [
-        "CMC médio otimizado: 4.00 → 3.00"
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "match_score": 2.0,
+      "core_cards": [
+        "Talrand, Sky Summoner"
+      ]
+    },
+    "deck_state": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 100,
+      "reasons": [
+        "O deck está com 99 terrenos, muito acima do intervalo saudável para commander.",
+        "O deck tem apenas 1 não-terrenos, insuficiente para sustainar o plano do comandante.",
+        "A base de mana ainda não cobre as cores exigidas pelo comandante.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "O comandante pede instants/sorceries, mas o deck só tem 0 cartas desse tipo.",
+        "O deck ainda não tem massa crítica suficiente para o arquétipo detectado."
       ],
-      "validation": {
-        "validation_score": 34,
-        "deck_health_score": 6,
-        "improvement_score": 76,
-        "verdict": "reprovado",
-        "monte_carlo": {
-          "before": {
-            "simulations": 1000,
-            "consistency_score": 10,
-            "mana_analysis": {
-              "land_count": 99,
-              "screw_rate": 0.0,
-              "flood_rate": 1.0,
-              "keepable_rate": 0.0
-            },
-            "curve_analysis": {
-              "avg_cmc": 4.0,
-              "turn_1_play": 0.0,
-              "turn_2_play": 0.0,
-              "turn_3_play": 0.0,
-              "turn_4_play": 0.0,
-              "cmc_distribution": {
-                "4": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
-              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
-              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
-              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
-            ]
-          },
-          "after": {
-            "simulations": 1000,
-            "consistency_score": 14,
-            "mana_analysis": {
-              "land_count": 98,
-              "screw_rate": 0.0,
-              "flood_rate": 0.996,
-              "keepable_rate": 0.004
-            },
-            "curve_analysis": {
-              "avg_cmc": 3.0,
-              "turn_1_play": 0.0,
-              "turn_2_play": 0.084,
-              "turn_3_play": 0.098,
-              "turn_4_play": 0.11,
-              "cmc_distribution": {
-                "4": 1,
-                "2": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana flood (99.6%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
-              "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
-              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
-            ]
-          },
-          "mulligan_before": {
-            "runs": 500,
-            "avg_mulligans": 2.0,
-            "keep_at_7": 0.0,
-            "keep_at_6": 0.0,
-            "keep_at_5": 1.0,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.0
-          },
-          "mulligan_after": {
-            "runs": 500,
-            "avg_mulligans": 1.99,
-            "keep_at_7": 0.002,
-            "keep_at_6": 0.002,
-            "keep_at_5": 0.996,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.006
-          },
-          "deltas": {
-            "consistency_score": 4,
-            "screw_rate_delta": 0.0,
-            "flood_rate_delta": -0.004,
-            "keepable_rate_delta": 0.004,
-            "turn2_play_delta": 0.084,
-            "mulligan_keep7_delta": 0.002
-          }
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [
+          "Cortar aproximadamente 63 terrenos excedentes antes de avaliar upgrades finos.",
+          "Trocar terrenos incolores por fontes U até estabilizar a base.",
+          "Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.",
+          "Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações."
+        ],
+        "role_targets": {
+          "instants_or_sorceries_to_add": 24
         },
-        "functional_analysis": {
-          "swaps": [
-            {
-              "removed": "Wastes",
-              "added": "Arcane Signet",
-              "removed_role": "land",
-              "added_role": "ramp",
-              "role_preserved": false,
-              "cmc_delta": 2,
-              "verdict": "questionável"
-            }
-          ],
-          "summary": {
-            "upgrades": 0,
-            "sidegrades": 0,
-            "tradeoffs": 0,
-            "questionable": 1
-          },
-          "role_delta": {
-            "draw": 0,
-            "removal": 0,
-            "ramp": 1,
-            "creature": 0,
-            "artifact": 0,
-            "enchantment": 0,
-            "land": -1,
-            "utility": 0,
-            "wipe": 0,
-            "tutor": 0,
-            "protection": 0
-          }
-        },
-        "critic_ai": {
-          "approval_score": 75,
-          "verdict": "aprovado_com_ressalvas",
-          "concerns": [
-            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
-            "Wastes pode ser útil em situações específicas, como para evitar ser afetado por efeitos que interagem com tipos de terreno."
-          ],
-          "strong_swaps": [],
-          "weak_swaps": [
-            {
-              "swap": "Wastes → Arcane Signet",
-              "justification": "Embora Arcane Signet melhore a consistência de mana e a capacidade de jogar no T2, a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
-            }
-          ],
-          "overall_assessment": "A troca melhora a consistência de jogadas, mas a perda de uma land pode ser arriscada e deve ser considerada com cautela."
-        },
-        "warnings": [
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "Saúde absoluta do deck final ainda está baixa (6/100)."
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
         ]
       }
     },
-    "validation_warnings": [
-      "🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: 34/100).",
-      "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-      "Saúde absoluta do deck final ainda está baixa (6/100)."
-    ]
+    "outcome_code": "needs_repair"
   }
 }

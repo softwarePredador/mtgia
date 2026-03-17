@@ -509,6 +509,7 @@ Future<DeckRunResult> _runOptimizationForDeck({
     final qualityCode = qualityError?['code']?.toString() ?? '';
     final protectedRejection = optimizeResponse.statusCode == 422 &&
         {
+          'OPTIMIZE_NEEDS_REPAIR',
           'OPTIMIZE_NO_SAFE_SWAPS',
           'OPTIMIZE_QUALITY_REJECTED',
           'OPTIMIZE_NO_ACTIONABLE_SWAPS',

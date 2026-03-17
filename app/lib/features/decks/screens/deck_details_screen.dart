@@ -2791,6 +2791,307 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     );
   }
 
+  List<String> _extractAiReasons(DeckAiFlowException error) {
+    final reasons = <String>{};
+
+    final qualityReasons = error.qualityError['reasons'];
+    if (qualityReasons is List) {
+      for (final reason in qualityReasons) {
+        final normalized = reason.toString().trim();
+        if (normalized.isNotEmpty) reasons.add(normalized);
+      }
+    }
+
+    final deckStateReasons = error.deckState['reasons'];
+    if (deckStateReasons is List) {
+      for (final reason in deckStateReasons) {
+        final normalized = reason.toString().trim();
+        if (normalized.isNotEmpty) reasons.add(normalized);
+      }
+    }
+
+    return reasons.toList(growable: false);
+  }
+
+  Map<String, dynamic> _extractRepairPlan(DeckAiFlowException error) {
+    if (error.qualityError['repair_plan'] is Map) {
+      return (error.qualityError['repair_plan'] as Map).cast<String, dynamic>();
+    }
+    if (error.deckState['repair_plan'] is Map) {
+      return (error.deckState['repair_plan'] as Map).cast<String, dynamic>();
+    }
+    return const <String, dynamic>{};
+  }
+
+  Future<void> _showOutcomeInfoDialog({
+    required BuildContext context,
+    required String title,
+    required String message,
+    List<String> reasons = const <String>[],
+  }) async {
+    await showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(title),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(message),
+                  if (reasons.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Motivos:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    ...reasons.take(6).map(
+                      (reason) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text('• $reason'),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Fechar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _runGuidedRebuild(
+    DeckProvider deckProvider,
+    DeckAiFlowException error, {
+    required String fallbackArchetype,
+  }) async {
+    final nextAction = error.nextAction;
+    final nextPayload =
+        (nextAction['payload'] is Map)
+            ? (nextAction['payload'] as Map).cast<String, dynamic>()
+            : <String, dynamic>{};
+    final themeInfo =
+        (error.payload['theme'] is Map)
+            ? (error.payload['theme'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+
+    final sheetNavigator = Navigator.of(context);
+    final rootNavigator = Navigator.of(context, rootNavigator: true);
+    final dialogContext = rootNavigator.context;
+    final messenger = ScaffoldMessenger.of(context);
+    var loadingOpen = false;
+
+    void closeLoading() {
+      if (loadingOpen && mounted) {
+        rootNavigator.pop();
+        loadingOpen = false;
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (_) => const Center(
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LinearProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      'Criando versão reconstruída...',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+    );
+    loadingOpen = true;
+
+    try {
+      final rebuildResult = await deckProvider.rebuildDeck(
+        widget.deckId,
+        archetype:
+            nextPayload['archetype']?.toString() ??
+            fallbackArchetype,
+        theme:
+            nextPayload['theme']?.toString() ??
+            themeInfo['theme']?.toString(),
+        bracket:
+            nextPayload['bracket'] as int? ??
+            _selectedBracket,
+        rebuildScope:
+            nextPayload['rebuild_scope']?.toString() ?? 'auto',
+        saveMode: nextPayload['save_mode']?.toString() ?? 'draft_clone',
+      );
+
+      closeLoading();
+      if (!mounted) return;
+
+      final draftDeckId = rebuildResult['draft_deck_id']?.toString();
+      if (draftDeckId == null || draftDeckId.isEmpty) {
+        if (!dialogContext.mounted) return;
+        await _showOutcomeInfoDialog(
+          context: dialogContext,
+          title: 'Reconstrução gerada',
+          message:
+              'A reconstrução foi gerada em preview, mas nenhum draft salvo foi retornado.',
+        );
+        return;
+      }
+
+      await deckProvider.fetchDeckDetails(draftDeckId, forceRefresh: true);
+      if (!mounted) return;
+
+      sheetNavigator.pop();
+      await rootNavigator.push(
+        MaterialPageRoute(
+          builder: (_) => DeckDetailsScreen(deckId: draftDeckId),
+        ),
+      );
+    } on DeckAiFlowException catch (rebuildError) {
+      closeLoading();
+      if (!dialogContext.mounted) return;
+      await _showOutcomeInfoDialog(
+        context: dialogContext,
+        title: 'Falha ao reconstruir',
+        message: rebuildError.message,
+        reasons: _extractAiReasons(rebuildError),
+      );
+    } catch (rebuildError) {
+      closeLoading();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Erro ao criar reconstrução: $rebuildError'),
+          backgroundColor: AppTheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleOptimizeAiFailure(
+    BuildContext context,
+    DeckProvider deckProvider,
+    DeckAiFlowException error, {
+    required String archetype,
+  }) async {
+    final reasons = _extractAiReasons(error);
+
+    if (error.isNeedsRepair) {
+      final repairPlan = _extractRepairPlan(error);
+      final repairSummary =
+          repairPlan['summary']?.toString() ??
+          'Esse deck precisa de reconstrução guiada antes de uma micro-otimização segura.';
+      final targetLandCount = repairPlan['target_land_count'];
+
+      final shouldRebuild = await showDialog<bool>(
+        context: context,
+        builder:
+            (ctx) => AlertDialog(
+              title: const Text('Esse deck precisa de reconstrução'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(error.message),
+                    const SizedBox(height: 12),
+                    Text(repairSummary),
+                    if (targetLandCount != null) ...[
+                      const SizedBox(height: 8),
+                      Text('Alvo de terrenos: $targetLandCount'),
+                    ],
+                    if (reasons.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Diagnóstico:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      ...reasons.take(6).map(
+                        (reason) => Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text('• $reason'),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Podemos criar uma versão reconstruída em rascunho, sem alterar o deck atual.',
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Agora não'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Criar rascunho'),
+                ),
+              ],
+            ),
+      );
+
+      if (shouldRebuild == true && mounted) {
+        await _runGuidedRebuild(
+          deckProvider,
+          error,
+          fallbackArchetype: archetype,
+        );
+      }
+      return;
+    }
+
+    if (error.isNearPeak) {
+      await _showOutcomeInfoDialog(
+        context: context,
+        title: 'Deck já está bem ajustado',
+        message:
+            error.message.isNotEmpty
+                ? error.message
+                : 'O deck já está perto do pico atual e não houve upgrade seguro suficiente.',
+        reasons: reasons,
+      );
+      return;
+    }
+
+    if (error.isNoSafeUpgradeFound) {
+      await _showOutcomeInfoDialog(
+        context: context,
+        title: 'Nenhuma melhoria segura encontrada',
+        message:
+            error.message.isNotEmpty
+                ? error.message
+                : 'As sugestões geradas não passaram pelo gate de segurança.',
+        reasons: reasons,
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: AppTheme.error,
+      ),
+    );
+  }
+
   Future<void> _applyOptimization(
     BuildContext context,
     String archetype,
@@ -3250,6 +3551,16 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
+    } on DeckAiFlowException catch (e) {
+      closeLoadingDialog();
+      if (context.mounted) {
+        await _handleOptimizeAiFailure(
+          context,
+          deckProvider,
+          e,
+          archetype: archetype,
+        );
+      }
     } catch (e) {
       // Garantir que o loading seja fechado em caso de erro
       closeLoadingDialog();

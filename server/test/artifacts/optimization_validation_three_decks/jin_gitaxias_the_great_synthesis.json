@@ -1,9 +1,9 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "562c85d1-3ade-490e-80f6-d8d5b1a08fa1",
+  "clone_deck_id": "f802ec62-c4af-4988-a605-a68d5b53b6b8",
   "optimize_request": {
-    "deck_id": "562c85d1-3ade-490e-80f6-d8d5b1a08fa1",
+    "deck_id": "f802ec62-c4af-4988-a605-a68d5b53b6b8",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -17,7 +17,7 @@
     },
     "cache": {
       "hit": false,
-      "cache_key": "v6:1e4479db"
+      "cache_key": "v6:3793da64"
     },
     "preferences": {
       "memory_applied": false,
@@ -31,14 +31,14 @@
       "core_cards": [
         "Jin-Gitaxias // The Great Synthesis",
         "Flusterstorm",
+        "Pact of Negation",
         "Force of Will",
         "Kozilek, the Great Distortion",
-        "Pact of Negation",
         "Chain of Vapor",
-        "Arcane Signet",
-        "Mind Stone",
-        "Fierce Guardianship",
-        "Kozilek, Butcher of Truth"
+        "Force of Negation",
+        "Fabricate",
+        "Fellwar Stone",
+        "Fierce Guardianship"
       ]
     },
     "removals": [
@@ -87,9 +87,9 @@
         "Mais interação instant-speed adicionada"
       ],
       "validation": {
-        "validation_score": 86,
-        "deck_health_score": 90,
-        "improvement_score": 74,
+        "validation_score": 74,
+        "deck_health_score": 89,
+        "improvement_score": 51,
         "verdict": "aprovado",
         "monte_carlo": {
           "before": {
@@ -97,25 +97,25 @@
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.15,
-              "flood_rate": 0.018,
-              "keepable_rate": 0.832
+              "screw_rate": 0.138,
+              "flood_rate": 0.014,
+              "keepable_rate": 0.848
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.732,
-              "turn_2_play": 0.933,
-              "turn_3_play": 0.986,
-              "turn_4_play": 0.996,
+              "turn_1_play": 0.742,
+              "turn_2_play": 0.925,
+              "turn_3_play": 0.987,
+              "turn_4_play": 0.998,
               "cmc_distribution": {
-                "1": 15,
-                "3": 13,
-                "2": 12,
-                "7": 3,
-                "10": 4,
                 "5": 3,
+                "7": 3,
+                "1": 15,
+                "2": 12,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
@@ -125,28 +125,28 @@
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 91,
+            "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.133,
-              "flood_rate": 0.014,
-              "keepable_rate": 0.853
+              "screw_rate": 0.147,
+              "flood_rate": 0.018,
+              "keepable_rate": 0.835
             },
             "curve_analysis": {
               "avg_cmc": 2.97,
-              "turn_1_play": 0.766,
-              "turn_2_play": 0.932,
-              "turn_3_play": 0.98,
-              "turn_4_play": 0.99,
+              "turn_1_play": 0.731,
+              "turn_2_play": 0.938,
+              "turn_3_play": 0.987,
+              "turn_4_play": 0.995,
               "cmc_distribution": {
-                "1": 16,
-                "3": 13,
-                "2": 12,
-                "10": 4,
                 "5": 3,
                 "7": 2,
+                "1": 16,
+                "2": 12,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
@@ -156,29 +156,29 @@
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.12,
-            "keep_at_7": 0.896,
-            "keep_at_6": 0.092,
-            "keep_at_5": 0.012,
+            "avg_mulligans": 0.13,
+            "keep_at_7": 0.878,
+            "keep_at_6": 0.114,
+            "keep_at_5": 0.008,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.926
+            "keepable_after_mull": 0.91
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.09,
-            "keep_at_7": 0.912,
-            "keep_at_6": 0.082,
-            "keep_at_5": 0.006,
+            "avg_mulligans": 0.1,
+            "keep_at_7": 0.904,
+            "keep_at_6": 0.092,
+            "keep_at_5": 0.004,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.942
+            "keepable_after_mull": 0.914
           },
           "deltas": {
-            "consistency_score": 1,
-            "screw_rate_delta": -0.017,
-            "flood_rate_delta": -0.004,
-            "keepable_rate_delta": 0.021,
-            "turn2_play_delta": -0.001,
-            "mulligan_keep7_delta": 0.016
+            "consistency_score": 0,
+            "screw_rate_delta": 0.009,
+            "flood_rate_delta": 0.004,
+            "keepable_rate_delta": -0.013,
+            "turn2_play_delta": 0.013,
+            "mulligan_keep7_delta": 0.026
           }
         },
         "functional_analysis": {
@@ -214,14 +214,19 @@
           }
         },
         "critic_ai": {
-          "approval_score": 92,
-          "verdict": "aprovado",
-          "concerns": [],
-          "strong_swaps": [
-            "OUT: Sea Gate Restoration // Sea Gate, Reborn → IN: Brainstorm"
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "Aumento na taxa de mana screw, o que pode impactar a consistência do deck em jogos longos.",
+            "A troca de um card que pode ser jogado como terreno (Sea Gate, Reborn) por um card que não tem essa flexibilidade pode ser arriscada em um formato de Commander, onde a curva de mana pode ser crítica."
           ],
-          "weak_swaps": [],
-          "overall_assessment": "A troca é claramente benéfica, melhorando a consistência do deck sem desvantagens significativas."
+          "strong_swaps": [
+            "Brainstorm é uma carta poderosa de manipulação de cartas e pode ajudar a encontrar respostas rapidamente."
+          ],
+          "weak_swaps": [
+            "A troca de Sea Gate Restoration por Brainstorm pode ser questionável devido à perda de um terreno adicional e a flexibilidade que ele oferece."
+          ],
+          "overall_assessment": "Embora a adição de Brainstorm seja uma melhoria em termos de manipulação de cartas, a perda de um terreno versátil pode comprometer a consistência do deck em situações críticas."
         },
         "warnings": []
       }
@@ -242,26 +247,26 @@
         "pair_count": 0
       },
       "empty_suggestions_fallback_aggregate": {
-        "request_count": 23,
-        "triggered_count": 0,
+        "request_count": 60,
+        "triggered_count": 2,
         "applied_count": 0,
-        "no_candidate_count": 0,
+        "no_candidate_count": 2,
         "no_replacement_count": 0,
-        "trigger_rate": 0.0,
+        "trigger_rate": 0.03333333333333333,
         "apply_rate": 0.0
       },
       "empty_suggestions_fallback_aggregate_persisted": {
         "all_time": {
-          "request_count": 60,
+          "request_count": 63,
           "triggered_count": 23,
           "applied_count": 0,
           "no_candidate_count": 23,
           "no_replacement_count": 0,
-          "trigger_rate": 0.38333333333333336,
+          "trigger_rate": 0.36507936507936506,
           "apply_rate": 0.0
         },
         "last_24h": {
-          "request_count": 25,
+          "request_count": 14,
           "triggered_count": 0,
           "applied_count": 0,
           "no_candidate_count": 0,
@@ -431,6 +436,14 @@
           "legality": "mantida"
         }
       }
-    ]
+    ],
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "optimized"
   }
 }

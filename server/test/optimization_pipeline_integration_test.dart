@@ -824,5 +824,206 @@ void main() {
       expect(types['instants'], equals(2));
       expect(types['artifacts'], equals(1));
     });
+
+    test('state assessment flags degenerate Talrand shell as needs_repair', () {
+      final cards = <Map<String, dynamic>>[
+        {
+          'name': 'Talrand, Sky Summoner',
+          'type_line': 'Legendary Creature — Merfolk Wizard',
+          'mana_cost': '{2}{U}{U}',
+          'oracle_text':
+              'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+          'cmc': 4.0,
+          'quantity': 1,
+          'colors': const ['U'],
+          'is_commander': true,
+        },
+        {
+          'name': 'Wastes',
+          'type_line': 'Basic Land',
+          'mana_cost': '',
+          'oracle_text': '{T}: Add {C}.',
+          'cmc': 0.0,
+          'quantity': 99,
+          'colors': const <String>[],
+          'is_commander': false,
+        },
+      ];
+
+      final analysis = optimize_route.DeckArchetypeAnalyzer(
+        cards,
+        const ['U'],
+      ).generateAnalysis();
+      final state = optimize_route.assessDeckOptimizationState(
+        cards: cards,
+        deckAnalysis: analysis,
+        deckFormat: 'commander',
+        currentTotalCards: 100,
+        commanderColorIdentity: {'U'},
+      );
+
+      expect(state.status, equals('needs_repair'));
+      expect(state.recommendedMode, equals('repair'));
+      expect(state.suggestedScope, equals('rebuild_core'));
+      expect(state.repairPlan['target_land_count'], equals(36));
+    });
+
+    test('state assessment keeps healthy spellslinger shell in optimize', () {
+      final cards = <Map<String, dynamic>>[
+        {
+          'name': 'Talrand, Sky Summoner',
+          'type_line': 'Legendary Creature — Merfolk Wizard',
+          'mana_cost': '{2}{U}{U}',
+          'oracle_text':
+              'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+          'cmc': 4.0,
+          'quantity': 1,
+          'colors': const ['U'],
+          'is_commander': true,
+        },
+        {
+          'name': 'Island',
+          'type_line': 'Basic Land — Island',
+          'mana_cost': '',
+          'oracle_text': '{T}: Add {U}.',
+          'cmc': 0.0,
+          'quantity': 35,
+          'colors': const <String>[],
+          'is_commander': false,
+        },
+        {
+          'name': 'Opt',
+          'type_line': 'Instant',
+          'mana_cost': '{U}',
+          'oracle_text': 'Scry 1. Draw a card.',
+          'cmc': 1.0,
+          'quantity': 20,
+          'colors': const ['U'],
+          'is_commander': false,
+        },
+        {
+          'name': 'Preordain',
+          'type_line': 'Sorcery',
+          'mana_cost': '{U}',
+          'oracle_text': 'Scry 2, then draw a card.',
+          'cmc': 1.0,
+          'quantity': 15,
+          'colors': const ['U'],
+          'is_commander': false,
+        },
+        {
+          'name': 'Arcane Signet',
+          'type_line': 'Artifact',
+          'mana_cost': '{2}',
+          'oracle_text':
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          'cmc': 2.0,
+          'quantity': 10,
+          'colors': const <String>[],
+          'is_commander': false,
+        },
+        {
+          'name': 'Mystic Sanctuary Adept',
+          'type_line': 'Creature — Wizard',
+          'mana_cost': '{2}{U}',
+          'oracle_text': 'Flying.',
+          'cmc': 3.0,
+          'quantity': 19,
+          'colors': const ['U'],
+          'is_commander': false,
+        },
+      ];
+
+      final analysis = optimize_route.DeckArchetypeAnalyzer(
+        cards,
+        const ['U'],
+      ).generateAnalysis();
+      final state = optimize_route.assessDeckOptimizationState(
+        cards: cards,
+        deckAnalysis: analysis,
+        deckFormat: 'commander',
+        currentTotalCards: 100,
+        commanderColorIdentity: {'U'},
+      );
+
+      expect(state.status, equals('healthy'));
+      expect(state.recommendedMode, equals('optimize'));
+      expect(state.reasons, isEmpty);
+    });
+
+    test('derive outcome code maps healthy no-safe-swap rejection', () {
+      const healthyDeckState = optimize_route.DeckOptimizationState(
+        status: 'healthy',
+        recommendedMode: 'optimize',
+        suggestedScope: 'micro_swaps',
+        reasons: <String>[],
+        severityScore: 0,
+      );
+
+      final outcome = optimize_route.deriveOptimizeOutcomeCode(
+        statusCode: 422,
+        body: const {
+          'quality_error': {
+            'code': 'OPTIMIZE_NO_SAFE_SWAPS',
+          },
+        },
+        deckState: healthyDeckState,
+      );
+
+      expect(outcome, equals('no_safe_upgrade_found'));
+    });
+
+    test('derive outcome code maps high-health low-improvement rejection', () {
+      const healthyDeckState = optimize_route.DeckOptimizationState(
+        status: 'healthy',
+        recommendedMode: 'optimize',
+        suggestedScope: 'micro_swaps',
+        reasons: <String>[],
+        severityScore: 0,
+      );
+
+      final outcome = optimize_route.deriveOptimizeOutcomeCode(
+        statusCode: 422,
+        body: const {
+          'quality_error': {
+            'code': 'OPTIMIZE_QUALITY_REJECTED',
+            'validation': {
+              'deck_health_score': 84,
+              'improvement_score': 18,
+            },
+          },
+        },
+        deckState: healthyDeckState,
+      );
+
+      expect(outcome, equals('near_peak'));
+    });
+
+    test('derive outcome code maps structural rejection to needs_repair', () {
+      const repairDeckState = optimize_route.DeckOptimizationState(
+        status: 'needs_repair',
+        recommendedMode: 'repair',
+        suggestedScope: 'rebuild_core',
+        reasons: <String>['Deck fora do plano do comandante.'],
+        severityScore: 88,
+        repairPlan: <String, dynamic>{'target_land_count': 36},
+      );
+
+      final outcome = optimize_route.deriveOptimizeOutcomeCode(
+        statusCode: 422,
+        body: const {
+          'quality_error': {
+            'code': 'OPTIMIZE_QUALITY_REJECTED',
+            'validation': {
+              'deck_health_score': 22,
+              'improvement_score': 9,
+            },
+          },
+        },
+        deckState: repairDeckState,
+      );
+
+      expect(outcome, equals('needs_repair'));
+    });
   });
 }

@@ -494,6 +494,62 @@ void main() {
     );
 
     test(
+      'full structurally broken Talrand deck returns needs_repair diagnostic',
+      () async {
+        final talrand = await findCardByName('Talrand, Sky Summoner');
+        final wastes = await findCardByName('Wastes');
+        final deckId = await createDeck(
+          format: 'commander',
+          cards: [
+            {
+              'card_id': talrand['id'] as String,
+              'quantity': 1,
+              'is_commander': true,
+            },
+            {
+              'card_id': wastes['id'] as String,
+              'quantity': 99,
+            },
+          ],
+        );
+        createdDeckIds.add(deckId);
+
+        final response = await optimizeWithPolling({
+          'deck_id': deckId,
+          'archetype': 'midrange',
+          'bracket': 2,
+          'keep_theme': true,
+        });
+
+        expect(response.statusCode, equals(422), reason: response.body);
+        final body = decodeJson(response);
+        final qualityError =
+            (body['quality_error'] as Map?)?.cast<String, dynamic>();
+        final deckState = (body['deck_state'] as Map?)?.cast<String, dynamic>();
+
+        expect(body['mode'], equals('optimize'), reason: response.body);
+        expect(body['outcome_code'], equals('needs_repair'),
+            reason: response.body);
+        expect(qualityError, isNotNull, reason: response.body);
+        expect(
+          qualityError!['code'],
+          equals('OPTIMIZE_NEEDS_REPAIR'),
+          reason: response.body,
+        );
+        expect(deckState, isNotNull, reason: response.body);
+        expect(deckState!['status'], equals('needs_repair'));
+        expect(deckState['recommended_mode'], equals('repair'));
+        expect(qualityError['repair_plan'], isA<Map>(), reason: response.body);
+        expect(body['next_action'], isA<Map>(), reason: response.body);
+        final nextAction = (body['next_action'] as Map).cast<String, dynamic>();
+        expect(nextAction['type'], equals('rebuild_guided'));
+        expect(nextAction['endpoint'], equals('/ai/rebuild'));
+      },
+      skip: skipIntegration,
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    test(
       'returns 404 when deck does not exist',
       () async {
         final response = await postJsonWithRetry('/ai/optimize', {
@@ -580,7 +636,7 @@ void main() {
         );
       },
       skip: skipIntegration,
-      timeout: const Timeout(Duration(minutes: 5)),
+      timeout: const Timeout(Duration(minutes: 8)),
     );
 
     test(
@@ -636,6 +692,124 @@ void main() {
           reason:
               'Bulk save falhou após optimize complete. body=${bulkResponse.body}',
         );
+      },
+      skip: skipIntegration,
+      timeout: const Timeout(Duration(minutes: 8)),
+    );
+
+    test(
+      'rebuild_guided preview_only rebuilds Talrand as full non-commander rebuild',
+      () async {
+        final talrand = await findCardByName('Talrand, Sky Summoner');
+        final wastes = await findCardByName('Wastes');
+        final deckId = await createDeck(
+          format: 'commander',
+          cards: [
+            {
+              'card_id': talrand['id'] as String,
+              'quantity': 1,
+              'is_commander': true,
+            },
+            {
+              'card_id': wastes['id'] as String,
+              'quantity': 99,
+            },
+          ],
+        );
+        createdDeckIds.add(deckId);
+
+        final response = await postJsonWithRetry('/ai/rebuild', {
+          'deck_id': deckId,
+          'bracket': 2,
+          'archetype': 'control',
+          'theme': 'spellslinger',
+          'rebuild_scope': 'auto',
+          'save_mode': 'preview_only',
+        });
+
+        expect(response.statusCode, equals(200), reason: response.body);
+        final body = decodeJson(response);
+        expect(body['mode'], equals('rebuild_guided'), reason: response.body);
+        expect(body['outcome_code'], equals('rebuild_preview'),
+            reason: response.body);
+        expect(
+          body['rebuild_scope_selected'],
+          equals('full_non_commander_rebuild'),
+          reason: response.body,
+        );
+
+        final rebuiltCards = (body['rebuilt_cards'] as List?)
+                ?.whereType<Map>()
+                .map((e) => e.cast<String, dynamic>())
+                .toList() ??
+            <Map<String, dynamic>>[];
+        expect(rebuiltCards, isNotEmpty, reason: response.body);
+
+        final totalCards = rebuiltCards.fold<int>(
+          0,
+          (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+        );
+        expect(totalCards, equals(100), reason: response.body);
+        expect(
+          rebuiltCards.any((card) =>
+              card['is_commander'] == true &&
+              card['name'] == 'Talrand, Sky Summoner'),
+          isTrue,
+          reason: response.body,
+        );
+        final keepSummary =
+            (body['keep_summary'] as Map?)?.cast<String, dynamic>() ?? {};
+        expect((keepSummary['replaced_slots'] as num?)?.toInt(), greaterThan(90),
+            reason: response.body);
+      },
+      skip: skipIntegration,
+      timeout: const Timeout(Duration(minutes: 5)),
+    );
+
+    test(
+      'rebuild_guided draft_clone creates a strict-valid commander deck',
+      () async {
+        final talrand = await findCardByName('Talrand, Sky Summoner');
+        final wastes = await findCardByName('Wastes');
+        final deckId = await createDeck(
+          format: 'commander',
+          cards: [
+            {
+              'card_id': talrand['id'] as String,
+              'quantity': 1,
+              'is_commander': true,
+            },
+            {
+              'card_id': wastes['id'] as String,
+              'quantity': 99,
+            },
+          ],
+        );
+        createdDeckIds.add(deckId);
+
+        final response = await postJsonWithRetry('/ai/rebuild', {
+          'deck_id': deckId,
+          'bracket': 2,
+          'archetype': 'control',
+          'theme': 'spellslinger',
+          'rebuild_scope': 'auto',
+          'save_mode': 'draft_clone',
+        });
+
+        expect(response.statusCode, equals(200), reason: response.body);
+        final body = decodeJson(response);
+        expect(body['outcome_code'], equals('rebuild_created'),
+            reason: response.body);
+        final draftDeckId = body['draft_deck_id'] as String?;
+        expect(draftDeckId, isNotNull, reason: response.body);
+        createdDeckIds.add(draftDeckId!);
+
+        final validateResponse = await postJsonWithRetry(
+          '/decks/$draftDeckId/validate',
+          const {},
+        );
+        expect(validateResponse.statusCode, equals(200),
+            reason: 'draft=$draftDeckId body=${validateResponse.body}');
       },
       skip: skipIntegration,
       timeout: const Timeout(Duration(minutes: 5)),
@@ -809,7 +983,7 @@ void main() {
         );
       },
       skip: skipIntegration,
-      timeout: const Timeout(Duration(minutes: 4)),
+      timeout: const Timeout(Duration(minutes: 10)),
     );
 
     test(

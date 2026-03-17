@@ -1,28 +1,101 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "657b84bb-87ef-41c6-a280-a7ab8618fcbe",
+  "clone_deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
   "optimize_request": {
-    "deck_id": "657b84bb-87ef-41c6-a280-a7ab8618fcbe",
+    "deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
+    "error": "O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.",
     "quality_error": {
-      "code": "OPTIMIZE_NO_SAFE_SWAPS",
-      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
-      "dropped_swaps": [
-        "🔒 Gate de qualidade removeu 3 troca(s) insegura(s) antes da resposta final.",
-        "🔒 Chandra's Ignition -> Blasphemous Act removida pelo gate: papel removal -> wipe, delta CMC +4.",
-        "🔒 Goblin Ringleader -> Dark Ritual removida pelo gate: papel creature -> ramp, delta CMC -3.",
-        "🔒 Vandalblast -> Deflecting Swat removida pelo gate: papel removal -> utility, delta CMC +2."
-      ]
+      "code": "OPTIMIZE_NEEDS_REPAIR",
+      "message": "O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.",
+      "reasons": [
+        "O deck está com apenas 24 terrenos, abaixo do mínimo seguro para Commander."
+      ],
+      "recommended_mode": "repair",
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "next_action": {
+      "type": "rebuild_guided",
+      "endpoint": "/ai/rebuild",
+      "payload": {
+        "deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
+        "bracket": 4,
+        "archetype": "aggro",
+        "theme": "tribal-goblin",
+        "rebuild_scope": "auto",
+        "save_mode": "draft_clone"
+      }
     },
     "mode": "optimize",
-    "removals": [],
-    "additions": []
+    "deck_analysis": {
+      "detected_archetype": "aggro",
+      "average_cmc": "2.43",
+      "type_distribution": {
+        "creatures": 33,
+        "instants": 11,
+        "sorceries": 11,
+        "enchantments": 9,
+        "artifacts": 12,
+        "planeswalkers": 1,
+        "lands": 24,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "OK: Curva aceitável para Aggro",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 24, ideal >= 34)",
+      "archetype_confidence": "média"
+    },
+    "theme": {
+      "theme": "tribal-goblin",
+      "confidence": "alta",
+      "match_score": 0.42105263157894735,
+      "core_cards": [
+        "Auntie Ool, Cursewretch",
+        "Goblin Chieftain",
+        "Goblin Rabblemaster",
+        "Goblin Trashmaster",
+        "Goblin Sledder",
+        "Goblin King",
+        "Goblin Piledriver",
+        "Krenko, Mob Boss",
+        "Krenko, Tin Street Kingpin",
+        "Purphoros, God of the Forge"
+      ]
+    },
+    "deck_state": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 30,
+      "reasons": [
+        "O deck está com apenas 24 terrenos, abaixo do mínimo seguro para Commander."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "outcome_code": "needs_repair"
   }
 }
