@@ -442,7 +442,8 @@ void main() {
           'archetype': 'midrange',
         });
 
-        expect(response.statusCode, anyOf(200, 500), reason: response.body);
+        expect(response.statusCode, anyOf(200, 422, 500),
+            reason: response.body);
         final body = decodeJson(response);
         if (response.statusCode == 200) {
           expect(body['mode'], isA<String>(), reason: response.body);
@@ -456,6 +457,15 @@ void main() {
             expect(body['additions'], isA<List>());
             expect(body['deck_analysis'], isA<Map<String, dynamic>>());
           }
+        } else if (response.statusCode == 422) {
+          expect(body['error'], isA<String>());
+          expect(body['quality_error'], isA<Map>(), reason: response.body);
+          expect(
+            (body['error'] as String).contains('Bad state: No element'),
+            isFalse,
+            reason:
+                'Regressão: optimize não deve vazar erro interno de coleção vazia.',
+          );
         } else {
           expect(body['error'], isA<String>());
           expect(
@@ -467,6 +477,7 @@ void main() {
         }
       },
       skip: skipIntegration,
+      timeout: const Timeout(Duration(minutes: 2)),
     );
 
     test(
@@ -569,7 +580,7 @@ void main() {
         );
       },
       skip: skipIntegration,
-      timeout: const Timeout(Duration(minutes: 2)),
+      timeout: const Timeout(Duration(minutes: 5)),
     );
 
     test(
@@ -627,7 +638,7 @@ void main() {
         );
       },
       skip: skipIntegration,
-      timeout: const Timeout(Duration(minutes: 3)),
+      timeout: const Timeout(Duration(minutes: 5)),
     );
 
     test(

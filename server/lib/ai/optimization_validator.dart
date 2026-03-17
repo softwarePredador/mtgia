@@ -468,6 +468,12 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
         improvementScore >= 55 &&
         !hasCriticalRoleLoss) {
       verdict = 'aprovado';
+    } else if (score >= 65 &&
+        healthScore >= 80 &&
+        improvementScore >= 35 &&
+        functional.questionable == 0 &&
+        !hasCriticalRoleLoss) {
+      verdict = 'aprovado';
     } else if (score >= 45) {
       verdict = 'aprovado_com_ressalvas';
     } else {

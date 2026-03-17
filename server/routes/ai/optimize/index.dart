@@ -2655,8 +2655,7 @@ Future<Response> onRequest(RequestContext context) async {
               postAnalysisMap['mana_base_assessment']?.toString() ?? '',
         );
         final hardQualityRejected =
-            optimizationValidationReport.verdict != 'aprovado' ||
-                optimizationValidationReport.score < 70;
+            optimizationValidationReport.verdict != 'aprovado';
         final effectiveRejectionReasons = rejectionReasons.isNotEmpty
             ? rejectionReasons
             : (hardQualityRejected
@@ -2724,8 +2723,7 @@ Future<Response> onRequest(RequestContext context) async {
         final responseValidationVerdict =
             responseValidationJson['verdict']?.toString() ?? '';
 
-        if (responseValidationVerdict != 'aprovado' ||
-            responseValidationScore < 70) {
+        if (responseValidationVerdict != 'aprovado') {
           final serializedValidationReasons = optimizationValidationReport !=
                   null
               ? buildOptimizationRejectionReasons(

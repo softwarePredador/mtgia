@@ -1,9 +1,9 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "95a4f2eb-9b06-4c47-8411-ee5d33591147",
+  "clone_deck_id": "188bbb82-396a-45fa-9702-44ccfb223e2e",
   "optimize_request": {
-    "deck_id": "95a4f2eb-9b06-4c47-8411-ee5d33591147",
+    "deck_id": "188bbb82-396a-45fa-9702-44ccfb223e2e",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -15,13 +15,16 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 63/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (63/100; mínimo 70).",
+        "Validação automática reprovou as trocas (score 34/100).",
+        "A validação final não fechou como \"aprovado\" (score 34/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (34/100; mínimo 70).",
         "A base de mana continua com problema crítico após a otimização."
       ],
       "validation": {
-        "validation_score": 63,
-        "verdict": "aprovado_com_ressalvas",
+        "validation_score": 34,
+        "deck_health_score": 6,
+        "improvement_score": 76,
+        "verdict": "reprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
@@ -53,30 +56,30 @@
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 10,
+            "consistency_score": 14,
             "mana_analysis": {
-              "land_count": 99,
+              "land_count": 98,
               "screw_rate": 0.0,
-              "flood_rate": 1.0,
-              "keepable_rate": 0.0
+              "flood_rate": 0.996,
+              "keepable_rate": 0.004
             },
             "curve_analysis": {
-              "avg_cmc": 4.0,
+              "avg_cmc": 3.0,
               "turn_1_play": 0.0,
-              "turn_2_play": 0.0,
-              "turn_3_play": 0.0,
-              "turn_4_play": 0.0,
+              "turn_2_play": 0.084,
+              "turn_3_play": 0.098,
+              "turn_4_play": 0.11,
               "cmc_distribution": {
-                "4": 1
+                "4": 1,
+                "2": 1
               }
             },
             "recommendations": [
-              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Alta taxa de mana flood (99.6%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
               "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
-              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
-              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
+              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
+              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
             ]
           },
           "mulligan_before": {
@@ -90,48 +93,48 @@
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 2.0,
-            "keep_at_7": 0.0,
-            "keep_at_6": 0.0,
-            "keep_at_5": 1.0,
+            "avg_mulligans": 1.99,
+            "keep_at_7": 0.002,
+            "keep_at_6": 0.002,
+            "keep_at_5": 0.996,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.0
+            "keepable_after_mull": 0.006
           },
           "deltas": {
-            "consistency_score": 0,
+            "consistency_score": 4,
             "screw_rate_delta": 0.0,
-            "flood_rate_delta": 0.0,
-            "keepable_rate_delta": 0.0,
-            "turn2_play_delta": 0.0,
-            "mulligan_keep7_delta": 0.0
+            "flood_rate_delta": -0.004,
+            "keepable_rate_delta": 0.004,
+            "turn2_play_delta": 0.084,
+            "mulligan_keep7_delta": 0.002
           }
         },
         "functional_analysis": {
           "swaps": [
             {
               "removed": "Wastes",
-              "added": "Command Tower",
+              "added": "Arcane Signet",
               "removed_role": "land",
-              "added_role": "land",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": 2,
+              "verdict": "questionável"
             }
           ],
           "summary": {
-            "upgrades": 1,
+            "upgrades": 0,
             "sidegrades": 0,
             "tradeoffs": 0,
-            "questionable": 0
+            "questionable": 1
           },
           "role_delta": {
             "draw": 0,
             "removal": 0,
-            "ramp": 0,
+            "ramp": 1,
             "creature": 0,
             "artifact": 0,
             "enchantment": 0,
-            "land": 0,
+            "land": -1,
             "utility": 0,
             "wipe": 0,
             "tutor": 0,
@@ -139,16 +142,25 @@
           }
         },
         "critic_ai": {
-          "approval_score": 85,
-          "verdict": "aprovado",
-          "concerns": [],
-          "strong_swaps": [
-            "OUT: Wastes → IN: Command Tower"
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
+            "Wastes pode ser útil em situações específicas, como para evitar ser afetado por efeitos que interagem com tipos de terreno."
           ],
-          "weak_swaps": [],
-          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem impactos negativos nas métricas de desempenho do deck."
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Wastes → Arcane Signet",
+              "justification": "Embora Arcane Signet melhore a consistência de mana e a capacidade de jogar no T2, a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência de jogadas, mas a perda de uma land pode ser arriscada e deve ser considerada com cautela."
         },
-        "warnings": []
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+          "Saúde absoluta do deck final ainda está baixa (6/100)."
+        ]
       }
     },
     "mode": "optimize",
@@ -156,7 +168,7 @@
       "Wastes"
     ],
     "additions": [
-      "Command Tower"
+      "Arcane Signet"
     ],
     "deck_analysis": {
       "detected_archetype": "midrange",
@@ -173,29 +185,34 @@
       },
       "total_cards": 100,
       "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
-      "mana_base_assessment": "Falta mana U (Tem 0 fontes, ideal > 15)",
+      "mana_base_assessment": "Terrenos em excesso (Tem 99, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
       "archetype_confidence": "baixa"
     },
     "post_analysis": {
       "detected_archetype": "midrange",
-      "average_cmc": "4.00",
+      "average_cmc": "3.00",
       "type_distribution": {
         "creatures": 1,
         "instants": 0,
         "sorceries": 0,
         "enchantments": 0,
-        "artifacts": 0,
+        "artifacts": 1,
         "planeswalkers": 0,
-        "lands": 99,
+        "lands": 98,
         "battles": 0
       },
       "total_cards": 100,
-      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
-      "mana_base_assessment": "Falta mana U (Tem 1 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Terrenos em excesso (Tem 98, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
       "archetype_confidence": "baixa",
+      "improvements": [
+        "CMC médio otimizado: 4.00 → 3.00"
+      ],
       "validation": {
-        "validation_score": 63,
-        "verdict": "aprovado_com_ressalvas",
+        "validation_score": 34,
+        "deck_health_score": 6,
+        "improvement_score": 76,
+        "verdict": "reprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
@@ -227,30 +244,30 @@
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 10,
+            "consistency_score": 14,
             "mana_analysis": {
-              "land_count": 99,
+              "land_count": 98,
               "screw_rate": 0.0,
-              "flood_rate": 1.0,
-              "keepable_rate": 0.0
+              "flood_rate": 0.996,
+              "keepable_rate": 0.004
             },
             "curve_analysis": {
-              "avg_cmc": 4.0,
+              "avg_cmc": 3.0,
               "turn_1_play": 0.0,
-              "turn_2_play": 0.0,
-              "turn_3_play": 0.0,
-              "turn_4_play": 0.0,
+              "turn_2_play": 0.084,
+              "turn_3_play": 0.098,
+              "turn_4_play": 0.11,
               "cmc_distribution": {
-                "4": 1
+                "4": 1,
+                "2": 1
               }
             },
             "recommendations": [
-              "Alta taxa de mana flood (100.0%). Considere remover 2-3 terrenos ou adicionar card draw.",
-              "99 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
+              "Alta taxa de mana flood (99.6%). Considere remover 2-3 terrenos ou adicionar card draw.",
+              "98 terrenos é acima do ideal. Considere trocar alguns por mana rocks.",
               "Poucas jogadas de 1 mana (0%). Adicione mana rocks ou cantrips de 1 CMC.",
-              "Curva de 2 mana fraca (0%). Adicione mais cartas de 2 CMC.",
-              "CMC médio alto (4.00). Deck pode ser lento; adicione mais cartas baratas.",
-              "Apenas 0 cartas com CMC 0-2. Considere mais early game."
+              "Curva de 2 mana fraca (8%). Adicione mais cartas de 2 CMC.",
+              "Apenas 1 cartas com CMC 0-2. Considere mais early game."
             ]
           },
           "mulligan_before": {
@@ -264,48 +281,48 @@
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 2.0,
-            "keep_at_7": 0.0,
-            "keep_at_6": 0.0,
-            "keep_at_5": 1.0,
+            "avg_mulligans": 1.99,
+            "keep_at_7": 0.002,
+            "keep_at_6": 0.002,
+            "keep_at_5": 0.996,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.0
+            "keepable_after_mull": 0.006
           },
           "deltas": {
-            "consistency_score": 0,
+            "consistency_score": 4,
             "screw_rate_delta": 0.0,
-            "flood_rate_delta": 0.0,
-            "keepable_rate_delta": 0.0,
-            "turn2_play_delta": 0.0,
-            "mulligan_keep7_delta": 0.0
+            "flood_rate_delta": -0.004,
+            "keepable_rate_delta": 0.004,
+            "turn2_play_delta": 0.084,
+            "mulligan_keep7_delta": 0.002
           }
         },
         "functional_analysis": {
           "swaps": [
             {
               "removed": "Wastes",
-              "added": "Command Tower",
+              "added": "Arcane Signet",
               "removed_role": "land",
-              "added_role": "land",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": 2,
+              "verdict": "questionável"
             }
           ],
           "summary": {
-            "upgrades": 1,
+            "upgrades": 0,
             "sidegrades": 0,
             "tradeoffs": 0,
-            "questionable": 0
+            "questionable": 1
           },
           "role_delta": {
             "draw": 0,
             "removal": 0,
-            "ramp": 0,
+            "ramp": 1,
             "creature": 0,
             "artifact": 0,
             "enchantment": 0,
-            "land": 0,
+            "land": -1,
             "utility": 0,
             "wipe": 0,
             "tutor": 0,
@@ -313,20 +330,31 @@
           }
         },
         "critic_ai": {
-          "approval_score": 85,
-          "verdict": "aprovado",
-          "concerns": [],
-          "strong_swaps": [
-            "OUT: Wastes → IN: Command Tower"
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de uma land por um artefato de mana pode afetar a base de mana do deck, especialmente em um formato onde a consistência de mana é crucial.",
+            "Wastes pode ser útil em situações específicas, como para evitar ser afetado por efeitos que interagem com tipos de terreno."
           ],
-          "weak_swaps": [],
-          "overall_assessment": "A troca de Wastes por Command Tower é uma melhoria clara em termos de versatilidade de mana, sem impactos negativos nas métricas de desempenho do deck."
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Wastes → Arcane Signet",
+              "justification": "Embora Arcane Signet melhore a consistência de mana e a capacidade de jogar no T2, a perda de uma land pode ser arriscada em um deck que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência de jogadas, mas a perda de uma land pode ser arriscada e deve ser considerada com cautela."
         },
-        "warnings": []
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+          "Saúde absoluta do deck final ainda está baixa (6/100)."
+        ]
       }
     },
     "validation_warnings": [
-      "⚠️ 1 (100%) das cartas sugeridas NÃO aparecem nos dados EDHREC de Talrand, Sky Summoner. Isso pode indicar baixa sinergia: Command Tower"
+      "🚫 VALIDAÇÃO: As trocas sugeridas NÃO passaram na validação automática (score: 34/100).",
+      "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+      "Saúde absoluta do deck final ainda está baixa (6/100)."
     ]
   }
 }
