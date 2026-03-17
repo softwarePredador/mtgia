@@ -419,10 +419,12 @@ void main() {
   }
 
   setUpAll(() async {
+    if (skipIntegration != null) return;
     authToken = await getAuthToken();
   });
 
   tearDownAll(() async {
+    if (skipIntegration != null) return;
     for (final deckId in createdDeckIds) {
       await deleteDeck(deckId);
     }

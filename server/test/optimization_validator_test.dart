@@ -57,7 +57,8 @@ void main() {
           'name': 'Swan Song',
           'type_line': 'Instant',
           'mana_cost': '{U}',
-          'oracle_text': 'Counter target enchantment, instant, or sorcery spell.',
+          'oracle_text':
+              'Counter target enchantment, instant, or sorcery spell.',
           'cmc': 1,
           'quantity': 1,
         },
@@ -128,20 +129,240 @@ void main() {
       expect(json['warnings'], isA<List>());
       expect(json.containsKey('critic_ai'), isFalse); // No API key = no critic
     });
+
+    test('approves healthy deck with measurable but incremental upgrade',
+        () async {
+      final originalDeck = [
+        {
+          'name': 'Test Commander',
+          'type_line': 'Legendary Creature',
+          'mana_cost': '{3}{U}',
+          'oracle_text': 'Flying.',
+          'cmc': 4,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        ..._makeLands(32),
+        ...List.generate(
+          4,
+          (i) => {
+            'name': 'Wastes ${i + 1}',
+            'type_line': 'Basic Land',
+            'mana_cost': '',
+            'oracle_text': '{T}: Add {C}.',
+            'cmc': 0,
+            'quantity': 1,
+            'colors': <String>[],
+          },
+        ),
+        {
+          'name': 'Clunky Spell 1',
+          'type_line': 'Instant',
+          'mana_cost': '{4}{U}{U}',
+          'oracle_text': 'Counter target spell.',
+          'cmc': 6,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Clunky Spell 2',
+          'type_line': 'Sorcery',
+          'mana_cost': '{4}{U}',
+          'oracle_text': 'Draw two cards.',
+          'cmc': 5,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Clunky Spell 3',
+          'type_line': 'Sorcery',
+          'mana_cost': '{5}{U}',
+          'oracle_text': 'Draw three cards.',
+          'cmc': 5,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Clunky Spell 4',
+          'type_line': 'Instant',
+          'mana_cost': '{4}{U}',
+          'oracle_text': 'Destroy target creature.',
+          'cmc': 6,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        ..._makeSpells(59, avgCmc: 3),
+      ];
+
+      final optimizedDeck = [
+        {
+          'name': 'Test Commander',
+          'type_line': 'Legendary Creature',
+          'mana_cost': '{3}{U}',
+          'oracle_text': 'Flying.',
+          'cmc': 4,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        ..._makeLands(36),
+        {
+          'name': 'Brainstorm',
+          'type_line': 'Instant',
+          'mana_cost': '{U}',
+          'oracle_text':
+              'Draw three cards, then put two cards from your hand on top of your library in any order.',
+          'cmc': 1,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Counterspell',
+          'type_line': 'Instant',
+          'mana_cost': '{U}{U}',
+          'oracle_text': 'Counter target spell.',
+          'cmc': 2,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Preordain',
+          'type_line': 'Sorcery',
+          'mana_cost': '{U}',
+          'oracle_text': 'Scry 2, then draw a card.',
+          'cmc': 1,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Rapid Hybridization',
+          'type_line': 'Instant',
+          'mana_cost': '{U}',
+          'oracle_text': 'Destroy target creature. It cannot be regenerated.',
+          'cmc': 1,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        ..._makeSpells(59, avgCmc: 3),
+      ];
+
+      final report = await validator.validate(
+        originalDeck: originalDeck,
+        optimizedDeck: optimizedDeck,
+        removals: const [
+          'Wastes 1',
+          'Wastes 2',
+          'Wastes 3',
+          'Wastes 4',
+          'Clunky Spell 1',
+          'Clunky Spell 2',
+          'Clunky Spell 3',
+          'Clunky Spell 4',
+        ],
+        additions: const [
+          'Island 33',
+          'Island 34',
+          'Island 35',
+          'Island 36',
+          'Brainstorm',
+          'Counterspell',
+          'Preordain',
+          'Rapid Hybridization',
+        ],
+        commanders: const ['Test Commander'],
+        archetype: 'control',
+      );
+
+      expect(report.healthScore, greaterThanOrEqualTo(70));
+      expect(report.improvementScore, greaterThanOrEqualTo(55));
+      expect(report.score, greaterThanOrEqualTo(75));
+      expect(report.verdict, equals('aprovado'));
+    });
+
+    test('keeps degenerate deck rejected even after cosmetic land swap',
+        () async {
+      final originalDeck = [
+        {
+          'name': 'Talrand, Sky Summoner',
+          'type_line': 'Legendary Creature',
+          'mana_cost': '{2}{U}{U}',
+          'oracle_text':
+              'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+          'cmc': 4,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Wastes',
+          'type_line': 'Basic Land',
+          'mana_cost': '',
+          'oracle_text': '{T}: Add {C}.',
+          'cmc': 0,
+          'quantity': 99,
+          'colors': <String>[],
+        },
+      ];
+
+      final optimizedDeck = [
+        {
+          'name': 'Talrand, Sky Summoner',
+          'type_line': 'Legendary Creature',
+          'mana_cost': '{2}{U}{U}',
+          'oracle_text':
+              'Whenever you cast an instant or sorcery spell, create a 2/2 blue Drake creature token with flying.',
+          'cmc': 4,
+          'quantity': 1,
+          'colors': ['U'],
+        },
+        {
+          'name': 'Wastes',
+          'type_line': 'Basic Land',
+          'mana_cost': '',
+          'oracle_text': '{T}: Add {C}.',
+          'cmc': 0,
+          'quantity': 98,
+          'colors': <String>[],
+        },
+        {
+          'name': 'Command Tower',
+          'type_line': 'Land',
+          'mana_cost': '',
+          'oracle_text':
+              '{T}: Add one mana of any color in your commander\'s color identity.',
+          'cmc': 0,
+          'quantity': 1,
+          'colors': <String>[],
+        },
+      ];
+
+      final report = await validator.validate(
+        originalDeck: originalDeck,
+        optimizedDeck: optimizedDeck,
+        removals: const ['Wastes'],
+        additions: const ['Command Tower'],
+        commanders: const ['Talrand, Sky Summoner'],
+        archetype: 'control',
+      );
+
+      expect(report.healthScore, lessThan(45));
+      expect(report.score, lessThan(45));
+      expect(report.verdict, equals('reprovado'));
+    });
   });
 }
 
 /// Helper: cria N terrenos básicos
 List<Map<String, dynamic>> _makeLands(int count) {
-  return List.generate(count, (i) => {
-    'name': 'Island ${i + 1}',
-    'type_line': 'Basic Land — Island',
-    'mana_cost': '',
-    'oracle_text': '{T}: Add {U}.',
-    'cmc': 0,
-    'quantity': 1,
-    'colors': <String>[],
-  });
+  return List.generate(
+      count,
+      (i) => {
+            'name': 'Island ${i + 1}',
+            'type_line': 'Basic Land — Island',
+            'mana_cost': '',
+            'oracle_text': '{T}: Add {U}.',
+            'cmc': 0,
+            'quantity': 1,
+            'colors': <String>[],
+          });
 }
 
 /// Helper: cria N spells com CMC médio controlado
@@ -151,9 +372,15 @@ List<Map<String, dynamic>> _makeSpells(int count, {int avgCmc = 3}) {
     final adjustedCmc = (cmc * avgCmc / 3).round().clamp(1, 8);
     return {
       'name': 'Spell ${i + 1}',
-      'type_line': i % 3 == 0 ? 'Creature — Wizard' : (i % 3 == 1 ? 'Instant' : 'Sorcery'),
+      'type_line': i % 3 == 0
+          ? 'Creature — Wizard'
+          : (i % 3 == 1 ? 'Instant' : 'Sorcery'),
       'mana_cost': '{${adjustedCmc}}',
-      'oracle_text': i % 4 == 0 ? 'Draw a card.' : (i % 4 == 1 ? 'Destroy target creature.' : 'Target player gains 2 life.'),
+      'oracle_text': i % 4 == 0
+          ? 'Draw a card.'
+          : (i % 4 == 1
+              ? 'Destroy target creature.'
+              : 'Target player gains 2 life.'),
       'cmc': adjustedCmc,
       'quantity': 1,
       'colors': ['U'],

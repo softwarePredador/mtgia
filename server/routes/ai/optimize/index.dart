@@ -173,6 +173,7 @@ class DeckArchetypeAnalyzer {
   Map<String, dynamic> analyzeManaBase() {
     final manaSymbols = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0};
     final landSources = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'Any': 0};
+    var landCount = 0;
 
     // 1. Contar símbolos de mana nas cartas (Devotion)
     // CORRIGIDO: multiplica por quantity (ex: Island x30 = 30 fontes)
@@ -191,6 +192,7 @@ class DeckArchetypeAnalyzer {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
       if (typeLine.contains('land')) {
+        landCount += qty;
         final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];
         final oracleText =
             ((card['oracle_text'] as String?) ?? '').toLowerCase();
@@ -241,7 +243,8 @@ class DeckArchetypeAnalyzer {
     return {
       'symbols': manaSymbols,
       'sources': landSources,
-      'assessment': _assessManaBase(manaSymbols, landSources),
+      'land_count': landCount,
+      'assessment': _assessManaBase(manaSymbols, landSources, landCount),
     };
   }
 
@@ -268,12 +271,23 @@ class DeckArchetypeAnalyzer {
     return colors;
   }
 
-  String _assessManaBase(Map<String, int> symbols, Map<String, int> sources) {
+  String _assessManaBase(
+    Map<String, int> symbols,
+    Map<String, int> sources,
+    int landCount,
+  ) {
     if (symbols.isEmpty) return 'N/A';
     final totalSymbols = symbols.values.fold<int>(0, (a, b) => a + b);
     if (totalSymbols == 0) return 'N/A';
 
     final issues = <String>[];
+
+    if (landCount < 26) {
+      issues
+          .add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
+    } else if (landCount > 45) {
+      issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
+    }
 
     symbols.forEach((color, count) {
       if (count > 0) {

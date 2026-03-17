@@ -577,6 +577,7 @@ void main() {
       final manaAssessment = analysis['mana_base_assessment'] as String? ?? '';
       // With only 20 lands in a 100-card deck, there should be a mana warning
       expect(manaAssessment.isNotEmpty, isTrue);
+      expect(manaAssessment, contains('Poucos terrenos'));
     });
 
     test('deck with good land ratio produces healthy analysis', () {

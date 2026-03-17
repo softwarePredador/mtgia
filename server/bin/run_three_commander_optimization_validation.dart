@@ -17,6 +17,7 @@ const _artifactDirPath = 'test/artifacts/optimization_validation_three_decks';
 const _summaryJsonPath =
     'test/artifacts/optimization_validation_three_decks/latest_summary.json';
 const _summaryMdPath = '../RELATORIO_OTIMIZACAO_3_DECKS_2026-03-16.md';
+const _minimumAcceptedOptimizations = 1;
 
 class SourceDeckCandidate {
   SourceDeckCandidate({
@@ -230,7 +231,17 @@ Future<void> main() async {
     print('Resumo salvo em $_summaryJsonPath');
     print('Relatorio salvo em $_summaryMdPath');
 
-    if (results.any((r) => !r.passed)) {
+    final acceptedOptimizations =
+        results.where((r) => r.resultKind == 'accepted_optimization').length;
+
+    if (results.any((r) => !r.passed) ||
+        acceptedOptimizations < _minimumAcceptedOptimizations) {
+      if (acceptedOptimizations < _minimumAcceptedOptimizations) {
+        stderr.writeln(
+          'Validacao insuficiente: apenas $acceptedOptimizations otimizacao(oes) aceita(s). '
+          'Minimo esperado: $_minimumAcceptedOptimizations.',
+        );
+      }
       exitCode = 1;
     }
   } finally {
