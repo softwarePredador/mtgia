@@ -1,9 +1,9 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
+  "clone_deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
   "optimize_request": {
-    "deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
+    "deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -33,10 +33,10 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
+        "deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
         "bracket": 4,
         "archetype": "aggro",
-        "theme": "tribal-goblin",
+        "theme": "counters",
         "rebuild_scope": "auto",
         "save_mode": "draft_clone"
       }
@@ -61,20 +61,20 @@
       "archetype_confidence": "média"
     },
     "theme": {
-      "theme": "tribal-goblin",
+      "theme": "counters",
       "confidence": "alta",
-      "match_score": 0.42105263157894735,
+      "match_score": 0.55,
       "core_cards": [
         "Auntie Ool, Cursewretch",
         "Goblin Chieftain",
         "Goblin Rabblemaster",
+        "Purphoros, God of the Forge",
         "Goblin Trashmaster",
         "Goblin Sledder",
         "Goblin King",
         "Goblin Piledriver",
-        "Krenko, Mob Boss",
-        "Krenko, Tin Street Kingpin",
-        "Purphoros, God of the Forge"
+        "Goblin Bombardment",
+        "Faithless Looting"
       ]
     },
     "deck_state": {

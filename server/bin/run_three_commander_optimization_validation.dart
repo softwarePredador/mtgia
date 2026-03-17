@@ -18,6 +18,7 @@ const _summaryJsonPath =
     'test/artifacts/optimization_validation_three_decks/latest_summary.json';
 const _summaryMdPath = '../RELATORIO_OTIMIZACAO_3_DECKS_2026-03-16.md';
 const _minimumAcceptedOptimizations = 1;
+late final String? _corpusPath;
 
 class SourceDeckCandidate {
   SourceDeckCandidate({
@@ -53,6 +54,18 @@ class SourceDeckCandidate {
 
   int get totalCards => cards.fold<int>(
       0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+}
+
+class ValidationCorpusEntry {
+  ValidationCorpusEntry({
+    required this.deckId,
+    this.label,
+    this.note,
+  });
+
+  final String deckId;
+  final String? label;
+  final String? note;
 }
 
 class DeckRunResult {
@@ -150,6 +163,7 @@ class DeckRunResult {
 Future<void> main() async {
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
+  _corpusPath = _resolveCorpusPath(env['VALIDATION_CORPUS_PATH']);
 
   final artifactsDir = Directory(_artifactDirPath);
   if (!artifactsDir.existsSync()) {
@@ -176,7 +190,11 @@ Future<void> main() async {
   try {
     final token = await _getOrCreateAuthToken(apiBaseUrl);
     final candidates = await _loadSourceCandidates(pool);
-    final selected = _selectThreeCandidates(candidates);
+    final corpusEntries =
+        _corpusPath != null ? _loadCorpusEntries(_corpusPath!) : const <ValidationCorpusEntry>[];
+    final selected = corpusEntries.isNotEmpty
+        ? _selectCandidatesFromCorpus(candidates, corpusEntries)
+        : _selectThreeCandidates(candidates);
 
     if (selected.length < 3) {
       stderr.writeln(
@@ -213,6 +231,7 @@ Future<void> main() async {
       'run_started_at': runStartedAt,
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
+      if (_corpusPath != null) 'corpus_path': _corpusPath,
       'total': results.length,
       'accepted_optimizations':
           results.where((r) => r.resultKind == 'accepted_optimization').length,
@@ -248,6 +267,76 @@ Future<void> main() async {
   } finally {
     await db.close();
   }
+}
+
+String? _resolveCorpusPath(String? raw) {
+  final normalized = raw?.trim() ?? '';
+  if (normalized.isEmpty) return null;
+  return normalized;
+}
+
+List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
+  final file = File(path);
+  if (!file.existsSync()) {
+    throw StateError('Corpus de validacao nao encontrado em $path');
+  }
+
+  final decoded = jsonDecode(file.readAsStringSync());
+  final rawEntries = switch (decoded) {
+    {'decks': final List decks} => decks,
+    final List decks => decks,
+    _ => throw StateError('Corpus invalido em $path: esperado lista ou objeto com "decks".'),
+  };
+
+  final entries = <ValidationCorpusEntry>[];
+  for (final rawEntry in rawEntries) {
+    if (rawEntry is! Map) continue;
+    final entry = rawEntry.cast<dynamic, dynamic>();
+    final deckId = entry['deck_id']?.toString().trim() ?? '';
+    if (deckId.isEmpty) continue;
+    entries.add(
+      ValidationCorpusEntry(
+        deckId: deckId,
+        label: entry['label']?.toString(),
+        note: entry['note']?.toString(),
+      ),
+    );
+  }
+  return entries;
+}
+
+List<SourceDeckCandidate> _selectCandidatesFromCorpus(
+  List<SourceDeckCandidate> candidates,
+  List<ValidationCorpusEntry> corpusEntries,
+) {
+  if (corpusEntries.length < 3) {
+    throw StateError(
+      'Corpus configurado com menos de 3 decks (${corpusEntries.length}).',
+    );
+  }
+
+  final byId = <String, SourceDeckCandidate>{
+    for (final candidate in candidates) candidate.deckId: candidate,
+  };
+  final selected = <SourceDeckCandidate>[];
+  final missing = <String>[];
+
+  for (final entry in corpusEntries.take(3)) {
+    final candidate = byId[entry.deckId];
+    if (candidate == null) {
+      missing.add(entry.deckId);
+      continue;
+    }
+    selected.add(candidate);
+  }
+
+  if (missing.isNotEmpty) {
+    throw StateError(
+      'Corpus referencia decks inexistentes ou invalidos: ${missing.join(', ')}',
+    );
+  }
+
+  return selected;
 }
 
 Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {

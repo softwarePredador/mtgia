@@ -1,0 +1,27 @@
+{
+  "name": "optimization-resolution-corpus-v1",
+  "generated_at": "2026-03-17",
+  "decks": [
+    {
+      "deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
+      "label": "Auntie Ool, Cursewretch",
+      "expected_flow_path": "rebuild_guided",
+      "note": "Deck precisa de rebuild orientado por counters."
+    },
+    {
+      "deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
+      "label": "Jin-Gitaxias // The Great Synthesis",
+      "expected_flow_paths": [
+        "optimized_directly",
+        "safe_no_change"
+      ],
+      "note": "Deck saudável; aceitamos otimização direta ou preservação segura sem mudança."
+    },
+    {
+      "deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
+      "label": "Talrand, Sky Summoner",
+      "expected_flow_path": "rebuild_guided",
+      "note": "Shell degenerado para validar full_non_commander_rebuild."
+    }
+  ]
+}

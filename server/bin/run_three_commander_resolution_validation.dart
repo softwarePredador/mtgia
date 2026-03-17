@@ -17,6 +17,7 @@ late final String _summaryJsonPath;
 late final String _summaryMdPath;
 late final int _validationLimit;
 late final String _selectionMode;
+late final String? _corpusPath;
 const _generatedDeckNameFilters = '''
         AND d.name NOT LIKE 'Optimization Validation - %'
         AND d.name NOT LIKE 'Resolution Validation - %'
@@ -36,6 +37,9 @@ class SourceDeckCandidate {
     required this.cards,
     required this.sourceDeckStateStatus,
     required this.sourceSeverityScore,
+    this.expectedFlowPaths = const [],
+    this.corpusLabel,
+    this.corpusNote,
   });
 
   final String deckId;
@@ -48,6 +52,27 @@ class SourceDeckCandidate {
   final List<Map<String, dynamic>> cards;
   final String sourceDeckStateStatus;
   final int sourceSeverityScore;
+  final List<String> expectedFlowPaths;
+  final String? corpusLabel;
+  final String? corpusNote;
+
+  SourceDeckCandidate withCorpusEntry(ValidationCorpusEntry entry) {
+    return SourceDeckCandidate(
+      deckId: deckId,
+      deckName: deckName,
+      commanderName: commanderName,
+      commanderCardId: commanderCardId,
+      commanderColors: commanderColors,
+      sourceArchetype: sourceArchetype,
+      bracket: bracket,
+      cards: cards,
+      sourceDeckStateStatus: sourceDeckStateStatus,
+      sourceSeverityScore: sourceSeverityScore,
+      expectedFlowPaths: entry.expectedFlowPaths,
+      corpusLabel: entry.label,
+      corpusNote: entry.note,
+    );
+  }
 
   String get resolvedArchetype {
     final detected = _normalizeArchetype(sourceArchetype);
@@ -58,6 +83,20 @@ class SourceDeckCandidate {
         _normalizeArchetype(analysis['detected_archetype']?.toString());
     return byAnalysis ?? 'midrange';
   }
+}
+
+class ValidationCorpusEntry {
+  ValidationCorpusEntry({
+    required this.deckId,
+    this.label,
+    this.expectedFlowPaths = const [],
+    this.note,
+  });
+
+  final String deckId;
+  final String? label;
+  final List<String> expectedFlowPaths;
+  final String? note;
 }
 
 class ResolutionRunResult {
@@ -143,6 +182,7 @@ Future<void> main() async {
       .trim()
       .toLowerCase()
       .replaceAll('-', '_');
+  _corpusPath = _resolveCorpusPath(env['VALIDATION_CORPUS_PATH']);
 
   final artifactsDir = Directory(_artifactDirPath);
   if (!artifactsDir.existsSync()) {
@@ -169,11 +209,20 @@ Future<void> main() async {
   try {
     final token = await _getOrCreateAuthToken(apiBaseUrl);
     final candidates = await _loadSourceCandidates(pool);
-    final selected = _selectCandidates(
-      candidates,
-      limit: _validationLimit,
-      selectionMode: _selectionMode,
-    );
+    final corpusEntries =
+        _corpusPath != null ? _loadCorpusEntries(_corpusPath!) : const <ValidationCorpusEntry>[];
+    final usingCorpus = corpusEntries.isNotEmpty;
+    final selected = usingCorpus
+        ? _selectCandidatesFromCorpus(
+            candidates,
+            corpusEntries: corpusEntries,
+            limit: _validationLimit,
+          )
+        : _selectCandidates(
+            candidates,
+            limit: _validationLimit,
+            selectionMode: _selectionMode,
+          );
 
     if (selected.length < _validationLimit) {
       stderr.writeln(
@@ -212,7 +261,8 @@ Future<void> main() async {
       'run_started_at': runStartedAt,
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
-      'selection_mode': _selectionMode,
+      'selection_mode': usingCorpus ? 'corpus' : _selectionMode,
+      if (_corpusPath != null) 'corpus_path': _corpusPath,
       'total': results.length,
       'direct_optimizations':
           results.where((r) => r.flowPath == 'optimized_directly').length,
@@ -457,6 +507,13 @@ Future<ResolutionRunResult> _runResolutionForDeck({
     );
   }
 
+  if (candidate.expectedFlowPaths.isNotEmpty) {
+    expectCheck(
+      'flow_path segue expectativa do corpus (${candidate.expectedFlowPaths.join(' / ')})',
+      candidate.expectedFlowPaths.contains(flowPath),
+    );
+  }
+
   return ResolutionRunResult(
     commanderName: candidate.commanderName,
     sourceDeckId: candidate.deckId,
@@ -683,6 +740,93 @@ Future<List<Map<String, dynamic>>> _loadDeckCards(
         },
       )
       .toList();
+}
+
+String? _resolveCorpusPath(String? raw) {
+  final normalized = raw?.trim() ?? '';
+  if (normalized.isEmpty) return null;
+  return normalized;
+}
+
+List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
+  final file = File(path);
+  if (!file.existsSync()) {
+    throw StateError('Corpus de validacao nao encontrado em $path');
+  }
+
+  final decoded = jsonDecode(file.readAsStringSync());
+  final rawEntries = switch (decoded) {
+    {'decks': final List decks} => decks,
+    final List decks => decks,
+    _ => throw StateError('Corpus invalido em $path: esperado lista ou objeto com "decks".'),
+  };
+
+  final entries = <ValidationCorpusEntry>[];
+  for (final rawEntry in rawEntries) {
+    if (rawEntry is! Map) continue;
+    final entry = rawEntry.cast<dynamic, dynamic>();
+    final deckId = entry['deck_id']?.toString().trim() ?? '';
+    if (deckId.isEmpty) continue;
+    entries.add(
+      ValidationCorpusEntry(
+        deckId: deckId,
+        label: entry['label']?.toString(),
+        expectedFlowPaths: _parseExpectedFlowPaths(entry),
+        note: entry['note']?.toString(),
+      ),
+    );
+  }
+
+  return entries;
+}
+
+List<SourceDeckCandidate> _selectCandidatesFromCorpus(
+  List<SourceDeckCandidate> candidates, {
+  required List<ValidationCorpusEntry> corpusEntries,
+  required int limit,
+}) {
+  if (limit > corpusEntries.length) {
+    throw StateError(
+      'VALIDATION_LIMIT=$limit excede o corpus configurado (${corpusEntries.length} entradas).',
+    );
+  }
+
+  final byId = <String, SourceDeckCandidate>{
+    for (final candidate in candidates) candidate.deckId: candidate,
+  };
+  final selected = <SourceDeckCandidate>[];
+  final missing = <String>[];
+
+  for (final entry in corpusEntries.take(limit)) {
+    final candidate = byId[entry.deckId];
+    if (candidate == null) {
+      missing.add(entry.deckId);
+      continue;
+    }
+    selected.add(candidate.withCorpusEntry(entry));
+  }
+
+  if (missing.isNotEmpty) {
+    throw StateError(
+      'Corpus referencia decks inexistentes ou invalidos: ${missing.join(', ')}',
+    );
+  }
+
+  return selected;
+}
+
+List<String> _parseExpectedFlowPaths(Map<dynamic, dynamic> entry) {
+  final multi = entry['expected_flow_paths'];
+  if (multi is List) {
+    return multi
+        .map((value) => value.toString().trim())
+        .where((value) => value.isNotEmpty)
+        .toList();
+  }
+
+  final single = entry['expected_flow_path']?.toString().trim() ?? '';
+  if (single.isEmpty) return const [];
+  return [single];
 }
 
 List<SourceDeckCandidate> _selectCandidates(

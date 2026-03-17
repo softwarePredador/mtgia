@@ -1,10 +1,10 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "2841221a-bb54-4bc4-9c5a-b217c52f8508",
-  "final_deck_id": "d0af24fc-1968-40f3-bbe0-47461dbfc21a",
+  "clone_deck_id": "b903ca0e-677a-4853-9661-d85935dfe16f",
+  "final_deck_id": "0c4380ec-64d3-41d6-ac42-2facbcacb4f0",
   "optimize_request": {
-    "deck_id": "2841221a-bb54-4bc4-9c5a-b217c52f8508",
+    "deck_id": "b903ca0e-677a-4853-9661-d85935dfe16f",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -34,7 +34,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "2841221a-bb54-4bc4-9c5a-b217c52f8508",
+        "deck_id": "b903ca0e-677a-4853-9661-d85935dfe16f",
         "bracket": 4,
         "archetype": "aggro",
         "theme": "counters",
@@ -74,8 +74,8 @@
         "Goblin Sledder",
         "Goblin King",
         "Goblin Piledriver",
-        "Thought Vessel",
-        "Abrade"
+        "Goblin Bombardment",
+        "Faithless Looting"
       ]
     },
     "deck_state": {
@@ -105,17 +105,17 @@
     "outcome_code": "rebuild_created",
     "save_mode": "draft_clone",
     "applied_to_original": false,
-    "source_deck_id": "2841221a-bb54-4bc4-9c5a-b217c52f8508",
-    "draft_deck_id": "d0af24fc-1968-40f3-bbe0-47461dbfc21a",
+    "source_deck_id": "b903ca0e-677a-4853-9661-d85935dfe16f",
+    "draft_deck_id": "0c4380ec-64d3-41d6-ac42-2facbcacb4f0",
     "draft_deck": {
-      "id": "d0af24fc-1968-40f3-bbe0-47461dbfc21a",
-      "name": "Rebuild Draft - Resolution Validation - Auntie Ool, Cursewretch - 1773774766175",
+      "id": "0c4380ec-64d3-41d6-ac42-2facbcacb4f0",
+      "name": "Rebuild Draft - Resolution Validation - Auntie Ool, Cursewretch - 1773775974825",
       "format": "commander",
-      "description": "Draft de rebuild_guided criado a partir de 2841221a-bb54-4bc4-9c5a-b217c52f8508 | theme=counters | scope=repair_partial",
+      "description": "Draft de rebuild_guided criado a partir de b903ca0e-677a-4853-9661-d85935dfe16f | theme=counters | scope=repair_partial",
       "archetype": "midrange",
       "bracket": 4,
       "is_public": false,
-      "created_at": "2026-03-17T19:14:07.939560Z"
+      "created_at": "2026-03-17T19:34:18.777902Z"
     },
     "rebuild_scope_requested": "auto",
     "rebuild_scope_selected": "repair_partial",
@@ -832,14 +832,14 @@
     "next_action": {
       "type": "review_rebuild_draft",
       "applied_to_original": false,
-      "draft_deck_id": "d0af24fc-1968-40f3-bbe0-47461dbfc21a"
+      "draft_deck_id": "0c4380ec-64d3-41d6-ac42-2facbcacb4f0"
     }
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "d0af24fc-1968-40f3-bbe0-47461dbfc21a"
+    "deck_id": "0c4380ec-64d3-41d6-ac42-2facbcacb4f0"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
