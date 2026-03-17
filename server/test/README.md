@@ -24,6 +24,44 @@ Alguns checks end-to-end e smoke tests são **scripts manuais** e ficam em `bin/
 - `bin/qa/integration_messages_notifications.dart`
 - `bin/qa/debug_community_decks.dart`
 
+## Corpus de Resolução
+
+O gate real de regressão do fluxo de deck usa um **corpus curado** em:
+
+```text
+test/fixtures/optimization_resolution_corpus.json
+```
+
+Ferramentas relacionadas:
+
+- `bin/run_three_commander_resolution_validation.dart`
+- `bin/run_three_commander_optimization_validation.dart`
+- `bin/audit_resolution_corpus.dart`
+- `bin/add_resolution_corpus_entry.dart`
+
+Comandos principais:
+
+```bash
+# Auditoria rápida do corpus atual
+dart run bin/audit_resolution_corpus.dart
+
+# Adicionar deck novo ao corpus sem gravar
+dart run bin/add_resolution_corpus_entry.dart \
+  --deck-id <uuid> \
+  --expected-flow-path rebuild_guided \
+  --dry-run
+
+# Rodar a validação fim a fim usando o corpus fixo
+VALIDATION_CORPUS_PATH=test/fixtures/optimization_resolution_corpus.json \
+dart run bin/run_three_commander_resolution_validation.dart
+```
+
+Guia operacional:
+
+```text
+doc/RESOLUTION_CORPUS_WORKFLOW.md
+```
+
 ## Testes Implementados
 
 ### ✅ Testes Unitários (Não requerem servidor)
