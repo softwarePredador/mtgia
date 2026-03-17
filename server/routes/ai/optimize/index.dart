@@ -888,6 +888,10 @@ Future<DeckThemeProfile> _detectThemeProfile(
   }
 
   final commanderLower = commanders.map((e) => e.toLowerCase()).toSet();
+  final commanderOracle = cards
+      .where((c) => c['is_commander'] == true)
+      .map((c) => ((c['oracle_text'] as String?) ?? '').toLowerCase())
+      .join(' ');
 
   var totalNonLands = 0;
   var artifactCount = 0;
@@ -900,6 +904,7 @@ Future<DeckThemeProfile> _detectThemeProfile(
   var landfallReferences = 0;
   var wheelReferences = 0;
   var staxReferences = 0;
+  var counterReferences = 0;
 
   // Tribal: track creature subtypes for tribe concentration
   final creatureSubtypes = <String, int>{};
@@ -1005,6 +1010,19 @@ Future<DeckThemeProfile> _detectThemeProfile(
       staxReferences += q;
     }
 
+    // --- Counters theme (-1/-1 counters, proliferate, hardened scales style) ---
+    if (oracle.contains('-1/-1 counter') ||
+        oracle.contains('proliferate') ||
+        oracle.contains('put a counter on') ||
+        oracle.contains('remove a counter from')) {
+      counterReferences += q;
+      if (c['isLand'] == false &&
+          commanderLower.contains(name.toLowerCase()) &&
+          (oracle.contains('-1/-1 counter') || oracle.contains('proliferate'))) {
+        counterReferences += q * 3;
+      }
+    }
+
     // --- Tribal: track creature subtypes ---
     if (typeLine.contains('creature')) {
       final dashIndex = typeLine.indexOf('—');
@@ -1069,10 +1087,37 @@ Future<DeckThemeProfile> _detectThemeProfile(
       'stax': staxReferences / totalNonLands >= 0.10
           ? staxReferences / totalNonLands
           : 0.0,
+      'counters': counterReferences / totalNonLands >= 0.12
+          ? counterReferences / totalNonLands
+          : 0.0,
       'tribal': tribalCount / totalNonLands >= 0.25
           ? tribalCount / totalNonLands
           : 0.0,
     };
+
+    if (commanderOracle.contains('-1/-1 counter') ||
+        commanderOracle.contains('proliferate')) {
+      themeScores['counters'] = (themeScores['counters'] ?? 0.0) + 0.55;
+      if ((themeScores['tribal'] ?? 0.0) < 0.55) {
+        themeScores['tribal'] = (themeScores['tribal'] ?? 0.0) * 0.5;
+      }
+    }
+    if (commanderOracle.contains('instant or sorcery')) {
+      themeScores['spellslinger'] =
+          (themeScores['spellslinger'] ?? 0.0) + 0.35;
+    }
+    if (commanderOracle.contains('artifact')) {
+      themeScores['artifacts'] = (themeScores['artifacts'] ?? 0.0) + 0.25;
+    }
+    if (commanderOracle.contains('enchantment')) {
+      themeScores['enchantments'] =
+          (themeScores['enchantments'] ?? 0.0) + 0.25;
+    }
+    if (commanderOracle.contains('landfall') ||
+        (commanderOracle.contains('land') &&
+            commanderOracle.contains('enters the battlefield'))) {
+      themeScores['landfall'] = (themeScores['landfall'] ?? 0.0) + 0.25;
+    }
 
     // Pick highest scoring theme (sem reduzir lista vazia)
     MapEntry<String, double>? best;
@@ -1138,6 +1183,9 @@ Future<DeckThemeProfile> _detectThemeProfile(
       if ((theme == 'spellslinger' && learnedRole.contains('counter')) ||
           (theme == 'reanimator' && learnedRole.contains('reanimate')) ||
           (theme == 'artifacts' && learnedRole.contains('artifact')) ||
+          (theme == 'counters' &&
+              (learnedRole.contains('counter') ||
+                  learnedRole.contains('proliferate'))) ||
           (theme.startsWith('tribal') && learnedRole.contains('tribal'))) {
         impactScore += 15;
       }
@@ -1291,6 +1339,17 @@ Future<DeckThemeProfile> _detectThemeProfile(
     if (theme == 'stax') {
       if (oracle.contains('can\'t') || oracle.contains('doesn\'t untap')) {
         impactScore += 30;
+      }
+    }
+
+    // 10. Counters: -1/-1 counters, proliferate, scalable counter engines
+    if (theme == 'counters') {
+      if (oracle.contains('-1/-1 counter') || oracle.contains('proliferate')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('put a counter on') ||
+          oracle.contains('remove a counter from')) {
+        impactScore += 20;
       }
     }
 

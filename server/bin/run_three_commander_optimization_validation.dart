@@ -408,7 +408,17 @@ Future<List<Map<String, dynamic>>> _loadDeckCards(
         COALESCE(c.mana_cost, '') AS mana_cost,
         COALESCE(c.colors, ARRAY[]::text[]) AS colors,
         COALESCE(
-          (SELECT COUNT(*) FROM regexp_matches(COALESCE(c.mana_cost, ''), '\\{([^}]+)\\}', 'g') AS m(m)),
+          (
+            SELECT SUM(
+              CASE
+                WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                WHEN m[1] = 'X' THEN 0
+                ELSE 1
+              END
+            )
+            FROM regexp_matches(COALESCE(c.mana_cost, ''), '\\{([^}]+)\\}', 'g') AS m(m)
+          ),
           0
         )::double precision AS cmc,
         COALESCE(c.oracle_text, '') AS oracle_text

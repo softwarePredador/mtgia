@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/rebuild_guided_service.dart';
+import '../../../lib/ai/deck_state_analysis.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/http_responses.dart';
 
@@ -198,6 +199,37 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
+    var responseDeckAnalysis = rebuildResult.deckAnalysisAfter;
+    var responseDeckState = rebuildResult.deckStateAfter;
+    if (draftDeck != null && draftDeck['id'] != null) {
+      final persistedCards = await _loadDeckCards(
+        pool: pool,
+        deckId: draftDeck['id'].toString(),
+      );
+      if (persistedCards.isNotEmpty) {
+        final deckColors = <String>{};
+        for (final card in persistedCards) {
+          deckColors.addAll(
+            (card['colors'] as List?)?.cast<String>() ?? const <String>[],
+          );
+        }
+        responseDeckAnalysis = DeckArchetypeAnalyzer(
+          persistedCards,
+          deckColors.toList(),
+        ).generateAnalysis();
+        responseDeckState = assessDeckOptimizationState(
+          cards: persistedCards,
+          deckAnalysis: responseDeckAnalysis,
+          deckFormat: deckFormat,
+          currentTotalCards: persistedCards.fold<int>(
+            0,
+            (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+          ),
+          commanderColorIdentity: commanderColorIdentity,
+        );
+      }
+    }
+
     final keptCardsNames = rebuildResult.keptCards
         .map((card) => card['name']?.toString() ?? '')
         .where((name) => name.isNotEmpty)
@@ -237,12 +269,12 @@ Future<Response> onRequest(RequestContext context) async {
         },
         'target_profile': rebuildResult.targetProfile.toJson(),
         'deck_analysis_before': rebuildResult.deckAnalysisBefore,
-        'post_analysis': rebuildResult.deckAnalysisAfter,
+        'post_analysis': responseDeckAnalysis,
         'deck_state_before': rebuildResult.deckStateBefore.toJson(),
-        'deck_state_after': rebuildResult.deckStateAfter.toJson(),
+        'deck_state_after': responseDeckState.toJson(),
         'validation': {
           'strict_rules_valid': true,
-          'deck_state_after': rebuildResult.deckStateAfter.toJson(),
+          'deck_state_after': responseDeckState.toJson(),
         },
         'warnings': rebuildResult.warnings,
         'source_summary': rebuildResult.sourceSummary,
@@ -283,4 +315,61 @@ Future<Response> onRequest(RequestContext context) async {
   } catch (e) {
     return internalServerError('Failed to rebuild deck', details: e);
   }
+}
+
+Future<List<Map<String, dynamic>>> _loadDeckCards({
+  required Pool pool,
+  required String deckId,
+}) async {
+  final result = await pool.execute(
+    Sql.named(r'''
+      SELECT
+        dc.card_id::text,
+        dc.quantity::int,
+        dc.is_commander,
+        c.name,
+        c.type_line,
+        COALESCE(c.mana_cost, '') AS mana_cost,
+        COALESCE(c.colors, ARRAY[]::text[]) AS colors,
+        COALESCE(
+          (
+            SELECT SUM(
+              CASE
+                WHEN m[1] ~ '^[0-9]+$' THEN m[1]::int
+                WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                WHEN m[1] = 'X' THEN 0
+                ELSE 1
+              END
+            )
+            FROM regexp_matches(COALESCE(c.mana_cost, ''), '\{([^}]+)\}', 'g') AS m(m)
+          ),
+          0
+        )::double precision AS cmc,
+        COALESCE(c.oracle_text, '') AS oracle_text,
+        COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity
+      FROM deck_cards dc
+      JOIN cards c ON c.id = dc.card_id
+      WHERE dc.deck_id = @deckId
+      ORDER BY dc.is_commander DESC, c.name ASC
+    '''),
+    parameters: {'deckId': deckId},
+  );
+
+  return result
+      .map(
+        (row) => <String, dynamic>{
+          'card_id': row[0] as String,
+          'quantity': row[1] as int,
+          'is_commander': row[2] as bool? ?? false,
+          'name': row[3] as String? ?? '',
+          'type_line': row[4] as String? ?? '',
+          'mana_cost': row[5] as String? ?? '',
+          'colors': (row[6] as List?)?.cast<String>() ?? const <String>[],
+          'cmc': (row[7] as num?)?.toDouble() ?? 0.0,
+          'oracle_text': row[8] as String? ?? '',
+          'color_identity':
+              (row[9] as List?)?.cast<String>() ?? const <String>[],
+        },
+      )
+      .toList();
 }

@@ -12,10 +12,11 @@ import '../lib/ai/deck_state_analysis.dart';
 import '../lib/database.dart';
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
-const _artifactDirPath = 'test/artifacts/optimization_resolution_three_decks';
-const _summaryJsonPath =
-    'test/artifacts/optimization_resolution_three_decks/latest_summary.json';
-const _summaryMdPath = '../RELATORIO_RESOLUCAO_3_DECKS_2026-03-17.md';
+late final String _artifactDirPath;
+late final String _summaryJsonPath;
+late final String _summaryMdPath;
+late final int _validationLimit;
+late final String _selectionMode;
 const _generatedDeckNameFilters = '''
         AND d.name NOT LIKE 'Optimization Validation - %'
         AND d.name NOT LIKE 'Resolution Validation - %'
@@ -33,6 +34,8 @@ class SourceDeckCandidate {
     required this.sourceArchetype,
     required this.bracket,
     required this.cards,
+    required this.sourceDeckStateStatus,
+    required this.sourceSeverityScore,
   });
 
   final String deckId;
@@ -43,6 +46,8 @@ class SourceDeckCandidate {
   final String? sourceArchetype;
   final int? bracket;
   final List<Map<String, dynamic>> cards;
+  final String sourceDeckStateStatus;
+  final int sourceSeverityScore;
 
   String get resolvedArchetype {
     final detected = _normalizeArchetype(sourceArchetype);
@@ -127,6 +132,17 @@ class ResolutionRunResult {
 Future<void> main() async {
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
+  _artifactDirPath = env['VALIDATION_ARTIFACT_DIR'] ??
+      'test/artifacts/optimization_resolution_three_decks';
+  _summaryJsonPath = env['VALIDATION_SUMMARY_JSON_PATH'] ??
+      'test/artifacts/optimization_resolution_three_decks/latest_summary.json';
+  _summaryMdPath = env['VALIDATION_SUMMARY_MD_PATH'] ??
+      '../RELATORIO_RESOLUCAO_3_DECKS_2026-03-17.md';
+  _validationLimit = int.tryParse(env['VALIDATION_LIMIT'] ?? '') ?? 3;
+  _selectionMode = (env['VALIDATION_SELECTION_MODE'] ?? '')
+      .trim()
+      .toLowerCase()
+      .replaceAll('-', '_');
 
   final artifactsDir = Directory(_artifactDirPath);
   if (!artifactsDir.existsSync()) {
@@ -153,11 +169,15 @@ Future<void> main() async {
   try {
     final token = await _getOrCreateAuthToken(apiBaseUrl);
     final candidates = await _loadSourceCandidates(pool);
-    final selected = _selectThreeCandidates(candidates);
+    final selected = _selectCandidates(
+      candidates,
+      limit: _validationLimit,
+      selectionMode: _selectionMode,
+    );
 
-    if (selected.length < 3) {
+    if (selected.length < _validationLimit) {
       stderr.writeln(
-        'Nao foi possivel selecionar 3 decks Commander validos e distintos. Encontrados: ${selected.length}',
+        'Nao foi possivel selecionar ${_validationLimit} decks Commander validos e distintos. Encontrados: ${selected.length}',
       );
       exitCode = 1;
       return;
@@ -192,6 +212,7 @@ Future<void> main() async {
       'run_started_at': runStartedAt,
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
+      'selection_mode': _selectionMode,
       'total': results.length,
       'direct_optimizations':
           results.where((r) => r.flowPath == 'optimized_directly').length,
@@ -580,6 +601,15 @@ $_generatedDeckNameFilters
     final total = _totalCards(cards);
     final hasCommander = cards.any((card) => card['is_commander'] == true);
     if (total != 100 || !hasCommander) continue;
+    final deckAnalysis =
+        DeckArchetypeAnalyzer(cards, commanderColors).generateAnalysis();
+    final deckState = assessDeckOptimizationState(
+      cards: cards,
+      deckAnalysis: deckAnalysis,
+      deckFormat: 'commander',
+      currentTotalCards: total,
+      commanderColorIdentity: commanderColors.toSet(),
+    );
 
     candidates.add(
       SourceDeckCandidate(
@@ -591,6 +621,8 @@ $_generatedDeckNameFilters
         sourceArchetype: archetype,
         bracket: bracket,
         cards: cards,
+        sourceDeckStateStatus: deckState.status,
+        sourceSeverityScore: deckState.severityScore,
       ),
     );
   }
@@ -614,7 +646,17 @@ Future<List<Map<String, dynamic>>> _loadDeckCards(
         COALESCE(c.mana_cost, '') AS mana_cost,
         COALESCE(c.colors, ARRAY[]::text[]) AS colors,
         COALESCE(
-          (SELECT COUNT(*) FROM regexp_matches(COALESCE(c.mana_cost, ''), '\\{([^}]+)\\}', 'g') AS m(m)),
+          (
+            SELECT SUM(
+              CASE
+                WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                WHEN m[1] = 'X' THEN 0
+                ELSE 1
+              END
+            )
+            FROM regexp_matches(COALESCE(c.mana_cost, ''), '\\{([^}]+)\\}', 'g') AS m(m)
+          ),
           0
         )::double precision AS cmc,
         COALESCE(c.oracle_text, '') AS oracle_text
@@ -643,9 +685,18 @@ Future<List<Map<String, dynamic>>> _loadDeckCards(
       .toList();
 }
 
-List<SourceDeckCandidate> _selectThreeCandidates(
-  List<SourceDeckCandidate> candidates,
-) {
+List<SourceDeckCandidate> _selectCandidates(
+  List<SourceDeckCandidate> candidates, {
+  required int limit,
+  required String selectionMode,
+}) {
+  if (limit <= 3 && selectionMode != 'balanced') {
+    return _selectThreeCandidates(candidates).take(limit).toList();
+  }
+  return _selectBalancedCandidates(candidates, limit: limit);
+}
+
+List<SourceDeckCandidate> _selectThreeCandidates(List<SourceDeckCandidate> candidates) {
   final selected = <SourceDeckCandidate>[];
   final usedCommanders = <String>{};
 
@@ -673,6 +724,68 @@ List<SourceDeckCandidate> _selectThreeCandidates(
   }
 
   return selected.take(3).toList();
+}
+
+List<SourceDeckCandidate> _selectBalancedCandidates(
+  List<SourceDeckCandidate> candidates, {
+  required int limit,
+}) {
+  final ordered = [...candidates]
+    ..sort((a, b) {
+      final statusOrder = _statusPriority(a.sourceDeckStateStatus)
+          .compareTo(_statusPriority(b.sourceDeckStateStatus));
+      if (statusOrder != 0) return statusOrder;
+      final severityOrder = b.sourceSeverityScore.compareTo(a.sourceSeverityScore);
+      if (severityOrder != 0) return severityOrder;
+      return a.commanderName.toLowerCase().compareTo(b.commanderName.toLowerCase());
+    });
+
+  final selected = <SourceDeckCandidate>[];
+  final usedCommanders = <String>{};
+  final preferredStatuses = const ['needs_repair', 'healthy'];
+  final preferredArchetypes = const ['aggro', 'control', 'midrange'];
+
+  void tryPick(String status, String archetype) {
+    if (selected.length >= limit) return;
+    for (final candidate in ordered) {
+      final commanderKey = candidate.commanderName.toLowerCase();
+      if (usedCommanders.contains(commanderKey)) continue;
+      if (candidate.sourceDeckStateStatus != status) continue;
+      if (candidate.resolvedArchetype != archetype) continue;
+      selected.add(candidate);
+      usedCommanders.add(commanderKey);
+      return;
+    }
+  }
+
+  while (selected.length < limit) {
+    final before = selected.length;
+    for (final status in preferredStatuses) {
+      for (final archetype in preferredArchetypes) {
+        tryPick(status, archetype);
+      }
+    }
+    if (selected.length == before) break;
+  }
+
+  for (final candidate in ordered) {
+    if (selected.length >= limit) break;
+    final commanderKey = candidate.commanderName.toLowerCase();
+    if (usedCommanders.contains(commanderKey)) continue;
+    selected.add(candidate);
+    usedCommanders.add(commanderKey);
+  }
+
+  return selected.take(limit).toList();
+}
+
+int _statusPriority(String status) {
+  return switch (status) {
+    'needs_repair' => 0,
+    'incomplete' => 1,
+    'healthy' => 2,
+    _ => 3,
+  };
 }
 
 Future<String> _createDeckClone({
@@ -976,6 +1089,7 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
     ..writeln('- Gerado em: `${summary['generated_at']}`')
     ..writeln('- API: `${summary['api_base_url']}`')
     ..writeln('- Artefatos: `${summary['artifact_dir']}`')
+    ..writeln('- Seleção: `${summary['selection_mode']}`')
     ..writeln('- Total: `${summary['total']}`')
     ..writeln('- Otimizacoes diretas: `${summary['direct_optimizations']}`')
     ..writeln('- Resolvidos via rebuild: `${summary['rebuild_resolutions']}`')

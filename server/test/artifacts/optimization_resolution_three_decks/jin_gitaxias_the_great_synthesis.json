@@ -1,182 +1,54 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "9de41ac8-09bc-40f8-91b6-2ef3681d23aa",
-  "final_deck_id": "9de41ac8-09bc-40f8-91b6-2ef3681d23aa",
+  "clone_deck_id": "738c2ed3-659e-423b-beed-d430ccb15ca7",
+  "final_deck_id": "738c2ed3-659e-423b-beed-d430ccb15ca7",
   "optimize_request": {
-    "deck_id": "9de41ac8-09bc-40f8-91b6-2ef3681d23aa",
-    "archetype": "midrange",
+    "deck_id": "738c2ed3-659e-423b-beed-d430ccb15ca7",
+    "archetype": "control",
     "bracket": 2,
     "keep_theme": true
   },
-  "optimize_status": 422,
+  "optimize_status": 200,
   "optimize_response": {
-    "error": "A otimizacao sugerida nao passou no gate final de qualidade.",
-    "quality_error": {
-      "code": "OPTIMIZE_QUALITY_REJECTED",
-      "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
-      "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 58/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (58/100; mínimo 70).",
-        "A segunda revisão crítica da IA rejeitou a proposta (approval_score 45/100)."
-      ],
-      "validation": {
-        "validation_score": 58,
-        "deck_health_score": 87,
-        "improvement_score": 15,
-        "verdict": "aprovado_com_ressalvas",
-        "monte_carlo": {
-          "before": {
-            "simulations": 1000,
-            "consistency_score": 90,
-            "mana_analysis": {
-              "land_count": 40,
-              "screw_rate": 0.14,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.843
-            },
-            "curve_analysis": {
-              "avg_cmc": 3.07,
-              "turn_1_play": 0.754,
-              "turn_2_play": 0.936,
-              "turn_3_play": 0.982,
-              "turn_4_play": 0.994,
-              "cmc_distribution": {
-                "5": 3,
-                "7": 3,
-                "1": 15,
-                "2": 12,
-                "3": 13,
-                "4": 5,
-                "0": 4,
-                "10": 4,
-                "9": 1
-              }
-            },
-            "recommendations": [
-              "Deck bem balanceado! Métricas dentro do ideal para Commander."
-            ]
-          },
-          "after": {
-            "simulations": 1000,
-            "consistency_score": 88,
-            "mana_analysis": {
-              "land_count": 40,
-              "screw_rate": 0.166,
-              "flood_rate": 0.018,
-              "keepable_rate": 0.816
-            },
-            "curve_analysis": {
-              "avg_cmc": 3.08,
-              "turn_1_play": 0.759,
-              "turn_2_play": 0.912,
-              "turn_3_play": 0.98,
-              "turn_4_play": 0.993,
-              "cmc_distribution": {
-                "5": 3,
-                "7": 3,
-                "1": 15,
-                "2": 11,
-                "3": 14,
-                "4": 5,
-                "0": 4,
-                "10": 4,
-                "9": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana screw (16.6%). Considere adicionar 2-4 terrenos."
-            ]
-          },
-          "mulligan_before": {
-            "runs": 500,
-            "avg_mulligans": 0.13,
-            "keep_at_7": 0.888,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.016,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.924
-          },
-          "mulligan_after": {
-            "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.902,
-            "keep_at_6": 0.094,
-            "keep_at_5": 0.004,
-            "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.926
-          },
-          "deltas": {
-            "consistency_score": -2,
-            "screw_rate_delta": 0.026,
-            "flood_rate_delta": 0.001,
-            "keepable_rate_delta": -0.027,
-            "turn2_play_delta": -0.024,
-            "mulligan_keep7_delta": 0.014
-          }
-        },
-        "functional_analysis": {
-          "swaps": [
-            {
-              "removed": "Dramatic Reversal",
-              "added": "Flux Channeler",
-              "removed_role": "utility",
-              "added_role": "creature",
-              "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
-            }
-          ],
-          "summary": {
-            "upgrades": 0,
-            "sidegrades": 0,
-            "tradeoffs": 0,
-            "questionable": 1
-          },
-          "role_delta": {
-            "draw": 0,
-            "removal": 0,
-            "ramp": 0,
-            "creature": 1,
-            "artifact": 0,
-            "enchantment": 0,
-            "land": 0,
-            "utility": -1,
-            "wipe": 0,
-            "tutor": 0,
-            "protection": 0
-          }
-        },
-        "critic_ai": {
-          "approval_score": 45,
-          "verdict": "reprovado",
-          "concerns": [
-            "A troca de Dramatic Reversal por Flux Channeler resultou em uma diminuição na consistência do deck.",
-            "A taxa de mana screw aumentou, o que pode comprometer a jogabilidade em momentos críticos.",
-            "Flux Channeler, sendo uma criatura, não oferece a mesma utilidade e flexibilidade que Dramatic Reversal em um deck de controle."
-          ],
-          "strong_swaps": [],
-          "weak_swaps": [
-            {
-              "swap": "Dramatic Reversal → Flux Channeler",
-              "justification": "A perda de uma carta de utilidade que permite gerar mana e ativar habilidades em momentos chave é significativa, especialmente em um deck de controle."
-            }
-          ],
-          "overall_assessment": "A troca proposta não é benéfica, pois compromete a consistência e a flexibilidade do deck de controle."
-        },
-        "warnings": [
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "A melhoria incremental foi pequena (15/100)."
-        ]
-      }
-    },
     "mode": "optimize",
+    "strategy_source": "deterministic_first",
+    "constraints": {
+      "keep_theme": true
+    },
+    "cache": {
+      "hit": false,
+      "cache_key": "v6:3705b586"
+    },
+    "preferences": {
+      "memory_applied": false,
+      "keep_theme": true,
+      "preferred_bracket": 2
+    },
+    "theme": {
+      "theme": "spellslinger",
+      "confidence": "alta",
+      "match_score": 0.4166666666666667,
+      "core_cards": [
+        "Jin-Gitaxias // The Great Synthesis",
+        "Flusterstorm",
+        "Pact of Negation",
+        "Force of Will",
+        "Kozilek, the Great Distortion",
+        "Chain of Vapor",
+        "Force of Negation",
+        "Fabricate",
+        "Fellwar Stone",
+        "Fierce Guardianship"
+      ]
+    },
     "removals": [
-      "Dramatic Reversal"
+      "Sea Gate Restoration // Sea Gate, Reborn"
     ],
     "additions": [
-      "Flux Channeler"
+      "Brainstorm"
     ],
+    "reasoning": "O backend priorizou swaps determinísticos para control antes da IA, usando função das cartas, prioridade competitiva do comandante e histórico de rejeição.",
     "deck_analysis": {
       "detected_archetype": "control",
       "average_cmc": "3.07",
@@ -196,12 +68,12 @@
       "archetype_confidence": "média"
     },
     "post_analysis": {
-      "detected_archetype": "control",
-      "average_cmc": "3.08",
+      "detected_archetype": "combo",
+      "average_cmc": "2.97",
       "type_distribution": {
-        "creatures": 11,
-        "instants": 16,
-        "sorceries": 8,
+        "creatures": 10,
+        "instants": 18,
+        "sorceries": 7,
         "enchantments": 5,
         "artifacts": 24,
         "planeswalkers": 0,
@@ -209,30 +81,33 @@
         "battles": 0
       },
       "total_cards": 100,
-      "mana_curve_assessment": "BOA: Curva adequada para Control",
+      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
       "mana_base_assessment": "Base de mana equilibrada",
       "archetype_confidence": "média",
+      "improvements": [
+        "Mais interação instant-speed adicionada"
+      ],
       "validation": {
-        "validation_score": 58,
-        "deck_health_score": 87,
-        "improvement_score": 15,
-        "verdict": "aprovado_com_ressalvas",
+        "validation_score": 81,
+        "deck_health_score": 89,
+        "improvement_score": 61,
+        "verdict": "aprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.14,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.843
+              "screw_rate": 0.159,
+              "flood_rate": 0.014,
+              "keepable_rate": 0.827
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.754,
-              "turn_2_play": 0.936,
-              "turn_3_play": 0.982,
-              "turn_4_play": 0.994,
+              "turn_1_play": 0.721,
+              "turn_2_play": 0.934,
+              "turn_3_play": 0.987,
+              "turn_4_play": 0.992,
               "cmc_distribution": {
                 "5": 3,
                 "7": 3,
@@ -246,30 +121,30 @@
               }
             },
             "recommendations": [
-              "Deck bem balanceado! Métricas dentro do ideal para Commander."
+              "Alta taxa de mana screw (15.9%). Considere adicionar 2-4 terrenos."
             ]
           },
           "after": {
             "simulations": 1000,
-            "consistency_score": 88,
+            "consistency_score": 91,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.166,
-              "flood_rate": 0.018,
-              "keepable_rate": 0.816
+              "screw_rate": 0.139,
+              "flood_rate": 0.014,
+              "keepable_rate": 0.847
             },
             "curve_analysis": {
-              "avg_cmc": 3.08,
-              "turn_1_play": 0.759,
-              "turn_2_play": 0.912,
-              "turn_3_play": 0.98,
-              "turn_4_play": 0.993,
+              "avg_cmc": 2.97,
+              "turn_1_play": 0.748,
+              "turn_2_play": 0.936,
+              "turn_3_play": 0.985,
+              "turn_4_play": 0.991,
               "cmc_distribution": {
                 "5": 3,
-                "7": 3,
-                "1": 15,
-                "2": 11,
-                "3": 14,
+                "7": 2,
+                "1": 16,
+                "2": 12,
+                "3": 13,
                 "4": 5,
                 "0": 4,
                 "10": 4,
@@ -277,100 +152,286 @@
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (16.6%). Considere adicionar 2-4 terrenos."
+              "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.13,
+            "avg_mulligans": 0.12,
             "keep_at_7": 0.888,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.016,
+            "keep_at_6": 0.102,
+            "keep_at_5": 0.01,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.924
+            "keepable_after_mull": 0.942
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.902,
-            "keep_at_6": 0.094,
-            "keep_at_5": 0.004,
+            "avg_mulligans": 0.11,
+            "keep_at_7": 0.896,
+            "keep_at_6": 0.096,
+            "keep_at_5": 0.008,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.926
+            "keepable_after_mull": 0.892
           },
           "deltas": {
-            "consistency_score": -2,
-            "screw_rate_delta": 0.026,
-            "flood_rate_delta": 0.001,
-            "keepable_rate_delta": -0.027,
-            "turn2_play_delta": -0.024,
-            "mulligan_keep7_delta": 0.014
+            "consistency_score": 1,
+            "screw_rate_delta": -0.02,
+            "flood_rate_delta": 0.0,
+            "keepable_rate_delta": 0.02,
+            "turn2_play_delta": 0.002,
+            "mulligan_keep7_delta": 0.008
           }
         },
         "functional_analysis": {
           "swaps": [
             {
-              "removed": "Dramatic Reversal",
-              "added": "Flux Channeler",
-              "removed_role": "utility",
-              "added_role": "creature",
-              "role_preserved": false,
-              "cmc_delta": 1,
-              "verdict": "questionável"
+              "removed": "Sea Gate Restoration // Sea Gate, Reborn",
+              "added": "Brainstorm",
+              "removed_role": "draw",
+              "added_role": "draw",
+              "role_preserved": true,
+              "cmc_delta": -6,
+              "verdict": "upgrade"
             }
           ],
           "summary": {
-            "upgrades": 0,
+            "upgrades": 1,
             "sidegrades": 0,
             "tradeoffs": 0,
-            "questionable": 1
+            "questionable": 0
           },
           "role_delta": {
             "draw": 0,
             "removal": 0,
             "ramp": 0,
-            "creature": 1,
+            "creature": 0,
             "artifact": 0,
             "enchantment": 0,
             "land": 0,
-            "utility": -1,
+            "utility": 0,
             "wipe": 0,
             "tutor": 0,
             "protection": 0
           }
         },
         "critic_ai": {
-          "approval_score": 45,
-          "verdict": "reprovado",
-          "concerns": [
-            "A troca de Dramatic Reversal por Flux Channeler resultou em uma diminuição na consistência do deck.",
-            "A taxa de mana screw aumentou, o que pode comprometer a jogabilidade em momentos críticos.",
-            "Flux Channeler, sendo uma criatura, não oferece a mesma utilidade e flexibilidade que Dramatic Reversal em um deck de controle."
+          "approval_score": 92,
+          "verdict": "aprovado",
+          "concerns": [],
+          "strong_swaps": [
+            "OUT: Sea Gate Restoration // Sea Gate, Reborn → IN: Brainstorm"
           ],
-          "strong_swaps": [],
-          "weak_swaps": [
-            {
-              "swap": "Dramatic Reversal → Flux Channeler",
-              "justification": "A perda de uma carta de utilidade que permite gerar mana e ativar habilidades em momentos chave é significativa, especialmente em um deck de controle."
-            }
-          ],
-          "overall_assessment": "A troca proposta não é benéfica, pois compromete a consistência e a flexibilidade do deck de controle."
+          "weak_swaps": [],
+          "overall_assessment": "A troca de Sea Gate Restoration por Brainstorm é uma melhoria clara em termos de consistência e eficiência de compra, fortalecendo o controle do deck."
         },
-        "warnings": [
-          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-          "A melhoria incremental foi pequena (15/100)."
-        ]
+        "warnings": []
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 5 troca(s) insegura(s) antes da resposta final.",
-      "🔒 All Is Dust -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel wipe -> creature, delta CMC +0.",
-      "🔒 Expedition Map -> Brainstorm removida pelo gate: papel ramp -> draw, delta CMC +0.",
-      "🔒 Blast Zone -> Counterspell removida pelo gate: papel land -> removal, delta CMC +2.",
-      "🔒 Swan Song -> Tezzeret's Gambit removida pelo gate: papel removal -> draw, delta CMC +3.",
-      "🔒 Academy Ruins -> Experimental Augury removida pelo gate: papel land -> draw, delta CMC +2.",
-      "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
-      "A melhoria incremental foi pequena (15/100)."
+      "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Engulf the Shore -> Command Tower removida pelo gate: papel utility -> land, delta CMC -4.",
+      "🔒 Mystic Forge -> Counterspell removida pelo gate: papel draw -> removal, delta CMC -2."
+    ],
+    "bracket": 2,
+    "target_additions": null,
+    "optimize_diagnostics": {
+      "empty_suggestions_fallback": {
+        "triggered": false,
+        "applied": false,
+        "candidate_count": 0,
+        "replacement_count": 0,
+        "pair_count": 0
+      },
+      "empty_suggestions_fallback_aggregate": {
+        "request_count": 17,
+        "triggered_count": 0,
+        "applied_count": 0,
+        "no_candidate_count": 0,
+        "no_replacement_count": 0,
+        "trigger_rate": 0.0,
+        "apply_rate": 0.0
+      },
+      "empty_suggestions_fallback_aggregate_persisted": {
+        "all_time": {
+          "request_count": 71,
+          "triggered_count": 23,
+          "applied_count": 0,
+          "no_candidate_count": 23,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.323943661971831,
+          "apply_rate": 0.0
+        },
+        "last_24h": {
+          "request_count": 22,
+          "triggered_count": 0,
+          "applied_count": 0,
+          "no_candidate_count": 0,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.0,
+          "apply_rate": 0.0
+        }
+      }
+    },
+    "edhrec_validation": {
+      "commander": "Jin-Gitaxias // The Great Synthesis",
+      "deck_count": 3388,
+      "themes": [
+        "Cantrips",
+        "Control",
+        "Combo",
+        "Wheels",
+        "Card Draw",
+        "Extra Turns",
+        "Infect",
+        "Spellslinger",
+        "Phyrexians",
+        "Artifacts",
+        "Proliferate",
+        "Mill",
+        "Counterspells",
+        "Midrange",
+        "Planeswalkers",
+        "Ramp",
+        "Storm",
+        "Big Mana",
+        "Hand Size",
+        "+1/+1 Counters",
+        "Commander Matters",
+        "Stax",
+        "Clones",
+        "Self-Mill",
+        "Blue Moon",
+        "Devotion",
+        "Burn",
+        "Equipment",
+        "Good Stuff",
+        "Historic",
+        "Persistent Petitioners",
+        "Praetors",
+        "Sagas",
+        "Tokens",
+        "Enchantress",
+        "Oil Counters",
+        "Pillow Fort",
+        "Self-Damage",
+        "Theft",
+        "Ad Nauseam",
+        "Counters Matter",
+        "Cycling",
+        "Discard",
+        "Flash",
+        "Group Slug",
+        "Lifegain",
+        "Prison",
+        "Tempo",
+        "Toolbox",
+        "Unnatural",
+        "Activated Abilities",
+        "Aggro",
+        "Blink",
+        "Bounce",
+        "Chaos",
+        "Eldrazi",
+        "Extra Upkeeps",
+        "Flying",
+        "Glass Cannon",
+        "Hatebears",
+        "Horrors",
+        "Power",
+        "Rock",
+        "Sea Creatures",
+        "Slivers",
+        "Snow",
+        "Spell Copy",
+        "Tap / Untap",
+        "Toughness Matters",
+        "Triggered Abilities",
+        "Vehicles",
+        "Voltron",
+        "Wizards"
+      ],
+      "additions_validated": 0,
+      "additions_not_in_edhrec": [
+        "Command Tower"
+      ]
+    },
+    "additions_detailed": [
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano control e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.10",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "removals_detailed": [
+      {
+        "type": "remove",
+        "name": "Sea Gate Restoration // Sea Gate, Reborn",
+        "card_id": "0abb6410-6267-49f1-aba4-7480e73d5447",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano control e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.10",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "remove",
+        "name": "Sea Gate Restoration // Sea Gate, Reborn",
+        "card_id": "0abb6410-6267-49f1-aba4-7480e73d5447",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano control e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.10",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      },
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano control e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.10",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
     ],
     "deck_state": {
       "status": "healthy",
@@ -379,21 +440,21 @@
       "severity_score": 0,
       "reasons": []
     },
-    "outcome_code": "near_peak"
+    "outcome_code": "optimized"
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "9de41ac8-09bc-40f8-91b6-2ef3681d23aa"
+    "deck_id": "738c2ed3-659e-423b-beed-d430ccb15ca7"
   },
   "final_analysis": {
     "detected_archetype": "combo",
-    "average_cmc": "1.57",
+    "average_cmc": "2.97",
     "type_distribution": {
       "creatures": 10,
-      "instants": 17,
-      "sorceries": 8,
+      "instants": 18,
+      "sorceries": 7,
       "enchantments": 5,
       "artifacts": 24,
       "planeswalkers": 0,

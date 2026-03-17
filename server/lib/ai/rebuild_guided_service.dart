@@ -168,10 +168,13 @@ class RebuildGuidedService {
       commanderName: commanderName,
       originalDeck: originalDeck,
     );
-    final resolvedArchetype = resolveOptimizeArchetype(
+    var resolvedArchetype = resolveOptimizeArchetype(
       requestedArchetype: requestedArchetype,
       detectedArchetype: deckAnalysisBefore['detected_archetype']?.toString(),
     );
+    if (resolvedTheme == 'counters' && resolvedArchetype == 'aggro') {
+      resolvedArchetype = 'midrange';
+    }
 
     final targetProfile = _buildTargetProfile(
       deckFormat: deckFormat,
@@ -196,6 +199,7 @@ class RebuildGuidedService {
       commanderColorIdentity: commanderColorIdentity,
       candidateWeights: candidateWeights,
       targetProfile: targetProfile,
+      resolvedArchetype: resolvedArchetype,
       resolvedTheme: resolvedTheme,
       mustKeep: mustKeepLower,
       mustAvoid: mustAvoidLower,
@@ -214,6 +218,7 @@ class RebuildGuidedService {
       candidateCards: candidateCards,
       candidateWeights: candidateWeights,
       commanderColorIdentity: commanderColorIdentity,
+      resolvedArchetype: resolvedArchetype,
       resolvedTheme: resolvedTheme,
       mustAvoid: mustAvoidLower,
     );
@@ -226,6 +231,7 @@ class RebuildGuidedService {
       commanderColorIdentity: commanderColorIdentity,
       deckFormat: deckFormat,
       bracket: bracket,
+      resolvedArchetype: resolvedArchetype,
       resolvedTheme: resolvedTheme,
       mustKeep: mustKeepLower,
       mustAvoid: mustAvoidLower,
@@ -423,7 +429,21 @@ class RebuildGuidedService {
       wincons = 6;
     }
 
-    if (resolvedTheme == 'spellslinger') {
+    if (resolvedTheme == 'counters') {
+      ramp = 9;
+      drawSelection = 10;
+      interaction = 10;
+      wipes = 2;
+      payoffs = 12;
+      wincons = 4;
+    } else if (_isAggroTribalTheme(resolvedTheme)) {
+      ramp = 7;
+      drawSelection = 8;
+      interaction = 7;
+      wipes = 1;
+      payoffs = 15;
+      wincons = 6;
+    } else if (resolvedTheme == 'spellslinger') {
       ramp = 10;
       drawSelection = 16;
       interaction = 15;
@@ -484,6 +504,7 @@ class RebuildGuidedService {
     if (deckFormat == 'brawl') return 25;
     if (requestedArchetype == 'aggro') return 34;
     if (requestedArchetype == 'control') return 37;
+    if (resolvedTheme == 'counters') return 36;
     if (resolvedTheme == 'spellslinger') return 36;
     return 36;
   }
@@ -526,6 +547,11 @@ class RebuildGuidedService {
     final normalized = raw?.trim().toLowerCase() ?? '';
     if (normalized.isEmpty) return null;
     if (normalized.contains('spell')) return 'spellslinger';
+    if (normalized.contains('-1/-1') ||
+        normalized.contains('proliferate') ||
+        normalized == 'counters') {
+      return 'counters';
+    }
     if (normalized.contains('artifact')) return 'artifacts';
     if (normalized.contains('enchant')) return 'enchantments';
     if (normalized.contains('voltron')) return 'voltron';
@@ -595,6 +621,7 @@ class RebuildGuidedService {
     required Set<String> commanderColorIdentity,
     required Map<String, int> candidateWeights,
     required RebuildTargetProfile targetProfile,
+    required String resolvedArchetype,
     required String resolvedTheme,
     required Set<String> mustKeep,
     required Set<String> mustAvoid,
@@ -621,7 +648,11 @@ class RebuildGuidedService {
       }
 
       var score = candidateWeights[name] ?? candidateWeights[lower] ?? 0;
-      final role = _normalizedRoleForCard(card, resolvedTheme: resolvedTheme);
+      final role = _normalizedRoleForCard(
+        card,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
       final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
       final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
       final colors = _extractIdentity(card);
@@ -651,6 +682,13 @@ class RebuildGuidedService {
         if (role == 'payoff' || role == 'engine') score += 18;
         if (role == 'wincon') score += 15;
       }
+
+      score += _curveAndThemeAdjustment(
+        card: card,
+        role: role,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
 
       scores[lower] = score;
     }
@@ -789,6 +827,7 @@ class RebuildGuidedService {
     required List<Map<String, dynamic>> candidateCards,
     required Map<String, int> candidateWeights,
     required Set<String> commanderColorIdentity,
+    required String resolvedArchetype,
     required String resolvedTheme,
     required Set<String> mustAvoid,
   }) {
@@ -806,7 +845,11 @@ class RebuildGuidedService {
       }
 
       var weight = candidateWeights[name] ?? candidateWeights[lower] ?? 0;
-      final role = _normalizedRoleForCard(card, resolvedTheme: resolvedTheme);
+      final role = _normalizedRoleForCard(
+        card,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
       if (role == 'ramp' || role == 'draw' || role == 'interaction') {
         weight += 12;
       } else if (role == 'payoff' || role == 'engine') {
@@ -816,6 +859,12 @@ class RebuildGuidedService {
       } else if (role == 'land') {
         weight += 8;
       }
+      weight += _curveAndThemeAdjustment(
+        card: card,
+        role: role,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
       weighted.add(
         _WeightedCard(
           card: Map<String, dynamic>.from(card),
@@ -841,6 +890,7 @@ class RebuildGuidedService {
     required Set<String> commanderColorIdentity,
     required String deckFormat,
     required int? bracket,
+    required String resolvedArchetype,
     required String resolvedTheme,
     required Set<String> mustKeep,
     required Set<String> mustAvoid,
@@ -853,7 +903,11 @@ class RebuildGuidedService {
       final name = (card['name'] as String?)?.trim().toLowerCase() ?? '';
       if (name.isEmpty) continue;
       if (!preserveAllKeep && card['is_commander'] != true) {
-        final score = _normalizedRoleForCard(card, resolvedTheme: resolvedTheme);
+        final score = _normalizedRoleForCard(
+          card,
+          resolvedArchetype: resolvedArchetype,
+          resolvedTheme: resolvedTheme,
+        );
         final mustPreserve = mustKeep.contains(name);
         final highPriorityLand = score == 'land' &&
             (_landProducesCommanderColor(
@@ -888,21 +942,33 @@ class RebuildGuidedService {
       );
     }
 
-    final landCandidates = <_WeightedCard>[];
+    final coloredLandCandidates = <_WeightedCard>[];
+    final utilityLandCandidates = <_WeightedCard>[];
     final nonLandCandidates = <_WeightedCard>[];
     for (final candidate in weightedCandidates) {
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
       if (!bracketAllowedNames.contains(lower)) continue;
       if (selected.containsKey(lower)) continue;
       if (_isLandCard(candidate.card)) {
-        landCandidates.add(candidate);
+        if (_isUtilityColorlessLandCard(
+          candidate.card,
+          commanderColorIdentity: commanderColorIdentity,
+        )) {
+          utilityLandCandidates.add(candidate);
+        } else {
+          coloredLandCandidates.add(candidate);
+        }
       } else {
         nonLandCandidates.add(candidate);
       }
     }
 
     final maxTotal = targetProfile.totalCards;
-    final roleCounts = _countRoles(selected.values, resolvedTheme: resolvedTheme);
+    final roleCounts = _countRoles(
+      selected.values,
+      resolvedArchetype: resolvedArchetype,
+      resolvedTheme: resolvedTheme,
+    );
     final commanderCount = selected.values
         .where((card) => card['is_commander'] == true)
         .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 1));
@@ -934,13 +1000,31 @@ class RebuildGuidedService {
       _incrementRole(roleCounts, candidate.role);
     }
 
-    for (final candidate in landCandidates) {
+    final monoColorUtilityLimit =
+        _maxUtilityColorlessLands(commanderColorIdentity);
+    var utilityLandCount = _countUtilityColorlessLands(
+      selected.values.toList(),
+      commanderColorIdentity: commanderColorIdentity,
+    );
+
+    for (final candidate in coloredLandCandidates) {
       final currentLandCount = roleCounts['land'] ?? 0;
       if (currentLandCount >= targetProfile.landCount) break;
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
       if (selected.containsKey(lower)) continue;
       _addCardToSelection(selected, candidate.card);
       _incrementRole(roleCounts, 'land');
+    }
+
+    for (final candidate in utilityLandCandidates) {
+      final currentLandCount = roleCounts['land'] ?? 0;
+      if (currentLandCount >= targetProfile.landCount) break;
+      final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
+      if (selected.containsKey(lower)) continue;
+      if (utilityLandCount >= monoColorUtilityLimit) continue;
+      _addCardToSelection(selected, candidate.card);
+      _incrementRole(roleCounts, 'land');
+      utilityLandCount += 1;
     }
 
     _addBasicLandsUntilTarget(
@@ -952,13 +1036,34 @@ class RebuildGuidedService {
 
     final remainingCandidates = [
       ...nonLandCandidates,
-      ...landCandidates,
+      ...coloredLandCandidates,
+      ...utilityLandCandidates,
     ];
     for (final candidate in remainingCandidates) {
       if (_totalCards(selected.values.toList()) >= maxTotal) break;
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
       if (selected.containsKey(lower)) continue;
+      if (_isLandCard(candidate.card)) {
+        final currentLandCount = roleCounts['land'] ?? 0;
+        if (currentLandCount >= targetProfile.landCount) continue;
+        if (_isUtilityColorlessLandCard(
+              candidate.card,
+              commanderColorIdentity: commanderColorIdentity,
+            ) &&
+            utilityLandCount >= monoColorUtilityLimit) {
+          continue;
+        }
+      }
       _addCardToSelection(selected, candidate.card);
+      if (_isLandCard(candidate.card)) {
+        _incrementRole(roleCounts, 'land');
+        if (_isUtilityColorlessLandCard(
+          candidate.card,
+          commanderColorIdentity: commanderColorIdentity,
+        )) {
+          utilityLandCount += 1;
+        }
+      }
     }
 
     _addBasicLandsUntilDeckComplete(
@@ -971,10 +1076,17 @@ class RebuildGuidedService {
     var assembled = selected.values
         .map((card) => Map<String, dynamic>.from(card))
         .toList(growable: true);
+    assembled = _rebalanceMonoColorManaBase(
+      cards: assembled,
+      commanderColorIdentity: commanderColorIdentity,
+      basicLandCatalog: basicLandCatalog,
+      resolvedTheme: resolvedTheme,
+    );
     if (_totalCards(assembled) > maxTotal) {
       assembled = _trimDeckToTarget(
         cards: assembled,
         targetTotal: maxTotal,
+        resolvedArchetype: resolvedArchetype,
         resolvedTheme: resolvedTheme,
       );
     }
@@ -987,6 +1099,53 @@ class RebuildGuidedService {
       return ((a['name'] as String?) ?? '').compareTo((b['name'] as String?) ?? '');
     });
     return assembled;
+  }
+
+  List<Map<String, dynamic>> _rebalanceMonoColorManaBase({
+    required List<Map<String, dynamic>> cards,
+    required Set<String> commanderColorIdentity,
+    required Map<String, Map<String, dynamic>> basicLandCatalog,
+    required String resolvedTheme,
+  }) {
+    if (commanderColorIdentity.length != 1) return cards;
+
+    final mutable = cards.map((card) => Map<String, dynamic>.from(card)).toList();
+    final utilityIndexes = <int>[];
+    for (var i = 0; i < mutable.length; i++) {
+      final card = mutable[i];
+      if (_isUtilityColorlessLandCard(
+        card,
+        commanderColorIdentity: commanderColorIdentity,
+      )) {
+        utilityIndexes.add(i);
+      }
+    }
+
+    final maxUtility = _maxUtilityColorlessLands(commanderColorIdentity);
+    if (utilityIndexes.length <= maxUtility) return mutable;
+
+    utilityIndexes.sort((a, b) {
+      final priorityA = _utilityLandKeepPriority(
+        mutable[a],
+        resolvedTheme: resolvedTheme,
+      );
+      final priorityB = _utilityLandKeepPriority(
+        mutable[b],
+        resolvedTheme: resolvedTheme,
+      );
+      return priorityA.compareTo(priorityB);
+    });
+
+    final replacementsNeeded = utilityIndexes.length - maxUtility;
+    for (var i = 0; i < replacementsNeeded; i++) {
+      final idx = utilityIndexes[i];
+      mutable[idx] = _basicLandCardForColor(
+        commanderColorIdentity.first,
+        basicLandCatalog,
+      );
+    }
+
+    return mutable;
   }
 
   bool _shouldAddByRole({
@@ -1021,11 +1180,16 @@ class RebuildGuidedService {
 
   Map<String, int> _countRoles(
     Iterable<Map<String, dynamic>> cards, {
+    required String resolvedArchetype,
     required String resolvedTheme,
   }) {
     final counts = <String, int>{};
     for (final card in cards) {
-      final role = _normalizedRoleForCard(card, resolvedTheme: resolvedTheme);
+      final role = _normalizedRoleForCard(
+        card,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
       counts[role] = (counts[role] ?? 0) + ((card['quantity'] as int?) ?? 1);
     }
     return counts;
@@ -1033,11 +1197,13 @@ class RebuildGuidedService {
 
   String _normalizedRoleForCard(
     Map<String, dynamic> card, {
+    required String resolvedArchetype,
     required String resolvedTheme,
   }) {
     final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
     final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
     final name = (card['name'] as String?)?.toLowerCase() ?? '';
+    final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
 
     if (typeLine.contains('land')) return 'land';
     if (oracle.contains('destroy all') ||
@@ -1070,6 +1236,26 @@ class RebuildGuidedService {
         oracle.contains('combat damage to a player')) {
       return 'wincon';
     }
+    if (_isAggroTribalTheme(resolvedTheme) &&
+        typeLine.contains('creature') &&
+        (name.contains('goblin') ||
+            oracle.contains('goblin') ||
+            oracle.contains('attacking creature') ||
+            oracle.contains('creatures you control get'))) {
+      return 'payoff';
+    }
+    if (resolvedTheme == 'counters' &&
+        (oracle.contains('-1/-1 counter') ||
+            oracle.contains('proliferate') ||
+            oracle.contains('put a counter on') ||
+            oracle.contains('remove a counter from'))) {
+      return 'payoff';
+    }
+    if (resolvedArchetype == 'aggro' &&
+        typeLine.contains('creature') &&
+        cmc <= 3.0) {
+      return 'payoff';
+    }
     if (resolvedTheme == 'spellslinger' &&
         oracle.contains('instant or sorcery')) {
       return 'payoff';
@@ -1086,13 +1272,88 @@ class RebuildGuidedService {
     return 'support';
   }
 
+  int _curveAndThemeAdjustment({
+    required Map<String, dynamic> card,
+    required String role,
+    required String resolvedArchetype,
+    required String resolvedTheme,
+  }) {
+    final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
+    final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
+    final name = (card['name'] as String?)?.toLowerCase() ?? '';
+    final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+
+    var delta = 0;
+
+    if (resolvedArchetype == 'aggro' || _isAggroTribalTheme(resolvedTheme)) {
+      if (cmc <= 2.0) {
+        delta += 18;
+      } else if (cmc <= 3.0) {
+        delta += 8;
+      } else if (cmc >= 5.0) {
+        delta -= 24;
+      } else if (cmc >= 4.0) {
+        delta -= 12;
+      }
+
+      if (typeLine.contains('creature')) delta += 10;
+      if (role == 'wipe') delta -= 6;
+    }
+
+    if (_isAggroTribalTheme(resolvedTheme)) {
+      if (name.contains('goblin') || oracle.contains('goblin')) {
+        delta += 22;
+      }
+      if (typeLine.contains('creature')) {
+        delta += 8;
+      }
+    }
+
+    if (resolvedTheme == 'spellslinger') {
+      if (typeLine.contains('instant') || typeLine.contains('sorcery')) {
+        delta += 10;
+      }
+      if (cmc >= 5.0) {
+        delta -= 10;
+      }
+    }
+
+    if (resolvedTheme == 'counters') {
+      if (oracle.contains('-1/-1 counter') || oracle.contains('proliferate')) {
+        delta += 18;
+      }
+      if (oracle.contains('put a counter on') ||
+          oracle.contains('remove a counter from')) {
+        delta += 10;
+      }
+    }
+
+    if (name == 'temple of the false god' &&
+        (resolvedTheme == 'spellslinger' ||
+            resolvedArchetype == 'control' ||
+            resolvedArchetype == 'combo')) {
+      delta -= 40;
+    }
+    if (name == 'terrain generator' && resolvedTheme != 'landfall') {
+      delta -= 15;
+    }
+
+    return delta;
+  }
+
+  bool _isAggroTribalTheme(String resolvedTheme) {
+    return resolvedTheme.contains('goblin') ||
+        resolvedTheme.contains('tribal') ||
+        resolvedTheme == 'aggro';
+  }
+
   bool _landProducesCommanderColor(
     String oracleText,
     Set<String> commanderColorIdentity,
   ) {
     final oracle = oracleText.toLowerCase();
     for (final color in commanderColorIdentity) {
-      if (oracle.contains('{${color.toLowerCase()}}')) return true;
+      if (oracle.contains('add {${color.toLowerCase()}}')) return true;
     }
     return false;
   }
@@ -1101,6 +1362,54 @@ class RebuildGuidedService {
     final oracle = oracleText.toLowerCase();
     return oracle.contains('one mana of any color') ||
         oracle.contains('one mana of any type');
+  }
+
+  bool _isUtilityColorlessLandCard(
+    Map<String, dynamic> card, {
+    required Set<String> commanderColorIdentity,
+  }) {
+    if (!_isLandCard(card)) return false;
+    if (card['is_commander'] == true) return false;
+    final name = (card['name'] as String?)?.toLowerCase() ?? '';
+    if (_isBasicLandCardByName(name)) return false;
+    final oracle = (card['oracle_text'] as String?) ?? '';
+    return !_landProducesCommanderColor(oracle, commanderColorIdentity) &&
+        !_isAnyColorLand(oracle);
+  }
+
+  int _countUtilityColorlessLands(
+    List<Map<String, dynamic>> cards, {
+    required Set<String> commanderColorIdentity,
+  }) {
+    return cards.fold<int>(0, (sum, card) {
+      if (_isUtilityColorlessLandCard(
+        card,
+        commanderColorIdentity: commanderColorIdentity,
+      )) {
+        return sum + ((card['quantity'] as int?) ?? 1);
+      }
+      return sum;
+    });
+  }
+
+  int _maxUtilityColorlessLands(Set<String> commanderColorIdentity) {
+    if (commanderColorIdentity.length <= 1) return 2;
+    return 4;
+  }
+
+  int _utilityLandKeepPriority(
+    Map<String, dynamic> card, {
+    required String resolvedTheme,
+  }) {
+    final name = (card['name'] as String?)?.toLowerCase() ?? '';
+    if (name == 'temple of the false god') return 0;
+    if (name == 'terrain generator') return 1;
+    if (name == 'scavenger grounds') return 2;
+    if (name == 'myriad landscape') return resolvedTheme == 'landfall' ? 7 : 3;
+    if (name == 'reliquary tower') return 4;
+    if (name == 'war room') return 5;
+    if (name == 'ancient tomb') return 8;
+    return 3;
   }
 
   bool _basicMatchesCommander(String lower, Set<String> commanderColorIdentity) {
@@ -1320,6 +1629,7 @@ class RebuildGuidedService {
   List<Map<String, dynamic>> _trimDeckToTarget({
     required List<Map<String, dynamic>> cards,
     required int targetTotal,
+    required String resolvedArchetype,
     required String resolvedTheme,
   }) {
     final mutable = cards.map((card) => Map<String, dynamic>.from(card)).toList();
@@ -1328,8 +1638,16 @@ class RebuildGuidedService {
       final commanderB = b['is_commander'] == true ? 0 : 1;
       final byCommander = commanderB.compareTo(commanderA);
       if (byCommander != 0) return byCommander;
-      final roleA = _normalizedRoleForCard(a, resolvedTheme: resolvedTheme);
-      final roleB = _normalizedRoleForCard(b, resolvedTheme: resolvedTheme);
+      final roleA = _normalizedRoleForCard(
+        a,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
+      final roleB = _normalizedRoleForCard(
+        b,
+        resolvedArchetype: resolvedArchetype,
+        resolvedTheme: resolvedTheme,
+      );
       final removableA = roleA == 'land' ? 0 : 1;
       final removableB = roleB == 'land' ? 0 : 1;
       final byRole = removableA.compareTo(removableB);

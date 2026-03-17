@@ -761,6 +761,28 @@ void main() {
             (body['keep_summary'] as Map?)?.cast<String, dynamic>() ?? {};
         expect((keepSummary['replaced_slots'] as num?)?.toInt(), greaterThan(90),
             reason: response.body);
+
+        final landCards = rebuiltCards
+            .where((card) =>
+                (card['type_line'] as String?)?.toLowerCase().contains('land') ??
+                false)
+            .toList();
+        final utilityColorlessLands = landCards.where((card) {
+          final name = (card['name'] as String?)?.toLowerCase() ?? '';
+          final oracle = (card['oracle_text'] as String?)?.toLowerCase() ?? '';
+          final isBasicIsland = name == 'island';
+          final producesBlue = oracle.contains('add {u}');
+          final producesAnyColor = oracle.contains('one mana of any color') ||
+              oracle.contains('one mana of any type');
+          return !isBasicIsland && !producesBlue && !producesAnyColor;
+        }).toList();
+        expect(utilityColorlessLands.length, lessThanOrEqualTo(2),
+            reason: response.body);
+        expect(
+          rebuiltCards.any((card) => card['name'] == 'Temple of the False God'),
+          isFalse,
+          reason: response.body,
+        );
       },
       skip: skipIntegration,
       timeout: const Timeout(Duration(minutes: 5)),
