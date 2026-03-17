@@ -1,6 +1,6 @@
 # Relatorio de Otimizacao Real - 3 Decks Commander
 
-- Gerado em: `2026-03-17T13:33:39.819039`
+- Gerado em: `2026-03-17T14:17:48.858790`
 - API: `http://127.0.0.1:8080`
 - Artefatos: `test/artifacts/optimization_validation_three_decks`
 - Total: `3`
@@ -14,7 +14,7 @@
 ### Auntie Ool, Cursewretch
 
 - Source deck: `8c22deb9-80bd-489f-8e87-1344eabac698`
-- Clone deck: `ab92d082-e199-4ad0-a16e-90254ddbc7f1`
+- Clone deck: `71c6e6d9-4f89-40b6-baeb-caf9d48da455`
 - Tipo de resultado: `protected_rejection`
 - Archetype usado: `aggro`
 - Optimize status: `422`
@@ -35,7 +35,7 @@ Avisos:
 ### Talrand, Sky Summoner
 
 - Source deck: `df780797-bcc4-47cb-82d6-08d01ae3b03b`
-- Clone deck: `072e8492-7e0a-4590-a751-3b396343fb36`
+- Clone deck: `f4ea56ab-ae17-4655-a341-91a43446695a`
 - Tipo de resultado: `protected_rejection`
 - Archetype usado: `midrange`
 - Optimize status: `422`
@@ -61,16 +61,16 @@ Avisos:
 ### Jin-Gitaxias // The Great Synthesis
 
 - Source deck: `f2a2a34a-4561-4a77-886d-7067b672ac85`
-- Clone deck: `f802ec62-c4af-4988-a605-a68d5b53b6b8`
+- Clone deck: `412354f3-afc4-4d1e-b918-a616e6fadcf0`
 - Tipo de resultado: `accepted_optimization`
 - Archetype usado: `midrange`
 - Optimize status: `200`
 - Deck salvo valido: `true`
-- Validation local: `90/100 - aprovado`
-- Validation da rota: `74/100 - aprovado`
+- Validation local: `75/100 - aprovado`
+- Validation da rota: `78/100 - aprovado`
 - CMC medio: `1.57 -> 1.52`
 - Interacao: `25 -> 25`
-- Consistencia: `90.0 -> 92.0`
+- Consistencia: `91.0 -> 91.0`
 - Artifact: `test/artifacts/optimization_validation_three_decks/jin_gitaxias_the_great_synthesis.json`
 - Status final: `PASSOU`
 

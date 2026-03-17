@@ -8,16 +8,20 @@ import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
-import '../lib/ai/optimization_validator.dart';
+import '../lib/ai/deck_state_analysis.dart';
 import '../lib/database.dart';
-import '../routes/ai/optimize/index.dart' as optimize_route;
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
-const _artifactDirPath = 'test/artifacts/optimization_validation_three_decks';
+const _artifactDirPath = 'test/artifacts/optimization_resolution_three_decks';
 const _summaryJsonPath =
-    'test/artifacts/optimization_validation_three_decks/latest_summary.json';
-const _summaryMdPath = '../RELATORIO_OTIMIZACAO_3_DECKS_2026-03-16.md';
-const _minimumAcceptedOptimizations = 1;
+    'test/artifacts/optimization_resolution_three_decks/latest_summary.json';
+const _summaryMdPath = '../RELATORIO_RESOLUCAO_3_DECKS_2026-03-17.md';
+const _generatedDeckNameFilters = '''
+        AND d.name NOT LIKE 'Optimization Validation - %'
+        AND d.name NOT LIKE 'Resolution Validation - %'
+        AND d.name NOT LIKE 'Rebuild Draft - %'
+        AND d.name NOT LIKE 'Rebuild Preview - %'
+''';
 
 class SourceDeckCandidate {
   SourceDeckCandidate({
@@ -44,102 +48,75 @@ class SourceDeckCandidate {
     final detected = _normalizeArchetype(sourceArchetype);
     if (detected != null) return detected;
     final analysis =
-        optimize_route.DeckArchetypeAnalyzer(cards, commanderColors)
-            .generateAnalysis();
+        DeckArchetypeAnalyzer(cards, commanderColors).generateAnalysis();
     final byAnalysis =
         _normalizeArchetype(analysis['detected_archetype']?.toString());
     return byAnalysis ?? 'midrange';
   }
-
-  int get totalCards => cards.fold<int>(
-      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
 }
 
-class DeckRunResult {
-  DeckRunResult({
-    required this.resultKind,
+class ResolutionRunResult {
+  ResolutionRunResult({
     required this.commanderName,
     required this.sourceDeckId,
     required this.sourceDeckName,
     required this.cloneDeckId,
+    required this.finalDeckId,
     required this.archetype,
     required this.bracket,
+    required this.flowPath,
     required this.optimizeStatus,
-    required this.optimizeMode,
+    required this.rebuildStatus,
+    required this.finalDeckValid,
+    required this.finalDeckState,
+    required this.finalAverageCmc,
+    required this.finalLandCount,
+    required this.finalInteraction,
     required this.savedArtifactPath,
-    required this.savedDeckValid,
-    required this.localValidationScore,
-    required this.localValidationVerdict,
-    required this.responseValidationScore,
-    required this.responseValidationVerdict,
-    required this.beforeAverageCmc,
-    required this.afterAverageCmc,
-    required this.beforeManaAssessment,
-    required this.afterManaAssessment,
-    required this.beforeInteraction,
-    required this.afterInteraction,
-    required this.beforeConsistency,
-    required this.afterConsistency,
     required this.expectedChecks,
     required this.failedChecks,
     required this.warnings,
-    required this.optimizeResponse,
   });
 
-  final String resultKind;
   final String commanderName;
   final String sourceDeckId;
   final String sourceDeckName;
   final String cloneDeckId;
+  final String finalDeckId;
   final String archetype;
   final int bracket;
+  final String flowPath;
   final int optimizeStatus;
-  final String optimizeMode;
+  final int? rebuildStatus;
+  final bool finalDeckValid;
+  final String finalDeckState;
+  final double finalAverageCmc;
+  final int finalLandCount;
+  final int finalInteraction;
   final String savedArtifactPath;
-  final bool savedDeckValid;
-  final int localValidationScore;
-  final String localValidationVerdict;
-  final int? responseValidationScore;
-  final String? responseValidationVerdict;
-  final double beforeAverageCmc;
-  final double afterAverageCmc;
-  final String beforeManaAssessment;
-  final String afterManaAssessment;
-  final int beforeInteraction;
-  final int afterInteraction;
-  final double beforeConsistency;
-  final double afterConsistency;
   final List<String> expectedChecks;
   final List<String> failedChecks;
   final List<String> warnings;
-  final Map<String, dynamic> optimizeResponse;
 
   bool get passed => failedChecks.isEmpty;
 
   Map<String, dynamic> toJson() => {
-        'result_kind': resultKind,
         'commander_name': commanderName,
         'source_deck_id': sourceDeckId,
         'source_deck_name': sourceDeckName,
         'clone_deck_id': cloneDeckId,
+        'final_deck_id': finalDeckId,
         'archetype': archetype,
         'bracket': bracket,
+        'flow_path': flowPath,
         'optimize_status': optimizeStatus,
-        'optimize_mode': optimizeMode,
+        'rebuild_status': rebuildStatus,
+        'final_deck_valid': finalDeckValid,
+        'final_deck_state': finalDeckState,
+        'final_average_cmc': finalAverageCmc,
+        'final_land_count': finalLandCount,
+        'final_interaction': finalInteraction,
         'saved_artifact_path': savedArtifactPath,
-        'saved_deck_valid': savedDeckValid,
-        'local_validation_score': localValidationScore,
-        'local_validation_verdict': localValidationVerdict,
-        'response_validation_score': responseValidationScore,
-        'response_validation_verdict': responseValidationVerdict,
-        'before_average_cmc': beforeAverageCmc,
-        'after_average_cmc': afterAverageCmc,
-        'before_mana_assessment': beforeManaAssessment,
-        'after_mana_assessment': afterManaAssessment,
-        'before_interaction': beforeInteraction,
-        'after_interaction': afterInteraction,
-        'before_consistency': beforeConsistency,
-        'after_consistency': afterConsistency,
         'expected_checks': expectedChecks,
         'failed_checks': failedChecks,
         'warnings': warnings,
@@ -186,14 +163,15 @@ Future<void> main() async {
       return;
     }
 
-    final results = <DeckRunResult>[];
+    final results = <ResolutionRunResult>[];
     final runStartedAt = DateTime.now().toIso8601String();
 
     for (final candidate in selected) {
       print('');
       print(
-          '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===');
-      final result = await _runOptimizationForDeck(
+        '=== ${candidate.commanderName} | ${candidate.resolvedArchetype} ===',
+      );
+      final result = await _runResolutionForDeck(
         apiBaseUrl: apiBaseUrl,
         token: token,
         pool: pool,
@@ -202,9 +180,10 @@ Future<void> main() async {
       results.add(result);
       print(
         '${result.passed ? 'PASSOU' : 'FALHOU'} | '
-        '${result.resultKind} | '
-        'score local ${result.localValidationScore}/100 | '
-        'veredito ${result.localValidationVerdict}',
+        '${result.flowPath} | '
+        'deck final ${result.finalDeckState} | '
+        'lands=${result.finalLandCount} | '
+        'interaction=${result.finalInteraction}',
       );
     }
 
@@ -214,10 +193,15 @@ Future<void> main() async {
       'api_base_url': apiBaseUrl,
       'artifact_dir': _artifactDirPath,
       'total': results.length,
-      'accepted_optimizations':
-          results.where((r) => r.resultKind == 'accepted_optimization').length,
-      'protected_rejections':
-          results.where((r) => r.resultKind == 'protected_rejection').length,
+      'direct_optimizations':
+          results.where((r) => r.flowPath == 'optimized_directly').length,
+      'rebuild_resolutions':
+          results.where((r) => r.flowPath == 'rebuild_guided').length,
+      'safe_no_change':
+          results.where((r) => r.flowPath == 'safe_no_change').length,
+      'unresolved': results
+          .where((r) => r.flowPath == 'unresolved_rejection')
+          .length,
       'passed': results.where((r) => r.passed).length,
       'failed': results.where((r) => !r.passed).length,
       'results': results.map((r) => r.toJson()).toList(),
@@ -232,22 +216,247 @@ Future<void> main() async {
     print('Resumo salvo em $_summaryJsonPath');
     print('Relatorio salvo em $_summaryMdPath');
 
-    final acceptedOptimizations =
-        results.where((r) => r.resultKind == 'accepted_optimization').length;
-
     if (results.any((r) => !r.passed) ||
-        acceptedOptimizations < _minimumAcceptedOptimizations) {
-      if (acceptedOptimizations < _minimumAcceptedOptimizations) {
-        stderr.writeln(
-          'Validacao insuficiente: apenas $acceptedOptimizations otimizacao(oes) aceita(s). '
-          'Minimo esperado: $_minimumAcceptedOptimizations.',
-        );
-      }
+        results.any((r) => r.flowPath == 'unresolved_rejection')) {
       exitCode = 1;
     }
   } finally {
     await db.close();
   }
+}
+
+Future<ResolutionRunResult> _runResolutionForDeck({
+  required String apiBaseUrl,
+  required String token,
+  required Pool pool,
+  required SourceDeckCandidate candidate,
+}) async {
+  final cloneDeckId = await _createDeckClone(
+    apiBaseUrl: apiBaseUrl,
+    token: token,
+    candidate: candidate,
+  );
+
+  final optimizePayload = {
+    'deck_id': cloneDeckId,
+    'archetype': candidate.resolvedArchetype,
+    'bracket': candidate.bracket ?? 2,
+    'keep_theme': true,
+  };
+
+  final optimizeResponse = await _optimizeWithPolling(
+    apiBaseUrl: apiBaseUrl,
+    token: token,
+    payload: optimizePayload,
+  );
+  final optimizeBody = _decodeJson(optimizeResponse);
+
+  String flowPath = 'optimized_directly';
+  int? rebuildStatus;
+  String finalDeckId = cloneDeckId;
+  Map<String, dynamic>? rebuildBody;
+  final warnings = <String>[];
+
+  if (optimizeResponse.statusCode == 200) {
+    final optimizedCards = await _applyRecommendations(
+      pool: pool,
+      originalCards: candidate.cards,
+      responseBody: optimizeBody,
+    );
+
+    final putResponse = await http.put(
+      Uri.parse('$apiBaseUrl/decks/$cloneDeckId'),
+      headers: _jsonHeaders(token),
+      body: jsonEncode({
+        'cards': optimizedCards
+            .map(
+              (card) => {
+                'card_id': card['card_id'],
+                'quantity': card['quantity'],
+                if (card['is_commander'] == true) 'is_commander': true,
+              },
+            )
+            .toList(),
+      }),
+    );
+    if (putResponse.statusCode != 200) {
+      warnings.add('Falha ao salvar optimize direto: ${putResponse.body}');
+    }
+  } else {
+    flowPath = 'unresolved_rejection';
+    final qualityError = optimizeBody['quality_error'] is Map
+        ? (optimizeBody['quality_error'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final qualityCode = qualityError['code']?.toString() ?? '';
+    final outcomeCode = optimizeBody['outcome_code']?.toString() ?? '';
+    final deckState = optimizeBody['deck_state'] is Map
+        ? (optimizeBody['deck_state'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final nextAction = optimizeBody['next_action'] is Map
+        ? (optimizeBody['next_action'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final nextPayload = nextAction['payload'] is Map
+        ? (nextAction['payload'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+
+    if (optimizeResponse.statusCode == 422 &&
+        const {'near_peak', 'no_safe_upgrade_found'}.contains(outcomeCode) &&
+        deckState['status']?.toString() == 'healthy') {
+      flowPath = 'safe_no_change';
+      warnings.add(
+        'Nenhuma troca segura encontrada; deck original preservado em estado saudável.',
+      );
+    } else if (optimizeResponse.statusCode == 422 &&
+        qualityCode == 'OPTIMIZE_NEEDS_REPAIR' &&
+        nextAction['type']?.toString() == 'rebuild_guided') {
+      final rebuildPayload = {
+        'deck_id': nextPayload['deck_id']?.toString() ?? cloneDeckId,
+        'archetype':
+            nextPayload['archetype']?.toString() ?? candidate.resolvedArchetype,
+        'bracket': nextPayload['bracket'] ?? candidate.bracket ?? 2,
+        'theme': nextPayload['theme']?.toString(),
+        'rebuild_scope': nextPayload['rebuild_scope']?.toString() ?? 'auto',
+        'save_mode': nextPayload['save_mode']?.toString() ?? 'draft_clone',
+      };
+
+      final rebuildResponse = await http.post(
+        Uri.parse('$apiBaseUrl/ai/rebuild'),
+        headers: _jsonHeaders(token),
+        body: jsonEncode(rebuildPayload),
+      );
+      rebuildStatus = rebuildResponse.statusCode;
+      rebuildBody = _decodeJson(rebuildResponse);
+
+      if (rebuildResponse.statusCode == 200) {
+        flowPath = 'rebuild_guided';
+        finalDeckId = rebuildBody['draft_deck_id']?.toString() ?? '';
+        if (finalDeckId.isEmpty) {
+          warnings.add('Rebuild retornou 200 sem draft_deck_id.');
+          flowPath = 'unresolved_rejection';
+          finalDeckId = cloneDeckId;
+        }
+      } else {
+        warnings.add(
+          'Falha ao executar rebuild_guided: ${_extractMessage(rebuildBody)}',
+        );
+      }
+    } else {
+      warnings.add(
+        'Rejeicao nao resolvida automaticamente: ${_extractMessage(optimizeBody)}',
+      );
+    }
+  }
+
+  final finalCards = await _loadDeckCards(pool, finalDeckId);
+  final finalValidate = finalDeckId.isNotEmpty
+      ? await http.post(
+          Uri.parse('$apiBaseUrl/decks/$finalDeckId/validate'),
+          headers: _authHeaders(token),
+        )
+      : http.Response('{"error":"final deck ausente"}', 500);
+
+  final finalAnalysis = DeckArchetypeAnalyzer(
+    finalCards,
+    candidate.commanderColors,
+  ).generateAnalysis();
+  final finalState = assessDeckOptimizationState(
+    cards: finalCards,
+    deckAnalysis: finalAnalysis,
+    deckFormat: 'commander',
+    currentTotalCards: _totalCards(finalCards),
+    commanderColorIdentity: candidate.commanderColors.toSet(),
+  );
+
+  final artifactPath = await _writeDeckArtifact(
+    commanderName: candidate.commanderName,
+    payload: {
+      'source_deck_id': candidate.deckId,
+      'source_deck_name': candidate.deckName,
+      'clone_deck_id': cloneDeckId,
+      'final_deck_id': finalDeckId,
+      'optimize_request': optimizePayload,
+      'optimize_status': optimizeResponse.statusCode,
+      'optimize_response': optimizeBody,
+      if (rebuildBody != null) 'rebuild_status': rebuildStatus,
+      if (rebuildBody != null) 'rebuild_response': rebuildBody,
+      'final_validate_status': finalValidate.statusCode,
+      'final_validate_response': _decodeJson(finalValidate),
+      'final_analysis': finalAnalysis,
+      'final_state': finalState.toJson(),
+    },
+  );
+
+  final expectedChecks = <String>[];
+  final failedChecks = <String>[];
+
+  void expectCheck(String description, bool passed) {
+    expectedChecks.add(description);
+    if (!passed) failedChecks.add(description);
+  }
+
+  final finalCardCount = _totalCards(finalCards);
+  final commanderCount = finalCards
+      .where((card) => card['is_commander'] == true)
+      .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  final finalLandCount = _landCount(finalAnalysis);
+  final finalInteraction = _countInteraction(finalAnalysis);
+
+  expectCheck('deck final existe', finalDeckId.isNotEmpty);
+  expectCheck('deck final mantem 100 cartas', finalCardCount == 100);
+  expectCheck('deck final mantem exatamente 1 comandante', commanderCount == 1);
+  expectCheck(
+    'POST /decks/:id/validate aprovou o deck final',
+    finalValidate.statusCode == 200,
+  );
+  expectCheck(
+    'deck final terminou em estado healthy',
+    finalState.status == 'healthy',
+  );
+  expectCheck(
+    'deck final manteve land count saudável',
+    finalLandCount >= 34 && finalLandCount <= 40,
+  );
+
+  if (flowPath == 'rebuild_guided') {
+    final rebuildValidation = rebuildBody?['validation'] is Map
+        ? (rebuildBody!['validation'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final deckStateAfter = rebuildValidation['deck_state_after'] is Map
+        ? (rebuildValidation['deck_state_after'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+
+    expectCheck('rebuild_guided retornou 200', rebuildStatus == 200);
+    expectCheck(
+      'rebuild_guided marcou strict_rules_valid',
+      rebuildValidation['strict_rules_valid'] == true,
+    );
+    expectCheck(
+      'rebuild_guided retornou deck_state_after healthy',
+      deckStateAfter['status']?.toString() == 'healthy',
+    );
+  }
+
+  return ResolutionRunResult(
+    commanderName: candidate.commanderName,
+    sourceDeckId: candidate.deckId,
+    sourceDeckName: candidate.deckName,
+    cloneDeckId: cloneDeckId,
+    finalDeckId: finalDeckId,
+    archetype: candidate.resolvedArchetype,
+    bracket: candidate.bracket ?? 2,
+    flowPath: flowPath,
+    optimizeStatus: optimizeResponse.statusCode,
+    rebuildStatus: rebuildStatus,
+    finalDeckValid: finalValidate.statusCode == 200,
+    finalDeckState: finalState.status,
+    finalAverageCmc: _parseDouble(finalAnalysis['average_cmc']),
+    finalLandCount: finalLandCount,
+    finalInteraction: finalInteraction,
+    savedArtifactPath: artifactPath,
+    expectedChecks: expectedChecks,
+    failedChecks: failedChecks,
+    warnings: warnings,
+  );
 }
 
 Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
@@ -347,10 +556,7 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
       WHERE d.deleted_at IS NULL
         AND LOWER(d.format) = 'commander'
         AND stats.total_cards = 100
-        AND d.name NOT LIKE 'Optimization Validation - %'
-        AND d.name NOT LIKE 'Resolution Validation - %'
-        AND d.name NOT LIKE 'Rebuild Draft - %'
-        AND d.name NOT LIKE 'Rebuild Preview - %'
+$_generatedDeckNameFilters
       ORDER BY d.created_at DESC NULLS LAST
       LIMIT 120
     '''),
@@ -371,10 +577,7 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
     final cards = await _loadDeckCards(pool, deckId);
     if (cards.isEmpty) continue;
 
-    final total = cards.fold<int>(
-      0,
-      (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
-    );
+    final total = _totalCards(cards);
     final hasCommander = cards.any((card) => card['is_commander'] == true);
     if (total != 100 || !hasCommander) continue;
 
@@ -396,7 +599,10 @@ Future<List<SourceDeckCandidate>> _loadSourceCandidates(Pool pool) async {
 }
 
 Future<List<Map<String, dynamic>>> _loadDeckCards(
-    Pool pool, String deckId) async {
+  Pool pool,
+  String deckId,
+) async {
+  if (deckId.isEmpty) return const <Map<String, dynamic>>[];
   final result = await pool.execute(
     Sql.named('''
       SELECT
@@ -469,271 +675,6 @@ List<SourceDeckCandidate> _selectThreeCandidates(
   return selected.take(3).toList();
 }
 
-Future<DeckRunResult> _runOptimizationForDeck({
-  required String apiBaseUrl,
-  required String token,
-  required Pool pool,
-  required SourceDeckCandidate candidate,
-}) async {
-  final cloneDeckId = await _createDeckClone(
-    apiBaseUrl: apiBaseUrl,
-    token: token,
-    candidate: candidate,
-  );
-
-  final optimizePayload = {
-    'deck_id': cloneDeckId,
-    'archetype': candidate.resolvedArchetype,
-    'bracket': candidate.bracket ?? 2,
-    'keep_theme': true,
-  };
-
-  final optimizeResponse = await _optimizeWithPolling(
-    apiBaseUrl: apiBaseUrl,
-    token: token,
-    payload: optimizePayload,
-  );
-
-  final optimizeBody = _decodeJson(optimizeResponse);
-  final artifactPath = await _writeDeckArtifact(
-    commanderName: candidate.commanderName,
-    payload: {
-      'source_deck_id': candidate.deckId,
-      'source_deck_name': candidate.deckName,
-      'clone_deck_id': cloneDeckId,
-      'optimize_request': optimizePayload,
-      'optimize_status': optimizeResponse.statusCode,
-      'optimize_response': optimizeBody,
-    },
-  );
-
-  if (optimizeResponse.statusCode != 200) {
-    final qualityError = optimizeBody['quality_error'] as Map<String, dynamic>?;
-    final qualityCode = qualityError?['code']?.toString() ?? '';
-    final protectedRejection = optimizeResponse.statusCode == 422 &&
-        {
-          'OPTIMIZE_NEEDS_REPAIR',
-          'OPTIMIZE_NO_SAFE_SWAPS',
-          'OPTIMIZE_QUALITY_REJECTED',
-          'OPTIMIZE_NO_ACTIONABLE_SWAPS',
-        }.contains(qualityCode);
-
-    return DeckRunResult(
-      resultKind: protectedRejection ? 'protected_rejection' : 'failure',
-      commanderName: candidate.commanderName,
-      sourceDeckId: candidate.deckId,
-      sourceDeckName: candidate.deckName,
-      cloneDeckId: cloneDeckId,
-      archetype: candidate.resolvedArchetype,
-      bracket: candidate.bracket ?? 2,
-      optimizeStatus: optimizeResponse.statusCode,
-      optimizeMode: optimizeBody['mode']?.toString() ?? 'unknown',
-      savedArtifactPath: artifactPath,
-      savedDeckValid: protectedRejection,
-      localValidationScore: 0,
-      localValidationVerdict:
-          protectedRejection ? 'quality_rejected' : 'reprovado',
-      responseValidationScore: null,
-      responseValidationVerdict: null,
-      beforeAverageCmc: 0,
-      afterAverageCmc: 0,
-      beforeManaAssessment: '',
-      afterManaAssessment: '',
-      beforeInteraction: 0,
-      afterInteraction: 0,
-      beforeConsistency: 0,
-      afterConsistency: 0,
-      expectedChecks: protectedRejection
-          ? const [
-              'o backend recusou a otimizacao insegura em vez de retornar sucesso ruim'
-            ]
-          : const [],
-      failedChecks: protectedRejection
-          ? const []
-          : ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
-      warnings: [
-        if (protectedRejection)
-          'Rejeicao protegida pelo gate de qualidade: ${qualityError?['message'] ?? qualityCode}',
-        ...((qualityError?['reasons'] as List?)?.map((item) => '$item') ??
-            const Iterable<String>.empty()),
-        _extractMessage(optimizeBody),
-      ],
-      optimizeResponse: optimizeBody,
-    );
-  }
-
-  final optimizedCards = await _applyRecommendations(
-    pool: pool,
-    originalCards: candidate.cards,
-    responseBody: optimizeBody,
-  );
-
-  final putResponse = await http.put(
-    Uri.parse('$apiBaseUrl/decks/$cloneDeckId'),
-    headers: _jsonHeaders(token),
-    body: jsonEncode({
-      'cards': optimizedCards
-          .map(
-            (card) => {
-              'card_id': card['card_id'],
-              'quantity': card['quantity'],
-              if (card['is_commander'] == true) 'is_commander': true,
-            },
-          )
-          .toList(),
-    }),
-  );
-
-  final validateResponse = await http.post(
-    Uri.parse('$apiBaseUrl/decks/$cloneDeckId/validate'),
-    headers: _authHeaders(token),
-  );
-
-  final preAnalysis = optimize_route.DeckArchetypeAnalyzer(
-          candidate.cards, candidate.commanderColors)
-      .generateAnalysis();
-  final postAnalysis = optimize_route.DeckArchetypeAnalyzer(
-          optimizedCards, candidate.commanderColors)
-      .generateAnalysis();
-
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
-  final validator = OptimizationValidator(openAiKey: env['OPENAI_API_KEY']);
-  final localValidation = await validator.validate(
-    originalDeck: candidate.cards,
-    optimizedDeck: optimizedCards,
-    removals: _extractNames(optimizeBody['removals']),
-    additions: _extractNames(optimizeBody['additions']),
-    commanders: [candidate.commanderName],
-    archetype: candidate.resolvedArchetype,
-  );
-
-  final responseValidation = (optimizeBody['post_analysis']
-      as Map<String, dynamic>?)?['validation'] as Map<String, dynamic>?;
-
-  final expectedChecks = <String>[];
-  final failedChecks = <String>[];
-
-  final finalCardCount = optimizedCards.fold<int>(
-    0,
-    (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
-  );
-  final commanderCount = optimizedCards
-      .where((card) => card['is_commander'] == true)
-      .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
-  final beforeAverageCmc = _parseDouble(preAnalysis['average_cmc']);
-  final afterAverageCmc = _parseDouble(postAnalysis['average_cmc']);
-  final beforeManaAssessment =
-      preAnalysis['mana_base_assessment']?.toString() ?? '';
-  final afterManaAssessment =
-      postAnalysis['mana_base_assessment']?.toString() ?? '';
-  final beforeInteraction = _countInteraction(preAnalysis);
-  final afterInteraction = _countInteraction(postAnalysis);
-  final beforeConsistency = localValidation.monteCarlo.before.consistencyScore;
-  final afterConsistency = localValidation.monteCarlo.after.consistencyScore;
-
-  void expectCheck(String description, bool passed) {
-    expectedChecks.add(description);
-    if (!passed) failedChecks.add(description);
-  }
-
-  expectCheck('deck final mantem 100 cartas', finalCardCount == 100);
-  expectCheck('deck final mantem exatamente 1 comandante', commanderCount == 1);
-  expectCheck('PUT /decks/:id para salvar resultado retornou sucesso',
-      putResponse.statusCode == 200);
-  expectCheck('POST /decks/:id/validate aprovou o deck salvo',
-      validateResponse.statusCode == 200);
-  expectCheck('Validation local fechou como aprovado',
-      localValidation.verdict == 'aprovado');
-  expectCheck('Validation local score >= 65', localValidation.score >= 65);
-  expectCheck(
-    'Validation retornada pela rota fechou como aprovado',
-    (responseValidation?['verdict']?.toString() ?? '') == 'aprovado',
-  );
-  expectCheck(
-    'Validation retornada pela rota score >= 65',
-    ((responseValidation?['validation_score'] as num?)?.toInt() ?? 0) >= 65,
-  );
-  expectCheck(
-    'Consistencia nao piorou',
-    afterConsistency >= (beforeConsistency - 1),
-  );
-
-  switch (candidate.resolvedArchetype) {
-    case 'aggro':
-      expectCheck('Aggro reduz ou mantem a curva media',
-          afterAverageCmc <= beforeAverageCmc);
-      expectCheck(
-        'Aggro melhora turn2 play rate',
-        localValidation.monteCarlo.after.turn2PlayRate >=
-            localValidation.monteCarlo.before.turn2PlayRate,
-      );
-      break;
-    case 'control':
-      expectCheck(
-        'Control mantem ou melhora interacao',
-        afterInteraction >= beforeInteraction,
-      );
-      expectCheck(
-        'Control nao piora a base de mana',
-        !_isManaAssessmentWorse(beforeManaAssessment, afterManaAssessment),
-      );
-      break;
-    case 'midrange':
-      expectCheck('Midrange reduz ou mantem a curva media',
-          afterAverageCmc <= beforeAverageCmc + 0.05);
-      expectCheck(
-        'Midrange preserva ramp/removal',
-        (localValidation.functional.roleDelta['ramp'] ?? 0) >= 0 &&
-            (localValidation.functional.roleDelta['removal'] ?? 0) >= 0,
-      );
-      break;
-    default:
-      expectCheck(
-        'Arquitetura generica mantem score local >= 45',
-        localValidation.score >= 45,
-      );
-      break;
-  }
-
-  return DeckRunResult(
-    resultKind: 'accepted_optimization',
-    commanderName: candidate.commanderName,
-    sourceDeckId: candidate.deckId,
-    sourceDeckName: candidate.deckName,
-    cloneDeckId: cloneDeckId,
-    archetype: candidate.resolvedArchetype,
-    bracket: candidate.bracket ?? 2,
-    optimizeStatus: optimizeResponse.statusCode,
-    optimizeMode: optimizeBody['mode']?.toString() ?? 'optimize',
-    savedArtifactPath: artifactPath,
-    savedDeckValid: validateResponse.statusCode == 200,
-    localValidationScore: localValidation.score,
-    localValidationVerdict: localValidation.verdict,
-    responseValidationScore: responseValidation?['validation_score'] as int?,
-    responseValidationVerdict: responseValidation?['verdict']?.toString(),
-    beforeAverageCmc: beforeAverageCmc,
-    afterAverageCmc: afterAverageCmc,
-    beforeManaAssessment: beforeManaAssessment,
-    afterManaAssessment: afterManaAssessment,
-    beforeInteraction: beforeInteraction,
-    afterInteraction: afterInteraction,
-    beforeConsistency: beforeConsistency.toDouble(),
-    afterConsistency: afterConsistency.toDouble(),
-    expectedChecks: expectedChecks,
-    failedChecks: failedChecks,
-    warnings: [
-      ...localValidation.warnings,
-      ...((optimizeBody['validation_warnings'] as List?)?.map((e) => '$e') ??
-          const Iterable<String>.empty()),
-      if (putResponse.statusCode != 200)
-        'Falha ao salvar deck: ${putResponse.body}',
-      if (validateResponse.statusCode != 200)
-        'Falha no validate: ${validateResponse.body}',
-    ],
-    optimizeResponse: optimizeBody,
-  );
-}
-
 Future<String> _createDeckClone({
   required String apiBaseUrl,
   required String token,
@@ -744,9 +685,9 @@ Future<String> _createDeckClone({
     headers: _jsonHeaders(token),
     body: jsonEncode({
       'name':
-          'Optimization Validation - ${candidate.commanderName} - ${DateTime.now().millisecondsSinceEpoch}',
+          'Resolution Validation - ${candidate.commanderName} - ${DateTime.now().millisecondsSinceEpoch}',
       'format': 'commander',
-      'description': 'Deck clone para validacao real de optimize',
+      'description': 'Deck clone para validacao do fluxo completo de optimize/rebuild',
       'is_public': false,
       'cards': candidate.cards
           .map(
@@ -794,7 +735,7 @@ Future<http.Response> _optimizeWithPolling({
     throw Exception('Resposta 202 sem job_id: ${response.body}');
   }
 
-  for (var poll = 0; poll < 150; poll++) {
+  for (var poll = 0; poll < 180; poll++) {
     await Future<void>.delayed(const Duration(seconds: 2));
     final pollResponse = await http.get(
       Uri.parse('$apiBaseUrl/ai/optimize/jobs/$jobId'),
@@ -818,26 +759,6 @@ Future<http.Response> _optimizeWithPolling({
     jsonEncode({'error': 'Polling timeout para optimize job'}),
     500,
   );
-}
-
-Map<String, dynamic> _decodeJson(http.Response response) {
-  final body = response.body.trim();
-  if (body.isEmpty) return <String, dynamic>{};
-  final decoded = jsonDecode(body);
-  if (decoded is Map<String, dynamic>) return decoded;
-  return {'value': decoded};
-}
-
-Future<String> _writeDeckArtifact({
-  required String commanderName,
-  required Map<String, dynamic> payload,
-}) async {
-  final slug = _slugify(commanderName);
-  final path = '$_artifactDirPath/$slug.json';
-  await File(path).writeAsString(
-    const JsonEncoder.withIndent('  ').convert(payload),
-  );
-  return path;
 }
 
 Future<List<Map<String, dynamic>>> _applyRecommendations({
@@ -971,23 +892,44 @@ Future<List<Map<String, dynamic>>> _applyRecommendations({
   return next;
 }
 
-List<String> _extractNames(Object? raw) {
-  if (raw is! List) return const <String>[];
-  return raw
-      .map((item) => item.toString())
-      .where((item) => item.isNotEmpty)
-      .toList();
+Map<String, dynamic> _decodeJson(http.Response response) {
+  final body = response.body.trim();
+  if (body.isEmpty) return <String, dynamic>{};
+  final decoded = jsonDecode(body);
+  if (decoded is Map<String, dynamic>) return decoded;
+  return {'value': decoded};
 }
 
-double _parseDouble(Object? value) {
-  if (value is num) return value.toDouble();
-  return double.tryParse('${value ?? ''}') ?? 0.0;
+Future<String> _writeDeckArtifact({
+  required String commanderName,
+  required Map<String, dynamic> payload,
+}) async {
+  final slug = _slugify(commanderName);
+  final path = '$_artifactDirPath/$slug.json';
+  await File(path).writeAsString(
+    const JsonEncoder.withIndent('  ').convert(payload),
+  );
+  return path;
+}
+
+int _totalCards(List<Map<String, dynamic>> cards) {
+  return cards.fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+}
+
+int _landCount(Map<String, dynamic> analysis) {
+  final types = (analysis['type_distribution'] as Map<String, dynamic>?) ?? {};
+  return (types['lands'] as int?) ?? 0;
 }
 
 int _countInteraction(Map<String, dynamic> analysis) {
   final types = (analysis['type_distribution'] as Map<String, dynamic>?) ?? {};
   return ((types['instants'] as int?) ?? 0) +
       ((types['sorceries'] as int?) ?? 0);
+}
+
+double _parseDouble(Object? value) {
+  if (value is num) return value.toDouble();
+  return double.tryParse('${value ?? ''}') ?? 0.0;
 }
 
 String? _normalizeArchetype(String? archetype) {
@@ -999,12 +941,6 @@ String? _normalizeArchetype(String? archetype) {
     'stax' || 'combo' || 'aristocrats' || 'tribal' || 'voltron' => 'midrange',
     _ => null,
   };
-}
-
-bool _isManaAssessmentWorse(String before, String after) {
-  final beforeHasIssue = before.toLowerCase().contains('falta mana');
-  final afterHasIssue = after.toLowerCase().contains('falta mana');
-  return !beforeHasIssue && afterHasIssue;
 }
 
 String _slugify(String value) {
@@ -1033,38 +969,18 @@ String _extractMessage(Map<String, dynamic> body) {
 String _buildMarkdownReport(Map<String, dynamic> summary) {
   final results =
       (summary['results'] as List).whereType<Map<String, dynamic>>().toList();
-  String formatValidation(Map<String, dynamic> result, bool isLocal) {
-    final resultKind = result['result_kind']?.toString() ?? '';
-    if (resultKind == 'protected_rejection') {
-      return isLocal ? 'n/d - quality_rejected' : 'n/d';
-    }
-
-    final scoreKey =
-        isLocal ? 'local_validation_score' : 'response_validation_score';
-    final verdictKey =
-        isLocal ? 'local_validation_verdict' : 'response_validation_verdict';
-    final score = result[scoreKey];
-    final verdict = result[verdictKey];
-    if (score == null || verdict == null) return 'n/d';
-    return '$score/100 - $verdict';
-  }
-
-  String formatPair(
-      Map<String, dynamic> result, String beforeKey, String afterKey) {
-    final resultKind = result['result_kind']?.toString() ?? '';
-    if (resultKind == 'protected_rejection') return 'n/d';
-    return '${result[beforeKey]} -> ${result[afterKey]}';
-  }
 
   final buffer = StringBuffer()
-    ..writeln('# Relatorio de Otimizacao Real - 3 Decks Commander')
+    ..writeln('# Relatorio de Resolucao Real - 3 Decks Commander')
     ..writeln()
     ..writeln('- Gerado em: `${summary['generated_at']}`')
     ..writeln('- API: `${summary['api_base_url']}`')
     ..writeln('- Artefatos: `${summary['artifact_dir']}`')
     ..writeln('- Total: `${summary['total']}`')
-    ..writeln('- Otimizacoes aceitas: `${summary['accepted_optimizations']}`')
-    ..writeln('- Rejeicoes protegidas: `${summary['protected_rejections']}`')
+    ..writeln('- Otimizacoes diretas: `${summary['direct_optimizations']}`')
+    ..writeln('- Resolvidos via rebuild: `${summary['rebuild_resolutions']}`')
+    ..writeln('- Sem troca segura: `${summary['safe_no_change']}`')
+    ..writeln('- Nao resolvidos: `${summary['unresolved']}`')
     ..writeln('- Passaram: `${summary['passed']}`')
     ..writeln('- Falharam: `${summary['failed']}`')
     ..writeln()
@@ -1077,21 +993,20 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
       ..writeln()
       ..writeln('- Source deck: `${result['source_deck_id']}`')
       ..writeln('- Clone deck: `${result['clone_deck_id']}`')
-      ..writeln('- Tipo de resultado: `${result['result_kind']}`')
+      ..writeln('- Deck final: `${result['final_deck_id']}`')
+      ..writeln('- Caminho: `${result['flow_path']}`')
       ..writeln('- Archetype usado: `${result['archetype']}`')
       ..writeln('- Optimize status: `${result['optimize_status']}`')
-      ..writeln('- Deck salvo valido: `${result['saved_deck_valid']}`')
-      ..writeln('- Validation local: `${formatValidation(result, true)}`')
-      ..writeln('- Validation da rota: `${formatValidation(result, false)}`')
-      ..writeln(
-          '- CMC medio: `${formatPair(result, 'before_average_cmc', 'after_average_cmc')}`')
-      ..writeln(
-          '- Interacao: `${formatPair(result, 'before_interaction', 'after_interaction')}`')
-      ..writeln(
-          '- Consistencia: `${formatPair(result, 'before_consistency', 'after_consistency')}`')
+      ..writeln('- Rebuild status: `${result['rebuild_status'] ?? 'n/d'}`')
+      ..writeln('- Deck final valido: `${result['final_deck_valid']}`')
+      ..writeln('- Deck final healthy: `${result['final_deck_state']}`')
+      ..writeln('- CMC medio final: `${result['final_average_cmc']}`')
+      ..writeln('- Terrenos finais: `${result['final_land_count']}`')
+      ..writeln('- Interacao final: `${result['final_interaction']}`')
       ..writeln('- Artifact: `${result['saved_artifact_path']}`')
       ..writeln(
-          '- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`')
+        '- Status final: `${result['passed'] == true ? 'PASSOU' : 'FALHOU'}`',
+      )
       ..writeln();
 
     final failedChecks =

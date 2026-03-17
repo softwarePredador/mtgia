@@ -1,0 +1,797 @@
+{
+  "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
+  "source_deck_name": "Deck incremental",
+  "clone_deck_id": "7e2d21a4-02cf-4061-b25f-d74c1fe1b1e4",
+  "final_deck_id": "abd59ccd-8883-48e9-ae1b-4bccaadacde3",
+  "optimize_request": {
+    "deck_id": "7e2d21a4-02cf-4061-b25f-d74c1fe1b1e4",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.",
+    "quality_error": {
+      "code": "OPTIMIZE_NEEDS_REPAIR",
+      "message": "O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.",
+      "reasons": [
+        "O deck está com 99 terrenos, muito acima do intervalo saudável para commander.",
+        "O deck tem apenas 1 não-terrenos, insuficiente para sustainar o plano do comandante.",
+        "A base de mana ainda não cobre as cores exigidas pelo comandante.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "O comandante pede instants/sorceries, mas o deck só tem 0 cartas desse tipo.",
+        "O deck ainda não tem massa crítica suficiente para o arquétipo detectado."
+      ],
+      "recommended_mode": "repair",
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [
+          "Cortar aproximadamente 63 terrenos excedentes antes de avaliar upgrades finos.",
+          "Trocar terrenos incolores por fontes U até estabilizar a base.",
+          "Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.",
+          "Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações."
+        ],
+        "role_targets": {
+          "instants_or_sorceries_to_add": 24
+        },
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "next_action": {
+      "type": "rebuild_guided",
+      "endpoint": "/ai/rebuild",
+      "payload": {
+        "deck_id": "7e2d21a4-02cf-4061-b25f-d74c1fe1b1e4",
+        "bracket": 2,
+        "archetype": "midrange",
+        "theme": "tokens",
+        "rebuild_scope": "auto",
+        "save_mode": "draft_clone"
+      }
+    },
+    "mode": "optimize",
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.00",
+      "type_distribution": {
+        "creatures": 1,
+        "instants": 0,
+        "sorceries": 0,
+        "enchantments": 0,
+        "artifacts": 0,
+        "planeswalkers": 0,
+        "lands": 99,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "Terrenos em excesso (Tem 99, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
+      "archetype_confidence": "baixa"
+    },
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "match_score": 2.0,
+      "core_cards": [
+        "Talrand, Sky Summoner"
+      ]
+    },
+    "deck_state": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 100,
+      "reasons": [
+        "O deck está com 99 terrenos, muito acima do intervalo saudável para commander.",
+        "O deck tem apenas 1 não-terrenos, insuficiente para sustainar o plano do comandante.",
+        "A base de mana ainda não cobre as cores exigidas pelo comandante.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "O comandante pede instants/sorceries, mas o deck só tem 0 cartas desse tipo.",
+        "O deck ainda não tem massa crítica suficiente para o arquétipo detectado."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [
+          "Cortar aproximadamente 63 terrenos excedentes antes de avaliar upgrades finos.",
+          "Trocar terrenos incolores por fontes U até estabilizar a base.",
+          "Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.",
+          "Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações."
+        ],
+        "role_targets": {
+          "instants_or_sorceries_to_add": 24
+        },
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "outcome_code": "needs_repair"
+  },
+  "rebuild_status": 200,
+  "rebuild_response": {
+    "mode": "rebuild_guided",
+    "outcome_code": "rebuild_created",
+    "save_mode": "draft_clone",
+    "applied_to_original": false,
+    "source_deck_id": "7e2d21a4-02cf-4061-b25f-d74c1fe1b1e4",
+    "draft_deck_id": "abd59ccd-8883-48e9-ae1b-4bccaadacde3",
+    "draft_deck": {
+      "id": "abd59ccd-8883-48e9-ae1b-4bccaadacde3",
+      "name": "Rebuild Draft - Resolution Validation - Talrand, Sky Summoner - 1773767971271",
+      "format": "commander",
+      "description": "Draft de rebuild_guided criado a partir de 7e2d21a4-02cf-4061-b25f-d74c1fe1b1e4 | theme=tokens | scope=full_non_commander_rebuild",
+      "archetype": "midrange",
+      "bracket": 2,
+      "is_public": false,
+      "created_at": "2026-03-17T17:19:43.670880Z"
+    },
+    "rebuild_scope_requested": "auto",
+    "rebuild_scope_selected": "full_non_commander_rebuild",
+    "rebuild_reason": [
+      "Keep rate calculado em 0% do shell atual.",
+      "Optimize classificou o deck como needs_repair antes do rebuild.",
+      "A maior parte da lista atual nao sustenta o plano do comandante; rebuild completo dos slots nao-comandante selecionado."
+    ],
+    "seed": {
+      "commander": "Talrand, Sky Summoner",
+      "requested_archetype": "midrange",
+      "resolved_archetype": "midrange",
+      "requested_theme": "tokens",
+      "resolved_theme": "tokens",
+      "bracket": 2
+    },
+    "keep_summary": {
+      "kept_cards_count": 1,
+      "kept_cards": [
+        "Talrand, Sky Summoner"
+      ],
+      "replaced_slots": 99,
+      "keep_rate": 0.0
+    },
+    "target_profile": {
+      "total_cards": 100,
+      "land_count": 35,
+      "ramp": 10,
+      "draw_selection": 12,
+      "interaction": 12,
+      "wipes": 2,
+      "payoffs": 8,
+      "wincons": 4,
+      "raw_category_targets": {}
+    },
+    "deck_analysis_before": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.00",
+      "type_distribution": {
+        "creatures": 1,
+        "instants": 0,
+        "sorceries": 0,
+        "enchantments": 0,
+        "artifacts": 0,
+        "planeswalkers": 0,
+        "lands": 99,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "Terrenos em excesso (Tem 99, ideal <= 40). Falta mana U (Tem 0 fontes, ideal > 15)",
+      "archetype_confidence": "baixa"
+    },
+    "post_analysis": {
+      "detected_archetype": "combo",
+      "average_cmc": "2.80",
+      "type_distribution": {
+        "creatures": 10,
+        "instants": 27,
+        "sorceries": 12,
+        "enchantments": 2,
+        "artifacts": 13,
+        "planeswalkers": 1,
+        "lands": 35,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "deck_state_before": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 100,
+      "reasons": [
+        "O deck está com 99 terrenos, muito acima do intervalo saudável para commander.",
+        "O deck tem apenas 1 não-terrenos, insuficiente para sustainar o plano do comandante.",
+        "A base de mana ainda não cobre as cores exigidas pelo comandante.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "O comandante pede instants/sorceries, mas o deck só tem 0 cartas desse tipo.",
+        "O deck ainda não tem massa crítica suficiente para o arquétipo detectado."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [
+          "Cortar aproximadamente 63 terrenos excedentes antes de avaliar upgrades finos.",
+          "Trocar terrenos incolores por fontes U até estabilizar a base.",
+          "Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.",
+          "Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações."
+        ],
+        "role_targets": {
+          "instants_or_sorceries_to_add": 24
+        },
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "deck_state_after": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "validation": {
+      "strict_rules_valid": true,
+      "deck_state_after": {
+        "status": "healthy",
+        "recommended_mode": "optimize",
+        "suggested_scope": "micro_swaps",
+        "severity_score": 0,
+        "reasons": []
+      }
+    },
+    "warnings": [],
+    "source_summary": {
+      "used_average_deck_seed": true,
+      "used_edhrec_top_cards": true,
+      "used_cached_commander_profile": false,
+      "candidate_pool_size": 225
+    },
+    "rebuilt_cards": [
+      {
+        "card_id": "399bc563-ee94-4143-9bf8-02545a144d7a",
+        "name": "Talrand, Sky Summoner",
+        "quantity": 1,
+        "is_commander": true
+      },
+      {
+        "card_id": "6c2c0309-dd07-4e1e-93c7-38551249db69",
+        "name": "Aetherize",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "215337b8-d3e3-4db0-9c57-6f109a9c06be",
+        "name": "Alandra, Sky Dreamer",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "name": "An Offer You Can't Refuse",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1a007987-3375-47e7-97d5-be3c48b66b75",
+        "name": "Ancient Tomb",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a08ff39e-2b24-4611-a590-bc07fddc76b3",
+        "name": "Anticipate",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "name": "Arcane Denial",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "name": "Arcane Signet",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "2952d139-9134-4586-8806-d30d55effaf6",
+        "name": "Archmage Emeritus",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1d2bcbaf-de31-42ac-8f17-513910a53693",
+        "name": "Baral, Chief of Compliance",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "name": "Brainstorm",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9f332672-4462-4ee4-a9e1-7030dadcbd5e",
+        "name": "Candlekeep Inspiration",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b09b96d5-778c-4be6-824c-93aa12999b53",
+        "name": "Castle Vantress",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f4daf4d7-7c95-4579-af9c-afb31b2a16a7",
+        "name": "Consider",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "01382c08-32b3-4f15-9f45-2ef857fd8b58",
+        "name": "Counterspell",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "84c84d70-4b9b-4581-b037-266d8da36a05",
+        "name": "Cryptic Command",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "29faca45-5f76-4500-a947-dcf2aa58dec6",
+        "name": "Curse of the Swine",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "0f2dbb67-fcef-4ced-9b66-e026d05965b1",
+        "name": "Cyclonic Rift",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e9d5c411-4d71-4e2e-8d01-d9fc6f528ce9",
+        "name": "Decanter of Endless Water",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "cfd21abf-ecfe-4c24-82cb-1e0b2aaffbfb",
+        "name": "Deep Analysis",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c2d3426a-b273-4ccc-b625-76043bc78533",
+        "name": "Desert of the Mindful",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "0c128e07-820a-40bf-9a01-01df2681e7ee",
+        "name": "Dig Through Time",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "82c4ed2b-09ef-486c-8ebc-b471a58e5ab6",
+        "name": "Dramatic Reversal",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+        "name": "Fact or Fiction",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8a680377-1f33-4c58-a1a5-4696cdfdeed0",
+        "name": "Favorable Winds",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "name": "Fellwar Stone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5d44c829-d2df-442b-88d1-9c15b0000e6c",
+        "name": "Frantic Search",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "deb3546f-3c76-4ee3-b183-12686288fb0d",
+        "name": "Halimar Depths",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "0b917683-2833-43dc-873c-47bd016e1523",
+        "name": "Haughty Djinn",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ac1c464d-773e-459f-bfbf-536babd20c79",
+        "name": "Heraldic Banner",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "3c92a261-3525-4cd5-9bb2-e31ef611a2c8",
+        "name": "High Tide",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4ffc23e2-cd23-49cc-ac7c-ec63ed9ad2fc",
+        "name": "Impulse",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "name": "Island",
+        "quantity": 18,
+        "is_commander": false
+      },
+      {
+        "card_id": "40ca51ca-90c6-442f-acd4-a3911f9c14e9",
+        "name": "Isochron Scepter",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "76213edd-8308-4f29-abbe-3148aba0c944",
+        "name": "Jace's Sanctum",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "name": "Lightning Greaves",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "695f7a10-bb05-4387-95e7-fe325f43a0d8",
+        "name": "Lonely Sandbar",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6eef1c2a-605d-4ec4-9784-3353256a11a8",
+        "name": "Midnight Clock",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "name": "Mind Stone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "081d4c34-3826-4630-a67c-706171051980",
+        "name": "Mistrise Village",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "dd43e77b-99c9-4726-b9d2-ebf410690381",
+        "name": "Mocking Sprite",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4d08f318-d62c-4de3-b163-a5fb2fcb27b0",
+        "name": "Murmuring Mystic",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d71b5612-0439-4204-bd4b-1a6d5facb0dd",
+        "name": "Myriad Landscape",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "307ab3d4-427d-48cd-9676-498f12ea181b",
+        "name": "Mystic Sanctuary",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+        "name": "Mystical Tutor",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "62f5207c-5f02-46b7-a204-25a22dc0e523",
+        "name": "Narset's Reversal",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a145d081-4887-445a-bf1e-0a9bc6b0b1ec",
+        "name": "Narset, Parter of Veils",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+        "name": "Negate",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a8c25880-407e-41d4-a579-e5a389fb04e7",
+        "name": "Octavia, Living Thesis",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "96cd1896-d7c8-4057-95c3-df5b958cd553",
+        "name": "Opt",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "204d2f5d-3c01-4ae5-a7cc-cf193f96c510",
+        "name": "Otawara, Soaring City",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "name": "Ponder",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e2290699-6527-4611-8957-1a1f0f88b7ff",
+        "name": "Pongify",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+        "name": "Preordain",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4b506563-2371-4bff-9bec-b12fb4a9c407",
+        "name": "Rapid Hybridization",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fa7f572b-d8f0-48d1-bb73-548cc1aec092",
+        "name": "Reality Shift",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a239b583-5f72-40a2-80af-e250e2858449",
+        "name": "Reliquary Tower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d8a0f47d-d026-4821-8564-ec534d87b9f8",
+        "name": "Remote Isle",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "84e2e339-5207-4fa4-b4e4-f1e404ae7184",
+        "name": "Rewind",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "cb0cab93-7a48-48dd-8bc9-5ef3656caf59",
+        "name": "Riptide Laboratory",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "225da33b-f0e2-470b-b19b-6fc208a2f61f",
+        "name": "Rise from the Tides",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c7d98320-5a74-418e-a6c6-6e9ff61f3e22",
+        "name": "Rivendell",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5531fa58-0120-46f9-a046-14aad924670f",
+        "name": "Sapphire Medallion",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "327f735c-a77b-4896-bb9c-f95b470205af",
+        "name": "Scavenger Grounds",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "80731d3c-0a9c-43b4-af33-73bfc0ff251f",
+        "name": "Serum Visions",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9295761d-1f95-4417-a365-1ba77c64b2ad",
+        "name": "Sky Diamond",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8d3d4549-c2e8-47e4-9334-6b67eeb5f401",
+        "name": "Sleight of Hand",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a6855327-a292-41d8-b178-2a3a90a545da",
+        "name": "Snap",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "083da955-e31c-4d6b-a0f1-dfdf1569d9d8",
+        "name": "Sol Ring",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "292aa5f8-18b7-4499-84ad-01f32d1433f0",
+        "name": "Solve the Equation",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f59259be-c722-4fcf-acf4-bbcce2a02d37",
+        "name": "Stormtide Leviathan",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "name": "Swiftfoot Boots",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "16e9f261-342e-4c7c-a361-d89346b10c17",
+        "name": "Telling Time",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fbecc3e5-ea27-438e-87a8-e58752a97de1",
+        "name": "Temple of the False God",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e9607152-a748-4629-900a-c0f32c00c778",
+        "name": "Terrain Generator",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+        "name": "Thought Vessel",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "60a5660f-de7c-4f02-9e86-32e06f33e788",
+        "name": "Thunderclap Drake",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "063b65aa-dc36-4ab9-ad02-c58a6d8494e2",
+        "name": "Treasure Cruise",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "92bdd08e-d438-41c3-8f1d-e66041bf83a7",
+        "name": "Unwind",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9d65f34d-bc5e-4979-8f58-2b52f7496d6c",
+        "name": "War Room",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8fac796c-f3c9-440b-92e9-b51cb9501a8b",
+        "name": "Windfall",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c4372cdd-7eb3-41ca-b7d7-d66eb04835e2",
+        "name": "Winged Words",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "24f67d55-9205-4315-a3b7-99215a2f905d",
+        "name": "Wizard's Retort",
+        "quantity": 1,
+        "is_commander": false
+      }
+    ],
+    "next_action": {
+      "type": "review_rebuild_draft",
+      "applied_to_original": false,
+      "draft_deck_id": "abd59ccd-8883-48e9-ae1b-4bccaadacde3"
+    }
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "abd59ccd-8883-48e9-ae1b-4bccaadacde3"
+  },
+  "final_analysis": {
+    "detected_archetype": "combo",
+    "average_cmc": "1.85",
+    "type_distribution": {
+      "creatures": 10,
+      "instants": 27,
+      "sorceries": 12,
+      "enchantments": 2,
+      "artifacts": 13,
+      "planeswalkers": 1,
+      "lands": 35,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

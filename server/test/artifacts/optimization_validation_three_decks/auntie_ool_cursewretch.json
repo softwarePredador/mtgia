@@ -1,9 +1,9 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
+  "clone_deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
   "optimize_request": {
-    "deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
+    "deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -33,7 +33,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "ab92d082-e199-4ad0-a16e-90254ddbc7f1",
+        "deck_id": "71c6e6d9-4f89-40b6-baeb-caf9d48da455",
         "bracket": 4,
         "archetype": "aggro",
         "theme": "tribal-goblin",

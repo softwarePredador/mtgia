@@ -2813,16 +2813,6 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     return reasons.toList(growable: false);
   }
 
-  Map<String, dynamic> _extractRepairPlan(DeckAiFlowException error) {
-    if (error.qualityError['repair_plan'] is Map) {
-      return (error.qualityError['repair_plan'] as Map).cast<String, dynamic>();
-    }
-    if (error.deckState['repair_plan'] is Map) {
-      return (error.deckState['repair_plan'] as Map).cast<String, dynamic>();
-    }
-    return const <String, dynamic>{};
-  }
-
   Future<void> _showOutcomeInfoDialog({
     required BuildContext context,
     required String title,
@@ -2956,6 +2946,13 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       if (!mounted) return;
 
       sheetNavigator.pop();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Criamos uma versão reconstruída em rascunho. O deck original não foi alterado.',
+          ),
+        ),
+      );
       await rootNavigator.push(
         MaterialPageRoute(
           builder: (_) => DeckDetailsScreen(deckId: draftDeckId),
@@ -2991,64 +2988,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     final reasons = _extractAiReasons(error);
 
     if (error.isNeedsRepair) {
-      final repairPlan = _extractRepairPlan(error);
-      final repairSummary =
-          repairPlan['summary']?.toString() ??
-          'Esse deck precisa de reconstrução guiada antes de uma micro-otimização segura.';
-      final targetLandCount = repairPlan['target_land_count'];
-
-      final shouldRebuild = await showDialog<bool>(
-        context: context,
-        builder:
-            (ctx) => AlertDialog(
-              title: const Text('Esse deck precisa de reconstrução'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(error.message),
-                    const SizedBox(height: 12),
-                    Text(repairSummary),
-                    if (targetLandCount != null) ...[
-                      const SizedBox(height: 8),
-                      Text('Alvo de terrenos: $targetLandCount'),
-                    ],
-                    if (reasons.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Diagnóstico:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      ...reasons.take(6).map(
-                        (reason) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text('• $reason'),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Podemos criar uma versão reconstruída em rascunho, sem alterar o deck atual.',
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Agora não'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Criar rascunho'),
-                ),
-              ],
-            ),
-      );
-
-      if (shouldRebuild == true && mounted) {
+      if (mounted) {
         await _runGuidedRebuild(
           deckProvider,
           error,

@@ -1,9 +1,9 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
+  "clone_deck_id": "f4ea56ab-ae17-4655-a341-91a43446695a",
   "optimize_request": {
-    "deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
+    "deck_id": "f4ea56ab-ae17-4655-a341-91a43446695a",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -45,7 +45,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "072e8492-7e0a-4590-a751-3b396343fb36",
+        "deck_id": "f4ea56ab-ae17-4655-a341-91a43446695a",
         "bracket": 2,
         "archetype": "midrange",
         "theme": "tokens",
