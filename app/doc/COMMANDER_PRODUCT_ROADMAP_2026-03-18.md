@@ -128,6 +128,10 @@ Objetivo:
   - `optimized`
   - `safe_no_change`
   - `rebuild_guided`
+- feedback de progresso durante optimize / rebuild
+  - etapa atual
+  - progresso compreensível
+  - dicas úteis enquanto o servidor processa
 - playtest leve
   - mão inicial
   - mulligan
@@ -147,6 +151,14 @@ Objetivo:
 
 - aumentar valor percebido para brewer de Commander
 - fazer o usuário confiar mais na IA
+
+#### Progresso já executado em 2026-03-18
+
+- preview de otimização mais claro e menos “painel técnico”
+- loadings de optimize e rebuild com:
+  - etapa humanizada
+  - barra de progresso
+  - dicas rotativas úteis
 
 ### Fase 2 — Consolidação visual, cores e layout
 
@@ -168,13 +180,17 @@ Objetivo:
   - `life counter`
 - ampliação do `AppTheme` para feedback visual mais consistente
 - centralização dos hardcodes mais visíveis de cor nos módulos de maior percepção
+- centralização de semântica MTG no `AppTheme`
+  - raridade
+  - fallback de pips / símbolos de mana
+- consolidação visual aplicada em:
+  - `card_detail`
+  - `deck_card`
+  - header principal de `deck_details`
 
 #### O que ainda resta nesta fase
 
-- reduzir hardcodes restantes em telas de domínio MTG mais profundas
-  - `card_detail`
-  - `deck_card`
-  - `deck_details`
+- reduzir hardcodes restantes em estados secundários de `deck_details`
 - revisar contraste fino e hierarquia visual das sheets de deck
 - consolidar estados vazios e headers secundários em mais módulos
 

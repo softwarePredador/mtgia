@@ -138,6 +138,60 @@ class AppTheme {
     }
   }
 
+  /// Cores base para fallback de pips / símbolos de mana.
+  static Color manaPipBackground(String symbol) {
+    switch (symbol.toUpperCase()) {
+      case 'W':
+        return manaW;
+      case 'U':
+        return manaU;
+      case 'B':
+        return manaB;
+      case 'R':
+        return manaR;
+      case 'G':
+        return manaG;
+      case 'C':
+        return manaC;
+      default:
+        return textSecondary;
+    }
+  }
+
+  static Color manaPipForeground(String symbol) {
+    switch (symbol.toUpperCase()) {
+      case 'W':
+        return const Color(0xFF3D3000);
+      case 'U':
+        return const Color(0xFF0A2340);
+      case 'B':
+        return const Color(0xFF1A1A1A);
+      case 'R':
+        return const Color(0xFF3D1005);
+      case 'G':
+        return const Color(0xFF0C2E1A);
+      case 'C':
+        return const Color(0xFF2A2A2A);
+      default:
+        return Colors.white;
+    }
+  }
+
+  static Color rarityColor(String rarity) {
+    switch (rarity.toLowerCase()) {
+      case 'common':
+        return textHint;
+      case 'uncommon':
+        return const Color(0xFFC0C0C0);
+      case 'rare':
+        return const Color(0xFFFFD700);
+      case 'mythic':
+        return mythicGold;
+      default:
+        return textHint;
+    }
+  }
+
   /// Cor de score/synergy (0-100) — usa palette existente.
   static Color scoreColor(int score) {
     if (score >= 80) return success;

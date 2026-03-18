@@ -41,6 +41,10 @@ Desde esta auditoria, já foram aplicados ajustes concretos nesta frente:
 - contador de vida com melhor hierarquia, separação visual e sessão resumida
 - notificações com cards mais legíveis e semântica de cor alinhada ao tema
 - tela de última edição com header, estado de erro e lista mais coerentes com o restante do app
+- semântica visual de MTG mais centralizada no tema
+  - raridade
+  - pips / símbolos de mana
+- `card_detail`, `deck_card` e o header de `deck_details` com visual mais consistente
 
 Isso melhora a nota prática do estado atual para algo mais próximo de:
 
@@ -103,8 +107,6 @@ Exemplos relevantes:
 - `app/lib/features/auth/screens/login_screen.dart`
 - `app/lib/features/auth/screens/register_screen.dart`
 - `app/lib/features/home/life_counter_screen.dart`
-- `app/lib/features/cards/screens/card_detail_screen.dart`
-- `app/lib/features/decks/widgets/deck_card.dart`
 - `app/lib/features/decks/screens/deck_details_screen.dart`
 
 Impacto:
@@ -189,12 +191,14 @@ Pontos a melhorar:
 Status:
 
 - funcionalmente forte
-- visualmente boa, mas ainda carregada em alguns momentos
+- visualmente mais consistente após a consolidação desta rodada, mas ainda carregada em alguns momentos
 
 Pontos positivos:
 
 - o fluxo de optimize tem valor real
 - a interface já comunica profundidade
+- o header principal do deck está mais próximo do nível visual de Home/Auth
+- `deck_card` e `card_detail` agora compartilham semântica visual melhor com o tema
 
 Pontos a melhorar:
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
@@ -104,7 +105,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
             onSelected: (value) {
               switch (value) {
                 case 'paste':
@@ -149,12 +152,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 PopupMenuItem(
                   value: 'toggle_public',
                   child: ListTile(
-                    leading: Icon(
-                      isPublic ? Icons.lock_outline : Icons.public,
-                    ),
-                    title: Text(
-                      isPublic ? 'Tornar Privado' : 'Tornar Público',
-                    ),
+                    leading: Icon(isPublic ? Icons.lock_outline : Icons.public),
+                    title: Text(isPublic ? 'Tornar Privado' : 'Tornar Público'),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
                   ),
@@ -193,10 +192,18 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       floatingActionButton: _buildAddCardsMenu(context),
       body: Builder(
         builder: (context) {
-          final isLoading = context.select<DeckProvider, bool>((p) => p.isLoading);
-          final detailsError = context.select<DeckProvider, String?>((p) => p.detailsErrorMessage);
-          final detailsStatusCode = context.select<DeckProvider, int?>((p) => p.detailsStatusCode);
-          final deck = context.select<DeckProvider, DeckDetails?>((p) => p.selectedDeck);
+          final isLoading = context.select<DeckProvider, bool>(
+            (p) => p.isLoading,
+          );
+          final detailsError = context.select<DeckProvider, String?>(
+            (p) => p.detailsErrorMessage,
+          );
+          final detailsStatusCode = context.select<DeckProvider, int?>(
+            (p) => p.detailsStatusCode,
+          );
+          final deck = context.select<DeckProvider, DeckDetails?>(
+            (p) => p.selectedDeck,
+          );
 
           if (isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -229,7 +236,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       )
                     else
                       ElevatedButton(
-                        onPressed: () => context.read<DeckProvider>().fetchDeckDetails(widget.deckId),
+                        onPressed:
+                            () => context.read<DeckProvider>().fetchDeckDetails(
+                              widget.deckId,
+                            ),
                         child: const Text('Tentar Novamente'),
                       ),
                   ],
@@ -274,146 +284,113 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      deck.name,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w700,
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceElevated,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                        border: Border.all(
+                          color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+                          width: 0.8,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Chip(label: Text(deck.format.toUpperCase())),
-                        if (deck.colorIdentity.isNotEmpty) ...[
-                          const SizedBox(width: 10),
-                          _ColorIdentityPips(colors: deck.colorIdentity),
-                        ],
-                        const SizedBox(width: 8),
-                        if (_isValidating)
-                          const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        else if (_validationResult != null)
-                          InkWell(
-                            onTap: () {
-                              final ok = _validationResult!['ok'] == true;
-                              if (ok) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('✅ Deck válido para o formato!'),
-                                    backgroundColor: AppTheme.success,
-                                  ),
-                                );
-                              } else {
-                                final msg = _validationResult!['error']?.toString()
-                                    ?? 'Deck não está completo ou válido para o formato';
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('⚠️ $msg'),
-                                    backgroundColor: theme.colorScheme.error,
-                                    duration: const Duration(seconds: 4),
-                                  ),
-                                );
-                                // Navega para a aba Cartas para destacar a carta problemática
-                                if (_invalidCardNames.isNotEmpty) {
-                                  _tabController.animateTo(1);
-                                }
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _validationResult!['ok'] == true
-                                    ? AppTheme.success.withValues(alpha: 0.15)
-                                    : theme.colorScheme.error.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                                border: Border.all(
-                                  color: _validationResult!['ok'] == true
-                                      ? AppTheme.success
-                                      : theme.colorScheme.error,
-                                  width: 0.5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            deck.name,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              _DeckMetaChip(
+                                label: deck.format.toUpperCase(),
+                                color: AppTheme.identityColor(
+                                  deck.colorIdentity.toSet(),
                                 ),
+                                icon: Icons.style_outlined,
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _validationResult!['ok'] == true
-                                        ? Icons.verified
-                                        : Icons.warning_amber_rounded,
-                                    size: 14,
-                                    color: _validationResult!['ok'] == true
-                                        ? AppTheme.success
-                                        : theme.colorScheme.error,
+                              if (deck.colorIdentity.isNotEmpty)
+                                _ColorIdentityPips(colors: deck.colorIdentity),
+                              if (_isValidating)
+                                const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _validationResult!['ok'] == true
-                                        ? 'Válido'
-                                        : 'Inválido',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: _validationResult!['ok'] == true
+                                )
+                              else if (_validationResult != null)
+                                _DeckMetaChip(
+                                  onTap: () {
+                                    final ok = _validationResult!['ok'] == true;
+                                    if (ok) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            '✅ Deck válido para o formato!',
+                                          ),
+                                          backgroundColor: AppTheme.success,
+                                        ),
+                                      );
+                                    } else {
+                                      final msg =
+                                          _validationResult!['error']
+                                              ?.toString() ??
+                                          'Deck não está completo ou válido para o formato';
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text('⚠️ $msg'),
+                                          backgroundColor:
+                                              theme.colorScheme.error,
+                                          duration: const Duration(seconds: 4),
+                                        ),
+                                      );
+                                      if (_invalidCardNames.isNotEmpty) {
+                                        _tabController.animateTo(1);
+                                      }
+                                    }
+                                  },
+                                  label:
+                                      _validationResult!['ok'] == true
+                                          ? 'Válido'
+                                          : 'Inválido',
+                                  color:
+                                      _validationResult!['ok'] == true
                                           ? AppTheme.success
                                           : theme.colorScheme.error,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
+                                  icon:
+                                      _validationResult!['ok'] == true
+                                          ? Icons.verified
+                                          : Icons.warning_amber_rounded,
+                                ),
+                              _DeckMetaChip(
+                                onTap: _togglePublic,
+                                label: deck.isPublic ? 'Público' : 'Privado',
+                                color:
+                                    deck.isPublic
+                                        ? AppTheme.primarySoft
+                                        : AppTheme.textSecondary,
+                                icon:
+                                    deck.isPublic
+                                        ? Icons.public
+                                        : Icons.lock_outline,
                               ),
-                            ),
+                            ],
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Visibility indicator
-                    InkWell(
-                      onTap: _togglePublic,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: deck.isPublic
-                              ? AppTheme.primarySoft.withValues(alpha: 0.15)
-                              : AppTheme.textHint.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                          border: Border.all(
-                            color: deck.isPublic
-                                ? AppTheme.primarySoft
-                                : AppTheme.textHint,
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              deck.isPublic ? Icons.public : Icons.lock_outline,
-                              size: 14,
-                              color: deck.isPublic
-                                  ? AppTheme.primarySoft
-                                  : AppTheme.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              deck.isPublic ? 'Público' : 'Privado',
-                              style: TextStyle(
-                                color: deck.isPublic
-                                    ? AppTheme.primarySoft
-                                    : AppTheme.textSecondary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: AppTheme.fontSm,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -442,7 +419,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           color: theme.colorScheme.errorContainer.withValues(
                             alpha: 0.25,
                           ),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
                           border: Border.all(
                             color: theme.colorScheme.errorContainer,
                           ),
@@ -482,9 +461,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         ),
                         TextButton.icon(
                           onPressed:
-                              () => _showEditDescriptionDialog(
-                                deck.description,
-                              ),
+                              () =>
+                                  _showEditDescriptionDialog(deck.description),
                           icon: Icon(
                             (deck.description == null ||
                                     deck.description!.trim().isEmpty)
@@ -506,16 +484,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         deck.description!.trim().isNotEmpty)
                       InkWell(
                         onTap:
-                            () => _showEditDescriptionDialog(
-                              deck.description,
-                            ),
+                            () => _showEditDescriptionDialog(deck.description),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusSm,
+                            ),
                             border: Border.all(
                               color: theme.colorScheme.outline.withValues(
                                 alpha: 0.3,
@@ -532,15 +510,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       )
                     else
                       InkWell(
-                        onTap:
-                            () => _showEditDescriptionDialog(null),
+                        onTap: () => _showEditDescriptionDialog(null),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusSm,
+                            ),
                             border: Border.all(
                               color: theme.colorScheme.outline.withValues(
                                 alpha: 0.2,
@@ -563,33 +542,41 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       const SizedBox(height: 8),
                       ...deck.commander.map(
                         (c) => Card(
-                          shape: _isCardInvalid(c)
-                              ? RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                  side: BorderSide(
-                                    color: theme.colorScheme.error,
-                                    width: 2,
-                                  ),
-                                )
-                              : null,
-                          color: _isCardInvalid(c)
-                              ? theme.colorScheme.error.withValues(alpha: 0.08)
-                              : null,
+                          shape:
+                              _isCardInvalid(c)
+                                  ? RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusMd,
+                                    ),
+                                    side: BorderSide(
+                                      color: theme.colorScheme.error,
+                                      width: 2,
+                                    ),
+                                  )
+                                  : null,
+                          color:
+                              _isCardInvalid(c)
+                                  ? theme.colorScheme.error.withValues(
+                                    alpha: 0.08,
+                                  )
+                                  : null,
                           child: Stack(
                             children: [
                               ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                              child: CachedCardImage(
-                                imageUrl: c.imageUrl,
-                                width: 44,
-                                height: 62,
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusSm,
+                                  ),
+                                  child: CachedCardImage(
+                                    imageUrl: c.imageUrl,
+                                    width: 44,
+                                    height: 62,
+                                  ),
+                                ),
+                                title: Text(c.name),
+                                subtitle: Text(c.typeLine),
+                                onTap: () => _showCardDetails(context, c),
                               ),
-                            ),
-                            title: Text(c.name),
-                            subtitle: Text(c.typeLine),
-                            onTap: () => _showCardDetails(context, c),
-                          ),
                               if (_isCardInvalid(c))
                                 Positioned(
                                   top: 4,
@@ -601,7 +588,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                     ),
                                     decoration: BoxDecoration(
                                       color: theme.colorScheme.error,
-                                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                      borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusSm,
+                                      ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -614,11 +603,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         const SizedBox(width: 3),
                                         Text(
                                           'Inválida',
-                                          style: theme.textTheme.labelSmall?.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: AppTheme.fontXs,
-                                          ),
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: AppTheme.fontXs,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -676,7 +666,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                       .withValues(alpha: 0.5)
                                   : theme.colorScheme.primaryContainer
                                       .withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
                           border: Border.all(
                             color:
                                 (deck.archetype == null ||
@@ -777,9 +769,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.error.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
                           border: Border.all(
-                            color: theme.colorScheme.error.withValues(alpha: 0.4),
+                            color: theme.colorScheme.error.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                         child: Row(
@@ -839,7 +835,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   ),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusMd,
+                                    ),
                                   ),
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -863,7 +861,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   ),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.error,
-                                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusMd,
+                                    ),
                                   ),
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -912,7 +912,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                       );
                                       if (!mounted) return true;
                                       if (!context.mounted) return true;
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             'Carta removida: ${card.name}',
@@ -928,7 +930,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                           () => _hiddenCardIds.remove(card.id),
                                         );
                                         if (!context.mounted) return false;
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               'Erro ao remover: $e',
@@ -946,141 +950,169 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 },
                                 child: Card(
                                   margin: const EdgeInsets.only(bottom: 8),
-                                  shape: _isCardInvalid(card)
-                                      ? RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                          side: BorderSide(
-                                            color: theme.colorScheme.error,
-                                            width: 2,
-                                          ),
-                                        )
-                                      : null,
-                                  color: _isCardInvalid(card)
-                                      ? theme.colorScheme.error.withValues(alpha: 0.08)
-                                      : null,
-                                  child: Stack(
-                                    children: [
-                                      ListTile(
-                                    contentPadding: const EdgeInsets.all(8),
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                                      child: CachedCardImage(
-                                        imageUrl: card.imageUrl,
-                                        width: 40,
-                                        height: 56,
-                                      ),
-                                    ),
-                                    title: Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                theme
-                                                    .colorScheme
-                                                    .primaryContainer,
+                                  shape:
+                                      _isCardInvalid(card)
+                                          ? RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               AppTheme.radiusMd,
                                             ),
-                                          ),
-                                          child: Text(
-                                            '${card.quantity}x',
-                                            style: theme.textTheme.labelSmall
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color:
-                                                      theme
-                                                          .colorScheme
-                                                          .onPrimaryContainer,
-                                                ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            card.name,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: AppTheme.textPrimary,
+                                            side: BorderSide(
+                                              color: theme.colorScheme.error,
+                                              width: 2,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
+                                          )
+                                          : null,
+                                  color:
+                                      _isCardInvalid(card)
+                                          ? theme.colorScheme.error.withValues(
+                                            alpha: 0.08,
+                                          )
+                                          : null,
+                                  child: Stack(
+                                    children: [
+                                      ListTile(
+                                        contentPadding: const EdgeInsets.all(8),
+                                        leading: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            AppTheme.radiusXs,
+                                          ),
+                                          child: CachedCardImage(
+                                            imageUrl: card.imageUrl,
+                                            width: 40,
+                                            height: 56,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          card.typeLine,
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: AppTheme.textSecondary,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
+                                        title: Row(
                                           children: [
-                                            _ManaCostRow(cost: card.manaCost),
-                                            const SizedBox(width: 8),
-                                            if (card.setCode.isNotEmpty)
-                                              Text(
-                                                card.setCode.toUpperCase(),
-                                                style: theme.textTheme.bodySmall
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    theme
+                                                        .colorScheme
+                                                        .primaryContainer,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      AppTheme.radiusMd,
+                                                    ),
+                                              ),
+                                              child: Text(
+                                                '${card.quantity}x',
+                                                style: theme
+                                                    .textTheme
+                                                    .labelSmall
                                                     ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       color:
                                                           theme
                                                               .colorScheme
-                                                              .outline,
+                                                              .onPrimaryContainer,
                                                     ),
                                               ),
-                                            if (card.condition != CardCondition.nm) ...[
-                                              const SizedBox(width: 6),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 4,
-                                                  vertical: 1,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                card.name,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppTheme.textPrimary,
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  color: _conditionColor(card.condition)
-                                                      .withValues(alpha: 0.15),
-                                                  borderRadius:
-                                                      BorderRadius.circular(AppTheme.radiusXs),
-                                                  border: Border.all(
-                                                    color: _conditionColor(
-                                                      card.condition,
-                                                    ),
-                                                    width: 0.5,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              card.typeLine,
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    color:
+                                                        AppTheme.textSecondary,
                                                   ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                _ManaCostRow(
+                                                  cost: card.manaCost,
                                                 ),
-                                                child: Text(
-                                                  card.condition.code,
-                                                  style: theme
-                                                      .textTheme.labelSmall
-                                                      ?.copyWith(
-                                                        fontSize: AppTheme.fontXs,
+                                                const SizedBox(width: 8),
+                                                if (card.setCode.isNotEmpty)
+                                                  Text(
+                                                    card.setCode.toUpperCase(),
+                                                    style: theme
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color:
+                                                              theme
+                                                                  .colorScheme
+                                                                  .outline,
+                                                        ),
+                                                  ),
+                                                if (card.condition !=
+                                                    CardCondition.nm) ...[
+                                                  const SizedBox(width: 6),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 4,
+                                                          vertical: 1,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: _conditionColor(
+                                                        card.condition,
+                                                      ).withValues(alpha: 0.15),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            AppTheme.radiusXs,
+                                                          ),
+                                                      border: Border.all(
                                                         color: _conditionColor(
                                                           card.condition,
                                                         ),
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                        width: 0.5,
                                                       ),
-                                                ),
-                                              ),
-                                            ],
+                                                    ),
+                                                    child: Text(
+                                                      card.condition.code,
+                                                      style: theme
+                                                          .textTheme
+                                                          .labelSmall
+                                                          ?.copyWith(
+                                                            fontSize:
+                                                                AppTheme.fontXs,
+                                                            color:
+                                                                _conditionColor(
+                                                                  card.condition,
+                                                                ),
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                    onTap:
-                                        () => _showCardDetails(context, card),
-                                  ),
+                                        onTap:
+                                            () =>
+                                                _showCardDetails(context, card),
+                                      ),
                                       if (_isCardInvalid(card))
                                         Positioned(
                                           top: 4,
@@ -1092,7 +1124,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                             ),
                                             decoration: BoxDecoration(
                                               color: theme.colorScheme.error,
-                                              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    AppTheme.radiusSm,
+                                                  ),
                                             ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
@@ -1105,11 +1140,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                                 const SizedBox(width: 3),
                                                 Text(
                                                   'Inválida',
-                                                  style: theme.textTheme.labelSmall?.copyWith(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: AppTheme.fontXs,
-                                                  ),
+                                                  style: theme
+                                                      .textTheme
+                                                      .labelSmall
+                                                      ?.copyWith(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize:
+                                                            AppTheme.fontXs,
+                                                      ),
                                                 ),
                                               ],
                                             ),
@@ -1198,9 +1238,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result.isEmpty
-                  ? 'Descrição removida'
-                  : 'Descrição atualizada',
+              result.isEmpty ? 'Descrição removida' : 'Descrição atualizada',
             ),
             backgroundColor: theme.colorScheme.primary,
           ),
@@ -1231,29 +1269,32 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         }
       },
       offset: const Offset(0, -120),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'search',
-          child: ListTile(
-            leading: const Icon(Icons.search),
-            title: const Text('Buscar Carta'),
-            subtitle: const Text('Pesquisar por nome'),
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-          ),
-        ),
-        PopupMenuItem(
-          value: 'scan',
-          child: ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text('Escanear Carta'),
-            subtitle: const Text('Usar câmera (OCR)'),
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-          ),
-        ),
-      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      ),
+      itemBuilder:
+          (context) => [
+            PopupMenuItem(
+              value: 'search',
+              child: ListTile(
+                leading: const Icon(Icons.search),
+                title: const Text('Buscar Carta'),
+                subtitle: const Text('Pesquisar por nome'),
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+              ),
+            ),
+            PopupMenuItem(
+              value: 'scan',
+              child: ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Escanear Carta'),
+                subtitle: const Text('Usar câmera (OCR)'),
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+              ),
+            ),
+          ],
       child: FloatingActionButton.extended(
         onPressed: null, // O PopupMenuButton cuida do tap
         icon: const Icon(Icons.add),
@@ -1267,7 +1308,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (_isValidating) return;
     setState(() => _isValidating = true);
     try {
-      final res = await context.read<DeckProvider>().validateDeck(widget.deckId);
+      final res = await context.read<DeckProvider>().validateDeck(
+        widget.deckId,
+      );
       if (!mounted) return;
       setState(() {
         _validationResult = res;
@@ -1296,8 +1339,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (deck == null) return;
 
     final newState = !deck.isPublic;
-    final success =
-        await provider.togglePublic(deck.id, isPublic: newState);
+    final success = await provider.togglePublic(deck.id, isPublic: newState);
 
     if (!mounted) return;
 
@@ -1357,7 +1399,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Lista de cartas copiada para a área de transferência! 📋'),
+        content: const Text(
+          'Lista de cartas copiada para a área de transferência! 📋',
+        ),
         backgroundColor: AppTheme.success,
       ),
     );
@@ -1386,8 +1430,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(ok ? '✅ Deck válido!' : 'Deck inválido'),
-          backgroundColor:
-              ok ? AppTheme.success : AppTheme.error,
+          backgroundColor: ok ? AppTheme.success : AppTheme.error,
         ),
       );
     } catch (e) {
@@ -1443,11 +1486,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       children: [
                         Text(
                           card.name,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.textPrimary,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
+                          ),
                         ),
                         if (card.manaCost != null) ...[
                           const SizedBox(height: 4),
@@ -1455,9 +1499,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             children: [
                               Text(
                                 'Custo: ',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: AppTheme.textSecondary),
                               ),
                               _ManaCostRow(cost: card.manaCost),
                             ],
@@ -1630,7 +1673,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXl),
+        ),
       ),
       builder:
           (context) => DraggableScrollableSheet(
@@ -1655,7 +1700,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXl),
+        ),
       ),
       builder: (sheetContext) {
         return SafeArea(
@@ -1732,7 +1779,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               imageUrl: it['image_url'],
                               width: 40,
                               height: 56,
-                              borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusXs,
+                              ),
                             ),
                             title: Text(setName),
                             subtitle: Text(
@@ -1957,20 +2006,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           child: DropdownButton<CardCondition>(
                             isExpanded: true,
                             value: selectedCondition,
-                            items: CardCondition.values.map((c) {
-                              return DropdownMenuItem<CardCondition>(
-                                value: c,
-                                child: Text('${c.code} — ${c.label}'),
-                              );
-                            }).toList(),
-                            onChanged: isSaving
-                                ? null
-                                : (v) {
-                                    if (v == null) return;
-                                    setDialogState(
-                                      () => selectedCondition = v,
-                                    );
-                                  },
+                            items:
+                                CardCondition.values.map((c) {
+                                  return DropdownMenuItem<CardCondition>(
+                                    value: c,
+                                    child: Text('${c.code} — ${c.label}'),
+                                  );
+                                }).toList(),
+                            onChanged:
+                                isSaving
+                                    ? null
+                                    : (v) {
+                                      if (v == null) return;
+                                      setDialogState(
+                                        () => selectedCondition = v,
+                                      );
+                                    },
                           ),
                         ),
                       ),
@@ -2094,7 +2145,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXl),
+        ),
       ),
       builder: (ctx) {
         return SafeArea(
@@ -2201,7 +2254,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             children: [
                               Text(
                                 'Importar Lista',
-                                style: TextStyle(fontSize: AppTheme.fontXl, color: AppTheme.textPrimary),
+                                style: TextStyle(
+                                  fontSize: AppTheme.fontXl,
+                                  color: AppTheme.textPrimary,
+                                ),
                               ),
                               Text(
                                 'Adicionar cartas de outra fonte',
@@ -2227,16 +2283,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               decoration: BoxDecoration(
                                 color:
                                     replaceAll
-                                        ? AppTheme.warning.withValues(alpha: 0.1)
+                                        ? AppTheme.warning.withValues(
+                                          alpha: 0.1,
+                                        )
                                         : theme.colorScheme.surface,
                                 border: Border.all(
                                   color:
                                       replaceAll
-                                          ? AppTheme.warning.withValues(alpha: 0.5)
+                                          ? AppTheme.warning.withValues(
+                                            alpha: 0.5,
+                                          )
                                           : theme.colorScheme.outline
                                               .withValues(alpha: 0.3),
                                 ),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusSm,
+                                ),
                               ),
                               child: CheckboxListTile(
                                 value: replaceAll,
@@ -2295,8 +2357,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 hintText:
                                     'Cole sua lista de cartas aqui...\n\nFormato: 1 Sol Ring ou 1x Sol Ring',
                                 hintStyle: TextStyle(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.4),
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.4,
+                                  ),
                                   fontSize: AppTheme.fontSm,
                                 ),
                                 border: const OutlineInputBorder(),
@@ -2318,9 +2381,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: AppTheme.error.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusSm,
+                                  ),
                                   border: Border.all(
-                                    color: AppTheme.error.withValues(alpha: 0.3),
+                                    color: AppTheme.error.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
                                 child: Row(
@@ -2351,10 +2418,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.warning.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                  color: AppTheme.warning.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusSm,
+                                  ),
                                   border: Border.all(
-                                    color: AppTheme.warning.withValues(alpha: 0.3),
+                                    color: AppTheme.warning.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
                                 child: Column(
@@ -2376,7 +2449,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                             '• $line',
                                             style: TextStyle(
                                               fontSize: AppTheme.fontSm,
-                                              color: AppTheme.warning.withValues(alpha: 0.6),
+                                              color: AppTheme.warning
+                                                  .withValues(alpha: 0.6),
                                             ),
                                           ),
                                         ),
@@ -2386,7 +2460,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                         style: TextStyle(
                                           fontSize: AppTheme.fontSm,
                                           fontStyle: FontStyle.italic,
-                                          color: AppTheme.warning.withValues(alpha: 0.7),
+                                          color: AppTheme.warning.withValues(
+                                            alpha: 0.7,
+                                          ),
                                         ),
                                       ),
                                   ],
@@ -2593,18 +2669,7 @@ class _PricingRow extends StatelessWidget {
 
 /// Retorna cor indicativa da condição da carta (TCGPlayer standard).
 Color _conditionColor(CardCondition c) {
-  switch (c) {
-    case CardCondition.nm:
-      return AppTheme.success;
-    case CardCondition.lp:
-      return AppTheme.primarySoft;
-    case CardCondition.mp:
-      return AppTheme.mythicGold;
-    case CardCondition.hp:
-      return AppTheme.warning;
-    case CardCondition.dmg:
-      return AppTheme.error;
-  }
+  return AppTheme.conditionColor(c.code);
 }
 
 class _ManaCostRow extends StatelessWidget {
@@ -2813,6 +2878,136 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     return reasons.toList(growable: false);
   }
 
+  _FlowLoadingPresentation _describeOptimizeProgress(_FlowProgressState state) {
+    final normalized = state.stage.trim().toLowerCase();
+
+    if (normalized.contains('preparando análise do deck') ||
+        normalized.contains('iniciando otimização')) {
+      return const _FlowLoadingPresentation(
+        title: 'Preparando análise do deck',
+        subtitle:
+            'Lendo comandante, identidade de cor e estado atual da lista.',
+        accent: AppTheme.manaViolet,
+        icon: Icons.auto_awesome_rounded,
+        stepNumber: 1,
+        totalSteps: 5,
+        progress: 0.12,
+        tips: [
+          'O app prioriza sinergia com o comandante, não só cartas fortes isoladas.',
+          'Se não houver upgrade seguro, é melhor preservar o deck do que piorá-lo.',
+          'Em decks mais pesados essa etapa inicial pode levar um pouco mais.',
+        ],
+      );
+    }
+
+    if (normalized.contains('preparando referências do commander')) {
+      return const _FlowLoadingPresentation(
+        title: 'Lendo referências do comandante',
+        subtitle:
+            'Cruza perfil do comandante, seeds do deck e prioridades conhecidas.',
+        accent: AppTheme.primarySoft,
+        icon: Icons.menu_book_rounded,
+        stepNumber: 1,
+        totalSteps: 5,
+        progress: 0.18,
+        tips: [
+          'Aqui o sistema entende o plano natural do comandante antes de sugerir trocas.',
+          'Commander bom não é só power: o plano da lista precisa continuar coerente.',
+          'Essa base evita sugestões aleatórias que não conversam com o seu deck.',
+        ],
+      );
+    }
+
+    if (normalized.contains('consultando ia para sugestões')) {
+      return const _FlowLoadingPresentation(
+        title: 'Consultando a IA para sugestões',
+        subtitle:
+            'Gerando shortlist de mudanças coerentes com o plano do deck.',
+        accent: AppTheme.manaViolet,
+        icon: Icons.psychology_alt_rounded,
+        stepNumber: 2,
+        totalSteps: 5,
+        progress: 0.38,
+        tips: [
+          'Essa costuma ser uma das etapas mais demoradas.',
+          'Nem toda staple entra: a IA tenta respeitar curva, tema e identidade.',
+          'Quando o deck já está perto do pico, o sistema tende a ser mais conservador.',
+        ],
+      );
+    }
+
+    if (normalized.contains('preenchendo com cartas sinérgicas')) {
+      return const _FlowLoadingPresentation(
+        title: 'Selecionando cartas mais sinérgicas',
+        subtitle:
+            'Montando trocas que reforçam o plano sem quebrar a estrutura da lista.',
+        accent: AppTheme.success,
+        icon: Icons.library_add_check_rounded,
+        stepNumber: 3,
+        totalSteps: 5,
+        progress: 0.58,
+        tips: [
+          'Boas trocas melhoram o plano do deck sem desmontar peças importantes.',
+          'Aqui o sistema evita duplicatas ruins e cartas fora da identidade de cor.',
+          'Se o deck estiver muito quebrado, ele pode migrar para rebuild em vez de micro-ajuste.',
+        ],
+      );
+    }
+
+    if (normalized.contains('ajustando base de mana')) {
+      return const _FlowLoadingPresentation(
+        title: 'Ajustando a base de mana',
+        subtitle: 'Revisando consistência, curva e fontes de cor do deck.',
+        accent: AppTheme.mythicGold,
+        icon: Icons.water_drop_outlined,
+        stepNumber: 4,
+        totalSteps: 5,
+        progress: 0.78,
+        tips: [
+          'Base de mana ruim derruba até lista com cartas fortes.',
+          'Essa etapa reduz flood, screw e inconsistência de cores.',
+          'Commander melhora muito quando mana e curva conversam com o plano.',
+        ],
+      );
+    }
+
+    if (normalized.contains('processando resultado final')) {
+      return const _FlowLoadingPresentation(
+        title: 'Validando o resultado final',
+        subtitle:
+            'Organizando o preview e preparando só as mudanças que passaram no gate.',
+        accent: AppTheme.success,
+        icon: Icons.fact_check_outlined,
+        stepNumber: 5,
+        totalSteps: 5,
+        progress: 0.94,
+        tips: [
+          'O preview só aparece depois da validação final das trocas.',
+          'Se a melhora não for segura, o sistema prefere bloquear a sugestão.',
+          'Falta pouco: estamos preparando a versão que você vai revisar.',
+        ],
+      );
+    }
+
+    final fallbackProgress =
+        state.stageNumber > 0 && state.totalStages > 0
+            ? (state.stageNumber / state.totalStages).clamp(0.1, 0.95)
+            : null;
+
+    return _FlowLoadingPresentation(
+      title: 'Processando otimização...',
+      subtitle: state.stage,
+      accent: AppTheme.manaViolet,
+      icon: Icons.auto_awesome_rounded,
+      progress: fallbackProgress,
+      tips: const [
+        'Estamos processando o deck no servidor.',
+        'O objetivo é encontrar melhorias reais sem desmontar o plano da lista.',
+        'Se não houver ganho seguro, o app prefere manter o deck intacto.',
+      ],
+    );
+  }
+
   Future<void> _showOutcomeInfoDialog({
     required BuildContext context,
     required String title,
@@ -2823,24 +3018,50 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: Text(title),
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            title: _DialogTitleBlock(
+              icon: Icons.info_outline,
+              title: title,
+              subtitle: 'Resultado da análise do deck',
+              accent: AppTheme.primarySoft,
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(message),
+                  Text(
+                    message,
+                    style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.4,
+                    ),
+                  ),
                   if (reasons.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    const Text(
-                      'Motivos:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    ...reasons.take(6).map(
-                      (reason) => Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text('• $reason'),
+                    _DialogSectionCard(
+                      title: 'Motivos',
+                      accent: AppTheme.primarySoft,
+                      icon: Icons.rule_folder_outlined,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:
+                            reasons
+                                .take(6)
+                                .map(
+                                  (reason) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Text(
+                                      '• $reason',
+                                      style: const TextStyle(
+                                        color: AppTheme.textSecondary,
+                                        height: 1.35,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       ),
                     ),
                   ],
@@ -2890,21 +3111,17 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       barrierDismissible: false,
       builder:
           (_) => const Center(
-            child: Card(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    LinearProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text(
-                      'Criando versão reconstruída...',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
+            child: _FlowLoadingDialog(
+              title: 'Criando versão reconstruída...',
+              subtitle:
+                  'Montando um rascunho novo sem alterar o deck original.',
+              accent: AppTheme.mythicGold,
+              icon: Icons.auto_fix_high_rounded,
+              tips: [
+                'O deck original continua intacto durante a reconstrução.',
+                'O rebuild respeita comandante, identidade de cor e bracket.',
+                'Quando a lista está muito quebrada, reconstruir é melhor do que forçar trocas pequenas.',
+              ],
             ),
           ),
     );
@@ -2913,17 +3130,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     try {
       final rebuildResult = await deckProvider.rebuildDeck(
         widget.deckId,
-        archetype:
-            nextPayload['archetype']?.toString() ??
-            fallbackArchetype,
+        archetype: nextPayload['archetype']?.toString() ?? fallbackArchetype,
         theme:
-            nextPayload['theme']?.toString() ??
-            themeInfo['theme']?.toString(),
-        bracket:
-            nextPayload['bracket'] as int? ??
-            _selectedBracket,
-        rebuildScope:
-            nextPayload['rebuild_scope']?.toString() ?? 'auto',
+            nextPayload['theme']?.toString() ?? themeInfo['theme']?.toString(),
+        bracket: nextPayload['bracket'] as int? ?? _selectedBracket,
+        rebuildScope: nextPayload['rebuild_scope']?.toString() ?? 'auto',
         saveMode: nextPayload['save_mode']?.toString() ?? 'draft_clone',
       );
 
@@ -3025,10 +3236,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: AppTheme.error,
-      ),
+      SnackBar(content: Text(error.message), backgroundColor: AppTheme.error),
     );
   }
 
@@ -3049,37 +3257,33 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     }
 
     // 1. Show Loading (progress-aware for async jobs)
-    final progressStage = ValueNotifier<String>('Gerando sugestões...');
-    final progressValue = ValueNotifier<double>(0);
+    final progressState = ValueNotifier<_FlowProgressState>(
+      const _FlowProgressState(
+        stage: 'Preparando análise do deck...',
+        stageNumber: 0,
+        totalStages: 5,
+      ),
+    );
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (ctx) => Center(
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ValueListenableBuilder<double>(
-                      valueListenable: progressValue,
-                      builder: (_, value, __) => LinearProgressIndicator(
-                        value: value > 0 ? value : null,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ValueListenableBuilder<String>(
-                      valueListenable: progressStage,
-                      builder: (_, stage, __) => Text(
-                        stage,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: ValueListenableBuilder<_FlowProgressState>(
+              valueListenable: progressState,
+              builder: (_, state, __) {
+                final presentation = _describeOptimizeProgress(state);
+                return _FlowLoadingDialog(
+                  title: presentation.title,
+                  subtitle: presentation.subtitle,
+                  accent: presentation.accent,
+                  icon: presentation.icon,
+                  progress: presentation.progress,
+                  stepNumber: presentation.stepNumber,
+                  totalSteps: presentation.totalSteps,
+                  tips: presentation.tips,
+                );
+              },
             ),
           ),
     );
@@ -3093,10 +3297,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         bracket: _selectedBracket,
         keepTheme: _keepTheme,
         onProgress: (stage, stageNumber, totalStages) {
-          progressStage.value = stage;
-          if (totalStages > 0) {
-            progressValue.value = stageNumber / totalStages;
-          }
+          progressState.value = _FlowProgressState(
+            stage: stage,
+            stageNumber: stageNumber,
+            totalStages: totalStages,
+          );
         },
       );
 
@@ -3132,27 +3337,27 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               .map((m) => m.cast<String, dynamic>())
               .toList() ??
           const <Map<String, dynamic>>[];
-        final deckAnalysis =
+      final deckAnalysis =
           (result['deck_analysis'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
-        final postAnalysis =
+      final postAnalysis =
           (result['post_analysis'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
 
-        final displayRemovals =
+      final displayRemovals =
           removalsDetailed.isNotEmpty
-            ? removalsDetailed
-            : removals.map((name) => {'name': name}).toList();
-        final displayAdditions =
+              ? removalsDetailed
+              : removals.map((name) => {'name': name}).toList();
+      final displayAdditions =
           additionsDetailed.isNotEmpty
-            ? additionsDetailed
-            : additions.map((name) => {'name': name}).toList();
+              ? additionsDetailed
+              : additions.map((name) => {'name': name}).toList();
 
-        // Extrair quality_warning (complete parcial — 200 com aviso)
-        final qualityWarning =
-            (result['quality_warning'] is Map)
-                ? (result['quality_warning'] as Map).cast<String, dynamic>()
-                : null;
+      // Extrair quality_warning (complete parcial — 200 com aviso)
+      final qualityWarning =
+          (result['quality_warning'] is Map)
+              ? (result['quality_warning'] as Map).cast<String, dynamic>()
+              : null;
 
       if (removals.isEmpty && additions.isEmpty) {
         if (!context.mounted) return;
@@ -3168,250 +3373,35 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder:
-            (ctx) => AlertDialog(
-              title: Text(
-                mode == 'complete'
-                    ? 'Completar deck ($archetype)'
-                    : 'Sugestões para: $archetype',
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (constraints['keep_theme'] == true &&
-                        themeInfo['theme'] != null) ...[
-                      Text(
-                        'Tema preservado: ${themeInfo['theme']}',
-                        style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    if (reasoning.isNotEmpty) ...[
-                      Text(
-                        reasoning,
-                        style: const TextStyle(fontStyle: FontStyle.italic, color: AppTheme.textSecondary),
-                      ),
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                    ],
-                    // Aviso de complete parcial
-                    if (qualityWarning != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.mythicGold.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppTheme.mythicGold.withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.info_outline, color: AppTheme.mythicGold, size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                qualityWarning['message'] as String? ??
-                                    'Otimização parcial.',
-                                style: const TextStyle(
-                                  color: AppTheme.mythicGold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                    if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
-                      const Text(
-                        'Antes vs Depois',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'CMC médio: ${deckAnalysis['average_cmc'] ?? '-'} → ${postAnalysis['average_cmc'] ?? '-'}',
-                        style: const TextStyle(color: AppTheme.textSecondary),
-                      ),
-                      Text(
-                        'Curva: ${deckAnalysis['mana_curve_assessment'] ?? '-'}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (postAnalysis['improvements'] is List &&
-                          (postAnalysis['improvements'] as List).isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            'Ganhos: ${(postAnalysis['improvements'] as List).take(2).join(' • ')}',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                    ],
-                    if (warnings.isNotEmpty) ...[
-                      const Text(
-                        'Avisos:',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                      ),
-                      if (warnings['filtered_by_color_identity'] is Map)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            '• Algumas adições foram removidas por estarem fora da identidade do comandante.',
-                            style: const TextStyle(color: AppTheme.textSecondary),
-                          ),
-                        ),
-                      if (warnings['blocked_by_bracket'] is Map)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            '• Algumas adições foram bloqueadas por exceder limites do bracket.',
-                          ),
-                        ),
-                      if (warnings['invalid_cards'] != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            '• Algumas cartas sugeridas não foram encontradas e foram removidas.',
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                    ],
-                    if (displayRemovals.isNotEmpty) ...[
-                      Text(
-                        '❌ Remover:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.error,
-                        ),
-                      ),
-                      ...displayRemovals.take(20).map((item) {
-                        final name = item['name']?.toString() ?? '';
-                        final confidenceMap =
-                            (item['confidence'] is Map)
-                                ? (item['confidence'] as Map)
-                                    .cast<String, dynamic>()
-                                : const <String, dynamic>{};
-                        final confidenceLevel =
-                            confidenceMap['level']?.toString() ?? '';
-                        final reason = item['reason']?.toString() ?? '';
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                confidenceLevel.isEmpty
-                                    ? '• $name'
-                                    : '• $name (${confidenceLevel.toUpperCase()})',
-                              ),
-                              if (reason.isNotEmpty)
-                                Text(
-                                  reason,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                            ],
-                          ),
+            (ctx) => _OptimizationPreviewDialog(
+              mode: mode,
+              archetype: archetype,
+              keepTheme: constraints['keep_theme'] == true,
+              preservedTheme: themeInfo['theme']?.toString(),
+              reasoning: reasoning,
+              qualityWarning: qualityWarning,
+              deckAnalysis: deckAnalysis,
+              postAnalysis: postAnalysis,
+              warnings: warnings,
+              displayRemovals: displayRemovals,
+              displayAdditions: displayAdditions,
+              onCancel: () => Navigator.pop(ctx, false),
+              onConfirm: () => Navigator.pop(ctx, true),
+              onCopyDebug:
+                  kDebugMode
+                      ? () async {
+                        await _copyOptimizeDebug(
+                          deckId: widget.deckId,
+                          archetype: archetype,
+                          bracket: _selectedBracket,
+                          result: result,
                         );
-                      }),
-                      const SizedBox(height: 16),
-                    ],
-                    if (displayAdditions.isNotEmpty) ...[
-                      Text(
-                        '✅ Adicionar:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.success,
-                        ),
-                      ),
-                      ...displayAdditions.take(30).map((item) {
-                        final name = item['name']?.toString() ?? '';
-                        final confidenceMap =
-                            (item['confidence'] is Map)
-                                ? (item['confidence'] as Map)
-                                    .cast<String, dynamic>()
-                                : const <String, dynamic>{};
-                        final confidenceLevel =
-                            confidenceMap['level']?.toString() ?? '';
-                        final score = (confidenceMap['score'] as num?)?.toDouble();
-                        final reason = item['reason']?.toString() ?? '';
-
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                score == null
-                                    ? (confidenceLevel.isEmpty
-                                        ? '• $name'
-                                        : '• $name (${confidenceLevel.toUpperCase()})')
-                                    : '• $name (${confidenceLevel.toUpperCase()} ${(score * 100).round()}%)',
-                              ),
-                              if (reason.isNotEmpty)
-                                Text(
-                                  reason,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                            ],
-                          ),
+                        if (!ctx.mounted) return;
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(content: Text('Debug copiado')),
                         );
-                      }),
-                      if (displayAdditions.length > 30)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 8),
-                          child: Text(
-                            '+ ${displayAdditions.length - 30} cartas…',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancelar'),
-                ),
-                if (kDebugMode)
-                  TextButton(
-                    onPressed: () async {
-                      await _copyOptimizeDebug(
-                        deckId: widget.deckId,
-                        archetype: archetype,
-                        bracket: _selectedBracket,
-                        result: result,
-                      );
-                      if (!ctx.mounted) return;
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(content: Text('Debug copiado')),
-                      );
-                    },
-                    child: const Text('Copiar debug'),
-                  ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Aplicar Mudanças'),
-                ),
-              ],
+                      }
+                      : null,
             ),
       );
 
@@ -3424,15 +3414,15 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         barrierDismissible: false,
         builder:
             (ctx) => const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LinearProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Aplicando mudanças...',
-                    style: TextStyle(color: Colors.white),
-                  ),
+              child: _FlowLoadingDialog(
+                title: 'Aplicando mudanças...',
+                subtitle: 'Salvando trocas e atualizando a estratégia do deck.',
+                accent: AppTheme.success,
+                icon: Icons.check_circle_outline_rounded,
+                tips: [
+                  'Estamos gravando as mudanças e recarregando o deck.',
+                  'As trocas aprovadas entram no deck só depois do salvamento final.',
+                  'Logo em seguida o app atualiza os detalhes e a estratégia da lista.',
                 ],
               ),
             ),
@@ -3547,74 +3537,92 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
               ),
             ),
           ),
-          Row(
-            children: [
-              Icon(Icons.tune, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Text('Otimizar Deck', style: theme.textTheme.headlineSmall),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Escolha uma estratégia para otimizar:',
-            style: theme.textTheme.bodyMedium,
+          _SheetHeroCard(
+            icon: Icons.tune_rounded,
+            title: 'Otimizar Deck',
+            subtitle:
+                'Escolha a direção da IA e aplique apenas mudanças seguras para este deck.',
+            accent: theme.colorScheme.primary,
           ),
           const SizedBox(height: 16),
-          InputDecorator(
-            decoration: const InputDecoration(
-              labelText: 'Bracket / Power level',
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<int>(
-                value: _selectedBracket,
-                isExpanded: true,
-                items: const [
-                  DropdownMenuItem(value: 1, child: Text('1 - Casual')),
-                  DropdownMenuItem(value: 2, child: Text('2 - Mid')),
-                  DropdownMenuItem(value: 3, child: Text('3 - High')),
-                  DropdownMenuItem(value: 4, child: Text('4 - cEDH')),
-                ],
-                onChanged: (v) {
-                  if (v == null) return;
-                  setState(() => _selectedBracket = v);
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          SwitchListTile.adaptive(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Manter tema do deck'),
-            subtitle: const Text(
-              'Otimiza sem trocar o plano principal e evita remover cartas núcleo.',
-            ),
-            value: _keepTheme,
-            onChanged: (v) => setState(() => _keepTheme = v),
-          ),
-          const SizedBox(height: 8),
-          if (savedArchetype != null && savedArchetype.trim().isNotEmpty) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+          _DialogSectionCard(
+            title: 'Configuração da otimização',
+            accent: theme.colorScheme.primary,
+            icon: Icons.settings_suggest_outlined,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Bracket / Power level',
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      value: _selectedBracket,
+                      isExpanded: true,
+                      items: const [
+                        DropdownMenuItem(value: 1, child: Text('1 - Casual')),
+                        DropdownMenuItem(value: 2, child: Text('2 - Mid')),
+                        DropdownMenuItem(value: 3, child: Text('3 - High')),
+                        DropdownMenuItem(value: 4, child: Text('4 - cEDH')),
+                      ],
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setState(() => _selectedBracket = v);
+                      },
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSlate,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: SwitchListTile.adaptive(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    title: const Text('Manter tema do deck'),
+                    subtitle: const Text(
+                      'Evita trocar o plano principal e preserva cartas núcleo quando possível.',
+                    ),
+                    value: _keepTheme,
+                    onChanged: (v) => setState(() => _keepTheme = v),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (savedArchetype != null && savedArchetype.trim().isNotEmpty) ...[
+            _DialogSectionCard(
+              title: 'Estratégia atual',
+              accent: AppTheme.primarySoft,
+              icon: Icons.auto_awesome_motion_rounded,
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      'Estratégia atual: $savedArchetype',
-                      style: theme.textTheme.bodyMedium,
+                      savedArchetype,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   TextButton(
                     onPressed: () {
                       setState(() => _showAllStrategies = !_showAllStrategies);
                     },
-                    child: Text(_showAllStrategies ? 'Ocultar' : 'Trocar'),
+                    child: Text(
+                      _showAllStrategies ? 'Ocultar outras' : 'Ver outras',
+                    ),
                   ),
                 ],
               ),
@@ -3623,7 +3631,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             FilledButton.icon(
               onPressed: () => _applyOptimization(context, savedArchetype),
               icon: const Icon(Icons.check),
-              label: const Text('Aplicar Otimização'),
+              label: const Text('Aplicar estratégia atual'),
             ),
             const SizedBox(height: 16),
           ],
@@ -3688,102 +3696,855 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                     _showAllStrategies
                         ? options
                         : const <Map<String, dynamic>>[];
+                if (visibleOptions.isEmpty) {
+                  return _DialogSectionCard(
+                    title: 'Estratégias alternativas ocultas',
+                    accent: AppTheme.textSecondary,
+                    icon: Icons.visibility_off_outlined,
+                    child: const Text(
+                      'Você pode seguir com a estratégia atual ou exibir novamente as demais opções para comparar.',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                  );
+                }
                 return ListView.separated(
                   controller: widget.scrollController,
                   itemCount: visibleOptions.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final option = visibleOptions[index];
-                    return Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                        side: BorderSide(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.3,
-                          ),
-                        ),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                        onTap: () {
-                          final title = (option['title'] ?? '').toString();
-                          if (title.isEmpty) return;
-                          _applyOptimization(context, title);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      option['title'] ?? 'Sem Título',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                    ),
-                                  ),
-                                  if (option['difficulty'] != null)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            theme
-                                                .colorScheme
-                                                .surfaceContainerHighest,
-                                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                      ),
-                                      child: Text(
-                                        option['difficulty'],
-                                        style: theme.textTheme.labelSmall,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                option['description'] ?? '',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Aplicar Estratégia',
-                                    style: TextStyle(
-                                      color: theme.colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    size: 16,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    return _StrategyOptionCard(
+                      title: (option['title'] ?? 'Sem Título').toString(),
+                      description: (option['description'] ?? '').toString(),
+                      difficulty: option['difficulty']?.toString(),
+                      accent: theme.colorScheme.primary,
+                      onTap: () {
+                        final title = (option['title'] ?? '').toString();
+                        if (title.isEmpty) return;
+                        _applyOptimization(context, title);
+                      },
                     );
                   },
                 );
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DialogTitleBlock extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Color accent;
+
+  const _DialogTitleBlock({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+          child: Icon(icon, color: accent, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  subtitle!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DialogSectionCard extends StatelessWidget {
+  final String title;
+  final Color accent;
+  final IconData? icon;
+  final Widget child;
+
+  const _DialogSectionCard({
+    required this.title,
+    required this.accent,
+    this.icon,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.2), width: 0.8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 16, color: accent),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _FlowProgressState {
+  final String stage;
+  final int stageNumber;
+  final int totalStages;
+
+  const _FlowProgressState({
+    required this.stage,
+    required this.stageNumber,
+    required this.totalStages,
+  });
+}
+
+class _FlowLoadingPresentation {
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final IconData icon;
+  final double? progress;
+  final int? stepNumber;
+  final int? totalSteps;
+  final List<String> tips;
+
+  const _FlowLoadingPresentation({
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.icon,
+    this.progress,
+    this.stepNumber,
+    this.totalSteps,
+    this.tips = const [],
+  });
+}
+
+class _FlowLoadingDialog extends StatefulWidget {
+  final String title;
+  final String? subtitle;
+  final Color accent;
+  final IconData icon;
+  final double? progress;
+  final int? stepNumber;
+  final int? totalSteps;
+  final List<String> tips;
+
+  const _FlowLoadingDialog({
+    required this.title,
+    this.subtitle,
+    required this.accent,
+    required this.icon,
+    this.progress,
+    this.stepNumber,
+    this.totalSteps,
+    this.tips = const [],
+  });
+
+  @override
+  State<_FlowLoadingDialog> createState() => _FlowLoadingDialogState();
+}
+
+class _FlowLoadingDialogState extends State<_FlowLoadingDialog> {
+  Timer? _tipTimer;
+  int _tipIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _configureTipRotation();
+  }
+
+  @override
+  void didUpdateWidget(covariant _FlowLoadingDialog oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tips != widget.tips) {
+      _tipIndex = 0;
+      _configureTipRotation();
+    }
+  }
+
+  void _configureTipRotation() {
+    _tipTimer?.cancel();
+    if (widget.tips.length <= 1) return;
+    _tipTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      setState(() {
+        _tipIndex = (_tipIndex + 1) % widget.tips.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _tipTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentTip =
+        widget.tips.isEmpty
+            ? null
+            : widget.tips[_tipIndex % widget.tips.length];
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: widget.accent.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              ),
+              child: Icon(widget.icon, color: widget.accent, size: 24),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              widget.title,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (widget.stepNumber != null && widget.totalSteps != null) ...[
+              const SizedBox(height: 10),
+              _DeckMetaChip(
+                label: 'Etapa ${widget.stepNumber} de ${widget.totalSteps}',
+                color: widget.accent,
+                icon: Icons.timelapse_rounded,
+              ),
+            ],
+            if (widget.subtitle != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                widget.subtitle!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  height: 1.35,
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            LinearProgressIndicator(value: widget.progress),
+            if (currentTip != null) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: 320,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceSlate,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(
+                    color: widget.accent.withValues(alpha: 0.16),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline_rounded,
+                      size: 18,
+                      color: widget.accent,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        child: Text(
+                          currentTip,
+                          key: ValueKey(currentTip),
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetHeroCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+
+  const _SheetHeroCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [accent.withValues(alpha: 0.18), AppTheme.surfaceElevated],
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: accent.withValues(alpha: 0.24), width: 0.8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
+            child: Icon(icon, color: accent),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StrategyOptionCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String? difficulty;
+  final Color accent;
+  final VoidCallback onTap;
+
+  const _StrategyOptionCard({
+    required this.title,
+    required this.description,
+    required this.accent,
+    required this.onTap,
+    this.difficulty,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        side: BorderSide(color: accent.withValues(alpha: 0.22), width: 0.8),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: accent,
+                      ),
+                    ),
+                  ),
+                  if (difficulty != null && difficulty!.trim().isNotEmpty)
+                    _DeckMetaChip(
+                      label: difficulty!,
+                      color: AppTheme.textSecondary,
+                    ),
+                ],
+              ),
+              if (description.trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Ver sugestões',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: accent,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(Icons.arrow_forward_rounded, size: 18, color: accent),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OptimizationPreviewDialog extends StatelessWidget {
+  final String mode;
+  final String archetype;
+  final bool keepTheme;
+  final String? preservedTheme;
+  final String reasoning;
+  final Map<String, dynamic>? qualityWarning;
+  final Map<String, dynamic> deckAnalysis;
+  final Map<String, dynamic> postAnalysis;
+  final Map<String, dynamic> warnings;
+  final List<Map<String, dynamic>> displayRemovals;
+  final List<Map<String, dynamic>> displayAdditions;
+  final VoidCallback onCancel;
+  final VoidCallback onConfirm;
+  final Future<void> Function()? onCopyDebug;
+
+  const _OptimizationPreviewDialog({
+    required this.mode,
+    required this.archetype,
+    required this.keepTheme,
+    required this.preservedTheme,
+    required this.reasoning,
+    required this.qualityWarning,
+    required this.deckAnalysis,
+    required this.postAnalysis,
+    required this.warnings,
+    required this.displayRemovals,
+    required this.displayAdditions,
+    required this.onCancel,
+    required this.onConfirm,
+    this.onCopyDebug,
+  });
+
+  List<String> _warningLines() {
+    final lines = <String>[];
+    if (warnings['filtered_by_color_identity'] is Map) {
+      lines.add(
+        'Algumas adições foram removidas por estarem fora da identidade do comandante.',
+      );
+    }
+    if (warnings['blocked_by_bracket'] is Map) {
+      lines.add(
+        'Algumas adições foram bloqueadas por exceder limites do bracket.',
+      );
+    }
+    if (warnings['invalid_cards'] != null) {
+      lines.add(
+        'Algumas cartas sugeridas não foram encontradas e foram removidas.',
+      );
+    }
+    return lines;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final warningLines = _warningLines();
+
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      title: _DialogTitleBlock(
+        icon:
+            mode == 'complete'
+                ? Icons.playlist_add_check_circle_outlined
+                : Icons.auto_awesome_rounded,
+        title:
+            mode == 'complete'
+                ? 'Completar deck ($archetype)'
+                : 'Sugestões para $archetype',
+        subtitle: 'Revise as mudanças antes de aplicar no deck.',
+        accent: mode == 'complete' ? AppTheme.mythicGold : AppTheme.manaViolet,
+      ),
+      content: SizedBox(
+        width: 560,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _DeckMetaChip(
+                    label:
+                        mode == 'complete' ? 'Modo Complete' : 'Modo Optimize',
+                    color:
+                        mode == 'complete'
+                            ? AppTheme.mythicGold
+                            : AppTheme.manaViolet,
+                    icon:
+                        mode == 'complete'
+                            ? Icons.playlist_add_rounded
+                            : Icons.auto_fix_high_rounded,
+                  ),
+                  if (keepTheme && preservedTheme != null)
+                    _DeckMetaChip(
+                      label: 'Tema: $preservedTheme',
+                      color: AppTheme.primarySoft,
+                      icon: Icons.category_outlined,
+                    ),
+                ],
+              ),
+              if (reasoning.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Leitura da IA',
+                  accent: AppTheme.primarySoft,
+                  icon: Icons.psychology_alt_outlined,
+                  child: Text(
+                    reasoning,
+                    style: const TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: AppTheme.textSecondary,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
+              if (qualityWarning != null) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Aviso de qualidade',
+                  accent: AppTheme.mythicGold,
+                  icon: Icons.info_outline_rounded,
+                  child: Text(
+                    qualityWarning!['message'] as String? ??
+                        'Otimização parcial.',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+              if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Antes vs Depois',
+                  accent: AppTheme.manaViolet,
+                  icon: Icons.compare_arrows_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _MetricDiffRow(
+                        label: 'CMC médio',
+                        before: '${deckAnalysis['average_cmc'] ?? '-'}',
+                        after: '${postAnalysis['average_cmc'] ?? '-'}',
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Curva: ${deckAnalysis['mana_curve_assessment'] ?? '-'}',
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
+                      if (postAnalysis['improvements'] is List &&
+                          (postAnalysis['improvements'] as List).isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            'Ganhos: ${(postAnalysis['improvements'] as List).take(2).join(' • ')}',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+              if (warningLines.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Avisos',
+                  accent: AppTheme.mythicGold,
+                  icon: Icons.warning_amber_rounded,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        warningLines
+                            .map(
+                              (line) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  '• $line',
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ],
+              if (displayRemovals.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Remover',
+                  accent: AppTheme.error,
+                  icon: Icons.remove_circle_outline_rounded,
+                  child: Column(
+                    children:
+                        displayRemovals
+                            .take(20)
+                            .map(
+                              (item) => _SuggestionLineItem(
+                                item: item,
+                                accent: AppTheme.error,
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ],
+              if (displayAdditions.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _DialogSectionCard(
+                  title: 'Adicionar',
+                  accent: AppTheme.success,
+                  icon: Icons.add_circle_outline_rounded,
+                  child: Column(
+                    children: [
+                      ...displayAdditions
+                          .take(30)
+                          .map(
+                            (item) => _SuggestionLineItem(
+                              item: item,
+                              accent: AppTheme.success,
+                            ),
+                          ),
+                      if (displayAdditions.length > 30)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            '+ ${displayAdditions.length - 30} cartas…',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: onCancel, child: const Text('Cancelar')),
+        if (onCopyDebug != null)
+          TextButton(
+            onPressed: () {
+              onCopyDebug!();
+            },
+            child: const Text('Copiar debug'),
+          ),
+        ElevatedButton(
+          onPressed: onConfirm,
+          child: const Text('Aplicar mudanças'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricDiffRow extends StatelessWidget {
+  final String label;
+  final String before;
+  final String after;
+
+  const _MetricDiffRow({
+    required this.label,
+    required this.before,
+    required this.after,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(
+          '$before → $after',
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SuggestionLineItem extends StatelessWidget {
+  final Map<String, dynamic> item;
+  final Color accent;
+
+  const _SuggestionLineItem({required this.item, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final name = item['name']?.toString() ?? '';
+    final confidenceMap =
+        (item['confidence'] is Map)
+            ? (item['confidence'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final confidenceLevel = confidenceMap['level']?.toString() ?? '';
+    final score = (confidenceMap['score'] as num?)?.toDouble();
+    final reason = item['reason']?.toString() ?? '';
+
+    String suffix = '';
+    if (confidenceLevel.isNotEmpty && score != null) {
+      suffix = ' • ${confidenceLevel.toUpperCase()} ${(score * 100).round()}%';
+    } else if (confidenceLevel.isNotEmpty) {
+      suffix = ' • ${confidenceLevel.toUpperCase()}';
+    } else if (score != null) {
+      suffix = ' • ${(score * 100).round()}%';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '• $name$suffix',
+            style: TextStyle(color: accent, fontWeight: FontWeight.w700),
+          ),
+          if (reason.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text(
+                reason,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
+                  height: 1.35,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -3800,28 +4561,28 @@ class _ColorIdentityPips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sorted = List<String>.from(colors)
-      ..sort((a, b) {
-        final ai = _wubrgOrder.indexOf(a);
-        final bi = _wubrgOrder.indexOf(b);
-        return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
-      });
+    final sorted = List<String>.from(colors)..sort((a, b) {
+      final ai = _wubrgOrder.indexOf(a);
+      final bi = _wubrgOrder.indexOf(b);
+      return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
+    });
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: sorted.map((c) {
-        return Padding(
-          padding: const EdgeInsets.only(right: 3),
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: SvgPicture.asset(
-              'assets/symbols/$c.svg',
-              placeholderBuilder: (_) => _FallbackColorPip(letter: c),
-            ),
-          ),
-        );
-      }).toList(),
+      children:
+          sorted.map((c) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 3),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: SvgPicture.asset(
+                  'assets/symbols/$c.svg',
+                  placeholderBuilder: (_) => _FallbackColorPip(letter: c),
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -3830,21 +4591,13 @@ class _FallbackColorPip extends StatelessWidget {
   final String letter;
   const _FallbackColorPip({required this.letter});
 
-  static const _colorMap = {
-    'W': Color(0xFFF9FAF4),
-    'U': Color(0xFF0E68AB),
-    'B': Color(0xFF150B00),
-    'R': Color(0xFFD3202A),
-    'G': Color(0xFF00733E),
-  };
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 20,
       height: 20,
       decoration: BoxDecoration(
-        color: _colorMap[letter] ?? AppTheme.textHint,
+        color: AppTheme.manaPipBackground(letter),
         shape: BoxShape.circle,
         border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
       ),
@@ -3854,9 +4607,59 @@ class _FallbackColorPip extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: letter == 'W' || letter == 'R' ? Colors.black87 : Colors.white,
+          color: AppTheme.manaPipForeground(letter),
         ),
       ),
+    );
+  }
+}
+
+class _DeckMetaChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData? icon;
+  final VoidCallback? onTap;
+
+  const _DeckMetaChip({
+    required this.label,
+    required this.color,
+    this.icon,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        border: Border.all(color: color.withValues(alpha: 0.28), width: 0.7),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (onTap == null) return content;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+      child: content,
     );
   }
 }

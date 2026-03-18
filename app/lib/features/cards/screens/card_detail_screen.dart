@@ -76,46 +76,51 @@ class CardDetailScreen extends StatelessWidget {
       onTap: () => _showFullscreenImage(context),
       child: AspectRatio(
         aspectRatio: _mtgCardAspectRatio,
-        child: card.imageUrl != null && card.imageUrl!.isNotEmpty
-            ? ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(AppTheme.radiusLg),
-                  bottomRight: Radius.circular(AppTheme.radiusLg),
-                ),
-                child: CachedCardImage(
-                  imageUrl: card.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                ),
-              )
-            : Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate,
+        child:
+            card.imageUrl != null && card.imageUrl!.isNotEmpty
+                ? ClipRRect(
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(AppTheme.radiusLg),
                     bottomRight: Radius.circular(AppTheme.radiusLg),
                   ),
-                  border: Border.all(
-                    color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.contain,
                   ),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.style, size: 48, color: AppTheme.textSecondary),
-                      SizedBox(height: 8),
-                      Text(
-                        'Sem imagem',
-                        style: TextStyle(
+                )
+                : Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSlate,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(AppTheme.radiusLg),
+                      bottomRight: Radius.circular(AppTheme.radiusLg),
+                    ),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.style,
+                          size: 48,
                           color: AppTheme.textSecondary,
-                          fontSize: AppTheme.fontMd,
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          'Sem imagem',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontMd,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
       ),
     );
   }
@@ -125,20 +130,21 @@ class CardDetailScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      barrierColor: Colors.black87,
-      builder: (_) => GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.all(16),
-          child: InteractiveViewer(
-            child: CachedCardImage(
-              imageUrl: card.imageUrl,
-              fit: BoxFit.contain,
+      barrierColor: AppTheme.backgroundAbyss.withValues(alpha: 0.94),
+      builder:
+          (_) => GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.all(16),
+              child: InteractiveViewer(
+                child: CachedCardImage(
+                  imageUrl: card.imageUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -190,35 +196,36 @@ class CardDetailScreen extends StatelessWidget {
     return Wrap(
       spacing: 3,
       runSpacing: 3,
-      children: matches.map((m) {
-        final symbol = m.group(1)!.toUpperCase();
-        final config = _manaSymbolConfig(symbol);
-        return Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            color: config.background,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: config.background.withValues(alpha: 0.4),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
+      children:
+          matches.map((m) {
+            final symbol = m.group(1)!.toUpperCase();
+            final config = _manaSymbolConfig(symbol);
+            return Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                color: config.background,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: config.background.withValues(alpha: 0.4),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-            ],
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            config.label,
-            style: TextStyle(
-              color: config.foreground,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              height: 1,
-            ),
-          ),
-        );
-      }).toList(),
+              alignment: Alignment.center,
+              child: Text(
+                config.label,
+                style: TextStyle(
+                  color: config.foreground,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -226,53 +233,45 @@ class CardDetailScreen extends StatelessWidget {
     switch (symbol) {
       case 'W':
         return _ManaSymbolStyle(
-          const Color(0xFFF0F2C0),
-          const Color(0xFF3D3000),
+          AppTheme.manaPipBackground('W'),
+          AppTheme.manaPipForeground('W'),
           'W',
         );
       case 'U':
         return _ManaSymbolStyle(
-          const Color(0xFFB3CEEA),
-          const Color(0xFF0A2340),
+          AppTheme.manaPipBackground('U'),
+          AppTheme.manaPipForeground('U'),
           'U',
         );
       case 'B':
         return _ManaSymbolStyle(
-          const Color(0xFFA69F9D),
-          const Color(0xFF1A1A1A),
+          AppTheme.manaPipBackground('B'),
+          AppTheme.manaPipForeground('B'),
           'B',
         );
       case 'R':
         return _ManaSymbolStyle(
-          const Color(0xFFEB9F82),
-          const Color(0xFF3D1005),
+          AppTheme.manaPipBackground('R'),
+          AppTheme.manaPipForeground('R'),
           'R',
         );
       case 'G':
         return _ManaSymbolStyle(
-          const Color(0xFFC4D3CA),
-          const Color(0xFF0C2E1A),
+          AppTheme.manaPipBackground('G'),
+          AppTheme.manaPipForeground('G'),
           'G',
         );
       case 'C':
         return _ManaSymbolStyle(
-          const Color(0xFFB8C0CC),
-          const Color(0xFF2A2A2A),
+          AppTheme.manaPipBackground('C'),
+          AppTheme.manaPipForeground('C'),
           'C',
         );
       case 'X':
-        return _ManaSymbolStyle(
-          const Color(0xFF94A3B8),
-          Colors.white,
-          'X',
-        );
+        return _ManaSymbolStyle(AppTheme.textSecondary, Colors.white, 'X');
       default:
         // Numeric or other generic symbols
-        return _ManaSymbolStyle(
-          const Color(0xFF94A3B8),
-          Colors.white,
-          symbol,
-        );
+        return _ManaSymbolStyle(AppTheme.textSecondary, Colors.white, symbol);
     }
   }
 
@@ -303,21 +302,22 @@ class CardDetailScreen extends StatelessWidget {
               color: AppTheme.outlineMuted.withValues(alpha: 0.4),
             ),
           ),
-          child: hasText
-              ? Text(
-                  card.oracleText!,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textPrimary,
-                    height: 1.5,
+          child:
+              hasText
+                  ? Text(
+                    card.oracleText!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.5,
+                    ),
+                  )
+                  : Text(
+                    'Sem texto de regras',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textHint,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
-                )
-              : Text(
-                  'Sem texto de regras',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textHint,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
         ),
       ],
     );
@@ -491,16 +491,21 @@ class CardDetailScreen extends StatelessWidget {
         card.colorIdentity.isNotEmpty ? card.colorIdentity : card.colors;
 
     if (identityColors.isEmpty) {
-      return _colorCircle('C', const Color(0xFFB8C0CC), const Color(0xFF2A2A2A));
+      return _colorCircle(
+        'C',
+        AppTheme.manaPipBackground('C'),
+        AppTheme.manaPipForeground('C'),
+      );
     }
 
     return Wrap(
       spacing: 4,
-      children: identityColors.map((c) {
-        final upper = c.toUpperCase();
-        final config = _manaSymbolConfig(upper);
-        return _colorCircle(upper, config.background, config.foreground);
-      }).toList(),
+      children:
+          identityColors.map((c) {
+            final upper = c.toUpperCase();
+            final config = _manaSymbolConfig(upper);
+            return _colorCircle(upper, config.background, config.foreground);
+          }).toList(),
     );
   }
 
@@ -511,16 +516,15 @@ class CardDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white24, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+          width: 0.5,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(
-          color: fg,
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-        ),
+        style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.w800),
       ),
     );
   }
@@ -539,18 +543,7 @@ class CardDetailScreen extends StatelessWidget {
   // Rarity helpers
   // ---------------------------------------------------------------------------
   Color _rarityColor(String rarity) {
-    switch (rarity.toLowerCase()) {
-      case 'common':
-        return Colors.grey;
-      case 'uncommon':
-        return const Color(0xFFC0C0C0);
-      case 'rare':
-        return const Color(0xFFFFD700);
-      case 'mythic':
-        return AppTheme.mythicGold;
-      default:
-        return Colors.grey;
-    }
+    return AppTheme.rarityColor(rarity);
   }
 
   String _capitalizeRarity(String rarity) {

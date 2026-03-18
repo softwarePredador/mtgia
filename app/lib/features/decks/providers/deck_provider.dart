@@ -735,6 +735,8 @@ class DeckProvider extends ChangeNotifier {
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
     try {
+      onProgress?.call('Preparando análise do deck...', 0, 5);
+
       final payload = <String, dynamic>{
         'deck_id': deckId,
         'archetype': archetype,
@@ -770,8 +772,8 @@ class DeckProvider extends ChangeNotifier {
         final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
         AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
         onProgress?.call(
-          'Iniciando otimização...',
-          0,
+          'Preparando referências do commander...',
+          1,
           data['total_stages'] as int? ?? 6,
         );
         return await _pollOptimizeJob(
