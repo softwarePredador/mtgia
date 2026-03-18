@@ -14,6 +14,10 @@ Arquivo atual do corpus:
 
 - `server/test/fixtures/optimization_resolution_corpus.json`
 
+Handoff de continuidade desta frente:
+
+- `server/doc/OPTIMIZATION_RESOLUTION_HANDOFF_2026-03-18.md`
+
 ## Quando adicionar um deck novo
 
 Adicione um deck ao corpus quando ele:

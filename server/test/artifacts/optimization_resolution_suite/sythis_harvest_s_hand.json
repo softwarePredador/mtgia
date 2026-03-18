@@ -1,10 +1,10 @@
 {
   "source_deck_id": "c4b6065d-0750-4bf0-8f7b-972e722a67d8",
   "source_deck_name": "Corpus Seed - Sythis, Harvest's Hand",
-  "clone_deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
-  "final_deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
+  "clone_deck_id": "398f4cb7-0615-48e9-9772-1be09849ad81",
+  "final_deck_id": "398f4cb7-0615-48e9-9772-1be09849ad81",
   "optimize_request": {
-    "deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
+    "deck_id": "398f4cb7-0615-48e9-9772-1be09849ad81",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -52,7 +52,7 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "55234635-d469-4c80-a3b7-0ead894041ad"
+    "deck_id": "398f4cb7-0615-48e9-9772-1be09849ad81"
   },
   "final_analysis": {
     "detected_archetype": "stax",

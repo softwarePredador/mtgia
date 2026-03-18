@@ -1,10 +1,10 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
-  "final_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
+  "clone_deck_id": "ebc5db4e-def7-4ef8-84ae-0c0314f0e224",
+  "final_deck_id": "965a5718-c45f-4cc1-b834-f7d77a071052",
   "optimize_request": {
-    "deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+    "deck_id": "ebc5db4e-def7-4ef8-84ae-0c0314f0e224",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -34,7 +34,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+        "deck_id": "ebc5db4e-def7-4ef8-84ae-0c0314f0e224",
         "bracket": 4,
         "archetype": "aggro",
         "theme": "counters",
@@ -105,17 +105,17 @@
     "outcome_code": "rebuild_created",
     "save_mode": "draft_clone",
     "applied_to_original": false,
-    "source_deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
-    "draft_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
+    "source_deck_id": "ebc5db4e-def7-4ef8-84ae-0c0314f0e224",
+    "draft_deck_id": "965a5718-c45f-4cc1-b834-f7d77a071052",
     "draft_deck": {
-      "id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
-      "name": "Rebuild Draft - Resolution Validation - Auntie Ool, Cursewretch - 1773845642694",
+      "id": "965a5718-c45f-4cc1-b834-f7d77a071052",
+      "name": "Rebuild Draft - Resolution Validation - Auntie Ool, Cursewretch - 1773846822924",
       "format": "commander",
-      "description": "Draft de rebuild_guided criado a partir de 0cc6af9f-4c42-4519-be9a-42c118044fa8 | theme=counters | scope=repair_partial",
+      "description": "Draft de rebuild_guided criado a partir de ebc5db4e-def7-4ef8-84ae-0c0314f0e224 | theme=counters | scope=repair_partial",
       "archetype": "midrange",
       "bracket": 4,
       "is_public": false,
-      "created_at": "2026-03-18T14:55:24.659958Z"
+      "created_at": "2026-03-18T15:15:05.207698Z"
     },
     "rebuild_scope_requested": "auto",
     "rebuild_scope_selected": "repair_partial",
@@ -832,14 +832,14 @@
     "next_action": {
       "type": "review_rebuild_draft",
       "applied_to_original": false,
-      "draft_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3"
+      "draft_deck_id": "965a5718-c45f-4cc1-b834-f7d77a071052"
     }
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3"
+    "deck_id": "965a5718-c45f-4cc1-b834-f7d77a071052"
   },
   "final_analysis": {
     "detected_archetype": "midrange",

@@ -1,10 +1,10 @@
 {
   "source_deck_id": "532cbc1d-a906-4075-91e4-da64f9e5fa4f",
   "source_deck_name": "Corpus Seed - Urza, Lord High Artificer",
-  "clone_deck_id": "9d04085c-6a42-4638-bd2a-558134e016c9",
-  "final_deck_id": "9d04085c-6a42-4638-bd2a-558134e016c9",
+  "clone_deck_id": "e3359599-30b9-4d6b-a88d-322b60d5b303",
+  "final_deck_id": "e3359599-30b9-4d6b-a88d-322b60d5b303",
   "optimize_request": {
-    "deck_id": "9d04085c-6a42-4638-bd2a-558134e016c9",
+    "deck_id": "e3359599-30b9-4d6b-a88d-322b60d5b303",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -54,7 +54,7 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "9d04085c-6a42-4638-bd2a-558134e016c9"
+    "deck_id": "e3359599-30b9-4d6b-a88d-322b60d5b303"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
