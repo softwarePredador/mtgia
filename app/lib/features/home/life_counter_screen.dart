@@ -57,6 +57,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 
   int _playerCount = 2;
   int _startingLife = 20;
+  bool _isHubExpanded = false;
 
   late List<int> _lives;
   late List<int> _poison;
@@ -439,6 +440,11 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   }
 
   void _showSettingsDialog() {
+    if (_isHubExpanded) {
+      setState(() {
+        _isHubExpanded = false;
+      });
+    }
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surfaceSlate,
@@ -464,6 +470,11 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   }
 
   void _showTableToolsSheet() {
+    if (_isHubExpanded) {
+      setState(() {
+        _isHubExpanded = false;
+      });
+    }
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surfaceSlate,
@@ -533,24 +544,36 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceElevated,
-        title: const Text('Contador de Vida'),
-      ),
+      backgroundColor: AppTheme.backgroundAbyss,
       body: Container(
         decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child:
-                  _playerCount <= 2 ? _buildTwoPlayers() : _buildGridPlayers(),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                ignoring: false,
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              const Positioned.fill(child: _LifeCounterBackdrop()),
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 6, 6, 10),
+                  child:
+                      _playerCount <= 2
+                          ? _buildTwoPlayers()
+                          : _buildGridPlayers(),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                left: 8,
+                child: _TableEdgeAction(
+                  icon: Icons.arrow_back_rounded,
+                  label: 'Sair',
+                  onTap: () => Navigator.of(context).maybePop(),
+                ),
+              ),
+              Positioned.fill(
                 child: Center(
                   child: _TableControlHub(
+                    isExpanded: _isHubExpanded,
                     playerCount: _playerCount,
                     startingLife: _startingLife,
                     canUndo: _history.isNotEmpty,
@@ -567,6 +590,11 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                         _firstPlayerIndex == null
                             ? null
                             : '1º ${_playerLabels[_firstPlayerIndex!]}',
+                    onToggle: () {
+                      setState(() {
+                        _isHubExpanded = !_isHubExpanded;
+                      });
+                    },
                     onSettings: _showSettingsDialog,
                     onTools: _showTableToolsSheet,
                     onUndo: _history.isNotEmpty ? _undo : null,
@@ -574,8 +602,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -603,6 +631,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
               onCountersTap: () => _showCountersSheet(i),
               quickPlusKey: Key('life-counter-quick-plus-$i'),
               quickMinusKey: Key('life-counter-quick-minus-$i'),
+              countersKey: Key('life-counter-counters-$i'),
               quarterTurns: i == 0 && _playerCount == 2 ? 2 : 0,
             ),
           ),
@@ -636,6 +665,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                     onCountersTap: () => _showCountersSheet(0),
                     quickPlusKey: const Key('life-counter-quick-plus-0'),
                     quickMinusKey: const Key('life-counter-quick-minus-0'),
+                    countersKey: const Key('life-counter-counters-0'),
                     compact: true,
                     quarterTurns: 2,
                   ),
@@ -660,6 +690,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                     onCountersTap: () => _showCountersSheet(1),
                     quickPlusKey: const Key('life-counter-quick-plus-1'),
                     quickMinusKey: const Key('life-counter-quick-minus-1'),
+                    countersKey: const Key('life-counter-counters-1'),
                     compact: true,
                     quarterTurns: 2,
                   ),
@@ -690,6 +721,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                     onCountersTap: () => _showCountersSheet(2),
                     quickPlusKey: const Key('life-counter-quick-plus-2'),
                     quickMinusKey: const Key('life-counter-quick-minus-2'),
+                    countersKey: const Key('life-counter-counters-2'),
                     compact: true,
                     quarterTurns: 0,
                   ),
@@ -715,6 +747,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                       onCountersTap: () => _showCountersSheet(3),
                       quickPlusKey: const Key('life-counter-quick-plus-3'),
                       quickMinusKey: const Key('life-counter-quick-minus-3'),
+                      countersKey: const Key('life-counter-counters-3'),
                       compact: true,
                       quarterTurns: 0,
                     ),
@@ -740,7 +773,125 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 // Tabletop control hub
 // ---------------------------------------------------------------------------
 
+class _LifeCounterBackdrop extends StatelessWidget {
+  const _LifeCounterBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Positioned(
+            top: -80,
+            left: -60,
+            child: _BackdropGlow(
+              size: 220,
+              color: AppTheme.manaViolet.withValues(alpha: 0.12),
+            ),
+          ),
+          Positioned(
+            top: 80,
+            right: -40,
+            child: _BackdropGlow(
+              size: 200,
+              color: AppTheme.mythicGold.withValues(alpha: 0.1),
+            ),
+          ),
+          Positioned(
+            bottom: 110,
+            left: -50,
+            child: _BackdropGlow(
+              size: 210,
+              color: AppTheme.primarySoft.withValues(alpha: 0.1),
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -30,
+            child: _BackdropGlow(
+              size: 240,
+              color: AppTheme.error.withValues(alpha: 0.1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BackdropGlow extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _BackdropGlow({required this.size, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, color.withValues(alpha: 0)],
+          stops: const [0, 1],
+        ),
+      ),
+    );
+  }
+}
+
+class _TableEdgeAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _TableEdgeAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+            border: Border.all(
+              color: AppTheme.outlineMuted.withValues(alpha: 0.9),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: AppTheme.textPrimary, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _TableControlHub extends StatelessWidget {
+  final bool isExpanded;
   final int playerCount;
   final int startingLife;
   final bool canUndo;
@@ -748,12 +899,14 @@ class _TableControlHub extends StatelessWidget {
   final String? monarchLabel;
   final String? initiativeLabel;
   final String? firstPlayerLabel;
+  final VoidCallback onToggle;
   final VoidCallback onSettings;
   final VoidCallback onTools;
   final VoidCallback? onUndo;
   final VoidCallback onReset;
 
   const _TableControlHub({
+    required this.isExpanded,
     required this.playerCount,
     required this.startingLife,
     required this.canUndo,
@@ -761,6 +914,7 @@ class _TableControlHub extends StatelessWidget {
     required this.monarchLabel,
     required this.initiativeLabel,
     required this.firstPlayerLabel,
+    required this.onToggle,
     required this.onSettings,
     required this.onTools,
     required this.onUndo,
@@ -769,136 +923,278 @@ class _TableControlHub extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      key: const Key('life-counter-control-hub'),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.backgroundAbyss.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.22),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    final statusChips = <Widget>[
+      if (stormCount > 0)
+        _HubStatusChip(
+          chipKey: const Key('life-counter-hub-status-storm'),
+          label: 'Storm $stormCount',
+          color: AppTheme.warning,
+        ),
+      if (monarchLabel != null)
+        _HubStatusChip(
+          chipKey: const Key('life-counter-hub-status-monarch'),
+          label: monarchLabel!,
+          color: AppTheme.mythicGold,
+        ),
+      if (initiativeLabel != null)
+        _HubStatusChip(
+          chipKey: const Key('life-counter-hub-status-initiative'),
+          label: initiativeLabel!,
+          color: AppTheme.success,
+        ),
+      if (firstPlayerLabel != null)
+        _HubStatusChip(
+          chipKey: const Key('life-counter-hub-status-first-player'),
+          label: firstPlayerLabel!,
+          color: AppTheme.primarySoft,
+        ),
+    ];
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
       child: Column(
+        key: const Key('life-counter-control-hub'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              key: const Key('life-counter-hub-settings'),
-              customBorder: const CircleBorder(),
-              onTap: onSettings,
-              child: Ink(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.manaViolet.withValues(alpha: 0.28),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+          if (isExpanded)
+            Container(
+              constraints: const BoxConstraints(maxWidth: 320),
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.9),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Mesa Commander',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.fontLg,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$playerCount jogadores • $startingLife de vida',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (statusChips.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: statusChips,
                     ),
                   ],
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.tune_rounded, color: Colors.white, size: 24),
-                    SizedBox(height: 2),
-                    Text(
-                      'Mesa',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: AppTheme.fontXs,
-                        fontWeight: FontWeight.w700,
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _HubSecondaryAction(
+                        buttonKey: const Key('life-counter-hub-settings'),
+                        icon: Icons.tune_rounded,
+                        label: 'Mesa',
+                        accent: AppTheme.manaViolet,
+                        onTap: onSettings,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      _HubSecondaryAction(
+                        buttonKey: const Key('life-counter-hub-undo'),
+                        icon: Icons.undo_rounded,
+                        label: 'Undo',
+                        accent: canUndo ? AppTheme.success : AppTheme.textHint,
+                        onTap: onUndo,
+                      ),
+                      const SizedBox(width: 8),
+                      _HubSecondaryAction(
+                        buttonKey: const Key('life-counter-hub-tools'),
+                        icon: Icons.casino_rounded,
+                        label: 'Tools',
+                        accent: AppTheme.mythicGold,
+                        onTap: onTools,
+                      ),
+                      const SizedBox(width: 8),
+                      _HubSecondaryAction(
+                        buttonKey: const Key('life-counter-hub-reset'),
+                        icon: Icons.refresh_rounded,
+                        label: 'Reset',
+                        accent: AppTheme.error,
+                        onTap: onReset,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          _HubMedallion(isExpanded: isExpanded, onTap: onToggle),
+          if (!isExpanded) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                border: Border.all(
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.8),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                '$playerCount jogadores • $startingLife vida',
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '$playerCount jogadores • $startingLife vida',
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          if (stormCount > 0 ||
-              monarchLabel != null ||
-              initiativeLabel != null ||
-              firstPlayerLabel != null) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                if (stormCount > 0)
-                  _HubStatusChip(
-                    chipKey: const Key('life-counter-hub-status-storm'),
-                    label: 'Storm $stormCount',
-                    color: AppTheme.warning,
-                  ),
-                if (monarchLabel != null)
-                  _HubStatusChip(
-                    chipKey: const Key('life-counter-hub-status-monarch'),
-                    label: monarchLabel!,
-                    color: AppTheme.mythicGold,
-                  ),
-                if (initiativeLabel != null)
-                  _HubStatusChip(
-                    chipKey: const Key('life-counter-hub-status-initiative'),
-                    label: initiativeLabel!,
-                    color: AppTheme.success,
-                  ),
-                if (firstPlayerLabel != null)
-                  _HubStatusChip(
-                    chipKey: const Key('life-counter-hub-status-first-player'),
-                    label: firstPlayerLabel!,
-                    color: AppTheme.primarySoft,
-                  ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _HubSecondaryAction(
-                buttonKey: const Key('life-counter-hub-undo'),
-                icon: Icons.undo_rounded,
-                label: 'Undo',
-                accent: canUndo ? AppTheme.success : AppTheme.textHint,
-                onTap: onUndo,
-              ),
-              const SizedBox(width: 8),
-              _HubSecondaryAction(
-                buttonKey: const Key('life-counter-hub-tools'),
-                icon: Icons.casino_rounded,
-                label: 'Tools',
-                accent: AppTheme.mythicGold,
-                onTap: onTools,
-              ),
-              const SizedBox(width: 8),
-              _HubSecondaryAction(
-                buttonKey: const Key('life-counter-hub-reset'),
-                icon: Icons.refresh_rounded,
-                label: 'Reset',
-                accent: AppTheme.error,
-                onTap: onReset,
+            if (statusChips.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 260),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: statusChips,
+                ),
               ),
             ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _HubMedallion extends StatelessWidget {
+  final bool isExpanded;
+  final VoidCallback onTap;
+
+  const _HubMedallion({required this.isExpanded, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: const Key('life-counter-hub-toggle'),
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: isExpanded ? 106 : 96,
+              height: isExpanded ? 106 : 96,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppTheme.goldAccentGradient,
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.24),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.mythicGold.withValues(alpha: 0.32),
+                    blurRadius: 22,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: isExpanded ? 82 : 74,
+              height: isExpanded ? 82 : 74,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppTheme.surfaceElevated, AppTheme.backgroundAbyss],
+                ),
+                border: Border.all(
+                  color: AppTheme.manaViolet.withValues(alpha: 0.45),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    isExpanded
+                        ? Icons.close_rounded
+                        : Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: isExpanded ? 26 : 24,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    isExpanded ? 'Fechar' : 'Mesa',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppTheme.fontXs,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 12,
+              child: _HubOrbitDot(color: AppTheme.manaViolet),
+            ),
+            Positioned(
+              bottom: 12,
+              left: 10,
+              child: _HubOrbitDot(color: AppTheme.primarySoft),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HubOrbitDot extends StatelessWidget {
+  final Color color;
+
+  const _HubOrbitDot({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.45),
+            blurRadius: 8,
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -1021,6 +1317,7 @@ class _PlayerPanel extends StatelessWidget {
   final VoidCallback onCountersTap;
   final Key? quickPlusKey;
   final Key? quickMinusKey;
+  final Key? countersKey;
   final int quarterTurns;
   final bool compact;
 
@@ -1040,31 +1337,61 @@ class _PlayerPanel extends StatelessWidget {
     required this.onCountersTap,
     this.quickPlusKey,
     this.quickMinusKey,
+    this.countersKey,
     this.quarterTurns = 0,
     this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final panelStart = Color.lerp(color, AppTheme.backgroundAbyss, 0.18)!;
+    final panelMid = Color.lerp(color, AppTheme.surfaceSlate, 0.62)!;
+    final panelEnd = Color.lerp(color, AppTheme.backgroundAbyss, 0.74)!;
+
     final content = Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppTheme.surfaceElevated, AppTheme.surfaceSlate],
+          colors: [panelStart, panelMid, panelEnd],
+          stops: const [0.0, 0.52, 1.0],
         ),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: color.withValues(alpha: 0.12),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Stack(
         children: [
+          Positioned(
+            top: -28,
+            right: -18,
+            child: _BackdropGlow(
+              size: compact ? 120 : 150,
+              color: color.withValues(alpha: 0.18),
+            ),
+          ),
+          Positioned(
+            bottom: -36,
+            left: -12,
+            child: _BackdropGlow(
+              size: compact ? 110 : 135,
+              color: Colors.white.withValues(alpha: 0.06),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            left: 12,
+            child: _SeatChip(label: label, color: color, compact: compact),
+          ),
           Positioned(
             left: 8,
             top: 8,
@@ -1098,8 +1425,8 @@ class _PlayerPanel extends StatelessWidget {
                   child: Center(
                     child: Icon(
                       Icons.add,
-                      color: color.withValues(alpha: 0.6),
-                      size: compact ? 28 : 40,
+                      color: Colors.white.withValues(alpha: 0.72),
+                      size: compact ? 30 : 42,
                     ),
                   ),
                 ),
@@ -1112,20 +1439,20 @@ class _PlayerPanel extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      label,
-                      style: TextStyle(
-                        color: color.withValues(alpha: 0.7),
-                        fontSize: compact ? AppTheme.fontXs : AppTheme.fontSm,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
                       '$life',
                       style: TextStyle(
-                        color: life <= 0 ? AppTheme.error : color,
-                        fontSize: compact ? 44 : 64,
-                        fontWeight: FontWeight.bold,
+                        color: life <= 0 ? AppTheme.error : Colors.white,
+                        fontSize: compact ? 52 : 72,
+                        fontWeight: FontWeight.w800,
                         height: 1.1,
+                        letterSpacing: -1.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                     ),
                     // Badges row: poison + commander damage
@@ -1141,8 +1468,8 @@ class _PlayerPanel extends StatelessWidget {
                   child: Center(
                     child: Icon(
                       Icons.remove,
-                      color: color.withValues(alpha: 0.6),
-                      size: compact ? 28 : 40,
+                      color: Colors.white.withValues(alpha: 0.72),
+                      size: compact ? 30 : 42,
                     ),
                   ),
                 ),
@@ -1154,7 +1481,11 @@ class _PlayerPanel extends StatelessWidget {
           Positioned(
             right: 4,
             bottom: 4,
-            child: _CountersButton(onTap: onCountersTap, compact: compact),
+            child: _CountersButton(
+              buttonKey: countersKey,
+              onTap: onCountersTap,
+              compact: compact,
+            ),
           ),
         ],
       ),
@@ -1237,6 +1568,42 @@ class _PlayerPanel extends StatelessWidget {
   }
 }
 
+class _SeatChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool compact;
+
+  const _SeatChip({
+    required this.label,
+    required this.color,
+    required this.compact,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 4 : 5,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        border: Border.all(color: color.withValues(alpha: 0.36), width: 1),
+      ),
+      child: Text(
+        label.replaceFirst('Jogador ', 'P'),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: compact ? AppTheme.fontXs : AppTheme.fontSm,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
 class _LifeQuickAdjustButton extends StatelessWidget {
   final Key? buttonKey;
   final String label;
@@ -1265,7 +1632,7 @@ class _LifeQuickAdjustButton extends StatelessWidget {
           onTap: onTap,
           child: Ink(
             decoration: BoxDecoration(
-              color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
+              color: AppTheme.backgroundAbyss.withValues(alpha: 0.78),
               borderRadius: BorderRadius.circular(AppTheme.radiusXl),
               border: Border.all(
                 color: color.withValues(alpha: 0.34),
@@ -1376,33 +1743,39 @@ class _TextBadgeChip extends StatelessWidget {
 // Counters button (opens the counters bottom sheet)
 // ---------------------------------------------------------------------------
 class _CountersButton extends StatelessWidget {
+  final Key? buttonKey;
   final VoidCallback onTap;
   final bool compact;
 
-  const _CountersButton({required this.onTap, required this.compact});
+  const _CountersButton({
+    this.buttonKey,
+    required this.onTap,
+    required this.compact,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        key: buttonKey,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         onTap: onTap,
         child: Container(
-          width: compact ? 44 : 52,
-          height: compact ? 44 : 52,
+          width: compact ? 48 : 56,
+          height: compact ? 48 : 56,
           decoration: BoxDecoration(
-            color: AppTheme.outlineMuted.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            color: AppTheme.backgroundAbyss.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color: AppTheme.textSecondary.withValues(alpha: 0.14),
-              width: 0.8,
+              color: AppTheme.primarySoft.withValues(alpha: 0.2),
+              width: 1,
             ),
           ),
           child: Icon(
             Icons.dashboard_customize,
-            color: AppTheme.textSecondary,
-            size: compact ? 20 : 22,
+            color: Colors.white.withValues(alpha: 0.86),
+            size: compact ? 22 : 24,
           ),
         ),
       ),

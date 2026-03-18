@@ -39,6 +39,22 @@ Este documento serve para:
   - `d20`
   - sorteio / marcação do primeiro jogador
 
+## Rodada visual autoral posterior
+
+Para evitar que o contador ficasse com cara de referência copiada, a direção visual foi puxada para uma identidade própria do app:
+
+- remoção do `AppBar` da tela principal de mesa
+- criação de um medalhão central expansível em vez de barra fixa genérica
+- uso de gradientes e brilho compatíveis com a paleta do `ManaLoom`
+- quadrantes dos jogadores tratados como áreas de mesa imersivas, não cards escuros empilhados
+- saída da tela deslocada para uma ação periférica discreta
+
+Princípio adicional adotado:
+
+7. Inspiração de mesa é válida; cópia literal não.
+- referências externas podem orientar ergonomia
+- a solução final precisa manter linguagem visual e semântica próprias do produto
+
 ## Princípios de UX de mesa adotados
 
 1. Ações críticas devem viver em zona neutra.

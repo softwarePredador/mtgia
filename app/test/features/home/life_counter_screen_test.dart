@@ -23,6 +23,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('life-counter-control-hub')), findsOneWidget);
+      expect(find.byKey(const Key('life-counter-hub-toggle')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+
       expect(
         find.byKey(const Key('life-counter-hub-settings')),
         findsOneWidget,
@@ -46,12 +51,14 @@ void main() {
         await tester.pumpWidget(createSubject());
         await tester.pumpAndSettle();
 
+        await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('life-counter-hub-settings')));
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(ChoiceChip, '4'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Jogador 4'), findsOneWidget);
+        expect(find.text('P4'), findsOneWidget);
         expect(find.byType(RotatedBox), findsNWidgets(2));
       },
     );
@@ -63,7 +70,7 @@ void main() {
       await tester.pumpWidget(createSubject());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.dashboard_customize).first);
+      await tester.tap(find.byKey(const Key('life-counter-counters-1')));
       await tester.pumpAndSettle();
 
       expect(find.text('Commander casts'), findsOneWidget);
@@ -103,6 +110,8 @@ void main() {
       await tester.pumpWidget(createSubject());
       await tester.pumpAndSettle();
 
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('life-counter-hub-tools')));
       await tester.pumpAndSettle();
 

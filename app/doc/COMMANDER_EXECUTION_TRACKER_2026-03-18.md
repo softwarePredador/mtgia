@@ -47,6 +47,7 @@ Transformar o roadmap em uma fila executável, com status claro, ordem de trabal
 | APP-UI-04 | Visual / layout | Limpeza fina de hardcodes e estados secundários | IN_PROGRESS | contraste, headers secundários, empty states |
 | APP-LIFE-01 | Contador de vida | Ergonomia de mesa e hub central | DONE | controles centrais, rotação, toque melhor |
 | APP-LIFE-02 | Contador de vida | Ferramentas de Commander na mesa | DONE | tax, casts, +5/-5, storm, monarch, initiative, d20 |
+| APP-LIFE-04 | Contador de vida | Identidade visual própria da mesa | DONE | hub expansível, sem AppBar e quadrantes imersivos sem copiar referência |
 | APP-LIFE-03 | Contador de vida | Presets e suporte avançado de variantes | QUEUED | partner, formatos, refinamentos opcionais |
 | APP-BINDER-01 | Coleção / trade | Conectar deck ao binder | QUEUED | mostrar o que já possui e o que falta |
 | APP-BINDER-02 | Coleção / trade | Matching útil de have/want | QUEUED | proposta de valor real para troca |
@@ -62,6 +63,7 @@ Transformar o roadmap em uma fila executável, com status claro, ordem de trabal
 - diagnóstico rápido de deck na visão geral
 - consolidação visual principal
 - contador de vida em nível de uso real de mesa
+- contador de vida com identidade visual própria e hub central expansível
 
 ### Em execução agora
 

@@ -272,6 +272,11 @@ Pontos obrigatórios para esta fase:
 - atalhos rápidos de `+5/-5`
 - `Storm`, `Monarch` e `Initiative` integrados ao hub de mesa
 - `coin flip`, `d20` e sorteio do primeiro jogador no fluxo da partida
+- redesign visual do contador com linguagem própria do app:
+  - remoção do `AppBar` da experiência principal de mesa
+  - hub central expansível com medalhão autoral
+  - quadrantes com fundos imersivos e menos cara de card genérico
+  - saída da tela tratada como ação periférica, não como centro operacional
 
 #### Must-have
 

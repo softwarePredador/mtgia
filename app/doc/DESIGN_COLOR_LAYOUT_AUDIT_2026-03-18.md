@@ -58,6 +58,10 @@ Atualização adicional dentro da frente de consistência:
   - messages
   - trade inbox
   - latest set collection
+- contador de vida ganhou uma direção visual mais autoral:
+  - medalhão central expansível
+  - menos chrome tradicional
+  - quadrantes mais imersivos e menos “cards genéricos”
 
 Documento complementar para o contador de vida:
 
