@@ -62,12 +62,12 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
 
   void _doSearch() {
     context.read<BinderProvider>().fetchMarketplace(
-          search: _searchController.text.trim(),
-          condition: _conditionFilter,
-          forTrade: _onlyTrade ? true : null,
-          forSale: _onlySale ? true : null,
-          reset: true,
-        );
+      search: _searchController.text.trim(),
+      condition: _conditionFilter,
+      forTrade: _onlyTrade ? true : null,
+      forSale: _onlySale ? true : null,
+      reset: true,
+    );
   }
 
   @override
@@ -77,22 +77,23 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
       children: [
         // Search bar (local state only — no provider rebuild needed)
         Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: TextField(
             controller: _searchController,
             onSubmitted: (_) => _doSearch(),
             style: const TextStyle(
-                color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
+              color: AppTheme.textPrimary,
+              fontSize: AppTheme.fontMd,
+            ),
             decoration: InputDecoration(
               hintText: 'Buscar carta no marketplace...',
-              hintStyle:
-                  const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon: const Icon(Icons.search,
-                  color: AppTheme.textSecondary),
+              hintStyle: const TextStyle(color: AppTheme.textSecondary),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppTheme.textSecondary,
+              ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.clear,
-                    color: AppTheme.textSecondary),
+                icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
                 onPressed: () {
                   _searchController.clear();
                   _doSearch();
@@ -100,8 +101,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
               ),
               filled: true,
               fillColor: AppTheme.surfaceSlate,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 0),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 borderSide: BorderSide.none,
@@ -132,19 +132,20 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     setState(() => _onlyTrade = v);
                     _doSearch();
                   },
-                  selectedColor:
-                      AppTheme.primarySoft.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.primarySoft.withValues(alpha: 0.3),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color: _onlyTrade
-                        ? AppTheme.primarySoft
-                        : AppTheme.textSecondary,
+                    color:
+                        _onlyTrade
+                            ? AppTheme.primarySoft
+                            : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color: _onlyTrade
-                        ? AppTheme.primarySoft
-                        : AppTheme.outlineMuted,
+                    color:
+                        _onlyTrade
+                            ? AppTheme.primarySoft
+                            : AppTheme.outlineMuted,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -155,19 +156,18 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     setState(() => _onlySale = v);
                     _doSearch();
                   },
-                  selectedColor:
-                      AppTheme.mythicGold.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.mythicGold.withValues(alpha: 0.3),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color: _onlySale
-                        ? AppTheme.mythicGold
-                        : AppTheme.textSecondary,
+                    color:
+                        _onlySale
+                            ? AppTheme.mythicGold
+                            : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color: _onlySale
-                        ? AppTheme.mythicGold
-                        : AppTheme.outlineMuted,
+                    color:
+                        _onlySale ? AppTheme.mythicGold : AppTheme.outlineMuted,
                   ),
                 ),
               ],
@@ -194,11 +194,16 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline,
-                size: 48, color: AppTheme.textSecondary),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppTheme.textSecondary,
+            ),
             const SizedBox(height: 12),
-            Text(provider.marketError!,
-                style: const TextStyle(color: AppTheme.textSecondary)),
+            Text(
+              provider.marketError!,
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _doSearch,
@@ -214,9 +219,11 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.store,
-                size: 64,
-                color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+            Icon(
+              Icons.store,
+              size: 64,
+              color: AppTheme.textSecondary.withValues(alpha: 0.4),
+            ),
             const SizedBox(height: 16),
             const Text(
               'Nenhuma carta encontrada',
@@ -238,15 +245,13 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(12),
-      itemCount:
-          provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
+      itemCount: provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= provider.marketItems.length) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Center(
-              child:
-                  CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.manaViolet),
             ),
           );
         }
@@ -273,19 +278,21 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
               price: mktItem.price,
               listType: 'have',
             );
-            final type = mktItem.forSale && !mktItem.forTrade
-                ? 'sale'
-                : mktItem.forTrade && !mktItem.forSale
+            final type =
+                mktItem.forSale && !mktItem.forTrade
+                    ? 'sale'
+                    : mktItem.forTrade && !mktItem.forSale
                     ? 'trade'
                     : 'mixed';
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CreateTradeScreen(
-                  receiverId: mktItem.ownerId,
-                  initialType: type,
-                  preselectedItem: binderItem,
-                ),
+                builder:
+                    (_) => CreateTradeScreen(
+                      receiverId: mktItem.ownerId,
+                      initialType: type,
+                      preselectedItem: binderItem,
+                    ),
               ),
             );
           },
@@ -294,7 +301,6 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     );
   }
 }
-
 
 class _ConditionDropdown extends StatelessWidget {
   final String? value;
@@ -315,19 +321,30 @@ class _ConditionDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
-          hint: const Text('Condição',
-              style:
-                  TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm)),
+          hint: const Text(
+            'Condição',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontSm,
+            ),
+          ),
           dropdownColor: AppTheme.surfaceSlate,
-          icon: const Icon(Icons.arrow_drop_down,
-              color: AppTheme.textSecondary, size: 18),
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: AppTheme.textSecondary,
+            size: 18,
+          ),
           style: const TextStyle(
-              color: AppTheme.textPrimary, fontSize: AppTheme.fontSm),
+            color: AppTheme.textPrimary,
+            fontSize: AppTheme.fontSm,
+          ),
           items: const [
             DropdownMenuItem(
               value: null,
-              child: Text('Todas',
-                  style: TextStyle(color: AppTheme.textSecondary)),
+              child: Text(
+                'Todas',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
             ),
             DropdownMenuItem(value: 'NM', child: Text('NM')),
             DropdownMenuItem(value: 'LP', child: Text('LP')),
@@ -351,7 +368,11 @@ class _MarketplaceCard extends StatelessWidget {
   final VoidCallback? onOwnerTap;
   final VoidCallback? onTradeTap;
 
-  const _MarketplaceCard({required this.item, this.onOwnerTap, this.onTradeTap});
+  const _MarketplaceCard({
+    required this.item,
+    this.onOwnerTap,
+    this.onTradeTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -394,32 +415,34 @@ class _MarketplaceCard extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   // Badges
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       _badge('×${item.quantity}', AppTheme.manaViolet),
-                      const SizedBox(width: 6),
                       _badge(item.condition, _condColor(item.condition)),
-                      if (item.isFoil) ...[
-                        const SizedBox(width: 6),
-                        Icon(Icons.auto_awesome,
-                            size: 14,
-                            color:
-                                AppTheme.mythicGold.withValues(alpha: 0.8)),
-                      ],
+                      if (item.isFoil)
+                        Icon(
+                          Icons.auto_awesome,
+                          size: 14,
+                          color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 4),
 
                   // Trade / Sale tags + price
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      if (item.forTrade) _statusTag('Troca', AppTheme.primarySoft),
-                      if (item.forSale) ...[
-                        if (item.forTrade) const SizedBox(width: 6),
+                      if (item.forTrade)
+                        _statusTag('Troca', AppTheme.primarySoft),
+                      if (item.forSale)
                         _statusTag('Venda', AppTheme.mythicGold),
-                      ],
-                      if (item.price != null) ...[
-                        const SizedBox(width: 8),
+                      if (item.price != null)
                         Text(
                           'R\$ ${item.price!.toStringAsFixed(2)}',
                           style: const TextStyle(
@@ -428,7 +451,6 @@ class _MarketplaceCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -440,23 +462,28 @@ class _MarketplaceCard extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 10,
-                          backgroundColor:
-                              AppTheme.manaViolet.withValues(alpha: 0.3),
-                          backgroundImage: item.ownerAvatarUrl != null
-                              ? CachedNetworkImageProvider(item.ownerAvatarUrl!)
-                              : null,
-                          child: item.ownerAvatarUrl == null
-                              ? Text(
-                                  item.ownerUsername.isNotEmpty
-                                      ? item.ownerUsername[0].toUpperCase()
-                                      : '?',
-                                  style: const TextStyle(
-                                    fontSize: AppTheme.fontXs,
-                                    color: AppTheme.manaViolet,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                              : null,
+                          backgroundColor: AppTheme.manaViolet.withValues(
+                            alpha: 0.3,
+                          ),
+                          backgroundImage:
+                              item.ownerAvatarUrl != null
+                                  ? CachedNetworkImageProvider(
+                                    item.ownerAvatarUrl!,
+                                  )
+                                  : null,
+                          child:
+                              item.ownerAvatarUrl == null
+                                  ? Text(
+                                    item.ownerUsername.isNotEmpty
+                                        ? item.ownerUsername[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontSize: AppTheme.fontXs,
+                                      color: AppTheme.manaViolet,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                  : null,
                         ),
                         const SizedBox(width: 6),
                         Flexible(
@@ -471,14 +498,21 @@ class _MarketplaceCard extends StatelessWidget {
                         ),
                         if (item.ownerLocationLabel != null) ...[
                           const SizedBox(width: 6),
-                          Icon(Icons.location_on,
-                              size: 12, color: AppTheme.textSecondary.withValues(alpha: 0.6)),
+                          Icon(
+                            Icons.location_on,
+                            size: 12,
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
                           const SizedBox(width: 2),
                           Flexible(
                             child: Text(
                               item.ownerLocationLabel!,
                               style: TextStyle(
-                                color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                                color: AppTheme.textSecondary.withValues(
+                                  alpha: 0.8,
+                                ),
                                 fontSize: AppTheme.fontXs,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -495,15 +529,19 @@ class _MarketplaceCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.info_outline,
-                            size: 12,
-                            color: AppTheme.textSecondary.withValues(alpha: 0.6)),
+                        Icon(
+                          Icons.info_outline,
+                          size: 12,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.6),
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             item.ownerTradeNotes!,
                             style: TextStyle(
-                              color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                              color: AppTheme.textSecondary.withValues(
+                                alpha: 0.7,
+                              ),
                               fontSize: AppTheme.fontXs,
                               fontStyle: FontStyle.italic,
                             ),
@@ -524,20 +562,21 @@ class _MarketplaceCard extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: onTradeTap,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: item.forSale
-                              ? AppTheme.mythicGold
-                              : AppTheme.primarySoft,
+                          foregroundColor:
+                              item.forSale
+                                  ? AppTheme.mythicGold
+                                  : AppTheme.primarySoft,
                           side: BorderSide(
                             color: (item.forSale
                                     ? AppTheme.mythicGold
                                     : AppTheme.primarySoft)
                                 .withValues(alpha: 0.5),
                           ),
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusSm),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusSm,
+                            ),
                           ),
                         ),
                         icon: Icon(
@@ -548,8 +587,7 @@ class _MarketplaceCard extends StatelessWidget {
                         ),
                         label: Text(
                           item.forSale ? 'Quero comprar' : 'Propor troca',
-                          style:
-                              const TextStyle(fontSize: AppTheme.fontSm),
+                          style: const TextStyle(fontSize: AppTheme.fontSm),
                         ),
                       ),
                     ),
@@ -573,7 +611,10 @@ class _MarketplaceCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color, fontSize: AppTheme.fontXs, fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -588,7 +629,10 @@ class _MarketplaceCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color, fontSize: AppTheme.fontXs, fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

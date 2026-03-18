@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -8,7 +9,8 @@ class OnboardingCoreFlowScreen extends StatefulWidget {
   const OnboardingCoreFlowScreen({super.key});
 
   @override
-  State<OnboardingCoreFlowScreen> createState() => _OnboardingCoreFlowScreenState();
+  State<OnboardingCoreFlowScreen> createState() =>
+      _OnboardingCoreFlowScreenState();
 }
 
 class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
@@ -71,7 +73,11 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Abra um deck e toque em “Otimizar Deck” para concluir o fluxo.')),
+      const SnackBar(
+        content: Text(
+          'Abra um deck e toque em “Otimizar Deck” para concluir o fluxo.',
+        ),
+      ),
     );
     context.go('/decks');
   }
@@ -84,6 +90,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
       appBar: AppBar(
         title: const Text('Criar e Otimizar Deck'),
         backgroundColor: AppTheme.surfaceElevated,
+        actions: const [ShellAppBarActions()],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -95,14 +102,15 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
             child: DropdownButtonFormField<String>(
               initialValue: _selectedFormat,
               decoration: const InputDecoration(labelText: 'Formato'),
-              items: _formats
-                  .map(
-                    (f) => DropdownMenuItem(
-                      value: f,
-                      child: Text(f[0].toUpperCase() + f.substring(1)),
-                    ),
-                  )
-                  .toList(),
+              items:
+                  _formats
+                      .map(
+                        (f) => DropdownMenuItem(
+                          value: f,
+                          child: Text(f[0].toUpperCase() + f.substring(1)),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 if (value == null) return;
                 setState(() => _selectedFormat = value);
@@ -113,28 +121,40 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
           _StepCard(
             step: '2',
             title: 'Monte a base inicial',
-            description: 'Você pode gerar com IA ou importar uma lista existente.',
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _chooseGenerate,
-                    icon: const Icon(Icons.auto_awesome),
-                    label: const Text('Gerar com IA'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.manaViolet,
+            description:
+                'Você pode gerar com IA ou importar uma lista existente.',
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final buttonWidth =
+                    constraints.maxWidth >= 360
+                        ? (constraints.maxWidth - 8) / 2
+                        : constraints.maxWidth;
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    SizedBox(
+                      width: buttonWidth,
+                      child: ElevatedButton.icon(
+                        onPressed: _chooseGenerate,
+                        icon: const Icon(Icons.auto_awesome),
+                        label: const Text('Gerar com IA'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.manaViolet,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _chooseImport,
-                    icon: const Icon(Icons.content_paste),
-                    label: const Text('Importar lista'),
-                  ),
-                ),
-              ],
+                    SizedBox(
+                      width: buttonWidth,
+                      child: OutlinedButton.icon(
+                        onPressed: _chooseImport,
+                        icon: const Icon(Icons.content_paste),
+                        label: const Text('Importar lista'),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 12),

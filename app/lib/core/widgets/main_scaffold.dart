@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
-import '../../features/messages/providers/message_provider.dart';
-import '../../features/notifications/providers/notification_provider.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
@@ -28,70 +25,6 @@ class MainScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(44),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.surfaceElevated,
-            border: Border(
-              bottom: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            toolbarHeight: 44,
-            automaticallyImplyLeading: false,
-            actions: [
-              // Ícone de mensagens com badge de não-lidas
-              Selector<MessageProvider, int>(
-                selector: (_, p) => p.unreadCount,
-                builder: (context, msgUnread, child) {
-                  return IconButton(
-                    icon: Badge(
-                      isLabelVisible: msgUnread > 0,
-                      label: Text(
-                        msgUnread > 99 ? '99+' : '$msgUnread',
-                        style: const TextStyle(fontSize: 9),
-                      ),
-                      backgroundColor: AppTheme.primarySoft,
-                      child: const Icon(Icons.chat_bubble_outline,
-                          color: AppTheme.textSecondary, size: 22),
-                    ),
-                    onPressed: () => context.push('/messages'),
-                    tooltip: 'Mensagens',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  );
-                },
-              ),
-              // Ícone de notificações com badge
-              Selector<NotificationProvider, int>(
-                selector: (_, p) => p.unreadCount,
-                builder: (context, unreadCount, child) {
-                  return IconButton(
-                    icon: Badge(
-                      isLabelVisible: unreadCount > 0,
-                      label: Text(
-                        unreadCount > 99 ? '99+' : '$unreadCount',
-                        style: const TextStyle(fontSize: 9),
-                      ),
-                      backgroundColor: AppTheme.error,
-                      child: const Icon(Icons.notifications_outlined,
-                          color: AppTheme.textSecondary, size: 22),
-                    ),
-                    onPressed: () => context.push('/notifications'),
-                    tooltip: 'Notificações',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  );
-                },
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-        ),
-      ),
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: AppTheme.scaffoldGradient),
         child: child,

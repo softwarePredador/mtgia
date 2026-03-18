@@ -70,15 +70,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     final conv = await msgProvider.getOrCreateConversation(userId);
     if (!mounted || conv == null) return;
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(
-            conversationId: conv.id,
-            otherUser: conv.otherUser,
-          ),
-        ),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) =>
+                ChatScreen(conversationId: conv.id, otherUser: conv.otherUser),
+      ),
+    );
   }
 
   void _loadTab(int index) {
@@ -88,7 +87,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     } else if (index == 2) {
       provider.fetchFollowing(widget.userId, reset: true);
     } else if (index == 3) {
-      context.read<BinderProvider>().fetchPublicBinder(widget.userId, reset: true);
+      context.read<BinderProvider>().fetchPublicBinder(
+        widget.userId,
+        reset: true,
+      );
     }
   }
 
@@ -104,8 +106,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         builder: (context, provider, _) {
           if (provider.isLoadingProfile) {
             return const Center(
-              child:
-                  CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.manaViolet),
             );
           }
 
@@ -114,16 +115,19 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline,
-                      size: 48, color: AppTheme.textSecondary),
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppTheme.textSecondary,
+                  ),
                   const SizedBox(height: 12),
-                  Text(provider.profileError!,
-                      style:
-                          const TextStyle(color: AppTheme.textSecondary)),
+                  Text(
+                    provider.profileError!,
+                    style: const TextStyle(color: AppTheme.textSecondary),
+                  ),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: () =>
-                        provider.fetchUserProfile(widget.userId),
+                    onPressed: () => provider.fetchUserProfile(widget.userId),
                     child: const Text('Tentar novamente'),
                   ),
                 ],
@@ -146,20 +150,23 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: AppTheme.manaViolet.withValues(
-                          alpha: 0.3),
-                      backgroundImage: user.avatarUrl != null
-                          ? CachedNetworkImageProvider(user.avatarUrl!)
-                          : null,
-                      child: user.avatarUrl == null
-                          ? Text(
-                              user.username[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: AppTheme.manaViolet,
-                                fontSize: AppTheme.fontDisplay,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : null,
+                        alpha: 0.3,
+                      ),
+                      backgroundImage:
+                          user.avatarUrl != null
+                              ? CachedNetworkImageProvider(user.avatarUrl!)
+                              : null,
+                      child:
+                          user.avatarUrl == null
+                              ? Text(
+                                user.username[0].toUpperCase(),
+                                style: const TextStyle(
+                                  color: AppTheme.manaViolet,
+                                  fontSize: AppTheme.fontDisplay,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                              : null,
                     ),
                     const SizedBox(height: 12),
                     // Display name
@@ -226,38 +233,46 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                             child: ElevatedButton.icon(
                               onPressed: _isToggling ? null : _toggleFollow,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: provider.isFollowingVisited
-                                    ? AppTheme.surfaceSlate
-                                    : AppTheme.manaViolet,
+                                backgroundColor:
+                                    provider.isFollowingVisited
+                                        ? AppTheme.surfaceSlate
+                                        : AppTheme.manaViolet,
                                 foregroundColor: AppTheme.textPrimary,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-                                  side: provider.isFollowingVisited
-                                      ? const BorderSide(
-                                          color: AppTheme.outlineMuted)
-                                      : BorderSide.none,
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusXl,
+                                  ),
+                                  side:
+                                      provider.isFollowingVisited
+                                          ? const BorderSide(
+                                            color: AppTheme.outlineMuted,
+                                          )
+                                          : BorderSide.none,
                                 ),
                               ),
-                              icon: _isToggling
-                                  ? const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppTheme.textPrimary,
+                              icon:
+                                  _isToggling
+                                      ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      )
+                                      : Icon(
+                                        provider.isFollowingVisited
+                                            ? Icons.person_remove
+                                            : Icons.person_add,
+                                        size: 18,
                                       ),
-                                    )
-                                  : Icon(
-                                      provider.isFollowingVisited
-                                          ? Icons.person_remove
-                                          : Icons.person_add,
-                                      size: 18,
-                                    ),
                               label: Text(
                                 provider.isFollowingVisited
                                     ? 'Deixar de seguir'
                                     : 'Seguir',
-                                style: const TextStyle(fontSize: AppTheme.fontSm),
+                                style: const TextStyle(
+                                  fontSize: AppTheme.fontSm,
+                                ),
                               ),
                             ),
                           ),
@@ -268,14 +283,23 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                               onPressed: () => _openChat(widget.userId),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppTheme.textPrimary,
-                                side: const BorderSide(color: AppTheme.outlineMuted),
+                                side: const BorderSide(
+                                  color: AppTheme.outlineMuted,
+                                ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusXl,
+                                  ),
                                 ),
                               ),
-                              icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                              label: const Text('Mensagem',
-                                  style: TextStyle(fontSize: AppTheme.fontSm)),
+                              icon: const Icon(
+                                Icons.chat_bubble_outline,
+                                size: 18,
+                              ),
+                              label: const Text(
+                                'Mensagem',
+                                style: TextStyle(fontSize: AppTheme.fontSm),
+                              ),
                             ),
                           ),
                         ],
@@ -292,9 +316,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   labelColor: AppTheme.textPrimary,
                   unselectedLabelColor: AppTheme.textSecondary,
                   tabs: [
-                    Tab(
-                        text:
-                            'Decks (${provider.visitedUserDecks.length})'),
+                    Tab(text: 'Decks (${provider.visitedUserDecks.length})'),
                     const Tab(text: 'Seguidores'),
                     const Tab(text: 'Seguindo'),
                     const Tab(text: 'Fichário'),
@@ -323,9 +345,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                     Consumer<BinderProvider>(
                       builder: (context, binder, _) {
-                        return _PublicBinderTabHaveWant(
-                          userId: widget.userId,
-                        );
+                        return _PublicBinderTabHaveWant(userId: widget.userId);
                       },
                     ),
                   ],
@@ -401,13 +421,18 @@ class _DecksTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.style,
-                size: 48,
-                color: AppTheme.textSecondary.withValues(alpha: 0.5)),
+            Icon(
+              Icons.style,
+              size: 48,
+              color: AppTheme.textSecondary.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             const Text(
               'Nenhum deck público',
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontLg,
+              ),
             ),
           ],
         ),
@@ -432,8 +457,7 @@ class _DecksTab extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      CommunityDeckDetailScreen(deckId: deck.id),
+                  builder: (_) => CommunityDeckDetailScreen(deckId: deck.id),
                 ),
               );
             },
@@ -468,11 +492,16 @@ class _DecksTab extends StatelessWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppTheme.manaViolet.withValues(
-                                    alpha: 0.2),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                                  alpha: 0.2,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusXs,
+                                ),
                               ),
                               child: Text(
                                 _capitalize(deck.format),
@@ -493,16 +522,20 @@ class _DecksTab extends StatelessWidget {
                             ),
                             if (deck.synergyScore != null) ...[
                               const SizedBox(width: 8),
-                              Icon(Icons.auto_awesome,
-                                  size: 12,
-                                  color: AppTheme.mythicGold.withValues(
-                                      alpha: 0.8)),
+                              Icon(
+                                Icons.auto_awesome,
+                                size: 12,
+                                color: AppTheme.mythicGold.withValues(
+                                  alpha: 0.8,
+                                ),
+                              ),
                               const SizedBox(width: 2),
                               Text(
                                 '${deck.synergyScore}%',
                                 style: TextStyle(
                                   color: AppTheme.mythicGold.withValues(
-                                      alpha: 0.8),
+                                    alpha: 0.8,
+                                  ),
                                   fontSize: AppTheme.fontSm,
                                 ),
                               ),
@@ -512,8 +545,11 @@ class _DecksTab extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right,
-                      color: AppTheme.textSecondary, size: 20),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppTheme.textSecondary,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -588,14 +624,18 @@ class _UsersListTabState extends State<_UsersListTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.people_outline,
-                size: 48,
-                color: AppTheme.textSecondary.withValues(alpha: 0.5)),
+            Icon(
+              Icons.people_outline,
+              size: 48,
+              color: AppTheme.textSecondary.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             Text(
               widget.emptyMessage,
-              style:
-                  const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontLg,
+              ),
             ),
           ],
         ),
@@ -626,20 +666,21 @@ class _UsersListTabState extends State<_UsersListTab> {
           child: ListTile(
             leading: CircleAvatar(
               radius: 20,
-              backgroundColor:
-                  AppTheme.manaViolet.withValues(alpha: 0.3),
-              backgroundImage: user.avatarUrl != null
-                  ? CachedNetworkImageProvider(user.avatarUrl!)
-                  : null,
-              child: user.avatarUrl == null
-                  ? Text(
-                      user.username[0].toUpperCase(),
-                      style: const TextStyle(
-                        color: AppTheme.manaViolet,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : null,
+              backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
+              backgroundImage:
+                  user.avatarUrl != null
+                      ? CachedNetworkImageProvider(user.avatarUrl!)
+                      : null,
+              child:
+                  user.avatarUrl == null
+                      ? Text(
+                        user.username[0].toUpperCase(),
+                        style: const TextStyle(
+                          color: AppTheme.manaViolet,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      : null,
             ),
             title: Text(
               user.displayName ?? user.username,
@@ -655,8 +696,10 @@ class _UsersListTabState extends State<_UsersListTab> {
                 fontSize: AppTheme.fontSm,
               ),
             ),
-            trailing: const Icon(Icons.chevron_right,
-                color: AppTheme.textSecondary),
+            trailing: const Icon(
+              Icons.chevron_right,
+              color: AppTheme.textSecondary,
+            ),
             onTap: () {
               Navigator.push(
                 context,
@@ -713,12 +756,14 @@ class _PublicBinderTabHaveWantState extends State<_PublicBinderTabHaveWant>
           color: AppTheme.backgroundAbyss,
           child: TabBar(
             controller: _subTabController,
-            indicatorColor: _subTabController.index == 0
-                ? AppTheme.primarySoft
-                : AppTheme.mythicGold,
-            labelColor: _subTabController.index == 0
-                ? AppTheme.primarySoft
-                : AppTheme.mythicGold,
+            indicatorColor:
+                _subTabController.index == 0
+                    ? AppTheme.primarySoft
+                    : AppTheme.mythicGold,
+            labelColor:
+                _subTabController.index == 0
+                    ? AppTheme.primarySoft
+                    : AppTheme.mythicGold,
             unselectedLabelColor: AppTheme.textSecondary,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,
@@ -742,14 +787,8 @@ class _PublicBinderTabHaveWantState extends State<_PublicBinderTabHaveWant>
           child: TabBarView(
             controller: _subTabController,
             children: [
-              _PublicBinderListView(
-                userId: widget.userId,
-                listType: 'have',
-              ),
-              _PublicBinderListView(
-                userId: widget.userId,
-                listType: 'want',
-              ),
+              _PublicBinderListView(userId: widget.userId, listType: 'have'),
+              _PublicBinderListView(userId: widget.userId, listType: 'want'),
             ],
           ),
         ),
@@ -766,10 +805,7 @@ class _PublicBinderListView extends StatefulWidget {
   final String userId;
   final String listType;
 
-  const _PublicBinderListView({
-    required this.userId,
-    required this.listType,
-  });
+  const _PublicBinderListView({required this.userId, required this.listType});
 
   @override
   State<_PublicBinderListView> createState() => _PublicBinderListViewState();
@@ -818,10 +854,10 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     setState(() => _isLoading = true);
     try {
       final res = await context.read<BinderProvider>().fetchPublicBinderDirect(
-            userId: widget.userId,
-            listType: widget.listType,
-            page: _page,
-          );
+        userId: widget.userId,
+        listType: widget.listType,
+        page: _page,
+      );
       if (res != null) {
         _items.addAll(res);
         _hasMore = res.length >= 20;
@@ -862,20 +898,24 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.cardName,
-                              style: const TextStyle(
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: AppTheme.fontLg)),
+                          Text(
+                            item.cardName,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppTheme.fontLg,
+                            ),
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             isHave
                                 ? 'Este jogador TEM esta carta'
                                 : 'Este jogador QUER esta carta',
                             style: TextStyle(
-                              color: isHave
-                                  ? AppTheme.primarySoft
-                                  : AppTheme.mythicGold,
+                              color:
+                                  isHave
+                                      ? AppTheme.primarySoft
+                                      : AppTheme.mythicGold,
                               fontSize: AppTheme.fontSm,
                             ),
                           ),
@@ -889,22 +929,24 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                 if (item.price != null || item.forTrade || item.forSale)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         if (item.forTrade)
                           _interactTag('Aceita troca', AppTheme.primarySoft),
-                        if (item.forSale) ...[
-                          if (item.forTrade) const SizedBox(width: 8),
+                        if (item.forSale)
                           _interactTag('À venda', AppTheme.mythicGold),
-                        ],
-                        if (item.price != null) ...[
-                          const SizedBox(width: 8),
-                          Text('R\$ ${item.price!.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                  color: AppTheme.mythicGold,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: AppTheme.fontMd)),
-                        ],
+                        if (item.price != null)
+                          Text(
+                            'R\$ ${item.price!.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: AppTheme.mythicGold,
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppTheme.fontMd,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -971,11 +1013,14 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
-      child: Text(text,
-          style: TextStyle(
-              color: color,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: AppTheme.fontSm,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 
@@ -990,13 +1035,19 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 4),
         leading: Icon(icon, color: color, size: 22),
-        title: Text(label,
-            style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: AppTheme.fontMd)),
-        trailing: const Icon(Icons.chevron_right,
-            color: AppTheme.textSecondary, size: 20),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: AppTheme.fontMd,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: AppTheme.textSecondary,
+          size: 20,
+        ),
         onTap: onTap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1010,11 +1061,12 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CreateTradeScreen(
-          receiverId: widget.userId,
-          initialType: type,
-          preselectedItem: targetItem,
-        ),
+        builder:
+            (_) => CreateTradeScreen(
+              receiverId: widget.userId,
+              initialType: type,
+              preselectedItem: targetItem,
+            ),
       ),
     );
   }
@@ -1026,10 +1078,9 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ChatScreen(
-          conversationId: conv.id,
-          otherUser: conv.otherUser,
-        ),
+        builder:
+            (_) =>
+                ChatScreen(conversationId: conv.id, otherUser: conv.otherUser),
       ),
     );
   }
@@ -1061,7 +1112,9 @@ class _PublicBinderListViewState extends State<_PublicBinderListView>
                   ? 'Nenhuma carta disponível para troca/venda'
                   : 'Nenhuma carta na lista de desejos',
               style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontLg,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1155,12 +1208,16 @@ class _PublicBinderItemCard extends StatelessWidget {
                         _binderBadge('×${item.quantity}', AppTheme.manaViolet),
                         const SizedBox(width: 4),
                         _binderBadge(
-                            item.condition, AppTheme.conditionColor(item.condition)),
+                          item.condition,
+                          AppTheme.conditionColor(item.condition),
+                        ),
                         if (item.isFoil) ...[
                           const SizedBox(width: 4),
-                          Icon(Icons.auto_awesome,
-                              size: 12,
-                              color: AppTheme.mythicGold.withValues(alpha: 0.8)),
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 12,
+                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                          ),
                         ],
                         if (item.forTrade) ...[
                           const SizedBox(width: 4),
@@ -1218,9 +1275,10 @@ class _PublicBinderItemCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color,
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -1235,9 +1293,10 @@ class _PublicBinderItemCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color,
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../binder/screens/binder_screen.dart' show BinderTabContent;
-import '../../binder/screens/marketplace_screen.dart' show MarketplaceTabContent;
+import '../../binder/screens/marketplace_screen.dart'
+    show MarketplaceTabContent;
 import '../../trades/screens/trade_inbox_screen.dart' show TradeInboxTabContent;
 
 /// Tela "Coleção" — hub unificado para Fichário, Marketplace e Trades.
@@ -50,6 +52,7 @@ class _CollectionScreenState extends State<CollectionScreen>
             onPressed: () => context.push('/collection/latest-set'),
             icon: const Icon(Icons.new_releases_outlined),
           ),
+          const ShellAppBarActions(),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -65,14 +68,8 @@ class _CollectionScreenState extends State<CollectionScreen>
               icon: Icon(Icons.collections_bookmark, size: 20),
               text: 'Fichário',
             ),
-            Tab(
-              icon: Icon(Icons.storefront, size: 20),
-              text: 'Marketplace',
-            ),
-            Tab(
-              icon: Icon(Icons.swap_horiz, size: 20),
-              text: 'Trades',
-            ),
+            Tab(icon: Icon(Icons.storefront, size: 20), text: 'Marketplace'),
+            Tab(icon: Icon(Icons.swap_horiz, size: 20), text: 'Trades'),
           ],
         ),
       ),

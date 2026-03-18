@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/market_provider.dart';
 import '../models/card_mover.dart';
@@ -41,14 +42,18 @@ class _MarketScreenState extends State<MarketScreen>
           appBar: AppBar(
             title: Row(
               children: [
-                const Icon(Icons.trending_up, color: AppTheme.mythicGold, size: 24),
+                const Icon(
+                  Icons.trending_up,
+                  color: AppTheme.mythicGold,
+                  size: 24,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Market',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -73,6 +78,7 @@ class _MarketScreenState extends State<MarketScreen>
                 onPressed: provider.isLoading ? null : () => provider.refresh(),
                 tooltip: 'Atualizar',
               ),
+              const ShellAppBarActions(),
             ],
             bottom: TabBar(
               controller: _tabController,
@@ -127,11 +133,19 @@ class _MarketScreenState extends State<MarketScreen>
               // Tab Gainers
               data.gainers.isEmpty
                   ? _buildEmptyTab('Nenhuma carta valorizou hoje')
-                  : _buildMoversList(data.gainers, isGainer: true, provider: provider),
+                  : _buildMoversList(
+                    data.gainers,
+                    isGainer: true,
+                    provider: provider,
+                  ),
               // Tab Losers
               data.losers.isEmpty
                   ? _buildEmptyTab('Nenhuma carta desvalorizou hoje')
-                  : _buildMoversList(data.losers, isGainer: false, provider: provider),
+                  : _buildMoversList(
+                    data.losers,
+                    isGainer: false,
+                    provider: provider,
+                  ),
             ],
           ),
         ),
@@ -145,20 +159,33 @@ class _MarketScreenState extends State<MarketScreen>
       color: AppTheme.surfaceElevated,
       child: Row(
         children: [
-          const Icon(Icons.calendar_today, size: 14, color: AppTheme.textSecondary),
+          const Icon(
+            Icons.calendar_today,
+            size: 14,
+            color: AppTheme.textSecondary,
+          ),
           const SizedBox(width: 6),
           Text(
             data.date != null ? _formatDate(data.date!) : 'Hoje',
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontMd,
+            ),
           ),
           if (data.previousDate != null) ...[
             const Text(
               '  vs  ',
-              style: TextStyle(color: AppTheme.outlineMuted, fontSize: AppTheme.fontSm),
+              style: TextStyle(
+                color: AppTheme.outlineMuted,
+                fontSize: AppTheme.fontSm,
+              ),
             ),
             Text(
               _formatDate(data.previousDate!),
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
             ),
           ],
           const Spacer(),
@@ -182,8 +209,11 @@ class _MarketScreenState extends State<MarketScreen>
     );
   }
 
-  Widget _buildMoversList(List<CardMover> movers,
-      {required bool isGainer, required MarketProvider provider}) {
+  Widget _buildMoversList(
+    List<CardMover> movers, {
+    required bool isGainer,
+    required MarketProvider provider,
+  }) {
     return RefreshIndicator(
       color: AppTheme.mythicGold,
       backgroundColor: AppTheme.surfaceSlate,
@@ -225,7 +255,11 @@ class _MarketScreenState extends State<MarketScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off, size: 48, color: AppTheme.textSecondary),
+            const Icon(
+              Icons.cloud_off,
+              size: 48,
+              color: AppTheme.textSecondary,
+            ),
             const SizedBox(height: 16),
             Text(
               provider.errorMessage ?? 'Erro desconhecido',
@@ -263,18 +297,28 @@ class _MarketScreenState extends State<MarketScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.hourglass_top, size: 48, color: AppTheme.mythicGold),
+            const Icon(
+              Icons.hourglass_top,
+              size: 48,
+              color: AppTheme.mythicGold,
+            ),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
               'Os preços são atualizados diariamente.\nAmanhã teremos dados de variação!',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontSm,
+              ),
             ),
           ],
         ),
@@ -287,12 +331,13 @@ class _MarketScreenState extends State<MarketScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.trending_flat, size: 40, color: AppTheme.textSecondary),
-          const SizedBox(height: 12),
-          Text(
-            message,
-            style: const TextStyle(color: AppTheme.textSecondary),
+          const Icon(
+            Icons.trending_flat,
+            size: 40,
+            color: AppTheme.textSecondary,
           ),
+          const SizedBox(height: 12),
+          Text(message, style: const TextStyle(color: AppTheme.textSecondary)),
         ],
       ),
     );
@@ -332,9 +377,10 @@ class _MoverCard extends StatelessWidget {
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: rank <= 3
-              ? changeColor.withValues(alpha: 0.3)
-              : AppTheme.outlineMuted.withValues(alpha: 0.3),
+          color:
+              rank <= 3
+                  ? changeColor.withValues(alpha: 0.3)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.3),
         ),
       ),
       child: Padding(
@@ -346,9 +392,10 @@ class _MoverCard extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: rank <= 3
-                    ? changeColor.withValues(alpha: 0.2)
-                    : AppTheme.surfaceElevated,
+                color:
+                    rank <= 3
+                        ? changeColor.withValues(alpha: 0.2)
+                        : AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               alignment: Alignment.center,
@@ -369,11 +416,31 @@ class _MoverCard extends StatelessWidget {
               child: SizedBox(
                 width: 36,
                 height: 50,
-                child: mover.imageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: mover.imageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(
+                child:
+                    mover.imageUrl != null
+                        ? CachedNetworkImage(
+                          imageUrl: mover.imageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder:
+                              (_, __) => Container(
+                                color: AppTheme.surfaceElevated,
+                                child: const Icon(
+                                  Icons.style,
+                                  size: 16,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                          errorWidget:
+                              (_, __, ___) => Container(
+                                color: AppTheme.surfaceElevated,
+                                child: const Icon(
+                                  Icons.style,
+                                  size: 16,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                        )
+                        : Container(
                           color: AppTheme.surfaceElevated,
                           child: const Icon(
                             Icons.style,
@@ -381,23 +448,6 @@ class _MoverCard extends StatelessWidget {
                             color: AppTheme.textSecondary,
                           ),
                         ),
-                        errorWidget: (_, __, ___) => Container(
-                          color: AppTheme.surfaceElevated,
-                          child: const Icon(
-                            Icons.style,
-                            size: 16,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        color: AppTheme.surfaceElevated,
-                        child: const Icon(
-                          Icons.style,
-                          size: 16,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
               ),
             ),
             const SizedBox(width: 10),
@@ -431,7 +481,10 @@ class _MoverCard extends StatelessWidget {
                       if (mover.rarity != null) ...[
                         const Text(
                           ' • ',
-                          style: TextStyle(color: AppTheme.outlineMuted, fontSize: AppTheme.fontSm),
+                          style: TextStyle(
+                            color: AppTheme.outlineMuted,
+                            fontSize: AppTheme.fontSm,
+                          ),
                         ),
                         Text(
                           _rarityLabel(mover.rarity!),
@@ -463,7 +516,10 @@ class _MoverCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 // Variação
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: changeColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),

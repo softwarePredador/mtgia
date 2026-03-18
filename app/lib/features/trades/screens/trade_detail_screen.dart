@@ -50,8 +50,15 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tradeData = context.select<TradeProvider, ({bool isLoading, TradeOffer? trade, String? error})>(
-      (p) => (isLoading: p.isLoading, trade: p.selectedTrade, error: p.errorMessage),
+    final tradeData = context.select<
+      TradeProvider,
+      ({bool isLoading, TradeOffer? trade, String? error})
+    >(
+      (p) => (
+        isLoading: p.isLoading,
+        trade: p.selectedTrade,
+        error: p.errorMessage,
+      ),
     );
 
     return Scaffold(
@@ -87,9 +94,17 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                     const SizedBox(height: 16),
                     _buildParticipants(trade, isSender),
                     const SizedBox(height: 16),
-                    _buildItems('Itens oferecidos', trade.myItems, Icons.upload),
+                    _buildItems(
+                      'Itens oferecidos',
+                      trade.myItems,
+                      Icons.upload,
+                    ),
                     const SizedBox(height: 12),
-                    _buildItems('Itens pedidos', trade.theirItems, Icons.download),
+                    _buildItems(
+                      'Itens pedidos',
+                      trade.theirItems,
+                      Icons.download,
+                    ),
                     if (trade.paymentAmount != null) ...[
                       const SizedBox(height: 12),
                       _buildPayment(trade),
@@ -149,7 +164,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 ),
                 Text(
                   _typeLabel(trade.type),
-                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontMd,
+                  ),
                 ),
               ],
             ),
@@ -197,18 +215,27 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               backgroundColor: AppTheme.outlineMuted,
               child: Text(
                 name.isNotEmpty ? name[0].toUpperCase() : '?',
-                style: const TextStyle(color: Colors.white, fontSize: AppTheme.fontMd),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppTheme.fontMd,
+                ),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               name,
-              style: const TextStyle(color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontMd,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
             Text(
               role,
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontSm,
+              ),
             ),
           ],
         ),
@@ -243,50 +270,52 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             ],
           ),
           const Divider(color: AppTheme.outlineMuted),
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    CachedCardImage(
-                      imageUrl: item.card.imageUrl,
-                      width: 28,
-                      height: 40,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.card.name,
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
-                              fontSize: AppTheme.fontMd,
-                            ),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  CachedCardImage(
+                    imageUrl: item.card.imageUrl,
+                    width: 28,
+                    height: 40,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.card.name,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontMd,
                           ),
-                          Text(
-                            '${item.condition ?? "?"} • x${item.quantity}${item.isFoil == true ? ' ⭐' : ''}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (item.agreedPrice != null)
-                      Text(
-                        'R\$${item.agreedPrice!.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: AppTheme.mythicGold,
-                          fontSize: AppTheme.fontMd,
-                          fontWeight: FontWeight.w600,
                         ),
+                        Text(
+                          '${item.condition ?? "?"} • x${item.quantity}${item.isFoil == true ? ' ⭐' : ''}',
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: AppTheme.fontSm,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (item.agreedPrice != null)
+                    Text(
+                      'R\$${item.agreedPrice!.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: AppTheme.mythicGold,
+                        fontSize: AppTheme.fontMd,
+                        fontWeight: FontWeight.w600,
                       ),
-                  ],
-                ),
-              )),
+                    ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -320,7 +349,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 if (trade.paymentMethod != null)
                   Text(
                     'via ${trade.paymentMethod}',
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
                   ),
               ],
             ),
@@ -340,7 +372,11 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_shipping, color: AppTheme.manaViolet, size: 20),
+          const Icon(
+            Icons.local_shipping,
+            color: AppTheme.manaViolet,
+            size: 20,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -348,7 +384,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               children: [
                 const Text(
                   'Código de rastreio',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
                 ),
                 SelectableText(
                   trade.trackingCode!,
@@ -453,9 +492,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                               h.notes!,
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
-                              fontSize: AppTheme.fontSm,
+                                fontSize: AppTheme.fontSm,
+                              ),
                             ),
-                          ),
                           Text(
                             _formatDate(h.createdAt),
                             style: const TextStyle(
@@ -495,7 +534,6 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               color: AppTheme.success,
               onTap: () => _respondTrade(provider, trade.id, 'accept'),
             ),
-            const SizedBox(width: 8),
             _actionButton(
               label: 'Recusar',
               icon: Icons.close,
@@ -505,51 +543,63 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           ]);
         }
         if (isSender) {
-          actions.add(_actionButton(
-            label: 'Cancelar',
-            icon: Icons.block,
-            color: AppTheme.disabled,
-            onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
-          ));
+          actions.add(
+            _actionButton(
+              label: 'Cancelar',
+              icon: Icons.block,
+              color: AppTheme.disabled,
+              onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
+            ),
+          );
         }
         break;
 
       case 'accepted':
         // Em venda: receiver (vendedor) envia; em troca: qualquer participante
-        final canShip = trade.type == 'sale' ? isReceiver : (isSender || isReceiver);
+        final canShip =
+            trade.type == 'sale' ? isReceiver : (isSender || isReceiver);
         if (canShip) {
-          actions.add(_actionButton(
-            label: 'Marcar como Enviado',
-            icon: Icons.local_shipping,
-            color: AppTheme.manaViolet,
-            onTap: () => _showShipDialog(provider, trade.id),
-          ));
+          actions.add(
+            _actionButton(
+              label: 'Marcar como Enviado',
+              icon: Icons.local_shipping,
+              color: AppTheme.manaViolet,
+              onTap: () => _showShipDialog(provider, trade.id),
+            ),
+          );
         }
-        actions.add(_actionButton(
-          label: 'Cancelar',
-          icon: Icons.block,
-          color: AppTheme.disabled,
-          onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
-        ));
+        actions.add(
+          _actionButton(
+            label: 'Cancelar',
+            icon: Icons.block,
+            color: AppTheme.disabled,
+            onTap: () => _updateStatus(provider, trade.id, 'cancelled'),
+          ),
+        );
         break;
 
       case 'shipped':
         // Em venda: sender (comprador) confirma recebimento; em troca: qualquer participante
-        final canConfirm = trade.type == 'sale' ? isSender : (isSender || isReceiver);
+        final canConfirm =
+            trade.type == 'sale' ? isSender : (isSender || isReceiver);
         if (canConfirm) {
-          actions.add(_actionButton(
-            label: 'Confirmar Entrega',
-            icon: Icons.inventory_2,
-            color: AppTheme.success,
-            onTap: () => _updateStatus(provider, trade.id, 'delivered'),
-          ));
+          actions.add(
+            _actionButton(
+              label: 'Confirmar Entrega',
+              icon: Icons.inventory_2,
+              color: AppTheme.success,
+              onTap: () => _updateStatus(provider, trade.id, 'delivered'),
+            ),
+          );
         }
-        actions.add(_actionButton(
-          label: 'Disputar',
-          icon: Icons.warning_amber,
-          color: AppTheme.error,
-          onTap: () => _updateStatus(provider, trade.id, 'disputed'),
-        ));
+        actions.add(
+          _actionButton(
+            label: 'Disputar',
+            icon: Icons.warning_amber,
+            color: AppTheme.error,
+            onTap: () => _updateStatus(provider, trade.id, 'disputed'),
+          ),
+        );
         break;
 
       case 'delivered':
@@ -560,7 +610,6 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             color: AppTheme.success,
             onTap: () => _updateStatus(provider, trade.id, 'completed'),
           ),
-          const SizedBox(width: 8),
           _actionButton(
             label: 'Disputar',
             icon: Icons.warning_amber,
@@ -573,7 +622,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
     if (actions.isEmpty) return const SizedBox.shrink();
 
-    return Row(children: actions);
+    return Wrap(spacing: 8, runSpacing: 8, children: actions);
   }
 
   Widget _actionButton({
@@ -582,15 +631,23 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Expanded(
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 160),
       child: ElevatedButton.icon(
         onPressed: onTap,
         icon: Icon(icon, size: 18),
-        label: Text(label, style: const TextStyle(fontSize: AppTheme.fontMd)),
+        label: Text(
+          label,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: AppTheme.fontMd),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color.withValues(alpha: 0.15),
           foregroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 10),
+          minimumSize: const Size(0, 44),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             side: BorderSide(color: color.withValues(alpha: 0.4)),
@@ -605,10 +662,11 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     if (mounted && success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(action == 'accept' ? 'Trade aceito!' : 'Trade recusado.'),
-          backgroundColor: action == 'accept'
-              ? AppTheme.success
-              : AppTheme.error,
+          content: Text(
+            action == 'accept' ? 'Trade aceito!' : 'Trade recusado.',
+          ),
+          backgroundColor:
+              action == 'accept' ? AppTheme.success : AppTheme.error,
         ),
       );
     }
@@ -619,7 +677,9 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     if (mounted && success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Status atualizado: ${TradeStatusHelper.label(status)}'),
+          content: Text(
+            'Status atualizado: ${TradeStatusHelper.label(status)}',
+          ),
         ),
       );
     }
@@ -631,55 +691,68 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surfaceSlate,
-        title: const Text('Informar envio', style: TextStyle(color: AppTheme.textPrimary)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: trackingController,
-              style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: const InputDecoration(
-                labelText: 'Código de rastreio (opcional)',
-              ),
+      builder:
+          (ctx) => AlertDialog(
+            backgroundColor: AppTheme.surfaceSlate,
+            title: const Text(
+              'Informar envio',
+              style: TextStyle(color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              initialValue: method,
-              decoration: const InputDecoration(labelText: 'Método de envio'),
-              dropdownColor: AppTheme.surfaceSlate,
-              items: const [
-                DropdownMenuItem(value: 'correios', child: Text('Correios')),
-                DropdownMenuItem(value: 'motoboy', child: Text('Motoboy')),
-                DropdownMenuItem(value: 'pessoalmente', child: Text('Pessoalmente')),
-                DropdownMenuItem(value: 'outro', child: Text('Outro')),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: trackingController,
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                  decoration: const InputDecoration(
+                    labelText: 'Código de rastreio (opcional)',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: method,
+                  decoration: const InputDecoration(
+                    labelText: 'Método de envio',
+                  ),
+                  dropdownColor: AppTheme.surfaceSlate,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'correios',
+                      child: Text('Correios'),
+                    ),
+                    DropdownMenuItem(value: 'motoboy', child: Text('Motoboy')),
+                    DropdownMenuItem(
+                      value: 'pessoalmente',
+                      child: Text('Pessoalmente'),
+                    ),
+                    DropdownMenuItem(value: 'outro', child: Text('Outro')),
+                  ],
+                  onChanged: (v) => method = v ?? method,
+                ),
               ],
-              onChanged: (v) => method = v ?? method,
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await provider.updateTradeStatus(
+                    tradeId,
+                    'shipped',
+                    trackingCode:
+                        trackingController.text.isNotEmpty
+                            ? trackingController.text
+                            : null,
+                    deliveryMethod: method,
+                  );
+                },
+                child: const Text('Confirmar Envio'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await provider.updateTradeStatus(
-                tradeId,
-                'shipped',
-                trackingCode: trackingController.text.isNotEmpty
-                    ? trackingController.text
-                    : null,
-                deliveryMethod: method,
-              );
-            },
-            child: const Text('Confirmar Envio'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -787,30 +860,32 @@ class _TradeChat extends StatelessWidget {
           if (messages.isNotEmpty) ...[
             const Divider(color: AppTheme.outlineMuted),
             ...messages.map((msg) {
-              final currentUserId =
-                  context.read<AuthProvider>().user?.id;
+              final currentUserId = context.read<AuthProvider>().user?.id;
               final isMe = msg.senderId == currentUserId;
 
               return Align(
-                alignment:
-                    isMe ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.65,
                   ),
                   margin: const EdgeInsets.symmetric(vertical: 3),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
-                    color: isMe
-                        ? AppTheme.manaViolet.withValues(alpha: 0.2)
-                        : AppTheme.outlineMuted,
+                    color:
+                        isMe
+                            ? AppTheme.manaViolet.withValues(alpha: 0.2)
+                            : AppTheme.outlineMuted,
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   ),
                   child: Column(
-                    crossAxisAlignment: isMe
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        isMe
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                     children: [
                       if (!isMe)
                         Text(
@@ -857,7 +932,10 @@ class _TradeChat extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 'Nenhuma mensagem ainda',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontMd,
+                ),
               ),
             ),
         ],

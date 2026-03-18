@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
@@ -110,8 +111,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         if (isSubmitting) return;
 
                         final trimmedName = nameController.text.trim();
-                        final trimmedDescription = descriptionController.text
-                            .trim();
+                        final trimmedDescription =
+                            descriptionController.text.trim();
 
                         if (trimmedName.isEmpty) {
                           ScaffoldMessenger.of(parentContext).showSnackBar(
@@ -130,9 +131,10 @@ class _DeckListScreenState extends State<DeckListScreen> {
                             .createDeck(
                               name: trimmedName,
                               format: selectedFormat,
-                              description: trimmedDescription.isEmpty
-                                  ? null
-                                  : trimmedDescription,
+                              description:
+                                  trimmedDescription.isEmpty
+                                      ? null
+                                      : trimmedDescription,
                               isPublic: isPublic,
                             );
 
@@ -163,16 +165,17 @@ class _DeckListScreenState extends State<DeckListScreen> {
                           }
                         }
                       },
-                      child: isSubmitting
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('Criar'),
+                      child:
+                          isSubmitting
+                              ? const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Text('Criar'),
                     ),
                   ],
                 ),
@@ -193,14 +196,21 @@ class _DeckListScreenState extends State<DeckListScreen> {
             onPressed: () => context.read<DeckProvider>().fetchDecks(),
             tooltip: 'Recarregar',
           ),
+          const ShellAppBarActions(),
         ],
       ),
       body: Builder(
         builder: (context) {
-          final deckIsLoading = context.select<DeckProvider, bool>((p) => p.isLoading);
+          final deckIsLoading = context.select<DeckProvider, bool>(
+            (p) => p.isLoading,
+          );
           final decks = context.select<DeckProvider, List>((p) => p.decks);
-          final hasError = context.select<DeckProvider, bool>((p) => p.hasError);
-          final errorMessage = context.select<DeckProvider, String?>((p) => p.errorMessage);
+          final hasError = context.select<DeckProvider, bool>(
+            (p) => p.hasError,
+          );
+          final errorMessage = context.select<DeckProvider, String?>(
+            (p) => p.errorMessage,
+          );
 
           // Loading (apenas se a lista estiver vazia)
           if (deckIsLoading && decks.isEmpty) {
@@ -248,7 +258,8 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     ),
                     const SizedBox(height: 24),
                     OutlinedButton.icon(
-                      onPressed: () => context.read<DeckProvider>().fetchDecks(),
+                      onPressed:
+                          () => context.read<DeckProvider>().fetchDecks(),
                       icon: const Icon(Icons.refresh, size: 18),
                       label: const Text('Tentar Novamente'),
                     ),
@@ -338,39 +349,48 @@ class _DeckListScreenState extends State<DeckListScreen> {
           }
         },
         offset: const Offset(0, -160),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 'create',
-            child: ListTile(
-              leading: Icon(Icons.add, color: theme.colorScheme.primary),
-              title: const Text('Novo Deck'),
-              subtitle: const Text('Criar do zero'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          PopupMenuItem(
-            value: 'generate',
-            child: ListTile(
-              leading: Icon(Icons.auto_awesome, color: theme.colorScheme.secondary),
-              title: const Text('Gerar com IA'),
-              subtitle: const Text('Descreva e a IA monta'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          PopupMenuItem(
-            value: 'import',
-            child: ListTile(
-              leading: Icon(Icons.content_paste, color: AppTheme.mythicGold),
-              title: const Text('Importar Lista'),
-              subtitle: const Text('Colar de outro site'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+        itemBuilder:
+            (context) => [
+              PopupMenuItem(
+                value: 'create',
+                child: ListTile(
+                  leading: Icon(Icons.add, color: theme.colorScheme.primary),
+                  title: const Text('Novo Deck'),
+                  subtitle: const Text('Criar do zero'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'generate',
+                child: ListTile(
+                  leading: Icon(
+                    Icons.auto_awesome,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  title: const Text('Gerar com IA'),
+                  subtitle: const Text('Descreva e a IA monta'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'import',
+                child: ListTile(
+                  leading: Icon(
+                    Icons.content_paste,
+                    color: AppTheme.mythicGold,
+                  ),
+                  title: const Text('Importar Lista'),
+                  subtitle: const Text('Colar de outro site'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+            ],
         child: FloatingActionButton.extended(
           onPressed: null,
           icon: const Icon(Icons.add),

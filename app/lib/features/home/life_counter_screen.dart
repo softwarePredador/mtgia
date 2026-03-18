@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 
 import '../../../core/theme/app_theme.dart';
 
@@ -82,13 +83,15 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   }
 
   void _saveSnapshot() {
-    _history.add(_GameSnapshot(
-      lives: List.of(_lives),
-      poison: List.of(_poison),
-      energy: List.of(_energy),
-      experience: List.of(_experience),
-      commanderDamage: _commanderDamage.map((row) => List.of(row)).toList(),
-    ));
+    _history.add(
+      _GameSnapshot(
+        lives: List.of(_lives),
+        poison: List.of(_poison),
+        energy: List.of(_energy),
+        experience: List.of(_experience),
+        commanderDamage: _commanderDamage.map((row) => List.of(row)).toList(),
+      ),
+    );
     if (_history.length > _maxHistory) {
       _history.removeAt(0);
     }
@@ -175,21 +178,23 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       context: context,
       backgroundColor: AppTheme.surfaceSlate,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusLg)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusLg),
+        ),
       ),
-      builder: (ctx) => _SettingsSheet(
-        playerCount: _playerCount,
-        startingLife: _startingLife,
-        onPlayerCountChanged: (count) {
-          _setPlayerCount(count);
-          Navigator.pop(ctx);
-        },
-        onStartingLifeChanged: (life) {
-          _setStartingLife(life);
-          Navigator.pop(ctx);
-        },
-      ),
+      builder:
+          (ctx) => _SettingsSheet(
+            playerCount: _playerCount,
+            startingLife: _startingLife,
+            onPlayerCountChanged: (count) {
+              _setPlayerCount(count);
+              Navigator.pop(ctx);
+            },
+            onStartingLifeChanged: (life) {
+              _setStartingLife(life);
+              Navigator.pop(ctx);
+            },
+          ),
     );
   }
 
@@ -199,27 +204,30 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       backgroundColor: AppTheme.surfaceSlate,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusLg)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusLg),
+        ),
       ),
-      builder: (ctx) => _CountersSheet(
-        playerIndex: playerIndex,
-        playerCount: _playerCount,
-        playerColor: _playerColors[playerIndex],
-        playerLabel: _playerLabels[playerIndex],
-        initialPoison: _poison[playerIndex],
-        initialEnergy: _energy[playerIndex],
-        initialExperience: _experience[playerIndex],
-        initialCommanderDamage: List.of(_commanderDamage[playerIndex]),
-        playerColors: _playerColors,
-        playerLabels: _playerLabels,
-        onPoisonChanged: (delta) => _changePoison(playerIndex, delta),
-        onEnergyChanged: (delta) => _changeEnergy(playerIndex, delta),
-        onExperienceChanged: (delta) =>
-            _changeExperience(playerIndex, delta),
-        onCommanderDamageChanged: (source, delta) =>
-            _changeCommanderDamage(playerIndex, source, delta),
-      ),
+      builder:
+          (ctx) => _CountersSheet(
+            playerIndex: playerIndex,
+            playerCount: _playerCount,
+            playerColor: _playerColors[playerIndex],
+            playerLabel: _playerLabels[playerIndex],
+            initialPoison: _poison[playerIndex],
+            initialEnergy: _energy[playerIndex],
+            initialExperience: _experience[playerIndex],
+            initialCommanderDamage: List.of(_commanderDamage[playerIndex]),
+            playerColors: _playerColors,
+            playerLabels: _playerLabels,
+            onPoisonChanged: (delta) => _changePoison(playerIndex, delta),
+            onEnergyChanged: (delta) => _changeEnergy(playerIndex, delta),
+            onExperienceChanged:
+                (delta) => _changeExperience(playerIndex, delta),
+            onCommanderDamageChanged:
+                (source, delta) =>
+                    _changeCommanderDamage(playerIndex, source, delta),
+          ),
     );
   }
 
@@ -234,9 +242,10 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           IconButton(
             icon: Icon(
               Icons.undo,
-              color: _history.isNotEmpty
-                  ? AppTheme.textPrimary
-                  : AppTheme.textHint,
+              color:
+                  _history.isNotEmpty
+                      ? AppTheme.textPrimary
+                      : AppTheme.textHint,
             ),
             tooltip: 'Desfazer',
             onPressed: _history.isNotEmpty ? _undo : null,
@@ -251,6 +260,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
             tooltip: 'Resetar tudo',
             onPressed: _reset,
           ),
+          const ShellAppBarActions(),
         ],
       ),
       body: _playerCount <= 2 ? _buildTwoPlayers() : _buildGridPlayers(),
@@ -465,10 +475,7 @@ class _PlayerPanel extends StatelessWidget {
           Positioned(
             right: 4,
             bottom: 4,
-            child: _CountersButton(
-              onTap: onCountersTap,
-              compact: compact,
-            ),
+            child: _CountersButton(onTap: onCountersTap, compact: compact),
           ),
         ],
       ),
@@ -484,23 +491,27 @@ class _PlayerPanel extends StatelessWidget {
     final badges = <Widget>[];
 
     if (poison > 0) {
-      badges.add(_BadgeChip(
-        icon: Icons.coronavirus,
-        value: poison,
-        color: const Color(0xFF10B981), // green for poison
-        isLethal: poison >= 10,
-        compact: compact,
-      ));
+      badges.add(
+        _BadgeChip(
+          icon: Icons.coronavirus,
+          value: poison,
+          color: const Color(0xFF10B981), // green for poison
+          isLethal: poison >= 10,
+          compact: compact,
+        ),
+      );
     }
 
     if (commanderDamageTotal > 0) {
-      badges.add(_BadgeChip(
-        icon: Icons.shield,
-        value: commanderDamageTotal,
-        color: AppTheme.mythicGold,
-        isLethal: commanderDamageTotal >= 21,
-        compact: compact,
-      ));
+      badges.add(
+        _BadgeChip(
+          icon: Icons.shield,
+          value: commanderDamageTotal,
+          color: AppTheme.mythicGold,
+          isLethal: commanderDamageTotal >= 21,
+          compact: compact,
+        ),
+      );
     }
 
     if (badges.isEmpty) return const SizedBox.shrink();
@@ -509,10 +520,9 @@ class _PlayerPanel extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: badges
-            .expand((w) => [w, const SizedBox(width: 6)])
-            .toList()
-          ..removeLast(),
+        children:
+            badges.expand((w) => [w, const SizedBox(width: 6)]).toList()
+              ..removeLast(),
       ),
     );
   }
@@ -692,106 +702,107 @@ class _CountersSheetState extends State<_CountersSheet> {
       minChildSize: 0.4,
       maxChildSize: 0.85,
       expand: false,
-      builder: (ctx, scrollController) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        child: ListView(
-          controller: scrollController,
-          children: [
-            // Handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: AppTheme.outlineMuted,
-                  borderRadius: BorderRadius.circular(2),
+      builder:
+          (ctx, scrollController) => Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: ListView(
+              controller: scrollController,
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.outlineMuted,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Text(
-              'Contadores — ${widget.playerLabel}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: widget.playerColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // ── Poison ──
-            _CounterRow(
-              icon: Icons.coronavirus,
-              label: 'Veneno (Poison)',
-              sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
-              value: _poison,
-              color: const Color(0xFF10B981),
-              isLethal: _poison >= 10,
-              onIncrement: () => _updatePoison(1),
-              onDecrement: () => _updatePoison(-1),
-            ),
-            const SizedBox(height: 12),
-
-            // ── Commander Damage ──
-            Text(
-              '⚔ Dano de Comandante',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.mythicGold,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '21 de uma mesma fonte = derrota',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textHint,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ...List.generate(widget.playerCount, (sourceIdx) {
-              if (sourceIdx == widget.playerIndex) {
-                return const SizedBox.shrink();
-              }
-              final dmg = _cmdDamage[sourceIdx];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _CounterRow(
-                  icon: Icons.shield,
-                  label: 'De ${widget.playerLabels[sourceIdx]}',
-                  sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
-                  value: dmg,
-                  color: widget.playerColors[sourceIdx],
-                  isLethal: dmg >= 21,
-                  onIncrement: () => _updateCmdDamage(sourceIdx, 1),
-                  onDecrement: () => _updateCmdDamage(sourceIdx, -1),
+                Text(
+                  'Contadores — ${widget.playerLabel}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: widget.playerColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              );
-            }),
-            const SizedBox(height: 12),
+                const SizedBox(height: 20),
 
-            // ── Energy ──
-            _CounterRow(
-              icon: Icons.bolt,
-              label: 'Energia (Energy)',
-              value: _energy,
-              color: AppTheme.mythicGold,
-              onIncrement: () => _updateEnergy(1),
-              onDecrement: () => _updateEnergy(-1),
-            ),
-            const SizedBox(height: 12),
+                // ── Poison ──
+                _CounterRow(
+                  icon: Icons.coronavirus,
+                  label: 'Veneno (Poison)',
+                  sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
+                  value: _poison,
+                  color: const Color(0xFF10B981),
+                  isLethal: _poison >= 10,
+                  onIncrement: () => _updatePoison(1),
+                  onDecrement: () => _updatePoison(-1),
+                ),
+                const SizedBox(height: 12),
 
-            // ── Experience ──
-            _CounterRow(
-              icon: Icons.star,
-              label: 'Experiência (Experience)',
-              value: _experience,
-              color: AppTheme.primarySoft,
-              onIncrement: () => _updateExperience(1),
-              onDecrement: () => _updateExperience(-1),
+                // ── Commander Damage ──
+                Text(
+                  '⚔ Dano de Comandante',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.mythicGold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '21 de uma mesma fonte = derrota',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textHint,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...List.generate(widget.playerCount, (sourceIdx) {
+                  if (sourceIdx == widget.playerIndex) {
+                    return const SizedBox.shrink();
+                  }
+                  final dmg = _cmdDamage[sourceIdx];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _CounterRow(
+                      icon: Icons.shield,
+                      label: 'De ${widget.playerLabels[sourceIdx]}',
+                      sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
+                      value: dmg,
+                      color: widget.playerColors[sourceIdx],
+                      isLethal: dmg >= 21,
+                      onIncrement: () => _updateCmdDamage(sourceIdx, 1),
+                      onDecrement: () => _updateCmdDamage(sourceIdx, -1),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 12),
+
+                // ── Energy ──
+                _CounterRow(
+                  icon: Icons.bolt,
+                  label: 'Energia (Energy)',
+                  value: _energy,
+                  color: AppTheme.mythicGold,
+                  onIncrement: () => _updateEnergy(1),
+                  onDecrement: () => _updateEnergy(-1),
+                ),
+                const SizedBox(height: 12),
+
+                // ── Experience ──
+                _CounterRow(
+                  icon: Icons.star,
+                  label: 'Experiência (Experience)',
+                  value: _experience,
+                  color: AppTheme.primarySoft,
+                  onIncrement: () => _updateExperience(1),
+                  onDecrement: () => _updateExperience(-1),
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -825,14 +836,16 @@ class _CounterRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isLethal
-            ? AppTheme.error.withValues(alpha: 0.15)
-            : AppTheme.surfaceElevated,
+        color:
+            isLethal
+                ? AppTheme.error.withValues(alpha: 0.15)
+                : AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: isLethal
-              ? AppTheme.error.withValues(alpha: 0.5)
-              : color.withValues(alpha: 0.2),
+          color:
+              isLethal
+                  ? AppTheme.error.withValues(alpha: 0.5)
+                  : color.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -883,11 +896,7 @@ class _CounterRow extends StatelessWidget {
             ),
           ),
           // Plus button
-          _RoundButton(
-            icon: Icons.add,
-            color: color,
-            onTap: onIncrement,
-          ),
+          _RoundButton(icon: Icons.add, color: color, onTap: onIncrement),
         ],
       ),
     );
@@ -902,11 +911,7 @@ class _RoundButton extends StatelessWidget {
   final Color color;
   final VoidCallback? onTap;
 
-  const _RoundButton({
-    required this.icon,
-    required this.color,
-    this.onTap,
-  });
+  const _RoundButton({required this.icon, required this.color, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -921,9 +926,10 @@ class _RoundButton extends StatelessWidget {
           height: 32,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: enabled
-                ? color.withValues(alpha: 0.15)
-                : AppTheme.outlineMuted.withValues(alpha: 0.3),
+            color:
+                enabled
+                    ? color.withValues(alpha: 0.15)
+                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
           ),
           child: Icon(
             icon,
@@ -982,25 +988,28 @@ class _SettingsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
-            children: [2, 3, 4].map((count) {
-              final isSelected = count == playerCount;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ChoiceChip(
-                    label: Text('$count'),
-                    selected: isSelected,
-                    onSelected: (_) => onPlayerCountChanged(count),
-                    selectedColor: AppTheme.manaViolet,
-                    labelStyle: TextStyle(
-                      color:
-                          isSelected ? Colors.white : AppTheme.textSecondary,
-                      fontWeight: FontWeight.bold,
+            children:
+                [2, 3, 4].map((count) {
+                  final isSelected = count == playerCount;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ChoiceChip(
+                        label: Text('$count'),
+                        selected: isSelected,
+                        onSelected: (_) => onPlayerCountChanged(count),
+                        selectedColor: AppTheme.manaViolet,
+                        labelStyle: TextStyle(
+                          color:
+                              isSelected
+                                  ? Colors.white
+                                  : AppTheme.textSecondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
           const SizedBox(height: 20),
 
@@ -1015,20 +1024,20 @@ class _SettingsSheet extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: [20, 25, 30, 40].map((life) {
-              final isSelected = life == startingLife;
-              return ChoiceChip(
-                label: Text('$life'),
-                selected: isSelected,
-                onSelected: (_) => onStartingLifeChanged(life),
-                selectedColor: AppTheme.manaViolet,
-                labelStyle: TextStyle(
-                  color:
-                      isSelected ? Colors.white : AppTheme.textSecondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            }).toList(),
+            children:
+                [20, 25, 30, 40].map((life) {
+                  final isSelected = life == startingLife;
+                  return ChoiceChip(
+                    label: Text('$life'),
+                    selected: isSelected,
+                    onSelected: (_) => onStartingLifeChanged(life),
+                    selectedColor: AppTheme.manaViolet,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : AppTheme.textSecondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }).toList(),
           ),
           const SizedBox(height: 16),
           Text(
