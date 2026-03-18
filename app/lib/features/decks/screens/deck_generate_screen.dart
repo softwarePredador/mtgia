@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
+import '../widgets/deck_feedback_dialogs.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
 class DeckGenerateScreen extends StatefulWidget {
@@ -98,7 +99,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+      builder:
+          (ctx) => const Center(
+            child: DeckBlockingTaskDialog(
+              title: 'Salvando deck...',
+              subtitle:
+                  'Criando a lista e preparando o deck para abrir na sua coleção.',
+              accent: AppTheme.success,
+              icon: Icons.save_outlined,
+              tips: [
+                'O deck só aparece na coleção depois que o salvamento termina.',
+                'As cartas geradas estão sendo convertidas para a estrutura final do app.',
+              ],
+            ),
+          ),
     );
 
     try {
@@ -262,7 +276,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     return ActionChip(
                       label: Text(
                         example,
-                        style: const TextStyle(fontSize: AppTheme.fontSm, color: AppTheme.textSecondary),
+                        style: const TextStyle(
+                          fontSize: AppTheme.fontSm,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                       onPressed: () {
                         setState(() {
@@ -346,7 +363,11 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 icon: const Icon(Icons.save),
                 label: const Text(
                   'Salvar Deck',
-                  style: TextStyle(fontSize: AppTheme.fontLg, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                  style: TextStyle(
+                    fontSize: AppTheme.fontLg,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),

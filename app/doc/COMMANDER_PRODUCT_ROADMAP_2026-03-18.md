@@ -55,6 +55,7 @@ Este roadmap cobre todas as frentes que já foram discutidas e validadas:
 
 - produto e visual:
   - `app/doc/COMMANDER_PRODUCT_ROADMAP_2026-03-18.md`
+  - `app/doc/COMMANDER_EXECUTION_TRACKER_2026-03-18.md`
   - `app/doc/DESIGN_COLOR_LAYOUT_AUDIT_2026-03-18.md`
   - `app/doc/LIFE_COUNTER_TABLETOP_UX_HANDOFF_2026-03-18.md`
 - otimização e validação:
@@ -154,6 +155,23 @@ Objetivo:
 
 #### Progresso já executado em 2026-03-18
 
+- painel de diagnóstico rápido na visão geral do deck com:
+  - terrenos
+  - ramp
+  - compra
+  - interação
+  - wipes
+  - CMC médio
+  - leitura rápida do estado da lista
+- playtest leve trazido para o fluxo principal com:
+  - sample hand compacta na visão geral do deck
+  - mulligan direto no mesmo componente
+  - leitura rápida de keep / mão arriscada
+  - comandante removido do pool da mão inicial em Commander
+- estados secundários de deck refinados com:
+  - loading de salvamento mais coerente no `deck_generate`
+  - resultado de importação mais legível no `deck_import`
+  - descrição e explicação de carta com dialogs mais alinhados ao fluxo principal
 - preview de otimização mais claro e menos “painel técnico”
 - loadings de optimize e rebuild com:
   - etapa humanizada

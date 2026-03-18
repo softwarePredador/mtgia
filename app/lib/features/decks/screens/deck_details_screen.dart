@@ -14,6 +14,7 @@ import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
+import '../widgets/deck_diagnostic_panel.dart';
 import '../widgets/deck_progress_indicator.dart';
 import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -411,6 +412,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       onForceRefresh: () => _loadPricing(force: true),
                       onShowDetails: _showPricingDetails,
                     ),
+                    const SizedBox(height: 12),
+                    DeckDiagnosticPanel(
+                      deck: deck,
+                      onOpenAnalysis: () => _tabController.animateTo(2),
+                    ),
+                    SampleHandWidget(deck: deck, compact: true),
                     if (isCommanderFormat && deck.commander.isEmpty) ...[
                       const SizedBox(height: 12),
                       Container(
@@ -1193,7 +1200,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: const Text('Descrição do Deck'),
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            title: const _DialogTitleBlock(
+              icon: Icons.edit_note_rounded,
+              title: 'Descrição do deck',
+              subtitle:
+                  'Registre o plano, tema ou objetivo principal da lista.',
+              accent: AppTheme.primarySoft,
+            ),
             content: TextField(
               controller: controller,
               maxLines: 5,
@@ -1614,7 +1629,20 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+      builder:
+          (ctx) => const Center(
+            child: _FlowLoadingDialog(
+              title: 'Analisando a carta...',
+              subtitle:
+                  'Relacionando a carta com o plano do deck e o papel dela na lista.',
+              accent: AppTheme.manaViolet,
+              icon: Icons.auto_awesome_rounded,
+              tips: [
+                'A análise tenta explicar função, sinergia e valor da carta no deck.',
+                'Cartas boas isoladamente podem ter papel diferente dependendo do plano da lista.',
+              ],
+            ),
+          ),
     );
 
     try {
@@ -1637,16 +1665,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         context: context,
         builder:
             (ctx) => AlertDialog(
-              title: Row(
-                children: [
-                  const Icon(Icons.auto_awesome, color: AppTheme.manaViolet),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('Análise: ${card.name}')),
-                ],
+              titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+              title: _DialogTitleBlock(
+                icon: Icons.auto_awesome_rounded,
+                title: 'Análise: ${card.name}',
+                subtitle: 'Leitura contextual da carta dentro do seu deck.',
+                accent: AppTheme.manaViolet,
               ),
               content: SingleChildScrollView(
-                child: Text(
-                  explanation ?? 'Não foi possível gerar uma explicação.',
+                child: _DialogSectionCard(
+                  title: 'O que essa carta faz aqui',
+                  accent: AppTheme.manaViolet,
+                  icon: Icons.psychology_alt_outlined,
+                  child: Text(
+                    explanation ?? 'Não foi possível gerar uma explicação.',
+                    style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                      height: 1.4,
+                    ),
+                  ),
                 ),
               ),
               actions: [
