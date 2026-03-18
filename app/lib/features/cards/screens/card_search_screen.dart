@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../providers/card_provider.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
@@ -265,6 +266,8 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
       ),
       body: Consumer<CardProvider>(
         builder: (context, provider, child) {
+          final query = _searchController.text.trim();
+
           if (provider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(color: AppTheme.manaViolet),
@@ -272,22 +275,35 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
           }
 
           if (provider.errorMessage != null) {
-            return Center(child: Text(provider.errorMessage!));
+            return AppStatePanel(
+              icon: Icons.error_outline_rounded,
+              title: 'Falha ao buscar cartas',
+              message: provider.errorMessage!,
+              accent: AppTheme.error,
+              actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
+              onAction:
+                  query.length >= 3 ? () => _onSearchChanged(query) : null,
+            );
           }
 
           if (provider.searchResults.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search, size: 64, color: AppTheme.disabled),
-                  SizedBox(height: 16),
-                  Text(
-                    'Digite o nome de uma carta',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                ],
-              ),
+            return AppStatePanel(
+              icon:
+                  query.length >= 3
+                      ? Icons.search_off_rounded
+                      : Icons.search_rounded,
+              title:
+                  query.length >= 3
+                      ? 'Nenhuma carta encontrada'
+                      : 'Busque uma carta',
+              message:
+                  query.length >= 3
+                      ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
+                      : 'Digite pelo menos 3 letras para começar a busca.',
+              accent:
+                  query.length >= 3
+                      ? AppTheme.warning
+                      : AppTheme.primarySoft,
             );
           }
 
@@ -301,7 +317,11 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
               if (index >= provider.searchResults.length) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.manaViolet,
+                    ),
+                  ),
                 );
               }
               final card = provider.searchResults[index];
