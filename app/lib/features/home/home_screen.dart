@@ -139,7 +139,7 @@ class HomeScreen extends StatelessWidget {
                         child: _QuickAction(
                           icon: Icons.favorite,
                           label: 'Vida',
-                          color: const Color(0xFFEF4444),
+                          color: AppTheme.error,
                           onTap: () => context.go('/life-counter'),
                         ),
                       ),
@@ -148,7 +148,7 @@ class HomeScreen extends StatelessWidget {
                         child: _QuickAction(
                           icon: Icons.store,
                           label: 'Marketplace',
-                          color: const Color(0xFF22C55E),
+                          color: AppTheme.success,
                           onTap: () => context.go('/collection?tab=1'),
                         ),
                       ),
@@ -235,15 +235,7 @@ class _HeroBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1A0A2E),
-            Color(0xFF0F172A),
-            AppTheme.backgroundAbyss,
-          ],
-        ),
+        gradient: AppTheme.heroGradient,
         border: const Border(
           bottom: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
         ),

@@ -51,11 +51,14 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
     try {
       final setResponse = await _apiClient.get('/sets?limit=1&page=1');
       if (setResponse.statusCode != 200) {
-        throw Exception('Falha ao buscar última edição (${setResponse.statusCode})');
+        throw Exception(
+          'Falha ao buscar última edição (${setResponse.statusCode})',
+        );
       }
 
       final setData = setResponse.data as Map<String, dynamic>;
-      final sets = (setData['data'] as List?)?.whereType<Map>().toList() ?? const [];
+      final sets =
+          (setData['data'] as List?)?.whereType<Map>().toList() ?? const [];
       if (sets.isEmpty) {
         throw Exception('Nenhuma edição encontrada no banco');
       }
@@ -79,7 +82,10 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
     }
   }
 
-  Future<void> _fetchCardsPage({required int page, required bool append}) async {
+  Future<void> _fetchCardsPage({
+    required int page,
+    required bool append,
+  }) async {
     final setCode = _setCode;
     if (setCode == null || setCode.isEmpty) return;
 
@@ -89,13 +95,18 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Falha ao buscar cartas da edição (${response.statusCode})');
+      throw Exception(
+        'Falha ao buscar cartas da edição (${response.statusCode})',
+      );
     }
 
     final body = response.data as Map<String, dynamic>;
     final incoming =
-        (body['data'] as List?)?.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList() ??
-            const <Map<String, dynamic>>[];
+        (body['data'] as List?)
+            ?.whereType<Map>()
+            .map((e) => e.cast<String, dynamic>())
+            .toList() ??
+        const <Map<String, dynamic>>[];
 
     setState(() {
       if (!append) {
@@ -149,6 +160,13 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
       appBar: AppBar(
         title: const Text('Última Edição'),
         backgroundColor: AppTheme.surfaceElevated,
+        actions: [
+          IconButton(
+            onPressed: _isLoading ? null : _loadLatestSetAndCards,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Recarregar edição',
+          ),
+        ],
       ),
       body: _buildBody(),
     );
@@ -156,29 +174,46 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      );
     }
 
     if (_error != null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.redAccent, size: 36),
-              const SizedBox(height: 12),
-              Text(
-                'Falha ao carregar coleção mais recente.\n$_error',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppTheme.textSecondary),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceElevated,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(
+                color: AppTheme.error.withValues(alpha: 0.24),
+                width: 0.8,
               ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _loadLatestSetAndCards,
-                child: const Text('Tentar novamente'),
-              ),
-            ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: AppTheme.error.withValues(alpha: 0.92),
+                  size: 36,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Falha ao carregar coleção mais recente.\n$_error',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: _loadLatestSetAndCards,
+                  child: const Text('Tentar novamente'),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -186,90 +221,200 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
 
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          color: AppTheme.surfaceSlate,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${_setName ?? 'Edição'} (${_setCode ?? '-'})',
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: AppTheme.fontLg,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: AppTheme.cardGradient,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(color: AppTheme.outlineMuted, width: 0.8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.goldAccentGradient,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+                      ),
+                      child: Text(
+                        _setCode ?? '-',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ),
+                    _InfoChip(
+                      icon: Icons.calendar_today_outlined,
+                      label: _releaseDate ?? '-',
+                    ),
+                    _InfoChip(
+                      icon: Icons.style_outlined,
+                      label: '${_cards.length} cartas',
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Lançamento: ${_releaseDate ?? '-'} • Cartas carregadas: ${_cards.length}',
-                style: const TextStyle(color: AppTheme.textSecondary),
-              ),
-            ],
+                const SizedBox(height: 14),
+                Text(
+                  _setName ?? 'Edição',
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: AppTheme.fontXl,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Acompanhe as cartas da edição mais recente com scroll contínuo e recarga manual.',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         Expanded(
-          child: ListView.separated(
-            controller: _scrollController,
-            itemCount: _cards.length + (_isLoadingMore ? 1 : 0),
-            separatorBuilder: (_, __) => const Divider(
-              color: AppTheme.outlineMuted,
-              height: 1,
-            ),
-            itemBuilder: (context, index) {
-              if (index >= _cards.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator()),
+          child: RefreshIndicator(
+            color: AppTheme.manaViolet,
+            onRefresh: _loadLatestSetAndCards,
+            child: ListView.separated(
+              controller: _scrollController,
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+              itemCount: _cards.length + (_isLoadingMore ? 1 : 0),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                if (index >= _cards.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.manaViolet,
+                      ),
+                    ),
+                  );
+                }
+
+                final card = _cards[index];
+                final imageUrl = card['image_url']?.toString();
+
+                return Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSlate,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: 44,
+                        height: 60,
+                        child:
+                            imageUrl == null || imageUrl.isEmpty
+                                ? Container(
+                                  color: AppTheme.surfaceElevated,
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    color: AppTheme.textSecondary,
+                                    size: 18,
+                                  ),
+                                )
+                                : Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Container(
+                                        color: AppTheme.surfaceElevated,
+                                        child: const Icon(
+                                          Icons.broken_image,
+                                          color: AppTheme.textSecondary,
+                                          size: 18,
+                                        ),
+                                      ),
+                                ),
+                      ),
+                    ),
+                    title: Text(
+                      card['name']?.toString() ?? '-',
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '${card['type_line'] ?? '-'} • ${card['rarity'] ?? '-'}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
+                    ),
+                    dense: true,
+                  ),
                 );
-              }
-
-              final card = _cards[index];
-              final imageUrl = card['image_url']?.toString();
-
-              return ListTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: SizedBox(
-                    width: 44,
-                    height: 60,
-                    child: imageUrl == null || imageUrl.isEmpty
-                        ? Container(
-                            color: AppTheme.surfaceSlate,
-                            child: const Icon(Icons.image_not_supported,
-                                color: AppTheme.textSecondary, size: 18),
-                          )
-                        : Image.network(
-                            imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: AppTheme.surfaceSlate,
-                              child: const Icon(Icons.broken_image,
-                                  color: AppTheme.textSecondary, size: 18),
-                            ),
-                          ),
-                  ),
-                ),
-                title: Text(
-                  card['name']?.toString() ?? '-',
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Text(
-                  '${card['type_line'] ?? '-'} • ${card['rarity'] ?? '-'}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppTheme.textSecondary),
-                ),
-                dense: true,
-              );
-            },
+              },
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.primarySoft),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -26,7 +26,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
       appBar: AppBar(
-        backgroundColor: AppTheme.backgroundAbyss,
+        backgroundColor: AppTheme.surfaceElevated,
         title: const Text(
           'Notificações',
           style: TextStyle(color: AppTheme.textPrimary),
@@ -65,9 +65,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.notifications_none,
-                        size: 64,
-                        color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+                    Icon(
+                      Icons.notifications_none,
+                      size: 64,
+                      color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                    ),
                     const SizedBox(height: 16),
                     const Text(
                       'Nenhuma notificação',
@@ -87,13 +89,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
             color: AppTheme.manaViolet,
             onRefresh: () => provider.fetchNotifications(),
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.all(12),
               itemCount: provider.notifications.length,
-              separatorBuilder: (_, __) => const Divider(
-                height: 1,
-                color: AppTheme.outlineMuted,
-                indent: 56,
-              ),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final notif = provider.notifications[index];
                 return _NotificationTile(
@@ -144,55 +142,86 @@ class _NotificationTile extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback onTap;
 
-  const _NotificationTile({
-    required this.notification,
-    required this.onTap,
-  });
+  const _NotificationTile({required this.notification, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final isRead = notification.isRead;
 
-    return ListTile(
-      onTap: onTap,
-      tileColor: isRead ? null : AppTheme.manaViolet.withValues(alpha: 0.06),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: CircleAvatar(
-        radius: 20,
-        backgroundColor: _typeColor(notification.type).withValues(alpha: 0.2),
-        child: Icon(
-          _typeIcon(notification.type),
-          color: _typeColor(notification.type),
-          size: 20,
-        ),
-      ),
-      title: Text(
-        notification.title,
-        style: TextStyle(
-          color: AppTheme.textPrimary,
-          fontWeight: isRead ? FontWeight.w400 : FontWeight.w600,
-          fontSize: AppTheme.fontMd,
-        ),
-      ),
-      subtitle: notification.body != null
-          ? Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                notification.body!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: AppTheme.fontSm,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Container(
+          decoration: BoxDecoration(
+            color:
+                isRead
+                    ? AppTheme.surfaceSlate
+                    : AppTheme.manaViolet.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color:
+                  isRead
+                      ? AppTheme.outlineMuted
+                      : AppTheme.manaViolet.withValues(alpha: 0.22),
+              width: 0.8,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: _typeColor(
+                  notification.type,
+                ).withValues(alpha: 0.18),
+                child: Icon(
+                  _typeIcon(notification.type),
+                  color: _typeColor(notification.type),
+                  size: 20,
                 ),
               ),
-            )
-          : null,
-      trailing: Text(
-        _formatRelative(notification.createdAt),
-        style: const TextStyle(
-          color: AppTheme.textSecondary,
-          fontSize: AppTheme.fontXs,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notification.title,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
+                        fontSize: AppTheme.fontMd,
+                      ),
+                    ),
+                    if (notification.body != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.body!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                _formatRelative(notification.createdAt),
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -230,15 +259,15 @@ class _NotificationTile extends StatelessWidget {
       case 'trade_offer_received':
         return AppTheme.mythicGold;
       case 'trade_accepted':
-        return Colors.green;
+        return AppTheme.success;
       case 'trade_declined':
         return AppTheme.error;
       case 'trade_shipped':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'trade_delivered':
         return AppTheme.primarySoft;
       case 'trade_completed':
-        return Colors.green;
+        return AppTheme.success;
       case 'trade_message':
         return AppTheme.manaViolet;
       case 'direct_message':
@@ -264,4 +293,3 @@ class _NotificationTile extends StatelessWidget {
     }
   }
 }
-
