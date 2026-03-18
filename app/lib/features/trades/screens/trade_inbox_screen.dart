@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/trade_provider.dart';
 
@@ -81,9 +82,16 @@ class _TradeInboxTabContentState extends State<TradeInboxTabContent>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _TradeListView(onRefresh: () => _loadForTab(0), role: 'receiver', status: 'pending'),
+              _TradeListView(
+                onRefresh: () => _loadForTab(0),
+                role: 'receiver',
+                status: 'pending',
+              ),
               _TradeListView(onRefresh: () => _loadForTab(1), role: 'sender'),
-              _TradeListView(onRefresh: () => _loadForTab(2), status: 'completed'),
+              _TradeListView(
+                onRefresh: () => _loadForTab(2),
+                status: 'completed',
+              ),
             ],
           ),
         ),
@@ -161,7 +169,11 @@ class _TradeInboxScreenState extends State<TradeInboxScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _TradeListView(onRefresh: () => _loadForTab(0), role: 'receiver', status: 'pending'),
+          _TradeListView(
+            onRefresh: () => _loadForTab(0),
+            role: 'receiver',
+            status: 'pending',
+          ),
           _TradeListView(onRefresh: () => _loadForTab(1), role: 'sender'),
           _TradeListView(onRefresh: () => _loadForTab(2), status: 'completed'),
         ],
@@ -174,7 +186,11 @@ class _TradeListView extends StatefulWidget {
   final VoidCallback onRefresh;
   final String role;
   final String? status;
-  const _TradeListView({required this.onRefresh, this.role = 'all', this.status});
+  const _TradeListView({
+    required this.onRefresh,
+    this.role = 'all',
+    this.status,
+  });
 
   @override
   State<_TradeListView> createState() => _TradeListViewState();
@@ -202,10 +218,7 @@ class _TradeListViewState extends State<_TradeListView> {
       final provider = context.read<TradeProvider>();
       if (!provider.isLoading &&
           provider.trades.length < provider.totalTrades) {
-        provider.fetchMoreTrades(
-          role: widget.role,
-          status: widget.status,
-        );
+        provider.fetchMoreTrades(role: widget.role, status: widget.status);
       }
     }
   }
@@ -215,37 +228,27 @@ class _TradeListViewState extends State<_TradeListView> {
     return Consumer<TradeProvider>(
       builder: (context, provider, _) {
         if (provider.isLoading && provider.trades.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.manaViolet),
+          );
         }
         if (provider.errorMessage != null) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  provider.errorMessage!,
-                  style: const TextStyle(color: AppTheme.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: widget.onRefresh, child: const Text('Tentar novamente')),
-              ],
-            ),
+          return AppStatePanel(
+            icon: Icons.sync_problem_rounded,
+            title: 'Falha ao carregar trades',
+            message: provider.errorMessage!,
+            accent: AppTheme.error,
+            actionLabel: 'Tentar novamente',
+            onAction: widget.onRefresh,
           );
         }
         if (provider.trades.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.swap_horiz, size: 64, color: AppTheme.outlineMuted),
-                const SizedBox(height: 12),
-                const Text(
-                  'Nenhum trade encontrado',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
-                ),
-              ],
-            ),
+          return const AppStatePanel(
+            icon: Icons.swap_horiz_rounded,
+            title: 'Nenhum trade encontrado',
+            message:
+                'Quando houver propostas, negociações ou finalizações, elas aparecem aqui.',
+            accent: AppTheme.primarySoft,
           );
         }
         return RefreshIndicator(
@@ -275,9 +278,8 @@ class _TradeCard extends StatelessWidget {
     final statusIcon = TradeStatusHelper.icon(trade.status);
     final statusLabel = TradeStatusHelper.label(trade.status);
     final currentUserId = context.read<AuthProvider>().user?.id;
-    final otherUser = trade.sender.id == currentUserId
-        ? trade.receiver
-        : trade.sender;
+    final otherUser =
+        trade.sender.id == currentUserId ? trade.receiver : trade.sender;
 
     return Card(
       color: AppTheme.surfaceSlate,
@@ -330,7 +332,10 @@ class _TradeCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -380,7 +385,10 @@ class _TradeCard extends StatelessWidget {
                   trade.message!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontMd,
+                  ),
                 ),
               ],
             ],
@@ -418,7 +426,10 @@ class _InfoChip extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+          style: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: AppTheme.fontSm,
+          ),
         ),
       ],
     );

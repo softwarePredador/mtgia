@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../providers/notification_provider.dart';
 
 /// Tela de notificações do app
@@ -59,29 +60,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
           }
 
           if (provider.notifications.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.notifications_none,
-                      size: 64,
-                      color: AppTheme.textSecondary.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Nenhuma notificação',
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontLg,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return const AppStatePanel(
+              icon: Icons.notifications_none_rounded,
+              title: 'Nenhuma notificação',
+              message:
+                  'Quando algo importante acontecer no app, os avisos aparecem aqui.',
+              accent: AppTheme.primarySoft,
             );
           }
 

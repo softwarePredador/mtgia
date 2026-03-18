@@ -50,6 +50,15 @@ Isso melhora a nota prática do estado atual para algo mais próximo de:
 
 - `7.5/10`
 
+Atualização adicional dentro da frente de consistência:
+
+- estados vazios e de erro começaram a convergir para um mesmo padrão visual
+- isso já foi aplicado em:
+  - notifications
+  - messages
+  - trade inbox
+  - latest set collection
+
 Documento complementar para o contador de vida:
 
 - `app/doc/LIFE_COUNTER_TABLETOP_UX_HANDOFF_2026-03-18.md`

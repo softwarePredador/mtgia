@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 
 class LatestSetCollectionScreen extends StatefulWidget {
   const LatestSetCollectionScreen({super.key});
@@ -180,42 +181,13 @@ class _LatestSetCollectionScreenState extends State<LatestSetCollectionScreen> {
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceElevated,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(
-                color: AppTheme.error.withValues(alpha: 0.24),
-                width: 0.8,
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: AppTheme.error.withValues(alpha: 0.92),
-                  size: 36,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Falha ao carregar coleção mais recente.\n$_error',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.textSecondary),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: _loadLatestSetAndCards,
-                  child: const Text('Tentar novamente'),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return AppStatePanel(
+        icon: Icons.error_outline_rounded,
+        title: 'Falha ao carregar coleção mais recente',
+        message: _error,
+        accent: AppTheme.error,
+        actionLabel: 'Tentar novamente',
+        onAction: _loadLatestSetAndCards,
       );
     }
 

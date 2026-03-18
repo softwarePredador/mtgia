@@ -149,7 +149,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade700,
+        backgroundColor: isError ? AppTheme.error : AppTheme.success,
       ),
     );
   }

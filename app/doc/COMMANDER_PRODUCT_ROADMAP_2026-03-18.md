@@ -205,6 +205,11 @@ Objetivo:
   - `card_detail`
   - `deck_card`
   - header principal de `deck_details`
+- unificação inicial de estados vazios/erro com componente compartilhado em:
+  - notifications
+  - messages
+  - trade inbox
+  - latest set collection
 
 #### O que ainda resta nesta fase
 
