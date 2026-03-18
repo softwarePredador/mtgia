@@ -1,0 +1,82 @@
+{
+  "source_deck_id": "c4b6065d-0750-4bf0-8f7b-972e722a67d8",
+  "source_deck_name": "Corpus Seed - Sythis, Harvest's Hand",
+  "clone_deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
+  "final_deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
+  "optimize_request": {
+    "deck_id": "55234635-d469-4c80-a3b7-0ead894041ad",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "A otimizacao nao encontrou trocas acionaveis apos os filtros de seguranca.",
+    "quality_error": {
+      "code": "OPTIMIZE_NO_ACTIONABLE_SWAPS",
+      "message": "As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.",
+      "blocked_by_theme": [],
+      "blocked_by_bracket": []
+    },
+    "mode": "optimize",
+    "removals": [],
+    "additions": [],
+    "deck_analysis": {
+      "detected_archetype": "stax",
+      "average_cmc": "2.45",
+      "type_distribution": {
+        "creatures": 22,
+        "instants": 5,
+        "sorceries": 4,
+        "enchantments": 41,
+        "artifacts": 3,
+        "planeswalkers": 0,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "55234635-d469-4c80-a3b7-0ead894041ad"
+  },
+  "final_analysis": {
+    "detected_archetype": "stax",
+    "average_cmc": "2.45",
+    "type_distribution": {
+      "creatures": 22,
+      "instants": 5,
+      "sorceries": 4,
+      "enchantments": 41,
+      "artifacts": 3,
+      "planeswalkers": 0,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

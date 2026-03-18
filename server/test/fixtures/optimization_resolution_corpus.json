@@ -1,6 +1,6 @@
 {
   "name": "optimization-resolution-corpus-v1",
-  "generated_at": "2026-03-17",
+  "generated_at": "2026-03-18",
   "decks": [
     {
       "deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
@@ -22,6 +22,54 @@
       "label": "Talrand, Sky Summoner",
       "expected_flow_path": "rebuild_guided",
       "note": "Shell degenerado para validar full_non_commander_rebuild."
+    },
+    {
+      "deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+      "label": "Atraxa, Praetors' Voice",
+      "expected_flow_paths": [
+        "optimized_directly",
+        "safe_no_change"
+      ],
+      "note": "Seed Atraxa estabilizado; aceitamos otimização direta ou preservação segura."
+    },
+    {
+      "deck_id": "5bf67c2e-fdeb-40a9-be91-ebb7edac7489",
+      "label": "Muldrotha, the Gravetide",
+      "expected_flow_path": "safe_no_change",
+      "note": "Seed Muldrotha saudável; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "c4b6065d-0750-4bf0-8f7b-972e722a67d8",
+      "label": "Sythis, Harvest's Hand",
+      "expected_flow_path": "safe_no_change",
+      "note": "Seed Sythis saudável; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "7e8b7632-8a89-40d6-ae93-1db6d6a90745",
+      "label": "Isshin, Two Heavens as One",
+      "expected_flow_path": "safe_no_change",
+      "note": "Seed Isshin saudável; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "169d8b11-5210-4bfc-b8f0-9fbfe6bbb635",
+      "label": "Krenko, Mob Boss",
+      "expected_flow_path": "safe_no_change",
+      "note": "Seed Krenko saudável; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "532cbc1d-a906-4075-91e4-da64f9e5fa4f",
+      "label": "Urza, Lord High Artificer",
+      "expected_flow_path": "safe_no_change",
+      "note": "Seed Urza saudável; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "cca9f573-5366-44ab-96a8-4ca16456c3f8",
+      "label": "Edgar Markov",
+      "expected_flow_paths": [
+        "optimized_directly",
+        "safe_no_change"
+      ],
+      "note": "Seed Edgar estabilizado; aceitamos otimização direta ou preservação segura."
     }
   ]
 }

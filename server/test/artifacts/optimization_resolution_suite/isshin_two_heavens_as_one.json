@@ -1,0 +1,82 @@
+{
+  "source_deck_id": "7e8b7632-8a89-40d6-ae93-1db6d6a90745",
+  "source_deck_name": "Corpus Seed - Isshin, Two Heavens as One",
+  "clone_deck_id": "01c59cff-d861-411c-b26e-61e8d2443e8d",
+  "final_deck_id": "01c59cff-d861-411c-b26e-61e8d2443e8d",
+  "optimize_request": {
+    "deck_id": "01c59cff-d861-411c-b26e-61e8d2443e8d",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "A otimizacao nao encontrou trocas acionaveis apos os filtros de seguranca.",
+    "quality_error": {
+      "code": "OPTIMIZE_NO_ACTIONABLE_SWAPS",
+      "message": "As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.",
+      "blocked_by_theme": [],
+      "blocked_by_bracket": []
+    },
+    "mode": "optimize",
+    "removals": [],
+    "additions": [],
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "3.16",
+      "type_distribution": {
+        "creatures": 30,
+        "instants": 9,
+        "sorceries": 5,
+        "enchantments": 9,
+        "artifacts": 12,
+        "planeswalkers": 0,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "01c59cff-d861-411c-b26e-61e8d2443e8d"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "3.16",
+    "type_distribution": {
+      "creatures": 30,
+      "instants": 9,
+      "sorceries": 5,
+      "enchantments": 9,
+      "artifacts": 12,
+      "planeswalkers": 0,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

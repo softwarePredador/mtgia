@@ -1,0 +1,590 @@
+{
+  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
+  "clone_deck_id": "a0a8a0e9-8ea9-48fd-92b0-7831517d9d37",
+  "final_deck_id": "a0a8a0e9-8ea9-48fd-92b0-7831517d9d37",
+  "optimize_request": {
+    "deck_id": "a0a8a0e9-8ea9-48fd-92b0-7831517d9d37",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 200,
+  "optimize_response": {
+    "mode": "optimize",
+    "strategy_source": "ai_primary",
+    "fallback_trigger": "primary",
+    "constraints": {
+      "keep_theme": true
+    },
+    "cache": {
+      "hit": false,
+      "cache_key": "v6:fd3ef011"
+    },
+    "preferences": {
+      "memory_applied": false,
+      "keep_theme": true,
+      "preferred_bracket": 2
+    },
+    "theme": {
+      "theme": "counters",
+      "confidence": "alta",
+      "match_score": 0.9875,
+      "core_cards": [
+        "Atraxa, Praetors' Voice",
+        "Tezzeret's Gambit",
+        "Evolution Sage",
+        "Contaminant Grafter",
+        "Counterspell",
+        "Ezuri, Stalker of Spheres",
+        "Vraska, Betrayal's Sting",
+        "Plague Stinger",
+        "Metastatic Evangel",
+        "Blightbelly Rat"
+      ]
+    },
+    "removals": [
+      "Contagion Engine"
+    ],
+    "additions": [
+      "Brainstorm"
+    ],
+    "reasoning": "",
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.89",
+      "type_distribution": {
+        "creatures": 25,
+        "instants": 9,
+        "sorceries": 8,
+        "enchantments": 7,
+        "artifacts": 10,
+        "planeswalkers": 6,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.81",
+      "type_distribution": {
+        "creatures": 25,
+        "instants": 10,
+        "sorceries": 8,
+        "enchantments": 7,
+        "artifacts": 9,
+        "planeswalkers": 6,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média",
+      "improvements": [
+        "CMC médio otimizado: 2.89 → 2.81",
+        "Mais interação instant-speed adicionada"
+      ],
+      "validation": {
+        "validation_score": 67,
+        "deck_health_score": 80,
+        "improvement_score": 46,
+        "verdict": "aprovado",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 80,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.203,
+              "flood_rate": 0.013,
+              "keepable_rate": 0.784
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.89,
+              "turn_1_play": 0.275,
+              "turn_2_play": 0.709,
+              "turn_3_play": 0.882,
+              "turn_4_play": 0.933,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 6,
+                "3": 18,
+                "6": 4,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.3%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 80,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.213,
+              "flood_rate": 0.005,
+              "keepable_rate": 0.782
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.81,
+              "turn_1_play": 0.321,
+              "turn_2_play": 0.727,
+              "turn_3_play": 0.884,
+              "turn_4_play": 0.94,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 7,
+                "3": 18,
+                "5": 5,
+                "6": 3
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (21.3%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.17,
+            "keep_at_7": 0.846,
+            "keep_at_6": 0.136,
+            "keep_at_5": 0.018,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.93
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.15,
+            "keep_at_7": 0.874,
+            "keep_at_6": 0.106,
+            "keep_at_5": 0.02,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.924
+          },
+          "deltas": {
+            "consistency_score": 0,
+            "screw_rate_delta": 0.01,
+            "flood_rate_delta": -0.008,
+            "keepable_rate_delta": -0.002,
+            "turn2_play_delta": 0.018,
+            "mulligan_keep7_delta": 0.028
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Contagion Engine",
+              "added": "Brainstorm",
+              "removed_role": "artifact",
+              "added_role": "draw",
+              "role_preserved": false,
+              "cmc_delta": -5,
+              "verdict": "tradeoff"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 1,
+            "questionable": 0
+          },
+          "role_delta": {
+            "draw": 1,
+            "removal": 0,
+            "ramp": 0,
+            "creature": 0,
+            "artifact": -1,
+            "enchantment": 0,
+            "land": 0,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 65,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de Contagion Engine por Brainstorm diminui a capacidade de manipulação de contadores, que é uma mecânica central em decks de Atraxa.",
+            "Embora a taxa de mulligan tenha melhorado, a adição de um card draw que não interage diretamente com a estratégia do deck pode não ser ideal.",
+            "A taxa de mana screw aumentou ligeiramente, o que pode impactar a jogabilidade em partidas mais longas."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Contagion Engine → Brainstorm",
+              "justificativa": "Brainstorm não oferece a mesma sinergia com contadores que o Contagion Engine, que pode ser crucial para a estratégia do deck."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência de cartas, mas compromete a sinergia central do deck, tornando-a uma escolha arriscada."
+        },
+        "warnings": [
+          "A melhoria incremental foi pequena (46/100)."
+        ]
+      }
+    },
+    "validation_warnings": [
+      "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Phyrexian Swarmlord -> Dark Ritual removida pelo gate: papel creature -> ramp, delta CMC -5.",
+      "A melhoria incremental foi pequena (46/100)."
+    ],
+    "bracket": 2,
+    "target_additions": null,
+    "optimize_diagnostics": {
+      "empty_suggestions_fallback": {
+        "triggered": false,
+        "applied": false,
+        "candidate_count": 0,
+        "replacement_count": 0,
+        "pair_count": 0
+      },
+      "empty_suggestions_fallback_aggregate": {
+        "request_count": 14,
+        "triggered_count": 0,
+        "applied_count": 0,
+        "no_candidate_count": 0,
+        "no_replacement_count": 0,
+        "trigger_rate": 0.0,
+        "apply_rate": 0.0
+      },
+      "empty_suggestions_fallback_aggregate_persisted": {
+        "all_time": {
+          "request_count": 76,
+          "triggered_count": 23,
+          "applied_count": 0,
+          "no_candidate_count": 23,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.3026315789473684,
+          "apply_rate": 0.0
+        },
+        "last_24h": {
+          "request_count": 16,
+          "triggered_count": 0,
+          "applied_count": 0,
+          "no_candidate_count": 0,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.0,
+          "apply_rate": 0.0
+        }
+      }
+    },
+    "edhrec_validation": {
+      "commander": "Atraxa, Praetors' Voice",
+      "deck_count": 39493,
+      "themes": [
+        "Infect",
+        "Planeswalkers",
+        "+1/+1 Counters",
+        "Phyrexians",
+        "Proliferate",
+        "-1/-1 Counters",
+        "Tokens",
+        "Control",
+        "Midrange",
+        "Combo",
+        "Energy",
+        "Aggro",
+        "Sagas",
+        "Lifegain",
+        "Enchantress",
+        "Artifacts",
+        "Counters Matter",
+        "Group Hug",
+        "Good Stuff",
+        "Ramp",
+        "Stax",
+        "Angels",
+        "Saprolings",
+        "Extra Turns",
+        "Historic",
+        "Pillow Fort",
+        "Flying",
+        "Mill",
+        "Voltron",
+        "Reanimator",
+        "Legends",
+        "Equipment",
+        "Charge Counters",
+        "Birthing Pod",
+        "Fungi",
+        "Wheels",
+        "Hydras",
+        "Tempo",
+        "Blink",
+        "Rad Counters",
+        "Group Slug",
+        "Card Draw",
+        "Horrors",
+        "Praetors",
+        "Auras",
+        "Mutants",
+        "X Spells",
+        "Lands Matter",
+        "Toolbox",
+        "Clones",
+        "Commander Matters",
+        "Hatebears",
+        "Deathtouch",
+        "Self-Damage",
+        "Aristocrats",
+        "Prison",
+        "Spellslinger",
+        "Activated Abilities",
+        "Modular",
+        "Mutate",
+        "Big Mana",
+        "Chaos",
+        "Oil Counters",
+        "Elves",
+        "Keywords",
+        "Politics",
+        "Land Destruction",
+        "Snow",
+        "Spirits",
+        "Sacrifice",
+        "Experience Counters",
+        "Zombies",
+        "Ad Nauseam",
+        "Cantrips",
+        "Defenders",
+        "Landfall",
+        "Self-Mill",
+        "Triggered Abilities",
+        "Unnatural",
+        "Zoo",
+        "Burn",
+        "Discard",
+        "Exalted",
+        "Frogs",
+        "Graveyard",
+        "Insects",
+        "Lifedrain",
+        "Merfolk",
+        "Spore Counters",
+        "Tap / Untap",
+        "Affinity",
+        "Anthems",
+        "Cycling",
+        "Stompy",
+        "Theft",
+        "Unblockable",
+        "Counterspells",
+        "Humans",
+        "Populate",
+        "Primal Surge",
+        "Rats",
+        "Stickers",
+        "Storm",
+        "Toughness Matters",
+        "Transform",
+        "Vehicles",
+        "Eggs",
+        "Exile",
+        "Faeries",
+        "Golems",
+        "Guildgates",
+        "Indestructible",
+        "Modified Creatures",
+        "Oozes",
+        "Spacecraft",
+        "Attractions",
+        "Clerics",
+        "Connive",
+        "Crabs",
+        "Creatureless",
+        "Devotion",
+        "Dragons",
+        "Dredge",
+        "Eldrazi",
+        "Flashback",
+        "Forced Combat",
+        "Knights",
+        "Multicolor Matters",
+        "Nightmares",
+        "Old School",
+        "Party",
+        "Plants",
+        "Power",
+        "Scry",
+        "Snakes",
+        "Time Counters",
+        "Topdeck",
+        "Treasure",
+        "Tron",
+        "Turbo Fog",
+        "Advisors",
+        "Allies",
+        "Apes",
+        "Attack Triggers",
+        "Bats",
+        "Battles",
+        "Birds",
+        "Bounce",
+        "Cascade",
+        "Clues",
+        "Craft",
+        "Curses",
+        "Dinosaurs",
+        "Donate",
+        "ETB",
+        "Food",
+        "Gods",
+        "Gyruda Companion",
+        "Hellbent",
+        "Improvise",
+        "Keruga Companion",
+        "Monarch",
+        "Monkeys",
+        "Myr",
+        "Ninjutsu",
+        "Ouphes",
+        "Persistent Petitioners",
+        "Pingers",
+        "Rat Colony",
+        "Rock",
+        "Rogues",
+        "Saboteurs",
+        "Sea Creatures",
+        "Shapeshifters",
+        "Slime Against Humanity",
+        "Slivers",
+        "Spiders",
+        "Stoneblade",
+        "The Ring",
+        "Wraiths"
+      ],
+      "additions_validated": 0,
+      "additions_not_in_edhrec": [
+        "Dark Ritual"
+      ]
+    },
+    "additions_detailed": [
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.08",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "removals_detailed": [
+      {
+        "type": "remove",
+        "name": "Contagion Engine",
+        "card_id": "b0060bb7-c1f3-4d1b-9742-14a011a86733",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.08",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "remove",
+        "name": "Contagion Engine",
+        "card_id": "b0060bb7-c1f3-4d1b-9742-14a011a86733",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.08",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      },
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "alta",
+          "score": 0.9
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.08",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "optimized"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "a0a8a0e9-8ea9-48fd-92b0-7831517d9d37"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.81",
+    "type_distribution": {
+      "creatures": 25,
+      "instants": 10,
+      "sorceries": 8,
+      "enchantments": 7,
+      "artifacts": 9,
+      "planeswalkers": 6,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

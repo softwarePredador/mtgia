@@ -1228,7 +1228,9 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
       (summary['results'] as List).whereType<Map<String, dynamic>>().toList();
 
   final buffer = StringBuffer()
-    ..writeln('# Relatorio de Resolucao Real - 3 Decks Commander')
+    ..writeln(
+      '# Relatorio de Resolucao Real - ${summary['total']} Decks Commander',
+    )
     ..writeln()
     ..writeln('- Gerado em: `${summary['generated_at']}`')
     ..writeln('- API: `${summary['api_base_url']}`')

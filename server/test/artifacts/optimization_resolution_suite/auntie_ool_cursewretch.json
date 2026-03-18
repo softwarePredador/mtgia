@@ -1,0 +1,869 @@
+{
+  "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
+  "source_deck_name": "goblins",
+  "clone_deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+  "final_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
+  "optimize_request": {
+    "deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+    "archetype": "aggro",
+    "bracket": 4,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.",
+    "quality_error": {
+      "code": "OPTIMIZE_NEEDS_REPAIR",
+      "message": "O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.",
+      "reasons": [
+        "O deck está com apenas 24 terrenos, abaixo do mínimo seguro para Commander."
+      ],
+      "recommended_mode": "repair",
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "next_action": {
+      "type": "rebuild_guided",
+      "endpoint": "/ai/rebuild",
+      "payload": {
+        "deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+        "bracket": 4,
+        "archetype": "aggro",
+        "theme": "counters",
+        "rebuild_scope": "auto",
+        "save_mode": "draft_clone"
+      }
+    },
+    "mode": "optimize",
+    "deck_analysis": {
+      "detected_archetype": "aggro",
+      "average_cmc": "2.43",
+      "type_distribution": {
+        "creatures": 33,
+        "instants": 11,
+        "sorceries": 11,
+        "enchantments": 9,
+        "artifacts": 12,
+        "planeswalkers": 1,
+        "lands": 24,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "OK: Curva aceitável para Aggro",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 24, ideal >= 34)",
+      "archetype_confidence": "média"
+    },
+    "theme": {
+      "theme": "counters",
+      "confidence": "alta",
+      "match_score": 0.55,
+      "core_cards": [
+        "Auntie Ool, Cursewretch",
+        "Goblin Chieftain",
+        "Goblin Rabblemaster",
+        "Purphoros, God of the Forge",
+        "Goblin Trashmaster",
+        "Goblin Sledder",
+        "Goblin King",
+        "Goblin Piledriver",
+        "Goblin Bombardment",
+        "Faithless Looting"
+      ]
+    },
+    "deck_state": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 30,
+      "reasons": [
+        "O deck está com apenas 24 terrenos, abaixo do mínimo seguro para Commander."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "outcome_code": "needs_repair"
+  },
+  "rebuild_status": 200,
+  "rebuild_response": {
+    "mode": "rebuild_guided",
+    "outcome_code": "rebuild_created",
+    "save_mode": "draft_clone",
+    "applied_to_original": false,
+    "source_deck_id": "0cc6af9f-4c42-4519-be9a-42c118044fa8",
+    "draft_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
+    "draft_deck": {
+      "id": "677f6569-a3f9-418d-a9cd-d2045f3215a3",
+      "name": "Rebuild Draft - Resolution Validation - Auntie Ool, Cursewretch - 1773845642694",
+      "format": "commander",
+      "description": "Draft de rebuild_guided criado a partir de 0cc6af9f-4c42-4519-be9a-42c118044fa8 | theme=counters | scope=repair_partial",
+      "archetype": "midrange",
+      "bracket": 4,
+      "is_public": false,
+      "created_at": "2026-03-18T14:55:24.659958Z"
+    },
+    "rebuild_scope_requested": "auto",
+    "rebuild_scope_selected": "repair_partial",
+    "rebuild_reason": [
+      "Keep rate calculado em 32% do shell atual.",
+      "Optimize classificou o deck como needs_repair antes do rebuild.",
+      "Parte relevante da shell ainda e aproveitavel; rebuild parcial selecionado."
+    ],
+    "seed": {
+      "commander": "Auntie Ool, Cursewretch",
+      "requested_archetype": "aggro",
+      "resolved_archetype": "midrange",
+      "requested_theme": "counters",
+      "resolved_theme": "counters",
+      "bracket": 4
+    },
+    "keep_summary": {
+      "kept_cards_count": 33,
+      "kept_cards": [
+        "Auntie Ool, Cursewretch",
+        "Arcane Signet",
+        "Beast Within",
+        "Blood Crypt",
+        "Bojuka Bog",
+        "Canyon Slough",
+        "Cathartic Reunion",
+        "Chaos Warp",
+        "Command Tower",
+        "Cultivate",
+        "Dragonskull Summit",
+        "Evolving Wilds",
+        "Exotic Orchard",
+        "Farseek",
+        "Fellwar Stone",
+        "Forest",
+        "Goblin Bombardment",
+        "Lightning Greaves",
+        "Mountain",
+        "Reliquary Tower",
+        "Skullclamp",
+        "Smoldering Marsh",
+        "Sol Ring",
+        "Swamp",
+        "Swiftfoot Boots",
+        "Talisman of Indulgence",
+        "Terminate",
+        "Thought Vessel"
+      ],
+      "replaced_slots": 67,
+      "keep_rate": 0.32323232323232326
+    },
+    "target_profile": {
+      "total_cards": 100,
+      "land_count": 37,
+      "ramp": 9,
+      "draw_selection": 10,
+      "interaction": 10,
+      "wipes": 2,
+      "payoffs": 12,
+      "wincons": 4,
+      "raw_category_targets": {}
+    },
+    "deck_analysis_before": {
+      "detected_archetype": "aggro",
+      "average_cmc": "2.43",
+      "type_distribution": {
+        "creatures": 33,
+        "instants": 11,
+        "sorceries": 11,
+        "enchantments": 9,
+        "artifacts": 12,
+        "planeswalkers": 1,
+        "lands": 24,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "OK: Curva aceitável para Aggro",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 24, ideal >= 34)",
+      "archetype_confidence": "média"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.97",
+      "type_distribution": {
+        "creatures": 26,
+        "instants": 8,
+        "sorceries": 12,
+        "enchantments": 6,
+        "artifacts": 12,
+        "planeswalkers": 1,
+        "lands": 37,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "deck_state_before": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 30,
+      "reasons": [
+        "O deck está com apenas 24 terrenos, abaixo do mínimo seguro para Commander."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "deck_state_after": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "validation": {
+      "strict_rules_valid": true,
+      "deck_state_after": {
+        "status": "healthy",
+        "recommended_mode": "optimize",
+        "suggested_scope": "micro_swaps",
+        "severity_score": 0,
+        "reasons": []
+      }
+    },
+    "warnings": [],
+    "source_summary": {
+      "used_average_deck_seed": true,
+      "used_edhrec_top_cards": true,
+      "used_cached_commander_profile": false,
+      "candidate_pool_size": 206
+    },
+    "rebuilt_cards": [
+      {
+        "card_id": "dedf254c-2672-46e6-bc76-41d6645c5652",
+        "name": "Auntie Ool, Cursewretch",
+        "quantity": 1,
+        "is_commander": true
+      },
+      {
+        "card_id": "4f7a4f20-d865-4978-a556-87283aeeeba4",
+        "name": "Aberrant Return",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a8062410-23f9-4853-85bf-2157cc789310",
+        "name": "Ammit Eternal",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "name": "Arcane Signet",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "81c7e15a-04ad-46dc-80af-d475f24f8156",
+        "name": "Assassin's Trophy",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "name": "Beast Within",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "cbd07b07-7855-4a3b-88bc-cf6ea9fa5e6a",
+        "name": "Binding the Old Gods",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "57943ced-d8f9-4796-8f92-4b94607bc2c3",
+        "name": "Black Sun's Zenith",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a0a16250-67f3-4ac4-bbce-7102fd7f46a9",
+        "name": "Blood Crypt",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e7d76767-2f77-4cf8-85b9-c533867cf476",
+        "name": "Blowfly Infestation",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7d22229a-9253-4b79-bf95-1bab33d129ae",
+        "name": "Bojuka Bog",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
+        "name": "Cankerbloom",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "3dc14c05-5025-4e5c-90af-ec7fb9bac203",
+        "name": "Canyon Slough",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fa445024-7915-47f1-94d5-b00910552513",
+        "name": "Carnifex Demon",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d3bfb30c-a591-484c-ba92-ae9631bc0be8",
+        "name": "Cathartic Pyre",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4013b9d7-32c9-47bd-85a6-05a58e5a1dce",
+        "name": "Cathartic Reunion",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b5e0abf7-23ca-48bf-8404-bece22599ded",
+        "name": "Channeler Initiate",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "13aeaa4a-1027-455f-869b-1722685354b6",
+        "name": "Chaos Warp",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "810a7995-8125-4ac1-85af-11bca31d7b11",
+        "name": "Cinder Glade",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "name": "Command Tower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "15fb3ab4-b224-4848-a3f7-14ad636c68d7",
+        "name": "Contagion Clasp",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "name": "Cultivate",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ee6b7d1d-2813-4152-97a5-dfa1d90b0f92",
+        "name": "Dawnhand Dissident",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "33df759b-4fa4-4347-ae7c-1224c457685d",
+        "name": "Devoted Druid",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "43d835bf-84c3-4caa-ab91-599d9c997e5a",
+        "name": "Dragonskull Summit",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a1a412c2-5b6e-46e7-ba5f-71027bcaa5d0",
+        "name": "Dread Tiller",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e75f8a64-c10c-43cf-924a-373da9dd1e61",
+        "name": "Dusk Urchins",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "3e905e42-1d92-42f9-a5ef-dd7184c8724c",
+        "name": "Eventide's Shadow",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "66f68e57-d6fd-4d50-a196-4a7f3fc0cf06",
+        "name": "Everlasting Torment",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
+        "name": "Evolution Sage",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ac904ad7-8fd3-49da-9388-60b86e077905",
+        "name": "Evolving Wilds",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f9fecf31-2518-4620-97bd-1e0abcc4785e",
+        "name": "Exotic Orchard",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "name": "Farseek",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "name": "Fellwar Stone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e3100c60-8fe3-4291-b038-e6d7f7dc6b65",
+        "name": "Ferrafor, Young Yew",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c2877ae9-895f-4d85-8aea-ca0788b1367c",
+        "name": "Festering Thicket",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e276af25-5d3a-4fe1-8180-74b169bbfc4c",
+        "name": "Fire Covenant",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5dcee000-ab33-4535-b0dd-b012529842b5",
+        "name": "Flourishing Defenses",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "name": "Forest",
+        "quantity": 2,
+        "is_commander": false
+      },
+      {
+        "card_id": "3a46e65a-b118-4fab-91fa-dd09cac71cde",
+        "name": "Glissa Sunslayer",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b9223c3c-40bc-4ce6-925d-c5ec9e1dfd33",
+        "name": "Goblin Bombardment",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "21c5498d-ccdb-434f-bd70-ad4cb3bac305",
+        "name": "Golgari Rot Farm",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b8f9eb72-49ed-4799-b268-6452a6f24984",
+        "name": "Grave Venerations",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "21d7c1fb-6856-42d9-9353-55a0312d49c8",
+        "name": "Gruul Turf",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6d0546b6-2acf-4f7b-845d-65e61bfd4712",
+        "name": "Hapatra, Vizier of Poisons",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f70ed8ec-826a-4857-a9e9-c9b91d93a743",
+        "name": "Ifnir Deadlands",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8e82e007-5103-4da7-8c80-bae1caef19c2",
+        "name": "Ignoble Hierarch",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b56a952c-9051-4857-be2c-ca31565a2bd8",
+        "name": "Infernal Grasp",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7f22f93f-6b76-43f7-bb6b-98bbdc6100ec",
+        "name": "Kulrath Knight",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "name": "Lightning Greaves",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f6151eed-14f3-4fb0-8db1-1699fd6204eb",
+        "name": "Llanowar Wastes",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9ab867e0-ff63-4405-a4b1-b8aa0ef21688",
+        "name": "Luxury Suite",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c7bd080e-2556-4a87-a1b8-9235b3afb86d",
+        "name": "Maha, Its Feathers Night",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "cfdf8daa-3fb9-4b3a-ac42-3c66410eecd3",
+        "name": "Massacre Girl, Known Killer",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "name": "Mountain",
+        "quantity": 4,
+        "is_commander": false
+      },
+      {
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "name": "Nature's Lore",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fc1a38ca-e447-4ab3-ae9b-6fa096f07ee5",
+        "name": "Necroskitter",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5d7089e3-cca6-442c-af2e-902b32ada928",
+        "name": "Night's Whisper",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d4c788e5-4ca2-4258-8ac1-35451e90e058",
+        "name": "Obelisk Spider",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d4e30205-4104-4083-a764-6fa7bf8cdfc5",
+        "name": "Oft-Nabbed Goat",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "bd53a3aa-0caf-4140-8c21-37c0bf4cf8a2",
+        "name": "Overgrown Tomb",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "36f14a9a-cf41-4680-8ec1-08aa4d7f7c26",
+        "name": "Painful Truths",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+        "name": "Path of Ancestry",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fa00bcd6-2c2c-429b-8123-4df254f72223",
+        "name": "Persist",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "0c69840e-254b-4c74-98a0-aa9a8018f739",
+        "name": "Putrefy",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1184e677-b72e-42e7-a5e2-cc95e4656a67",
+        "name": "Rakdos Carnarium",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d553a5c8-1bf6-4648-b567-f6c68a6e30f9",
+        "name": "Rampant Growth",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a239b583-5f72-40a2-80af-e250e2858449",
+        "name": "Reliquary Tower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "8b7ea201-f501-4152-b493-ebf369847616",
+        "name": "Rootbound Crag",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "2d5012c9-df2a-404b-9e37-6643e1dd7d24",
+        "name": "Savage Lands",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "01b8f6de-2c4d-4a80-85f6-7d9082bd3eb7",
+        "name": "Sheltered Thicket",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "32c6f69f-3d81-4049-bfd5-d9496496ceff",
+        "name": "Sinister Gnarlbark",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "53f9ed4b-c7f3-42c6-a751-4b79287f4a0a",
+        "name": "Skullclamp",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f5c802e3-dc2c-4665-a520-eb46bc96eb2d",
+        "name": "Smoldering Marsh",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c971ff63-79d9-45e4-a7d9-4aec4eecd525",
+        "name": "Sol Ring",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ac1f8277-b28c-44a1-b4b3-6836996a8b48",
+        "name": "Spire Garden",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "50af22b3-8f87-46bb-8d8c-dce104efbe05",
+        "name": "Stomping Ground",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c920c19d-0f09-485f-b7d4-7770e5b21820",
+        "name": "Sulfurous Springs",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "name": "Swamp",
+        "quantity": 2,
+        "is_commander": false
+      },
+      {
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "name": "Swiftfoot Boots",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b69caae7-6c2c-4a9e-862d-01681e17964d",
+        "name": "Talisman of Indulgence",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b62bee68-6750-4b02-a731-49574e97f4d9",
+        "name": "Terminate",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6572c90c-e746-423f-91a8-bacea2b8cdad",
+        "name": "The Reaper, King No More",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "90ad05d2-bb46-4b3a-bc70-6f08d3a9fac5",
+        "name": "The Scorpion God",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+        "name": "Thought Vessel",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "3ae0fbae-cb68-4375-abb3-2fdd8fa03a20",
+        "name": "Three Visits",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1d0d892c-d707-4a27-8bef-eaa400e3568d",
+        "name": "Tree of Perdition",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7e2280bd-e380-4ded-9514-7216b6ce12bc",
+        "name": "Undergrowth Stadium",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "31fd530d-a9e3-4711-9d88-3ecff6f28048",
+        "name": "Vernal Fen",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7588f9e8-67c2-45c8-a9c2-d8b0250658e8",
+        "name": "Village Pillagers",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b4268854-b4e2-4765-9bb7-78d8c16e2ee4",
+        "name": "Vraska, Betrayal's Sting",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a9244386-bd28-45e0-a611-71fb10973e59",
+        "name": "Wickerbough Elder",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "df39134e-e8fb-465f-a182-46fe98a58f53",
+        "name": "Wickersmith's Tools",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "27889883-8e7b-4278-91b4-39efcd496762",
+        "name": "Woodland Cemetery",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9e804827-ca2c-4158-a815-750f585f1739",
+        "name": "Ziatora's Proving Ground",
+        "quantity": 1,
+        "is_commander": false
+      }
+    ],
+    "next_action": {
+      "type": "review_rebuild_draft",
+      "applied_to_original": false,
+      "draft_deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3"
+    }
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "677f6569-a3f9-418d-a9cd-d2045f3215a3"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.97",
+    "type_distribution": {
+      "creatures": 26,
+      "instants": 8,
+      "sorceries": 12,
+      "enchantments": 6,
+      "artifacts": 12,
+      "planeswalkers": 1,
+      "lands": 37,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

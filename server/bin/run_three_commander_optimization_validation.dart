@@ -1156,7 +1156,9 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
   }
 
   final buffer = StringBuffer()
-    ..writeln('# Relatorio de Otimizacao Real - 3 Decks Commander')
+    ..writeln(
+      '# Relatorio de Otimizacao Real - ${summary['total']} Decks Commander',
+    )
     ..writeln()
     ..writeln('- Gerado em: `${summary['generated_at']}`')
     ..writeln('- API: `${summary['api_base_url']}`')

@@ -737,6 +737,12 @@ String deriveOptimizeOutcomeCode({
     case 'OPTIMIZE_EXECUTION_FAILED':
     case 'OPTIMIZE_VALIDATION_FAILED':
     case 'OPTIMIZE_POST_ANALYSIS_FAILED':
+      if (deckState.status == 'needs_repair') {
+        return 'needs_repair';
+      }
+      if (deckState.status == 'healthy') {
+        return 'no_safe_upgrade_found';
+      }
       return 'execution_failed';
     default:
       return statusCode >= 500 ? 'execution_failed' : 'blocked';
@@ -1956,14 +1962,23 @@ Future<Response> onRequest(RequestContext context) async {
     } else {
       final aiResponse = await runAiOptimizeAttempt(trigger: 'primary');
       if (aiResponse == null) {
+        final executionFailedButPreserved =
+            deckState.status == 'healthy' &&
+                deckState.recommendedMode == 'optimize';
         return respondWithOptimizeTelemetry(
-          statusCode: HttpStatus.internalServerError,
+          statusCode: executionFailedButPreserved
+              ? HttpStatus.unprocessableEntity
+              : HttpStatus.internalServerError,
           body: {
-            'error': 'Optimization failed',
+            'error': executionFailedButPreserved
+                ? 'Nenhuma otimizacao segura foi produzida; deck original preservado.'
+                : 'Optimization failed',
             'quality_error': {
               'code': 'OPTIMIZE_EXECUTION_FAILED',
               'message':
-                  'A execucao da otimizacao falhou antes da validacao final.',
+                  executionFailedButPreserved
+                      ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.'
+                      : 'A execucao da otimizacao falhou antes da validacao final.',
               'details':
                   'Falha ao executar optimizeDeck na tentativa primaria.',
             },

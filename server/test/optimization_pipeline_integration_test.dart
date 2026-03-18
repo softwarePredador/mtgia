@@ -999,6 +999,28 @@ void main() {
       expect(outcome, equals('near_peak'));
     });
 
+    test('derive outcome code maps healthy execution failure to safe preserve', () {
+      const healthyDeckState = optimize_route.DeckOptimizationState(
+        status: 'healthy',
+        recommendedMode: 'optimize',
+        suggestedScope: 'micro_swaps',
+        reasons: <String>[],
+        severityScore: 0,
+      );
+
+      final outcome = optimize_route.deriveOptimizeOutcomeCode(
+        statusCode: 422,
+        body: const {
+          'quality_error': {
+            'code': 'OPTIMIZE_EXECUTION_FAILED',
+          },
+        },
+        deckState: healthyDeckState,
+      );
+
+      expect(outcome, equals('no_safe_upgrade_found'));
+    });
+
     test('derive outcome code maps structural rejection to needs_repair', () {
       const repairDeckState = optimize_route.DeckOptimizationState(
         status: 'needs_repair',
