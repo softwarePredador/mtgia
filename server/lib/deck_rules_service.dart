@@ -1,5 +1,7 @@
 import 'package:postgres/postgres.dart';
 
+import 'color_identity.dart';
+
 class DeckRulesService {
   DeckRulesService(this._session);
 
@@ -54,7 +56,8 @@ class DeckRulesService {
         (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
             ? 1
             : 4;
-    print('[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
+    print(
+        '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
       final value = entry.value;
       final name = value['name'] as String? ?? entry.key;
@@ -93,7 +96,7 @@ class DeckRulesService {
           (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
               ? 1
               : 4;
-      
+
       // Commanders são validados separadamente pela regra quantity == 1
       // Aqui só validamos cartas normais
       if (!isBasicLand && !isCommander && quantity > limit) {
@@ -227,18 +230,15 @@ class DeckRulesService {
       if (cmdId == null) continue;
       final info = cardsData[cmdId];
       if (info == null) continue;
-      
+
       if (!_isCommanderEligible(info) && !_isBackground(info)) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" não pode ser comandante.',
           cardName: info.name,
         );
       }
-      
-      final identity = info.colorIdentity.isNotEmpty
-          ? info.colorIdentity
-          : info.colors;
-      commanderIdentitySet.addAll(identity.map((e) => e.toUpperCase()));
+
+      commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
     for (final item in cards) {
@@ -247,9 +247,7 @@ class DeckRulesService {
       final info = cardsData[cardId];
       if (info == null) continue;
 
-      final identity =
-          info.colorIdentity.isNotEmpty ? info.colorIdentity : info.colors;
-      for (final c in identity) {
+      for (final c in _resolvedIdentity(info)) {
         if (!commanderIdentitySet.contains(c.toUpperCase())) {
           throw DeckRulesException(
             'Regra violada: "${info.name}" tem identidade de cor fora do(s) comandante(s).',
@@ -296,9 +294,9 @@ class DeckRulesService {
   /// Verifica se a carta é um Background (encantamento lendário com subtipo Background)
   bool _isBackground(_CardData card) {
     final typeLine = card.typeLine.toLowerCase();
-    return typeLine.contains('legendary') && 
-           typeLine.contains('enchantment') && 
-           typeLine.contains('background');
+    return typeLine.contains('legendary') &&
+        typeLine.contains('enchantment') &&
+        typeLine.contains('background');
   }
 
   /// Verifica se a carta tem "Partner" (qualquer um) no texto
@@ -334,7 +332,10 @@ class DeckRulesService {
     final partnerWith2 = _getPartnerWithName(cmd2);
 
     // Se ambos têm Partner genérico (sem "with"), podem ser pareados
-    if (hasPartner1 && hasPartner2 && partnerWith1 == null && partnerWith2 == null) {
+    if (hasPartner1 &&
+        hasPartner2 &&
+        partnerWith1 == null &&
+        partnerWith2 == null) {
       return true;
     }
 
@@ -365,17 +366,18 @@ class DeckRulesService {
     // Caso 4: Friends forever (Doctor Who)
     final oracle1 = (cmd1.oracleText ?? '').toLowerCase();
     final oracle2 = (cmd2.oracleText ?? '').toLowerCase();
-    if (oracle1.contains('friends forever') && oracle2.contains('friends forever')) {
+    if (oracle1.contains('friends forever') &&
+        oracle2.contains('friends forever')) {
       return true;
     }
 
     // Caso 5: Doctor's companion
     final hasDoctor1 = oracle1.contains("doctor's companion");
     final hasDoctor2 = oracle2.contains("doctor's companion");
-    final isTimeLord1 = cmd1.typeLine.toLowerCase().contains('time lord') && 
-                        cmd1.typeLine.toLowerCase().contains('doctor');
-    final isTimeLord2 = cmd2.typeLine.toLowerCase().contains('time lord') && 
-                        cmd2.typeLine.toLowerCase().contains('doctor');
+    final isTimeLord1 = cmd1.typeLine.toLowerCase().contains('time lord') &&
+        cmd1.typeLine.toLowerCase().contains('doctor');
+    final isTimeLord2 = cmd2.typeLine.toLowerCase().contains('time lord') &&
+        cmd2.typeLine.toLowerCase().contains('doctor');
 
     if ((hasDoctor1 && isTimeLord2) || (hasDoctor2 && isTimeLord1)) {
       return true;
@@ -384,7 +386,7 @@ class DeckRulesService {
   }
 
   /// Retorna `true` para terrenos básicos (incluindo Snow-Covered variants).
-  /// 
+  ///
   /// Tipo de linha das variações:
   ///   - Normais:       "Basic Land — Plains/Island/Swamp/Mountain/Forest"
   ///   - Snow-Covered:  "Basic Snow Land — Plains/Island/Swamp/Mountain/Forest"
@@ -446,6 +448,14 @@ class DeckRulesService {
       for (final row in result)
         row[0] as String: (row[1] as String).toLowerCase()
     };
+  }
+
+  Set<String> _resolvedIdentity(_CardData card) {
+    return resolveCardColorIdentity(
+      colorIdentity: card.colorIdentity,
+      colors: card.colors,
+      oracleText: card.oracleText,
+    );
   }
 }
 

@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "86cfa127-c737-43d7-aec9-b41d1668880e",
+  "source_deck_name": "Corpus Seed - Prosper, Tome-Bound",
+  "clone_deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475",
+  "final_deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475",
+  "optimize_request": {
+    "deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "3.13",
+    "type_distribution": {
+      "creatures": 23,
+      "instants": 11,
+      "sorceries": 12,
+      "enchantments": 6,
+      "artifacts": 12,
+      "planeswalkers": 1,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

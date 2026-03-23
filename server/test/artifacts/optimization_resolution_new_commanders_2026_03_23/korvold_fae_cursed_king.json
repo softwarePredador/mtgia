@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
+  "source_deck_name": "Corpus Seed - Korvold, Fae-Cursed King",
+  "clone_deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e",
+  "final_deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e",
+  "optimize_request": {
+    "deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.64",
+    "type_distribution": {
+      "creatures": 28,
+      "instants": 11,
+      "sorceries": 10,
+      "enchantments": 6,
+      "artifacts": 10,
+      "planeswalkers": 0,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

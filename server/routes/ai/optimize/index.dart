@@ -473,8 +473,9 @@ DeckOptimizationState assessDeckOptimizationState({
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
 
-  final commanders =
-      cards.where((card) => card['is_commander'] == true).toList(growable: false);
+  final commanders = cards
+      .where((card) => card['is_commander'] == true)
+      .toList(growable: false);
   final commanderText = commanders
       .map((card) => (card['oracle_text'] as String?) ?? '')
       .join(' ')
@@ -487,12 +488,13 @@ DeckOptimizationState assessDeckOptimizationState({
   final enchantmentCount = (typeDistribution['enchantments'] as int?) ?? 0;
   final nonLandCount = currentTotalCards - landCount;
   final instantSorceryCount = instantCount + sorceryCount;
-  final manaAssessment = (deckAnalysis['mana_base_assessment']?.toString() ?? '');
+  final manaAssessment =
+      (deckAnalysis['mana_base_assessment']?.toString() ?? '');
   final manaAssessmentLower = manaAssessment.toLowerCase();
   final archetypeConfidence =
       (deckAnalysis['archetype_confidence']?.toString() ?? '').toLowerCase();
-  final sources =
-      (manaBase['sources'] as Map?)?.cast<String, int>() ?? const <String, int>{};
+  final sources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+      const <String, int>{};
   final anySource = sources['Any'] ?? 0;
 
   final reasons = <String>[];
@@ -558,7 +560,8 @@ DeckOptimizationState assessDeckOptimizationState({
     }
   }
 
-  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 10) {
+  if (_commanderSignalsSpellslinger(commanderText) &&
+      instantSorceryCount < 10) {
     addReason(
       'O comandante pede instants/sorceries, mas o deck só tem $instantSorceryCount cartas desse tipo.',
       severe: true,
@@ -645,7 +648,8 @@ Map<String, dynamic> _buildDeckRepairPlan({
     );
   }
 
-  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 24) {
+  if (_commanderSignalsSpellslinger(commanderText) &&
+      instantSorceryCount < 24) {
     roleTargets['instants_or_sorceries_to_add'] = 24 - instantSorceryCount;
     priorityRepairs.add(
       'Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.',
@@ -1024,7 +1028,8 @@ Future<DeckThemeProfile> _detectThemeProfile(
       counterReferences += q;
       if (c['isLand'] == false &&
           commanderLower.contains(name.toLowerCase()) &&
-          (oracle.contains('-1/-1 counter') || oracle.contains('proliferate'))) {
+          (oracle.contains('-1/-1 counter') ||
+              oracle.contains('proliferate'))) {
         counterReferences += q * 3;
       }
     }
@@ -1109,15 +1114,13 @@ Future<DeckThemeProfile> _detectThemeProfile(
       }
     }
     if (commanderOracle.contains('instant or sorcery')) {
-      themeScores['spellslinger'] =
-          (themeScores['spellslinger'] ?? 0.0) + 0.35;
+      themeScores['spellslinger'] = (themeScores['spellslinger'] ?? 0.0) + 0.35;
     }
     if (commanderOracle.contains('artifact')) {
       themeScores['artifacts'] = (themeScores['artifacts'] ?? 0.0) + 0.25;
     }
     if (commanderOracle.contains('enchantment')) {
-      themeScores['enchantments'] =
-          (themeScores['enchantments'] ?? 0.0) + 0.25;
+      themeScores['enchantments'] = (themeScores['enchantments'] ?? 0.0) + 0.25;
     }
     if (commanderOracle.contains('landfall') ||
         (commanderOracle.contains('land') &&
@@ -1962,9 +1965,8 @@ Future<Response> onRequest(RequestContext context) async {
     } else {
       final aiResponse = await runAiOptimizeAttempt(trigger: 'primary');
       if (aiResponse == null) {
-        final executionFailedButPreserved =
-            deckState.status == 'healthy' &&
-                deckState.recommendedMode == 'optimize';
+        final executionFailedButPreserved = deckState.status == 'healthy' &&
+            deckState.recommendedMode == 'optimize';
         return respondWithOptimizeTelemetry(
           statusCode: executionFailedButPreserved
               ? HttpStatus.unprocessableEntity
@@ -1975,10 +1977,9 @@ Future<Response> onRequest(RequestContext context) async {
                 : 'Optimization failed',
             'quality_error': {
               'code': 'OPTIMIZE_EXECUTION_FAILED',
-              'message':
-                  executionFailedButPreserved
-                      ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.'
-                      : 'A execucao da otimizacao falhou antes da validacao final.',
+              'message': executionFailedButPreserved
+                  ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.'
+                  : 'A execucao da otimizacao falhou antes da validacao final.',
               'details':
                   'Falha ao executar optimizeDeck na tentativa primaria.',
             },
@@ -2464,7 +2465,7 @@ Future<Response> onRequest(RequestContext context) async {
       if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
         final additionsIdentityResult = await pool.execute(
           Sql.named('''
-            SELECT name, color_identity, colors
+            SELECT name, color_identity, colors, oracle_text
             FROM cards
             WHERE name = ANY(@names)
           '''),
@@ -2477,8 +2478,12 @@ Future<Response> onRequest(RequestContext context) async {
           final colorIdentity =
               (row[1] as List?)?.cast<String>() ?? const <String>[];
           final colors = (row[2] as List?)?.cast<String>() ?? const <String>[];
-          final identity = (colorIdentity.isNotEmpty ? colorIdentity : colors);
-          identityByName[name] = identity;
+          final oracleText = row[3] as String? ?? '';
+          identityByName[name] = _resolvedCardIdentityFromParts(
+            colorIdentity: colorIdentity,
+            colors: colors,
+            oracleText: oracleText,
+          ).toList();
         }
 
         validAdditions = validAdditions.where((name) {
@@ -4171,10 +4176,9 @@ Future<void> _processCompleteModeAsync({
       // Filtro por identidade do comandante
       final identityAllowed = <Map<String, dynamic>>[];
       for (final c in candidates) {
-        final identity = ((c['color_identity'] as List).cast<String>());
-        final colors = ((c['colors'] as List).cast<String>());
+        final identity = _resolvedCardIdentity(c);
         final ok = isWithinCommanderIdentity(
-          cardIdentity: identity.isNotEmpty ? identity : colors,
+          cardIdentity: identity,
           commanderIdentity: commanderColorIdentity,
         );
         if (!ok) {
@@ -4514,15 +4518,8 @@ Future<void> _processCompleteModeAsync({
             final id = spell['id'] as String;
             final name = spell['name'] as String;
             final nameLower = name.toLowerCase();
-            final spellColors =
-                (spell['colors'] as List?)?.cast<String>() ?? const <String>[];
-            final spellIdentity =
-                (spell['color_identity'] as List?)?.cast<String>() ??
-                    const <String>[];
-
             final withinIdentity = isWithinCommanderIdentity(
-              cardIdentity:
-                  spellIdentity.isNotEmpty ? spellIdentity : spellColors,
+              cardIdentity: _resolvedCardIdentity(spell),
               commanderIdentity: commanderColorIdentity,
             );
             if (!withinIdentity) {
@@ -6249,6 +6246,27 @@ int _recommendedLandCountForOptimizeArchetype(String targetArchetype) {
   return 35;
 }
 
+Set<String> _resolvedCardIdentity(Map<String, dynamic> card) {
+  return _resolvedCardIdentityFromParts(
+    colorIdentity:
+        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[],
+    colors: (card['colors'] as List?)?.cast<String>() ?? const <String>[],
+    oracleText: card['oracle_text']?.toString(),
+  );
+}
+
+Set<String> _resolvedCardIdentityFromParts({
+  List<String> colorIdentity = const <String>[],
+  List<String> colors = const <String>[],
+  String? oracleText,
+}) {
+  return resolveCardColorIdentity(
+    colorIdentity: colorIdentity,
+    colors: colors,
+    oracleText: oracleText,
+  );
+}
+
 bool _landProducesCommanderColors({
   required Map<String, dynamic> card,
   required Set<String> commanderColorIdentity,
@@ -7489,7 +7507,11 @@ Future<List<Map<String, dynamic>>> _loadIdentitySafeNonLandFillers({
     final colorIdentity = (row[5] as List?)?.cast<String>() ?? const <String>[];
 
     final withinIdentity = isWithinCommanderIdentity(
-      cardIdentity: colorIdentity.isNotEmpty ? colorIdentity : colors,
+      cardIdentity: _resolvedCardIdentityFromParts(
+        colorIdentity: colorIdentity,
+        colors: colors,
+        oracleText: oracleText,
+      ),
       commanderIdentity: commanderColorIdentity,
     );
     if (!withinIdentity) continue;
@@ -7550,7 +7572,11 @@ Future<List<Map<String, dynamic>>> _loadPreferredNameFillers({
     final colorIdentity = (row[5] as List?)?.cast<String>() ?? const <String>[];
 
     final withinIdentity = isWithinCommanderIdentity(
-      cardIdentity: colorIdentity.isNotEmpty ? colorIdentity : colors,
+      cardIdentity: _resolvedCardIdentityFromParts(
+        colorIdentity: colorIdentity,
+        colors: colors,
+        oracleText: oracleText,
+      ),
       commanderIdentity: commanderColorIdentity,
     );
     if (!withinIdentity) continue;
@@ -7722,7 +7748,10 @@ Future<List<Map<String, dynamic>>> _findSynergyReplacements({
 
     // Verificar identidade de cor (double check)
     if (!isWithinCommanderIdentity(
-      cardIdentity: identity,
+      cardIdentity: _resolvedCardIdentityFromParts(
+        colorIdentity: identity,
+        oracleText: oracle,
+      ),
       commanderIdentity: commanderColorIdentity,
     )) continue;
 

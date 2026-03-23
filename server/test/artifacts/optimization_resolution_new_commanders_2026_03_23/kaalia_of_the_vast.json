@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "eca0d9ad-4818-47a3-aa84-787a2851b3a3",
+  "source_deck_name": "Corpus Seed - Kaalia of the Vast",
+  "clone_deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8",
+  "final_deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8",
+  "optimize_request": {
+    "deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "4.11",
+    "type_distribution": {
+      "creatures": 31,
+      "instants": 10,
+      "sorceries": 7,
+      "enchantments": 5,
+      "artifacts": 11,
+      "planeswalkers": 0,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

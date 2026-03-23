@@ -7,7 +7,9 @@ import '../widgets/deck_feedback_dialogs.dart';
 
 /// Tela para gerar decks automaticamente a partir de uma descrição em texto
 class DeckGenerateScreen extends StatefulWidget {
-  const DeckGenerateScreen({super.key});
+  const DeckGenerateScreen({super.key, this.initialFormat});
+
+  final String? initialFormat;
 
   @override
   State<DeckGenerateScreen> createState() => _DeckGenerateScreenState();
@@ -19,6 +21,27 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
   Map<String, dynamic>? _generatedDeck;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
+  }
+
+  String? _normalizeFormat(String? format) {
+    if (format == null || format.trim().isEmpty) {
+      return null;
+    }
+
+    final normalized = format.trim().toLowerCase();
+    for (final option in _formats) {
+      if (option.toLowerCase() == normalized) {
+        return option;
+      }
+    }
+
+    return null;
+  }
 
   final List<String> _formats = [
     'Commander',

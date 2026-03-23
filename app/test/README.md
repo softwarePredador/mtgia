@@ -1,37 +1,121 @@
-# Testes do App Flutter - MTG Deck Builder
+# Flutter Test Suite - MTGIA
 
-Esta pasta contém os testes unitários e de widget do aplicativo Flutter.
+Esta pasta cobre o comportamento do app que sustenta o fluxo principal de decks.
 
-## Estrutura
+O backend carrega a maior parte da logica de otimizacao, mas o app precisa preservar contexto, interpretar contratos corretamente e nao degradar a confianca percebida do usuario.
 
-```
-test/
-├── smoke_test.dart          # Testes básicos de renderização
-├── core/
-│   └── utils/
-│       └── logger_test.dart # Testes do logger centralizado
-└── features/
-    └── decks/
-        └── models/
-            └── deck_test.dart # Testes do modelo Deck
-```
+## Foco atual
 
-## Executando os testes
+Em `2026-03-23`, a prioridade oficial do projeto passou a ser proteger a jornada:
+
+- onboarding
+- gerar ou importar deck
+- abrir details
+- otimizar
+- aplicar e validar
+
+## Estrutura relevante hoje
+
+- `test/features/decks/models/`
+- `test/features/decks/providers/`
+- `test/features/decks/screens/`
+- `test/features/decks/widgets/`
+
+## Suites relevantes do core
+
+### Models
+
+- `deck_card_item_test.dart`
+- `deck_details_test.dart`
+- `deck_test.dart`
+
+Cobrem:
+
+- parsing de contratos JSON
+- defaults e fallbacks
+- serializacao
+- preservacao de cores e dados de carta
+
+### Provider
+
+- `deck_provider_test.dart`
+
+Cobertura principal:
+
+- falha quando o batch resolve quebra
+- falha quando ha nomes nao resolvidos
+- falha quando ha nomes ambiguos
+- preserva ids diretos e nomes resolvidos na criacao
+- interpreta corretamente payload estruturado de `needs_repair`
+- preserva contrato de `rebuild` em sucesso
+
+### Screens
+
+- `deck_flow_entry_screens_test.dart`
+
+Cobertura principal:
+
+- o formato escolhido no onboarding chega intacto em generate
+- o formato escolhido no onboarding chega intacto em import
+
+### Widgets
+
+- `deck_diagnostic_panel_test.dart`
+- `sample_hand_widget_test.dart`
+- `deck_card_overflow_test.dart`
+
+Cobrem:
+
+- exibicao de metricas e insights do deck
+- comportamento de sample hand
+- robustez visual em larguras pequenas e nomes longos
+
+## Resultado da auditoria de 2026-03-23
+
+Validado nesta rodada:
+
+- suites de models ligadas a deck
+- `deck_provider_test.dart`
+- widgets que sustentam diagnostico, sample hand e robustez visual
+- entrada do fluxo de onboarding para generate e import
+
+Status:
+
+- camada Flutter relevante auditada nesta rodada: verde
+
+Leitura operacional:
+
+- o app esta protegendo melhor os contratos do backend
+- ainda falta smoke dedicado para `deck list -> details -> optimize -> apply -> validate`
+- a maior fragilidade continua sendo cobertura insuficiente de jornadas completas, nao de widgets isolados
+
+## Comandos recomendados
+
+### Validacao Flutter do core
 
 ```bash
-# Rodar todos os testes
-flutter test
-
-# Rodar um teste específico
-flutter test test/smoke_test.dart
-
-# Rodar com cobertura
-flutter test --coverage
+flutter test test/features/decks/models/deck_card_item_test.dart \
+  test/features/decks/models/deck_details_test.dart \
+  test/features/decks/models/deck_test.dart \
+  test/features/decks/providers/deck_provider_test.dart \
+  test/features/decks/screens/deck_flow_entry_screens_test.dart \
+  test/features/decks/widgets/deck_diagnostic_panel_test.dart \
+  test/features/decks/widgets/sample_hand_widget_test.dart \
+  test/features/decks/widgets/deck_card_overflow_test.dart
 ```
 
-## Convenções
+### Validacao completa do app
 
-- Arquivos de teste devem terminar com `_test.dart`
-- Cada feature deve ter sua pasta correspondente em `test/features/`
-- Use `group()` para agrupar testes relacionados
-- Use nomes descritivos nos testes
+```bash
+flutter test
+```
+
+## Proximo salto de cobertura
+
+Para colocar o app no mesmo nivel de exigencia do backend, as proximas suites devem cobrir:
+
+1. `deck list -> deck details`
+2. `deck details -> optimize`
+3. `optimize -> apply`
+4. `apply -> validate`
+5. erros de loading, timeout e `needs_repair` na tela de details

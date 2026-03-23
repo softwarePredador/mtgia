@@ -8,6 +8,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
+import '../lib/color_identity.dart';
 import '../lib/database.dart';
 
 const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
@@ -41,6 +42,7 @@ Future<void> main(List<String> args) async {
   final corpusPath = (env['VALIDATION_CORPUS_PATH'] ?? '').trim().isNotEmpty
       ? env['VALIDATION_CORPUS_PATH']!.trim()
       : _defaultCorpusPath;
+  final commanders = _resolveCommanders(env['VALIDATION_COMMANDERS']);
   final dryRun = args.contains('--dry-run');
 
   final db = Database();
@@ -70,7 +72,7 @@ Future<void> main(List<String> args) async {
     final created = <String>[];
     final skipped = <String>[];
 
-    for (final commander in _defaultCommanders) {
+    for (final commander in commanders) {
       if (existingLabels.contains(commander.toLowerCase())) {
         skipped.add('$commander (já existe no corpus)');
         continue;
@@ -165,6 +167,16 @@ Future<void> main(List<String> args) async {
   }
 }
 
+List<String> _resolveCommanders(String? raw) {
+  final configured = (raw ?? '')
+      .split(RegExp(r'[;\n]+'))
+      .map((entry) => entry.trim())
+      .where((entry) => entry.isNotEmpty)
+      .toList();
+  if (configured.isEmpty) return _defaultCommanders;
+  return configured;
+}
+
 Map<String, dynamic> _loadCorpus(File file) {
   final decoded = jsonDecode(file.readAsStringSync());
   if (decoded is Map<String, dynamic> && decoded['decks'] is List) {
@@ -232,7 +244,8 @@ Future<_CommanderInfo?> _loadCommanderInfo(Pool pool, String commander) async {
   if (result.isEmpty) return null;
   return _CommanderInfo(
     name: result.first[0] as String,
-    colorIdentity: (result.first[1] as List?)?.cast<String>() ?? const <String>[],
+    colorIdentity:
+        (result.first[1] as List?)?.cast<String>() ?? const <String>[],
   );
 }
 
@@ -269,10 +282,9 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
       ? (profile['average_type_distribution'] as Map).cast<String, dynamic>()
       : const <String, dynamic>{};
 
-  final targetLandCount =
-      (recommendedStructure['lands'] as num?)?.toInt() ??
-          (averageTypeDistribution['land'] as num?)?.toInt() ??
-          36;
+  final targetLandCount = (recommendedStructure['lands'] as num?)?.toInt() ??
+      (averageTypeDistribution['land'] as num?)?.toInt() ??
+      36;
 
   final seedEntries = <_ReferenceCard>[
     ..._parseSeedCards(profile['average_deck_seed']),
@@ -306,6 +318,7 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
     if (card == null) continue;
     final nameLower = (card['name'] as String).toLowerCase();
     if (chosenNames.contains(nameLower)) continue;
+    if (!_isCardWithinCommanderIdentity(card, commanderColors)) continue;
     final typeLine = (card['type_line'] as String).toLowerCase();
     if (_isBasicLand(typeLine, nameLower)) continue;
     chosenNames.add(nameLower);
@@ -329,6 +342,7 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
       if (card == null) continue;
       final nameLower = (card['name'] as String).toLowerCase();
       if (chosenNames.contains(nameLower)) continue;
+      if (!_isCardWithinCommanderIdentity(card, commanderColors)) continue;
       final typeLine = (card['type_line'] as String).toLowerCase();
       if (typeLine.contains('land')) continue;
       chosenNames.add(nameLower);
@@ -353,9 +367,10 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
     cards.add({'name': card['name'], 'quantity': 1});
   }
 
-  final currentLandCount =
-      cards.where((card) => _looksLikeLandName(card['name']?.toString() ?? '')).length +
-          landCards.length;
+  final currentLandCount = cards
+          .where((card) => _looksLikeLandName(card['name']?.toString() ?? ''))
+          .length +
+      landCards.length;
 
   final landNamesToAdd = _buildBasicLandNames(
     commanderColors: commanderColors,
@@ -365,16 +380,12 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
     cards.add({'name': land, 'quantity': 1});
   }
 
-  while (cards.length < 100) {
-    final filler = _buildBasicLandNames(
-      commanderColors: commanderColors,
-      count: 1,
-    );
-    cards.add({'name': filler.first, 'quantity': 1});
-  }
-
-  if (cards.length > 100) {
-    cards.removeRange(100, cards.length);
+  final totalCards = cards.fold<int>(
+    0,
+    (sum, card) => sum + ((card['quantity'] as int?) ?? 1),
+  );
+  if (totalCards != 100) {
+    return null;
   }
 
   final compactedCards = _compactCreateCards(cards);
@@ -417,7 +428,9 @@ Future<Map<String, Map<String, dynamic>>> _loadCardCatalog(
     Sql.named('''
       SELECT DISTINCT ON (LOWER(name))
         name,
-        type_line
+        type_line,
+        COALESCE(oracle_text, '') AS oracle_text,
+        COALESCE(color_identity, colors, ARRAY[]::text[]) AS color_identity
       FROM cards
       WHERE LOWER(name) = ANY(@names)
       ORDER BY LOWER(name), id
@@ -432,9 +445,25 @@ Future<Map<String, Map<String, dynamic>>> _loadCardCatalog(
     catalog[name.toLowerCase()] = {
       'name': name,
       'type_line': row[1] as String? ?? '',
+      'oracle_text': row[2] as String? ?? '',
+      'color_identity': (row[3] as List?)?.cast<String>() ?? const <String>[],
     };
   }
   return catalog;
+}
+
+bool _isCardWithinCommanderIdentity(
+  Map<String, dynamic> card,
+  List<String> commanderColors,
+) {
+  final allowedColors =
+      commanderColors.map((color) => color.toUpperCase()).toSet();
+  final cardIdentity = resolveCardColorIdentity(
+    colorIdentity:
+        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[],
+    oracleText: card['oracle_text']?.toString(),
+  );
+  return cardIdentity.every(allowedColors.contains);
 }
 
 Future<String> _createDeck({
@@ -537,7 +566,8 @@ String _basicLandNameForColor(String color) {
   }
 }
 
-List<Map<String, dynamic>> _compactCreateCards(List<Map<String, dynamic>> cards) {
+List<Map<String, dynamic>> _compactCreateCards(
+    List<Map<String, dynamic>> cards) {
   final byName = <String, Map<String, dynamic>>{};
   for (final card in cards) {
     final name = card['name']?.toString().trim() ?? '';

@@ -141,6 +141,26 @@ Explique esta carta para ajudar o jogador a tomar melhores decisões durante a p
 
       return Response.json(body: {'explanation': content, 'is_mock': false});
     } else {
+      if (aiConfig.shouldUseFallbackForInvalidApiKey(
+        statusCode: response.statusCode,
+        responseBody: response.body,
+      )) {
+        return Response.json(
+          body: {
+            'explanation': _generateFallbackExplanation(
+              cardName,
+              oracleText,
+              typeLine,
+            ),
+            'is_mock': true,
+            'warnings': {
+              'code': 'openai_api_key_invalid_dev_fallback',
+              'message':
+                  'OPENAI_API_KEY invalida no ambiente atual. Retornando explicacao local simplificada.',
+            },
+          },
+        );
+      }
       return apiError(
         response.statusCode,
         'Failed to call AI provider: ${response.body}',

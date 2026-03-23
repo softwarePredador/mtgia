@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "3d12d60b-c40f-4fed-8d3a-edb9351f2198",
+  "source_deck_name": "Corpus Seed - Meren of Clan Nel Toth",
+  "clone_deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85",
+  "final_deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85",
+  "optimize_request": {
+    "deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.94",
+    "type_distribution": {
+      "creatures": 36,
+      "instants": 7,
+      "sorceries": 9,
+      "enchantments": 5,
+      "artifacts": 8,
+      "planeswalkers": 1,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

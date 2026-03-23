@@ -103,6 +103,7 @@ void main() {
   }
 
   setUpAll(() async {
+    if (skipIntegration != null) return;
     authToken = await getAuthToken();
     authUserId = await getAuthUserId(authToken!);
   });
@@ -1759,6 +1760,5 @@ void main() {
       },
       skip: skipIntegration,
     );
-
   });
 }

@@ -21,6 +21,22 @@ class OpenAiRuntimeConfig {
     return 'dev';
   }
 
+  String get profile => _profile;
+
+  bool get isProductionLike => _profile == 'prod';
+
+  bool shouldUseFallbackForInvalidApiKey({
+    required int statusCode,
+    required String responseBody,
+  }) {
+    if (isProductionLike || statusCode != 401) return false;
+
+    final body = responseBody.toLowerCase();
+    return body.contains('invalid_api_key') ||
+        body.contains('incorrect api key') ||
+        body.contains('openai api error');
+  }
+
   String modelFor({
     required String key,
     required String fallback,

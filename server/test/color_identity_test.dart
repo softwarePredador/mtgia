@@ -3,6 +3,44 @@ import 'package:test/test.dart';
 import '../lib/color_identity.dart';
 
 void main() {
+  group('resolveCardColorIdentity', () {
+    test('infers colored land identity from oracle text when db field is empty',
+        () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          oracleText:
+              '({T}: Add {W} or {B}.)\nAs this land enters, you may pay 2 life.',
+        ),
+        equals({'W', 'B'}),
+      );
+    });
+
+    test('keeps fetchland colorless when oracle text has no mana symbols', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          oracleText:
+              '{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card.',
+        ),
+        isEmpty,
+      );
+    });
+
+    test('treats {C} as colorless identity, not as a commander color', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          oracleText: '{T}: Add {C}{C}.',
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   group('isWithinCommanderIdentity', () {
     test('allows colorless cards in any commander', () {
       expect(
@@ -61,7 +99,7 @@ void main() {
     // Phyrexian mana (ex: {W/P}) conta como a cor indicada.
     // Devoid remove a cor da carta, mas NÃO afeta a identidade de cor.
     // MDFC considera ambas as faces para identidade.
-    
+
     test('hybrid mana - card with {W/U} should have both W and U identity', () {
       // Uma carta com {W/U} no custo tem identidade W e U
       // Se o comandante é apenas W, a carta não pode entrar
@@ -72,7 +110,7 @@ void main() {
         ),
         isFalse,
       );
-      
+
       // Se o comandante é W e U, a carta pode entrar
       expect(
         isWithinCommanderIdentity(
@@ -92,7 +130,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       // Mas não funciona em comandante sem W
       expect(
         isWithinCommanderIdentity(
@@ -114,7 +152,9 @@ void main() {
       );
     });
 
-    test('devoid - colorless card but with colored mana symbols still has identity', () {
+    test(
+        'devoid - colorless card but with colored mana symbols still has identity',
+        () {
       // Devoid remove a cor da carta, mas a identidade vem dos símbolos de mana no custo/texto
       // Ex: Eldrazi como "Thought-Knot Seer" tem devoid mas custo {3}{C} (sem identidade de cor)
       // Ex: "Kozilek's Return" tem devoid mas {2}{R} (identidade vermelha)
@@ -125,7 +165,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       expect(
         isWithinCommanderIdentity(
           cardIdentity: const <String>['R'],
@@ -140,12 +180,15 @@ void main() {
       // Ex: Se frente é W e verso é B, a identidade é W + B
       expect(
         isWithinCommanderIdentity(
-          cardIdentity: const <String>['W', 'B'], // MDFC com W na frente, B no verso
+          cardIdentity: const <String>[
+            'W',
+            'B'
+          ], // MDFC com W na frente, B no verso
           commanderIdentity: {'W', 'B'},
         ),
         isTrue,
       );
-      
+
       expect(
         isWithinCommanderIdentity(
           cardIdentity: const <String>['W', 'B'],
@@ -165,7 +208,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       // Mas Blood Crypt tem identidade B e R (pelo texto)
       expect(
         isWithinCommanderIdentity(
@@ -174,7 +217,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       expect(
         isWithinCommanderIdentity(
           cardIdentity: const <String>['B', 'R'],
@@ -193,7 +236,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       // Mas não funciona se falta uma cor
       expect(
         isWithinCommanderIdentity(
@@ -212,7 +255,7 @@ void main() {
         ),
         isTrue,
       );
-      
+
       expect(
         isWithinCommanderIdentity(
           cardIdentity: const <String>['W'], // White card

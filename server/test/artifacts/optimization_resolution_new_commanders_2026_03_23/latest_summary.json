@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-03-23T06:41:33.157240",
+  "run_started_at": "2026-03-23T06:30:14.151081",
+  "api_base_url": "http://127.0.0.1:8080",
+  "artifact_dir": "test/artifacts/optimization_resolution_new_commanders_2026_03_23",
+  "selection_mode": "corpus",
+  "corpus_path": "test/fixtures/optimization_resolution_corpus_new_commanders_2026-03-23.json",
+  "total": 6,
+  "direct_optimizations": 0,
+  "rebuild_resolutions": 0,
+  "safe_no_change": 6,
+  "unresolved": 0,
+  "passed": 6,
+  "failed": 0,
+  "results": [
+    {
+      "commander_name": "Meren of Clan Nel Toth",
+      "source_deck_id": "3d12d60b-c40f-4fed-8d3a-edb9351f2198",
+      "source_deck_name": "Corpus Seed - Meren of Clan Nel Toth",
+      "clone_deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85",
+      "final_deck_id": "e234ace0-0d53-4155-8e00-ff7a0d97ad85",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 2.94,
+      "final_land_count": 36,
+      "final_interaction": 16,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/meren_of_clan_nel_toth.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    },
+    {
+      "commander_name": "Korvold, Fae-Cursed King",
+      "source_deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
+      "source_deck_name": "Corpus Seed - Korvold, Fae-Cursed King",
+      "clone_deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e",
+      "final_deck_id": "b455d730-0539-4dd5-b982-fcfa53c1844e",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 2.64,
+      "final_land_count": 36,
+      "final_interaction": 21,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/korvold_fae_cursed_king.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    },
+    {
+      "commander_name": "Kaalia of the Vast",
+      "source_deck_id": "eca0d9ad-4818-47a3-aa84-787a2851b3a3",
+      "source_deck_name": "Corpus Seed - Kaalia of the Vast",
+      "clone_deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8",
+      "final_deck_id": "8acec52f-4e8d-4602-92e6-c1df939ec0c8",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 4.11,
+      "final_land_count": 36,
+      "final_interaction": 17,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/kaalia_of_the_vast.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    },
+    {
+      "commander_name": "Miirym, Sentinel Wyrm",
+      "source_deck_id": "c017a412-0f8c-4d9f-b35a-df5395705fdf",
+      "source_deck_name": "Corpus Seed - Miirym, Sentinel Wyrm",
+      "clone_deck_id": "c43becee-2051-4beb-8d1b-8cb91403fcb5",
+      "final_deck_id": "c43becee-2051-4beb-8d1b-8cb91403fcb5",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 4.31,
+      "final_land_count": 36,
+      "final_interaction": 16,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/miirym_sentinel_wyrm.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    },
+    {
+      "commander_name": "Wilhelt, the Rotcleaver",
+      "source_deck_id": "6cfa4644-16a6-4070-9e73-619acc5e77e3",
+      "source_deck_name": "Corpus Seed - Wilhelt, the Rotcleaver",
+      "clone_deck_id": "c2e1c4f6-d7a8-4483-b7e3-ac38dbaf0fa0",
+      "final_deck_id": "c2e1c4f6-d7a8-4483-b7e3-ac38dbaf0fa0",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 3.02,
+      "final_land_count": 36,
+      "final_interaction": 17,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/wilhelt_the_rotcleaver.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    },
+    {
+      "commander_name": "Prosper, Tome-Bound",
+      "source_deck_id": "86cfa127-c737-43d7-aec9-b41d1668880e",
+      "source_deck_name": "Corpus Seed - Prosper, Tome-Bound",
+      "clone_deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475",
+      "final_deck_id": "ab83b60d-a885-4633-a5b5-eb40ac2fa475",
+      "archetype": "midrange",
+      "bracket": 2,
+      "flow_path": "safe_no_change",
+      "optimize_status": 422,
+      "rebuild_status": null,
+      "final_deck_valid": true,
+      "final_deck_state": "healthy",
+      "final_average_cmc": 3.13,
+      "final_land_count": 36,
+      "final_interaction": 23,
+      "saved_artifact_path": "test/artifacts/optimization_resolution_new_commanders_2026_03_23/prosper_tome_bound.json",
+      "expected_checks": [
+        "deck final existe",
+        "deck final mantem 100 cartas",
+        "deck final mantem exatamente 1 comandante",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final terminou em estado healthy",
+        "deck final manteve land count saudável"
+      ],
+      "failed_checks": [],
+      "warnings": [
+        "Nenhuma troca segura encontrada; deck original preservado em estado saudável."
+      ],
+      "passed": true
+    }
+  ]
+}

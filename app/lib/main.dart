@@ -124,7 +124,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
         if (status == AuthStatus.loading || status == AuthStatus.initial) {
           final isBootSafeRoute =
-              location == '/' || location == '/login' || location == '/register';
+              location == '/' ||
+              location == '/login' ||
+              location == '/register';
           if (!isBootSafeRoute) {
             debugPrint('[🧭 Router] → / (status=$status, aguardando auth)');
             return '/';
@@ -144,9 +146,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/community') ||
             location.startsWith('/trades') ||
             location.startsWith('/messages') ||
-          location.startsWith('/notifications') ||
-          location.startsWith('/onboarding') ||
-          location.startsWith('/life-counter');
+            location.startsWith('/notifications') ||
+            location.startsWith('/onboarding') ||
+            location.startsWith('/life-counter');
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -196,11 +198,17 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
               routes: [
                 GoRoute(
                   path: 'generate',
-                  builder: (context, state) => const DeckGenerateScreen(),
+                  builder: (context, state) {
+                    final initialFormat = state.uri.queryParameters['format'];
+                    return DeckGenerateScreen(initialFormat: initialFormat);
+                  },
                 ),
                 GoRoute(
                   path: 'import',
-                  builder: (context, state) => const DeckImportScreen(),
+                  builder: (context, state) {
+                    final initialFormat = state.uri.queryParameters['format'];
+                    return DeckImportScreen(initialFormat: initialFormat);
+                  },
                 ),
                 GoRoute(
                   path: ':id',
