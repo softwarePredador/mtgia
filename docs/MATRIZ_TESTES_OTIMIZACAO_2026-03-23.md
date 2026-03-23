@@ -212,7 +212,21 @@ Validacao adicional desta rodada:
 
 - com backend local ativo e `RUN_INTEGRATION_TESTS=1`, `ai_optimize_flow_test.dart` foi exercitado com sucesso
 - `ai_generate_create_optimize_flow_test.dart` expôs dependencia externa de credencial OpenAI invalida no ambiente
-- a suite foi endurecida para marcar skip dinamico quando a geracao falhar exclusivamente por credencial invalida, sem mascarar regressao funcional do fluxo
+- o backend foi endurecido para fallback seguro em `dev/staging` nas rotas com modo mock (`generate`, `archetypes`, `explain`)
+- apos o ajuste, `ai_generate_create_optimize_flow_test.dart` voltou a passar com backend local ativo
+
+### Banco auditado nesta rodada
+
+Sinais observados:
+
+- cache/meta existe e esta populado
+- logs reais de IA existem e confirmam sucesso e falha por endpoint
+- telemetria de fallback existe, mas hoje so mostrou eventos em `mode=optimize`
+- `commander_reference_profiles` ainda cobre menos comandantes do que o corpus real de validacao
+
+Leitura:
+
+- a base de dados sustenta o core, mas o cache de referencia de commander ainda nao esta no mesmo nivel da suite commander operacional
 
 ### Flutter validado e verde
 

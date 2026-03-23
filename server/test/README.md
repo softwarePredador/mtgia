@@ -76,6 +76,10 @@ Essas suites devem ser lidas como:
 - suites que dependem de geracao por IA tambem podem ser puladas quando a credencial OpenAI do ambiente estiver invalida
 - nao devem derrubar a suite local por ausencia de infraestrutura
 
+Observacao operacional nova:
+
+- rotas com fallback seguro de IA (`generate`, `archetypes`, `explain`) agora degradam em `dev/staging` quando a chave existe mas esta invalida, preservando a validacao local do fluxo
+
 ## Resultado da auditoria de 2026-03-23
 
 Validado nesta rodada:

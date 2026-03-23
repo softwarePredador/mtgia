@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
-import 'package:dotenv/dotenv.dart';
+
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
@@ -22,51 +24,39 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest('Prompt is required');
     }
 
-    // Carregar variáveis de ambiente
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
 
     if (apiKey == null || apiKey.isEmpty) {
-      final mockDeck = _mockGeneratedDeck(format);
-      return Response.json(body: {
-        'prompt': prompt,
-        'format': format,
-        'generated_deck': mockDeck,
-        'meta_context_used': false,
-        'is_mock': true,
-        'stats': {
-          'total_suggested': (mockDeck['cards'] as List).length,
-          'valid_cards': (mockDeck['cards'] as List).length,
-          'invalid_cards': 0,
-        },
-        'warnings': {
-          'message':
-              'OPENAI_API_KEY não configurada. Retornando deck mock para desenvolvimento.',
-        },
-      });
+      return Response.json(
+        body: _buildMockGenerateResponse(
+          prompt: prompt,
+          format: format,
+          warningCode: 'openai_api_key_missing',
+          warningMessage:
+              'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
+        ),
+      );
     }
 
-    // 1. RAG: Buscar contexto no Meta (Opcional, mas recomendado)
-    // Tenta encontrar decks no meta que tenham palavras-chave do prompt
     final pool = context.read<Pool>();
-    String metaContext = '';
+    var metaContext = '';
 
     try {
-      // Extrai palavras-chave simples (remove stop words básicas)
       final keywords = prompt
           .split(' ')
-          .where((w) => w.length > 3)
-          .map((w) => "'%${w.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')}%'")
+          .where((word) => word.length > 3)
+          .map((word) => "'%${word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')}%'")
           .join(' OR archetype ILIKE ');
 
       if (keywords.isNotEmpty) {
         final metaResult = await pool.execute(
           Sql.named('''
-            SELECT archetype, card_list 
-            FROM meta_decks 
-            WHERE format = @format 
-            AND (archetype ILIKE $keywords)
+            SELECT archetype, card_list
+            FROM meta_decks
+            WHERE format = @format
+              AND (archetype ILIKE $keywords)
             LIMIT 3
           '''),
           parameters: {
@@ -77,29 +67,27 @@ Future<Response> onRequest(RequestContext context) async {
         );
 
         if (metaResult.isNotEmpty) {
-          metaContext =
-              'Here are some successful meta decks for inspiration:\n';
+          metaContext = 'Here are some successful meta decks for inspiration:\n';
           for (final row in metaResult) {
             metaContext +=
                 'Archetype: ${row[0]}\nList: ${(row[1] as String).substring(0, 200)}...\n\n';
           }
         }
       }
-    } catch (e) {
-      print('[ERROR] handler: $e');
-      Log.w('Erro ao buscar contexto do meta: $e');
-      // Segue sem contexto
+    } catch (error) {
+      print('[ERROR] handler: $error');
+      Log.w('Erro ao buscar contexto do meta: $error');
     }
 
-    // 2. Chamada para OpenAI
-    final systemPrompt = '''
+    const systemPromptPrefix = '''
 You are a world-class Magic: The Gathering deck builder and Level 3 judge.
-Your goal is to build a competitive, consistent, and fully legal deck for the format "$format".
+Your goal is to build a competitive, consistent, and fully legal deck for the format
+provided by the user.
 Think like a judge verifying legality and a pro player maximizing consistency.
 
 Return ONLY a JSON object (no markdown). Use this schema:
 {
-  "commander": { "name": "Exact English card name" },   // REQUIRED for Commander/Brawl, otherwise omit or null
+  "commander": { "name": "Exact English card name" },
   "cards": [
     { "name": "Exact English card name", "quantity": 1 }
   ]
@@ -111,31 +99,31 @@ Commander (EDH):
 1. Commander is REQUIRED (a legendary creature or allowed planeswalker).
 2. Total must be exactly 100 cards including the commander (1 commander + 99 others).
 3. Only 1 copy of each card except basic lands (singleton rule).
-4. ALL cards must respect the commander's color identity (rule 903.4): mana symbols in cost + rules text (not reminder text) + color indicator + back faces of MDFCs. Hybrid mana counts as BOTH colors.
+4. ALL cards must respect the commander's color identity.
 5. Do NOT include banned cards in the Commander format.
-6. Starting life: 40. This means aggro must be explosive; drain/life-gain scale better.
+6. Starting life is 40.
 
 Brawl:
 1. Commander required (legendary creature or planeswalker).
 2. Total must be exactly 60 cards including the commander.
 3. Singleton (1 copy except basics). Cards must be Standard-legal.
 
-Standard/Pioneer/Modern/Legacy/Vintage/Pauper (60-card formats):
+Standard/Pioneer/Modern/Legacy/Vintage/Pauper:
 1. Minimum 60 cards in the main deck.
 2. Maximum 4 copies of any non-basic-land card.
-3. Include 22-26 lands (adjust by curve: aggro ~20-22, midrange ~23-25, control ~25-27).
-4. No commander field needed; set "commander" to null.
+3. Include 22-26 lands depending on curve.
+4. No commander field needed; set commander to null.
 5. Respect the ban list for the specific format.
-6. Pauper: commons only. Vintage: restricted list applies (max 1 copy of restricted cards).
+6. Pauper: commons only. Vintage: restricted list applies.
 
-Deck construction guidelines (apply to ALL formats):
-- Include a functional mana base: lands that fix colors proportional to pip distribution.
-- For Commander: 35-38 lands, 10-12 ramp sources, 10+ card draw, 8-10 removal, 3-4 board wipes.
-- For 60-card: 22-26 lands, 4+ removal, adequate draw for the archetype.
-- Include 2-3 distinct win conditions (do not rely on a single card to win).
-- Mana curve should be smooth: majority of spells at MV 1-3 for aggro, 2-4 for midrange, 2-5 for control.
-- Prioritize instant-speed interaction over sorcery-speed when available.
-- Use EXACT real card names (English). Do NOT invent card names.
+Deck construction guidelines:
+- Include a functional mana base.
+- For Commander: 35-38 lands, 10-12 ramp, 10+ draw, 8-10 removal, 3-4 wipes.
+- For 60-card formats: 22-26 lands, 4+ removal, adequate draw.
+- Include 2-3 distinct win conditions.
+- Keep the mana curve smooth.
+- Prioritize instant-speed interaction when available.
+- Use exact real card names in English.
 ''';
 
     final userMessage = '''
@@ -160,7 +148,10 @@ $metaContext
           prodFallback: 'gpt-4o-mini',
         ),
         'messages': [
-          {'role': 'system', 'content': systemPrompt},
+          {
+            'role': 'system',
+            'content': '$systemPromptPrefix\nFormat: "$format".',
+          },
           {'role': 'user', 'content': userMessage},
         ],
         'temperature': aiConfig.temperatureFor(
@@ -175,14 +166,29 @@ $metaContext
     );
 
     if (response.statusCode != 200) {
+      if (aiConfig.shouldUseFallbackForInvalidApiKey(
+        statusCode: response.statusCode,
+        responseBody: response.body,
+      )) {
+        return Response.json(
+          body: _buildMockGenerateResponse(
+            prompt: prompt,
+            format: format,
+            warningCode: 'openai_api_key_invalid_dev_fallback',
+            warningMessage:
+                'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
+          ),
+        );
+      }
+
       return apiError(
-          response.statusCode, 'OpenAI API Error: ${response.body}');
+        response.statusCode,
+        'OpenAI API Error: ${response.body}',
+      );
     }
 
     final aiData = jsonDecode(utf8.decode(response.bodyBytes));
     var content = aiData['choices'][0]['message']['content'] as String;
-
-    // Limpeza básica se a IA mandar markdown
     content = content.replaceAll('```json', '').replaceAll('```', '').trim();
 
     final deckList = jsonDecode(content) as Map<String, dynamic>;
@@ -206,8 +212,7 @@ $metaContext
       commanderName: commanderName,
     );
 
-    // Preparar resposta
-    final responseBody = {
+    final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
       'generated_deck': validation.generatedDeck,
@@ -241,10 +246,35 @@ $metaContext
     }
 
     return Response.json(body: responseBody);
-  } catch (e) {
-    print('[ERROR] Failed to generate deck: $e');
+  } catch (error) {
+    print('[ERROR] Failed to generate deck: $error');
     return internalServerError('Failed to generate deck');
   }
+}
+
+Map<String, dynamic> _buildMockGenerateResponse({
+  required String prompt,
+  required String format,
+  required String warningCode,
+  required String warningMessage,
+}) {
+  final mockDeck = _mockGeneratedDeck(format);
+  return {
+    'prompt': prompt,
+    'format': format,
+    'generated_deck': mockDeck,
+    'meta_context_used': false,
+    'is_mock': true,
+    'stats': {
+      'total_suggested': (mockDeck['cards'] as List).length,
+      'valid_cards': (mockDeck['cards'] as List).length,
+      'invalid_cards': 0,
+    },
+    'warnings': {
+      'code': warningCode,
+      'message': warningMessage,
+    },
+  };
 }
 
 Map<String, dynamic> _mockGeneratedDeck(String format) {

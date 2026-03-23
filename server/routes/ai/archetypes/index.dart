@@ -189,6 +189,42 @@ Formato obrigatório:
       final jsonResult = jsonDecode(jsonStr);
       return Response.json(body: jsonResult);
     } else {
+      if (aiConfig.shouldUseFallbackForInvalidApiKey(
+        statusCode: response.statusCode,
+        responseBody: response.body,
+      )) {
+        return Response.json(body: {
+          'options': [
+            {
+              'id': 'aggro',
+              'title': 'Aggro / Token Swarm',
+              'description':
+                  'Focar em criar muitas criaturas pequenas e atacar rapido.',
+              'difficulty': 'Baixa'
+            },
+            {
+              'id': 'control',
+              'title': 'Control / Stax',
+              'description':
+                  'Controlar o campo de batalha e impedir os oponentes de jogar.',
+              'difficulty': 'Alta'
+            },
+            {
+              'id': 'combo',
+              'title': 'Combo',
+              'description':
+                  'Montar uma combinacao especifica de cartas para vencer em um turno.',
+              'difficulty': 'Media'
+            }
+          ],
+          'is_mock': true,
+          'warnings': {
+            'code': 'openai_api_key_invalid_dev_fallback',
+            'message':
+                'OPENAI_API_KEY invalida no ambiente atual. Retornando arquetipos mock para manter o fluxo local utilizavel.',
+          },
+        });
+      }
       return internalServerError('OpenAI API Error: ${response.statusCode}');
     }
 

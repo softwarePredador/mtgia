@@ -331,6 +331,33 @@ Conclusao pratica:
 - a documentacao oficial dessa leitura agora esta em `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md`
 - o maior gap restante nao e ausencia de regra testada, e sim homologacao completa de ambiente e jornada final do app
 
+## Aditivo - Auditoria De Banco E Infra Da Otimizacao
+
+Leitura confirmada em `2026-03-23`:
+
+- `meta_decks`: `325` registros
+- `format_staples`: `748` registros
+- `card_legalities`: `312942` registros
+- `ai_logs`: `492` registros
+- `ai_optimize_fallback_telemetry`: `77` registros
+
+Achados importantes:
+
+- a tabela operacional de telemetria do fallback e `ai_optimize_fallback_telemetry`, nao `ai_optimization_logs`
+- a tabela de logs de IA em uso e `ai_logs`
+- `commander_reference_profiles` tem apenas `7` perfis cacheados, enquanto o corpus operacional de commander ja cobre `10` comandantes
+
+Gap concreto de dados observado:
+
+- faltam perfis de referencia para `Talrand, Sky Summoner`
+- faltam perfis de referencia para `Jin-Gitaxias // The Great Synthesis`
+- faltam perfis de referencia para `Auntie Ool, Cursewretch`
+
+Impacto pratico:
+
+- o `complete` ainda depende mais de fallback/live fetch do que o ideal em parte do corpus
+- isso nao invalida a pipeline, mas reduz previsibilidade e aumenta custo/latencia potencial
+
 ## Pendencias Recomendadas
 
 ### P1 Imediato
