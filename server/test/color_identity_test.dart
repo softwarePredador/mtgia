@@ -28,6 +28,17 @@ void main() {
         isEmpty,
       );
     });
+
+    test('treats {C} as colorless identity, not as a commander color', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          oracleText: '{T}: Add {C}{C}.',
+        ),
+        isEmpty,
+      );
+    });
   });
 
   group('isWithinCommanderIdentity', () {

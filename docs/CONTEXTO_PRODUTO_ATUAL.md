@@ -174,3 +174,31 @@ Antes de implementar qualquer pedido novo, confirmar internamente:
 3. a mudanca precisa de teste automatico ou checklist manual?
 4. ha algum arquivo gigante demais para receber mais responsabilidade?
 5. a documentacao ativa continua coerente com o estado real do sistema?
+
+## Aditivo - Estado Atual Da Otimizacao Em 2026-03-23
+
+Revalidacao operacional concluida:
+
+- `server/test/ai_optimize_flow_test.dart`: verde contra backend local real
+- `server/test/ai_generate_create_optimize_flow_test.dart`: verde contra backend local real
+- `server/run_optimize_validation.ps1`: verde, consolidando bootstrap local + suites deterministicas + suites HTTP criticas
+
+Achados de logica fechados:
+
+- a otimizacao agora usa inferencia de identidade por `oracle_text` tambem dentro da propria rota, e nao so na camada de regra
+- `{C}` deixou de ser tratado como cor de identidade de Commander
+- isso removeu falso negativo em cartas colorless validas e reduziu risco de candidato off-color passar por base incompleta
+
+Decisao sobre comandantes:
+
+- o corpus estavel atual com `16` decks e suficiente para a fase atual
+- nao ha necessidade de adicionar mais comandantes apenas por quantidade
+- a proxima expansao, quando vier, deve ser dirigida por cobertura de comportamento e nao por volume
+
+Proximas tasks oficialmente definidas para o core:
+
+1. modularizar `server/routes/ai/optimize/index.dart`
+2. transformar o corpus estavel em gate recorrente de release
+3. adicionar casos dirigidos para `optimized_directly`, `partner/background`, five-color e colorless
+4. criar smoke do app para `deck details -> optimize -> apply -> validate`
+5. so depois retomar frentes fora do deck builder

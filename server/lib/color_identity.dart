@@ -1,12 +1,12 @@
 Set<String> normalizeColorIdentity(Iterable<String> identity) {
   final normalized = <String>{};
-  final allowed = {'W', 'U', 'B', 'R', 'G', 'C'};
+  final allowed = {'W', 'U', 'B', 'R', 'G'};
 
   for (final raw in identity) {
     final value = raw.toUpperCase().trim();
     if (value.isEmpty) continue;
 
-    final matches = RegExp(r'[WUBRGC]').allMatches(value);
+    final matches = RegExp(r'[WUBRG]').allMatches(value);
     for (final match in matches) {
       final symbol = match.group(0);
       if (symbol != null && allowed.contains(symbol)) {

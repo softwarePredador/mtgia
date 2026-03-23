@@ -145,6 +145,30 @@ RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart \
   test/deck_analysis_contract_test.dart
 ```
 
+### Runner operacional local da otimizacao
+
+Para Windows/local, o projeto agora tem bootstrap dedicado para evitar problema de `dart_frog dev` em modo nao interativo:
+
+- `bin/local_test_server.dart`
+- `start_local_test_server.ps1`
+- `stop_local_test_server.ps1`
+- `run_optimize_validation.ps1`
+
+Fluxo recomendado:
+
+```powershell
+.\run_optimize_validation.ps1
+```
+
+Esse runner:
+
+- sobe o backend local em IPv4
+- valida readiness em `127.0.0.1:8080/health/live`
+- roda a bateria deterministica principal
+- roda `ai_optimize_flow_test.dart`
+- roda `ai_generate_create_optimize_flow_test.dart`
+- encerra o servidor ao final
+
 ### Validacao total do servidor
 
 ```bash
@@ -181,3 +205,27 @@ Qualquer mudanca em `server/routes/ai/optimize/` ou `server/lib/ai/` deve respon
 5. alterou contrato HTTP, telemetry ou outcome code?
 
 Se a resposta for "sim" para qualquer uma delas, a mudanca precisa vir acompanhada de teste nesta pasta.
+
+## Aditivo de 2026-03-23 - Reanalise Completa
+
+Rodada adicional confirmada nesta data:
+
+- suites deterministicas principais: verdes
+- `ai_optimize_flow_test.dart` com `RUN_INTEGRATION_TESTS=1`: verde
+- `ai_generate_create_optimize_flow_test.dart` com `RUN_INTEGRATION_TESTS=1`: verde
+
+Furos fechados na rodada:
+
+- filtros internos da rota `optimize` agora usam identidade inferida por `oracle_text` quando necessario
+- `C` nao e mais tratado como cor de identidade de Commander
+
+Decisao sobre corpus Commander:
+
+- o corpus atual de `16` decks e suficiente para a fase atual
+- as proximas adicoes devem ser dirigidas por cobertura de comportamento
+- prioridades futuras:
+- `optimized_directly`
+- segundo `rebuild_guided`
+- `partner/background`
+- five-color
+- colorless estrito

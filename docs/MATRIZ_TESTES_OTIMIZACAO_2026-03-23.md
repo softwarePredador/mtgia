@@ -266,7 +266,6 @@ Nao honestamente.
 
 Razoes:
 
-- ainda falta prova fresca de HTTP real ponta a ponta nesta rodada
 - ainda falta smoke do app em `deck details -> optimize -> apply -> validate`
 - os arquivos centrais do motor continuam grandes demais, o que aumenta risco de regressao futura
 
@@ -278,11 +277,11 @@ A base atual justifica travar a Sprint 1 em otimizacao de decks e evoluir com cr
 
 ## Gaps residuais
 
-1. homologar novamente a jornada HTTP real com `RUN_INTEGRATION_TESTS=1`
-2. rodar corpus oficial de decks reais e extremos como gate operacional
-3. criar smoke Flutter para `details -> optimize -> apply -> validate`
-4. modularizar `server/routes/ai/optimize/index.dart`
-5. reduzir concentracao de fluxo AI em `deck_provider.dart` e `deck_details_screen.dart`
+1. transformar o corpus estavel em gate operacional recorrente, nao apenas auditoria manual
+2. criar smoke Flutter para `details -> optimize -> apply -> validate`
+3. modularizar `server/routes/ai/optimize/index.dart`
+4. reduzir concentracao de fluxo AI em `deck_provider.dart` e `deck_details_screen.dart`
+5. adicionar cobertura dirigida para flow paths ainda sub-representados
 
 ## Aditivo - Expansao Do Corpus Commander Em 2026-03-23
 
@@ -326,3 +325,49 @@ O projeto nao esta "sem testes".
 Ele ja tem uma malha respeitavel para o motor de otimizacao, e essa malha foi confirmada nesta rodada como util e bem alinhada com o objetivo do produto.
 
 O caminho certo agora nao e abrir frente nova. E usar essa base para endurecer o que ainda falta para confianca de release do carro chefe.
+
+## Aditivo - Reanalise Completa Do Core Em 2026-03-23
+
+Validacao adicional fechada nesta rodada:
+
+- `dart test` da bateria deterministica principal: verde
+- `RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart`: verde contra backend local real
+- `RUN_INTEGRATION_TESTS=1 dart test test/ai_generate_create_optimize_flow_test.dart`: verde contra backend local real
+- `run_optimize_validation.ps1`: verde com `start_local_test_server.ps1` + `bin/local_test_server.dart`
+
+Furos reais encontrados e corrigidos:
+
+- a rota `ai/optimize` ainda tinha filtros de identidade de cor que dependiam apenas de `cards.color_identity` e `cards.colors`
+- isso deixava espaco para aceitar candidatos ilegais quando a base viesse incompleta e a cor real estivesse apenas no `oracle_text`
+- a normalizacao de identidade de cor ainda tratava `C` como cor de Commander, o que podia marcar `Wastes` e `Sol Ring` como off-color em testes reais
+
+Ajustes executados:
+
+- `server/routes/ai/optimize/index.dart` passou a resolver identidade por `oracle_text` tambem nos filtros internos da otimizacao
+- `server/lib/color_identity.dart` deixou de tratar `C` como cor valida de identidade de Commander
+- `server/test/color_identity_test.dart` recebeu regressao para confirmar que `{C}` continua colorless e nao vira cor de identidade
+- o projeto ganhou runner operacional local com:
+- `server/bin/local_test_server.dart`
+- `server/start_local_test_server.ps1`
+- `server/stop_local_test_server.ps1`
+- `server/run_optimize_validation.ps1`
+
+Decisao sobre mais comandantes:
+
+- nao precisamos de mais comandantes aleatorios agora
+- o corpus estavel atual de `16` decks ja e suficiente para o proximo passo de endurecimento
+- o gap nao e volume bruto; e distribuicao de comportamento
+
+Distribuicao atual do corpus:
+
+- `rebuild_guided`: `2`
+- `safe_no_change`: `11`
+- `expected_flow_paths` multiplos aceitando `optimized_directly` ou `safe_no_change`: `3`
+
+Proximos comandantes so fazem sentido se forem dirigidos para estes vazios:
+
+1. mais pelo menos `1` caso estavel que feche em `optimized_directly`
+2. mais pelo menos `1` caso `rebuild_guided` fora do shell Talrand
+3. `1` comandante com `partner` ou `background`
+4. `1` comandante five-color
+5. `1` comandante estritamente colorless

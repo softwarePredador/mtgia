@@ -421,3 +421,49 @@ Decisao operacional:
 
 - `Yuriko, the Tiger's Shadow` foi retirada do corpus estavel
 - ela deve voltar apenas quando houver material de referencia suficiente para seed saudavel e repetivel
+
+## Aditivo - Revalidacao Ponta A Ponta Da Otimizacao Em 2026-03-23
+
+Reanalise concluida com foco em:
+
+- logica interna da otimizacao
+- filtros de identidade de cor
+- fluxo HTTP real
+- retorno efetivo do optimize em modo `complete`, `rebuild_guided` e `safe_no_change`
+- coerencia operacional entre prompt, banco e contrato do endpoint
+
+Furos reais fechados:
+
+- a rota `server/routes/ai/optimize/index.dart` ainda tinha trechos usando apenas `color_identity` e `colors` do banco para filtrar candidatos
+- em cenarios onde o banco viesse incompleto, a identidade real podia existir apenas no `oracle_text`, abrindo margem para falso positivo na selecao
+- `server/lib/color_identity.dart` ainda aceitava `C` como se fosse cor valida de identidade, o que e incorreto para Commander
+
+Resultado pratico apos o ajuste:
+
+- `Wastes` voltou a ser tratado como colorless valido
+- `Sol Ring` deixou de cair como fora da identidade em testes reais
+- a rota `optimize` passou a validar candidatos com a mesma regra mais robusta usada na camada de regras/validacao
+
+Validacao executada nesta rodada:
+
+- `dart test` das suites deterministicas principais da otimizacao: verde
+- `RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart`: verde com backend local real
+- `RUN_INTEGRATION_TESTS=1 dart test test/ai_generate_create_optimize_flow_test.dart`: verde com backend local real
+- `server/run_optimize_validation.ps1`: verde usando bootstrap local nao interativo em IPv4
+
+Leitura de produto e engenharia:
+
+- o core de otimizacao ficou mais confiavel de verdade, nao apenas "com mais testes"
+- a resposta do endpoint foi acompanhada em conteudo e persistencia, nao so em status code
+- o principal gargalo restante nao e falta de comandantes; e a concentracao exagerada de responsabilidade em `optimize/index.dart`
+
+Decisao sobre expansao de comandantes:
+
+- nao ha necessidade de adicionar mais comandantes genericamente nesta rodada
+- as proximas adicoes devem ser dirigidas para cobrir flow paths ainda raros no corpus atual
+- prioridade de cobertura futura:
+- `optimized_directly` estavel
+- segundo caso `rebuild_guided`
+- `partner/background`
+- five-color
+- colorless estrito
