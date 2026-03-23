@@ -20,8 +20,18 @@ Set<String> normalizeColorIdentity(Iterable<String> identity) {
 
 Set<String> extractColorIdentityFromText(String? text) {
   if (text == null || text.trim().isEmpty) return <String>{};
+  final sanitized = text
+      .split('\n')
+      .map((line) {
+        final trimmed = line.trim();
+        if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
+          return trimmed;
+        }
+        return line.replaceAll(RegExp(r'\([^)]*\)'), '');
+      })
+      .join('\n');
   final symbols = RegExp(r'\{([^}]+)\}')
-      .allMatches(text)
+      .allMatches(sanitized)
       .map((match) => match.group(1) ?? '')
       .toList();
   return normalizeColorIdentity(symbols);

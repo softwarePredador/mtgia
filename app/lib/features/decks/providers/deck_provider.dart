@@ -7,6 +7,7 @@ import '../../../core/utils/logger.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 import '../models/deck_card_item.dart';
+import 'deck_provider_support.dart';
 
 typedef ActivationEventTracker =
     Future<void> Function(
@@ -118,32 +119,6 @@ class DeckProvider extends ChangeNotifier {
     );
   }
 
-  Map<String, Map<String, dynamic>> _buildCurrentCardsMap(DeckDetails deck) {
-    final currentCards = <String, Map<String, dynamic>>{};
-
-    for (final commander in deck.commander) {
-      currentCards[commander.id] = {
-        'card_id': commander.id,
-        'quantity': commander.quantity,
-        'is_commander': true,
-      };
-    }
-
-    for (final entry in deck.mainBoard.entries) {
-      for (final card in entry.value) {
-        if (!card.isCommander) {
-          currentCards[card.id] = {
-            'card_id': card.id,
-            'quantity': card.quantity,
-            'is_commander': false,
-          };
-        }
-      }
-    }
-
-    return currentCards;
-  }
-
   Future<void> removeCardFromDeck({
     required String deckId,
     required String cardId,
@@ -154,7 +129,7 @@ class DeckProvider extends ChangeNotifier {
     final deck = _selectedDeck;
     if (deck == null) throw Exception('Deck não encontrado');
 
-    final currentCards = _buildCurrentCardsMap(deck);
+    final currentCards = buildCurrentCardsMap(deck);
     currentCards.remove(cardId);
 
     final response = await _apiClient.put('/decks/$deckId', {
@@ -754,7 +729,7 @@ class DeckProvider extends ChangeNotifier {
         final data = _asMap(response.data);
         await _saveOptimizeDebug(response: data);
         AppLogger.debug('🧪 [AI Optimize] response=${jsonEncode(data)}');
-        await ActivationFunnelService.instance.track(
+        await _trackActivationEvent(
           'deck_optimized',
           deckId: deckId,
           source: 'deck_provider.optimizeDeck',
@@ -1335,7 +1310,7 @@ class DeckProvider extends ChangeNotifier {
       final isCommander = format == 'commander' || format == 'brawl';
       final defaultLimit = isCommander ? 1 : 4;
       final commanderIdentity =
-          isCommander ? _getCommanderIdentitySet(_selectedDeck) : null;
+          isCommander ? getCommanderIdentitySet(_selectedDeck) : null;
 
       for (final cardToAdd in cardsToAddIds) {
         final cardId = cardToAdd['card_id'] as String;
@@ -1607,17 +1582,6 @@ class DeckProvider extends ChangeNotifier {
   void clearAllCache() {
     _deckDetailsCache.clear();
     _deckDetailsCacheTime.clear();
-  }
-
-  Set<String>? _getCommanderIdentitySet(DeckDetails? deck) {
-    if (deck == null) return null;
-    if (deck.commander.isEmpty) return null;
-    final commander = deck.commander.first;
-    final identity =
-        commander.colorIdentity.isNotEmpty
-            ? commander.colorIdentity
-            : commander.colors;
-    return identity.map((e) => e.toUpperCase()).toSet();
   }
 
   /// Importa um deck a partir de uma lista de texto (ex: "1 Sol Ring")

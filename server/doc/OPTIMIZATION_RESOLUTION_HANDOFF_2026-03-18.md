@@ -1,5 +1,11 @@
 # Optimization Resolution Handoff — 2026-03-18
 
+> Handoff historico da baseline de `2026-03-18`.
+> Para prioridade atual, corpus vigente e fila oficial do core, consultar primeiro:
+> - `docs/CONTEXTO_PRODUTO_ATUAL.md`
+> - `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md`
+> - `server/doc/RESOLUTION_CORPUS_WORKFLOW.md`
+
 ## Objetivo
 
 Deixar salvo o estado atual da frente de `optimize -> rebuild -> validate`, com baseline congelada e próximos passos claros para retomada futura sem reconstruir contexto.
@@ -20,18 +26,18 @@ Hoje o sistema já decide entre:
 
 O app já acompanha isso sem exigir intenção extra do usuário quando cai em `needs_repair`.
 
-## Baseline congelada
+## Baseline congelada desta rodada historica
 
-Corpus oficial atual:
+Corpus oficial daquela rodada:
 
 - `server/test/fixtures/optimization_resolution_corpus.json`
 
-Resumo da última execução estável do gate:
+Resumo da execução estável daquela data:
 
 - `server/test/artifacts/optimization_resolution_suite/latest_summary.json`
 - `RELATORIO_RESOLUCAO_SUITE_COMMANDER_2026-03-18.md`
 
-Números da baseline congelada:
+Numeros da baseline congelada em `2026-03-18`:
 
 - `total = 10`
 - `passed = 10`
@@ -173,7 +179,7 @@ dart run bin/add_resolution_corpus_entry.dart \
   --replace
 ```
 
-## Próximos passos quando esta frente voltar a ser prioridade
+## Próximos passos previstos naquela rodada
 
 ### Prioridade 1
 
@@ -231,7 +237,7 @@ Quando retomar:
 - depois rodar a suíte congelada
 - só então mexer em corpus, scoring ou heurística
 
-## Critério de sucesso da retomada
+## Critério de sucesso da retomada proposto na epoca
 
 Considerar essa frente saudável quando:
 
@@ -239,4 +245,3 @@ Considerar essa frente saudável quando:
 - o corpus crescer para `15-20` decks
 - `unresolved` continuar em `0`
 - houver mais casos úteis de `optimized_directly` e `rebuild_guided`
-

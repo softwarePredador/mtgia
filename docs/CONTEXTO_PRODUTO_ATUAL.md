@@ -4,6 +4,16 @@
 > Sempre consultar este arquivo antes de ampliar escopo, mudar fluxo core ou reorganizar prioridades.
 > Se alguma decisao estrutural mudar, este documento deve ser atualizado primeiro.
 
+## Regra de precedencia documental
+
+Este arquivo prevalece sobre:
+
+- roadmaps antigos do app
+- trackers locais de frentes secundarias
+- handoffs congelados antes de `2026-03-23`
+
+Esses documentos continuam como apoio e historico, mas nao devem redefinir a prioridade operacional sem que este arquivo seja atualizado primeiro.
+
 ## Resumo Executivo
 
 - produto ativo: `app/` + `server/`
@@ -28,6 +38,70 @@
 - `RELATORIO_VALIDACAO_2026-03-16.md`
 - `server/manual-de-instrucao.md`
 
+## Proximo passo oficial
+
+Enquanto este documento nao mudar, a proxima task dominante do projeto e:
+
+1. reduzir responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`
+
+Sequencia imediata ja definida:
+
+2. so depois retomar frentes fora do deck builder
+
+Progresso atual documentado da Sprint 1:
+
+- `server/routes/ai/optimize/index.dart`: reduzido para `2745` linhas
+- `server/lib/ai/optimize_runtime_support.dart`: consolidado em `2842` linhas
+- `server/lib/ai/optimize_analysis_support.dart`: novo modulo com `294` linhas
+- `server/lib/ai/optimize_deck_support.dart`: novo modulo com `179` linhas
+- `server/lib/ai/optimize_state_support.dart`: novo modulo com `981` linhas
+- `server/lib/ai/optimize_complete_support.dart`: novo modulo com `772` linhas
+- `server/lib/ai/optimize_complete_support.dart`: expandido para `1080` linhas
+- `server/lib/ai/optimize_request_support.dart`: novo modulo com `245` linhas
+- gate recorrente do corpus estavel criado em `scripts/quality_gate_resolution_corpus.sh`
+- wrapper geral adicionado em `scripts/quality_gate.sh resolution`
+- `server/bin/bootstrap_resolution_corpus_decks.dart` agora aceita seeds pareados via `A + B`
+- casos dirigidos estabilizados e promovidos ao corpus estavel:
+  - `Jodah, the Unifier` -> `safe_no_change`
+  - `Kozilek, the Great Distortion` -> `rebuild_guided`
+  - `Wilson, Refined Grizzly + Sword Coast Sailor` -> `safe_no_change`
+- o runner de resolucao agora aceita `1` ou `2` comandantes legais, cobrindo `partner/background`
+- a inferencia de identidade de cor passou a ignorar simbolos de mana presentes apenas em reminder text inline, evitando falso positivo em cartas como `Blind Obedience`
+- gate recorrente do corpus estavel revalidado com o build novo do backend: `19/19 passed`, `0 failed`, `0 unresolved`
+- smoke funcional do app para `deck details -> optimize -> apply -> validate` adicionado na suite do provider
+- contrato funcional do fluxo `optimize -> rebuild -> validate` consolidado em documento proprio
+- revisao residual do `onRequest` concluida: a rota ainda e grande (`2721` linhas), mas o miolo critico ja esta modularizado e deixou de ser bloqueio dominante da Sprint 1
+- task 6 iniciada com extracao dos helpers puros de payload/identidade do comandante para `app/lib/features/decks/providers/deck_provider_support.dart`
+- blocos ja extraidos:
+  - payload parser e normalizacao
+  - deterministic-first response/cache/fallback
+  - inferencia funcional e heuristicas
+  - commander profile cache/fallbacks
+  - identidade de cor, basicos e recovery estrutural
+  - slot fillers deterministas, broad/meta fillers, synergy replacement e scoring
+  - removal candidates e swap candidates do caminho deterministico
+  - logging/persistencia de analysis outcome
+  - montagem de deck virtual, addition entries e repair plan
+  - analisador de arquétipo, detecção de tema e avaliação de estado do deck
+  - preparação de referências do commander, loop de complete async, rebalanceamento e fallback de preenchimento
+  - assembly final do `complete`, incluindo agregação por nome, `post_analysis` e payload final do job
+  - carregamento de deck, parsing de cartas, identidade de cor, análise inicial, tema e estado do deck
+- cuidado de compatibilidade mantido: helpers exercitados por testes continuam acessiveis via wrappers leves na biblioteca da rota
+
+## Pendencias abertas da Sprint 1
+
+Fila oficial restante da Sprint 1, na ordem:
+
+1. reduzir responsabilidade concentrada nos pontos gigantes restantes do app core:
+   - `app/lib/features/decks/screens/deck_details_screen.dart`
+   - `app/lib/features/decks/providers/deck_provider.dart`
+2. so depois retomar frentes fora do deck builder
+
+Regra pratica:
+
+- nenhuma melhoria visual ou operacional fora do core deve furar essa fila
+- toda entrega desta fila deve atualizar este arquivo e `docs/PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md`
+
 ## Regra Rapida De Decisao
 
 Se um pedido novo nao disser o contrario:
@@ -50,7 +124,9 @@ Se um pedido novo nao disser o contrario:
 - regra tecnica nova de consistencia: simulacoes do `OptimizationValidator` devem ser deterministicas para reduzir flakiness de score e aumentar confianca do CI
 - regra documental nova: toda decisao sobre a frente de otimizacao deve consultar `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md` antes de ampliar escopo ou declarar confianca de release
 - regra de resiliencia local: rotas de IA que ja possuem fallback seguro devem tolerar `OPENAI_API_KEY` invalida em `dev/staging`, sem mascarar erro em `prod`
-- regra nova do corpus operacional: o corpus estavel de resolucao Commander foi ampliado para `16` decks validados, incluindo `Meren`, `Korvold`, `Kaalia`, `Miirym`, `Wilhelt` e `Prosper`
+- regra nova do corpus operacional: o corpus estavel de resolucao Commander foi ampliado para `19` decks validados, incluindo cobertura dirigida de five-color, colorless e `background`
+- regra nova de cobertura dirigida: o bootstrap do corpus passou a aceitar pares de comandantes com `A + B`, e o runner passou a validar `1` ou `2` comandantes legais conforme o deck fonte
+- regra nova de identidade de cor: reminder text inline nao pode mais inflar identidade de cor; o caso de `Blind Obedience` em `Sythis` passou a validar corretamente
 - regra nova de seed confiavel: o bootstrap do corpus nao pode mais completar 100 cartas inflando terrenos quando faltarem spells; nesses casos ele deve falhar com `montagem insuficiente`
 - regra nova de identidade de cor: quando `cards.color_identity` vier vazio/incompleto, a validacao deve inferir identidade pelo `oracle_text` para nao aceitar duals/lands fora da identidade real por lacuna de banco
 - excecao documentada do corpus: `Yuriko, the Tiger's Shadow` ficou fora do corpus estavel apos a rodada de 2026-03-23 por nao conseguir gerar seed saudavel com o material atual de referencia
@@ -133,6 +209,7 @@ Fechar o ciclo de confiabilidade do deck builder principal e transformar a audit
 - novo teste de widget garante que o formato vindo do onboarding chega nas telas de entrada do fluxo
 - suites de integracao do backend agora respeitam melhor o modo local sem servidor
 - `OptimizationValidator` passou a usar seed estavel para reduzir flakiness nos scores
+- `GoldfishSimulator` passou a usar seed estavel por deck/simulacao, removendo oscilacao residual da suíte do validator
 - auditoria formal da malha de testes da otimizacao foi consolidada em documento proprio com distincoes entre regra, simulacao e HTTP real
 
 ### Definicao Oficial Da Sprint 1
@@ -195,10 +272,4 @@ Decisao sobre comandantes:
 - nao ha necessidade de adicionar mais comandantes apenas por quantidade
 - a proxima expansao, quando vier, deve ser dirigida por cobertura de comportamento e nao por volume
 
-Proximas tasks oficialmente definidas para o core:
-
-1. modularizar `server/routes/ai/optimize/index.dart`
-2. transformar o corpus estavel em gate recorrente de release
-3. adicionar casos dirigidos para `optimized_directly`, `partner/background`, five-color e colorless
-4. criar smoke do app para `deck details -> optimize -> apply -> validate`
-5. so depois retomar frentes fora do deck builder
+As tasks acima continuam sendo a fila oficial do core.

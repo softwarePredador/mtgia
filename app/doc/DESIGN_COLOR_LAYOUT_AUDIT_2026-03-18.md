@@ -67,6 +67,10 @@ Documento complementar para o contador de vida:
 
 - `app/doc/LIFE_COUNTER_TABLETOP_UX_HANDOFF_2026-03-18.md`
 
+Documento complementar para evolução estrutural do tema:
+
+- `app/doc/THEME_SYSTEM_ABSORPTION_PLAN_2026-03-23.md`
+
 ## O que está forte
 
 ### 1. Paleta base

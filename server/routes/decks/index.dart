@@ -254,6 +254,7 @@ Future<Response> _listDecks(RequestContext context) async {
 
 /// Cria um novo deck para o usuário autenticado.
 Future<Response> _createDeck(RequestContext context) async {
+  final stopwatch = Stopwatch()..start();
   // 1. Obter o ID do usuário (injetado pelo middleware de autenticação)
   final userId = context.read<String>();
 
@@ -349,10 +350,17 @@ Future<Response> _createDeck(RequestContext context) async {
         });
       }
 
+      print(
+        '[DECK_CREATE_TIMING] normalized_cards=${normalizedCards.length} elapsed_ms=${stopwatch.elapsedMilliseconds}',
+      );
+
       await DeckRulesService(session).validateAndThrow(
         format: format.toLowerCase(),
         cards: normalizedCards,
         strict: false,
+      );
+      print(
+        '[DECK_CREATE_TIMING] validate_rules_done elapsed_ms=${stopwatch.elapsedMilliseconds}',
       );
 
       // Prepara a inserção das cartas do deck
@@ -368,6 +376,10 @@ Future<Response> _createDeck(RequestContext context) async {
           'isCommander': card['is_commander'] ?? false,
         });
       }
+
+      print(
+        '[DECK_CREATE_TIMING] insert_cards_done elapsed_ms=${stopwatch.elapsedMilliseconds}',
+      );
 
       return deckMap;
     });

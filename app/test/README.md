@@ -1,5 +1,8 @@
 # Flutter Test Suite - MTGIA
 
+> Guia ativo de testes do app.
+> A prioridade funcional dessas suites deve seguir `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+
 Esta pasta cobre o comportamento do app que sustenta o fluxo principal de decks.
 
 O backend carrega a maior parte da logica de otimizacao, mas o app precisa preservar contexto, interpretar contratos corretamente e nao degradar a confianca percebida do usuario.
@@ -86,7 +89,7 @@ Status:
 Leitura operacional:
 
 - o app esta protegendo melhor os contratos do backend
-- ainda falta smoke dedicado para `deck list -> details -> optimize -> apply -> validate`
+- ja existe smoke funcional do provider para `deck details -> optimize -> apply -> validate`
 - a maior fragilidade continua sendo cobertura insuficiente de jornadas completas, nao de widgets isolados
 
 ## Comandos recomendados
@@ -115,7 +118,5 @@ flutter test
 Para colocar o app no mesmo nivel de exigencia do backend, as proximas suites devem cobrir:
 
 1. `deck list -> deck details`
-2. `deck details -> optimize`
-3. `optimize -> apply`
-4. `apply -> validate`
-5. erros de loading, timeout e `needs_repair` na tela de details
+2. elevar o smoke funcional atual para smoke de tela completa em `deck details -> optimize -> apply -> validate`
+3. erros de loading, timeout e `needs_repair` na tela de details

@@ -1,28 +1,378 @@
 {
   "source_deck_id": "169d8b11-5210-4bfc-b8f0-9fbfe6bbb635",
   "source_deck_name": "Corpus Seed - Krenko, Mob Boss",
-  "clone_deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
-  "final_deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
+  "clone_deck_id": "2ba81c76-159a-40d2-8f61-62ef63d4cc24",
+  "final_deck_id": "2ba81c76-159a-40d2-8f61-62ef63d4cc24",
   "optimize_request": {
-    "deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
+    "deck_id": "2ba81c76-159a-40d2-8f61-62ef63d4cc24",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
+    "error": "A otimizacao sugerida nao passou no gate final de qualidade.",
     "quality_error": {
-      "code": "OPTIMIZE_NO_SAFE_SWAPS",
-      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
-      "dropped_swaps": [
-        "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
-        "🔒 Blasphemous Act -> Command Tower removida pelo gate: papel wipe -> land, delta CMC -9."
-      ]
+      "code": "OPTIMIZE_QUALITY_REJECTED",
+      "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
+      "reasons": [
+        "A validação final não fechou como \"aprovado\" (score 67/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (67/100; mínimo 70)."
+      ],
+      "validation": {
+        "validation_score": 67,
+        "deck_health_score": 85,
+        "improvement_score": 54,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 86,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.208,
+              "flood_rate": 0.008,
+              "keepable_rate": 0.784
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.64,
+              "turn_1_play": 0.534,
+              "turn_2_play": 0.904,
+              "turn_3_play": 0.967,
+              "turn_4_play": 0.984,
+              "cmc_distribution": {
+                "4": 5,
+                "2": 21,
+                "9": 1,
+                "3": 22,
+                "1": 11,
+                "5": 3,
+                "6": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.8%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 87,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.204,
+              "flood_rate": 0.01,
+              "keepable_rate": 0.786
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.53,
+              "turn_1_play": 0.534,
+              "turn_2_play": 0.913,
+              "turn_3_play": 0.973,
+              "turn_4_play": 0.986,
+              "cmc_distribution": {
+                "4": 5,
+                "2": 22,
+                "3": 22,
+                "1": 11,
+                "5": 3,
+                "6": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.4%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.26,
+            "keep_at_7": 0.78,
+            "keep_at_6": 0.184,
+            "keep_at_5": 0.036,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.95
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.24,
+            "keep_at_7": 0.804,
+            "keep_at_6": 0.154,
+            "keep_at_5": 0.042,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.948
+          },
+          "deltas": {
+            "consistency_score": 1,
+            "screw_rate_delta": -0.004,
+            "flood_rate_delta": 0.002,
+            "keepable_rate_delta": 0.002,
+            "turn2_play_delta": 0.009,
+            "mulligan_keep7_delta": 0.024
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Blasphemous Act",
+              "added": "Fellwar Stone",
+              "removed_role": "wipe",
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": -7,
+              "verdict": "tradeoff"
+            },
+            {
+              "removed": "Lightning Bolt",
+              "added": "Vandalblast",
+              "removed_role": "removal",
+              "added_role": "removal",
+              "role_preserved": true,
+              "cmc_delta": 0,
+              "verdict": "upgrade"
+            }
+          ],
+          "summary": {
+            "upgrades": 1,
+            "sidegrades": 0,
+            "tradeoffs": 1,
+            "questionable": 0
+          },
+          "role_delta": {
+            "draw": 0,
+            "removal": 0,
+            "ramp": 1,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": 0,
+            "utility": 0,
+            "wipe": -1,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de Blasphemous Act por Fellwar Stone reduz a capacidade de remoção em massa, o que pode ser crítico em jogos onde o oponente estabelece uma board muito forte.",
+            "A inclusão de Vandalblast é boa, mas depende de ter artefatos em jogo para ser mais eficaz, o que pode não ser garantido em todos os jogos."
+          ],
+          "strong_swaps": [
+            "Lightning Bolt para Vandalblast é uma melhoria em termos de versatilidade de remoção."
+          ],
+          "weak_swaps": [
+            "Blasphemous Act para Fellwar Stone é um tradeoff que pode comprometer a resposta a múltiplas ameaças, especialmente em um formato onde muitos decks podem gerar muitos tokens ou criaturas."
+          ],
+          "overall_assessment": "As trocas apresentam melhorias em consistência, mas a perda de uma remoção em massa pode ser arriscada em um ambiente competitivo."
+        },
+        "warnings": [
+          "O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas."
+        ]
+      }
     },
     "mode": "optimize",
-    "removals": [],
-    "additions": [],
+    "removals": [
+      "Blasphemous Act",
+      "Lightning Bolt"
+    ],
+    "additions": [
+      "Fellwar Stone",
+      "Vandalblast"
+    ],
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.64",
+      "type_distribution": {
+        "creatures": 31,
+        "instants": 7,
+        "sorceries": 7,
+        "enchantments": 8,
+        "artifacts": 12,
+        "planeswalkers": 0,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.53",
+      "type_distribution": {
+        "creatures": 31,
+        "instants": 6,
+        "sorceries": 7,
+        "enchantments": 8,
+        "artifacts": 13,
+        "planeswalkers": 0,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média",
+      "improvements": [
+        "CMC médio otimizado: 2.64 → 2.53"
+      ],
+      "validation": {
+        "validation_score": 67,
+        "deck_health_score": 85,
+        "improvement_score": 54,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 86,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.208,
+              "flood_rate": 0.008,
+              "keepable_rate": 0.784
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.64,
+              "turn_1_play": 0.534,
+              "turn_2_play": 0.904,
+              "turn_3_play": 0.967,
+              "turn_4_play": 0.984,
+              "cmc_distribution": {
+                "4": 5,
+                "2": 21,
+                "9": 1,
+                "3": 22,
+                "1": 11,
+                "5": 3,
+                "6": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.8%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 87,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.204,
+              "flood_rate": 0.01,
+              "keepable_rate": 0.786
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.53,
+              "turn_1_play": 0.534,
+              "turn_2_play": 0.913,
+              "turn_3_play": 0.973,
+              "turn_4_play": 0.986,
+              "cmc_distribution": {
+                "4": 5,
+                "2": 22,
+                "3": 22,
+                "1": 11,
+                "5": 3,
+                "6": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.4%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.26,
+            "keep_at_7": 0.78,
+            "keep_at_6": 0.184,
+            "keep_at_5": 0.036,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.95
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.24,
+            "keep_at_7": 0.804,
+            "keep_at_6": 0.154,
+            "keep_at_5": 0.042,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.948
+          },
+          "deltas": {
+            "consistency_score": 1,
+            "screw_rate_delta": -0.004,
+            "flood_rate_delta": 0.002,
+            "keepable_rate_delta": 0.002,
+            "turn2_play_delta": 0.009,
+            "mulligan_keep7_delta": 0.024
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Blasphemous Act",
+              "added": "Fellwar Stone",
+              "removed_role": "wipe",
+              "added_role": "ramp",
+              "role_preserved": false,
+              "cmc_delta": -7,
+              "verdict": "tradeoff"
+            },
+            {
+              "removed": "Lightning Bolt",
+              "added": "Vandalblast",
+              "removed_role": "removal",
+              "added_role": "removal",
+              "role_preserved": true,
+              "cmc_delta": 0,
+              "verdict": "upgrade"
+            }
+          ],
+          "summary": {
+            "upgrades": 1,
+            "sidegrades": 0,
+            "tradeoffs": 1,
+            "questionable": 0
+          },
+          "role_delta": {
+            "draw": 0,
+            "removal": 0,
+            "ramp": 1,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": 0,
+            "utility": 0,
+            "wipe": -1,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 75,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de Blasphemous Act por Fellwar Stone reduz a capacidade de remoção em massa, o que pode ser crítico em jogos onde o oponente estabelece uma board muito forte.",
+            "A inclusão de Vandalblast é boa, mas depende de ter artefatos em jogo para ser mais eficaz, o que pode não ser garantido em todos os jogos."
+          ],
+          "strong_swaps": [
+            "Lightning Bolt para Vandalblast é uma melhoria em termos de versatilidade de remoção."
+          ],
+          "weak_swaps": [
+            "Blasphemous Act para Fellwar Stone é um tradeoff que pode comprometer a resposta a múltiplas ameaças, especialmente em um formato onde muitos decks podem gerar muitos tokens ou criaturas."
+          ],
+          "overall_assessment": "As trocas apresentam melhorias em consistência, mas a perda de uma remoção em massa pode ser arriscada em um ambiente competitivo."
+        },
+        "warnings": [
+          "O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas."
+        ]
+      }
+    },
+    "validation_warnings": [
+      "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Kiki-Jiki, Mirror Breaker -> Command Tower removida pelo gate: papel creature -> land, delta CMC -5.",
+      "O deck perdeu board wipe(s). Pode ter dificuldade contra ameaças múltiplas."
+    ],
     "deck_state": {
       "status": "healthy",
       "recommended_mode": "optimize",
@@ -36,7 +386,7 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a"
+    "deck_id": "2ba81c76-159a-40d2-8f61-62ef63d4cc24"
   },
   "final_analysis": {
     "detected_archetype": "midrange",

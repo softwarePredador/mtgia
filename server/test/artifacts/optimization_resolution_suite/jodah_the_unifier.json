@@ -1,10 +1,10 @@
 {
-  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
-  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
-  "clone_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
-  "final_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+  "source_deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
+  "source_deck_name": "Corpus Seed - Jodah, the Unifier",
+  "clone_deck_id": "a5f80224-0bfe-4bca-b31e-72614968901d",
+  "final_deck_id": "a5f80224-0bfe-4bca-b31e-72614968901d",
   "optimize_request": {
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+    "deck_id": "a5f80224-0bfe-4bca-b31e-72614968901d",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -15,7 +15,11 @@
     "quality_error": {
       "code": "OPTIMIZE_NO_ACTIONABLE_SWAPS",
       "message": "As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.",
-      "blocked_by_theme": [],
+      "blocked_by_theme": [
+        "Timeless Lotus",
+        "Cultivate",
+        "Commander's Sphere"
+      ],
       "blocked_by_bracket": []
     },
     "mode": "optimize",
@@ -23,14 +27,14 @@
     "additions": [],
     "deck_analysis": {
       "detected_archetype": "midrange",
-      "average_cmc": "2.89",
+      "average_cmc": "3.02",
       "type_distribution": {
-        "creatures": 25,
-        "instants": 9,
-        "sorceries": 8,
-        "enchantments": 7,
-        "artifacts": 10,
-        "planeswalkers": 6,
+        "creatures": 32,
+        "instants": 7,
+        "sorceries": 7,
+        "enchantments": 6,
+        "artifacts": 12,
+        "planeswalkers": 2,
         "lands": 36,
         "battles": 0
       },
@@ -52,18 +56,18 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873"
+    "deck_id": "a5f80224-0bfe-4bca-b31e-72614968901d"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
-    "average_cmc": "2.89",
+    "average_cmc": "3.02",
     "type_distribution": {
-      "creatures": 25,
-      "instants": 9,
-      "sorceries": 8,
-      "enchantments": 7,
-      "artifacts": 10,
-      "planeswalkers": 6,
+      "creatures": 32,
+      "instants": 7,
+      "sorceries": 7,
+      "enchantments": 6,
+      "artifacts": 12,
+      "planeswalkers": 2,
       "lands": 36,
       "battles": 0
     },

@@ -39,6 +39,18 @@ void main() {
         isEmpty,
       );
     });
+
+    test('ignores mana symbols that appear only inside inline reminder text', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>['W'],
+          oracleText:
+              'Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)',
+        ),
+        equals({'W'}),
+      );
+    });
   });
 
   group('isWithinCommanderIdentity', () {

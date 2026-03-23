@@ -56,6 +56,13 @@ class SourceDeckCandidate {
   final String? corpusLabel;
   final String? corpusNote;
 
+  int get expectedCommanderCount {
+    final count = cards
+        .where((card) => card['is_commander'] == true)
+        .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+    return count.clamp(1, 2);
+  }
+
   SourceDeckCandidate withCorpusEntry(ValidationCorpusEntry entry) {
     return SourceDeckCandidate(
       deckId: deckId,
@@ -209,8 +216,9 @@ Future<void> main() async {
   try {
     final token = await _getOrCreateAuthToken(apiBaseUrl);
     final candidates = await _loadSourceCandidates(pool);
-    final corpusEntries =
-        _corpusPath != null ? _loadCorpusEntries(_corpusPath!) : const <ValidationCorpusEntry>[];
+    final corpusEntries = _corpusPath != null
+        ? _loadCorpusEntries(_corpusPath!)
+        : const <ValidationCorpusEntry>[];
     final usingCorpus = corpusEntries.isNotEmpty;
     final selected = usingCorpus
         ? _selectCandidatesFromCorpus(
@@ -270,9 +278,8 @@ Future<void> main() async {
           results.where((r) => r.flowPath == 'rebuild_guided').length,
       'safe_no_change':
           results.where((r) => r.flowPath == 'safe_no_change').length,
-      'unresolved': results
-          .where((r) => r.flowPath == 'unresolved_rejection')
-          .length,
+      'unresolved':
+          results.where((r) => r.flowPath == 'unresolved_rejection').length,
       'passed': results.where((r) => r.passed).length,
       'failed': results.where((r) => !r.passed).length,
       'results': results.map((r) => r.toJson()).toList(),
@@ -469,12 +476,16 @@ Future<ResolutionRunResult> _runResolutionForDeck({
   final commanderCount = finalCards
       .where((card) => card['is_commander'] == true)
       .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  final expectedCommanderCount = candidate.expectedCommanderCount;
   final finalLandCount = _landCount(finalAnalysis);
   final finalInteraction = _countInteraction(finalAnalysis);
 
   expectCheck('deck final existe', finalDeckId.isNotEmpty);
   expectCheck('deck final mantem 100 cartas', finalCardCount == 100);
-  expectCheck('deck final mantem exatamente 1 comandante', commanderCount == 1);
+  expectCheck(
+    'deck final mantem exatamente $expectedCommanderCount comandante${expectedCommanderCount == 1 ? '' : 's'} ${expectedCommanderCount == 1 ? 'legal' : 'legais'}',
+    commanderCount == expectedCommanderCount,
+  );
   expectCheck(
     'POST /decks/:id/validate aprovou o deck final',
     finalValidate.statusCode == 200,
@@ -758,7 +769,8 @@ List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
   final rawEntries = switch (decoded) {
     {'decks': final List decks} => decks,
     final List decks => decks,
-    _ => throw StateError('Corpus invalido em $path: esperado lista ou objeto com "decks".'),
+    _ => throw StateError(
+        'Corpus invalido em $path: esperado lista ou objeto com "decks".'),
   };
 
   final entries = <ValidationCorpusEntry>[];
@@ -840,7 +852,8 @@ List<SourceDeckCandidate> _selectCandidates(
   return _selectBalancedCandidates(candidates, limit: limit);
 }
 
-List<SourceDeckCandidate> _selectThreeCandidates(List<SourceDeckCandidate> candidates) {
+List<SourceDeckCandidate> _selectThreeCandidates(
+    List<SourceDeckCandidate> candidates) {
   final selected = <SourceDeckCandidate>[];
   final usedCommanders = <String>{};
 
@@ -874,14 +887,16 @@ List<SourceDeckCandidate> _selectBalancedCandidates(
   List<SourceDeckCandidate> candidates, {
   required int limit,
 }) {
-  final ordered = [...candidates]
-    ..sort((a, b) {
+  final ordered = [...candidates]..sort((a, b) {
       final statusOrder = _statusPriority(a.sourceDeckStateStatus)
           .compareTo(_statusPriority(b.sourceDeckStateStatus));
       if (statusOrder != 0) return statusOrder;
-      final severityOrder = b.sourceSeverityScore.compareTo(a.sourceSeverityScore);
+      final severityOrder =
+          b.sourceSeverityScore.compareTo(a.sourceSeverityScore);
       if (severityOrder != 0) return severityOrder;
-      return a.commanderName.toLowerCase().compareTo(b.commanderName.toLowerCase());
+      return a.commanderName
+          .toLowerCase()
+          .compareTo(b.commanderName.toLowerCase());
     });
 
   final selected = <SourceDeckCandidate>[];
@@ -944,7 +959,8 @@ Future<String> _createDeckClone({
       'name':
           'Resolution Validation - ${candidate.commanderName} - ${DateTime.now().millisecondsSinceEpoch}',
       'format': 'commander',
-      'description': 'Deck clone para validacao do fluxo completo de optimize/rebuild',
+      'description':
+          'Deck clone para validacao do fluxo completo de optimize/rebuild',
       'is_public': false,
       'cards': candidate.cards
           .map(
@@ -1170,7 +1186,8 @@ Future<String> _writeDeckArtifact({
 }
 
 int _totalCards(List<Map<String, dynamic>> cards) {
-  return cards.fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  return cards.fold<int>(
+      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
 }
 
 int _landCount(Map<String, dynamic> analysis) {

@@ -1,5 +1,9 @@
 # Commander Execution Tracker — 2026-03-18
 
+> Tracker historico/complementar do app.
+> Desde `2026-03-23`, a ordem operacional principal do projeto e definida por `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+> Este arquivo continua util para backlog e memoria de execucao das frentes de app, mas nao substitui a prioridade atual do core de decks.
+
 ## Objetivo
 
 Transformar o roadmap em uma fila executável, com status claro, ordem de trabalho e andamento atual.

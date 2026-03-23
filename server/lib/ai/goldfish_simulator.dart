@@ -122,7 +122,7 @@ class GoldfishSimulator {
     this.cards, {
     this.simulations = 1000,
     Random? random,
-  }) : _random = random ?? Random();
+  }) : _random = random ?? Random(_stableDeckSeed(cards, simulations));
 
   /// Executa a simulação e retorna métricas
   GoldfishResult simulate() {
@@ -215,6 +215,27 @@ class GoldfishSimulator {
       }
     }
     return expanded;
+  }
+
+  static int _stableDeckSeed(
+    List<Map<String, dynamic>> cards,
+    int simulations,
+  ) {
+    var hash = 17;
+
+    for (final card in cards) {
+      final name = (card['name'] as String? ?? '').toLowerCase();
+      final quantity = (card['quantity'] as int?) ?? 1;
+      final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
+      final manaCost = (card['mana_cost'] as String? ?? '').toLowerCase();
+
+      hash = 31 * hash + name.hashCode;
+      hash = 31 * hash + quantity.hashCode;
+      hash = 31 * hash + typeLine.hashCode;
+      hash = 31 * hash + manaCost.hashCode;
+    }
+
+    return hash ^ simulations.hashCode;
   }
 
   /// Verifica se a carta é um terreno

@@ -1,10 +1,10 @@
 {
   "source_deck_id": "7e8b7632-8a89-40d6-ae93-1db6d6a90745",
   "source_deck_name": "Corpus Seed - Isshin, Two Heavens as One",
-  "clone_deck_id": "73d5bde8-a195-445f-8b9b-01fc9bc54047",
-  "final_deck_id": "73d5bde8-a195-445f-8b9b-01fc9bc54047",
+  "clone_deck_id": "5c25d8b6-7690-4aba-9ac6-1dd8b3116fd1",
+  "final_deck_id": "5c25d8b6-7690-4aba-9ac6-1dd8b3116fd1",
   "optimize_request": {
-    "deck_id": "73d5bde8-a195-445f-8b9b-01fc9bc54047",
+    "deck_id": "5c25d8b6-7690-4aba-9ac6-1dd8b3116fd1",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -52,7 +52,7 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "73d5bde8-a195-445f-8b9b-01fc9bc54047"
+    "deck_id": "5c25d8b6-7690-4aba-9ac6-1dd8b3116fd1"
   },
   "final_analysis": {
     "detected_archetype": "midrange",

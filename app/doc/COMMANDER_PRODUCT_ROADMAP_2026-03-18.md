@@ -1,5 +1,12 @@
 # Commander Product Roadmap — 2026-03-18
 
+> Documento complementar e historico de produto/app.
+> Desde `2026-03-23`, a prioridade operacional do repositorio passou a ser definida por `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+> Use este arquivo como apoio de UX, backlog do app e contexto de decisoes anteriores, nao como fonte principal de execucao.
+>
+> Complemento importante para a frente visual/tema:
+> `app/doc/THEME_SYSTEM_ABSORPTION_PLAN_2026-03-23.md`
+
 ## Objetivo
 
 Consolidar em um único documento o fluxo de evolução do produto, incluindo:

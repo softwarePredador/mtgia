@@ -246,6 +246,7 @@ Resultado:
 - verde
 - contratos relevantes do provider confirmados
 - entrada do fluxo de onboarding protegida
+- smoke do provider cobrindo `deck details -> optimize -> apply -> validate`
 
 ## Veredito da auditoria
 
@@ -266,7 +267,7 @@ Nao honestamente.
 
 Razoes:
 
-- ainda falta smoke do app em `deck details -> optimize -> apply -> validate`
+- ainda falta smoke de tela completa com UI, embora o smoke funcional do provider do fluxo core já exista
 - os arquivos centrais do motor continuam grandes demais, o que aumenta risco de regressao futura
 
 ### Estao suficientes para dizer "forte e pronta para Sprint 1 focada no core"?
@@ -278,7 +279,7 @@ A base atual justifica travar a Sprint 1 em otimizacao de decks e evoluir com cr
 ## Gaps residuais
 
 1. transformar o corpus estavel em gate operacional recorrente, nao apenas auditoria manual
-2. criar smoke Flutter para `details -> optimize -> apply -> validate`
+2. ampliar do smoke funcional atual para smoke de tela completa em `details -> optimize -> apply -> validate`
 3. modularizar `server/routes/ai/optimize/index.dart`
 4. reduzir concentracao de fluxo AI em `deck_provider.dart` e `deck_details_screen.dart`
 5. adicionar cobertura dirigida para flow paths ainda sub-representados

@@ -1,0 +1,916 @@
+{
+  "source_deck_id": "458a8df7-afde-4232-b4da-e1ce8e9fbb0c",
+  "source_deck_name": "Corpus Seed - Kozilek, the Great Distortion",
+  "clone_deck_id": "bd5918b9-3de0-4498-87bf-5376f00471a9",
+  "final_deck_id": "30c8443e-4674-48ea-b149-d9f07723a98e",
+  "optimize_request": {
+    "deck_id": "bd5918b9-3de0-4498-87bf-5376f00471a9",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.",
+    "quality_error": {
+      "code": "OPTIMIZE_NEEDS_REPAIR",
+      "message": "O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.",
+      "reasons": [
+        "A identidade W do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade B do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade R do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade G do comandante não possui nenhuma fonte funcional de mana no deck."
+      ],
+      "recommended_mode": "repair",
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "next_action": {
+      "type": "rebuild_guided",
+      "endpoint": "/ai/rebuild",
+      "payload": {
+        "deck_id": "bd5918b9-3de0-4498-87bf-5376f00471a9",
+        "bracket": 2,
+        "archetype": "midrange",
+        "theme": "artifacts",
+        "rebuild_scope": "auto",
+        "save_mode": "draft_clone"
+      }
+    },
+    "mode": "optimize",
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.98",
+      "type_distribution": {
+        "creatures": 24,
+        "instants": 4,
+        "sorceries": 3,
+        "enchantments": 2,
+        "artifacts": 35,
+        "planeswalkers": 2,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "N/A",
+      "archetype_confidence": "média"
+    },
+    "theme": {
+      "theme": "artifacts",
+      "confidence": "alta",
+      "match_score": 0.53125,
+      "core_cards": [
+        "Kozilek, the Great Distortion",
+        "Liberator, Urza's Battlethopter",
+        "Dreamstone Hedron",
+        "Everflowing Chalice",
+        "Expedition Map",
+        "Gilded Lotus",
+        "Hedron Archive",
+        "Kozilek, Butcher of Truth",
+        "Liquimetal Torque",
+        "Mana Vault"
+      ]
+    },
+    "deck_state": {
+      "status": "needs_repair",
+      "recommended_mode": "repair",
+      "suggested_scope": "rebuild_core",
+      "severity_score": 100,
+      "reasons": [
+        "A identidade W do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade U do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade B do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade R do comandante não possui nenhuma fonte funcional de mana no deck.",
+        "A identidade G do comandante não possui nenhuma fonte funcional de mana no deck."
+      ],
+      "repair_plan": {
+        "summary": "O deck precisa de reconstrução estrutural antes de trocas pontuais.",
+        "target_land_count": 36,
+        "priority_repairs": [],
+        "role_targets": {},
+        "preserve": [
+          "commander",
+          "cartas core realmente sinérgicas"
+        ]
+      }
+    },
+    "outcome_code": "needs_repair"
+  },
+  "rebuild_status": 200,
+  "rebuild_response": {
+    "mode": "rebuild_guided",
+    "outcome_code": "rebuild_created",
+    "save_mode": "draft_clone",
+    "applied_to_original": false,
+    "source_deck_id": "bd5918b9-3de0-4498-87bf-5376f00471a9",
+    "draft_deck_id": "30c8443e-4674-48ea-b149-d9f07723a98e",
+    "draft_deck": {
+      "id": "30c8443e-4674-48ea-b149-d9f07723a98e",
+      "name": "Rebuild Draft - Resolution Validation - Kozilek, the Great Distortion - 1774297825319",
+      "format": "commander",
+      "description": "Draft de rebuild_guided criado a partir de bd5918b9-3de0-4498-87bf-5376f00471a9 | theme=artifacts | scope=repair_partial",
+      "archetype": "midrange",
+      "bracket": 2,
+      "is_public": false,
+      "created_at": "2026-03-23T20:31:50.009422Z"
+    },
+    "rebuild_scope_requested": "auto",
+    "rebuild_scope_selected": "repair_partial",
+    "rebuild_reason": [
+      "Keep rate calculado em 100% do shell atual.",
+      "Parte relevante da shell ainda e aproveitavel; rebuild parcial selecionado."
+    ],
+    "seed": {
+      "commander": "Kozilek, the Great Distortion",
+      "requested_archetype": "midrange",
+      "resolved_archetype": "midrange",
+      "requested_theme": "artifacts",
+      "resolved_theme": "artifacts",
+      "bracket": 2
+    },
+    "keep_summary": {
+      "kept_cards_count": 100,
+      "kept_cards": [
+        "Kozilek, the Great Distortion",
+        "All Is Dust",
+        "Ancient Tomb",
+        "Artisan of Kozilek",
+        "Bane of Bala Ged",
+        "Basalt Monolith",
+        "Blast Zone",
+        "Bonders' Enclave",
+        "Buried Ruin",
+        "Calamity of the Titans",
+        "Conduit of Ruin",
+        "Darksteel Citadel",
+        "Darksteel Monolith",
+        "Dreamstone Hedron",
+        "Echoes of Eternity",
+        "Eldrazi Temple",
+        "Emrakul, the Promised End",
+        "Endbringer",
+        "Everflowing Chalice",
+        "Expedition Map",
+        "Eye of Ugin",
+        "Flayer of Loyalties",
+        "Forsaken Monument",
+        "Geode Golem",
+        "Gilded Lotus",
+        "Glaring Fleshraker",
+        "Hedron Archive",
+        "Inventors' Fair",
+        "It That Betrays",
+        "It That Heralds the End",
+        "Kozilek, Butcher of Truth",
+        "Kozilek's Channeler",
+        "Liberator, Urza's Battlethopter",
+        "Lightning Greaves",
+        "Liquimetal Torque",
+        "Mage-Ring Network",
+        "Mana Vault",
+        "Manifold Key",
+        "Mind Stone",
+        "Mirage Mirror",
+        "Moonsilver Key",
+        "Mystic Forge",
+        "Not of This World",
+        "Null Elemental Blast",
+        "Oblivion Sower",
+        "Palladium Myr",
+        "Pathrazer of Ulamog",
+        "Planar Bridge",
+        "Reliquary Tower",
+        "Rise of the Eldrazi",
+        "Rogue's Passage",
+        "Sanctum of Ugin",
+        "Scavenger Grounds",
+        "Sea Gate Wreckage",
+        "Sensei's Divining Top",
+        "Shrine of the Forsaken Gods",
+        "Skittering Cicada",
+        "Solemn Simulacrum",
+        "Sol Ring",
+        "Stonespeaker Crystal",
+        "Swiftfoot Boots",
+        "Temple of the False God",
+        "The Eternity Elevator",
+        "The One Ring",
+        "Thespian's Stage",
+        "Thought Vessel",
+        "Thran Dynamo",
+        "Titan's Presence",
+        "Tomb of the Spirit Dragon",
+        "Ugin's Labyrinth",
+        "Ugin, the Ineffable",
+        "Ugin, the Spirit Dragon",
+        "Ulamog, the Defiler",
+        "Ulamog, the Infinite Gyre",
+        "Ultima, Origin of Oblivion",
+        "Unstable Obelisk",
+        "Unwinding Clock",
+        "Urza's Cave",
+        "Urza's Incubator",
+        "Urza's Mine",
+        "Urza's Power Plant",
+        "Urza's Saga",
+        "Urza's Tower",
+        "Urza's Workshop",
+        "Void Winnower",
+        "Voltaic Key",
+        "Warping Wail",
+        "War Room",
+        "Wastes",
+        "Worn Powerstone",
+        "Zhalfirin Void",
+        "Zhulodok, Void Gorger"
+      ],
+      "replaced_slots": 0,
+      "keep_rate": 1.0
+    },
+    "target_profile": {
+      "total_cards": 100,
+      "land_count": 36,
+      "ramp": 11,
+      "draw_selection": 11,
+      "interaction": 10,
+      "wipes": 2,
+      "payoffs": 12,
+      "wincons": 5,
+      "raw_category_targets": {
+        "other": 22,
+        "instants": 4,
+        "artifacts": 23,
+        "creatures": 13,
+        "enchantments": 0
+      }
+    },
+    "deck_analysis_before": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.98",
+      "type_distribution": {
+        "creatures": 24,
+        "instants": 4,
+        "sorceries": 3,
+        "enchantments": 2,
+        "artifacts": 35,
+        "planeswalkers": 2,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "N/A",
+      "archetype_confidence": "média"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "4.98",
+      "type_distribution": {
+        "creatures": 24,
+        "instants": 4,
+        "sorceries": 3,
+        "enchantments": 2,
+        "artifacts": 35,
+        "planeswalkers": 2,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+      "mana_base_assessment": "N/A",
+      "archetype_confidence": "média"
+    },
+    "deck_state_before": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "deck_state_after": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "validation": {
+      "strict_rules_valid": true,
+      "deck_state_after": {
+        "status": "healthy",
+        "recommended_mode": "optimize",
+        "suggested_scope": "micro_swaps",
+        "severity_score": 0,
+        "reasons": []
+      }
+    },
+    "warnings": [],
+    "source_summary": {
+      "used_average_deck_seed": true,
+      "used_edhrec_top_cards": true,
+      "used_cached_commander_profile": true,
+      "candidate_pool_size": 262
+    },
+    "rebuilt_cards": [
+      {
+        "card_id": "31ca10ef-ca02-47e1-938e-70a079630108",
+        "name": "Kozilek, the Great Distortion",
+        "quantity": 1,
+        "is_commander": true
+      },
+      {
+        "card_id": "ae8e22bb-dacc-43f6-81ac-e3cc935941f7",
+        "name": "All Is Dust",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1a007987-3375-47e7-97d5-be3c48b66b75",
+        "name": "Ancient Tomb",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b7d1255f-1809-46f9-91f6-314b18ab2c95",
+        "name": "Artisan of Kozilek",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "481364c8-ccfd-4504-9f70-b999db617006",
+        "name": "Bane of Bala Ged",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "040b7976-58c1-4c54-b594-1c6e950a7592",
+        "name": "Basalt Monolith",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f86ef583-6069-4bed-a6dc-206694cfbd58",
+        "name": "Blast Zone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e403e945-7aa7-4f53-be27-04f21a8fdce6",
+        "name": "Bonders' Enclave",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "849bad7c-1569-4da7-86d3-d9e123e4b6e5",
+        "name": "Buried Ruin",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "dc3039e6-8ffc-4efe-8d57-f394c1f52460",
+        "name": "Calamity of the Titans",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "74de7267-d164-472d-a3d4-c7b7eecf2f99",
+        "name": "Conduit of Ruin",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d5753bc9-b530-4488-9719-368e1deacad7",
+        "name": "Darksteel Citadel",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "27da3a20-3164-41b5-8ba0-6e0f85d58bb3",
+        "name": "Darksteel Monolith",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "bff796ee-4273-44fd-b255-661e1f5e2dc9",
+        "name": "Dreamstone Hedron",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "88e6a069-2769-4a38-8574-ed3d9ea0cf7a",
+        "name": "Echoes of Eternity",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "15a3fa4a-c8ee-4ee2-abe7-9a79c158ecb3",
+        "name": "Eldrazi Temple",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6f980f41-52bf-48f1-be6f-d988e2fe63cd",
+        "name": "Emrakul, the Promised End",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7dd903af-0941-40cc-8085-c579f0f93cbb",
+        "name": "Endbringer",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "name": "Everflowing Chalice",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+        "name": "Expedition Map",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "800ede69-7e28-4092-a51e-7888187e65e3",
+        "name": "Eye of Ugin",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1f34fb5b-f094-4ab3-b66e-e71527775974",
+        "name": "Flayer of Loyalties",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "734f85cb-f173-4e0c-88e3-9a2057a9e334",
+        "name": "Forsaken Monument",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "b78a41fe-a79b-4873-a75e-ddaa383de4be",
+        "name": "Geode Golem",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "2768db30-3eb3-49f7-8244-5ab25ceca0ef",
+        "name": "Gilded Lotus",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "54ad4b63-06a9-40a4-927c-8c63c03eb3a2",
+        "name": "Glaring Fleshraker",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c2b7643c-e29e-47a5-b6d5-62dc0a5e1cc3",
+        "name": "Hedron Archive",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "4df732d0-7304-4634-b40a-d912e8baef52",
+        "name": "Inventors' Fair",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "efcdc4bf-8c0e-4d61-9efa-67547dbdeb1c",
+        "name": "It That Betrays",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a33ad3ce-78de-40ff-81d5-d709acc9eb46",
+        "name": "It That Heralds the End",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5ad771af-da67-4d4f-9409-9765faf8e2ab",
+        "name": "Kozilek's Channeler",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5e7f60a7-c0f0-495a-97b0-af70df00ff54",
+        "name": "Kozilek, Butcher of Truth",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f5c01506-2e0a-42a4-87d1-90151b735a5d",
+        "name": "Liberator, Urza's Battlethopter",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "name": "Lightning Greaves",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "28438157-7cea-4db4-b971-9fad04e48eaa",
+        "name": "Liquimetal Torque",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "296d4e74-76c9-4855-bee9-f2c7630d38f6",
+        "name": "Mage-Ring Network",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+        "name": "Mana Vault",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ed8ddcc7-d08f-4e63-83fa-45b07d614253",
+        "name": "Manifold Key",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "name": "Mind Stone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ded64c92-6782-4599-bc4e-b890eb9ddfa5",
+        "name": "Mirage Mirror",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "437a8f88-a210-4b60-9afb-8a6118767435",
+        "name": "Moonsilver Key",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "e56493c6-6cc2-4cd7-ba41-37bb97e3c625",
+        "name": "Mystic Forge",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a2ec0b66-3f6b-4b10-b1f6-8faeba6ce79f",
+        "name": "Not of This World",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5b0a7ba0-ecfc-465d-a5e7-c7aa43542501",
+        "name": "Null Elemental Blast",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "03be4d0a-b29c-4121-84ce-600c33135d85",
+        "name": "Oblivion Sower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "473726d5-0222-41e0-b7c1-09d4ac47a050",
+        "name": "Palladium Myr",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c0f2e68d-8b91-416a-afca-03b442f54216",
+        "name": "Pathrazer of Ulamog",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "dcbed5bd-6ff7-490d-9c52-783d0d1a6066",
+        "name": "Planar Bridge",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a239b583-5f72-40a2-80af-e250e2858449",
+        "name": "Reliquary Tower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c31583f4-ed96-466b-9716-51d1090a1263",
+        "name": "Rise of the Eldrazi",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1e6fb22e-4416-4886-b908-5a4caf67e590",
+        "name": "Rogue's Passage",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ae7082dd-ab96-4250-8260-52bb5a2c737b",
+        "name": "Sanctum of Ugin",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "327f735c-a77b-4896-bb9c-f95b470205af",
+        "name": "Scavenger Grounds",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f99d6e82-9e74-4aae-9ad9-b8202b428313",
+        "name": "Sea Gate Wreckage",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "7c56bc66-8eb0-4c2e-9652-56274fa061e2",
+        "name": "Sensei's Divining Top",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "ea259c14-071c-41d7-ab66-e4a2e6cc0b33",
+        "name": "Shrine of the Forsaken Gods",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "81833e45-c151-454a-9dfd-08a78b1cda67",
+        "name": "Skittering Cicada",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "083da955-e31c-4d6b-a0f1-dfdf1569d9d8",
+        "name": "Sol Ring",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d599a4c3-9f07-47e7-ba5e-8202dbb2a6bb",
+        "name": "Solemn Simulacrum",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "87f819dd-6909-48db-8daa-77546b914d9a",
+        "name": "Stonespeaker Crystal",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "name": "Swiftfoot Boots",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fbecc3e5-ea27-438e-87a8-e58752a97de1",
+        "name": "Temple of the False God",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "385a9490-5567-463d-8498-acb9470d1649",
+        "name": "The Eternity Elevator",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "name": "The One Ring",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6104ff83-af62-4673-be67-c9321df46dd4",
+        "name": "Thespian's Stage",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+        "name": "Thought Vessel",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "dfcf553a-fe62-4cd1-9d89-e9bcc31f0b3e",
+        "name": "Thran Dynamo",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a3f2fde5-5962-41fe-a164-5cc97dab602b",
+        "name": "Titan's Presence",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f536437c-899b-4909-b566-52380a5208a0",
+        "name": "Tomb of the Spirit Dragon",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "935fa994-aa06-41e7-bc42-19ea70fbcbb6",
+        "name": "Ugin's Labyrinth",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "1384eee6-8fbc-4864-aaae-b9279424cb7e",
+        "name": "Ugin, the Ineffable",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fd60bf54-0ec1-4e1f-89d3-d66285823b51",
+        "name": "Ugin, the Spirit Dragon",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "3611afb5-3a21-415e-8d5b-08e0fe5364f6",
+        "name": "Ulamog, the Defiler",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fdabb4dd-d228-46bc-90b9-3823a4d103a6",
+        "name": "Ulamog, the Infinite Gyre",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "c89cd7f6-363c-45fa-b804-59d5a6841f00",
+        "name": "Ultima, Origin of Oblivion",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f3532c47-1d10-402a-8e3a-a271485b2a38",
+        "name": "Unstable Obelisk",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5dca96c0-f10e-4e9b-8060-ddb7dee11b3e",
+        "name": "Unwinding Clock",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "6e57249a-13a3-4143-b836-9edf45bd8fa4",
+        "name": "Urza's Cave",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "17498c57-8588-4981-be78-a2cd6932b074",
+        "name": "Urza's Incubator",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "201b0583-7245-461d-833d-cee1c96ee19d",
+        "name": "Urza's Mine",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "5fd4a0d7-317e-4cb0-9829-78878ce55938",
+        "name": "Urza's Power Plant",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "55761b91-117b-4861-ba85-5ac377ab09df",
+        "name": "Urza's Saga",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a0ab7c83-63d5-4d89-b957-0d6df35af9bf",
+        "name": "Urza's Tower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "fe26daab-fc2f-4865-989e-6b237620285d",
+        "name": "Urza's Workshop",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "de3da37c-8b67-466b-bf7b-d5385e271e80",
+        "name": "Void Winnower",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "f7b68341-7248-4d12-908b-893d15a851c4",
+        "name": "Voltaic Key",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "9d65f34d-bc5e-4979-8f58-2b52f7496d6c",
+        "name": "War Room",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "470c4f0c-29c8-49de-a437-8f38d011f061",
+        "name": "Warping Wail",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "72356f04-71b4-42f3-a008-699f64ba03eb",
+        "name": "Wastes",
+        "quantity": 9,
+        "is_commander": false
+      },
+      {
+        "card_id": "51f819ef-32e5-4138-92d8-06a20d3364d4",
+        "name": "Worn Powerstone",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "a10d15b5-e9af-4d68-92f2-031788e1c032",
+        "name": "Zhalfirin Void",
+        "quantity": 1,
+        "is_commander": false
+      },
+      {
+        "card_id": "d10b25c4-dab3-4fe9-8462-cafa509a6246",
+        "name": "Zhulodok, Void Gorger",
+        "quantity": 1,
+        "is_commander": false
+      }
+    ],
+    "next_action": {
+      "type": "review_rebuild_draft",
+      "applied_to_original": false,
+      "draft_deck_id": "30c8443e-4674-48ea-b149-d9f07723a98e"
+    }
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "30c8443e-4674-48ea-b149-d9f07723a98e"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "4.98",
+    "type_distribution": {
+      "creatures": 24,
+      "instants": 4,
+      "sorceries": 3,
+      "enchantments": 2,
+      "artifacts": 35,
+      "planeswalkers": 2,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+    "mana_base_assessment": "N/A",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

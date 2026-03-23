@@ -1,73 +1,92 @@
-# ManaLoom — AI-Powered MTG Deck Builder
+# ManaLoom
 
-Deck builder de Magic focado em resultado: montar, validar, analisar e otimizar decks com apoio de IA.
+Plataforma para Magic: The Gathering focada em um fluxo confiável de decks:
 
-## Proposta de Valor
+1. criar ou importar
+2. validar e analisar
+3. otimizar ou reconstruir
+4. aplicar e validar o resultado final
 
-O ManaLoom reduz o tempo entre ideia e deck competitivo com um fluxo único:
+## Fonte de verdade
 
-1. criar ou importar deck,
-2. validar legalidade por formato,
-3. analisar consistência/sinergia,
-4. otimizar com sugestões acionáveis.
+Se você precisar entender o estado atual do projeto, a ordem correta é:
 
-## Para quem é
+1. [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
+2. [docs/README.md](docs/README.md)
+3. [docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
 
-- Jogadores competitivos que querem otimizar listas com rapidez.
-- Jogadores casuais que precisam de assistência para fechar estratégia.
-- Colecionadores e usuários que querem usar fichário/market/trades no mesmo app.
+`docs/CONTEXTO_PRODUTO_ATUAL.md` é a fonte de verdade operacional.  
+Roadmaps e handoffs antigos continuam úteis como apoio, mas não mandam mais na prioridade.
 
-## Diferenciais atuais
+## Prioridade atual
 
-- Geração de decks por descrição textual.
-- Otimização assistida por IA com recomendações de add/remove.
-- Validação de formato e legalidade integrada ao fluxo.
-- Base social/comunidade, fichário, marketplace e trades no mesmo produto.
+O foco ativo do produto está no core de decks:
 
-## Stack
+- onboarding
+- geração
+- importação
+- análise
+- otimização
+- rebuild
+- validação final
 
-- Frontend: Flutter + Provider + GoRouter
-- Backend: Dart Frog + PostgreSQL
-- IA: OpenAI (com fallback controlado em desenvolvimento)
+Frentes adjacentes como social, binder, trade, scanner e refinamentos cosméticos só devem avançar se não competirem com a confiabilidade desse fluxo.
 
 ## Estrutura do repositório
 
-- app/: aplicativo Flutter
-- server/: API Dart Frog + banco + scripts
-- archive_docs/: documentos arquivados para reduzir ruído operacional
+- `app/`: aplicativo Flutter
+- `server/`: API Dart Frog, regras, IA, testes e scripts
+- `docs/`: documentação ativa e auditorias atuais
+- `archive_docs/`: documentação arquivada para referência histórica
 
-## Quick Start
+## Documentação principal
+
+- contexto operacional: [docs/CONTEXTO_PRODUTO_ATUAL.md](docs/CONTEXTO_PRODUTO_ATUAL.md)
+- índice documental: [docs/README.md](docs/README.md)
+- matriz de testes da otimização: [docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
+- auditoria de UX, lógica e performance: [docs/AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md](docs/AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md)
+- manual técnico contínuo: [server/manual-de-instrucao.md](server/manual-de-instrucao.md)
+
+## Setup rápido
 
 ### Backend
 
-1. entrar em server
-2. instalar dependências com dart pub get
-3. configurar .env a partir de .env.example
-4. criar banco e aplicar schema/migrations
-5. iniciar API com dart_frog dev
+```bash
+cd server
+dart pub get
+dart_frog dev -p 8080
+```
 
 ### Frontend
 
-1. entrar em app
-2. instalar dependências com flutter pub get
-3. rodar com flutter run
+```bash
+cd app
+flutter pub get
+flutter run
+```
 
-## Documentação ativa
+## Testes
 
-- Roadmap oficial do produto: [ROADMAP.md](ROADMAP.md)
-- Manual técnico contínuo: [server/manual-de-instrucao.md](server/manual-de-instrucao.md)
-- Instruções de testes backend: [server/test/README.md](server/test/README.md)
+### App
 
-## Direção de produto (90 dias)
+```bash
+cd app
+flutter analyze
+flutter test
+```
 
-O foco atual é transformar o ManaLoom em produto competitivo:
+### Server
 
-- Core impecável (criar -> analisar -> otimizar).
-- IA com impacto mensurável e custo controlado.
-- Base pronta para escala e monetização freemium/pro.
+```bash
+cd server
+dart test
+```
 
-Detalhes completos em [ROADMAP.md](ROADMAP.md).
+Para a malha mais importante do core, ver:
+
+- [app/test/README.md](app/test/README.md)
+- [server/test/README.md](server/test/README.md)
 
 ## Status
 
-Projeto em fase de MVP avançado para evolução acelerada rumo a produto.
+Em `2026-03-23`, o projeto está em fase de endurecimento do core de decks para atingir confiança de release no fluxo principal.

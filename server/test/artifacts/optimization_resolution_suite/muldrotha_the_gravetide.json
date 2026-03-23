@@ -1,23 +1,29 @@
 {
   "source_deck_id": "5bf67c2e-fdeb-40a9-be91-ebb7edac7489",
   "source_deck_name": "Corpus Seed - Muldrotha, the Gravetide",
-  "clone_deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
-  "final_deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
+  "clone_deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
+  "final_deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
   "optimize_request": {
-    "deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
+    "deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
     "quality_error": {
-      "code": "OPTIMIZE_EXECUTION_FAILED",
-      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
-      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+      "code": "OPTIMIZE_NO_SAFE_SWAPS",
+      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
+      "dropped_swaps": [
+        "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
+        "🔒 Opulent Palace -> Fellwar Stone removida pelo gate: papel land -> ramp, delta CMC +2.",
+        "🔒 Woodland Cemetery -> Beast Within removida pelo gate: papel land -> removal, delta CMC +3."
+      ]
     },
     "mode": "optimize",
+    "removals": [],
+    "additions": [],
     "deck_state": {
       "status": "healthy",
       "recommended_mode": "optimize",
@@ -31,7 +37,7 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae"
+    "deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529"
   },
   "final_analysis": {
     "detected_archetype": "midrange",

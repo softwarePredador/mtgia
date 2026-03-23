@@ -1,18 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeApiClient extends ApiClient {
   _FakeApiClient({
     Map<String, ApiResponse Function(Map<String, dynamic>)>? postHandlers,
     Map<String, ApiResponse Function()>? getHandlers,
+    Map<String, ApiResponse Function(Map<String, dynamic>)>? putHandlers,
   }) : _postHandlers = postHandlers ?? const {},
-       _getHandlers = getHandlers ?? const {};
+       _getHandlers = getHandlers ?? const {},
+       _putHandlers = putHandlers ?? const {};
 
   final Map<String, ApiResponse Function(Map<String, dynamic>)> _postHandlers;
   final Map<String, ApiResponse Function()> _getHandlers;
+  final Map<String, ApiResponse Function(Map<String, dynamic>)> _putHandlers;
   final List<String> postCalls = [];
   final List<Map<String, dynamic>> postBodies = [];
+  final List<String> putCalls = [];
+  final List<Map<String, dynamic>> putBodies = [];
 
   @override
   Future<ApiResponse> post(
@@ -37,9 +43,112 @@ class _FakeApiClient extends ApiClient {
     }
     return handler();
   }
+
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    putCalls.add(endpoint);
+    putBodies.add(body);
+    final handler = _putHandlers[endpoint];
+    if (handler == null) {
+      throw UnimplementedError('No PUT handler for $endpoint');
+    }
+    return handler(body);
+  }
+}
+
+Map<String, dynamic> _buildDeckDetailsJson(
+  Map<String, int> cardsById, {
+  String deckId = 'deck-1',
+}) {
+  Map<String, dynamic> card(
+    String id,
+    String name, {
+    required int quantity,
+    bool isCommander = false,
+    List<String> colors = const <String>[],
+    List<String> colorIdentity = const <String>[],
+    String typeLine = 'Artifact',
+    String manaCost = '{2}',
+  }) => {
+    'id': id,
+    'name': name,
+    'mana_cost': manaCost,
+    'type_line': typeLine,
+    'oracle_text': '',
+    'colors': colors,
+    'color_identity': colorIdentity,
+    'image_url': null,
+    'set_code': 'tst',
+    'set_name': 'Test Set',
+    'set_release_date': '2026-01-01',
+    'rarity': 'rare',
+    'quantity': quantity,
+    'is_commander': isCommander,
+    'condition': 'NM',
+  };
+
+  return {
+    'id': deckId,
+    'name': 'Smoke Deck',
+    'format': 'commander',
+    'description': 'Deck para smoke do fluxo core',
+    'is_public': false,
+    'created_at': '2026-03-23T00:00:00.000Z',
+    'color_identity': const ['U'],
+    'stats': {
+      'total_cards': cardsById.values.fold<int>(0, (sum, qty) => sum + qty),
+    },
+    'commander': [
+      card(
+        'cmd-1',
+        'Talrand, Sky Summoner',
+        quantity: 1,
+        isCommander: true,
+        colors: const ['U'],
+        colorIdentity: const ['U'],
+        typeLine: 'Legendary Creature — Merfolk Wizard',
+        manaCost: '{2}{U}{U}',
+      ),
+    ],
+    'main_board': {
+      'Artifacts': [
+        if ((cardsById['remove-1'] ?? 0) > 0)
+          card('remove-1', 'Mind Stone', quantity: cardsById['remove-1']!),
+        if ((cardsById['add-1'] ?? 0) > 0)
+          card('add-1', 'Arcane Signet', quantity: cardsById['add-1']!),
+      ],
+      'Instants': [
+        card(
+          'spell-1',
+          'Opt',
+          quantity: cardsById['spell-1'] ?? 1,
+          colors: const ['U'],
+          colorIdentity: const ['U'],
+          typeLine: 'Instant',
+          manaCost: '{U}',
+        ),
+      ],
+      'Lands': List.generate(
+        cardsById['land-1'] ?? 36,
+        (index) => card(
+          'land-$index',
+          'Island',
+          quantity: 1,
+          colors: const <String>[],
+          colorIdentity: const <String>[],
+          typeLine: 'Basic Land — Island',
+          manaCost: '',
+        ),
+      ),
+    },
+  };
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   group('DeckProvider.createDeck', () {
     test('fails when batch resolve endpoint fails', () async {
       final apiClient = _FakeApiClient(
@@ -274,5 +383,103 @@ void main() {
       expect(result['draft_deck_id'], 'draft-1');
       expect(trackedEvents, contains('deck_rebuild_created'));
     });
+
+    test(
+      'core smoke: deck details -> optimize -> apply with ids -> validate',
+      () async {
+        final currentCards = <String, int>{
+          'remove-1': 1,
+          'spell-1': 1,
+          'land-1': 36,
+        };
+
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+          },
+          postHandlers: {
+            '/ai/optimize': (_) => ApiResponse(200, {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+              'removals_detailed': const [
+                {
+                  'card_id': 'remove-1',
+                  'name': 'Mind Stone',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+              'additions_detailed': const [
+                {
+                  'card_id': 'add-1',
+                  'name': 'Arcane Signet',
+                  'type_line': 'Artifact',
+                  'color_identity': <String>[],
+                },
+              ],
+            }),
+            '/decks/deck-1/validate': (_) => ApiResponse(200, {
+              'valid': true,
+              'ok': true,
+              'errors': const <String>[],
+            }),
+          },
+          putHandlers: {
+            '/decks/deck-1': (body) {
+              final cards =
+                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              expect(
+                cards.any((entry) => entry['card_id'] == 'add-1'),
+                isTrue,
+              );
+              expect(
+                cards.any((entry) => entry['card_id'] == 'remove-1'),
+                isFalse,
+              );
+
+              currentCards
+                ..remove('remove-1')
+                ..['add-1'] = 1;
+
+              return ApiResponse(200, {'ok': true});
+            },
+          },
+        );
+
+        final provider = DeckProvider(
+          apiClient: apiClient,
+          trackActivationEvent:
+              (
+                String eventName, {
+                String? format,
+                String? deckId,
+                String source = 'app',
+                Map<String, dynamic>? metadata,
+              }) async {},
+        );
+
+        await provider.fetchDeckDetails('deck-1');
+
+        final optimizeResult = await provider.optimizeDeck('deck-1', 'control');
+        final applied = await provider.applyOptimizationWithIds(
+          deckId: 'deck-1',
+          removalsDetailed:
+              (optimizeResult['removals_detailed'] as List)
+                  .cast<Map<String, dynamic>>(),
+          additionsDetailed:
+              (optimizeResult['additions_detailed'] as List)
+                  .cast<Map<String, dynamic>>(),
+        );
+        final validation = await provider.validateDeck('deck-1');
+
+        expect(applied, isTrue);
+        expect(validation['valid'], isTrue);
+        expect(apiClient.postCalls, contains('/ai/optimize'));
+        expect(apiClient.postCalls, contains('/decks/deck-1/validate'));
+        expect(apiClient.putCalls, contains('/decks/deck-1'));
+      },
+    );
   });
 }

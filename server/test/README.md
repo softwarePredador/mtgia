@@ -1,5 +1,8 @@
 # Server Test Suite - MTGIA
 
+> Guia ativo de testes do backend.
+> A ordem de leitura e prioridade funcional dessas suites deve seguir `docs/CONTEXTO_PRODUTO_ATUAL.md` e `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md`.
+
 Este diretorio concentra a malha principal de confiabilidade do produto, com foco especial no carro chefe:
 
 - gerar deck
@@ -145,6 +148,28 @@ RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart \
   test/deck_analysis_contract_test.dart
 ```
 
+### Gate recorrente do corpus de resolucao
+
+Para validar o corpus estavel Commander fim a fim:
+
+```bash
+./scripts/quality_gate_resolution_corpus.sh
+```
+
+Ou:
+
+```bash
+./scripts/quality_gate.sh resolution
+```
+
+Esse gate:
+
+- sobe a API local se necessario
+- usa `test/fixtures/optimization_resolution_corpus.json` por padrao
+- calcula `VALIDATION_LIMIT` automaticamente pelo tamanho do corpus
+- executa `bin/run_three_commander_resolution_validation.dart`
+- falha se houver `failed`, `unresolved` ou `total` inconsistente
+
 ### Runner operacional local da otimizacao
 
 Para Windows/local, o projeto agora tem bootstrap dedicado para evitar problema de `dart_frog dev` em modo nao interativo:
@@ -179,15 +204,23 @@ dart test
 
 Fixtures operacionais:
 
-- `test/fixtures/optimization_resolution_corpus.json`: corpus estavel principal com `16` decks Commander validados
+- `test/fixtures/optimization_resolution_corpus.json`: corpus estavel principal com `19` decks Commander validados
 - `test/fixtures/optimization_resolution_corpus_new_commanders_2026-03-23.json`: suite focada usada para estabilizar os `6` novos comandantes da rodada
 
 Regras novas confirmadas em `2026-03-23`:
 
 - `bootstrap_resolution_corpus_decks.dart` aceita `VALIDATION_COMMANDERS` separados por `;` ou quebra de linha
+- `bootstrap_resolution_corpus_decks.dart` aceita seed pareado via `A + B`
+- o runner oficial de resolucao aceita `1` ou `2` comandantes legais com base no deck fonte
+- reminder text inline nao pode mais inflar identidade de cor; `Blind Obedience` em `Sythis` passou a validar corretamente
 - o bootstrap nao pode mais preencher 100 cartas adicionando terrenos extras quando faltarem spells
 - se nao houver spell density suficiente, o comportamento correto agora e `montagem insuficiente`
 - a identidade de cor nao depende mais apenas de `cards.color_identity`; quando esse campo vier incompleto, o servidor infere pelo `oracle_text`
+
+Status atual do gate recorrente:
+
+- corpus estavel principal: `19` decks
+- ultima revalidacao completa: `19/19 passed`, `0 failed`, `0 unresolved`
 
 Excecao operacional documentada:
 
@@ -229,3 +262,9 @@ Decisao sobre corpus Commander:
 - `partner/background`
 - five-color
 - colorless estrito
+
+Atualizacao pratica desta rodada:
+
+- `Jodah, the Unifier` foi confirmado como seed five-color viavel
+- probe real do `Jodah` com backend atualizado fechou em `safe_no_change`
+- colorless e `background` ainda estao em estabilizacao antes de entrar no corpus estavel

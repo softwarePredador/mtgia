@@ -1,6 +1,7 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -25,6 +26,8 @@ const _defaultCommanders = <String>[
   'Urza, Lord High Artificer',
   'Edgar Markov',
 ];
+
+const _pairedCommanderSeparator = ' + ';
 
 class _ReferenceCard {
   _ReferenceCard({
@@ -55,6 +58,7 @@ Future<void> main(List<String> args) async {
 
   try {
     final token = await _getOrCreateToken(apiBaseUrl);
+    final builderUserId = await _loadBuilderUserId(db.connection);
     final corpusFile = File(corpusPath);
     if (!corpusFile.existsSync()) {
       stderr.writeln('Corpus não encontrado em $corpusPath');
@@ -72,77 +76,136 @@ Future<void> main(List<String> args) async {
     final created = <String>[];
     final skipped = <String>[];
 
-    for (final commander in commanders) {
-      if (existingLabels.contains(commander.toLowerCase())) {
-        skipped.add('$commander (já existe no corpus)');
+    for (final commanderSpec in commanders) {
+      final commanderStopwatch = Stopwatch()..start();
+      if (existingLabels.contains(commanderSpec.label.toLowerCase())) {
+        skipped.add('${commanderSpec.label} (já existe no corpus)');
         continue;
       }
 
       print('');
-      print('=== Bootstrap $commander ===');
-      final commanderInfo = await _loadCommanderInfo(db.connection, commander);
-      if (commanderInfo == null) {
-        skipped.add('$commander (comandante não encontrado no catálogo)');
-        print('SKIP | comandante ausente no catálogo');
+      print('=== Bootstrap ${commanderSpec.label} ===');
+      print('STEP | load_commander_catalog');
+      final commanderInfos = <_CommanderInfo>[];
+      var missingCommander = false;
+      for (final commander in commanderSpec.commanders) {
+        final commanderInfo = await _loadCommanderInfo(db.connection, commander);
+        if (commanderInfo == null) {
+          skipped.add('${commanderSpec.label} ($commander ausente no catálogo)');
+          print('SKIP | comandante ausente no catálogo: $commander');
+          missingCommander = true;
+          break;
+        }
+        commanderInfos.add(commanderInfo);
+      }
+      if (missingCommander) {
         continue;
       }
+      print('OK   | load_commander_catalog (${commanderStopwatch.elapsedMilliseconds}ms)');
 
-      final reference = await _fetchCommanderReference(
-        apiBaseUrl: apiBaseUrl,
-        token: token,
-        commander: commander,
-      );
-      if (reference == null) {
-        skipped.add('$commander (commander-reference indisponível)');
-        print('SKIP | commander-reference indisponível');
+      print('STEP | fetch_commander_reference');
+      final references = <Map<String, dynamic>>[];
+      var missingReference = false;
+      for (final commander in commanderSpec.commanders) {
+        final reference = await _fetchCommanderReference(
+          apiBaseUrl: apiBaseUrl,
+          token: token,
+          commander: commander,
+        );
+        if (reference == null) {
+          skipped.add('${commanderSpec.label} ($commander sem commander-reference)');
+          print('SKIP | commander-reference indisponível: $commander');
+          missingReference = true;
+          break;
+        }
+        references.add(reference);
+      }
+      if (missingReference) {
         continue;
       }
+      print('OK   | fetch_commander_reference (${commanderStopwatch.elapsedMilliseconds}ms)');
 
+      print('STEP | build_create_payload');
       final deckPayload = await _buildCreateDeckPayload(
         pool: db.connection,
-        commander: commander,
-        commanderColors: commanderInfo.colorIdentity,
-        reference: reference,
+        commanders: commanderInfos,
+        commanderColors: _mergeCommanderColors(commanderInfos),
+        references: references,
       );
       if (deckPayload == null) {
-        skipped.add('$commander (não foi possível montar 100 cartas válidas)');
+        skipped.add(
+          '${commanderSpec.label} (não foi possível montar 100 cartas válidas)',
+        );
         print('SKIP | montagem insuficiente');
         continue;
       }
+      print('OK   | build_create_payload (${commanderStopwatch.elapsedMilliseconds}ms)');
 
       if (dryRun) {
         print(
           'DRY-RUN | cartas=${(deckPayload['cards'] as List).length} | land_target=${deckPayload['target_land_count']}',
         );
-        created.add('$commander (dry-run)');
+        created.add('${commanderSpec.label} (dry-run)');
         continue;
       }
 
-      final deckId = await _createDeck(
-        apiBaseUrl: apiBaseUrl,
-        token: token,
-        commander: commander,
-        payload: deckPayload,
-      );
-      final validateStatus = await _validateDeck(
-        apiBaseUrl: apiBaseUrl,
-        token: token,
-        deckId: deckId,
-      );
+      late final String deckId;
+      try {
+        print('STEP | create_deck');
+        deckId = await _createDeck(
+          apiBaseUrl: apiBaseUrl,
+          token: token,
+          deckLabel: commanderSpec.label,
+          payload: deckPayload,
+        );
+        print('OK   | create_deck (${commanderStopwatch.elapsedMilliseconds}ms)');
+      } on TimeoutException {
+        print('WARN | create_deck timeout, tentando fallback direto no banco');
+        deckId = await _createDeckDirectInDb(
+          pool: db.connection,
+          userId: builderUserId,
+          deckLabel: commanderSpec.label,
+          payload: deckPayload,
+        );
+        print(
+          'OK   | create_deck_db_fallback (${commanderStopwatch.elapsedMilliseconds}ms)',
+        );
+      } on StateError catch (e) {
+        skipped.add('${commanderSpec.label} (${e.message})');
+        print('SKIP | create_deck error: ${e.message}');
+        continue;
+      }
+
+      late final int validateStatus;
+      try {
+        print('STEP | validate_deck');
+        validateStatus = await _validateDeck(
+          apiBaseUrl: apiBaseUrl,
+          token: token,
+          deckId: deckId,
+        );
+        print('OK   | validate_deck (${commanderStopwatch.elapsedMilliseconds}ms)');
+      } on TimeoutException {
+        skipped.add('${commanderSpec.label} (validate_deck timeout)');
+        print('SKIP | validate_deck timeout');
+        continue;
+      }
       if (validateStatus != 200) {
-        skipped.add('$commander (validate=$validateStatus)');
+        skipped.add('${commanderSpec.label} (validate=$validateStatus)');
         print('SKIP | validate=$validateStatus');
         continue;
       }
 
       decks.add({
         'deck_id': deckId,
-        'label': commander,
+        'label': commanderSpec.label,
         'note':
             'Auto-seeded from commander-reference on 2026-03-18. Expected flow pending stabilization.',
       });
-      created.add('$commander | $deckId');
-      print('CRIADO | $deckId | validate=200');
+      created.add('${commanderSpec.label} | $deckId');
+      print(
+        'CRIADO | $deckId | validate=200 | total=${commanderStopwatch.elapsedMilliseconds}ms',
+      );
     }
 
     if (!dryRun) {
@@ -167,14 +230,27 @@ Future<void> main(List<String> args) async {
   }
 }
 
-List<String> _resolveCommanders(String? raw) {
+List<_CommanderSeedSpec> _resolveCommanders(String? raw) {
   final configured = (raw ?? '')
       .split(RegExp(r'[;\n]+'))
       .map((entry) => entry.trim())
       .where((entry) => entry.isNotEmpty)
       .toList();
-  if (configured.isEmpty) return _defaultCommanders;
-  return configured;
+  final entries = configured.isEmpty ? _defaultCommanders : configured;
+  return entries.map(_parseCommanderSeedSpec).toList();
+}
+
+_CommanderSeedSpec _parseCommanderSeedSpec(String raw) {
+  final normalized = raw.trim();
+  final commanders = normalized
+      .split(_pairedCommanderSeparator)
+      .map((entry) => entry.trim())
+      .where((entry) => entry.isNotEmpty)
+      .toList();
+  return _CommanderSeedSpec(
+    label: commanders.join(_pairedCommanderSeparator),
+    commanders: commanders,
+  );
 }
 
 Map<String, dynamic> _loadCorpus(File file) {
@@ -229,10 +305,27 @@ Future<String> _getOrCreateToken(String apiBaseUrl) async {
   return token;
 }
 
+Future<String> _loadBuilderUserId(Pool pool) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT id::text
+      FROM users
+      WHERE LOWER(email) = LOWER(@email)
+      LIMIT 1
+    '''),
+    parameters: {'email': _builderEmail},
+  );
+  if (result.isEmpty) {
+    throw StateError('Usuário builder não encontrado no banco.');
+  }
+  return result.first[0] as String;
+}
+
 Future<_CommanderInfo?> _loadCommanderInfo(Pool pool, String commander) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT
+        id::text,
         name,
         COALESCE(color_identity, colors, ARRAY[]::text[]) AS color_identity
       FROM cards
@@ -243,9 +336,10 @@ Future<_CommanderInfo?> _loadCommanderInfo(Pool pool, String commander) async {
   );
   if (result.isEmpty) return null;
   return _CommanderInfo(
-    name: result.first[0] as String,
+    cardId: result.first[0] as String,
+    name: result.first[1] as String,
     colorIdentity:
-        (result.first[1] as List?)?.cast<String>() ?? const <String>[],
+        (result.first[2] as List?)?.cast<String>() ?? const <String>[],
   );
 }
 
@@ -268,34 +362,44 @@ Future<Map<String, dynamic>?> _fetchCommanderReference({
 
 Future<Map<String, dynamic>?> _buildCreateDeckPayload({
   required Pool pool,
-  required String commander,
+  required List<_CommanderInfo> commanders,
   required List<String> commanderColors,
-  required Map<String, dynamic> reference,
+  required List<Map<String, dynamic>> references,
 }) async {
-  final profile = reference['commander_profile'] is Map
-      ? (reference['commander_profile'] as Map).cast<String, dynamic>()
-      : const <String, dynamic>{};
-  final recommendedStructure = profile['recommended_structure'] is Map
-      ? (profile['recommended_structure'] as Map).cast<String, dynamic>()
-      : const <String, dynamic>{};
-  final averageTypeDistribution = profile['average_type_distribution'] is Map
-      ? (profile['average_type_distribution'] as Map).cast<String, dynamic>()
-      : const <String, dynamic>{};
+  final targetLandCandidates = <int>[];
+  for (final reference in references) {
+    final profile = reference['commander_profile'] is Map
+        ? (reference['commander_profile'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final recommendedStructure = profile['recommended_structure'] is Map
+        ? (profile['recommended_structure'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final averageTypeDistribution = profile['average_type_distribution'] is Map
+        ? (profile['average_type_distribution'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final lands = (recommendedStructure['lands'] as num?)?.toInt() ??
+        (averageTypeDistribution['land'] as num?)?.toInt();
+    if (lands != null && lands > 0) {
+      targetLandCandidates.add(lands);
+    }
+  }
 
-  final targetLandCount = (recommendedStructure['lands'] as num?)?.toInt() ??
-      (averageTypeDistribution['land'] as num?)?.toInt() ??
-      36;
+  final targetLandCount =
+      targetLandCandidates.isEmpty ? 36 : targetLandCandidates.reduce((a, b) => a > b ? a : b);
 
   final seedEntries = <_ReferenceCard>[
-    ..._parseSeedCards(profile['average_deck_seed']),
-    ..._parseSeedCards(reference['reference_cards']),
+    for (final reference in references) ..._seedEntriesFromReference(reference),
   ];
 
+  final commanderNamesLower = commanders
+      .map((commander) => commander.name.trim().toLowerCase())
+      .where((name) => name.isNotEmpty)
+      .toSet();
   final uniqueSeedNames = <String>{};
   final normalizedSeed = <_ReferenceCard>[];
   for (final seed in seedEntries) {
     final lower = seed.name.trim().toLowerCase();
-    if (lower.isEmpty || lower == commander.toLowerCase()) continue;
+    if (lower.isEmpty || commanderNamesLower.contains(lower)) continue;
     if (!uniqueSeedNames.add(lower)) continue;
     normalizedSeed.add(seed);
   }
@@ -307,9 +411,16 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
     normalizedSeed.map((seed) => seed.name).toList(),
   );
   if (cardCatalog.isEmpty) return null;
+  final basicLandCatalog = await _loadCardCatalog(
+    pool,
+    _buildBasicLandNames(
+      commanderColors: commanderColors,
+      count: commanderColors.isEmpty ? 1 : commanderColors.length,
+    ).toSet().toList(),
+  );
 
-  final desiredSpellCount = 99 - targetLandCount;
-  final chosenNames = <String>{commander.toLowerCase()};
+  final desiredSpellCount = 100 - commanders.length - targetLandCount;
+  final chosenNames = <String>{...commanderNamesLower};
   final spellCards = <Map<String, dynamic>>[];
   final landCards = <Map<String, dynamic>>[];
 
@@ -336,7 +447,9 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
   }
 
   if (spellCards.length < desiredSpellCount) {
-    final extraReferences = _parseSeedCards(reference['reference_cards']);
+    final extraReferences = <_ReferenceCard>[
+      for (final reference in references) ..._parseSeedCards(reference['reference_cards']),
+    ];
     for (final seed in extraReferences) {
       final card = cardCatalog[seed.name.toLowerCase()];
       if (card == null) continue;
@@ -354,17 +467,27 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
   if (spellCards.isEmpty) return null;
 
   final cards = <Map<String, dynamic>>[
-    {
-      'name': commander,
-      'quantity': 1,
-      'is_commander': true,
-    },
+    for (final commander in commanders)
+      {
+        'card_id': commander.cardId,
+        'name': commander.name,
+        'quantity': 1,
+        'is_commander': true,
+      },
   ];
   for (final card in spellCards.take(desiredSpellCount)) {
-    cards.add({'name': card['name'], 'quantity': 1});
+    cards.add({
+      'card_id': card['card_id'],
+      'name': card['name'],
+      'quantity': 1,
+    });
   }
   for (final card in landCards.take(targetLandCount)) {
-    cards.add({'name': card['name'], 'quantity': 1});
+    cards.add({
+      'card_id': card['card_id'],
+      'name': card['name'],
+      'quantity': 1,
+    });
   }
 
   final currentLandCount = cards
@@ -377,7 +500,15 @@ Future<Map<String, dynamic>?> _buildCreateDeckPayload({
     count: targetLandCount - landCards.length,
   );
   for (final land in landNamesToAdd) {
-    cards.add({'name': land, 'quantity': 1});
+    final card = basicLandCatalog[land.toLowerCase()];
+    if (card == null) {
+      return null;
+    }
+    cards.add({
+      'card_id': card['card_id'],
+      'name': card['name'],
+      'quantity': 1,
+    });
   }
 
   final totalCards = cards.fold<int>(
@@ -427,6 +558,7 @@ Future<Map<String, Map<String, dynamic>>> _loadCardCatalog(
   final result = await pool.execute(
     Sql.named('''
       SELECT DISTINCT ON (LOWER(name))
+        id::text,
         name,
         type_line,
         COALESCE(oracle_text, '') AS oracle_text,
@@ -440,13 +572,14 @@ Future<Map<String, Map<String, dynamic>>> _loadCardCatalog(
 
   final catalog = <String, Map<String, dynamic>>{};
   for (final row in result) {
-    final name = row[0] as String? ?? '';
+    final name = row[1] as String? ?? '';
     if (name.isEmpty) continue;
     catalog[name.toLowerCase()] = {
-      'name': name,
-      'type_line': row[1] as String? ?? '',
-      'oracle_text': row[2] as String? ?? '',
-      'color_identity': (row[3] as List?)?.cast<String>() ?? const <String>[],
+      'card_id': row[0] as String? ?? '',
+      'name': row[1] as String? ?? '',
+      'type_line': row[2] as String? ?? '',
+      'oracle_text': row[3] as String? ?? '',
+      'color_identity': (row[4] as List?)?.cast<String>() ?? const <String>[],
     };
   }
   return catalog;
@@ -469,35 +602,111 @@ bool _isCardWithinCommanderIdentity(
 Future<String> _createDeck({
   required String apiBaseUrl,
   required String token,
-  required String commander,
+  required String deckLabel,
   required Map<String, dynamic> payload,
 }) async {
   final response = await http.post(
-    Uri.parse('$apiBaseUrl/decks'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-    body: jsonEncode({
-      'name': 'Corpus Seed - $commander',
-      'format': 'commander',
-      'description':
-          'Auto-seeded from commander-reference on 2026-03-18 for regression corpus.',
-      'cards': payload['cards'],
-    }),
-  );
+        Uri.parse('$apiBaseUrl/decks'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'name': 'Corpus Seed - $deckLabel',
+          'format': 'commander',
+          'description':
+              'Auto-seeded from commander-reference on 2026-03-18 for regression corpus.',
+          'cards': payload['cards'],
+        }),
+      ).timeout(const Duration(seconds: 45));
 
   if (response.statusCode != 200 && response.statusCode != 201) {
     throw StateError(
-      'Falha ao criar deck para $commander: ${response.statusCode} ${response.body}',
+      'Falha ao criar deck para $deckLabel: ${response.statusCode} ${response.body}',
     );
   }
   final body = jsonDecode(response.body) as Map<String, dynamic>;
   final deckId = body['id']?.toString() ?? '';
   if (deckId.isEmpty) {
-    throw StateError('Deck criado sem id para $commander.');
+    throw StateError('Deck criado sem id para $deckLabel.');
   }
   return deckId;
+}
+
+Future<String> _createDeckDirectInDb({
+  required Pool pool,
+  required String userId,
+  required String deckLabel,
+  required Map<String, dynamic> payload,
+}) async {
+  final cards = (payload['cards'] as List?)?.cast<Map<String, dynamic>>() ??
+      const <Map<String, dynamic>>[];
+  if (cards.isEmpty) {
+    throw StateError('Payload sem cartas para fallback direto no banco.');
+  }
+
+  final deckId = await pool.runTx((session) async {
+    final deckResult = await session.execute(
+      Sql.named('''
+        INSERT INTO decks (user_id, name, format, description, is_public)
+        VALUES (@userId, @name, @format, @description, FALSE)
+        RETURNING id::text
+      '''),
+      parameters: {
+        'userId': userId,
+        'name': 'Corpus Seed - $deckLabel',
+        'format': 'commander',
+        'description':
+            'Auto-seeded via direct-db fallback from commander-reference on 2026-03-23 for regression corpus.',
+      },
+    );
+    final createdDeckId = deckResult.first[0] as String;
+
+    final insertSql = Sql.named('''
+      INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander)
+      VALUES (@deckId, @cardId, @quantity, @isCommander)
+    ''');
+
+    for (final card in cards) {
+      final cardId = card['card_id']?.toString() ?? '';
+      final quantity = (card['quantity'] as int?) ?? 1;
+      final isCommander = card['is_commander'] == true;
+      if (cardId.isEmpty || quantity <= 0) {
+        throw StateError('Carta inválida no payload de fallback direto.');
+      }
+      await session.execute(
+        insertSql,
+        parameters: {
+          'deckId': createdDeckId,
+          'cardId': cardId,
+          'quantity': quantity,
+          'isCommander': isCommander,
+        },
+      );
+    }
+
+    return createdDeckId;
+  });
+
+  return deckId;
+}
+
+List<_ReferenceCard> _seedEntriesFromReference(Map<String, dynamic> reference) {
+  final profile = reference['commander_profile'] is Map
+      ? (reference['commander_profile'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
+  return <_ReferenceCard>[
+    ..._parseSeedCards(profile['average_deck_seed']),
+    ..._parseSeedCards(reference['reference_cards']),
+  ];
+}
+
+List<String> _mergeCommanderColors(List<_CommanderInfo> commanders) {
+  final colors = <String>{};
+  for (final commander in commanders) {
+    colors.addAll(commander.colorIdentity.map((color) => color.toUpperCase()));
+  }
+  return colors.toList()..sort();
 }
 
 Future<int> _validateDeck({
@@ -506,13 +715,13 @@ Future<int> _validateDeck({
   required String deckId,
 }) async {
   final response = await http.post(
-    Uri.parse('$apiBaseUrl/decks/$deckId/validate'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-    body: '{}',
-  );
+        Uri.parse('$apiBaseUrl/decks/$deckId/validate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: '{}',
+      ).timeout(const Duration(seconds: 45));
   return response.statusCode;
 }
 
@@ -541,7 +750,7 @@ List<String> _buildBasicLandNames({
   required int count,
 }) {
   if (count <= 0) return const <String>[];
-  final colors = commanderColors.isEmpty ? const ['W'] : commanderColors;
+  final colors = commanderColors.isEmpty ? const ['C'] : commanderColors;
   final names = <String>[];
   for (var i = 0; i < count; i++) {
     names.add(_basicLandNameForColor(colors[i % colors.length]));
@@ -579,6 +788,7 @@ List<Map<String, dynamic>> _compactCreateCards(
     if (existing == null) {
       byName[lower] = {
         'name': name,
+        if (card['card_id'] != null) 'card_id': card['card_id'],
         'quantity': quantity,
         if (isCommander) 'is_commander': true,
       };
@@ -587,6 +797,8 @@ List<Map<String, dynamic>> _compactCreateCards(
 
     byName[lower] = {
       ...existing,
+      if (existing['card_id'] == null && card['card_id'] != null)
+        'card_id': card['card_id'],
       'quantity': (existing['quantity'] as int? ?? 1) + quantity,
       if (isCommander || existing['is_commander'] == true) 'is_commander': true,
     };
@@ -604,10 +816,22 @@ List<Map<String, dynamic>> _compactCreateCards(
 
 class _CommanderInfo {
   _CommanderInfo({
+    required this.cardId,
     required this.name,
     required this.colorIdentity,
   });
 
+  final String cardId;
   final String name;
   final List<String> colorIdentity;
+}
+
+class _CommanderSeedSpec {
+  _CommanderSeedSpec({
+    required this.label,
+    required this.commanders,
+  });
+
+  final String label;
+  final List<String> commanders;
 }

@@ -85,6 +85,11 @@ run_frontend_full() {
   flutter test
 }
 
+run_resolution_corpus() {
+  print_header "Resolution corpus gate"
+  "$ROOT_DIR/scripts/quality_gate_resolution_corpus.sh"
+}
+
 ensure_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "❌ Comando não encontrado: $1"
@@ -102,16 +107,19 @@ print_usage() {
 Uso:
   ./scripts/quality_gate.sh quick   # validação rápida (dart test + flutter analyze)
   ./scripts/quality_gate.sh full    # validação completa (dart test + flutter analyze + flutter test)
+  ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
   No modo 'full', se a API responder corretamente em API_BASE_URL
   (default: http://localhost:8080), os testes de integração backend
   são habilitados automaticamente.
+  Use 'resolution' para validar o corpus estável Commander fim a fim.
 
 Exemplos:
   ./scripts/quality_gate.sh full
   API_BASE_URL=https://sua-api.easypanel.host ./scripts/quality_gate.sh full
+  ./scripts/quality_gate.sh resolution
 EOF
 }
 
@@ -126,6 +134,9 @@ main() {
     full)
       run_backend_full
       run_frontend_full
+      ;;
+    resolution)
+      run_resolution_corpus
       ;;
     -h|--help|help)
       print_usage

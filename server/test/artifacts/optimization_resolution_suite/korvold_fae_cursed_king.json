@@ -1,10 +1,10 @@
 {
-  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
-  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
-  "clone_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
-  "final_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+  "source_deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
+  "source_deck_name": "Corpus Seed - Korvold, Fae-Cursed King",
+  "clone_deck_id": "3d0b5dbd-fe57-4d96-ae3a-06fb28ce8119",
+  "final_deck_id": "3d0b5dbd-fe57-4d96-ae3a-06fb28ce8119",
   "optimize_request": {
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+    "deck_id": "3d0b5dbd-fe57-4d96-ae3a-06fb28ce8119",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -23,14 +23,14 @@
     "additions": [],
     "deck_analysis": {
       "detected_archetype": "midrange",
-      "average_cmc": "2.89",
+      "average_cmc": "2.64",
       "type_distribution": {
-        "creatures": 25,
-        "instants": 9,
-        "sorceries": 8,
-        "enchantments": 7,
+        "creatures": 28,
+        "instants": 11,
+        "sorceries": 10,
+        "enchantments": 6,
         "artifacts": 10,
-        "planeswalkers": 6,
+        "planeswalkers": 0,
         "lands": 36,
         "battles": 0
       },
@@ -52,18 +52,18 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873"
+    "deck_id": "3d0b5dbd-fe57-4d96-ae3a-06fb28ce8119"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
-    "average_cmc": "2.89",
+    "average_cmc": "2.64",
     "type_distribution": {
-      "creatures": 25,
-      "instants": 9,
-      "sorceries": 8,
-      "enchantments": 7,
+      "creatures": 28,
+      "instants": 11,
+      "sorceries": 10,
+      "enchantments": 6,
       "artifacts": 10,
-      "planeswalkers": 6,
+      "planeswalkers": 0,
       "lands": 36,
       "battles": 0
     },

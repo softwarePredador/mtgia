@@ -1,6 +1,6 @@
 {
   "name": "optimization-resolution-corpus-v1",
-  "generated_at": "2026-03-18",
+  "generated_at": "2026-03-23",
   "decks": [
     {
       "deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
@@ -106,6 +106,24 @@
       "label": "Prosper, Tome-Bound",
       "expected_flow_path": "safe_no_change",
       "note": "Seed Prosper estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
+      "label": "Jodah, the Unifier",
+      "expected_flow_path": "safe_no_change",
+      "note": "Caso five-color estabilizado em 2026-03-23; baseline atual preserva o deck sem trocas."
+    },
+    {
+      "deck_id": "458a8df7-afde-4232-b4da-e1ce8e9fbb0c",
+      "label": "Kozilek, the Great Distortion",
+      "expected_flow_path": "rebuild_guided",
+      "note": "Caso colorless estabilizado em 2026-03-23; baseline atual resolve por rebuild_guided."
+    },
+    {
+      "deck_id": "4a2e3a8f-32a3-4298-8309-a693b8e0f996",
+      "label": "Wilson, Refined Grizzly + Sword Coast Sailor",
+      "expected_flow_path": "safe_no_change",
+      "note": "Caso background estabilizado em 2026-03-23; baseline atual preserva o deck saudável com dois comandantes legais."
     }
   ]
 }

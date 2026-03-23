@@ -1,10 +1,10 @@
 {
   "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
   "source_deck_name": "Deck incremental",
-  "clone_deck_id": "a3ee92a7-c489-4198-8efb-2d2075cbaef2",
-  "final_deck_id": "fe970ebc-e6b4-48da-a39f-a6d4d7854110",
+  "clone_deck_id": "54c27287-a57b-4e2f-adc4-700462f413cc",
+  "final_deck_id": "f4bfe397-4933-4cf7-bb3f-91fd8ffc8888",
   "optimize_request": {
-    "deck_id": "a3ee92a7-c489-4198-8efb-2d2075cbaef2",
+    "deck_id": "54c27287-a57b-4e2f-adc4-700462f413cc",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -46,7 +46,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "a3ee92a7-c489-4198-8efb-2d2075cbaef2",
+        "deck_id": "54c27287-a57b-4e2f-adc4-700462f413cc",
         "bracket": 2,
         "archetype": "midrange",
         "theme": "tokens",
@@ -120,17 +120,17 @@
     "outcome_code": "rebuild_created",
     "save_mode": "draft_clone",
     "applied_to_original": false,
-    "source_deck_id": "a3ee92a7-c489-4198-8efb-2d2075cbaef2",
-    "draft_deck_id": "fe970ebc-e6b4-48da-a39f-a6d4d7854110",
+    "source_deck_id": "54c27287-a57b-4e2f-adc4-700462f413cc",
+    "draft_deck_id": "f4bfe397-4933-4cf7-bb3f-91fd8ffc8888",
     "draft_deck": {
-      "id": "fe970ebc-e6b4-48da-a39f-a6d4d7854110",
-      "name": "Rebuild Draft - Resolution Validation - Talrand, Sky Summoner - 1773847042335",
+      "id": "f4bfe397-4933-4cf7-bb3f-91fd8ffc8888",
+      "name": "Rebuild Draft - Resolution Validation - Talrand, Sky Summoner - 1774295958294",
       "format": "commander",
-      "description": "Draft de rebuild_guided criado a partir de a3ee92a7-c489-4198-8efb-2d2075cbaef2 | theme=tokens | scope=full_non_commander_rebuild",
+      "description": "Draft de rebuild_guided criado a partir de 54c27287-a57b-4e2f-adc4-700462f413cc | theme=tokens | scope=full_non_commander_rebuild",
       "archetype": "midrange",
       "bracket": 2,
       "is_public": false,
-      "created_at": "2026-03-18T15:17:34.745958Z"
+      "created_at": "2026-03-23T19:59:32.170553Z"
     },
     "rebuild_scope_requested": "auto",
     "rebuild_scope_selected": "full_non_commander_rebuild",
@@ -255,7 +255,7 @@
       "used_average_deck_seed": true,
       "used_edhrec_top_cards": true,
       "used_cached_commander_profile": false,
-      "candidate_pool_size": 225
+      "candidate_pool_size": 226
     },
     "rebuilt_cards": [
       {
@@ -724,14 +724,14 @@
     "next_action": {
       "type": "review_rebuild_draft",
       "applied_to_original": false,
-      "draft_deck_id": "fe970ebc-e6b4-48da-a39f-a6d4d7854110"
+      "draft_deck_id": "f4bfe397-4933-4cf7-bb3f-91fd8ffc8888"
     }
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "fe970ebc-e6b4-48da-a39f-a6d4d7854110"
+    "deck_id": "f4bfe397-4933-4cf7-bb3f-91fd8ffc8888"
   },
   "final_analysis": {
     "detected_archetype": "combo",

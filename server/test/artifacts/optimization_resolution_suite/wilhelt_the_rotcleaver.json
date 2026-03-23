@@ -1,10 +1,10 @@
 {
-  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
-  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
-  "clone_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
-  "final_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+  "source_deck_id": "6cfa4644-16a6-4070-9e73-619acc5e77e3",
+  "source_deck_name": "Corpus Seed - Wilhelt, the Rotcleaver",
+  "clone_deck_id": "875dd910-fb09-4f6c-8c7e-0e6c1ad3992a",
+  "final_deck_id": "875dd910-fb09-4f6c-8c7e-0e6c1ad3992a",
   "optimize_request": {
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+    "deck_id": "875dd910-fb09-4f6c-8c7e-0e6c1ad3992a",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -23,14 +23,14 @@
     "additions": [],
     "deck_analysis": {
       "detected_archetype": "midrange",
-      "average_cmc": "2.89",
+      "average_cmc": "3.02",
       "type_distribution": {
-        "creatures": 25,
-        "instants": 9,
-        "sorceries": 8,
+        "creatures": 30,
+        "instants": 8,
+        "sorceries": 9,
         "enchantments": 7,
-        "artifacts": 10,
-        "planeswalkers": 6,
+        "artifacts": 9,
+        "planeswalkers": 1,
         "lands": 36,
         "battles": 0
       },
@@ -52,18 +52,18 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873"
+    "deck_id": "875dd910-fb09-4f6c-8c7e-0e6c1ad3992a"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
-    "average_cmc": "2.89",
+    "average_cmc": "3.02",
     "type_distribution": {
-      "creatures": 25,
-      "instants": 9,
-      "sorceries": 8,
+      "creatures": 30,
+      "instants": 8,
+      "sorceries": 9,
       "enchantments": 7,
-      "artifacts": 10,
-      "planeswalkers": 6,
+      "artifacts": 9,
+      "planeswalkers": 1,
       "lands": 36,
       "battles": 0
     },

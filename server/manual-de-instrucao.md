@@ -1,3 +1,6 @@
+> Manual tecnico continuo e historico de implementacao.
+> Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+
 ## 2026-03-12 — Arquitetura async job para modo complete (otimização pesada)
 
 ### O Porquê

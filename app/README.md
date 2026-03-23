@@ -1,16 +1,45 @@
-# mtg_app
+# App Flutter — ManaLoom
 
-A new Flutter project.
+Aplicativo Flutter do ManaLoom.
 
-## Getting Started
+## Papel do app hoje
 
-This project is a starting point for a Flutter application.
+O app deve preservar a jornada principal do produto:
 
-A few resources to get you started if this is your first Flutter project:
+1. onboarding com contexto correto
+2. gerar ou importar deck
+3. abrir details
+4. otimizar ou reconstruir
+5. aplicar e validar
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Fonte de verdade
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Antes de mudar fluxo, prioridade ou UX do app, consultar:
+
+1. [../docs/CONTEXTO_PRODUTO_ATUAL.md](../docs/CONTEXTO_PRODUTO_ATUAL.md)
+2. [../docs/README.md](../docs/README.md)
+3. [test/README.md](test/README.md)
+
+Os documentos em `app/doc/` continuam úteis como apoio, mas hoje são complementares ao contexto operacional do repositório.
+
+## Comandos
+
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter run
+```
+
+## Pastas principais
+
+- `lib/features/decks/`
+- `lib/features/home/`
+- `lib/features/auth/`
+- `lib/features/collection/`
+- `lib/features/trades/`
+
+## Observação
+
+Neste momento, o app não deve puxar prioridade para longe do core de decks.  
+Melhorias visuais e superfícies secundárias só entram quando protegem ou reforçam o fluxo principal.

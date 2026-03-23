@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "c017a412-0f8c-4d9f-b35a-df5395705fdf",
+  "source_deck_name": "Corpus Seed - Miirym, Sentinel Wyrm",
+  "clone_deck_id": "cf70e6ea-8860-41ca-be02-18446ca43453",
+  "final_deck_id": "cf70e6ea-8860-41ca-be02-18446ca43453",
+  "optimize_request": {
+    "deck_id": "cf70e6ea-8860-41ca-be02-18446ca43453",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "cf70e6ea-8860-41ca-be02-18446ca43453"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "4.31",
+    "type_distribution": {
+      "creatures": 30,
+      "instants": 9,
+      "sorceries": 7,
+      "enchantments": 8,
+      "artifacts": 10,
+      "planeswalkers": 1,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}
