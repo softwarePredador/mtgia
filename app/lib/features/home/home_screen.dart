@@ -8,8 +8,32 @@ import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
 import '../market/providers/market_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _requestedDeckBootstrap = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_requestedDeckBootstrap) {
+      return;
+    }
+
+    _requestedDeckBootstrap = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final provider = context.read<DeckProvider>();
+      if (provider.decks.isEmpty && !provider.isLoading) {
+        provider.fetchDecks();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +42,9 @@ class HomeScreen extends StatelessWidget {
         .select<AuthProvider, ({String? displayName, String? username})>(
           (a) => (displayName: a.user?.displayName, username: a.user?.username),
         );
+    final isDeckLoading = context.select<DeckProvider, bool>(
+      (dp) => dp.isLoading,
+    );
     final recentDecks = context.select<DeckProvider, List<Deck>>(
       (dp) => dp.decks.take(3).toList(),
     );
@@ -173,6 +200,8 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     ...recentDecks.map((deck) => _RecentDeckTile(deck: deck)),
+                  ] else if (isDeckLoading) ...[
+                    const _DecksLoadingState(),
                   ] else ...[
                     // Empty state
                     const _EmptyDecksState(),
@@ -580,6 +609,42 @@ class _EmptyDecksState extends StatelessWidget {
 }
 
 // ── Stat Tile ────────────────────────────────────────────────────────────────
+
+class _DecksLoadingState extends StatelessWidget {
+  const _DecksLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: AppTheme.cardGradient,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+      ),
+      child: const Row(
+        children: [
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2.4),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Carregando seus decks para montar o resumo da home...',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _StatTile extends StatelessWidget {
   final String label;

@@ -1,308 +1,160 @@
-# Test Suite Documentation
+# Server Test Suite - MTGIA
 
-## Overview
+Este diretorio concentra a malha principal de confiabilidade do produto, com foco especial no carro chefe:
 
-Este diretório contém os testes automatizados do servidor MTG Deck Builder. A suíte de testes está dividida em **testes unitários** (podem ser executados sem dependências externas) e **testes de integração** (requerem servidor e banco de dados).
+- gerar deck
+- criar deck
+- analisar deck
+- otimizar deck
+- validar o resultado final
 
-## Estrutura de Testes
+Em `2026-03-23`, a auditoria do core confirmou que a cobertura relevante de otimizacao esta forte, mas distribuida em tres camadas diferentes. A leitura correta dos testes depende dessa separacao.
 
-```
-test/
-├── fixtures/                  # Arquivos de apoio (ex: listas/import)
-├── auth_service_test.dart      # Testes unitários do AuthService
-├── import_parser_test.dart      # Testes unitários do parser de importação
-├── deck_validation_test.dart    # Testes unitários de validações de deck (NOVO)
-└── decks_crud_test.dart         # Testes de integração PUT/DELETE (NOVO)
-```
+## Modelo de validacao
 
-## Scripts QA (manuais)
+### 1. Suites deterministicas e de regra
 
-Alguns checks end-to-end e smoke tests são **scripts manuais** e ficam em `bin/qa/`:
-- `bin/qa/performance_smoke.dart`
-- `bin/qa/integration_binder.dart`
-- `bin/qa/integration_trades.dart`
-- `bin/qa/integration_messages_notifications.dart`
-- `bin/qa/debug_community_decks.dart`
+Rodam em `dart test` puro, sem servidor externo.
 
-## Corpus de Resolução
+Essas suites provam a maior parte da logica critica do motor de otimizacao:
 
-O gate real de regressão do fluxo de deck usa um **corpus curado** em:
+- `optimization_rules_test.dart` - 52 testes
+- `optimization_quality_gate_test.dart` - 8 testes
+- `optimization_final_validation_test.dart` - 25 testes
+- `optimization_goal_validation_test.dart` - 3 testes
+- `optimization_validator_test.dart` - 6 testes
+- `goldfish_simulator_test.dart` - 14 testes
+- `generated_deck_validation_service_test.dart` - 3 testes
+- `optimize_learning_pipeline_test.dart` - 12 testes
+- `optimize_payload_parser_test.dart` - 3 testes
+- `card_resolution_support_test.dart` - 5 testes
+- `commander_reference_atraxa_test.dart` - 1 teste
+- `ml_analyzer_test.dart` - 31 testes
 
-```text
-test/fixtures/optimization_resolution_corpus.json
-```
+Cobrem principalmente:
 
-Ferramentas relacionadas:
+- tamanho final do deck por formato
+- limite de copias
+- identidade de cor
+- elegibilidade de commander
+- banlist e restricted list
+- classificacao funcional por papel
+- quality gates para swaps inseguros
+- validacao final da lista virtual apos swaps
+- consistencia e goldfish simulation
+- parser e aprendizado do pipeline
 
-- `bin/run_three_commander_resolution_validation.dart`
-- `bin/run_three_commander_optimization_validation.dart`
-- `bin/audit_resolution_corpus.dart`
-- `bin/add_resolution_corpus_entry.dart`
+### 2. Suites de integracao estilo simulacao
 
-Comandos principais:
+Tambem rodam em `dart test` puro, mas nao fazem a jornada HTTP real.
+
+- `optimization_pipeline_integration_test.dart` - 23 testes
+
+Importante:
+
+- o nome "integration" aqui significa integracao interna do pipeline
+- ela valida composicao de helpers, parser, analise virtual e derivacao de outcome
+- ela nao substitui a validacao real de endpoint, auth, persistencia ou banco
+
+### 3. Suites de contrato e integracao HTTP real
+
+Essas suites sao opt-in por ambiente e ficam protegidas por `RUN_INTEGRATION_TESTS=1`.
+
+- `ai_optimize_flow_test.dart` - 11 testes
+- `ai_generate_create_optimize_flow_test.dart` - 2 testes
+- `ai_optimize_telemetry_contract_test.dart` - 4 testes
+- `deck_analysis_contract_test.dart` - 3 testes
+- `decks_crud_test.dart`
+- `core_flow_smoke_test.dart`
+- `error_contract_test.dart`
+- `import_to_deck_flow_test.dart`
+
+Essas suites devem ser lidas como:
+
+- passam de verdade quando servidor, auth e banco estao disponiveis
+- fazem skip controlado quando o ambiente nao foi armado
+- suites que dependem de geracao por IA tambem podem ser puladas quando a credencial OpenAI do ambiente estiver invalida
+- nao devem derrubar a suite local por ausencia de infraestrutura
+
+## Resultado da auditoria de 2026-03-23
+
+Validado nesta rodada:
+
+- toda a bateria deterministica relevante da otimizacao
+- a suite `optimization_pipeline_integration_test.dart`
+- os contratos Flutter que consomem optimize e rebuild
+
+Status observado:
+
+- backend logico: verde
+- pipeline simulada: verde
+- suites HTTP protegidas por ambiente: skip controlado sem falso negativo
+
+Leitura operacional:
+
+- a logica principal da otimizacao esta bem coberta
+- o projeto tem protecao real contra regressao em legalidade, consistencia e role preservation
+- a parte que ainda depende de homologacao de ambiente e a jornada HTTP real completa
+
+## Suites mais importantes para release do core
+
+Se precisarmos de uma leitura rapida da saude da otimizacao, estas sao as baterias mais importantes:
+
+1. `optimization_rules_test.dart`
+2. `optimization_quality_gate_test.dart`
+3. `optimization_final_validation_test.dart`
+4. `optimization_validator_test.dart`
+5. `optimization_goal_validation_test.dart`
+6. `goldfish_simulator_test.dart`
+7. `optimization_pipeline_integration_test.dart`
+8. `ai_optimize_flow_test.dart` com `RUN_INTEGRATION_TESTS=1`
+
+## Comandos recomendados
+
+### Validacao local rapida do core de otimizacao
 
 ```bash
-# Auditoria rápida do corpus atual
-dart run bin/audit_resolution_corpus.dart
-
-# Adicionar deck novo ao corpus sem gravar
-dart run bin/add_resolution_corpus_entry.dart \
-  --deck-id <uuid> \
-  --expected-flow-path rebuild_guided \
-  --dry-run
-
-# Rodar a validação fim a fim usando o corpus fixo
-VALIDATION_CORPUS_PATH=test/fixtures/optimization_resolution_corpus.json \
-dart run bin/run_three_commander_resolution_validation.dart
+dart test test/optimization_rules_test.dart \
+  test/optimization_quality_gate_test.dart \
+  test/optimization_final_validation_test.dart \
+  test/optimization_goal_validation_test.dart \
+  test/optimization_validator_test.dart \
+  test/goldfish_simulator_test.dart \
+  test/generated_deck_validation_service_test.dart \
+  test/optimize_learning_pipeline_test.dart \
+  test/optimize_payload_parser_test.dart \
+  test/optimization_pipeline_integration_test.dart
 ```
 
-Guia operacional:
+### Validacao HTTP real do core
 
-```text
-doc/RESOLUTION_CORPUS_WORKFLOW.md
-```
+Pre requisitos:
 
-## Testes Implementados
+- servidor em `localhost:8080`
+- banco configurado
+- autenticacao operacional
 
-### ✅ Testes Unitários (Não requerem servidor)
-
-#### 1. `auth_service_test.dart` (16 testes)
-**Cobertura:**
-- Hash e verificação de senhas com bcrypt
-- Geração e validação de tokens JWT
-- Edge cases (senhas vazias, caracteres especiais, Unicode)
-
-**Executar:**
 ```bash
-dart test test/auth_service_test.dart
+RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart \
+  test/ai_generate_create_optimize_flow_test.dart \
+  test/ai_optimize_telemetry_contract_test.dart \
+  test/deck_analysis_contract_test.dart
 ```
 
-#### 2. `import_parser_test.dart` (35 testes)
-**Cobertura:**
-- Parsing de diferentes formatos de lista de deck
-- Detecção de comandantes
-- Limpeza de nomes de cartas
-- Validação de formato
-- Edge cases
+### Validacao total do servidor
 
-**Executar:**
-```bash
-dart test test/import_parser_test.dart
-```
-
-#### 3. `deck_validation_test.dart` (44 testes) ⭐ NOVO
-**Cobertura:**
-- Limites de cópias por formato (Commander: 1, Standard: 4)
-- Detecção de terrenos básicos (unlimited)
-- Detecção de tipo de carta (Creature, Land, etc)
-- Cálculo de CMC (Converted Mana Cost)
-- Validação de legalidade (banned, restricted)
-- Lógica de UPDATE e DELETE (edge cases)
-- Comportamento transacional
-
-**Executar:**
-```bash
-dart test test/deck_validation_test.dart
-```
-
-### 🔌 Testes de Integração (Requerem servidor e banco)
-
-#### 4. `decks_crud_test.dart` (14 testes) ⭐ NOVO
-**Cobertura:**
-- `PUT /decks/:id` - Atualização de decks
-  - Atualizar nome, formato, descrição
-  - Atualizar múltiplos campos
-  - Substituir lista de cartas
-  - Validação de regras do MTG
-  - Testes de permissão (ownership)
-- `DELETE /decks/:id` - Deleção de decks
-  - Delete bem-sucedido
-  - Cascade delete de cartas
-  - Verificação de ownership
-- Testes de ciclo completo (CREATE → UPDATE → DELETE)
-
-**Pré-requisitos:**
-1. Servidor rodando: `dart_frog dev`
-2. Banco de dados configurado no `.env`
-3. Porta 8080 disponível
-
-**Executar:**
-```bash
-# Terminal 1: Iniciar servidor
-cd server
-dart_frog dev
-
-# Terminal 2: Executar testes de integração
-dart test test/decks_crud_test.dart
-```
-
-**Nota:** Os testes de integração criam e limpam seus próprios dados de teste automaticamente.
-
-## Executar Todos os Testes
-
-### Apenas testes unitários (rápido, sem dependências):
 ```bash
 dart test
 ```
 
-### Testes de integração (requer servidor rodando):
-```bash
-RUN_INTEGRATION_TESTS=1 dart test test/decks_crud_test.dart
-RUN_INTEGRATION_TESTS=1 dart test test/decks_incremental_add_test.dart
-```
+## Regra de manutencao
 
-### Com relatório detalhado:
-```bash
-dart test --reporter=expanded
-```
+Qualquer mudanca em `server/routes/ai/optimize/` ou `server/lib/ai/` deve responder estas perguntas antes de ser considerada segura:
 
-### Com cobertura de código:
-```bash
-dart test --coverage=./coverage
-dart pub global activate coverage
-dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
-```
+1. alterou legalidade do deck final?
+2. alterou balance de swaps?
+3. alterou classificacao funcional de cartas?
+4. alterou a consistencia ou o score do validator?
+5. alterou contrato HTTP, telemetry ou outcome code?
 
-## Estatísticas de Cobertura
-
-| Módulo | Testes | Status | Cobertura Estimada |
-|--------|--------|--------|-------------------|
-| `lib/auth_service.dart` | 16 | ✅ | ~90% |
-| `routes/import/index.dart` | 35 | ✅ | ~85% (parser logic) |
-| `routes/decks/[id]/index.dart` (validações) | 44 | ✅ | ~75% (unit) |
-| `routes/decks/[id]/index.dart` (endpoints) | 14 | 🔌 | ~80% (integration) |
-
-**Total:** 109 testes (95 unitários + 14 integração)
-
-## Continuous Integration (CI/CD)
-
-Para integrar no GitHub Actions, adicione ao `.github/workflows/test.yml`:
-
-```yaml
-name: Run Tests
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: mtgdb_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Dart
-        uses: dart-lang/setup-dart@v1
-      
-      - name: Install dependencies
-        run: |
-          cd server
-          dart pub get
-      
-      - name: Run unit tests
-        run: |
-          cd server
-          dart test test/auth_service_test.dart
-          dart test test/import_parser_test.dart
-          dart test test/deck_validation_test.dart
-      
-      - name: Start server for integration tests
-        run: |
-          cd server
-          dart_frog dev &
-          sleep 10
-      
-      - name: Run integration tests
-        run: |
-          cd server
-          dart test test/decks_crud_test.dart
-```
-
-## Próximos Passos (Roadmap de Testes)
-
-### Prioridade Alta
-- [ ] Testes de integração para `routes/auth/login.dart` e `register.dart`
-- [ ] Testes de integração para `routes/decks/index.dart` (GET, POST)
-- [ ] Testes para middleware de autenticação
-
-### Prioridade Média
-- [ ] Testes para análise de deck (`routes/decks/[id]/analysis/index.dart`)
-- [ ] Testes para recomendações
-- [ ] Testes para simulação
-
-### Prioridade Baixa
-- [ ] Testes para endpoints de IA (mocks necessários para OpenAI)
-- [ ] Testes de performance (load testing)
-- [ ] Testes end-to-end com Selenium/Puppeteer
-
-## Convenções de Teste
-
-1. **Nomenclatura:**
-   - Arquivos: `<modulo>_test.dart`
-   - Grupos: `group('Feature Name', () {...})`
-   - Testes: `test('should do something', () {...})`
-
-2. **Estrutura AAA:**
-   ```dart
-   test('should validate correctly', () {
-     // Arrange (preparar dados)
-     final input = 'test';
-     
-     // Act (executar ação)
-     final result = validate(input);
-     
-     // Assert (verificar resultado)
-     expect(result, isTrue);
-   });
-   ```
-
-3. **Helpers:**
-   - Use funções helper para reduzir duplicação
-   - Coloque helpers no `setUp()` ou em funções privadas no início do arquivo
-
-4. **Limpeza:**
-   - Use `tearDown()` para limpar dados de teste
-   - Garanta que testes são independentes (não dependem de ordem)
-
-## Troubleshooting
-
-### Erro: "JWT_SECRET não configurado"
-**Solução:** Crie um arquivo `.env` na pasta `server/` com:
-```
-JWT_SECRET=test_secret_for_testing
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=mtgdb_test
-DB_USER=postgres
-DB_PASS=postgres
-```
-
-### Erro: "Connection refused" nos testes de integração
-**Solução:** Certifique-se que o servidor está rodando:
-```bash
-cd server
-dart_frog dev
-```
-
-### Testes falhando no CI/CD
-**Solução:** Verifique que:
-1. O serviço PostgreSQL está configurado corretamente
-2. As variáveis de ambiente estão definidas
-3. O servidor tem tempo suficiente para iniciar antes dos testes
-
-## Referências
-
-- [Dart Test Package](https://pub.dev/packages/test)
-- [Dart Frog Testing Guide](https://dartfrog.vgv.dev/docs/testing)
-- [MTG Comprehensive Rules](https://magic.wizards.com/en/rules)
+Se a resposta for "sim" para qualquer uma delas, a mudanca precisa vir acompanhada de teste nesta pasta.

@@ -6,7 +6,9 @@ import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
 class DeckImportScreen extends StatefulWidget {
-  const DeckImportScreen({super.key});
+  const DeckImportScreen({super.key, this.initialFormat});
+
+  final String? initialFormat;
 
   @override
   State<DeckImportScreen> createState() => _DeckImportScreenState();
@@ -24,6 +26,27 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   List<String> _warnings = [];
   int _cardsImported = 0;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedFormat = _normalizeFormat(widget.initialFormat) ?? _selectedFormat;
+  }
+
+  String? _normalizeFormat(String? format) {
+    if (format == null || format.trim().isEmpty) {
+      return null;
+    }
+
+    final normalized = format.trim().toLowerCase();
+    for (final option in _formats) {
+      if (option == normalized) {
+        return option;
+      }
+    }
+
+    return null;
+  }
 
   final _formats = [
     'commander',

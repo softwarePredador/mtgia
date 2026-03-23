@@ -97,10 +97,12 @@ void main() {
   }
 
   setUpAll(() async {
+    if (skipIntegration != null) return;
     authToken = await getAuthToken();
   });
 
   tearDownAll(() async {
+    if (skipIntegration != null) return;
     for (final deckId in createdDeckIds) {
       await deleteDeck(deckId);
     }
@@ -134,7 +136,8 @@ void main() {
       'returns 404 for missing deck',
       () async {
         final response = await http.get(
-          Uri.parse('$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
+          Uri.parse(
+              '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
           headers: authHeaders(),
         );
 
@@ -148,7 +151,8 @@ void main() {
       'returns 405 for invalid method',
       () async {
         final response = await http.post(
-          Uri.parse('$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
+          Uri.parse(
+              '$baseUrl/decks/00000000-0000-0000-0000-000000000098/analysis'),
           headers: authHeaders(withContentType: true),
           body: jsonEncode({}),
         );

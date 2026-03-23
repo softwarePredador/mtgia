@@ -105,7 +105,7 @@ class OptimizationValidator {
     List<Map<String, dynamic>> deck, {
     int runs = 500,
   }) {
-    final random = Random();
+    final random = Random(_stableDeckSeed(deck, runs));
     var totalMulligans = 0;
     var keptAt7 = 0;
     var keptAt6 = 0;
@@ -186,6 +186,24 @@ class OptimizationValidator {
       keepAt4OrLessRate: keptAt4OrLess / runs,
       keepableAfterMullRate: totalKeepableAfterMull / runs,
     );
+  }
+
+  int _stableDeckSeed(List<Map<String, dynamic>> deck, int runs) {
+    var hash = 17;
+
+    for (final card in deck) {
+      final name = (card['name'] as String? ?? '').toLowerCase();
+      final quantity = (card['quantity'] as int?) ?? 1;
+      final typeLine = (card['type_line'] as String? ?? '').toLowerCase();
+      final manaCost = (card['mana_cost'] as String? ?? '').toLowerCase();
+
+      hash = 31 * hash + name.hashCode;
+      hash = 31 * hash + quantity.hashCode;
+      hash = 31 * hash + typeLine.hashCode;
+      hash = 31 * hash + manaCost.hashCode;
+    }
+
+    return hash ^ runs.hashCode;
   }
 
   // ═══════════════════════════════════════════════════════════════

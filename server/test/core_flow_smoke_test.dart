@@ -166,10 +166,12 @@ void main() {
   }
 
   setUpAll(() async {
+    if (skipIntegration != null) return;
     authToken = await getAuthToken();
   });
 
   tearDownAll(() async {
+    if (skipIntegration != null) return;
     for (final deckId in createdDeckIds) {
       await deleteDeck(deckId);
     }
@@ -180,7 +182,8 @@ void main() {
       'create flow enforces core contracts',
       () async {
         final deckId = await createDeck(
-          name: 'Smoke Create Standard ${DateTime.now().millisecondsSinceEpoch}',
+          name:
+              'Smoke Create Standard ${DateTime.now().millisecondsSinceEpoch}',
           format: 'standard',
         );
         createdDeckIds.add(deckId);
@@ -205,11 +208,13 @@ void main() {
           }),
         );
 
-        expect(invalidImport.statusCode, equals(400), reason: invalidImport.body);
+        expect(invalidImport.statusCode, equals(400),
+            reason: invalidImport.body);
         expect(decodeJson(invalidImport)['error'], isA<String>());
 
         final deckId = await createDeck(
-          name: 'Smoke Create For Error ${DateTime.now().millisecondsSinceEpoch}',
+          name:
+              'Smoke Create For Error ${DateTime.now().millisecondsSinceEpoch}',
           format: 'standard',
         );
         createdDeckIds.add(deckId);
