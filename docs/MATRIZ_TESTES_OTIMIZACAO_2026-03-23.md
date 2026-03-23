@@ -284,6 +284,41 @@ A base atual justifica travar a Sprint 1 em otimizacao de decks e evoluir com cr
 4. modularizar `server/routes/ai/optimize/index.dart`
 5. reduzir concentracao de fluxo AI em `deck_provider.dart` e `deck_details_screen.dart`
 
+## Aditivo - Expansao Do Corpus Commander Em 2026-03-23
+
+Leitura consolidada nesta rodada:
+
+- o corpus estavel de resolucao Commander saiu de `10` para `16` decks
+- os `6` novos comandantes estabilizados foram:
+- `Meren of Clan Nel Toth`
+- `Korvold, Fae-Cursed King`
+- `Kaalia of the Vast`
+- `Miirym, Sentinel Wyrm`
+- `Wilhelt, the Rotcleaver`
+- `Prosper, Tome-Bound`
+
+Validacao real executada:
+
+- relatorio focado em novos comandantes: `RELATORIO_RESOLUCAO_NOVOS_COMMANDERS_2026-03-23.md`
+- artifact dir: `server/test/artifacts/optimization_resolution_new_commanders_2026_03_23`
+- resultado: `6/6` passaram
+- flow path observado nos `6`: `safe_no_change`
+- deck final valido em todos os `6`
+- deck final `healthy` em todos os `6`
+- land count final `36` em todos os `6`
+
+Ajustes de logica feitos para suportar essa rodada:
+
+- `bootstrap_resolution_corpus_decks.dart` passou a aceitar `VALIDATION_COMMANDERS` por `;` ou quebra de linha
+- o bootstrap deixou de completar deck com terrenos extras quando faltam spells
+- o bootstrap passou a inferir identidade de cor por `oracle_text` quando o banco nao traz `color_identity` suficiente
+- `DeckRulesService` passou a inferir identidade de cor por `oracle_text`, reduzindo falso negativo em Commander quando o banco vier incompleto
+
+Caso explicitamente removido do corpus estavel:
+
+- `Yuriko, the Tiger's Shadow`
+- motivo: o seed anterior foi montado com `47` terrenos por falta de spell density suficiente; apos o ajuste, o bootstrap agora retorna `montagem insuficiente`, o que e o comportamento correto para um corpus serio
+
 ## Conclusao operacional
 
 O projeto nao esta "sem testes".

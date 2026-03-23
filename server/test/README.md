@@ -151,6 +151,25 @@ RUN_INTEGRATION_TESTS=1 dart test test/ai_optimize_flow_test.dart \
 dart test
 ```
 
+## Corpus de resolucao Commander
+
+Fixtures operacionais:
+
+- `test/fixtures/optimization_resolution_corpus.json`: corpus estavel principal com `16` decks Commander validados
+- `test/fixtures/optimization_resolution_corpus_new_commanders_2026-03-23.json`: suite focada usada para estabilizar os `6` novos comandantes da rodada
+
+Regras novas confirmadas em `2026-03-23`:
+
+- `bootstrap_resolution_corpus_decks.dart` aceita `VALIDATION_COMMANDERS` separados por `;` ou quebra de linha
+- o bootstrap nao pode mais preencher 100 cartas adicionando terrenos extras quando faltarem spells
+- se nao houver spell density suficiente, o comportamento correto agora e `montagem insuficiente`
+- a identidade de cor nao depende mais apenas de `cards.color_identity`; quando esse campo vier incompleto, o servidor infere pelo `oracle_text`
+
+Excecao operacional documentada:
+
+- `Yuriko, the Tiger's Shadow` ficou fora do corpus estavel apos a rodada de 2026-03-23
+- motivo: o seed anterior inflava land count para `47`; depois da correcao, o bootstrap passou a rejeitar esse caso como `montagem insuficiente`
+
 ## Regra de manutencao
 
 Qualquer mudanca em `server/routes/ai/optimize/` ou `server/lib/ai/` deve responder estas perguntas antes de ser considerada segura:

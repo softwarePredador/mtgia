@@ -400,3 +400,24 @@ O `mtgia` esta em um estado bom e serio para um produto cujo diferencial esta no
 O que mais ameaca a evolucao do projeto hoje nao e ausencia de feature. Sao os monolitos de app/backend, a cobertura ainda insuficiente no app para as jornadas mais criticas e a necessidade de validar em device real tudo o que envolve integracoes externas.
 
 Com a decisao de dedicar a Sprint 1 integralmente a otimizacao de decks, o caminho mais forte e correto e perseguir confianca maxima no core antes de qualquer outra expansao. Isso coloca o projeto na direcao certa.
+
+## Aditivo - Corpus Estavel De Commander Em 2026-03-23
+
+Evolucao confirmada nesta rodada:
+
+- o corpus estavel de resolucao Commander agora cobre `16` decks
+- os `6` novos casos estabilizados foram `Meren`, `Korvold`, `Kaalia`, `Miirym`, `Wilhelt` e `Prosper`
+- a execucao focada desses `6` fechou `6/6` verde em `RELATORIO_RESOLUCAO_NOVOS_COMMANDERS_2026-03-23.md`
+- o comportamento observado nos `6` foi conservador e coerente: `safe_no_change` com deck final valido, healthy e `36` terrenos
+
+Achados tecnicos importantes:
+
+- o bootstrap do corpus tinha um furo de confiabilidade: quando faltavam spells, ele completava 100 cartas adicionando terrenos extras
+- esse comportamento produziu um falso baseline para `Yuriko`, que apareceu com `47` terrenos mesmo em `safe_no_change`
+- o bootstrap foi corrigido para falhar honestamente com `montagem insuficiente` em vez de inflar land count
+- a validacao de identidade de cor do servidor passou a inferir cores pelo `oracle_text` quando o banco vier com `color_identity` vazio, reduzindo risco de aceitar lands/duals fora da identidade real
+
+Decisao operacional:
+
+- `Yuriko, the Tiger's Shadow` foi retirada do corpus estavel
+- ela deve voltar apenas quando houver material de referencia suficiente para seed saudavel e repetivel

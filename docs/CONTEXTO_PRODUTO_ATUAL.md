@@ -50,6 +50,10 @@ Se um pedido novo nao disser o contrario:
 - regra tecnica nova de consistencia: simulacoes do `OptimizationValidator` devem ser deterministicas para reduzir flakiness de score e aumentar confianca do CI
 - regra documental nova: toda decisao sobre a frente de otimizacao deve consultar `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md` antes de ampliar escopo ou declarar confianca de release
 - regra de resiliencia local: rotas de IA que ja possuem fallback seguro devem tolerar `OPENAI_API_KEY` invalida em `dev/staging`, sem mascarar erro em `prod`
+- regra nova do corpus operacional: o corpus estavel de resolucao Commander foi ampliado para `16` decks validados, incluindo `Meren`, `Korvold`, `Kaalia`, `Miirym`, `Wilhelt` e `Prosper`
+- regra nova de seed confiavel: o bootstrap do corpus nao pode mais completar 100 cartas inflando terrenos quando faltarem spells; nesses casos ele deve falhar com `montagem insuficiente`
+- regra nova de identidade de cor: quando `cards.color_identity` vier vazio/incompleto, a validacao deve inferir identidade pelo `oracle_text` para nao aceitar duals/lands fora da identidade real por lacuna de banco
+- excecao documentada do corpus: `Yuriko, the Tiger's Shadow` ficou fora do corpus estavel apos a rodada de 2026-03-23 por nao conseguir gerar seed saudavel com o material atual de referencia
 
 ## Estrutura Oficial Do Produto
 
