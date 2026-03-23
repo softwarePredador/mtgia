@@ -1,0 +1,66 @@
+{
+  "source_deck_id": "169d8b11-5210-4bfc-b8f0-9fbfe6bbb635",
+  "source_deck_name": "Corpus Seed - Krenko, Mob Boss",
+  "clone_deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
+  "final_deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
+  "optimize_request": {
+    "deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
+    "quality_error": {
+      "code": "OPTIMIZE_NO_SAFE_SWAPS",
+      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
+      "dropped_swaps": [
+        "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
+        "🔒 Blasphemous Act -> Command Tower removida pelo gate: papel wipe -> land, delta CMC -9."
+      ]
+    },
+    "mode": "optimize",
+    "removals": [],
+    "additions": [],
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "69410c32-e998-4ac6-a6f5-51d23bb13e9a"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.64",
+    "type_distribution": {
+      "creatures": 31,
+      "instants": 7,
+      "sorceries": 7,
+      "enchantments": 8,
+      "artifacts": 12,
+      "planeswalkers": 0,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

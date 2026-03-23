@@ -1,10 +1,10 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "33454d6f-447f-4f9f-a2c6-8dd7857b5558",
+  "clone_deck_id": "60e0438e-5589-4215-96a7-8a7ce377ca1e",
   "optimize_request": {
-    "deck_id": "33454d6f-447f-4f9f-a2c6-8dd7857b5558",
-    "archetype": "midrange",
+    "deck_id": "60e0438e-5589-4215-96a7-8a7ce377ca1e",
+    "archetype": "control",
     "bracket": 2,
     "keep_theme": true
   },
@@ -15,42 +15,43 @@
       "code": "OPTIMIZE_QUALITY_REJECTED",
       "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
       "reasons": [
-        "A validação final não fechou como \"aprovado\" (score 66/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
-        "Score final abaixo do mínimo para aceitar a otimização com sucesso (66/100; mínimo 70)."
+        "As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano."
       ],
       "validation": {
-        "validation_score": 66,
-        "verdict": "aprovado_com_ressalvas",
+        "validation_score": 79,
+        "deck_health_score": 89,
+        "improvement_score": 56,
+        "verdict": "aprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
-            "consistency_score": 89,
+            "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.16,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.823
+              "screw_rate": 0.145,
+              "flood_rate": 0.013,
+              "keepable_rate": 0.842
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.72,
-              "turn_2_play": 0.932,
-              "turn_3_play": 0.983,
-              "turn_4_play": 0.995,
+              "turn_1_play": 0.746,
+              "turn_2_play": 0.933,
+              "turn_3_play": 0.989,
+              "turn_4_play": 0.991,
               "cmc_distribution": {
-                "1": 15,
-                "3": 13,
-                "2": 12,
-                "7": 3,
-                "10": 4,
                 "5": 3,
+                "7": 3,
+                "1": 15,
+                "2": 12,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (16.0%). Considere adicionar 2-4 terrenos."
+              "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
           "after": {
@@ -58,25 +59,25 @@
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.141,
-              "flood_rate": 0.016,
-              "keepable_rate": 0.843
+              "screw_rate": 0.14,
+              "flood_rate": 0.014,
+              "keepable_rate": 0.846
             },
             "curve_analysis": {
-              "avg_cmc": 3.07,
-              "turn_1_play": 0.751,
-              "turn_2_play": 0.929,
-              "turn_3_play": 0.985,
+              "avg_cmc": 3.08,
+              "turn_1_play": 0.732,
+              "turn_2_play": 0.923,
+              "turn_3_play": 0.984,
               "turn_4_play": 0.995,
               "cmc_distribution": {
-                "3": 13,
-                "2": 12,
-                "7": 3,
-                "1": 15,
-                "10": 4,
                 "5": 3,
+                "7": 3,
+                "1": 14,
+                "2": 13,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
@@ -87,72 +88,54 @@
           "mulligan_before": {
             "runs": 500,
             "avg_mulligans": 0.12,
-            "keep_at_7": 0.89,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.014,
+            "keep_at_7": 0.896,
+            "keep_at_6": 0.092,
+            "keep_at_5": 0.012,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.928
+            "keepable_after_mull": 0.88
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.908,
-            "keep_at_6": 0.086,
+            "avg_mulligans": 0.11,
+            "keep_at_7": 0.9,
+            "keep_at_6": 0.094,
             "keep_at_5": 0.006,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.93
+            "keepable_after_mull": 0.908
           },
           "deltas": {
-            "consistency_score": 1,
-            "screw_rate_delta": -0.019,
-            "flood_rate_delta": -0.001,
-            "keepable_rate_delta": 0.02,
-            "turn2_play_delta": -0.003,
-            "mulligan_keep7_delta": 0.018
+            "consistency_score": 0,
+            "screw_rate_delta": -0.005,
+            "flood_rate_delta": 0.001,
+            "keepable_rate_delta": 0.004,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": 0.004
           }
         },
         "functional_analysis": {
           "swaps": [
             {
-              "removed": "Isochron Scepter",
-              "added": "Counterspell",
-              "removed_role": "artifact",
-              "added_role": "removal",
-              "role_preserved": false,
-              "cmc_delta": 0,
-              "verdict": "tradeoff"
-            },
-            {
               "removed": "Ponder",
-              "added": "Brainstorm",
+              "added": "Experimental Augury",
               "removed_role": "draw",
               "added_role": "draw",
               "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
-            },
-            {
-              "removed": "Urza's Saga",
-              "added": "Command Tower",
-              "removed_role": "land",
-              "added_role": "land",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "cmc_delta": 1,
+              "verdict": "sidegrade"
             }
           ],
           "summary": {
-            "upgrades": 2,
-            "sidegrades": 0,
-            "tradeoffs": 1,
+            "upgrades": 0,
+            "sidegrades": 1,
+            "tradeoffs": 0,
             "questionable": 0
           },
           "role_delta": {
             "draw": 0,
-            "removal": 1,
+            "removal": 0,
             "ramp": 0,
             "creature": 0,
-            "artifact": -1,
+            "artifact": 0,
             "enchantment": 0,
             "land": 0,
             "utility": 0,
@@ -162,33 +145,30 @@
           }
         },
         "critic_ai": {
-          "approval_score": 85,
+          "approval_score": 75,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de Isochron Scepter por Counterspell pode reduzir a versatilidade do deck, já que Isochron Scepter pode gerar valor contínuo ao longo do jogo.",
-            "A perda de Urza's Saga, que pode gerar criaturas e mana, pode impactar a capacidade de pressão do deck, mesmo que Command Tower seja uma adição sólida."
+            "Experimental Augury oferece uma opção de scry, mas não é tão eficiente quanto Ponder em termos de filtragem de cartas.",
+            "A troca resulta em uma leve diminuição na jogada no T2, o que pode impactar o ritmo do deck."
           ],
-          "strong_swaps": [
-            "Ponder por Brainstorm é uma troca clara e positiva, pois Brainstorm oferece mais flexibilidade e sinergia com efeitos de embaralhamento."
-          ],
+          "strong_swaps": [],
           "weak_swaps": [
-            "Isochron Scepter por Counterspell é uma troca questionável, pois a remoção de um artefato que pode gerar valor repetido pode ser mais prejudicial do que a adição de um único counter."
+            {
+              "card": "Ponder",
+              "justification": "Ponder permite uma filtragem mais eficaz e a possibilidade de embaralhar o deck, o que pode ser crucial em um deck de controle."
+            }
           ],
-          "overall_assessment": "As trocas são em sua maioria benéficas, mas a perda de versatilidade e pressão pode ser uma preocupação a longo prazo."
+          "overall_assessment": "A troca é aceitável, mas pode comprometer a eficiência do deck em termos de filtragem e ritmo."
         },
         "warnings": []
       }
     },
     "mode": "optimize",
     "removals": [
-      "Isochron Scepter",
-      "Ponder",
-      "Urza's Saga"
+      "Ponder"
     ],
     "additions": [
-      "Counterspell",
-      "Brainstorm",
-      "Command Tower"
+      "Experimental Augury"
     ],
     "deck_analysis": {
       "detected_archetype": "control",
@@ -210,13 +190,13 @@
     },
     "post_analysis": {
       "detected_archetype": "control",
-      "average_cmc": "3.07",
+      "average_cmc": "3.08",
       "type_distribution": {
         "creatures": 10,
-        "instants": 19,
+        "instants": 18,
         "sorceries": 7,
-        "enchantments": 4,
-        "artifacts": 23,
+        "enchantments": 5,
+        "artifacts": 24,
         "planeswalkers": 0,
         "lands": 40,
         "battles": 0
@@ -229,38 +209,40 @@
         "Mais interação instant-speed adicionada"
       ],
       "validation": {
-        "validation_score": 66,
-        "verdict": "aprovado_com_ressalvas",
+        "validation_score": 79,
+        "deck_health_score": 89,
+        "improvement_score": 56,
+        "verdict": "aprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
-            "consistency_score": 89,
+            "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.16,
-              "flood_rate": 0.017,
-              "keepable_rate": 0.823
+              "screw_rate": 0.145,
+              "flood_rate": 0.013,
+              "keepable_rate": 0.842
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
-              "turn_1_play": 0.72,
-              "turn_2_play": 0.932,
-              "turn_3_play": 0.983,
-              "turn_4_play": 0.995,
+              "turn_1_play": 0.746,
+              "turn_2_play": 0.933,
+              "turn_3_play": 0.989,
+              "turn_4_play": 0.991,
               "cmc_distribution": {
-                "1": 15,
-                "3": 13,
-                "2": 12,
-                "7": 3,
-                "10": 4,
                 "5": 3,
+                "7": 3,
+                "1": 15,
+                "2": 12,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
             "recommendations": [
-              "Alta taxa de mana screw (16.0%). Considere adicionar 2-4 terrenos."
+              "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
           "after": {
@@ -268,25 +250,25 @@
             "consistency_score": 90,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.141,
-              "flood_rate": 0.016,
-              "keepable_rate": 0.843
+              "screw_rate": 0.14,
+              "flood_rate": 0.014,
+              "keepable_rate": 0.846
             },
             "curve_analysis": {
-              "avg_cmc": 3.07,
-              "turn_1_play": 0.751,
-              "turn_2_play": 0.929,
-              "turn_3_play": 0.985,
+              "avg_cmc": 3.08,
+              "turn_1_play": 0.732,
+              "turn_2_play": 0.923,
+              "turn_3_play": 0.984,
               "turn_4_play": 0.995,
               "cmc_distribution": {
-                "3": 13,
-                "2": 12,
-                "7": 3,
-                "1": 15,
-                "10": 4,
                 "5": 3,
+                "7": 3,
+                "1": 14,
+                "2": 13,
+                "3": 13,
                 "4": 5,
                 "0": 4,
+                "10": 4,
                 "9": 1
               }
             },
@@ -297,72 +279,54 @@
           "mulligan_before": {
             "runs": 500,
             "avg_mulligans": 0.12,
-            "keep_at_7": 0.89,
-            "keep_at_6": 0.096,
-            "keep_at_5": 0.014,
+            "keep_at_7": 0.896,
+            "keep_at_6": 0.092,
+            "keep_at_5": 0.012,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.928
+            "keepable_after_mull": 0.88
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.908,
-            "keep_at_6": 0.086,
+            "avg_mulligans": 0.11,
+            "keep_at_7": 0.9,
+            "keep_at_6": 0.094,
             "keep_at_5": 0.006,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.93
+            "keepable_after_mull": 0.908
           },
           "deltas": {
-            "consistency_score": 1,
-            "screw_rate_delta": -0.019,
-            "flood_rate_delta": -0.001,
-            "keepable_rate_delta": 0.02,
-            "turn2_play_delta": -0.003,
-            "mulligan_keep7_delta": 0.018
+            "consistency_score": 0,
+            "screw_rate_delta": -0.005,
+            "flood_rate_delta": 0.001,
+            "keepable_rate_delta": 0.004,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": 0.004
           }
         },
         "functional_analysis": {
           "swaps": [
             {
-              "removed": "Isochron Scepter",
-              "added": "Counterspell",
-              "removed_role": "artifact",
-              "added_role": "removal",
-              "role_preserved": false,
-              "cmc_delta": 0,
-              "verdict": "tradeoff"
-            },
-            {
               "removed": "Ponder",
-              "added": "Brainstorm",
+              "added": "Experimental Augury",
               "removed_role": "draw",
               "added_role": "draw",
               "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
-            },
-            {
-              "removed": "Urza's Saga",
-              "added": "Command Tower",
-              "removed_role": "land",
-              "added_role": "land",
-              "role_preserved": true,
-              "cmc_delta": 0,
-              "verdict": "upgrade"
+              "cmc_delta": 1,
+              "verdict": "sidegrade"
             }
           ],
           "summary": {
-            "upgrades": 2,
-            "sidegrades": 0,
-            "tradeoffs": 1,
+            "upgrades": 0,
+            "sidegrades": 1,
+            "tradeoffs": 0,
             "questionable": 0
           },
           "role_delta": {
             "draw": 0,
-            "removal": 1,
+            "removal": 0,
             "ramp": 0,
             "creature": 0,
-            "artifact": -1,
+            "artifact": 0,
             "enchantment": 0,
             "land": 0,
             "utility": 0,
@@ -372,29 +336,39 @@
           }
         },
         "critic_ai": {
-          "approval_score": 85,
+          "approval_score": 75,
           "verdict": "aprovado_com_ressalvas",
           "concerns": [
-            "A troca de Isochron Scepter por Counterspell pode reduzir a versatilidade do deck, já que Isochron Scepter pode gerar valor contínuo ao longo do jogo.",
-            "A perda de Urza's Saga, que pode gerar criaturas e mana, pode impactar a capacidade de pressão do deck, mesmo que Command Tower seja uma adição sólida."
+            "Experimental Augury oferece uma opção de scry, mas não é tão eficiente quanto Ponder em termos de filtragem de cartas.",
+            "A troca resulta em uma leve diminuição na jogada no T2, o que pode impactar o ritmo do deck."
           ],
-          "strong_swaps": [
-            "Ponder por Brainstorm é uma troca clara e positiva, pois Brainstorm oferece mais flexibilidade e sinergia com efeitos de embaralhamento."
-          ],
+          "strong_swaps": [],
           "weak_swaps": [
-            "Isochron Scepter por Counterspell é uma troca questionável, pois a remoção de um artefato que pode gerar valor repetido pode ser mais prejudicial do que a adição de um único counter."
+            {
+              "card": "Ponder",
+              "justification": "Ponder permite uma filtragem mais eficaz e a possibilidade de embaralhar o deck, o que pode ser crucial em um deck de controle."
+            }
           ],
-          "overall_assessment": "As trocas são em sua maioria benéficas, mas a perda de versatilidade e pressão pode ser uma preocupação a longo prazo."
+          "overall_assessment": "A troca é aceitável, mas pode comprometer a eficiência do deck em termos de filtragem e ritmo."
         },
         "warnings": []
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 4 troca(s) insegura(s) antes da resposta final.",
-      "🔒 All Is Dust -> Tezzeret's Gambit removida pelo gate: papel wipe -> draw, delta CMC -3.",
-      "🔒 Lightning Greaves -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel protection -> creature, delta CMC +5.",
-      "🔒 Basalt Monolith -> Arcane Denial removida pelo gate: papel ramp -> draw, delta CMC -1.",
-      "🔒 Expedition Map -> Laboratory Maniac removida pelo gate: papel ramp -> draw, delta CMC +2."
-    ]
+      "🔒 Gate de qualidade removeu 5 troca(s) insegura(s) antes da resposta final.",
+      "🔒 All Is Dust -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel wipe -> creature, delta CMC +0.",
+      "🔒 Expedition Map -> Command Tower removida pelo gate: papel ramp -> land, delta CMC -1.",
+      "🔒 Blast Zone -> Counterspell removida pelo gate: papel land -> removal, delta CMC +2.",
+      "🔒 Dramatic Reversal -> Tezzeret's Gambit removida pelo gate: papel utility -> draw, delta CMC +2.",
+      "🔒 Basalt Monolith -> Flux Channeler removida pelo gate: papel ramp -> creature, delta CMC +0."
+    ],
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
   }
 }

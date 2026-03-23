@@ -9,6 +9,10 @@ TEST_NAME="source deck regression uses fixed sourceDeckId and persists full retu
 SERVER_PID=""
 
 CARRO_CHEFE_STRICT="${CARRO_CHEFE_STRICT:-}"
+RUN_RESOLUTION_FLOW="${RUN_RESOLUTION_FLOW:-1}"
+RESOLUTION_VALIDATION_LIMIT="${RESOLUTION_VALIDATION_LIMIT:-3}"
+RESOLUTION_SELECTION_MODE="${RESOLUTION_SELECTION_MODE:-three}"
+VALIDATION_CORPUS_PATH="${VALIDATION_CORPUS_PATH:-}"
 if [[ -z "$CARRO_CHEFE_STRICT" ]]; then
   if [[ "${CI:-}" == "1" || "${CI:-}" == "true" ]]; then
     CARRO_CHEFE_STRICT=1
@@ -31,6 +35,9 @@ printf "Quality Gate - Carro-Chefe (optimize/complete)\n"
 printf "============================================================\n"
 printf "SOURCE_DECK_ID=%s\n" "$SOURCE_DECK_ID"
 printf "STRICT_MODE=%s\n" "$CARRO_CHEFE_STRICT"
+printf "RUN_RESOLUTION_FLOW=%s\n" "$RUN_RESOLUTION_FLOW"
+printf "RESOLUTION_VALIDATION_LIMIT=%s\n" "$RESOLUTION_VALIDATION_LIMIT"
+printf "RESOLUTION_SELECTION_MODE=%s\n" "$RESOLUTION_SELECTION_MODE"
 printf "SERVER=%s\n\n" "$SERVER_DIR"
 
 cd "$SERVER_DIR"
@@ -164,6 +171,35 @@ if mode == "complete" and isinstance(details, list):
 
 print("✅ Verificação estrita do artefato aprovada.")
 PY
+
+if [[ "$RUN_RESOLUTION_FLOW" == "1" ]]; then
+  VALIDATION_ARTIFACT_DIR="${VALIDATION_ARTIFACT_DIR:-}"
+  VALIDATION_SUMMARY_JSON_PATH="${VALIDATION_SUMMARY_JSON_PATH:-}"
+  VALIDATION_SUMMARY_MD_PATH="${VALIDATION_SUMMARY_MD_PATH:-}"
+  if [[ -z "$VALIDATION_CORPUS_PATH" && -f "$SERVER_DIR/test/fixtures/optimization_resolution_corpus.json" ]]; then
+    VALIDATION_CORPUS_PATH="test/fixtures/optimization_resolution_corpus.json"
+  fi
+
+  if [[ -z "$VALIDATION_ARTIFACT_DIR" && "$RESOLUTION_VALIDATION_LIMIT" -gt 3 ]]; then
+    VALIDATION_ARTIFACT_DIR="test/artifacts/optimization_resolution_suite"
+  fi
+  if [[ -z "$VALIDATION_SUMMARY_JSON_PATH" && "$RESOLUTION_VALIDATION_LIMIT" -gt 3 ]]; then
+    VALIDATION_SUMMARY_JSON_PATH="test/artifacts/optimization_resolution_suite/latest_summary.json"
+  fi
+  if [[ -z "$VALIDATION_SUMMARY_MD_PATH" && "$RESOLUTION_VALIDATION_LIMIT" -gt 3 ]]; then
+    VALIDATION_SUMMARY_MD_PATH="../RELATORIO_RESOLUCAO_SUITE_COMMANDER_$(date +%Y-%m-%d).md"
+  fi
+
+  echo
+  echo "▶ Rodando validação do fluxo completo optimize -> rebuild..."
+  VALIDATION_LIMIT="$RESOLUTION_VALIDATION_LIMIT" \
+  VALIDATION_SELECTION_MODE="$RESOLUTION_SELECTION_MODE" \
+  VALIDATION_CORPUS_PATH="$VALIDATION_CORPUS_PATH" \
+  VALIDATION_ARTIFACT_DIR="$VALIDATION_ARTIFACT_DIR" \
+  VALIDATION_SUMMARY_JSON_PATH="$VALIDATION_SUMMARY_JSON_PATH" \
+  VALIDATION_SUMMARY_MD_PATH="$VALIDATION_SUMMARY_MD_PATH" \
+  dart run bin/run_three_commander_resolution_validation.dart
+fi
 
 printf "\n✅ Quality gate carro-chefe concluído com sucesso.\n"
 printf "📦 Artefato latest: %s\n" "$SERVER_DIR/test/artifacts/ai_optimize/source_deck_optimize_latest.json"

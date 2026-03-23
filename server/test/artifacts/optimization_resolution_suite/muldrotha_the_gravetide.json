@@ -1,0 +1,61 @@
+{
+  "source_deck_id": "5bf67c2e-fdeb-40a9-be91-ebb7edac7489",
+  "source_deck_name": "Corpus Seed - Muldrotha, the Gravetide",
+  "clone_deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
+  "final_deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
+  "optimize_request": {
+    "deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma otimizacao segura foi produzida; deck original preservado.",
+    "quality_error": {
+      "code": "OPTIMIZE_EXECUTION_FAILED",
+      "message": "A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.",
+      "details": "Falha ao executar optimizeDeck na tentativa primaria."
+    },
+    "mode": "optimize",
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "673506f8-8501-41b3-832d-12e0f30db2ae"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.61",
+    "type_distribution": {
+      "creatures": 32,
+      "instants": 6,
+      "sorceries": 6,
+      "enchantments": 10,
+      "artifacts": 12,
+      "planeswalkers": 2,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

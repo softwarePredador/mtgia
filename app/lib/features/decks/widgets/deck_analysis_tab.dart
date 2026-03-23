@@ -48,14 +48,20 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
 
     // Color distribution
     final colorCounts = <String, int>{
-      'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'C': 0,
+      'W': 0,
+      'U': 0,
+      'B': 0,
+      'R': 0,
+      'G': 0,
+      'C': 0,
     };
     for (var card in allCards) {
       if (card.typeLine.toLowerCase().contains('land')) continue;
       final pips = ManaHelper.countColorPips(card.manaCost);
       pips.forEach((color, count) {
         if (colorCounts.containsKey(color)) {
-          colorCounts[color] = (colorCounts[color] ?? 0) + (count * card.quantity);
+          colorCounts[color] =
+              (colorCounts[color] ?? 0) + (count * card.quantity);
         }
       });
     }
@@ -93,11 +99,15 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         (deck != null && deck.id == widget.deck.id) ? deck : widget.deck;
 
     // Auto-trigger AI analysis for decks with enough cards that were never analyzed
-    final hasAnalysis = (effectiveDeck.synergyScore ?? 0) > 0 ||
+    final hasAnalysis =
+        (effectiveDeck.synergyScore ?? 0) > 0 ||
         (effectiveDeck.strengths ?? '').trim().isNotEmpty ||
         (effectiveDeck.weaknesses ?? '').trim().isNotEmpty;
     final totalCardCount = effectiveDeck.cardCount;
-    if (!_autoAnalysisTriggered && !_isRefreshingAi && !hasAnalysis && totalCardCount >= 60) {
+    if (!_autoAnalysisTriggered &&
+        !_isRefreshingAi &&
+        !hasAnalysis &&
+        totalCardCount >= 60) {
       _autoAnalysisTriggered = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _refreshAi();
@@ -203,7 +213,8 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   maxY:
-                      (manaCurve.reduce((a, b) => a > b ? a : b) + 1).toDouble(),
+                      (manaCurve.reduce((a, b) => a > b ? a : b) + 1)
+                          .toDouble(),
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
@@ -321,7 +332,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         titleStyle: const TextStyle(
           fontSize: AppTheme.fontSm,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: AppTheme.backgroundAbyss,
         ),
       );
     }).toList();

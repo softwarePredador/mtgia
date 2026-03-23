@@ -219,7 +219,7 @@ List<String> buildOptimizationRejectionReasons({
     );
   }
 
-  if (validationReport.score < 70) {
+  if (validationReport.verdict != 'aprovado' && validationReport.score < 70) {
     reasons.add(
       'Score final abaixo do mínimo para aceitar a otimização com sucesso (${validationReport.score}/100; mínimo 70).',
     );

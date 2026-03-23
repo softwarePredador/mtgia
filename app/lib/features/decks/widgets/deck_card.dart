@@ -94,16 +94,18 @@ class DeckCard extends StatelessWidget {
                     if (hasCommander) ...[
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
                           border: Border.all(
                             color: AppTheme.outlineMuted,
                             width: 0.5,
                           ),
                         ),
                         child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
                           child: CachedCardImage(
                             imageUrl: commanderImageUrl,
                             width: 48,
@@ -130,38 +132,18 @@ class DeckCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 6),
-                          // Format chip + color identity + public icon
-                          Row(
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Flexible(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      _FormatChip(
-                                        format: deck.format,
-                                        accentColor: accentColor,
-                                      ),
-                                      if (deck.colorIdentity.isNotEmpty) ...[
-                                        const SizedBox(width: 8),
-                                        _ColorIdentityRow(
-                                          colors: deck.colorIdentity,
-                                        ),
-                                      ],
-                                      if (deck.isPublic) ...[
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.public,
-                                          size: 14,
-                                          color: AppTheme.textHint,
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
+                              _FormatChip(
+                                format: deck.format,
+                                accentColor: accentColor,
                               ),
+                              if (deck.colorIdentity.isNotEmpty)
+                                _ColorIdentityRow(colors: deck.colorIdentity),
+                              if (deck.isPublic) const _PublicStatusChip(),
                             ],
                           ),
                         ],
@@ -211,8 +193,9 @@ class DeckCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 3,
-                      backgroundColor:
-                          AppTheme.outlineMuted.withValues(alpha: 0.5),
+                      backgroundColor: AppTheme.outlineMuted.withValues(
+                        alpha: 0.5,
+                      ),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isComplete ? AppTheme.success : accentColor,
                       ),
@@ -232,9 +215,10 @@ class DeckCard extends StatelessWidget {
                           ? Icons.check_circle_outline
                           : Icons.layers_outlined,
                       size: 14,
-                      color: isComplete
-                          ? AppTheme.success
-                          : AppTheme.textSecondary,
+                      color:
+                          isComplete
+                              ? AppTheme.success
+                              : AppTheme.textSecondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -244,9 +228,10 @@ class DeckCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.w600,
-                        color: isComplete
-                            ? AppTheme.success
-                            : AppTheme.textSecondary,
+                        color:
+                            isComplete
+                                ? AppTheme.success
+                                : AppTheme.textSecondary,
                       ),
                     ),
 
@@ -321,11 +306,13 @@ class DeckCard extends StatelessWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline,
-                  size: 20, color: theme.colorScheme.error),
+              Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: theme.colorScheme.error,
+              ),
               const SizedBox(width: 8),
-              Text('Excluir',
-                  style: TextStyle(color: theme.colorScheme.error)),
+              Text('Excluir', style: TextStyle(color: theme.colorScheme.error)),
             ],
           ),
         ),
@@ -347,28 +334,28 @@ class _ColorIdentityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Sort by WUBRG order
-    final sorted = List<String>.from(colors)
-      ..sort((a, b) {
-        final ai = _wubrgOrder.indexOf(a);
-        final bi = _wubrgOrder.indexOf(b);
-        return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
-      });
+    final sorted = List<String>.from(colors)..sort((a, b) {
+      final ai = _wubrgOrder.indexOf(a);
+      final bi = _wubrgOrder.indexOf(b);
+      return (ai == -1 ? 99 : ai).compareTo(bi == -1 ? 99 : bi);
+    });
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: sorted.map((c) {
-        return Padding(
-          padding: const EdgeInsets.only(right: 2),
-          child: SizedBox(
-            width: 16,
-            height: 16,
-            child: SvgPicture.asset(
-              'assets/symbols/$c.svg',
-              placeholderBuilder: (_) => _FallbackPip(letter: c),
-            ),
-          ),
-        );
-      }).toList(),
+      children:
+          sorted.map((c) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: SvgPicture.asset(
+                  'assets/symbols/$c.svg',
+                  placeholderBuilder: (_) => _FallbackPip(letter: c),
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -377,26 +364,15 @@ class _FallbackPip extends StatelessWidget {
   final String letter;
   const _FallbackPip({required this.letter});
 
-  static const _colorMap = {
-    'W': Color(0xFFF9FAF4),
-    'U': Color(0xFF0E68AB),
-    'B': Color(0xFF150B00),
-    'R': Color(0xFFD3202A),
-    'G': Color(0xFF00733E),
-  };
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 16,
       height: 16,
       decoration: BoxDecoration(
-        color: _colorMap[letter] ?? AppTheme.textHint,
+        color: AppTheme.manaPipBackground(letter),
         shape: BoxShape.circle,
-        border: Border.all(
-          color: AppTheme.outlineMuted,
-          width: 0.5,
-        ),
+        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -404,9 +380,7 @@ class _FallbackPip extends StatelessWidget {
         style: TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.bold,
-          color: letter == 'W' || letter == 'R'
-              ? Colors.black87
-              : Colors.white,
+          color: AppTheme.manaPipForeground(letter),
         ),
       ),
     );
@@ -437,6 +411,40 @@ class _FormatChip extends StatelessWidget {
           fontSize: AppTheme.fontXs,
           letterSpacing: 0.5,
         ),
+      ),
+    );
+  }
+}
+
+class _PublicStatusChip extends StatelessWidget {
+  const _PublicStatusChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppTheme.primarySoft.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+        border: Border.all(
+          color: AppTheme.primarySoft.withValues(alpha: 0.24),
+          width: 0.5,
+        ),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.public, size: 12, color: AppTheme.primarySoft),
+          SizedBox(width: 4),
+          Text(
+            'Público',
+            style: TextStyle(
+              color: AppTheme.primarySoft,
+              fontWeight: FontWeight.w700,
+              fontSize: AppTheme.fontXs,
+            ),
+          ),
+        ],
       ),
     );
   }

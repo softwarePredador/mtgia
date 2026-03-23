@@ -1,0 +1,82 @@
+{
+  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
+  "clone_deck_id": "dd90d181-4571-430e-90b0-c756015991bd",
+  "final_deck_id": "dd90d181-4571-430e-90b0-c756015991bd",
+  "optimize_request": {
+    "deck_id": "dd90d181-4571-430e-90b0-c756015991bd",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "A otimizacao nao encontrou trocas acionaveis apos os filtros de seguranca.",
+    "quality_error": {
+      "code": "OPTIMIZE_NO_ACTIONABLE_SWAPS",
+      "message": "As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.",
+      "blocked_by_theme": [],
+      "blocked_by_bracket": []
+    },
+    "mode": "optimize",
+    "removals": [],
+    "additions": [],
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.89",
+      "type_distribution": {
+        "creatures": 25,
+        "instants": 9,
+        "sorceries": 8,
+        "enchantments": 7,
+        "artifacts": 10,
+        "planeswalkers": 6,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "dd90d181-4571-430e-90b0-c756015991bd"
+  },
+  "final_analysis": {
+    "detected_archetype": "midrange",
+    "average_cmc": "2.89",
+    "type_distribution": {
+      "creatures": 25,
+      "instants": 9,
+      "sorceries": 8,
+      "enchantments": 7,
+      "artifacts": 10,
+      "planeswalkers": 6,
+      "lands": 36,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

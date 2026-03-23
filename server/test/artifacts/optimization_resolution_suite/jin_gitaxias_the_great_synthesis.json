@@ -1,0 +1,70 @@
+{
+  "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
+  "source_deck_name": "jin",
+  "clone_deck_id": "ab635b8d-3e62-4a17-a463-cb35670347e8",
+  "final_deck_id": "ab635b8d-3e62-4a17-a463-cb35670347e8",
+  "optimize_request": {
+    "deck_id": "ab635b8d-3e62-4a17-a463-cb35670347e8",
+    "archetype": "control",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
+    "quality_error": {
+      "code": "OPTIMIZE_NO_SAFE_SWAPS",
+      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
+      "dropped_swaps": [
+        "🔒 Gate de qualidade removeu 5 troca(s) insegura(s) antes da resposta final.",
+        "🔒 All Is Dust -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel wipe -> creature, delta CMC +0.",
+        "🔒 Expedition Map -> Brainstorm removida pelo gate: papel ramp -> draw, delta CMC +0.",
+        "🔒 Blast Zone -> Counterspell removida pelo gate: papel land -> removal, delta CMC +2.",
+        "🔒 Swan Song -> Flux Channeler removida pelo gate: papel removal -> creature, delta CMC +2.",
+        "🔒 Dramatic Reversal -> Jace, Wielder of Mysteries removida pelo gate: papel utility -> draw, delta CMC +2."
+      ]
+    },
+    "mode": "optimize",
+    "removals": [],
+    "additions": [],
+    "deck_state": {
+      "status": "healthy",
+      "recommended_mode": "optimize",
+      "suggested_scope": "micro_swaps",
+      "severity_score": 0,
+      "reasons": []
+    },
+    "outcome_code": "no_safe_upgrade_found"
+  },
+  "final_validate_status": 200,
+  "final_validate_response": {
+    "ok": true,
+    "format": "commander",
+    "deck_id": "ab635b8d-3e62-4a17-a463-cb35670347e8"
+  },
+  "final_analysis": {
+    "detected_archetype": "control",
+    "average_cmc": "3.07",
+    "type_distribution": {
+      "creatures": 10,
+      "instants": 17,
+      "sorceries": 8,
+      "enchantments": 5,
+      "artifacts": 24,
+      "planeswalkers": 0,
+      "lands": 40,
+      "battles": 0
+    },
+    "total_cards": 100,
+    "mana_curve_assessment": "BOA: Curva adequada para Control",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "archetype_confidence": "média"
+  },
+  "final_state": {
+    "status": "healthy",
+    "recommended_mode": "optimize",
+    "suggested_scope": "micro_swaps",
+    "severity_score": 0,
+    "reasons": []
+  }
+}

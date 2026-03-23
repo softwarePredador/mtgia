@@ -62,6 +62,7 @@ class OptimizationValidator {
     return _computeVerdict(
       monteCarlo: monteCarloReport,
       functional: functionalReport,
+      archetype: archetype,
       critic: criticReport,
     );
   }
@@ -205,17 +206,12 @@ class OptimizationValidator {
       final addedName = additions[i];
 
       // Encontrar dados da carta removida
-      final removedCard = originalDeck.firstWhere(
-        (c) =>
-            (c['name'] as String?)?.toLowerCase() == removedName.toLowerCase(),
-        orElse: () => <String, dynamic>{},
-      );
+      final removedCard =
+          _findCardByName(originalDeck, removedName) ?? <String, dynamic>{};
 
       // Encontrar dados da carta adicionada
-      final addedCard = optimizedDeck.firstWhere(
-        (c) => (c['name'] as String?)?.toLowerCase() == addedName.toLowerCase(),
-        orElse: () => <String, dynamic>{},
-      );
+      final addedCard =
+          _findCardByName(optimizedDeck, addedName) ?? <String, dynamic>{};
 
       if (removedCard.isEmpty || addedCard.isEmpty) {
         swapAnalysis.add(SwapFunctionalAnalysis(
@@ -426,52 +422,57 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
   ValidationReport _computeVerdict({
     required MonteCarloComparison monteCarlo,
     required FunctionalReport functional,
+    required String archetype,
     Map<String, dynamic>? critic,
   }) {
-    // Score composto (0-100)
-    var score = 50.0; // Base neutra
+    final healthScore = _computeDeckHealthScore(
+      monteCarlo: monteCarlo,
+      archetype: archetype,
+    );
+    final improvementScore = _computeImprovementScore(
+      monteCarlo: monteCarlo,
+      functional: functional,
+      archetype: archetype,
+      critic: critic,
+    );
 
-    // Monte Carlo: consistência melhorou?
-    final consistencyDelta =
-        monteCarlo.after.consistencyScore - monteCarlo.before.consistencyScore;
-    score += consistencyDelta * 0.5; // Cada ponto de consistência vale 0.5
-
-    // Mulligan: keep rate melhorou?
-    final mulliganDelta = monteCarlo.afterMulligan.keepAt7Rate -
-        monteCarlo.beforeMulligan.keepAt7Rate;
-    score += mulliganDelta * 20; // Cada 1% de melhoria vale 0.2
-
-    // Screw rate: diminuiu?
-    final screwDelta = monteCarlo.before.screwRate - monteCarlo.after.screwRate;
-    score += screwDelta * 15; // Cada 1% de melhoria vale 0.15
-
-    // Análise funcional: upgrades são bons, questionáveis são ruins
-    score += functional.upgrades * 3;
-    score += functional.sidegrades * 1;
-    score -= functional.questionable * 5;
-
-    // Role preservation: perder removal, draw, wipe ou ramp é muito ruim
+    // Role preservation: perder removal, draw, wipe ou ramp é muito ruim.
+    // Essas perdas impactam tanto o score final quanto o veredito.
     final lostRemoval = (functional.roleDelta['removal'] ?? 0) < 0;
     final lostDraw = (functional.roleDelta['draw'] ?? 0) < 0;
     final lostWipe = (functional.roleDelta['wipe'] ?? 0) < 0;
     final lostRamp = (functional.roleDelta['ramp'] ?? 0) < 0;
-    if (lostRemoval) score -= 8;
-    if (lostDraw) score -= 6;
-    if (lostWipe) score -= 5;
-    if (lostRamp) score -= 4;
+    final hasCriticalRoleLoss = lostRemoval || lostDraw || lostWipe || lostRamp;
+    final consistencyDelta =
+        monteCarlo.after.consistencyScore - monteCarlo.before.consistencyScore;
 
-    // Critic AI bonus/penalty
-    if (critic != null) {
-      final criticScore = (critic['approval_score'] as num?)?.toDouble() ?? 50;
-      // Misturar score do critic com o score calculado (30% weight)
-      score = score * 0.7 + criticScore * 0.3;
+    var score = (healthScore * 0.6) + (improvementScore * 0.4);
+    if (hasCriticalRoleLoss) {
+      score -= 6;
     }
-
+    final cleanUpgradeBonus = healthScore >= 70 &&
+        improvementScore >= 55 &&
+        functional.questionable == 0 &&
+        !hasCriticalRoleLoss;
+    if (cleanUpgradeBonus) {
+      score += 3;
+    }
     score = score.clamp(0, 100);
 
     // Veredito
     String verdict;
-    if (score >= 70) {
+    if (healthScore < 45) {
+      verdict = 'reprovado';
+    } else if (score >= 70 &&
+        healthScore >= 70 &&
+        improvementScore >= 55 &&
+        !hasCriticalRoleLoss) {
+      verdict = 'aprovado';
+    } else if (score >= 65 &&
+        healthScore >= 80 &&
+        improvementScore >= 35 &&
+        functional.questionable == 0 &&
+        !hasCriticalRoleLoss) {
       verdict = 'aprovado';
     } else if (score >= 45) {
       verdict = 'aprovado_com_ressalvas';
@@ -506,15 +507,112 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     if (monteCarlo.after.screwRate > monteCarlo.before.screwRate + 0.03) {
       warnings.add('Risco de mana screw aumentou significativamente.');
     }
+    if (healthScore < 60) {
+      warnings.add(
+          'Saúde absoluta do deck final ainda está baixa (${healthScore.round()}/100).');
+    }
+    if (improvementScore < 50) {
+      warnings.add(
+          'A melhoria incremental foi pequena (${improvementScore.round()}/100).');
+    }
 
     return ValidationReport(
       score: score.round(),
+      healthScore: healthScore.round(),
+      improvementScore: improvementScore.round(),
       verdict: verdict,
       monteCarlo: monteCarlo,
       functional: functional,
       critic: critic,
       warnings: warnings,
     );
+  }
+
+  double _computeDeckHealthScore({
+    required MonteCarloComparison monteCarlo,
+    required String archetype,
+  }) {
+    final after = monteCarlo.after;
+    final afterMulligan = monteCarlo.afterMulligan;
+    final pressureRate = _pressureRateForArchetype(after, archetype);
+    final stableManaRate =
+        (1 - after.screwRate - after.floodRate).clamp(0.0, 1.0);
+
+    var score = 0.0;
+    score += after.consistencyScore * 0.35;
+    score += (after.keepableRate * 100) * 0.20;
+    score += (afterMulligan.keepableAfterMullRate * 100) * 0.15;
+    score += (stableManaRate * 100) * 0.20;
+    score += (pressureRate * 100) * 0.10;
+    return score.clamp(0, 100).toDouble();
+  }
+
+  double _computeImprovementScore({
+    required MonteCarloComparison monteCarlo,
+    required FunctionalReport functional,
+    required String archetype,
+    required Map<String, dynamic>? critic,
+  }) {
+    final before = monteCarlo.before;
+    final after = monteCarlo.after;
+    final beforeMulligan = monteCarlo.beforeMulligan;
+    final afterMulligan = monteCarlo.afterMulligan;
+
+    final consistencyDelta = after.consistencyScore - before.consistencyScore;
+    final keepableDelta = after.keepableRate - before.keepableRate;
+    final keepAfterMullDelta = afterMulligan.keepableAfterMullRate -
+        beforeMulligan.keepableAfterMullRate;
+    final keepAt7Delta = afterMulligan.keepAt7Rate - beforeMulligan.keepAt7Rate;
+    final screwDelta = before.screwRate - after.screwRate;
+    final floodDelta = before.floodRate - after.floodRate;
+    final pressureDelta = _pressureRateForArchetype(after, archetype) -
+        _pressureRateForArchetype(before, archetype);
+
+    var score = 40.0;
+    score += consistencyDelta * 5.0;
+    score += keepableDelta * 300.0;
+    score += keepAfterMullDelta * 180.0;
+    score += keepAt7Delta * 120.0;
+    score += screwDelta * 300.0;
+    score += floodDelta * 100.0;
+    score += pressureDelta * 250.0;
+
+    score += functional.upgrades * 5.0;
+    score += functional.sidegrades * 2.0;
+    score -= functional.tradeoffs * 3.0;
+    score -= functional.questionable * 8.0;
+
+    if ((functional.roleDelta['removal'] ?? 0) < 0) score -= 12.0;
+    if ((functional.roleDelta['draw'] ?? 0) < 0) score -= 10.0;
+    if ((functional.roleDelta['wipe'] ?? 0) < 0) score -= 8.0;
+    if ((functional.roleDelta['ramp'] ?? 0) < 0) score -= 8.0;
+    if ((functional.roleDelta['protection'] ?? 0) < 0) score -= 6.0;
+
+    final cleanIncrementalUpgrade = functional.upgrades >= 1 &&
+        functional.questionable == 0 &&
+        consistencyDelta >= 0 &&
+        keepAfterMullDelta >= -0.01 &&
+        screwDelta >= -0.01;
+    if (cleanIncrementalUpgrade) {
+      score += 4.0;
+    }
+
+    score = score.clamp(0, 100).toDouble();
+
+    if (critic != null) {
+      final criticScore = (critic['approval_score'] as num?)?.toDouble() ?? 50;
+      score = (score * 0.8) + (criticScore * 0.2);
+    }
+
+    return score.clamp(0, 100).toDouble();
+  }
+
+  double _pressureRateForArchetype(GoldfishResult result, String archetype) {
+    return switch (archetype.trim().toLowerCase()) {
+      'control' => result.turn4PlayRate,
+      'combo' => result.turn3PlayRate,
+      _ => result.turn2PlayRate,
+    };
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -525,6 +623,18 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
     return ((card['type_line'] as String?) ?? '')
         .toLowerCase()
         .contains('land');
+  }
+
+  Map<String, dynamic>? _findCardByName(
+    List<Map<String, dynamic>> deck,
+    String name,
+  ) {
+    final normalized = name.trim().toLowerCase();
+    for (final card in deck) {
+      final candidate = ((card['name'] as String?) ?? '').trim().toLowerCase();
+      if (candidate == normalized) return card;
+    }
+    return null;
   }
 
   int _getCmc(Map<String, dynamic> card) {
@@ -667,6 +777,8 @@ class FunctionalReport {
 
 class ValidationReport {
   final int score; // 0-100
+  final int healthScore; // 0-100
+  final int improvementScore; // 0-100
   final String verdict; // 'aprovado', 'aprovado_com_ressalvas', 'reprovado'
   final MonteCarloComparison monteCarlo;
   final FunctionalReport functional;
@@ -675,6 +787,8 @@ class ValidationReport {
 
   ValidationReport({
     required this.score,
+    this.healthScore = 0,
+    this.improvementScore = 0,
     required this.verdict,
     required this.monteCarlo,
     required this.functional,
@@ -684,6 +798,8 @@ class ValidationReport {
 
   Map<String, dynamic> toJson() => {
         'validation_score': score,
+        'deck_health_score': healthScore,
+        'improvement_score': improvementScore,
         'verdict': verdict,
         'monte_carlo': monteCarlo.toJson(),
         'functional_analysis': functional.toJson(),

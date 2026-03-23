@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -59,12 +60,16 @@ class _CommunityScreenState extends State<CommunityScreen>
       appBar: AppBar(
         title: const Text('Comunidade'),
         backgroundColor: AppTheme.surfaceElevated,
+        actions: const [ShellAppBarActions()],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppTheme.manaViolet,
           labelColor: AppTheme.textPrimary,
           unselectedLabelColor: AppTheme.textSecondary,
-          labelStyle: const TextStyle(fontSize: AppTheme.fontMd, fontWeight: FontWeight.w600),
+          labelStyle: const TextStyle(
+            fontSize: AppTheme.fontMd,
+            fontWeight: FontWeight.w600,
+          ),
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           tabs: const [
@@ -141,10 +146,10 @@ class _ExploreTabState extends State<_ExploreTab>
   void _doSearch() {
     final query = _searchController.text.trim();
     context.read<CommunityProvider>().fetchPublicDecks(
-          search: query.isEmpty ? null : query,
-          format: _selectedFormat,
-          reset: true,
-        );
+      search: query.isEmpty ? null : query,
+      format: _selectedFormat,
+      reset: true,
+    );
   }
 
   @override
@@ -164,11 +169,16 @@ class _ExploreTabState extends State<_ExploreTab>
                 decoration: InputDecoration(
                   hintText: 'Pesquisar decks públicos...',
                   hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                  prefixIcon:
-                      const Icon(Icons.search, color: AppTheme.primarySoft),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppTheme.primarySoft,
+                  ),
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear,
-                        color: AppTheme.textSecondary, size: 18),
+                    icon: const Icon(
+                      Icons.clear,
+                      color: AppTheme.textSecondary,
+                      size: 18,
+                    ),
                     onPressed: () {
                       _searchController.clear();
                       _doSearch();
@@ -180,8 +190,10 @@ class _ExploreTabState extends State<_ExploreTab>
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 onSubmitted: (_) => _doSearch(),
               ),
@@ -205,8 +217,7 @@ class _ExploreTabState extends State<_ExploreTab>
             builder: (context, provider, _) {
               if (provider.isLoading && provider.decks.isEmpty) {
                 return const Center(
-                  child:
-                      CircularProgressIndicator(color: AppTheme.manaViolet),
+                  child: CircularProgressIndicator(color: AppTheme.manaViolet),
                 );
               }
 
@@ -215,16 +226,19 @@ class _ExploreTabState extends State<_ExploreTab>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.wifi_off,
-                          size: 48, color: AppTheme.textSecondary),
+                      const Icon(
+                        Icons.wifi_off,
+                        size: 48,
+                        color: AppTheme.textSecondary,
+                      ),
                       const SizedBox(height: 12),
-                      Text(provider.errorMessage!,
-                          style:
-                              const TextStyle(color: AppTheme.textSecondary)),
+                      Text(
+                        provider.errorMessage!,
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () =>
-                            provider.fetchPublicDecks(reset: true),
+                        onPressed: () => provider.fetchPublicDecks(reset: true),
                         child: const Text('Tentar novamente'),
                       ),
                     ],
@@ -237,23 +251,26 @@ class _ExploreTabState extends State<_ExploreTab>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.public_off,
-                          size: 64,
-                          color:
-                              AppTheme.textSecondary.withValues(alpha: 0.5)),
+                      Icon(
+                        Icons.public_off,
+                        size: 64,
+                        color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Nenhum deck público encontrado',
                         style: TextStyle(
-                            color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontLg,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Compartilhe seus decks para aparecerem aqui!',
                         style: TextStyle(
-                            color:
-                                AppTheme.textSecondary.withValues(alpha: 0.7),
-                            fontSize: AppTheme.fontMd),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                          fontSize: AppTheme.fontMd,
+                        ),
                       ),
                     ],
                   ),
@@ -263,15 +280,15 @@ class _ExploreTabState extends State<_ExploreTab>
               return ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(12),
-                itemCount:
-                    provider.decks.length + (provider.hasMore ? 1 : 0),
+                itemCount: provider.decks.length + (provider.hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= provider.decks.length) {
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(16),
                         child: CircularProgressIndicator(
-                            color: AppTheme.manaViolet),
+                          color: AppTheme.manaViolet,
+                        ),
                       ),
                     );
                   }
@@ -279,13 +296,15 @@ class _ExploreTabState extends State<_ExploreTab>
                   final deck = provider.decks[index];
                   return _CommunityDeckCard(
                     deck: deck,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            CommunityDeckDetailScreen(deckId: deck.id),
-                      ),
-                    ),
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) =>
+                                    CommunityDeckDetailScreen(deckId: deck.id),
+                          ),
+                        ),
                   );
                 },
               );
@@ -301,13 +320,13 @@ class _ExploreTabState extends State<_ExploreTab>
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
-        label: Text(label,
-            style: TextStyle(
-              color: isSelected
-                  ? AppTheme.backgroundAbyss
-                  : AppTheme.textPrimary,
-              fontSize: AppTheme.fontSm,
-            )),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppTheme.backgroundAbyss : AppTheme.textPrimary,
+            fontSize: AppTheme.fontSm,
+          ),
+        ),
         selected: isSelected,
         selectedColor: AppTheme.primarySoft,
         backgroundColor: AppTheme.surfaceSlate,
@@ -385,9 +404,11 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.people_outline,
-                      size: 64,
-                      color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+                  Icon(
+                    Icons.people_outline,
+                    size: 64,
+                    color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Nenhum deck dos seus seguidos',
@@ -413,8 +434,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
         }
 
         return RefreshIndicator(
-          onRefresh: () =>
-              provider.fetchFollowingFeed(reset: true),
+          onRefresh: () => provider.fetchFollowingFeed(reset: true),
           color: AppTheme.manaViolet,
           child: ListView.builder(
             controller: _scrollController,
@@ -427,7 +447,8 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: CircularProgressIndicator(
-                        color: AppTheme.manaViolet),
+                      color: AppTheme.manaViolet,
+                    ),
                   ),
                 );
               }
@@ -435,13 +456,14 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
               final deck = provider.followingFeed[index];
               return _FollowingDeckCard(
                 deck: deck,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        CommunityDeckDetailScreen(deckId: deck.id),
-                  ),
-                ),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => CommunityDeckDetailScreen(deckId: deck.id),
+                      ),
+                    ),
               );
             },
           ),
@@ -498,11 +520,16 @@ class _UserSearchTabState extends State<_UserSearchTab>
             decoration: InputDecoration(
               hintText: 'Buscar por nick ou nome de usuário...',
               hintStyle: const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon:
-                  const Icon(Icons.person_search, color: AppTheme.primarySoft),
+              prefixIcon: const Icon(
+                Icons.person_search,
+                color: AppTheme.primarySoft,
+              ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.clear,
-                    color: AppTheme.textSecondary, size: 18),
+                icon: const Icon(
+                  Icons.clear,
+                  color: AppTheme.textSecondary,
+                  size: 18,
+                ),
                 onPressed: () {
                   _searchController.clear();
                   context.read<SocialProvider>().clearSearch();
@@ -514,8 +541,10 @@ class _UserSearchTabState extends State<_UserSearchTab>
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 borderSide: BorderSide.none,
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
             onChanged: _onSearchChanged,
           ),
@@ -526,8 +555,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
             builder: (context, provider, _) {
               if (provider.isSearching) {
                 return const Center(
-                  child:
-                      CircularProgressIndicator(color: AppTheme.manaViolet),
+                  child: CircularProgressIndicator(color: AppTheme.manaViolet),
                 );
               }
 
@@ -547,10 +575,11 @@ class _UserSearchTabState extends State<_UserSearchTab>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.person_search,
-                            size: 64,
-                            color:
-                                AppTheme.textSecondary.withValues(alpha: 0.4)),
+                        Icon(
+                          Icons.person_search,
+                          size: 64,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                        ),
                         const SizedBox(height: 16),
                         const Text(
                           'Encontre outros jogadores',
@@ -565,8 +594,9 @@ class _UserSearchTabState extends State<_UserSearchTab>
                           'Busque pelo nick ou nome de usuário para ver perfis, decks e seguir jogadores.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color:
-                                AppTheme.textSecondary.withValues(alpha: 0.7),
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.7,
+                            ),
                             fontSize: AppTheme.fontMd,
                           ),
                         ),
@@ -581,15 +611,18 @@ class _UserSearchTabState extends State<_UserSearchTab>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.search_off,
-                          size: 48,
-                          color:
-                              AppTheme.textSecondary.withValues(alpha: 0.5)),
+                      Icon(
+                        Icons.search_off,
+                        size: 48,
+                        color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                      ),
                       const SizedBox(height: 12),
                       const Text(
                         'Nenhum usuário encontrado',
                         style: TextStyle(
-                            color: AppTheme.textSecondary, fontSize: AppTheme.fontLg),
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontLg,
+                        ),
                       ),
                     ],
                   ),
@@ -607,8 +640,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              UserProfileScreen(userId: user.id),
+                          builder: (_) => UserProfileScreen(userId: user.id),
                         ),
                       );
                     },
@@ -675,34 +707,41 @@ class _CommunityDeckCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.person_outline,
-                            size: 14,
-                            color:
-                                AppTheme.textSecondary.withValues(alpha: 0.8)),
+                        Icon(
+                          Icons.person_outline,
+                          size: 14,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                        ),
                         const SizedBox(width: 4),
                         GestureDetector(
-                          onTap: deck.ownerId != null
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => UserProfileScreen(
-                                          userId: deck.ownerId!),
-                                    ),
-                                  );
-                                }
-                              : null,
+                          onTap:
+                              deck.ownerId != null
+                                  ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => UserProfileScreen(
+                                              userId: deck.ownerId!,
+                                            ),
+                                      ),
+                                    );
+                                  }
+                                  : null,
                           child: Text(
                             deck.ownerUsername ?? 'Anônimo',
                             style: TextStyle(
-                              color: deck.ownerId != null
-                                  ? AppTheme.primarySoft
-                                  : AppTheme.textSecondary.withValues(
-                                      alpha: 0.8),
+                              color:
+                                  deck.ownerId != null
+                                      ? AppTheme.primarySoft
+                                      : AppTheme.textSecondary.withValues(
+                                        alpha: 0.8,
+                                      ),
                               fontSize: AppTheme.fontSm,
-                              decoration: deck.ownerId != null
-                                  ? TextDecoration.underline
-                                  : null,
+                              decoration:
+                                  deck.ownerId != null
+                                      ? TextDecoration.underline
+                                      : null,
                               decorationColor: AppTheme.primarySoft,
                             ),
                           ),
@@ -710,11 +749,14 @@ class _CommunityDeckCard extends StatelessWidget {
                         const SizedBox(width: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color:
-                                AppTheme.manaViolet.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                            color: AppTheme.manaViolet.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusXs,
+                            ),
                           ),
                           child: Text(
                             _capitalize(deck.format),
@@ -742,15 +784,13 @@ class _CommunityDeckCard extends StatelessWidget {
                           Icon(
                             Icons.auto_awesome,
                             size: 14,
-                            color:
-                                AppTheme.mythicGold.withValues(alpha: 0.8),
+                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '${deck.synergyScore}%',
                             style: TextStyle(
-                              color:
-                                  AppTheme.mythicGold.withValues(alpha: 0.8),
+                              color: AppTheme.mythicGold.withValues(alpha: 0.8),
                               fontSize: AppTheme.fontSm,
                             ),
                           ),
@@ -763,8 +803,7 @@ class _CommunityDeckCard extends StatelessWidget {
                       Text(
                         deck.description!,
                         style: TextStyle(
-                          color:
-                              AppTheme.textSecondary.withValues(alpha: 0.7),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.7),
                           fontSize: AppTheme.fontSm,
                         ),
                         maxLines: 2,
@@ -774,8 +813,11 @@ class _CommunityDeckCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppTheme.textSecondary, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppTheme.textSecondary,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -835,11 +877,14 @@ class _FollowingDeckCard extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color:
-                                AppTheme.manaViolet.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                            color: AppTheme.manaViolet.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusXs,
+                            ),
                           ),
                           child: Text(
                             _capitalize(deck.format),
@@ -860,16 +905,16 @@ class _FollowingDeckCard extends StatelessWidget {
                         ),
                         if (deck.synergyScore != null) ...[
                           const SizedBox(width: 8),
-                          Icon(Icons.auto_awesome,
-                              size: 12,
-                              color:
-                                  AppTheme.mythicGold.withValues(alpha: 0.8)),
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 12,
+                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                          ),
                           const SizedBox(width: 2),
                           Text(
                             '${deck.synergyScore}%',
                             style: TextStyle(
-                              color:
-                                  AppTheme.mythicGold.withValues(alpha: 0.8),
+                              color: AppTheme.mythicGold.withValues(alpha: 0.8),
                               fontSize: AppTheme.fontSm,
                             ),
                           ),
@@ -879,8 +924,11 @@ class _FollowingDeckCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppTheme.textSecondary, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppTheme.textSecondary,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -917,19 +965,21 @@ class _UserCard extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
-                backgroundImage: user.avatarUrl != null
-                    ? CachedNetworkImageProvider(user.avatarUrl!)
-                    : null,
-                child: user.avatarUrl == null
-                    ? Text(
-                        user.username[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppTheme.manaViolet,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.fontXl,
-                        ),
-                      )
-                    : null,
+                backgroundImage:
+                    user.avatarUrl != null
+                        ? CachedNetworkImageProvider(user.avatarUrl!)
+                        : null,
+                child:
+                    user.avatarUrl == null
+                        ? Text(
+                          user.username[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: AppTheme.manaViolet,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.fontXl,
+                          ),
+                        )
+                        : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -955,9 +1005,11 @@ class _UserCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.style,
-                            size: 13,
-                            color: AppTheme.primarySoft.withValues(alpha: 0.7)),
+                        Icon(
+                          Icons.style,
+                          size: 13,
+                          color: AppTheme.primarySoft.withValues(alpha: 0.7),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${user.publicDeckCount} decks',
@@ -967,10 +1019,11 @@ class _UserCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Icon(Icons.people,
-                            size: 13,
-                            color:
-                                AppTheme.manaViolet.withValues(alpha: 0.7)),
+                        Icon(
+                          Icons.people,
+                          size: 13,
+                          color: AppTheme.manaViolet.withValues(alpha: 0.7),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${user.followerCount} seguidores',
@@ -984,8 +1037,11 @@ class _UserCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppTheme.textSecondary, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppTheme.textSecondary,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -1038,7 +1094,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
               children: [
                 CircularProgressIndicator(color: AppTheme.mythicGold),
                 SizedBox(height: 16),
-                Text('Carregando cotações...', style: TextStyle(color: AppTheme.textSecondary)),
+                Text(
+                  'Carregando cotações...',
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
               ],
             ),
           );
@@ -1051,7 +1110,11 @@ class _CotacoesTabState extends State<_CotacoesTab>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.cloud_off, size: 48, color: AppTheme.textSecondary),
+                  const Icon(
+                    Icons.cloud_off,
+                    size: 48,
+                    color: AppTheme.textSecondary,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     provider.errorMessage ?? 'Erro desconhecido',
@@ -1063,7 +1126,9 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     onPressed: () => provider.refresh(),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Tentar novamente'),
-                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.manaViolet),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.manaViolet,
+                    ),
                   ),
                 ],
               ),
@@ -1074,7 +1139,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
         final data = provider.moversData;
         if (data == null) {
           return const Center(
-            child: Text('Sem dados de mercado', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(
+              'Sem dados de mercado',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           );
         }
 
@@ -1085,18 +1153,28 @@ class _CotacoesTabState extends State<_CotacoesTab>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.hourglass_top, size: 48, color: AppTheme.mythicGold),
+                  const Icon(
+                    Icons.hourglass_top,
+                    size: 48,
+                    color: AppTheme.mythicGold,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     data.message ?? 'Aguardando dados...',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontMd,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Os preços são atualizados diariamente.\nAmanhã teremos dados de variação!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm),
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
                   ),
                 ],
               ),
@@ -1117,8 +1195,14 @@ class _CotacoesTabState extends State<_CotacoesTab>
                 labelColor: AppTheme.mythicGold,
                 unselectedLabelColor: AppTheme.textSecondary,
                 tabs: const [
-                  Tab(icon: Icon(Icons.arrow_upward, size: 16), text: 'Valorizando'),
-                  Tab(icon: Icon(Icons.arrow_downward, size: 16), text: 'Desvalorizando'),
+                  Tab(
+                    icon: Icon(Icons.arrow_upward, size: 16),
+                    text: 'Valorizando',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.arrow_downward, size: 16),
+                    text: 'Desvalorizando',
+                  ),
                 ],
               ),
             ),
@@ -1127,11 +1211,29 @@ class _CotacoesTabState extends State<_CotacoesTab>
                 controller: _subTabController,
                 children: [
                   data.gainers.isEmpty
-                      ? const Center(child: Text('Nenhuma carta valorizou hoje', style: TextStyle(color: AppTheme.textSecondary)))
-                      : _buildMoversList(data.gainers, isGainer: true, provider: provider),
+                      ? const Center(
+                        child: Text(
+                          'Nenhuma carta valorizou hoje',
+                          style: TextStyle(color: AppTheme.textSecondary),
+                        ),
+                      )
+                      : _buildMoversList(
+                        data.gainers,
+                        isGainer: true,
+                        provider: provider,
+                      ),
                   data.losers.isEmpty
-                      ? const Center(child: Text('Nenhuma carta desvalorizou hoje', style: TextStyle(color: AppTheme.textSecondary)))
-                      : _buildMoversList(data.losers, isGainer: false, provider: provider),
+                      ? const Center(
+                        child: Text(
+                          'Nenhuma carta desvalorizou hoje',
+                          style: TextStyle(color: AppTheme.textSecondary),
+                        ),
+                      )
+                      : _buildMoversList(
+                        data.losers,
+                        isGainer: false,
+                        provider: provider,
+                      ),
                 ],
               ),
             ),
@@ -1147,17 +1249,33 @@ class _CotacoesTabState extends State<_CotacoesTab>
       color: AppTheme.surfaceElevated.withValues(alpha: 0.5),
       child: Row(
         children: [
-          const Icon(Icons.calendar_today, size: 14, color: AppTheme.textSecondary),
+          const Icon(
+            Icons.calendar_today,
+            size: 14,
+            color: AppTheme.textSecondary,
+          ),
           const SizedBox(width: 6),
           Text(
             data.date != null ? _formatDate(data.date!) : 'Hoje',
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontMd,
+            ),
           ),
           if (data.previousDate != null) ...[
-            const Text(' vs ', style: TextStyle(color: AppTheme.outlineMuted, fontSize: AppTheme.fontSm)),
+            const Text(
+              ' vs ',
+              style: TextStyle(
+                color: AppTheme.outlineMuted,
+                fontSize: AppTheme.fontSm,
+              ),
+            ),
             Text(
               _formatDate(data.previousDate!),
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
             ),
           ],
           const Spacer(),
@@ -1169,7 +1287,11 @@ class _CotacoesTabState extends State<_CotacoesTab>
             ),
             child: Text(
               '${data.totalTracked} cartas',
-              style: const TextStyle(color: AppTheme.mythicGold, fontSize: AppTheme.fontSm, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppTheme.mythicGold,
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -1178,7 +1300,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
             child: Icon(
               Icons.refresh,
               size: 20,
-              color: provider.isLoading ? AppTheme.outlineMuted : AppTheme.textSecondary,
+              color:
+                  provider.isLoading
+                      ? AppTheme.outlineMuted
+                      : AppTheme.textSecondary,
             ),
           ),
         ],
@@ -1186,7 +1311,11 @@ class _CotacoesTabState extends State<_CotacoesTab>
     );
   }
 
-  Widget _buildMoversList(List<CardMover> movers, {required bool isGainer, required MarketProvider provider}) {
+  Widget _buildMoversList(
+    List<CardMover> movers, {
+    required bool isGainer,
+    required MarketProvider provider,
+  }) {
     return RefreshIndicator(
       color: AppTheme.mythicGold,
       backgroundColor: AppTheme.surfaceSlate,
@@ -1197,7 +1326,8 @@ class _CotacoesTabState extends State<_CotacoesTab>
         itemBuilder: (context, index) {
           final mover = movers[index];
           final changeColor = isGainer ? AppTheme.success : AppTheme.error;
-          final changeIcon = isGainer ? Icons.arrow_upward : Icons.arrow_downward;
+          final changeIcon =
+              isGainer ? Icons.arrow_upward : Icons.arrow_downward;
           final changePrefix = isGainer ? '+' : '';
 
           return Container(
@@ -1206,9 +1336,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
               color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
-                color: index < 3
-                    ? changeColor.withValues(alpha: 0.3)
-                    : AppTheme.outlineMuted.withValues(alpha: 0.3),
+                color:
+                    index < 3
+                        ? changeColor.withValues(alpha: 0.3)
+                        : AppTheme.outlineMuted.withValues(alpha: 0.3),
               ),
             ),
             child: Padding(
@@ -1220,7 +1351,10 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: index < 3 ? changeColor.withValues(alpha: 0.2) : AppTheme.surfaceElevated,
+                      color:
+                          index < 3
+                              ? changeColor.withValues(alpha: 0.2)
+                              : AppTheme.surfaceElevated,
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
                     alignment: Alignment.center,
@@ -1240,14 +1374,38 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     child: SizedBox(
                       width: 36,
                       height: 50,
-                      child: mover.imageUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: mover.imageUrl!,
-                              fit: BoxFit.cover,
-                              placeholder: (_, __) => Container(color: AppTheme.surfaceElevated, child: const Icon(Icons.style, size: 16, color: AppTheme.textSecondary)),
-                              errorWidget: (_, __, ___) => Container(color: AppTheme.surfaceElevated, child: const Icon(Icons.style, size: 16, color: AppTheme.textSecondary)),
-                            )
-                          : Container(color: AppTheme.surfaceElevated, child: const Icon(Icons.style, size: 16, color: AppTheme.textSecondary)),
+                      child:
+                          mover.imageUrl != null
+                              ? CachedNetworkImage(
+                                imageUrl: mover.imageUrl!,
+                                fit: BoxFit.cover,
+                                placeholder:
+                                    (_, __) => Container(
+                                      color: AppTheme.surfaceElevated,
+                                      child: const Icon(
+                                        Icons.style,
+                                        size: 16,
+                                        color: AppTheme.textSecondary,
+                                      ),
+                                    ),
+                                errorWidget:
+                                    (_, __, ___) => Container(
+                                      color: AppTheme.surfaceElevated,
+                                      child: const Icon(
+                                        Icons.style,
+                                        size: 16,
+                                        color: AppTheme.textSecondary,
+                                      ),
+                                    ),
+                              )
+                              : Container(
+                                color: AppTheme.surfaceElevated,
+                                child: const Icon(
+                                  Icons.style,
+                                  size: 16,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1258,19 +1416,43 @@ class _CotacoesTabState extends State<_CotacoesTab>
                       children: [
                         Text(
                           mover.name,
-                          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600, fontSize: AppTheme.fontMd),
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: AppTheme.fontMd,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
-                        Row(children: [
-                          if (mover.setCode != null)
-                            Text(mover.setCode!.toUpperCase(), style: const TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontSm)),
-                          if (mover.rarity != null) ...[
-                            const Text(' • ', style: TextStyle(color: AppTheme.outlineMuted, fontSize: AppTheme.fontSm)),
-                            Text(_rarityLabel(mover.rarity!), style: TextStyle(color: _rarityColor(mover.rarity!), fontSize: AppTheme.fontSm)),
+                        Row(
+                          children: [
+                            if (mover.setCode != null)
+                              Text(
+                                mover.setCode!.toUpperCase(),
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                            if (mover.rarity != null) ...[
+                              const Text(
+                                ' • ',
+                                style: TextStyle(
+                                  color: AppTheme.outlineMuted,
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                              Text(
+                                _rarityLabel(mover.rarity!),
+                                style: TextStyle(
+                                  color: _rarityColor(mover.rarity!),
+                                  fontSize: AppTheme.fontSm,
+                                ),
+                              ),
+                            ],
                           ],
-                        ]),
+                        ),
                       ],
                     ),
                   ),
@@ -1280,25 +1462,47 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     children: [
                       Text(
                         '\$${mover.priceToday.toStringAsFixed(2)}',
-                        style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold, fontSize: AppTheme.fontLg),
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.fontLg,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: changeColor.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusSm,
+                          ),
                         ),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(changeIcon, size: 12, color: changeColor),
-                          const SizedBox(width: 2),
-                          Text('$changePrefix${mover.changePct.toStringAsFixed(1)}%', style: TextStyle(color: changeColor, fontSize: AppTheme.fontSm, fontWeight: FontWeight.bold)),
-                        ]),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(changeIcon, size: 12, color: changeColor),
+                            const SizedBox(width: 2),
+                            Text(
+                              '$changePrefix${mover.changePct.toStringAsFixed(1)}%',
+                              style: TextStyle(
+                                color: changeColor,
+                                fontSize: AppTheme.fontSm,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 1),
                       Text(
                         '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
-                        style: TextStyle(color: changeColor.withValues(alpha: 0.7), fontSize: AppTheme.fontXs),
+                        style: TextStyle(
+                          color: changeColor.withValues(alpha: 0.7),
+                          fontSize: AppTheme.fontXs,
+                        ),
                       ),
                     ],
                   ),
@@ -1339,4 +1543,3 @@ class _CotacoesTabState extends State<_CotacoesTab>
     };
   }
 }
-

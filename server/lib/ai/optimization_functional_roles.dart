@@ -10,6 +10,33 @@ bool looksLikeOptimizationBoardWipeText(String oracleText) {
       (oracle.contains('each creature') && oracle.contains('damage'));
 }
 
+bool looksLikeOptimizationRampText(String oracleText) {
+  final oracle = oracleText.toLowerCase();
+
+  if (oracle.contains('add {') || oracle.contains('mana of any')) {
+    return true;
+  }
+
+  if (oracle.contains('search your library') &&
+      (oracle.contains('land card') ||
+          oracle.contains('basic land') ||
+          oracle.contains('forest card') ||
+          oracle.contains('plains card') ||
+          oracle.contains('island card') ||
+          oracle.contains('swamp card') ||
+          oracle.contains('mountain card'))) {
+    return true;
+  }
+
+  return oracle.contains('additional land this turn') ||
+      oracle.contains('additional land on each of your turns') ||
+      oracle.contains('put a land card from your hand onto the battlefield') ||
+      oracle.contains('put up to') && oracle.contains('land cards') ||
+      oracle.contains('create a treasure token') ||
+      oracle.contains('create two treasure tokens') ||
+      oracle.contains('create three treasure tokens');
+}
+
 String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
@@ -38,10 +65,7 @@ String classifyOptimizationFunctionalRole(Map<String, dynamic> card) {
     return 'wipe';
   }
 
-  if (oracle.contains('add {') ||
-      (oracle.contains('search your library for a') &&
-          oracle.contains('land')) ||
-      oracle.contains('mana of any') ||
+  if (looksLikeOptimizationRampText(oracle) ||
       (typeLine.contains('artifact') && oracle.contains('add'))) {
     return 'ramp';
   }

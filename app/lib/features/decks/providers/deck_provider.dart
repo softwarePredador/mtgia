@@ -17,6 +17,48 @@ typedef ActivationEventTracker =
       Map<String, dynamic>? metadata,
     });
 
+class DeckAiFlowException implements Exception {
+  DeckAiFlowException({
+    required this.message,
+    required this.code,
+    required this.payload,
+    this.outcomeCode,
+  });
+
+  final String message;
+  final String code;
+  final String? outcomeCode;
+  final Map<String, dynamic> payload;
+
+  Map<String, dynamic> get qualityError =>
+      (payload['quality_error'] is Map)
+          ? (payload['quality_error'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+
+  Map<String, dynamic> get nextAction =>
+      (payload['next_action'] is Map)
+          ? (payload['next_action'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+
+  Map<String, dynamic> get deckState =>
+      (payload['deck_state'] is Map)
+          ? (payload['deck_state'] as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+
+  bool get isNeedsRepair =>
+      outcomeCode == 'needs_repair' || code == 'OPTIMIZE_NEEDS_REPAIR';
+
+  bool get isNearPeak => outcomeCode == 'near_peak';
+
+  bool get isNoSafeUpgradeFound =>
+      outcomeCode == 'no_safe_upgrade_found' ||
+      code == 'OPTIMIZE_NO_SAFE_SWAPS' ||
+      code == 'OPTIMIZE_NO_ACTIONABLE_SWAPS';
+
+  @override
+  String toString() => message;
+}
+
 /// Provider para gerenciar estado da listagem de decks
 class DeckProvider extends ChangeNotifier {
   final ApiClient _apiClient;
@@ -48,6 +90,33 @@ class DeckProvider extends ChangeNotifier {
   }) : _apiClient = apiClient ?? ApiClient(),
        _trackActivationEvent =
            trackActivationEvent ?? ActivationFunnelService.instance.track;
+
+  Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return value.cast<String, dynamic>();
+    return <String, dynamic>{};
+  }
+
+  DeckAiFlowException _buildAiFlowException(
+    dynamic data, {
+    required String fallbackMessage,
+    required String fallbackCode,
+  }) {
+    final payload = _asMap(data);
+    final qualityError = _asMap(payload['quality_error']);
+    final message =
+        payload['error']?.toString() ??
+        qualityError['message']?.toString() ??
+        fallbackMessage;
+    final code = qualityError['code']?.toString() ?? fallbackCode;
+    final outcomeCode = payload['outcome_code']?.toString();
+    return DeckAiFlowException(
+      message: message,
+      code: code,
+      outcomeCode: outcomeCode,
+      payload: payload,
+    );
+  }
 
   Map<String, Map<String, dynamic>> _buildCurrentCardsMap(DeckDetails deck) {
     final currentCards = <String, Map<String, dynamic>>{};
@@ -666,6 +735,8 @@ class DeckProvider extends ChangeNotifier {
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
     try {
+      onProgress?.call('Preparando análise do deck...', 0, 5);
+
       final payload = <String, dynamic>{
         'deck_id': deckId,
         'archetype': archetype,
@@ -680,7 +751,7 @@ class DeckProvider extends ChangeNotifier {
       final response = await _apiClient.post('/ai/optimize', payload);
 
       if (response.statusCode == 200) {
-        final data = (response.data as Map).cast<String, dynamic>();
+        final data = _asMap(response.data);
         await _saveOptimizeDebug(response: data);
         AppLogger.debug('🧪 [AI Optimize] response=${jsonEncode(data)}');
         await ActivationFunnelService.instance.track(
@@ -696,13 +767,13 @@ class DeckProvider extends ChangeNotifier {
         return data;
       } else if (response.statusCode == 202) {
         // Async job: servidor processará em background
-        final data = (response.data as Map).cast<String, dynamic>();
+        final data = _asMap(response.data);
         final jobId = data['job_id'] as String;
         final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
         AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
         onProgress?.call(
-          'Iniciando otimização...',
-          0,
+          'Preparando referências do commander...',
+          1,
           data['total_stages'] as int? ?? 6,
         );
         return await _pollOptimizeJob(
@@ -711,20 +782,20 @@ class DeckProvider extends ChangeNotifier {
           onProgress: onProgress,
         );
       } else if (response.statusCode == 422) {
-        // Quality gate: servidor retornou erro de qualidade no modo complete
-        final data =
-            (response.data is Map)
-                ? (response.data as Map).cast<String, dynamic>()
-                : <String, dynamic>{};
+        final data = _asMap(response.data);
         await _saveOptimizeDebug(response: {'statusCode': 422, 'data': data});
+        final qualityError = _asMap(data['quality_error']);
         final errorMsg =
             data['error'] as String? ??
-            data['quality_error']?['message'] as String? ??
+            qualityError['message'] as String? ??
             'A otimização não atingiu a qualidade mínima.';
-        final code =
-            data['quality_error']?['code'] as String? ?? 'QUALITY_ERROR';
+        final code = qualityError['code'] as String? ?? 'QUALITY_ERROR';
         AppLogger.warning('⚠️ [AI Optimize] quality gate: $code — $errorMsg');
-        throw Exception(errorMsg);
+        throw _buildAiFlowException(
+          data,
+          fallbackMessage: errorMsg,
+          fallbackCode: code,
+        );
       } else {
         await _saveOptimizeDebug(
           response: {'statusCode': response.statusCode, 'data': response.data},
@@ -734,6 +805,65 @@ class DeckProvider extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<Map<String, dynamic>> rebuildDeck(
+    String deckId, {
+    String? archetype,
+    String? theme,
+    int? bracket,
+    String rebuildScope = 'auto',
+    String saveMode = 'draft_clone',
+    List<String> mustKeep = const <String>[],
+    List<String> mustAvoid = const <String>[],
+  }) async {
+    final payload = <String, dynamic>{
+      'deck_id': deckId,
+      if (archetype != null && archetype.trim().isNotEmpty)
+        'archetype': archetype,
+      if (theme != null && theme.trim().isNotEmpty) 'theme': theme,
+      if (bracket != null) 'bracket': bracket,
+      'rebuild_scope': rebuildScope,
+      'save_mode': saveMode,
+      if (mustKeep.isNotEmpty) 'must_keep': mustKeep,
+      if (mustAvoid.isNotEmpty) 'must_avoid': mustAvoid,
+    };
+
+    final response = await _apiClient.post(
+      '/ai/rebuild',
+      payload,
+      timeout: const Duration(minutes: 4),
+    );
+
+    if (response.statusCode == 200) {
+      final data = _asMap(response.data);
+      final draftDeckId = data['draft_deck_id']?.toString();
+      if (draftDeckId != null && draftDeckId.isNotEmpty) {
+        await _trackActivationEvent(
+          'deck_rebuild_created',
+          deckId: draftDeckId,
+          source: 'deck_provider.rebuildDeck',
+          metadata: {
+            'source_deck_id': deckId,
+            'rebuild_scope_selected': data['rebuild_scope_selected'],
+            'save_mode': saveMode,
+          },
+        );
+      }
+      return data;
+    }
+
+    if (response.statusCode == 422) {
+      final data = _asMap(response.data);
+      throw _buildAiFlowException(
+        data,
+        fallbackMessage:
+            data['error']?.toString() ?? 'A reconstrução guiada falhou.',
+        fallbackCode: 'REBUILD_FAILED',
+      );
+    }
+
+    throw Exception('Falha ao reconstruir deck: ${response.statusCode}');
   }
 
   Future<void> _saveOptimizeDebug({
@@ -779,20 +909,25 @@ class DeckProvider extends ChangeNotifier {
         final status = data['status'] as String?;
         if (status == 'completed') {
           final result = data['result'];
-          final resultMap =
-              (result is Map)
-                  ? result.cast<String, dynamic>()
-                  : <String, dynamic>{};
+          final resultMap = _asMap(result);
           await _saveOptimizeDebug(response: resultMap);
           AppLogger.debug(
             '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
           );
           return resultMap;
         } else if (status == 'failed') {
+          final qualityError = _asMap(data['quality_error']);
           final errorMsg =
-              data['error'] as String? ?? 'Otimização falhou no servidor.';
+              data['error'] as String? ??
+              qualityError['message'] as String? ??
+              'Otimização falhou no servidor.';
           AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $errorMsg');
-          throw Exception(errorMsg);
+          throw _buildAiFlowException(
+            data,
+            fallbackMessage: errorMsg,
+            fallbackCode:
+                qualityError['code']?.toString() ?? 'OPTIMIZE_JOB_FAILED',
+          );
         } else {
           // Still processing — update progress
           onProgress?.call(

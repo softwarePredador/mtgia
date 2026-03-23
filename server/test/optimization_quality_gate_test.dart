@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 
 import '../lib/ai/goldfish_simulator.dart';
+import '../lib/ai/optimization_functional_roles.dart';
 import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimization_validator.dart';
 
@@ -269,6 +270,18 @@ void main() {
       expect(result.removals, equals(const ['Wastes']));
       expect(result.additions, equals(const ['Arcane Signet']));
       expect(result.droppedReasons, isEmpty);
+    });
+
+    test('classifies land-search sorceries as ramp instead of utility', () {
+      final role = classifyOptimizationFunctionalRole(const {
+        'name': 'Cultivate',
+        'type_line': 'Sorcery',
+        'mana_cost': '{2}{G}',
+        'oracle_text':
+            'Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle.',
+      });
+
+      expect(role, equals('ramp'));
     });
 
     test('treats all is dust as wipe and blocks wipe to creature downgrade',

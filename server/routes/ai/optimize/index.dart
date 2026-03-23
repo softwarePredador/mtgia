@@ -173,6 +173,7 @@ class DeckArchetypeAnalyzer {
   Map<String, dynamic> analyzeManaBase() {
     final manaSymbols = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0};
     final landSources = {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 0, 'Any': 0};
+    var landCount = 0;
 
     // 1. Contar símbolos de mana nas cartas (Devotion)
     // CORRIGIDO: multiplica por quantity (ex: Island x30 = 30 fontes)
@@ -191,6 +192,7 @@ class DeckArchetypeAnalyzer {
       final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
       final qty = (card['quantity'] as int?) ?? 1;
       if (typeLine.contains('land')) {
+        landCount += qty;
         final cardColors = (card['colors'] as List?)?.cast<String>() ?? [];
         final oracleText =
             ((card['oracle_text'] as String?) ?? '').toLowerCase();
@@ -241,7 +243,8 @@ class DeckArchetypeAnalyzer {
     return {
       'symbols': manaSymbols,
       'sources': landSources,
-      'assessment': _assessManaBase(manaSymbols, landSources),
+      'land_count': landCount,
+      'assessment': _assessManaBase(manaSymbols, landSources, landCount),
     };
   }
 
@@ -268,12 +271,23 @@ class DeckArchetypeAnalyzer {
     return colors;
   }
 
-  String _assessManaBase(Map<String, int> symbols, Map<String, int> sources) {
+  String _assessManaBase(
+    Map<String, int> symbols,
+    Map<String, int> sources,
+    int landCount,
+  ) {
     if (symbols.isEmpty) return 'N/A';
     final totalSymbols = symbols.values.fold<int>(0, (a, b) => a + b);
     if (totalSymbols == 0) return 'N/A';
 
     final issues = <String>[];
+
+    if (landCount < 26) {
+      issues
+          .add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
+    } else if (landCount > 45) {
+      issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
+    }
 
     symbols.forEach((color, count) {
       if (count > 0) {
@@ -383,6 +397,356 @@ class DeckThemeProfile {
         'match_score': matchScore,
         'core_cards': coreCards,
       };
+}
+
+class DeckOptimizationState {
+  const DeckOptimizationState({
+    required this.status,
+    required this.recommendedMode,
+    required this.suggestedScope,
+    required this.reasons,
+    required this.severityScore,
+    this.repairPlan = const <String, dynamic>{},
+  });
+
+  final String status;
+  final String recommendedMode;
+  final String suggestedScope;
+  final List<String> reasons;
+  final int severityScore;
+  final Map<String, dynamic> repairPlan;
+
+  Map<String, dynamic> toJson() => {
+        'status': status,
+        'recommended_mode': recommendedMode,
+        'suggested_scope': suggestedScope,
+        'severity_score': severityScore,
+        'reasons': reasons,
+        if (repairPlan.isNotEmpty) 'repair_plan': repairPlan,
+      };
+}
+
+DeckOptimizationState assessDeckOptimizationState({
+  required List<Map<String, dynamic>> cards,
+  required Map<String, dynamic> deckAnalysis,
+  required String deckFormat,
+  required int currentTotalCards,
+  required Set<String> commanderColorIdentity,
+}) {
+  final maxTotal =
+      deckFormat == 'commander' ? 100 : (deckFormat == 'brawl' ? 60 : null);
+  if (maxTotal != null && currentTotalCards < maxTotal) {
+    final missing = maxTotal - currentTotalCards;
+    return DeckOptimizationState(
+      status: 'incomplete',
+      recommendedMode: 'complete',
+      suggestedScope: 'fill_missing_slots',
+      severityScore: (missing * 3).clamp(0, 100),
+      reasons: [
+        'O deck ainda está incompleto ($currentTotalCards/$maxTotal cartas).',
+      ],
+      repairPlan: {
+        'missing_cards': missing,
+        'summary':
+            'Preencha os slots faltantes antes de avaliar micro-otimizações.',
+      },
+    );
+  }
+
+  if (deckFormat != 'commander' && deckFormat != 'brawl') {
+    return const DeckOptimizationState(
+      status: 'healthy',
+      recommendedMode: 'optimize',
+      suggestedScope: 'micro_swaps',
+      severityScore: 0,
+      reasons: <String>[],
+    );
+  }
+
+  final deckColors = <String>{};
+  for (final card in cards) {
+    deckColors.addAll((card['colors'] as List?)?.cast<String>() ?? const []);
+  }
+  final analyzer = DeckArchetypeAnalyzer(cards, deckColors.toList());
+  final manaBase = analyzer.analyzeManaBase();
+  final typeDistribution =
+      (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+
+  final commanders =
+      cards.where((card) => card['is_commander'] == true).toList(growable: false);
+  final commanderText = commanders
+      .map((card) => (card['oracle_text'] as String?) ?? '')
+      .join(' ')
+      .toLowerCase();
+
+  final landCount = (typeDistribution['lands'] as int?) ?? 0;
+  final instantCount = (typeDistribution['instants'] as int?) ?? 0;
+  final sorceryCount = (typeDistribution['sorceries'] as int?) ?? 0;
+  final artifactCount = (typeDistribution['artifacts'] as int?) ?? 0;
+  final enchantmentCount = (typeDistribution['enchantments'] as int?) ?? 0;
+  final nonLandCount = currentTotalCards - landCount;
+  final instantSorceryCount = instantCount + sorceryCount;
+  final manaAssessment = (deckAnalysis['mana_base_assessment']?.toString() ?? '');
+  final manaAssessmentLower = manaAssessment.toLowerCase();
+  final archetypeConfidence =
+      (deckAnalysis['archetype_confidence']?.toString() ?? '').toLowerCase();
+  final sources =
+      (manaBase['sources'] as Map?)?.cast<String, int>() ?? const <String, int>{};
+  final anySource = sources['Any'] ?? 0;
+
+  final reasons = <String>[];
+  var severeIssues = 0;
+  var moderateIssues = 0;
+
+  void addReason(String message, {required bool severe}) {
+    reasons.add(message);
+    if (severe) {
+      severeIssues++;
+    } else {
+      moderateIssues++;
+    }
+  }
+
+  if (commanders.isEmpty) {
+    addReason(
+      'O deck não tem comandante marcado e não dá para inferir um plano coerente de optimize.',
+      severe: true,
+    );
+  }
+
+  if (landCount >= 55) {
+    addReason(
+      'O deck está com $landCount terrenos, muito acima do intervalo saudável para $deckFormat.',
+      severe: true,
+    );
+  } else if (landCount > 45) {
+    addReason(
+      'O deck está com $landCount terrenos e tende a floodar antes de gerar valor.',
+      severe: false,
+    );
+  }
+
+  if (landCount > 0 && nonLandCount < 25) {
+    addReason(
+      'O deck tem apenas $nonLandCount não-terrenos, insuficiente para sustainar o plano do comandante.',
+      severe: true,
+    );
+  }
+
+  if (landCount > 0 && landCount <= 24) {
+    addReason(
+      'O deck está com apenas $landCount terrenos, abaixo do mínimo seguro para Commander.',
+      severe: true,
+    );
+  }
+
+  if (manaAssessmentLower.contains('falta mana')) {
+    addReason(
+      'A base de mana ainda não cobre as cores exigidas pelo comandante.',
+      severe: false,
+    );
+  }
+
+  for (final color in commanderColorIdentity) {
+    final sourceCount = (sources[color] ?? 0) + anySource;
+    if (sourceCount == 0) {
+      addReason(
+        'A identidade $color do comandante não possui nenhuma fonte funcional de mana no deck.',
+        severe: true,
+      );
+    }
+  }
+
+  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 10) {
+    addReason(
+      'O comandante pede instants/sorceries, mas o deck só tem $instantSorceryCount cartas desse tipo.',
+      severe: true,
+    );
+  }
+
+  if (_commanderSignalsArtifacts(commanderText) && artifactCount < 6) {
+    addReason(
+      'O comandante depende de artefatos, mas o deck só apresenta $artifactCount artefatos.',
+      severe: false,
+    );
+  }
+
+  if (_commanderSignalsEnchantments(commanderText) && enchantmentCount < 6) {
+    addReason(
+      'O comandante depende de encantamentos, mas o deck só apresenta $enchantmentCount encantamentos.',
+      severe: false,
+    );
+  }
+
+  if (archetypeConfidence == 'baixa' && nonLandCount < 35) {
+    addReason(
+      'O deck ainda não tem massa crítica suficiente para o arquétipo detectado.',
+      severe: false,
+    );
+  }
+
+  final needsRepair = severeIssues > 0 || moderateIssues >= 3;
+  if (!needsRepair) {
+    return const DeckOptimizationState(
+      status: 'healthy',
+      recommendedMode: 'optimize',
+      suggestedScope: 'micro_swaps',
+      severityScore: 0,
+      reasons: <String>[],
+    );
+  }
+
+  return DeckOptimizationState(
+    status: 'needs_repair',
+    recommendedMode: 'repair',
+    suggestedScope: 'rebuild_core',
+    severityScore: (severeIssues * 30 + moderateIssues * 12).clamp(0, 100),
+    reasons: reasons.take(6).toList(),
+    repairPlan: _buildDeckRepairPlan(
+      deckFormat: deckFormat,
+      landCount: landCount,
+      nonLandCount: nonLandCount,
+      instantSorceryCount: instantSorceryCount,
+      artifactCount: artifactCount,
+      enchantmentCount: enchantmentCount,
+      commanderColorIdentity: commanderColorIdentity,
+      commanderText: commanderText,
+      manaAssessment: manaAssessment,
+    ),
+  );
+}
+
+Map<String, dynamic> _buildDeckRepairPlan({
+  required String deckFormat,
+  required int landCount,
+  required int nonLandCount,
+  required int instantSorceryCount,
+  required int artifactCount,
+  required int enchantmentCount,
+  required Set<String> commanderColorIdentity,
+  required String commanderText,
+  required String manaAssessment,
+}) {
+  final targetLandCount = deckFormat == 'brawl' ? 25 : 36;
+  final priorityRepairs = <String>[];
+  final roleTargets = <String, int>{};
+
+  if (landCount > targetLandCount) {
+    priorityRepairs.add(
+      'Cortar aproximadamente ${landCount - targetLandCount} terrenos excedentes antes de avaliar upgrades finos.',
+    );
+  }
+
+  if (commanderColorIdentity.isNotEmpty &&
+      manaAssessment.toLowerCase().contains('falta mana')) {
+    priorityRepairs.add(
+      'Trocar terrenos incolores por fontes ${commanderColorIdentity.join('/')} até estabilizar a base.',
+    );
+  }
+
+  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 24) {
+    roleTargets['instants_or_sorceries_to_add'] = 24 - instantSorceryCount;
+    priorityRepairs.add(
+      'Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.',
+    );
+  }
+
+  if (_commanderSignalsArtifacts(commanderText) && artifactCount < 12) {
+    roleTargets['artifacts_to_add'] = 12 - artifactCount;
+  }
+
+  if (_commanderSignalsEnchantments(commanderText) && enchantmentCount < 10) {
+    roleTargets['enchantments_to_add'] = 10 - enchantmentCount;
+  }
+
+  if (nonLandCount < 30) {
+    priorityRepairs.add(
+      'Aumentar a densidade de mágicas úteis antes de tentar micro-otimizações.',
+    );
+  }
+
+  return {
+    'summary':
+        'O deck precisa de reconstrução estrutural antes de trocas pontuais.',
+    'target_land_count': targetLandCount,
+    'priority_repairs': priorityRepairs,
+    'role_targets': roleTargets,
+    'preserve': const ['commander', 'cartas core realmente sinérgicas'],
+  };
+}
+
+bool _commanderSignalsSpellslinger(String commanderText) {
+  return commanderText.contains('instant or sorcery') ||
+      commanderText.contains('instant or sorcery spell') ||
+      commanderText.contains('whenever you cast an instant') ||
+      commanderText.contains('whenever you cast a sorcery');
+}
+
+bool _commanderSignalsArtifacts(String commanderText) {
+  return commanderText.contains('artifact');
+}
+
+bool _commanderSignalsEnchantments(String commanderText) {
+  return commanderText.contains('enchantment');
+}
+
+String deriveOptimizeOutcomeCode({
+  required int statusCode,
+  required Map<String, dynamic> body,
+  required DeckOptimizationState deckState,
+  ValidationReport? validationReport,
+}) {
+  if (statusCode >= 200 && statusCode < 300) {
+    final mode = body['mode']?.toString() ?? 'optimize';
+    return mode == 'complete' ? 'deck_completed' : 'optimized';
+  }
+
+  final qualityError = body['quality_error'] is Map
+      ? (body['quality_error'] as Map).cast<String, dynamic>()
+      : null;
+  final qualityCode = qualityError?['code']?.toString() ?? '';
+  final validation = qualityError?['validation'] is Map
+      ? (qualityError?['validation'] as Map).cast<String, dynamic>()
+      : const <String, dynamic>{};
+  final healthScore = validationReport?.healthScore ??
+      (validation['deck_health_score'] as num?)?.toInt();
+  final improvementScore = validationReport?.improvementScore ??
+      (validation['improvement_score'] as num?)?.toInt();
+
+  switch (qualityCode) {
+    case 'OPTIMIZE_NEEDS_REPAIR':
+      return 'needs_repair';
+    case 'OPTIMIZE_NO_SAFE_SWAPS':
+    case 'OPTIMIZE_NO_ACTIONABLE_SWAPS':
+      return deckState.status == 'needs_repair'
+          ? 'needs_repair'
+          : 'no_safe_upgrade_found';
+    case 'OPTIMIZE_QUALITY_REJECTED':
+      if (deckState.status == 'needs_repair' ||
+          (healthScore != null && healthScore < 45)) {
+        return 'needs_repair';
+      }
+      if (healthScore != null &&
+          healthScore >= 80 &&
+          improvementScore != null &&
+          improvementScore < 35) {
+        return 'near_peak';
+      }
+      return 'no_safe_upgrade_found';
+    case 'OPTIMIZE_EXECUTION_FAILED':
+    case 'OPTIMIZE_VALIDATION_FAILED':
+    case 'OPTIMIZE_POST_ANALYSIS_FAILED':
+      if (deckState.status == 'needs_repair') {
+        return 'needs_repair';
+      }
+      if (deckState.status == 'healthy') {
+        return 'no_safe_upgrade_found';
+      }
+      return 'execution_failed';
+    default:
+      return statusCode >= 500 ? 'execution_failed' : 'blocked';
+  }
 }
 
 List<Map<String, dynamic>> buildOptimizeAdditionEntries({
@@ -530,6 +894,10 @@ Future<DeckThemeProfile> _detectThemeProfile(
   }
 
   final commanderLower = commanders.map((e) => e.toLowerCase()).toSet();
+  final commanderOracle = cards
+      .where((c) => c['is_commander'] == true)
+      .map((c) => ((c['oracle_text'] as String?) ?? '').toLowerCase())
+      .join(' ');
 
   var totalNonLands = 0;
   var artifactCount = 0;
@@ -542,6 +910,7 @@ Future<DeckThemeProfile> _detectThemeProfile(
   var landfallReferences = 0;
   var wheelReferences = 0;
   var staxReferences = 0;
+  var counterReferences = 0;
 
   // Tribal: track creature subtypes for tribe concentration
   final creatureSubtypes = <String, int>{};
@@ -647,6 +1016,19 @@ Future<DeckThemeProfile> _detectThemeProfile(
       staxReferences += q;
     }
 
+    // --- Counters theme (-1/-1 counters, proliferate, hardened scales style) ---
+    if (oracle.contains('-1/-1 counter') ||
+        oracle.contains('proliferate') ||
+        oracle.contains('put a counter on') ||
+        oracle.contains('remove a counter from')) {
+      counterReferences += q;
+      if (c['isLand'] == false &&
+          commanderLower.contains(name.toLowerCase()) &&
+          (oracle.contains('-1/-1 counter') || oracle.contains('proliferate'))) {
+        counterReferences += q * 3;
+      }
+    }
+
     // --- Tribal: track creature subtypes ---
     if (typeLine.contains('creature')) {
       final dashIndex = typeLine.indexOf('—');
@@ -711,10 +1093,37 @@ Future<DeckThemeProfile> _detectThemeProfile(
       'stax': staxReferences / totalNonLands >= 0.10
           ? staxReferences / totalNonLands
           : 0.0,
+      'counters': counterReferences / totalNonLands >= 0.12
+          ? counterReferences / totalNonLands
+          : 0.0,
       'tribal': tribalCount / totalNonLands >= 0.25
           ? tribalCount / totalNonLands
           : 0.0,
     };
+
+    if (commanderOracle.contains('-1/-1 counter') ||
+        commanderOracle.contains('proliferate')) {
+      themeScores['counters'] = (themeScores['counters'] ?? 0.0) + 0.55;
+      if ((themeScores['tribal'] ?? 0.0) < 0.55) {
+        themeScores['tribal'] = (themeScores['tribal'] ?? 0.0) * 0.5;
+      }
+    }
+    if (commanderOracle.contains('instant or sorcery')) {
+      themeScores['spellslinger'] =
+          (themeScores['spellslinger'] ?? 0.0) + 0.35;
+    }
+    if (commanderOracle.contains('artifact')) {
+      themeScores['artifacts'] = (themeScores['artifacts'] ?? 0.0) + 0.25;
+    }
+    if (commanderOracle.contains('enchantment')) {
+      themeScores['enchantments'] =
+          (themeScores['enchantments'] ?? 0.0) + 0.25;
+    }
+    if (commanderOracle.contains('landfall') ||
+        (commanderOracle.contains('land') &&
+            commanderOracle.contains('enters the battlefield'))) {
+      themeScores['landfall'] = (themeScores['landfall'] ?? 0.0) + 0.25;
+    }
 
     // Pick highest scoring theme (sem reduzir lista vazia)
     MapEntry<String, double>? best;
@@ -780,6 +1189,9 @@ Future<DeckThemeProfile> _detectThemeProfile(
       if ((theme == 'spellslinger' && learnedRole.contains('counter')) ||
           (theme == 'reanimator' && learnedRole.contains('reanimate')) ||
           (theme == 'artifacts' && learnedRole.contains('artifact')) ||
+          (theme == 'counters' &&
+              (learnedRole.contains('counter') ||
+                  learnedRole.contains('proliferate'))) ||
           (theme.startsWith('tribal') && learnedRole.contains('tribal'))) {
         impactScore += 15;
       }
@@ -933,6 +1345,17 @@ Future<DeckThemeProfile> _detectThemeProfile(
     if (theme == 'stax') {
       if (oracle.contains('can\'t') || oracle.contains('doesn\'t untap')) {
         impactScore += 30;
+      }
+    }
+
+    // 10. Counters: -1/-1 counters, proliferate, scalable counter engines
+    if (theme == 'counters') {
+      if (oracle.contains('-1/-1 counter') || oracle.contains('proliferate')) {
+        impactScore += 35;
+      }
+      if (oracle.contains('put a counter on') ||
+          oracle.contains('remove a counter from')) {
+        impactScore += 20;
       }
     }
 
@@ -1177,6 +1600,13 @@ Future<Response> onRequest(RequestContext context) async {
       commanders: commanders,
       pool: pool,
     );
+    final deckState = assessDeckOptimizationState(
+      cards: allCardData,
+      deckAnalysis: deckAnalysis,
+      deckFormat: deckFormat,
+      currentTotalCards: currentTotalCards,
+      commanderColorIdentity: commanderColorIdentity,
+    );
 
     // Usar arquétipo passado pelo usuário
     final targetArchetype = archetype;
@@ -1202,32 +1632,41 @@ Future<Response> onRequest(RequestContext context) async {
       List<String> blockedByColorIdentityOverride = const [],
       List<Map<String, dynamic>> blockedByBracketOverride = const [],
     }) async {
+      final responseBody = Map<String, dynamic>.from(body);
+      responseBody['deck_state'] ??= deckState.toJson();
+      responseBody['outcome_code'] ??= deriveOptimizeOutcomeCode(
+        statusCode: statusCode,
+        body: responseBody,
+        deckState: deckState,
+        validationReport: validationReport,
+      );
+
       await _recordOptimizeAnalysisOutcome(
         pool: pool,
         deckId: deckId,
         userId: userId,
         commanderName: commanderNameForLogs,
         commanderColors: commanderColorIdentity.toList(),
-        operationMode: body['mode']?.toString() ?? effectiveMode,
+        operationMode: responseBody['mode']?.toString() ?? effectiveMode,
         requestedMode: requestMode,
         targetArchetype: targetArchetype,
         detectedTheme: themeProfile.theme,
         deckAnalysis: deckAnalysis,
         postAnalysis: postAnalysisOverride,
         removals: removalsOverride ??
-            ((body['removals'] as List?)?.map((e) => '$e').toList() ??
+            ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
                 const <String>[]),
         additions: additionsOverride ??
-            ((body['additions'] as List?)?.map((e) => '$e').toList() ??
+            ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
                 const <String>[]),
         statusCode: statusCode,
-        qualityError: body['quality_error'] is Map
-            ? (body['quality_error'] as Map).cast<String, dynamic>()
+        qualityError: responseBody['quality_error'] is Map
+            ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
             : null,
         validationReport: validationReport,
         validationWarnings: validationWarningsOverride.isNotEmpty
             ? validationWarningsOverride
-            : ((body['validation_warnings'] as List?)
+            : ((responseBody['validation_warnings'] as List?)
                     ?.map((e) => '$e')
                     .toList() ??
                 const <String>[]),
@@ -1240,7 +1679,40 @@ Future<Response> onRequest(RequestContext context) async {
         executionTimeMs: requestStopwatch.elapsedMilliseconds,
       );
 
-      return Response.json(statusCode: statusCode, body: body);
+      return Response.json(statusCode: statusCode, body: responseBody);
+    }
+
+    if (deckState.status == 'needs_repair') {
+      return respondWithOptimizeTelemetry(
+        statusCode: HttpStatus.unprocessableEntity,
+        body: {
+          'error':
+              'O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.',
+          'quality_error': {
+            'code': 'OPTIMIZE_NEEDS_REPAIR',
+            'message':
+                'O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.',
+            'reasons': deckState.reasons,
+            'recommended_mode': deckState.recommendedMode,
+            'repair_plan': deckState.repairPlan,
+          },
+          'next_action': {
+            'type': 'rebuild_guided',
+            'endpoint': '/ai/rebuild',
+            'payload': {
+              'deck_id': deckId,
+              'bracket': bracket,
+              'archetype': effectiveOptimizeArchetype,
+              'theme': themeProfile.theme,
+              'rebuild_scope': 'auto',
+              'save_mode': 'draft_clone',
+            },
+          },
+          'mode': 'optimize',
+          'deck_analysis': deckAnalysis,
+          'theme': themeProfile.toJson(),
+        },
+      );
     }
 
     // 2. Otimização via DeckOptimizerService (IA + RAG)
@@ -1490,14 +1962,23 @@ Future<Response> onRequest(RequestContext context) async {
     } else {
       final aiResponse = await runAiOptimizeAttempt(trigger: 'primary');
       if (aiResponse == null) {
+        final executionFailedButPreserved =
+            deckState.status == 'healthy' &&
+                deckState.recommendedMode == 'optimize';
         return respondWithOptimizeTelemetry(
-          statusCode: HttpStatus.internalServerError,
+          statusCode: executionFailedButPreserved
+              ? HttpStatus.unprocessableEntity
+              : HttpStatus.internalServerError,
           body: {
-            'error': 'Optimization failed',
+            'error': executionFailedButPreserved
+                ? 'Nenhuma otimizacao segura foi produzida; deck original preservado.'
+                : 'Optimization failed',
             'quality_error': {
               'code': 'OPTIMIZE_EXECUTION_FAILED',
               'message':
-                  'A execucao da otimizacao falhou antes da validacao final.',
+                  executionFailedButPreserved
+                      ? 'A execucao da otimizacao falhou; o deck original foi preservado em estado saudável.'
+                      : 'A execucao da otimizacao falhou antes da validacao final.',
               'details':
                   'Falha ao executar optimizeDeck na tentativa primaria.',
             },
@@ -2641,8 +3122,7 @@ Future<Response> onRequest(RequestContext context) async {
               postAnalysisMap['mana_base_assessment']?.toString() ?? '',
         );
         final hardQualityRejected =
-            optimizationValidationReport.verdict != 'aprovado' ||
-                optimizationValidationReport.score < 70;
+            optimizationValidationReport.verdict != 'aprovado';
         final effectiveRejectionReasons = rejectionReasons.isNotEmpty
             ? rejectionReasons
             : (hardQualityRejected
@@ -2710,8 +3190,7 @@ Future<Response> onRequest(RequestContext context) async {
         final responseValidationVerdict =
             responseValidationJson['verdict']?.toString() ?? '';
 
-        if (responseValidationVerdict != 'aprovado' ||
-            responseValidationScore < 70) {
+        if (responseValidationVerdict != 'aprovado') {
           final serializedValidationReasons = optimizationValidationReport !=
                   null
               ? buildOptimizationRejectionReasons(
@@ -4641,6 +5120,18 @@ Future<void> _processCompleteModeAsync({
           : const <String, dynamic>{};
       if (warnings.isNotEmpty) {
         responseBody['warnings'] = warnings;
+      }
+
+      final qualityWarning = jsonResponse['quality_warning'];
+      if (qualityWarning is Map) {
+        responseBody['quality_warning'] =
+            qualityWarning.cast<String, dynamic>();
+      }
+
+      final consistencySlo = jsonResponse['consistency_slo'];
+      if (consistencySlo is Map) {
+        responseBody['consistency_slo'] =
+            consistencySlo.cast<String, dynamic>();
       }
 
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);

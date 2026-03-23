@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_state_panel.dart';
 import '../providers/message_provider.dart';
 import 'chat_screen.dart';
 
@@ -42,36 +43,12 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
           }
 
           if (provider.conversations.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.chat_bubble_outline,
-                        size: 64,
-                        color: AppTheme.textSecondary.withValues(alpha: 0.4)),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Nenhuma conversa',
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontLg,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Envie mensagem para alguém pelo perfil!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: AppTheme.fontMd,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return const AppStatePanel(
+              icon: Icons.chat_bubble_outline_rounded,
+              title: 'Nenhuma conversa',
+              message:
+                  'Quando você começar uma conversa a partir do perfil de outro jogador, ela aparece aqui.',
+              accent: AppTheme.primarySoft,
             );
           }
 
@@ -81,11 +58,12 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: provider.conversations.length,
-              separatorBuilder: (_, __) => const Divider(
-                height: 1,
-                color: AppTheme.outlineMuted,
-                indent: 72,
-              ),
+              separatorBuilder:
+                  (_, __) => const Divider(
+                    height: 1,
+                    color: AppTheme.outlineMuted,
+                    indent: 72,
+                  ),
               itemBuilder: (context, index) {
                 final conv = provider.conversations[index];
                 return _ConversationTile(
@@ -94,10 +72,11 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatScreen(
-                          conversationId: conv.id,
-                          otherUser: conv.otherUser,
-                        ),
+                        builder:
+                            (_) => ChatScreen(
+                              conversationId: conv.id,
+                              otherUser: conv.otherUser,
+                            ),
                       ),
                     );
                   },
@@ -115,10 +94,7 @@ class _ConversationTile extends StatelessWidget {
   final Conversation conversation;
   final VoidCallback onTap;
 
-  const _ConversationTile({
-    required this.conversation,
-    required this.onTap,
-  });
+  const _ConversationTile({required this.conversation, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -131,19 +107,21 @@ class _ConversationTile extends StatelessWidget {
       leading: CircleAvatar(
         radius: 24,
         backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
-        backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-            ? NetworkImage(user.avatarUrl!)
-            : null,
-        child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-            ? Text(
-                user.label.isNotEmpty ? user.label[0].toUpperCase() : '?',
-                style: const TextStyle(
-                  color: AppTheme.manaViolet,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppTheme.fontLg,
-                ),
-              )
-            : null,
+        backgroundImage:
+            user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                ? NetworkImage(user.avatarUrl!)
+                : null,
+        child:
+            user.avatarUrl == null || user.avatarUrl!.isEmpty
+                ? Text(
+                  user.label.isNotEmpty ? user.label[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    color: AppTheme.manaViolet,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppTheme.fontLg,
+                  ),
+                )
+                : null,
       ),
       title: Text(
         user.label,
@@ -153,17 +131,19 @@ class _ConversationTile extends StatelessWidget {
           fontSize: AppTheme.fontMd,
         ),
       ),
-      subtitle: conversation.lastMessage != null
-          ? Text(
-              conversation.lastMessage!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: hasUnread ? AppTheme.textPrimary : AppTheme.textSecondary,
-                fontSize: AppTheme.fontSm,
-              ),
-            )
-          : null,
+      subtitle:
+          conversation.lastMessage != null
+              ? Text(
+                conversation.lastMessage!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color:
+                      hasUnread ? AppTheme.textPrimary : AppTheme.textSecondary,
+                  fontSize: AppTheme.fontSm,
+                ),
+              )
+              : null,
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,

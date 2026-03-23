@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider.dart';
+import '../widgets/deck_feedback_dialogs.dart';
 
 class DeckImportScreen extends StatefulWidget {
   const DeckImportScreen({super.key});
@@ -16,7 +17,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   final _descriptionController = TextEditingController();
   final _listController = TextEditingController();
   final _commanderController = TextEditingController();
-  
+
   String _selectedFormat = 'commander';
   bool _isImporting = false;
   List<String> _notFoundLines = [];
@@ -44,21 +45,21 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     super.dispose();
   }
 
-  bool get _isCommanderFormat => 
+  bool get _isCommanderFormat =>
       _selectedFormat == 'commander' || _selectedFormat == 'brawl';
 
   Future<void> _importDeck() async {
     if (_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Digite o nome do deck')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Digite o nome do deck')));
       return;
     }
 
     if (_listController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cole a lista de cartas')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Cole a lista de cartas')));
       return;
     }
 
@@ -74,12 +75,14 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       name: _nameController.text,
       format: _selectedFormat,
       list: _listController.text,
-      description: _descriptionController.text.isNotEmpty 
-          ? _descriptionController.text 
-          : null,
-      commander: _commanderController.text.isNotEmpty 
-          ? _commanderController.text 
-          : null,
+      description:
+          _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+      commander:
+          _commanderController.text.isNotEmpty
+              ? _commanderController.text
+              : null,
     );
 
     if (!mounted) return;
@@ -93,7 +96,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
     if (result['success'] == true) {
       final deck = result['deck'];
-      
+
       // Se houve cartas não encontradas, mostra resultado com opção de editar
       if (_notFoundLines.isNotEmpty) {
         _showResultDialog(
@@ -121,7 +124,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
       setState(() {
         _error = result['error'];
       });
-      
+
       // Se houve erro mas tem cartas não encontradas, mostra pra ajudar
       if (_notFoundLines.isNotEmpty) {
         _showResultDialog(
@@ -142,208 +145,176 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     String? error,
   }) {
     final theme = Theme.of(context);
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  success ? Icons.check_circle : Icons.warning,
-                  color: success ? theme.colorScheme.primary : AppTheme.warning,
-                ),
-                const SizedBox(width: 8),
-                Text(success ? 'Importação Concluída' : 'Atenção'),
-              ],
+      builder:
+          (context) => AlertDialog(
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            title: DeckDialogTitleBlock(
+              icon:
+                  success
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.warning_amber_rounded,
+              title: success ? 'Importação concluída' : 'Revisão da importação',
+              subtitle:
+                  success
+                      ? 'A lista foi processada e o deck já pode ser aberto.'
+                      : 'A lista foi lida, mas alguns pontos precisam de revisão.',
+              accent: success ? theme.colorScheme.primary : AppTheme.warning,
             ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (success) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: theme.colorScheme.primary),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '$cardsImported cartas reconhecidas',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (success) ...[
+                    DeckDialogSectionCard(
+                      title: 'Resumo',
+                      accent: theme.colorScheme.primary,
+                      icon: Icons.checklist_rounded,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$cardsImported cartas reconhecidas',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
                             ),
-                            Text(
-                              'Pronto para análise de sinergia',
-                              style: TextStyle(
-                                fontSize: AppTheme.fontSm,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'O deck já pode seguir para análise, otimização ou revisão manual.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              
-              if (error != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.error_outline, color: AppTheme.error),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          error,
-                          style: TextStyle(color: AppTheme.error),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              
-              if (warnings.isNotEmpty) ...[
-                Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 18, color: AppTheme.warning),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Avisos:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.warning,
+                          ),
+                        ],
                       ),
                     ),
+                    const SizedBox(height: 12),
                   ],
-                ),
-                const SizedBox(height: 8),
-                ...warnings.map((w) => Padding(
-                  padding: const EdgeInsets.only(left: 8, bottom: 4),
-                  child: Text('• $w', style: TextStyle(fontSize: AppTheme.fontMd, color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
-                )),
-                const SizedBox(height: 16),
-              ],
-              
-              if (notFound.isNotEmpty) ...[
-                Row(
-                  children: [
-                    Icon(Icons.search_off, size: 18, color: theme.colorScheme.error),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${notFound.length} cartas não identificadas:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: notFound.map((line) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          children: [
-                            Icon(Icons.help_outline, size: 14, color: theme.colorScheme.error.withValues(alpha: 0.7)),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                line,
-                                style: TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontSize: AppTheme.fontSm,
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )).toList(),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.tips_and_updates, size: 14, color: theme.colorScheme.secondary),
-                    const SizedBox(width: 4),
-                    Expanded(
+                  if (error != null) ...[
+                    DeckDialogSectionCard(
+                      title: 'Erro principal',
+                      accent: AppTheme.error,
+                      icon: Icons.error_outline_rounded,
                       child: Text(
-                        'Tente usar o nome em inglês ou verifique a ortografia',
-                        style: TextStyle(
-                          fontSize: AppTheme.fontSm,
-                          fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        error,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          height: 1.35,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 12),
                   ],
+                  if (warnings.isNotEmpty) ...[
+                    DeckDialogSectionCard(
+                      title: 'Avisos',
+                      accent: AppTheme.warning,
+                      icon: Icons.info_outline_rounded,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:
+                            warnings
+                                .map(
+                                  (warning) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Text(
+                                      '• $warning',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: AppTheme.textPrimary,
+                                            height: 1.35,
+                                          ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (notFound.isNotEmpty) ...[
+                    DeckDialogSectionCard(
+                      title: '${notFound.length} cartas não identificadas',
+                      accent: theme.colorScheme.error,
+                      icon: Icons.search_off_rounded,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 220),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children:
+                                    notFound
+                                        .map(
+                                          (line) => Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 8,
+                                            ),
+                                            child: Text(
+                                              line,
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    fontFamily: 'monospace',
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tente usar o nome em inglês ou revisar a ortografia das linhas listadas.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary,
+                              fontStyle: FontStyle.italic,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              if (!success)
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Revisar Lista'),
                 ),
+              if (success) ...[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.go('/decks');
+                  },
+                  child: const Text('Ver Decks'),
+                ),
+                if (deckId != null)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.go('/decks/$deckId');
+                    },
+                    child: const Text('Abrir Deck'),
+                  ),
               ],
             ],
           ),
-        ),
-        actions: [
-          if (!success)
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Revisar Lista'),
-            ),
-          if (success) ...[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                context.go('/decks');
-              },
-              child: const Text('Ver Decks'),
-            ),
-            if (deckId != null)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.go('/decks/$deckId');
-                },
-                child: const Text('Abrir Deck'),
-              ),
-          ],
-        ],
-      ),
     );
   }
 
@@ -360,7 +331,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Importar Lista'),
@@ -396,7 +367,11 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.content_paste, color: theme.colorScheme.primary, size: 24),
+                      Icon(
+                        Icons.content_paste,
+                        color: theme.colorScheme.primary,
+                        size: 24,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Importar Lista',
@@ -416,14 +391,16 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                     '• Texto simples',
                     style: TextStyle(
                       fontSize: AppTheme.fontMd,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.85,
+                      ),
                       height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
 
             // Nome do Deck
@@ -438,7 +415,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 fillColor: theme.colorScheme.surface,
               ),
             ),
-            
+
             const SizedBox(height: 16),
 
             // Formato
@@ -449,17 +426,22 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category),
               ),
-              items: _formats.map((f) => DropdownMenuItem(
-                value: f,
-                child: Text(f[0].toUpperCase() + f.substring(1)),
-              )).toList(),
+              items:
+                  _formats
+                      .map(
+                        (f) => DropdownMenuItem(
+                          value: f,
+                          child: Text(f[0].toUpperCase() + f.substring(1)),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 if (value != null) {
                   setState(() => _selectedFormat = value);
                 }
               },
             ),
-            
+
             const SizedBox(height: 16),
 
             // Comandante (só para Commander/Brawl)
@@ -488,13 +470,17 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               ),
               maxLines: 2,
             ),
-            
+
             const SizedBox(height: 16),
 
             // Lista de Cartas
             Row(
               children: [
-                Icon(Icons.list_alt, size: 20, color: theme.colorScheme.secondary),
+                Icon(
+                  Icons.list_alt,
+                  size: 20,
+                  color: theme.colorScheme.secondary,
+                ),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
@@ -507,8 +493,15 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 ),
                 TextButton.icon(
                   onPressed: _pasteExample,
-                  icon: Icon(Icons.help_outline, size: 18, color: theme.colorScheme.tertiary),
-                  label: Text('Exemplo', style: TextStyle(color: theme.colorScheme.tertiary)),
+                  icon: Icon(
+                    Icons.help_outline,
+                    size: 18,
+                    color: theme.colorScheme.tertiary,
+                  ),
+                  label: Text(
+                    'Exemplo',
+                    style: TextStyle(color: theme.colorScheme.tertiary),
+                  ),
                 ),
               ],
             ),
@@ -516,7 +509,8 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             TextField(
               controller: _listController,
               decoration: InputDecoration(
-                hintText: 'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
+                hintText:
+                    'Cole aqui sua lista de cartas...\n\nFormato: 1 Sol Ring ou 1x Sol Ring (set)',
                 border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: theme.colorScheme.surface,
@@ -528,16 +522,17 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 color: theme.colorScheme.onSurface,
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // Contador de linhas com feedback inteligente
             Builder(
               builder: (context) {
-                final detectedCount = _listController.text
-                    .split('\n')
-                    .where((l) => l.trim().isNotEmpty)
-                    .length;
+                final detectedCount =
+                    _listController.text
+                        .split('\n')
+                        .where((l) => l.trim().isNotEmpty)
+                        .length;
                 final hasCards = detectedCount > 0;
                 return Row(
                   children: [
@@ -546,15 +541,20 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                           ? Icons.check_circle_outline
                           : Icons.radio_button_unchecked,
                       size: 14,
-                      color: hasCards
-                          ? theme.colorScheme.secondary
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      color:
+                          hasCards
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.4,
+                              ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '$detectedCount cartas detectadas',
                       style: TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         fontSize: AppTheme.fontSm,
                       ),
                     ),
@@ -597,35 +597,49 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: _isImporting 
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text('Importando...', style: TextStyle(fontSize: AppTheme.fontLg, color: AppTheme.textPrimary)),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.upload),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Criar Deck',
-                            style: TextStyle(fontSize: AppTheme.fontLg, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
-                          ),
-                        ],
-                      ),
+                child:
+                    _isImporting
+                        ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Importando...',
+                              style: TextStyle(
+                                fontSize: AppTheme.fontLg,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                          ],
+                        )
+                        : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.upload),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Criar Deck',
+                              style: TextStyle(
+                                fontSize: AppTheme.fontLg,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Texto auxiliar
             Text(
               'Cartas serão validadas automaticamente',

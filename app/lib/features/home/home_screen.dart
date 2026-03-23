@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../auth/providers/auth_provider.dart';
@@ -13,9 +14,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final auth = context.select<AuthProvider, ({String? displayName, String? username})>(
-      (a) => (displayName: a.user?.displayName, username: a.user?.username),
-    );
+    final auth = context
+        .select<AuthProvider, ({String? displayName, String? username})>(
+          (a) => (displayName: a.user?.displayName, username: a.user?.username),
+        );
     final recentDecks = context.select<DeckProvider, List<Deck>>(
       (dp) => dp.decks.take(3).toList(),
     );
@@ -36,12 +38,18 @@ class HomeScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
-              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
+              shaderCallback:
+                  (bounds) => AppTheme.primaryGradient.createShader(bounds),
+              child: const Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 8),
             ShaderMask(
-              shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
+              shaderCallback:
+                  (bounds) => AppTheme.primaryGradient.createShader(bounds),
               child: Text(
                 'ManaLoom',
                 style: theme.textTheme.titleLarge?.copyWith(
@@ -53,6 +61,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+        actions: const [ShellAppBarActions()],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -130,7 +139,7 @@ class HomeScreen extends StatelessWidget {
                         child: _QuickAction(
                           icon: Icons.favorite,
                           label: 'Vida',
-                          color: const Color(0xFFEF4444),
+                          color: AppTheme.error,
                           onTap: () => context.go('/life-counter'),
                         ),
                       ),
@@ -139,7 +148,7 @@ class HomeScreen extends StatelessWidget {
                         child: _QuickAction(
                           icon: Icons.store,
                           label: 'Marketplace',
-                          color: const Color(0xFF22C55E),
+                          color: AppTheme.success,
                           onTap: () => context.go('/collection?tab=1'),
                         ),
                       ),
@@ -152,7 +161,10 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _SectionHeader(label: 'Decks Recentes', icon: Icons.style),
+                        _SectionHeader(
+                          label: 'Decks Recentes',
+                          icon: Icons.style,
+                        ),
                         TextButton(
                           onPressed: () => context.go('/decks'),
                           child: const Text('Ver todos'),
@@ -223,15 +235,7 @@ class _HeroBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1A0A2E),
-            Color(0xFF0F172A),
-            AppTheme.backgroundAbyss,
-          ],
-        ),
+        gradient: AppTheme.heroGradient,
         border: const Border(
           bottom: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
         ),
@@ -274,7 +278,11 @@ class _HeroBanner extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 24),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
         ],
       ),
@@ -410,10 +418,7 @@ class _QuickAction extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(
-              color: AppTheme.outlineMuted,
-              width: 0.5,
-            ),
+            border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
           ),
           child: Column(
             children: [
@@ -542,14 +547,16 @@ class _EmptyDecksState extends StatelessWidget {
       child: Column(
         children: [
           ShaderMask(
-            shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
-            child: const Icon(Icons.style_outlined, size: 48, color: Colors.white),
+            shaderCallback:
+                (bounds) => AppTheme.primaryGradient.createShader(bounds),
+            child: const Icon(
+              Icons.style_outlined,
+              size: 48,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 12),
-          Text(
-            'Nenhum deck criado ainda',
-            style: theme.textTheme.titleSmall,
-          ),
+          Text('Nenhum deck criado ainda', style: theme.textTheme.titleSmall),
           const SizedBox(height: 4),
           Text(
             'Crie seu primeiro deck ou gere um com IA!',
@@ -655,7 +662,9 @@ class _MarketPreviewSectionState extends State<_MarketPreviewSection> {
     return Consumer<MarketProvider>(
       builder: (context, provider, _) {
         final gainers = provider.moversData?.gainers.take(3).toList() ?? [];
-        if (gainers.isEmpty && !provider.isLoading) return const SizedBox.shrink();
+        if (gainers.isEmpty && !provider.isLoading) {
+          return const SizedBox.shrink();
+        }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -687,11 +696,16 @@ class _MarketPreviewSectionState extends State<_MarketPreviewSection> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     gradient: AppTheme.cardGradient,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted,
+                      width: 0.5,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -718,12 +732,15 @@ class _MarketPreviewSectionState extends State<_MarketPreviewSection> {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: (isUp ? AppTheme.success : AppTheme.error)
                               .withValues(alpha: 0.15),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusXs),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXs,
+                          ),
                         ),
                         child: Text(
                           '${isUp ? '+' : ''}${card.changePct.toStringAsFixed(1)}%',
