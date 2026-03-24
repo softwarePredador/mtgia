@@ -49,4 +49,37 @@ post_install do |installer|
       ]
     end
   end
+
+  installer.aggregate_targets.each do |aggregate_target|
+    aggregate_target.xcconfigs.each do |_config_name, config_file|
+      config_path =
+        if config_file.respond_to?(:real_path)
+          config_file.real_path
+        else
+          Pathname.new(config_file.to_s)
+        end
+      next unless File.exist?(config_path)
+
+      xcconfig = File.read(config_path)
+      patched = xcconfig.gsub('DT_TOOLCHAIN_DIR', 'TOOLCHAIN_DIR')
+      next if patched == xcconfig
+
+      File.write(config_path, patched)
+    end
+  end
+
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      next unless config.base_configuration_reference
+
+      config_path = config.base_configuration_reference.real_path
+      next unless File.exist?(config_path)
+
+      xcconfig = File.read(config_path)
+      patched = xcconfig.gsub('DT_TOOLCHAIN_DIR', 'TOOLCHAIN_DIR')
+      next if patched == xcconfig
+
+      File.write(config_path, patched)
+    end
+  end
 end

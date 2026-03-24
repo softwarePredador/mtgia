@@ -32,6 +32,8 @@ Observações da rodada `2026-03-24`:
 - o retry do smoke mobile em `macos` continuou preso no build nativo; a pendência do app segue sendo de toolchain/execução, não de integração de código
 - o smoke mobile agora falha de forma classificável: em `macos` com timeout de `20s`, encerrou com `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1` e `exit 124`
 - o bloqueio Android por Kotlin incompatível foi removido ao atualizar o KGP para `2.2.0`, mas o smoke em `emulator-5554` ainda não concluiu dentro da janela de `240s`/`300s`
+- no iOS, o erro inicial de `CocoaPods not installed` foi resolvido; `pod install` já fecha e o app já compila/instala em `Rafa`
+- a pendência iOS atual deixou de ser de pods/build e passou a ser de attach do Flutter (`service protocol connection reset by peer`) no device wireless
 
 ## IA e custo
 - [ ] Limites por plano Free/Pro ativos

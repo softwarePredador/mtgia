@@ -194,6 +194,11 @@ Progresso atual documentado da Sprint 1:
 - a classificação foi revalidada nesta rodada: em `macos`, com timeout reduzido para `20s`, o smoke encerrou com `exit 124` e `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1`, confirmando que a pendência atual é de execução/toolchain e não de integração de código
 - o smoke Android avançou um passo: a falha de Kotlin incompatível foi corrigida ao atualizar `app/android/settings.gradle.kts` para `org.jetbrains.kotlin.android` `2.2.0`
 - mesmo assim, o retry real em `emulator-5554` não concluiu dentro de `240s`/`300s`, então a pendência do app segue operacional, agora concentrada em tempo/execução do target mobile e não mais em quebra imediata de build por versão de Kotlin
+- no iOS, o bloqueio inicial de CocoaPods foi resolvido nesta rodada:
+  - `cocoapods 1.12.1` instalado em escopo de usuário
+  - `pod install` executado com sucesso em `app/ios`
+  - workaround de `DT_TOOLCHAIN_DIR -> TOOLCHAIN_DIR` aplicado no `Podfile`
+- o `flutter run` em `Rafa` já compilou e instalou o app; o novo bloqueio desse trilho passou a ser `service protocol connection reset by peer` no attach do Flutter sobre o device wireless, não mais erro de CocoaPods/build de pods
 - `GET /ready` foi publicado em `server/routes/ready/index.dart`, compartilhando os checks reais de readiness já usados em `/health/ready`
 - blocos ja extraidos:
   - payload parser e normalizacao

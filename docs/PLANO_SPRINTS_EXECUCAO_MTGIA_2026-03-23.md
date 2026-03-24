@@ -254,6 +254,8 @@ Estado do app core em `2026-03-24`:
 - a classificação foi revalidada em `macos` com timeout de `20s`: `exit 124` + `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1`
 - `app/android/settings.gradle.kts` foi atualizado para `org.jetbrains.kotlin.android` `2.2.0`, removendo o bloqueio Android de metadata Kotlin incompatível
 - o retry real do smoke em `emulator-5554` deixou de quebrar por Kotlin, mas ainda não concluiu dentro de `240s`/`300s` e segue sem `SENTRY_MOBILE_EVENT_ID`
+- no iOS, o bloqueio de `CocoaPods not installed` foi resolvido com `cocoapods 1.12.1` em escopo de usuário, `pod install` funcional e workaround de `DT_TOOLCHAIN_DIR -> TOOLCHAIN_DIR` no `Podfile`
+- o `flutter run` no device `Rafa` já compilou e instalou o app; o bloqueio atual desse trilho passou a ser `service protocol connection reset by peer` no attach do Flutter via conexão wireless
 - o refactor estrutural do app core entrou em fase final/residual; o proximo bloqueio dominante do projeto volta a ser a validacao real do mobile `Sentry`
 
 Critério de saida:

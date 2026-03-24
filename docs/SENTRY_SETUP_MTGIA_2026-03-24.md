@@ -141,6 +141,9 @@ Esses valores servem como evidência da primeira ingestão real do backend nesta
 - a versao atual do smoke mobile ja classifica esse caso de forma repetível: em `macos`, com `MOBILE_SENTRY_BUILD_TIMEOUT_SECONDS=20`, o script encerrou com `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1` e `exit 124`
 - no Android, o bloqueio de incompatibilidade Kotlin foi corrigido ao atualizar `org.jetbrains.kotlin.android` para `2.2.0` em `app/android/settings.gradle.kts`
 - após esse ajuste, o smoke em `emulator-5554` deixou de falhar por compilação Kotlin incompatível, mas ainda nao concluiu dentro da janela de `240s`/`300s`, sem chegar a emitir `SENTRY_MOBILE_EVENT_ID`
+- no iOS, o bloqueio inicial de `CocoaPods not installed` foi resolvido com instalação local compatível (`cocoapods 1.12.1`) e `pod install` funcionando via PATH da gem do usuário
+- o `Podfile` ganhou workaround de `DT_TOOLCHAIN_DIR -> TOOLCHAIN_DIR`, removendo a falha de Xcode que acontecia após o `pod install`
+- o `flutter run` em `Rafa` já passou por `pod install`, compilou no Xcode e chegou a instalar/lançar; o bloqueio atual nesse trilho virou `service protocol connection reset by peer`, provavelmente no attach sobre o device wireless
 - correlação manual de um erro entre:
   - app request
   - `x-request-id`
