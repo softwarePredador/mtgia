@@ -42,7 +42,7 @@ Esses documentos continuam como apoio e historico, mas nao devem redefinir a pri
 
 Enquanto este documento nao mudar, a proxima task dominante do projeto e:
 
-1. reduzir responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`
+1. continuar reduzindo responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`, priorizando extracao de semantica/fluxo reutilizavel antes de mexer na navegacao
 
 Sequencia imediata ja definida:
 
@@ -72,6 +72,9 @@ Progresso atual documentado da Sprint 1:
 - contrato funcional do fluxo `optimize -> rebuild -> validate` consolidado em documento proprio
 - revisao residual do `onRequest` concluida: a rota ainda e grande (`2721` linhas), mas o miolo critico ja esta modularizado e deixou de ser bloqueio dominante da Sprint 1
 - task 6 iniciada com extracao dos helpers puros de payload/identidade do comandante para `app/lib/features/decks/providers/deck_provider_support.dart`
+- task 6 avancou com extracao do contrato de IA, snapshots de debug e montagem do payload de aplicacao para `app/lib/features/decks/providers/deck_provider_support.dart`
+- `deck_details_screen.dart` iniciou o recorte da camada de semantica do optimize para `app/lib/features/decks/widgets/deck_optimize_ui_support.dart`
+- `deck_details_screen.dart` tambem iniciou a extracao dos componentes compartilhados de UI de deck para `app/lib/features/decks/widgets/deck_ui_components.dart`
 - blocos ja extraidos:
   - payload parser e normalizacao
   - deterministic-first response/cache/fallback

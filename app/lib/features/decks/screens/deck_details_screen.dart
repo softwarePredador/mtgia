@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +13,10 @@ import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
 import '../widgets/deck_diagnostic_panel.dart';
+import '../widgets/deck_optimize_flow_support.dart';
+import '../widgets/deck_optimize_ui_support.dart';
 import '../widgets/deck_progress_indicator.dart';
+import '../widgets/deck_ui_components.dart';
 import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../cards/screens/card_detail_screen.dart';
@@ -312,7 +313,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             runSpacing: 8,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              _DeckMetaChip(
+                              DeckMetaChip(
                                 label: deck.format.toUpperCase(),
                                 color: AppTheme.identityColor(
                                   deck.colorIdentity.toSet(),
@@ -330,7 +331,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   ),
                                 )
                               else if (_validationResult != null)
-                                _DeckMetaChip(
+                                DeckMetaChip(
                                   onTap: () {
                                     final ok = _validationResult!['ok'] == true;
                                     if (ok) {
@@ -377,7 +378,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                           ? Icons.verified
                                           : Icons.warning_amber_rounded,
                                 ),
-                              _DeckMetaChip(
+                              DeckMetaChip(
                                 onTap: _togglePublic,
                                 label: deck.isPublic ? 'Público' : 'Privado',
                                 color:
@@ -1202,7 +1203,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           (ctx) => AlertDialog(
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
             contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            title: const _DialogTitleBlock(
+            title: const DialogTitleBlock(
               icon: Icons.edit_note_rounded,
               title: 'Descrição do deck',
               subtitle:
@@ -1631,7 +1632,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       barrierDismissible: false,
       builder:
           (ctx) => const Center(
-            child: _FlowLoadingDialog(
+            child: FlowLoadingDialog(
               title: 'Analisando a carta...',
               subtitle:
                   'Relacionando a carta com o plano do deck e o papel dela na lista.',
@@ -1667,14 +1668,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             (ctx) => AlertDialog(
               titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-              title: _DialogTitleBlock(
+              title: DialogTitleBlock(
                 icon: Icons.auto_awesome_rounded,
                 title: 'Análise: ${card.name}',
                 subtitle: 'Leitura contextual da carta dentro do seu deck.',
                 accent: AppTheme.manaViolet,
               ),
               content: SingleChildScrollView(
-                child: _DialogSectionCard(
+                child: DialogSectionCard(
                   title: 'O que essa carta faz aqui',
                   accent: AppTheme.manaViolet,
                   icon: Icons.psychology_alt_outlined,
@@ -2878,171 +2879,16 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     required int bracket,
     required Map<String, dynamic> result,
   }) async {
-    final debugJson = {
-      'request': {
-        'deck_id': deckId,
-        'archetype': archetype,
-        'bracket': bracket,
-        'keep_theme': _keepTheme,
-      },
-      'response': result,
-    };
     await Clipboard.setData(
       ClipboardData(
-        text: const JsonEncoder.withIndent('  ').convert(debugJson),
+        text: buildOptimizeDebugJson(
+          deckId: deckId,
+          archetype: archetype,
+          bracket: bracket,
+          keepTheme: _keepTheme,
+          result: result,
+        ),
       ),
-    );
-  }
-
-  List<String> _extractAiReasons(DeckAiFlowException error) {
-    final reasons = <String>{};
-
-    final qualityReasons = error.qualityError['reasons'];
-    if (qualityReasons is List) {
-      for (final reason in qualityReasons) {
-        final normalized = reason.toString().trim();
-        if (normalized.isNotEmpty) reasons.add(normalized);
-      }
-    }
-
-    final deckStateReasons = error.deckState['reasons'];
-    if (deckStateReasons is List) {
-      for (final reason in deckStateReasons) {
-        final normalized = reason.toString().trim();
-        if (normalized.isNotEmpty) reasons.add(normalized);
-      }
-    }
-
-    return reasons.toList(growable: false);
-  }
-
-  _FlowLoadingPresentation _describeOptimizeProgress(_FlowProgressState state) {
-    final normalized = state.stage.trim().toLowerCase();
-
-    if (normalized.contains('preparando análise do deck') ||
-        normalized.contains('iniciando otimização')) {
-      return const _FlowLoadingPresentation(
-        title: 'Preparando análise do deck',
-        subtitle:
-            'Lendo comandante, identidade de cor e estado atual da lista.',
-        accent: AppTheme.manaViolet,
-        icon: Icons.auto_awesome_rounded,
-        stepNumber: 1,
-        totalSteps: 5,
-        progress: 0.12,
-        tips: [
-          'O app prioriza sinergia com o comandante, não só cartas fortes isoladas.',
-          'Se não houver upgrade seguro, é melhor preservar o deck do que piorá-lo.',
-          'Em decks mais pesados essa etapa inicial pode levar um pouco mais.',
-        ],
-      );
-    }
-
-    if (normalized.contains('preparando referências do commander')) {
-      return const _FlowLoadingPresentation(
-        title: 'Lendo referências do comandante',
-        subtitle:
-            'Cruza perfil do comandante, seeds do deck e prioridades conhecidas.',
-        accent: AppTheme.primarySoft,
-        icon: Icons.menu_book_rounded,
-        stepNumber: 1,
-        totalSteps: 5,
-        progress: 0.18,
-        tips: [
-          'Aqui o sistema entende o plano natural do comandante antes de sugerir trocas.',
-          'Commander bom não é só power: o plano da lista precisa continuar coerente.',
-          'Essa base evita sugestões aleatórias que não conversam com o seu deck.',
-        ],
-      );
-    }
-
-    if (normalized.contains('consultando ia para sugestões')) {
-      return const _FlowLoadingPresentation(
-        title: 'Consultando a IA para sugestões',
-        subtitle:
-            'Gerando shortlist de mudanças coerentes com o plano do deck.',
-        accent: AppTheme.manaViolet,
-        icon: Icons.psychology_alt_rounded,
-        stepNumber: 2,
-        totalSteps: 5,
-        progress: 0.38,
-        tips: [
-          'Essa costuma ser uma das etapas mais demoradas.',
-          'Nem toda staple entra: a IA tenta respeitar curva, tema e identidade.',
-          'Quando o deck já está perto do pico, o sistema tende a ser mais conservador.',
-        ],
-      );
-    }
-
-    if (normalized.contains('preenchendo com cartas sinérgicas')) {
-      return const _FlowLoadingPresentation(
-        title: 'Selecionando cartas mais sinérgicas',
-        subtitle:
-            'Montando trocas que reforçam o plano sem quebrar a estrutura da lista.',
-        accent: AppTheme.success,
-        icon: Icons.library_add_check_rounded,
-        stepNumber: 3,
-        totalSteps: 5,
-        progress: 0.58,
-        tips: [
-          'Boas trocas melhoram o plano do deck sem desmontar peças importantes.',
-          'Aqui o sistema evita duplicatas ruins e cartas fora da identidade de cor.',
-          'Se o deck estiver muito quebrado, ele pode migrar para rebuild em vez de micro-ajuste.',
-        ],
-      );
-    }
-
-    if (normalized.contains('ajustando base de mana')) {
-      return const _FlowLoadingPresentation(
-        title: 'Ajustando a base de mana',
-        subtitle: 'Revisando consistência, curva e fontes de cor do deck.',
-        accent: AppTheme.mythicGold,
-        icon: Icons.water_drop_outlined,
-        stepNumber: 4,
-        totalSteps: 5,
-        progress: 0.78,
-        tips: [
-          'Base de mana ruim derruba até lista com cartas fortes.',
-          'Essa etapa reduz flood, screw e inconsistência de cores.',
-          'Commander melhora muito quando mana e curva conversam com o plano.',
-        ],
-      );
-    }
-
-    if (normalized.contains('processando resultado final')) {
-      return const _FlowLoadingPresentation(
-        title: 'Validando o resultado final',
-        subtitle:
-            'Organizando o preview e preparando só as mudanças que passaram no gate.',
-        accent: AppTheme.success,
-        icon: Icons.fact_check_outlined,
-        stepNumber: 5,
-        totalSteps: 5,
-        progress: 0.94,
-        tips: [
-          'O preview só aparece depois da validação final das trocas.',
-          'Se a melhora não for segura, o sistema prefere bloquear a sugestão.',
-          'Falta pouco: estamos preparando a versão que você vai revisar.',
-        ],
-      );
-    }
-
-    final fallbackProgress =
-        state.stageNumber > 0 && state.totalStages > 0
-            ? (state.stageNumber / state.totalStages).clamp(0.1, 0.95)
-            : null;
-
-    return _FlowLoadingPresentation(
-      title: 'Processando otimização...',
-      subtitle: state.stage,
-      accent: AppTheme.manaViolet,
-      icon: Icons.auto_awesome_rounded,
-      progress: fallbackProgress,
-      tips: const [
-        'Estamos processando o deck no servidor.',
-        'O objetivo é encontrar melhorias reais sem desmontar o plano da lista.',
-        'Se não houver ganho seguro, o app prefere manter o deck intacto.',
-      ],
     );
   }
 
@@ -3058,7 +2904,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           (ctx) => AlertDialog(
             titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
             contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            title: _DialogTitleBlock(
+            title: DialogTitleBlock(
               icon: Icons.info_outline,
               title: title,
               subtitle: 'Resultado da análise do deck',
@@ -3078,7 +2924,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   ),
                   if (reasons.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _DialogSectionCard(
+                    DialogSectionCard(
                       title: 'Motivos',
                       accent: AppTheme.primarySoft,
                       icon: Icons.rule_folder_outlined,
@@ -3149,7 +2995,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       barrierDismissible: false,
       builder:
           (_) => const Center(
-            child: _FlowLoadingDialog(
+            child: FlowLoadingDialog(
               title: 'Criando versão reconstruída...',
               subtitle:
                   'Montando um rascunho novo sem alterar o deck original.',
@@ -3214,7 +3060,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         context: dialogContext,
         title: 'Falha ao reconstruir',
         message: rebuildError.message,
-        reasons: _extractAiReasons(rebuildError),
+        reasons: extractDeckAiReasons(rebuildError),
       );
     } catch (rebuildError) {
       closeLoading();
@@ -3234,9 +3080,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     DeckAiFlowException error, {
     required String archetype,
   }) async {
-    final reasons = _extractAiReasons(error);
+    final presentation = describeDeckAiFailure(
+      error,
+      extractDeckAiReasons(error),
+    );
 
-    if (error.isNeedsRepair) {
+    if (presentation.kind == DeckAiFailureKind.needsRepair) {
       if (mounted) {
         await _runGuidedRebuild(
           deckProvider,
@@ -3247,34 +3096,31 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       return;
     }
 
-    if (error.isNearPeak) {
+    if (presentation.kind == DeckAiFailureKind.nearPeak) {
       await _showOutcomeInfoDialog(
         context: context,
-        title: 'Deck já está bem ajustado',
-        message:
-            error.message.isNotEmpty
-                ? error.message
-                : 'O deck já está perto do pico atual e não houve upgrade seguro suficiente.',
-        reasons: reasons,
+        title: presentation.title,
+        message: presentation.message,
+        reasons: presentation.reasons,
       );
       return;
     }
 
-    if (error.isNoSafeUpgradeFound) {
+    if (presentation.kind == DeckAiFailureKind.noSafeUpgradeFound) {
       await _showOutcomeInfoDialog(
         context: context,
-        title: 'Nenhuma melhoria segura encontrada',
-        message:
-            error.message.isNotEmpty
-                ? error.message
-                : 'As sugestões geradas não passaram pelo gate de segurança.',
-        reasons: reasons,
+        title: presentation.title,
+        message: presentation.message,
+        reasons: presentation.reasons,
       );
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(error.message), backgroundColor: AppTheme.error),
+      SnackBar(
+        content: Text(presentation.message),
+        backgroundColor: AppTheme.error,
+      ),
     );
   }
 
@@ -3295,8 +3141,8 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     }
 
     // 1. Show Loading (progress-aware for async jobs)
-    final progressState = ValueNotifier<_FlowProgressState>(
-      const _FlowProgressState(
+    final progressState = ValueNotifier<FlowProgressState>(
+      const FlowProgressState(
         stage: 'Preparando análise do deck...',
         stageNumber: 0,
         totalStages: 5,
@@ -3307,11 +3153,11 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       barrierDismissible: false,
       builder:
           (ctx) => Center(
-            child: ValueListenableBuilder<_FlowProgressState>(
+            child: ValueListenableBuilder<FlowProgressState>(
               valueListenable: progressState,
               builder: (_, state, __) {
-                final presentation = _describeOptimizeProgress(state);
-                return _FlowLoadingDialog(
+                final presentation = describeOptimizeProgress(state);
+                return FlowLoadingDialog(
                   title: presentation.title,
                   subtitle: presentation.subtitle,
                   accent: presentation.accent,
@@ -3335,7 +3181,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         bracket: _selectedBracket,
         keepTheme: _keepTheme,
         onProgress: (stage, stageNumber, totalStages) {
-          progressState.value = _FlowProgressState(
+          progressState.value = FlowProgressState(
             stage: stage,
             stageNumber: stageNumber,
             totalStages: totalStages,
@@ -3347,57 +3193,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
 
       if (!context.mounted) return;
 
-      final removals = (result['removals'] as List).cast<String>();
-      final additions = (result['additions'] as List).cast<String>();
-      final reasoning = result['reasoning'] as String? ?? '';
-      final warnings =
-          (result['warnings'] is Map)
-              ? (result['warnings'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{};
-      final themeInfo =
-          (result['theme'] is Map)
-              ? (result['theme'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{};
-      final constraints =
-          (result['constraints'] is Map)
-              ? (result['constraints'] as Map).cast<String, dynamic>()
-              : const <String, dynamic>{};
-      final mode = (result['mode'] as String?) ?? 'optimize';
-      final additionsDetailed =
-          (result['additions_detailed'] as List?)
-              ?.whereType<Map>()
-              .map((m) => m.cast<String, dynamic>())
-              .toList() ??
-          const <Map<String, dynamic>>[];
-      final removalsDetailed =
-          (result['removals_detailed'] as List?)
-              ?.whereType<Map>()
-              .map((m) => m.cast<String, dynamic>())
-              .toList() ??
-          const <Map<String, dynamic>>[];
-      final deckAnalysis =
-          (result['deck_analysis'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
-      final postAnalysis =
-          (result['post_analysis'] as Map?)?.cast<String, dynamic>() ??
-          const <String, dynamic>{};
+      final preview = OptimizePreviewData.fromResult(result);
 
-      final displayRemovals =
-          removalsDetailed.isNotEmpty
-              ? removalsDetailed
-              : removals.map((name) => {'name': name}).toList();
-      final displayAdditions =
-          additionsDetailed.isNotEmpty
-              ? additionsDetailed
-              : additions.map((name) => {'name': name}).toList();
-
-      // Extrair quality_warning (complete parcial — 200 com aviso)
-      final qualityWarning =
-          (result['quality_warning'] is Map)
-              ? (result['quality_warning'] as Map).cast<String, dynamic>()
-              : null;
-
-      if (removals.isEmpty && additions.isEmpty) {
+      if (!preview.hasChanges) {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -3412,17 +3210,17 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         context: context,
         builder:
             (ctx) => _OptimizationPreviewDialog(
-              mode: mode,
+              mode: preview.mode,
               archetype: archetype,
-              keepTheme: constraints['keep_theme'] == true,
-              preservedTheme: themeInfo['theme']?.toString(),
-              reasoning: reasoning,
-              qualityWarning: qualityWarning,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              warnings: warnings,
-              displayRemovals: displayRemovals,
-              displayAdditions: displayAdditions,
+              keepTheme: preview.constraints['keep_theme'] == true,
+              preservedTheme: preview.themeInfo['theme']?.toString(),
+              reasoning: preview.reasoning,
+              qualityWarning: preview.qualityWarning,
+              deckAnalysis: preview.deckAnalysis,
+              postAnalysis: preview.postAnalysis,
+              warnings: preview.warnings,
+              displayRemovals: preview.displayRemovals,
+              displayAdditions: preview.displayAdditions,
               onCancel: () => Navigator.pop(ctx, false),
               onConfirm: () => Navigator.pop(ctx, true),
               onCopyDebug:
@@ -3452,7 +3250,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         barrierDismissible: false,
         builder:
             (ctx) => const Center(
-              child: _FlowLoadingDialog(
+              child: FlowLoadingDialog(
                 title: 'Aplicando mudanças...',
                 subtitle: 'Salvando trocas e atualizando a estratégia do deck.',
                 accent: AppTheme.success,
@@ -3468,12 +3266,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       isLoadingDialogOpen = true;
 
       // Aplicar as mudanças via DeckProvider (versão otimizada com IDs)
-      if (mode == 'complete' && additionsDetailed.isNotEmpty) {
+      if (preview.mode == 'complete' && preview.additionsDetailed.isNotEmpty) {
         // Completar deck: adicionar em lote.
         await deckProvider.addCardsBulk(
           deckId: widget.deckId,
           cards:
-              additionsDetailed
+              preview.additionsDetailed
                   .where((m) => m['card_id'] != null)
                   .map(
                     (m) => {
@@ -3484,19 +3282,20 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   )
                   .toList(),
         );
-      } else if (removalsDetailed.isNotEmpty || additionsDetailed.isNotEmpty) {
+      } else if (preview.removalsDetailed.isNotEmpty ||
+          preview.additionsDetailed.isNotEmpty) {
         // Usar versão rápida com IDs (evita N buscas HTTP)
         await deckProvider.applyOptimizationWithIds(
           deckId: widget.deckId,
-          removalsDetailed: removalsDetailed,
-          additionsDetailed: additionsDetailed,
+          removalsDetailed: preview.removalsDetailed,
+          additionsDetailed: preview.additionsDetailed,
         );
       } else {
         // Fallback para versão antiga (caso servidor não retorne detailed)
         await deckProvider.applyOptimization(
           deckId: widget.deckId,
-          cardsToRemove: removals,
-          cardsToAdd: additions,
+          cardsToRemove: preview.removals,
+          cardsToAdd: preview.additions,
         );
       }
 
@@ -3583,7 +3382,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             accent: theme.colorScheme.primary,
           ),
           const SizedBox(height: 16),
-          _DialogSectionCard(
+          DialogSectionCard(
             title: 'Configuração da otimização',
             accent: theme.colorScheme.primary,
             icon: Icons.settings_suggest_outlined,
@@ -3639,7 +3438,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           ),
           const SizedBox(height: 12),
           if (savedArchetype != null && savedArchetype.trim().isNotEmpty) ...[
-            _DialogSectionCard(
+            DialogSectionCard(
               title: 'Estratégia atual',
               accent: AppTheme.primarySoft,
               icon: Icons.auto_awesome_motion_rounded,
@@ -3735,7 +3534,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                         ? options
                         : const <Map<String, dynamic>>[];
                 if (visibleOptions.isEmpty) {
-                  return _DialogSectionCard(
+                  return DialogSectionCard(
                     title: 'Estratégias alternativas ocultas',
                     accent: AppTheme.textSecondary,
                     icon: Icons.visibility_off_outlined,
@@ -3771,307 +3570,6 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DialogTitleBlock extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final Color accent;
-
-  const _DialogTitleBlock({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    required this.accent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-          child: Icon(icon, color: accent, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DialogSectionCard extends StatelessWidget {
-  final String title;
-  final Color accent;
-  final IconData? icon;
-  final Widget child;
-
-  const _DialogSectionCard({
-    required this.title,
-    required this.accent,
-    this.icon,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceSlate,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.2), width: 0.8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 16, color: accent),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _FlowProgressState {
-  final String stage;
-  final int stageNumber;
-  final int totalStages;
-
-  const _FlowProgressState({
-    required this.stage,
-    required this.stageNumber,
-    required this.totalStages,
-  });
-}
-
-class _FlowLoadingPresentation {
-  final String title;
-  final String subtitle;
-  final Color accent;
-  final IconData icon;
-  final double? progress;
-  final int? stepNumber;
-  final int? totalSteps;
-  final List<String> tips;
-
-  const _FlowLoadingPresentation({
-    required this.title,
-    required this.subtitle,
-    required this.accent,
-    required this.icon,
-    this.progress,
-    this.stepNumber,
-    this.totalSteps,
-    this.tips = const [],
-  });
-}
-
-class _FlowLoadingDialog extends StatefulWidget {
-  final String title;
-  final String? subtitle;
-  final Color accent;
-  final IconData icon;
-  final double? progress;
-  final int? stepNumber;
-  final int? totalSteps;
-  final List<String> tips;
-
-  const _FlowLoadingDialog({
-    required this.title,
-    this.subtitle,
-    required this.accent,
-    required this.icon,
-    this.progress,
-    this.stepNumber,
-    this.totalSteps,
-    this.tips = const [],
-  });
-
-  @override
-  State<_FlowLoadingDialog> createState() => _FlowLoadingDialogState();
-}
-
-class _FlowLoadingDialogState extends State<_FlowLoadingDialog> {
-  Timer? _tipTimer;
-  int _tipIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _configureTipRotation();
-  }
-
-  @override
-  void didUpdateWidget(covariant _FlowLoadingDialog oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.tips != widget.tips) {
-      _tipIndex = 0;
-      _configureTipRotation();
-    }
-  }
-
-  void _configureTipRotation() {
-    _tipTimer?.cancel();
-    if (widget.tips.length <= 1) return;
-    _tipTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (!mounted) return;
-      setState(() {
-        _tipIndex = (_tipIndex + 1) % widget.tips.length;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _tipTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentTip =
-        widget.tips.isEmpty
-            ? null
-            : widget.tips[_tipIndex % widget.tips.length];
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: widget.accent.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              ),
-              child: Icon(widget.icon, color: widget.accent, size: 24),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              widget.title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            if (widget.stepNumber != null && widget.totalSteps != null) ...[
-              const SizedBox(height: 10),
-              _DeckMetaChip(
-                label: 'Etapa ${widget.stepNumber} de ${widget.totalSteps}',
-                color: widget.accent,
-                icon: Icons.timelapse_rounded,
-              ),
-            ],
-            if (widget.subtitle != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                widget.subtitle!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  height: 1.35,
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            LinearProgressIndicator(value: widget.progress),
-            if (currentTip != null) ...[
-              const SizedBox(height: 14),
-              Container(
-                width: 320,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSlate,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color: widget.accent.withValues(alpha: 0.16),
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outline_rounded,
-                      size: 18,
-                      color: widget.accent,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 220),
-                        child: Text(
-                          currentTip,
-                          key: ValueKey(currentTip),
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }
@@ -4190,7 +3688,7 @@ class _StrategyOptionCard extends StatelessWidget {
                     ),
                   ),
                   if (difficulty != null && difficulty!.trim().isNotEmpty)
-                    _DeckMetaChip(
+                    DeckMetaChip(
                       label: difficulty!,
                       color: AppTheme.textSecondary,
                     ),
@@ -4290,7 +3788,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      title: _DialogTitleBlock(
+      title: DialogTitleBlock(
         icon:
             mode == 'complete'
                 ? Icons.playlist_add_check_circle_outlined
@@ -4313,7 +3811,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _DeckMetaChip(
+                  DeckMetaChip(
                     label:
                         mode == 'complete' ? 'Modo Complete' : 'Modo Optimize',
                     color:
@@ -4326,7 +3824,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
                             : Icons.auto_fix_high_rounded,
                   ),
                   if (keepTheme && preservedTheme != null)
-                    _DeckMetaChip(
+                    DeckMetaChip(
                       label: 'Tema: $preservedTheme',
                       color: AppTheme.primarySoft,
                       icon: Icons.category_outlined,
@@ -4335,7 +3833,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ),
               if (reasoning.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Leitura da IA',
                   accent: AppTheme.primarySoft,
                   icon: Icons.psychology_alt_outlined,
@@ -4351,7 +3849,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ],
               if (qualityWarning != null) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Aviso de qualidade',
                   accent: AppTheme.mythicGold,
                   icon: Icons.info_outline_rounded,
@@ -4367,7 +3865,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ],
               if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Antes vs Depois',
                   accent: AppTheme.manaViolet,
                   icon: Icons.compare_arrows_rounded,
@@ -4402,7 +3900,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ],
               if (warningLines.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Avisos',
                   accent: AppTheme.mythicGold,
                   icon: Icons.warning_amber_rounded,
@@ -4428,7 +3926,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ],
               if (displayRemovals.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Remover',
                   accent: AppTheme.error,
                   icon: Icons.remove_circle_outline_rounded,
@@ -4448,7 +3946,7 @@ class _OptimizationPreviewDialog extends StatelessWidget {
               ],
               if (displayAdditions.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _DialogSectionCard(
+                DialogSectionCard(
                   title: 'Adicionar',
                   accent: AppTheme.success,
                   icon: Icons.add_circle_outline_rounded,
@@ -4648,56 +4146,6 @@ class _FallbackColorPip extends StatelessWidget {
           color: AppTheme.manaPipForeground(letter),
         ),
       ),
-    );
-  }
-}
-
-class _DeckMetaChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  final IconData? icon;
-  final VoidCallback? onTap;
-
-  const _DeckMetaChip({
-    required this.label,
-    required this.color,
-    this.icon,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final content = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: color.withValues(alpha: 0.28), width: 0.7),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (onTap == null) return content;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-      child: content,
     );
   }
 }

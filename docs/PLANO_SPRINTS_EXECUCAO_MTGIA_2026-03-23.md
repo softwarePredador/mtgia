@@ -92,10 +92,13 @@ Atualizacao da rodada atual:
 - o contrato final de `optimize/rebuild` foi congelado em documento próprio
 - a revisão residual do `onRequest` concluiu que o backend saiu da zona de bloqueio dominante da Sprint 1; o próximo gargalo real passou a ser o app core
 - a task 6 foi iniciada com a extração de helpers puros para `deck_provider_support.dart`
+- task 6 avancou com a extracao do contrato de IA, snapshots de debug e do builder de payload de aplicacao para `deck_provider_support.dart`
+- `deck_details_screen.dart` iniciou recorte da semantica de loading/motivos do optimize para `deck_optimize_ui_support.dart`
+- `deck_details_screen.dart` passou a mover tambem componentes compartilhados de UI para `deck_ui_components.dart`, reduzindo dependencias locais do arquivo gigante
 
 Subfila tecnica atual da Sprint 1:
 
-1. reduzir responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`
+1. continuar quebrando `deck_provider.dart` e `deck_details_screen.dart` em suporte de fluxo, contrato e apresentacao
 
 Critério de saida:
 
