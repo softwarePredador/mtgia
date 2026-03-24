@@ -5,16 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
-import 'package:share_plus/share_plus.dart' show Share;
 import '../providers/deck_provider.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
 import '../widgets/deck_analysis_tab.dart';
+import '../widgets/deck_add_cards_menu.dart';
+import '../widgets/deck_details_actions.dart';
 import '../widgets/deck_optimize_dialogs.dart';
 import '../widgets/deck_details_aux_widgets.dart';
 import '../widgets/deck_card_edit_dialog.dart';
 import '../widgets/deck_details_dialogs.dart';
+import '../widgets/deck_import_list_dialog.dart';
 import '../widgets/deck_details_overview_tab.dart';
 import '../widgets/deck_optimize_flow_support.dart';
 import '../widgets/deck_optimize_sections.dart';
@@ -812,7 +814,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
 
   /// Menu expansível para adicionar cartas (busca ou scanner)
   Widget _buildAddCardsMenu(BuildContext context) {
-    return PopupMenuButton<String>(
+    return DeckAddCardsMenu(
       onSelected: (value) {
         switch (value) {
           case 'search':
@@ -823,67 +825,28 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             break;
         }
       },
-      offset: const Offset(0, -120),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      ),
-      itemBuilder:
-          (context) => [
-            PopupMenuItem(
-              value: 'search',
-              child: ListTile(
-                leading: const Icon(Icons.search),
-                title: const Text('Buscar Carta'),
-                subtitle: const Text('Pesquisar por nome'),
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-              ),
-            ),
-            PopupMenuItem(
-              value: 'scan',
-              child: ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Escanear Carta'),
-                subtitle: const Text('Usar câmera (OCR)'),
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-              ),
-            ),
-          ],
-      child: FloatingActionButton.extended(
-        onPressed: null, // O PopupMenuButton cuida do tap
-        icon: const Icon(Icons.add),
-        label: const Text('Adicionar Cartas'),
-      ),
     );
   }
 
   /// Validação silenciosa auto-triggered (sem loading dialog, sem snackbar).
   Future<void> _autoValidateDeck() async {
     if (_isValidating) return;
-    setState(() => _isValidating = true);
-    try {
-      final res = await context.read<DeckProvider>().validateDeck(
-        widget.deckId,
-      );
-      if (!mounted) return;
-      setState(() {
-        _validationResult = res;
-        _invalidCardNames = _extractInvalidCardNames(res);
-      });
-    } catch (e) {
-      if (!mounted) return;
-      final errorResult = {
-        'ok': false,
-        'error': e.toString().replaceFirst('Exception: ', ''),
-      };
-      setState(() {
-        _validationResult = errorResult;
-        _invalidCardNames = _extractInvalidCardNames(errorResult);
-      });
-    } finally {
-      if (mounted) setState(() => _isValidating = false);
-    }
+    await executeSilentDeckValidation(
+      deckId: widget.deckId,
+      validateDeck: context.read<DeckProvider>().validateDeck,
+      extractInvalidCardNames: _extractInvalidCardNames,
+      onLoadingChanged: (isLoading) {
+        if (!mounted) return;
+        setState(() => _isValidating = isLoading);
+      },
+      onValidationResult: (result, invalidNames) {
+        if (!mounted) return;
+        setState(() {
+          _validationResult = result;
+          _invalidCardNames = invalidNames;
+        });
+      },
+    );
   }
 
   // ───── Social / Sharing ─────
@@ -892,120 +855,143 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final provider = context.read<DeckProvider>();
     final deck = provider.selectedDeck;
     if (deck == null) return;
-
-    final newState = !deck.isPublic;
-    final success = await provider.togglePublic(deck.id, isPublic: newState);
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? (newState
-                  ? 'Deck agora é público! 🌍'
-                  : 'Deck agora é privado 🔒')
-              : 'Erro ao alterar visibilidade',
-        ),
-        backgroundColor: success ? AppTheme.success : AppTheme.error,
-      ),
+    await executeToggleDeckVisibility(
+      deckId: deck.id,
+      currentIsPublic: deck.isPublic,
+      togglePublic: provider.togglePublic,
+      showSnackBar: ({required message, required backgroundColor}) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        );
+      },
     );
   }
 
   Future<void> _shareDeck() async {
-    final provider = context.read<DeckProvider>();
-    final result = await provider.exportDeckAsText(widget.deckId);
-
-    if (!mounted) return;
-
-    if (result.containsKey('error')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['error'].toString()),
-          backgroundColor: AppTheme.error,
-        ),
-      );
-      return;
-    }
-
-    final text = result['text'] as String? ?? '';
-    await Share.share(text);
+    await executeShareDeckText(
+      deckId: widget.deckId,
+      exportDeckAsText: context.read<DeckProvider>().exportDeckAsText,
+      showSnackBar: ({required message, required backgroundColor}) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        );
+      },
+    );
   }
 
   Future<void> _exportDeckAsText() async {
-    final provider = context.read<DeckProvider>();
-    final result = await provider.exportDeckAsText(widget.deckId);
-
-    if (!mounted) return;
-
-    if (result.containsKey('error')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['error'].toString()),
-          backgroundColor: AppTheme.error,
-        ),
-      );
-      return;
-    }
-
-    final text = result['text'] as String? ?? '';
-    await Clipboard.setData(ClipboardData(text: text));
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Lista de cartas copiada para a área de transferência! 📋',
-        ),
-        backgroundColor: AppTheme.success,
-      ),
+    await executeCopyDeckText(
+      deckId: widget.deckId,
+      exportDeckAsText: context.read<DeckProvider>().exportDeckAsText,
+      showSnackBar: ({required message, required backgroundColor}) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        );
+      },
     );
   }
 
   Future<void> _validateDeck() async {
-    final provider = context.read<DeckProvider>();
-    final deckId = widget.deckId;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+    await executeDeckValidation(
+      deckId: widget.deckId,
+      validateDeck: context.read<DeckProvider>().validateDeck,
+      extractInvalidCardNames: _extractInvalidCardNames,
+      showLoading: () {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+      },
+      closeLoading: () {
+        if (!mounted) return;
+        Navigator.of(context, rootNavigator: true).pop();
+      },
+      onValidationResult: (result, invalidNames) {
+        if (!mounted) return;
+        setState(() {
+          _validationResult = result;
+          _invalidCardNames = invalidNames;
+        });
+      },
+      showSnackBar: ({required message, required backgroundColor}) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        );
+      },
+      showErrorDialog: ({required title, required message}) async {
+        if (!mounted) return;
+        await showDialog(
+          context: context,
+          builder:
+              (dialogContext) => AlertDialog(
+                title: Text(title),
+                content: Text(message),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+        );
+      },
     );
+  }
 
-    try {
-      final res = await provider.validateDeck(deckId);
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop();
-      setState(() {
-        _validationResult = res;
-        _invalidCardNames = _extractInvalidCardNames(res);
-      });
+  Future<void> _loadPricing({required bool force}) async {
+    if (_isPricingLoading) return;
+    await executeDeckPricingLoad(
+      deckId: widget.deckId,
+      force: force,
+      fetchDeckPricing: context.read<DeckProvider>().fetchDeckPricing,
+      onLoadingChanged: (isLoading) {
+        if (!mounted) return;
+        setState(() => _isPricingLoading = isLoading);
+      },
+      onPricingLoaded: (pricing) {
+        if (!mounted) return;
+        setState(() => _pricing = pricing);
+      },
+      onError: (message) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      },
+    );
+  }
 
-      final ok = res['ok'] == true;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(ok ? '✅ Deck válido!' : 'Deck inválido'),
-          backgroundColor: ok ? AppTheme.success : AppTheme.error,
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop();
-      showDialog(
-        context: context,
-        builder:
-            (dialogContext) => AlertDialog(
-              title: const Text('Deck inválido'),
-              content: Text(e.toString().replaceFirst('Exception: ', '')),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-      );
-    }
+  void _showImportListDialog(BuildContext context) {
+    showDeckImportListDialog(
+      context: context,
+      deckId: widget.deckId,
+      importListToDeck:
+          ({
+            required deckId,
+            required list,
+            required replaceAll,
+          }) => context.read<DeckProvider>().importListToDeck(
+            deckId: deckId,
+            list: list,
+            replaceAll: replaceAll,
+          ),
+      refreshDeckDetails:
+          (deckId) => context.read<DeckProvider>().fetchDeckDetails(
+            deckId,
+            forceRefresh: true,
+          ),
+      showSnackBar: ({required message, required backgroundColor}) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        );
+      },
+    );
   }
 
   void _showCardDetails(BuildContext context, DeckCardItem card) {
@@ -1166,26 +1152,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
-  Future<void> _loadPricing({required bool force}) async {
-    if (_isPricingLoading) return;
-    setState(() => _isPricingLoading = true);
-    try {
-      final res = await context.read<DeckProvider>().fetchDeckPricing(
-        widget.deckId,
-        force: force,
-      );
-      if (!mounted) return;
-      setState(() => _pricing = res);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
-      );
-    } finally {
-      if (mounted) setState(() => _isPricingLoading = false);
-    }
-  }
-
   Future<void> _showPricingDetails() async {
     // Se não tem items, precisa carregar do endpoint
     final hasItems =
@@ -1282,353 +1248,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
-  /// Dialog para importar lista de cartas para o deck existente
-  void _showImportListDialog(BuildContext context) {
-    final listController = TextEditingController();
-    final theme = Theme.of(context);
-    final deckId = widget.deckId; // Captura antes do dialog
-    final parentContext = context; // Salva contexto pai para snackbar
-    bool isImporting = false;
-    bool replaceAll = false;
-    List<String> notFoundLines = [];
-    String? error;
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder:
-          (dialogContext) => StatefulBuilder(
-            builder:
-                (ctx, setDialogState) => PopScope(
-                  canPop: !isImporting,
-                  child: AlertDialog(
-                    title: Row(
-                      children: [
-                        Icon(
-                          Icons.auto_awesome,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Importar Lista',
-                                style: TextStyle(
-                                  fontSize: AppTheme.fontXl,
-                                  color: AppTheme.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                'Adicionar cartas de outra fonte',
-                                style: TextStyle(
-                                  fontSize: AppTheme.fontSm,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    content: SizedBox(
-                      width: double.maxFinite,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Opção de substituir tudo
-                            Container(
-                              decoration: BoxDecoration(
-                                color:
-                                    replaceAll
-                                        ? AppTheme.warning.withValues(
-                                          alpha: 0.1,
-                                        )
-                                        : theme.colorScheme.surface,
-                                border: Border.all(
-                                  color:
-                                      replaceAll
-                                          ? AppTheme.warning.withValues(
-                                            alpha: 0.5,
-                                          )
-                                          : theme.colorScheme.outline
-                                              .withValues(alpha: 0.3),
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusSm,
-                                ),
-                              ),
-                              child: CheckboxListTile(
-                                value: replaceAll,
-                                onChanged: (value) {
-                                  setDialogState(
-                                    () => replaceAll = value ?? false,
-                                  );
-                                },
-                                title: Row(
-                                  children: [
-                                    Icon(
-                                      replaceAll
-                                          ? Icons.swap_horiz
-                                          : Icons.add_circle_outline,
-                                      size: 18,
-                                      color:
-                                          replaceAll
-                                              ? AppTheme.warning
-                                              : theme.colorScheme.secondary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      replaceAll
-                                          ? 'Substituir deck'
-                                          : 'Adicionar cartas',
-                                      style: const TextStyle(
-                                        fontSize: AppTheme.fontMd,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                subtitle: Text(
-                                  replaceAll
-                                      ? 'Remove cartas atuais e usa apenas a nova lista'
-                                      : 'Mantém cartas existentes e adiciona as novas',
-                                  style: TextStyle(
-                                    fontSize: AppTheme.fontSm,
-                                    color: replaceAll ? AppTheme.warning : null,
-                                  ),
-                                ),
-                                controlAffinity:
-                                    ListTileControlAffinity.trailing,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 4,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Campo de texto
-                            TextField(
-                              controller: listController,
-                              decoration: InputDecoration(
-                                hintText:
-                                    'Cole sua lista de cartas aqui...\n\nFormato: 1 Sol Ring ou 1x Sol Ring',
-                                hintStyle: TextStyle(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                  fontSize: AppTheme.fontSm,
-                                ),
-                                border: const OutlineInputBorder(),
-                                filled: true,
-                                fillColor: theme.colorScheme.surface,
-                              ),
-                              maxLines: 10,
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: AppTheme.fontSm,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-
-                            // Erro
-                            if (error != null) ...[
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.error.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusSm,
-                                  ),
-                                  border: Border.all(
-                                    color: AppTheme.error.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.error_outline,
-                                      color: AppTheme.error,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        error!,
-                                        style: TextStyle(
-                                          color: AppTheme.error,
-                                          fontSize: AppTheme.fontSm,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-
-                            // Cartas não encontradas
-                            if (notFoundLines.isNotEmpty) ...[
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.warning.withValues(
-                                    alpha: 0.15,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusSm,
-                                  ),
-                                  border: Border.all(
-                                    color: AppTheme.warning.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '⚠️ ${notFoundLines.length} cartas não encontradas:',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme.warning,
-                                        fontSize: AppTheme.fontSm,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    ...notFoundLines
-                                        .take(5)
-                                        .map(
-                                          (line) => Text(
-                                            '• $line',
-                                            style: TextStyle(
-                                              fontSize: AppTheme.fontSm,
-                                              color: AppTheme.warning
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                          ),
-                                        ),
-                                    if (notFoundLines.length > 5)
-                                      Text(
-                                        '... e mais ${notFoundLines.length - 5}',
-                                        style: TextStyle(
-                                          fontSize: AppTheme.fontSm,
-                                          fontStyle: FontStyle.italic,
-                                          color: AppTheme.warning.withValues(
-                                            alpha: 0.7,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed:
-                            isImporting ? null : () => Navigator.pop(ctx),
-                        child: const Text('Cancelar'),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed:
-                            isImporting
-                                ? null
-                                : () async {
-                                  if (listController.text.trim().isEmpty) {
-                                    setDialogState(
-                                      () => error = 'Cole a lista de cartas',
-                                    );
-                                    return;
-                                  }
-
-                                  setDialogState(() {
-                                    isImporting = true;
-                                    error = null;
-                                    notFoundLines = [];
-                                  });
-
-                                  final provider =
-                                      parentContext.read<DeckProvider>();
-                                  final result = await provider
-                                      .importListToDeck(
-                                        deckId: deckId,
-                                        list: listController.text,
-                                        replaceAll: replaceAll,
-                                      );
-
-                                  if (!ctx.mounted) return;
-
-                                  setDialogState(() {
-                                    isImporting = false;
-                                    notFoundLines = List<String>.from(
-                                      result['not_found_lines'] ?? [],
-                                    );
-                                  });
-
-                                  if (result['success'] == true) {
-                                    Navigator.pop(ctx);
-
-                                    final imported =
-                                        result['cards_imported'] ?? 0;
-                                    ScaffoldMessenger.of(
-                                      parentContext,
-                                    ).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          notFoundLines.isEmpty
-                                              ? '$imported cartas importadas!'
-                                              : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
-                                        ),
-                                        backgroundColor:
-                                            notFoundLines.isEmpty
-                                                ? Theme.of(
-                                                  parentContext,
-                                                ).colorScheme.primary
-                                                : AppTheme.warning,
-                                      ),
-                                    );
-
-                                    // Recarrega o deck
-                                    provider.fetchDeckDetails(
-                                      deckId,
-                                      forceRefresh: true,
-                                    );
-                                  } else {
-                                    setDialogState(() {
-                                      error =
-                                          result['error'] ?? 'Erro ao importar';
-                                    });
-                                  }
-                                },
-                        icon:
-                            isImporting
-                                ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                : const Icon(Icons.upload),
-                        label: Text(isImporting ? 'Importando...' : 'Importar'),
-                      ),
-                    ],
-                  ),
-                ),
-          ),
-    );
-  }
+  
 }
 
 /// Retorna cor indicativa da condição da carta (TCGPlayer standard).

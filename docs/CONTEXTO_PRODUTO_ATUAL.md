@@ -106,6 +106,10 @@ Progresso atual documentado da Sprint 1:
 - o diálogo de edição de carta saiu para `app/lib/features/decks/widgets/deck_card_edit_dialog.dart`, reduzindo `deck_details_screen.dart` para `2532` linhas e adicionando cobertura dedicada em `deck_card_edit_dialog_test.dart`
 - a aba `Visão Geral` saiu para `app/lib/features/decks/widgets/deck_details_overview_tab.dart`, reduzindo `deck_details_screen.dart` para `2108` linhas e adicionando cobertura dedicada em `deck_details_overview_tab_test.dart`
 - o diálogo completo de detalhes da carta foi movido para `app/lib/features/decks/widgets/deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `1970` linhas e ampliando `deck_details_dialogs_test.dart` com cobertura das ações `explicar`, `trocar edição` e `ver detalhes`
+- handlers auxiliares de `toggle public`, `share`, `export`, `validate`, `auto-validate` e `pricing load` saíram para `app/lib/features/decks/widgets/deck_details_actions.dart`, com cobertura dedicada em `deck_details_actions_test.dart`
+- o diálogo grande de importação de lista saiu para `app/lib/features/decks/widgets/deck_import_list_dialog.dart`, com cobertura dedicada em `deck_import_list_dialog_test.dart`
+- o menu flutuante de adicionar cartas saiu para `app/lib/features/decks/widgets/deck_add_cards_menu.dart`
+- `deck_details_screen.dart` caiu para `1550` linhas mantendo a malha verde do app core
 - blocos ja extraidos:
   - payload parser e normalizacao
   - deterministic-first response/cache/fallback

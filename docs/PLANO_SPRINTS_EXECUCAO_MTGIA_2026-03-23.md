@@ -126,11 +126,15 @@ Atualizacao da rodada atual:
 - o diálogo de edição de carta foi extraído para `deck_card_edit_dialog.dart`, reduzindo `deck_details_screen.dart` para `2532` linhas com cobertura dedicada em `deck_card_edit_dialog_test.dart`
 - a aba `Visão Geral` foi extraída para `deck_details_overview_tab.dart`, reduzindo `deck_details_screen.dart` para `2108` linhas com cobertura dedicada em `deck_details_overview_tab_test.dart`
 - o diálogo completo de detalhes da carta foi extraído para `deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `1970` linhas e ampliando `deck_details_dialogs_test.dart` para cobrir `explicar`, `trocar edição` e `ver detalhes`
+- handlers auxiliares de `toggle public`, `share`, `export`, `validate`, `auto-validate` e `pricing` foram extraídos para `deck_details_actions.dart`, com cobertura dedicada em `deck_details_actions_test.dart`
+- o diálogo de importar lista do deck foi extraído para `deck_import_list_dialog.dart`, com cobertura dedicada em `deck_import_list_dialog_test.dart`
+- o menu flutuante de adicionar cartas foi extraído para `deck_add_cards_menu.dart`
+- `deck_details_screen.dart` caiu para `1550` linhas sem regressão na suíte focada do app core
 
 Subfila tecnica atual da Sprint 1:
 
 1. continuar quebrando `deck_provider.dart` e `deck_details_screen.dart` em suporte de fluxo, contrato e apresentacao
-2. focar agora nos handlers e menus restantes de `deck_details_screen.dart`, principalmente `descricao`, `import/export/share` e acoes auxiliares fora do fluxo de optimize
+2. focar agora no que ainda resta concentrado em `deck_details_screen.dart` e `deck_provider.dart`, principalmente blocos residuais de pricing/details state e domínios de importação/exportação no provider
 
 Critério de saida:
 
