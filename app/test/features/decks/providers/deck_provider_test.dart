@@ -300,52 +300,56 @@ void main() {
         );
 
         expect(created, isTrue);
-      expect(apiClient.postCalls, equals(['/cards/resolve/batch', '/decks']));
-    },
+        expect(apiClient.postCalls, equals(['/cards/resolve/batch', '/decks']));
+      },
     );
   });
 
   group('DeckProvider AI deck flows', () {
-    test('optimizeDeck surfaces structured needs_repair payload on 422', () async {
-      final apiClient = _FakeApiClient(
-        postHandlers: {
-          '/ai/optimize': (_) => ApiResponse(422, {
-                'error': 'O deck precisa de reparo estrutural.',
-                'outcome_code': 'needs_repair',
-                'quality_error': {
-                  'code': 'OPTIMIZE_NEEDS_REPAIR',
-                  'message': 'O deck atual está fora da faixa de optimize.',
-                  'reasons': ['Poucas mágicas relevantes para o comandante.'],
-                  'repair_plan': {'target_land_count': 36},
-                },
-                'next_action': {
-                  'type': 'rebuild_guided',
-                  'endpoint': '/ai/rebuild',
-                  'payload': {
-                    'deck_id': 'deck-1',
-                    'rebuild_scope': 'auto',
-                    'save_mode': 'draft_clone',
+    test(
+      'optimizeDeck surfaces structured needs_repair payload on 422',
+      () async {
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/optimize':
+                (_) => ApiResponse(422, {
+                  'error': 'O deck precisa de reparo estrutural.',
+                  'outcome_code': 'needs_repair',
+                  'quality_error': {
+                    'code': 'OPTIMIZE_NEEDS_REPAIR',
+                    'message': 'O deck atual está fora da faixa de optimize.',
+                    'reasons': ['Poucas mágicas relevantes para o comandante.'],
+                    'repair_plan': {'target_land_count': 36},
                   },
-                },
-              }),
-        },
-      );
-      final provider = DeckProvider(apiClient: apiClient);
+                  'next_action': {
+                    'type': 'rebuild_guided',
+                    'endpoint': '/ai/rebuild',
+                    'payload': {
+                      'deck_id': 'deck-1',
+                      'rebuild_scope': 'auto',
+                      'save_mode': 'draft_clone',
+                    },
+                  },
+                }),
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
 
-      expect(
-        () => provider.optimizeDeck('deck-1', 'control'),
-        throwsA(
-          isA<DeckAiFlowException>()
-              .having((e) => e.code, 'code', 'OPTIMIZE_NEEDS_REPAIR')
-              .having((e) => e.outcomeCode, 'outcomeCode', 'needs_repair')
-              .having(
-                (e) => e.nextAction['type'],
-                'nextAction.type',
-                'rebuild_guided',
-              ),
-        ),
-      );
-    });
+        expect(
+          () => provider.optimizeDeck('deck-1', 'control'),
+          throwsA(
+            isA<DeckAiFlowException>()
+                .having((e) => e.code, 'code', 'OPTIMIZE_NEEDS_REPAIR')
+                .having((e) => e.outcomeCode, 'outcomeCode', 'needs_repair')
+                .having(
+                  (e) => e.nextAction['type'],
+                  'nextAction.type',
+                  'rebuild_guided',
+                ),
+          ),
+        );
+      },
+    );
 
     test('rebuildDeck returns saved draft payload on success', () async {
       final apiClient = _FakeApiClient(
@@ -366,16 +370,15 @@ void main() {
       final trackedEvents = <String>[];
       final provider = DeckProvider(
         apiClient: apiClient,
-        trackActivationEvent:
-            (
-              String eventName, {
-              String? format,
-              String? deckId,
-              String source = 'app',
-              Map<String, dynamic>? metadata,
-            }) async {
-              trackedEvents.add(eventName);
-            },
+        trackActivationEvent: (
+          String eventName, {
+          String? format,
+          String? deckId,
+          String source = 'app',
+          Map<String, dynamic>? metadata,
+        }) async {
+          trackedEvents.add(eventName);
+        },
       );
 
       final result = await provider.rebuildDeck('deck-1');
@@ -399,41 +402,40 @@ void main() {
                 () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
           },
           postHandlers: {
-            '/ai/optimize': (_) => ApiResponse(200, {
-              'mode': 'optimize',
-              'removals': const ['Mind Stone'],
-              'additions': const ['Arcane Signet'],
-              'removals_detailed': const [
-                {
-                  'card_id': 'remove-1',
-                  'name': 'Mind Stone',
-                  'type_line': 'Artifact',
-                  'color_identity': <String>[],
-                },
-              ],
-              'additions_detailed': const [
-                {
-                  'card_id': 'add-1',
-                  'name': 'Arcane Signet',
-                  'type_line': 'Artifact',
-                  'color_identity': <String>[],
-                },
-              ],
-            }),
-            '/decks/deck-1/validate': (_) => ApiResponse(200, {
-              'valid': true,
-              'ok': true,
-              'errors': const <String>[],
-            }),
+            '/ai/optimize':
+                (_) => ApiResponse(200, {
+                  'mode': 'optimize',
+                  'removals': const ['Mind Stone'],
+                  'additions': const ['Arcane Signet'],
+                  'removals_detailed': const [
+                    {
+                      'card_id': 'remove-1',
+                      'name': 'Mind Stone',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                  'additions_detailed': const [
+                    {
+                      'card_id': 'add-1',
+                      'name': 'Arcane Signet',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                }),
+            '/decks/deck-1/validate':
+                (_) => ApiResponse(200, {
+                  'valid': true,
+                  'ok': true,
+                  'errors': const <String>[],
+                }),
           },
           putHandlers: {
             '/decks/deck-1': (body) {
               final cards =
                   (body['cards'] as List).cast<Map<String, dynamic>>();
-              expect(
-                cards.any((entry) => entry['card_id'] == 'add-1'),
-                isTrue,
-              );
+              expect(cards.any((entry) => entry['card_id'] == 'add-1'), isTrue);
               expect(
                 cards.any((entry) => entry['card_id'] == 'remove-1'),
                 isFalse,
@@ -481,5 +483,89 @@ void main() {
         expect(apiClient.putCalls, contains('/decks/deck-1'));
       },
     );
+  });
+
+  group('DeckProvider incremental mutations', () {
+    test(
+      'addCardToDeck increments local count and refreshes details',
+      () async {
+        final currentCards = <String, int>{'spell-1': 1, 'land-1': 36};
+
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks':
+                () => ApiResponse(200, [
+                  {
+                    'id': 'deck-1',
+                    'name': 'Smoke Deck',
+                    'format': 'commander',
+                    'is_public': false,
+                    'created_at': '2026-03-23T00:00:00.000Z',
+                    'card_count': 37,
+                  },
+                ]),
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+          },
+          postHandlers: {
+            '/decks/deck-1/cards': (_) => ApiResponse(200, {'ok': true}),
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDecks();
+        await provider.fetchDeckDetails('deck-1');
+
+        final added = await provider.addCardToDeck(
+          'deck-1',
+          provider.selectedDeck!.mainBoard['Instants']!.first,
+          2,
+        );
+
+        expect(added, isTrue);
+        expect(provider.decks.single.cardCount, 39);
+      },
+    );
+
+    test('refreshAiAnalysis updates selected deck and list', () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks':
+              () => ApiResponse(200, [
+                {
+                  'id': 'deck-1',
+                  'name': 'Smoke Deck',
+                  'format': 'commander',
+                  'is_public': false,
+                  'created_at': '2026-03-23T00:00:00.000Z',
+                  'card_count': 37,
+                },
+              ]),
+          '/decks/deck-1':
+              () => ApiResponse(
+                200,
+                _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+              ),
+        },
+        postHandlers: {
+          '/decks/deck-1/ai-analysis':
+              (_) => ApiResponse(200, {
+                'synergy_score': 87,
+                'strengths': 'draw',
+                'weaknesses': 'ramp',
+              }),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+      await provider.fetchDecks();
+      await provider.fetchDeckDetails('deck-1');
+
+      final result = await provider.refreshAiAnalysis('deck-1');
+
+      expect(result['synergy_score'], 87);
+      expect(provider.selectedDeck?.synergyScore, 87);
+      expect(provider.decks.single.synergyScore, 87);
+    });
   });
 }

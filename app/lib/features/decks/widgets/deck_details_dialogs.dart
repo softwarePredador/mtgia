@@ -56,6 +56,30 @@ Future<String?> showDeckDescriptionEditorDialog({
   );
 }
 
+Future<bool?> showDeckRemoveCardConfirmationDialog({
+  required BuildContext context,
+  required DeckCardItem card,
+}) {
+  return showDialog<bool>(
+    context: context,
+    builder:
+        (ctx) => AlertDialog(
+          title: const Text('Remover carta'),
+          content: Text('Remover "${card.name}" do deck?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Remover'),
+            ),
+          ],
+        ),
+  );
+}
+
 Future<void> showDeckAiExplanationFlow({
   required BuildContext context,
   required DeckCardItem card,
@@ -402,5 +426,96 @@ Future<void> showDeckCardDetailsDialog({
             ),
           ),
         ),
+  );
+}
+
+Future<void> showDeckPricingDetailsSheet({
+  required BuildContext context,
+  required Map<String, dynamic> pricing,
+}) async {
+  final items =
+      (pricing['items'] as List?)?.whereType<Map>().toList() ?? const [];
+
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppTheme.radiusXl),
+      ),
+    ),
+    builder: (ctx) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Custo do deck',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Total estimado: \$${(pricing['estimated_total_usd'] ?? 0)}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.65,
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final it = items[index].cast<String, dynamic>();
+                    final name = (it['name'] ?? '').toString();
+                    final qty = (it['quantity'] as int?) ?? 0;
+                    final setCode = (it['set_code'] ?? '').toString();
+                    final unit = it['unit_price_usd'];
+                    final unitText =
+                        (unit is num)
+                            ? '\$${unit.toStringAsFixed(2)}'
+                            : '—';
+                    final line = it['line_total_usd'];
+                    final lineText =
+                        (line is num)
+                            ? '\$${line.toStringAsFixed(2)}'
+                            : '—';
+
+                    return ListTile(
+                      dense: true,
+                      title: Text('$qty× $name'),
+                      subtitle: Text(
+                        setCode.isEmpty ? '' : setCode.toUpperCase(),
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            lineText,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            unitText,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }

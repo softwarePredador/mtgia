@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/observability/app_observability.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
@@ -63,7 +66,9 @@ void main() async {
     debugPrint('[Main] Performance monitoring não disponível: $e');
   }
 
-  runApp(const ManaLoomApp());
+  await AppObservability.instance.bootstrap(() async {
+    runApp(const ManaLoomApp());
+  });
 }
 
 class ManaLoomApp extends StatefulWidget {
@@ -110,7 +115,10 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _router = GoRouter(
       initialLocation: '/',
       refreshListenable: _authProvider,
-      observers: [PerformanceNavigatorObserver()],
+      observers: [
+        PerformanceNavigatorObserver(),
+        AppObservabilityNavigatorObserver(),
+      ],
       redirect: (context, state) {
         final location = state.matchedLocation;
         final status = _authProvider.status;
@@ -312,6 +320,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
 
     if (_authProvider.isAuthenticated) {
       _hadAuthenticatedSession = true;
+      unawaited(AppObservability.instance.setUserContext(_authProvider.user));
       _notificationProvider.startPolling();
       _messageProvider.startPolling();
 
@@ -326,6 +335,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     }
 
     if (status == AuthStatus.unauthenticated) {
+      unawaited(AppObservability.instance.clearUserContext());
       // Parar polling e limpar todo o estado dos providers ao deslogar
       _notificationProvider.stopPolling();
       _messageProvider.stopPolling();

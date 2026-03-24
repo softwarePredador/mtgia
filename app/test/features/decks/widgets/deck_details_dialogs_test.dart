@@ -218,4 +218,89 @@ void main() {
     await tester.pumpAndSettle();
     expect(detailsCalls, 1);
   });
+
+  testWidgets('showDeckRemoveCardConfirmationDialog returns confirmation', (
+    tester,
+  ) async {
+    final card = _buildCard();
+    bool? confirmed;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    confirmed = await showDeckRemoveCardConfirmationDialog(
+                      context: context,
+                      card: card,
+                    );
+                  },
+                  child: const Text('abrir'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Remover carta'), findsOneWidget);
+    expect(find.text('Remover "Arcane Signet" do deck?'), findsOneWidget);
+
+    await tester.tap(find.text('Remover'));
+    await tester.pumpAndSettle();
+
+    expect(confirmed, isTrue);
+  });
+
+  testWidgets('showDeckPricingDetailsSheet renders pricing breakdown', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await showDeckPricingDetailsSheet(
+                      context: context,
+                      pricing: {
+                        'estimated_total_usd': 42.5,
+                        'items': const [
+                          {
+                            'name': 'Arcane Signet',
+                            'quantity': 1,
+                            'set_code': 'tst',
+                            'unit_price_usd': 2.5,
+                            'line_total_usd': 2.5,
+                          },
+                        ],
+                      },
+                    );
+                  },
+                  child: const Text('abrir'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Custo do deck'), findsOneWidget);
+    expect(find.text('Total estimado: \$42.5'), findsOneWidget);
+    expect(find.text('1× Arcane Signet'), findsOneWidget);
+    expect(find.text('\$2.50'), findsWidgets);
+  });
 }

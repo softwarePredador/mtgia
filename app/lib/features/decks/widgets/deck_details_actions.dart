@@ -29,6 +29,12 @@ typedef DeckValidator = Future<Map<String, dynamic>> Function(String deckId);
 typedef DeckPricingLoader =
     Future<Map<String, dynamic>> Function(String deckId, {required bool force});
 
+typedef DeckDescriptionUpdater =
+    Future<bool> Function({
+      required String deckId,
+      required String description,
+    });
+
 String? extractDeckExportText(Map<String, dynamic> result) {
   if (result.containsKey('error')) {
     return null;
@@ -179,6 +185,25 @@ Future<void> executeDeckPricingLoad({
   } finally {
     onLoadingChanged(false);
   }
+}
+
+Future<void> executeDeckDescriptionUpdate({
+  required String deckId,
+  required String description,
+  required DeckDescriptionUpdater updateDeckDescription,
+  required DeckSnackBarPresenter showSnackBar,
+}) async {
+  final response = await updateDeckDescription(
+    deckId: deckId,
+    description: description,
+  );
+
+  if (!response) return;
+
+  showSnackBar(
+    message: description.isEmpty ? 'Descrição removida' : 'Descrição atualizada',
+    backgroundColor: AppTheme.success,
+  );
 }
 
 Future<void> _copyTextToClipboard(String text) {

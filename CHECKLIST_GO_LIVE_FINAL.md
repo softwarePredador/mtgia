@@ -10,6 +10,11 @@
 - [ ] `JWT_SECRET` forte e rotacionável
 - [ ] Rate limiting distribuído ativo
 - [ ] Política de logs sem segredos confirmada
+- [x] `Sentry` backend validado com ingestão real
+- [ ] `Sentry` app validado com ingestão real
+- [ ] `x-request-id` ponta a ponta validado
+- [x] `GET /ready` publicado e validado
+- [x] Runbook EasyPanel publicado e conferido
 
 ## IA e custo
 - [ ] Limites por plano Free/Pro ativos

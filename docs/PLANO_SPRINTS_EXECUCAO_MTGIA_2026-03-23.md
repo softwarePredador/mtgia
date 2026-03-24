@@ -130,11 +130,34 @@ Atualizacao da rodada atual:
 - o diálogo de importar lista do deck foi extraído para `deck_import_list_dialog.dart`, com cobertura dedicada em `deck_import_list_dialog_test.dart`
 - o menu flutuante de adicionar cartas foi extraído para `deck_add_cards_menu.dart`
 - `deck_details_screen.dart` caiu para `1550` linhas sem regressão na suíte focada do app core
+- `deck_provider_support.dart` passou a encapsular tambem builders/parsers de importação e social (`importDeckFromList`, `validateImportList`, `importListToDeck`, `togglePublic`, `exportDeckAsText`, `copyPublicDeck`), reduzindo `deck_provider.dart` para `1502` linhas com cobertura dedicada em `deck_provider_support_test.dart`
+- a bottom sheet de optimize foi corrigida para scroll único em `deck_optimize_sections.dart`, eliminando overflow real de viewport baixo
+- a suíte do app ganhou smoke/widget real em `deck_details_screen_smoke_test.dart`, cobrindo `optimize -> preview -> apply -> validate` e `needs_repair -> rebuild_guided -> abrir draft`
+- a `DeckDetailsScreen` também passou a ter cobertura de estados `loading`, `unauthorized`, `retry/error` e `empty`, fortalecendo a blindagem de UI real da Sprint 1
+- o update de descricao, a confirmacao de remocao e a sheet de pricing foram extraídos do `deck_details_screen.dart`, reduzindo o arquivo para `1445` linhas e ampliando a cobertura dedicada de actions/dialogs
+- `deck_provider_support.dart` passou a encapsular tambem `extractApiError`, `normalizeCreateDeckCards`, `generateDeckFromPrompt`, `searchFirstCardByName`, `resolveOptimizationAdditions` e `resolveOptimizationRemovals`
+- `deck_provider_support.dart` passou a encapsular tambem parsing/cache/listagem de decks (`readFreshDeckDetailsFromCache`, `storeDeckDetailsInCache`, `syncDeckColorIdentityToList`, `applyCachedColorIdentitiesToDeckList`, `decksMissingColorIdentity`, `parseDeckDetailsResponse`, `parseDeckListResponse`)
+- `deck_provider.dart` caiu para `1233` linhas e `deck_provider_support.dart` subiu para `883` linhas, mantendo a malha verde do provider e o smoke da `DeckDetailsScreen`
+- `deck_provider_support_test.dart` foi ampliado para cobrir cache fresco, identidade de cor em lista, parse de respostas de detalhes/lista, normalizacao de criacao, geracao por prompt e resolucao de cartas por nome
+- `deck_provider_support.dart` passou a encapsular tambem `parseAddCardResponse`, `incrementDeckCardCount`, `parseDeckAiAnalysisResponse`, `applyAiAnalysisToSelectedDeck` e `applyAiAnalysisToDeckList`
+- `deck_provider.dart` caiu para `1207` linhas, delegando tambem mutacao incremental de contagem local e atualizacao de analise de IA
+- `deck_provider_test.dart` ganhou cobertura direta para `addCardToDeck` e `refreshAiAnalysis`
+- `deck_provider_support.dart` passou a encapsular tambem os parsers simples de I/O do deck (`parseOptimizationOptionsResponse`, `parseDeckValidationResponse`, `parseDeckPricingResponse`, `ensureSuccessfulDeckMutationResponse`)
+- `deck_provider.dart` caiu para `1168` linhas, reduzindo boilerplate repetido em `fetchOptimizationOptions`, `updateDeckDescription`, `updateDeckStrategy`, `validateDeck`, `replaceCardEdition` e `fetchDeckPricing`
+- `deck_provider_support_test.dart` ganhou cobertura desses parsers simples, e a suíte focada do provider continuou verde com a smoke da `DeckDetailsScreen`
+- o caminho final de persistencia do optimize foi unificado em `_persistDeckCardsPayload`, removendo duplicacao entre `_saveOptimizedCards` e `applyOptimizationWithIds`
+- `deck_provider.dart` caiu para `1167` linhas mantendo `flutter analyze` e a suíte focada do app core verdes
+- `deck_provider_support.dart` passou a encapsular tambem `NamedOptimizationApplyResult` e `buildNamedOptimizationApplyResult`, tirando do provider o miolo puro de remocao/adicao/checagem de mudança no `applyOptimization`
+- `deck_provider.dart` caiu para `1144` linhas e `deck_provider_support.dart` subiu para `1098` linhas mantendo `flutter analyze` e a suíte focada do app core verdes
+- `deck_provider_support_test.dart` ganhou cobertura direta do miolo puro de `applyOptimization`, verificando remoção, adição e skip por identidade de cor
 
 Subfila tecnica atual da Sprint 1:
 
 1. continuar quebrando `deck_provider.dart` e `deck_details_screen.dart` em suporte de fluxo, contrato e apresentacao
-2. focar agora no que ainda resta concentrado em `deck_details_screen.dart` e `deck_provider.dart`, principalmente blocos residuais de pricing/details state e domínios de importação/exportação no provider
+2. focar agora no que ainda resta concentrado em `deck_provider.dart`, principalmente:
+   - reduzir o boilerplate restante do bloco de optimize/aplicacao ainda local
+   - limpeza final de I/O e atualizacao de estado compartilhado / mutacoes restantes
+3. depois fechar o que faltar de smoke/widget das telas core adjacentes
 
 Critério de saida:
 
@@ -142,6 +165,11 @@ Critério de saida:
 - corpus recorrente de release funcionando
 - smoke do app definido e repetivel
 - sem regressao de contrato no optimize/rebuild
+
+Observacao de execucao em `2026-03-24`:
+
+- uma fatia minima da Sprint 2 foi antecipada para plugar `Sentry` e `x-request-id`
+- isso nao substitui o fechamento da task 6 no app core; apenas evita que a frente operacional continue zerada
 
 ### Sprint 2 - Observabilidade e Operacao Base
 
@@ -166,6 +194,34 @@ Tasks:
 5. formalizar `server/.env.example` com chaves operacionais
 6. criar runbook de EasyPanel do `mtgia`
 7. criar smoke de ingestao/observabilidade
+
+Estado parcial em `2026-03-24`:
+
+- `IN_PROGRESS`: tasks 1, 2 e 3 em recorte minimo funcional
+- `DONE` no recorte inicial:
+  - `Sentry` backend ligado no middleware global
+  - `Sentry` app ligado no bootstrap Flutter
+  - `x-request-id` propagado em `ApiClient` e no backend
+  - `GET /ready` publicado como alias operacional explícito
+  - `server/.env.example` atualizado com chaves minimas de observabilidade e placeholders operacionais
+  - setup documentado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`
+  - smoke real do backend validado por `event_id` via `./scripts/validate_sentry_backend_ingestion.sh`
+  - runbook EasyPanel formalizado em `docs/EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md`
+- `PENDENTE`:
+  - validacao de ingestao real do app
+  - smoke operacional de observabilidade
+  - validacao do smoke mobile em device/toolchain que conclua o build
+
+Estado do app core em `2026-03-24`:
+
+- `deck_details_screen.dart` reduzido para `1445` linhas com smoke/widget tests reais
+- `deck_provider.dart` reduzido para `1095` linhas
+- `deck_provider_support.dart` absorvendo requests simples de I/O, importação, social/export e helpers puros com cobertura dedicada
+- malha focada do app core segue verde após o recorte:
+  - `deck_provider_support_test.dart`
+  - `deck_provider_test.dart`
+  - `deck_details_screen_smoke_test.dart`
+  - `api_client_request_id_test.dart`
 
 Critério de saida:
 

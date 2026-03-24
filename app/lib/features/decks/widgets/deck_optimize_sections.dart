@@ -137,7 +137,6 @@ class CurrentStrategySection extends StatelessWidget {
 class OptimizationOptionsSection extends StatelessWidget {
   final AsyncSnapshot<List<Map<String, dynamic>>> snapshot;
   final bool showAllStrategies;
-  final ScrollController scrollController;
   final Color accent;
   final VoidCallback onRetry;
   final ValueChanged<String> onSelectArchetype;
@@ -146,7 +145,6 @@ class OptimizationOptionsSection extends StatelessWidget {
     super.key,
     required this.snapshot,
     required this.showAllStrategies,
-    required this.scrollController,
     required this.accent,
     required this.onRetry,
     required this.onSelectArchetype,
@@ -209,24 +207,28 @@ class OptimizationOptionsSection extends StatelessWidget {
       );
     }
 
-    return ListView.separated(
-      controller: scrollController,
-      itemCount: visibleOptions.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final option = visibleOptions[index];
-        final title = (option['title'] ?? 'Sem Título').toString();
-        return StrategyOptionCard(
-          title: title,
-          description: (option['description'] ?? '').toString(),
-          difficulty: option['difficulty']?.toString(),
-          accent: accent,
-          onTap: () {
-            if (title.isEmpty) return;
-            onSelectArchetype(title);
-          },
-        );
-      },
+    return Column(
+      children: [
+        for (var index = 0; index < visibleOptions.length; index++) ...[
+          if (index > 0) const SizedBox(height: 12),
+          Builder(
+            builder: (context) {
+              final option = visibleOptions[index];
+              final title = (option['title'] ?? 'Sem Título').toString();
+              return StrategyOptionCard(
+                title: title,
+                description: (option['description'] ?? '').toString(),
+                difficulty: option['difficulty']?.toString(),
+                accent: accent,
+                onTap: () {
+                  if (title.isEmpty) return;
+                  onSelectArchetype(title);
+                },
+              );
+            },
+          ),
+        ],
+      ],
     );
   }
 }
@@ -263,63 +265,58 @@ class OptimizationSheetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return ListView(
+      controller: scrollController,
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: AppTheme.textHint,
-                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-              ),
+      children: [
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.textHint,
+              borderRadius: BorderRadius.circular(AppTheme.radiusXs),
             ),
           ),
-          SheetHeroCard(
-            icon: Icons.tune_rounded,
-            title: 'Otimizar Deck',
-            subtitle:
-                'Escolha a direção da IA e aplique apenas mudanças seguras para este deck.',
-            accent: accent,
+        ),
+        SheetHeroCard(
+          icon: Icons.tune_rounded,
+          title: 'Otimizar Deck',
+          subtitle:
+              'Escolha a direção da IA e aplique apenas mudanças seguras para este deck.',
+          accent: accent,
+        ),
+        const SizedBox(height: 16),
+        OptimizationConfigSection(
+          selectedBracket: selectedBracket,
+          keepTheme: keepTheme,
+          accent: accent,
+          onBracketChanged: onBracketChanged,
+          onKeepThemeChanged: onKeepThemeChanged,
+        ),
+        const SizedBox(height: 12),
+        if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
+          CurrentStrategySection(
+            savedArchetype: savedArchetype!,
+            showAllStrategies: showAllStrategies,
+            onToggleVisibility: onToggleStrategyVisibility,
+            onApply: () => onApplyArchetype(savedArchetype!),
           ),
           const SizedBox(height: 16),
-          OptimizationConfigSection(
-            selectedBracket: selectedBracket,
-            keepTheme: keepTheme,
-            accent: accent,
-            onBracketChanged: onBracketChanged,
-            onKeepThemeChanged: onKeepThemeChanged,
-          ),
-          const SizedBox(height: 12),
-          if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
-            CurrentStrategySection(
-              savedArchetype: savedArchetype!,
-              showAllStrategies: showAllStrategies,
-              onToggleVisibility: onToggleStrategyVisibility,
-              onApply: () => onApplyArchetype(savedArchetype!),
-            ),
-            const SizedBox(height: 16),
-          ],
-          Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: optionsFuture,
-              builder:
-                  (context, snapshot) => OptimizationOptionsSection(
-                    snapshot: snapshot,
-                    showAllStrategies: showAllStrategies,
-                    scrollController: scrollController,
-                    accent: accent,
-                    onRetry: onRetryOptions,
-                    onSelectArchetype: onApplyArchetype,
-                  ),
-            ),
-          ),
         ],
-      ),
+        FutureBuilder<List<Map<String, dynamic>>>(
+          future: optionsFuture,
+          builder:
+              (context, snapshot) => OptimizationOptionsSection(
+                snapshot: snapshot,
+                showAllStrategies: showAllStrategies,
+                accent: accent,
+                onRetry: onRetryOptions,
+                onSelectArchetype: onApplyArchetype,
+              ),
+        ),
+      ],
     );
   }
 }

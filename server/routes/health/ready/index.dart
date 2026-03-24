@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../lib/health_readiness_support.dart';
 import '../../../lib/http_responses.dart';
 
 /// GET /health/ready - Readiness check (verifica dependências)
@@ -61,16 +60,13 @@ Future<Response> onRequest(RequestContext context) async {
     allHealthy = false;
   }
 
-  final response = {
-    'status': allHealthy ? 'ready' : 'not_ready',
-    'service': 'mtgia-server',
-    'timestamp': DateTime.now().toIso8601String(),
-    'environment': Platform.environment['ENVIRONMENT'] ?? 'development',
-    'checks': checks,
-  };
+  final response = buildReadinessResponseBody(
+    checks: checks,
+    allHealthy: allHealthy,
+  );
 
   return Response.json(
-    statusCode: allHealthy ? HttpStatus.ok : HttpStatus.serviceUnavailable,
+    statusCode: readinessStatusCode(allHealthy),
     body: response,
   );
 }

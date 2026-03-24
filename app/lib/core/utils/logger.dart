@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+
+import '../observability/app_observability.dart';
 
 /// Logger centralizado que só exibe logs em modo debug/development.
 /// Em produção (release mode), os logs são silenciados.
@@ -17,7 +21,17 @@ class AppLogger {
       if (error != null) debugPrint('  -> $error');
       if (stackTrace != null) debugPrint('  -> $stackTrace');
     }
-    // Em produção, poderia enviar para serviço de crash reporting
+
+    if (error != null) {
+      unawaited(
+        AppObservability.instance.captureException(
+          error,
+          stackTrace: stackTrace,
+          tags: const {'source': 'app_logger'},
+          extras: {'message': message},
+        ),
+      );
+    }
   }
 
   /// Log de warning

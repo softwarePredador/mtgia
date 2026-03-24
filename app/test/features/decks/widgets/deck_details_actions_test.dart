@@ -118,4 +118,20 @@ void main() {
     expect(loadingStates, [true, false]);
     expect(pricing?['estimated_total_usd'], 12.5);
   });
+
+  test('executeDeckDescriptionUpdate reports correct success copy', () async {
+    String? snackMessage;
+
+    await executeDeckDescriptionUpdate(
+      deckId: 'deck-1',
+      description: 'Nova descrição',
+      updateDeckDescription:
+          ({required deckId, required description}) async => true,
+      showSnackBar: ({required message, required backgroundColor}) {
+        snackMessage = message;
+      },
+    );
+
+    expect(snackMessage, 'Descrição atualizada');
+  });
 }

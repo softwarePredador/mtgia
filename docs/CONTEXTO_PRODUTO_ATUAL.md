@@ -43,10 +43,16 @@ Esses documentos continuam como apoio e historico, mas nao devem redefinir a pri
 Enquanto este documento nao mudar, a proxima task dominante do projeto e:
 
 1. continuar reduzindo responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`, priorizando extracao de semantica/fluxo reutilizavel antes de mexer na navegacao
+2. subir smoke/widget tests reais da UI do fluxo `deck details -> optimize -> preview -> apply -> validate` e `needs_repair -> rebuild_guided -> abrir draft`
 
 Sequencia imediata ja definida:
 
-2. so depois retomar frentes fora do deck builder
+3. so depois retomar frentes fora do deck builder
+
+Excecao documentada em `2026-03-24`:
+
+- a primeira fenda da Sprint 2 foi antecipada para plugar `Sentry` e `x-request-id`, usando como referencia operacional o `carMatch`
+- isso foi feito sem reabrir escopo de produto e sem interromper a fila do app core
 
 Progresso atual documentado da Sprint 1:
 
@@ -110,6 +116,52 @@ Progresso atual documentado da Sprint 1:
 - o diálogo grande de importação de lista saiu para `app/lib/features/decks/widgets/deck_import_list_dialog.dart`, com cobertura dedicada em `deck_import_list_dialog_test.dart`
 - o menu flutuante de adicionar cartas saiu para `app/lib/features/decks/widgets/deck_add_cards_menu.dart`
 - `deck_details_screen.dart` caiu para `1550` linhas mantendo a malha verde do app core
+- `deck_provider_support.dart` passou a encapsular tambem builders/parsers de importacao e social (`importDeckFromList`, `validateImportList`, `importListToDeck`, `togglePublic`, `exportDeckAsText`, `copyPublicDeck`), reduzindo `deck_provider.dart` para `1502` linhas com cobertura dedicada em `deck_provider_support_test.dart`
+- a `OptimizationSheetBody` passou de `Column + Expanded` para `ListView` com scroll unico, eliminando overflow real da bottom sheet em viewport baixa
+- a UI do fluxo core agora tem smoke/widget tests dedicados em `app/test/features/decks/screens/deck_details_screen_smoke_test.dart`, cobrindo:
+  - `deck details -> optimize -> preview -> apply -> validate`
+  - `needs_repair -> rebuild_guided -> abrir draft`
+- a `DeckDetailsScreen` agora tem cobertura real de estados `loading`, `unauthorized`, `retry/error` e `empty`, usando providers de teste e fake API sem depender apenas do smoke feliz
+- o update de descricao, a confirmacao de remocao e a sheet de pricing saíram do `deck_details_screen.dart` para helpers/dialogs dedicados, reduzindo a tela para `1445` linhas com cobertura ampliada em `deck_details_actions_test.dart` e `deck_details_dialogs_test.dart`
+- `deck_provider_support.dart` passou a encapsular tambem `extractApiError`, `normalizeCreateDeckCards`, `generateDeckFromPrompt`, `searchFirstCardByName`, `resolveOptimizationAdditions` e `resolveOptimizationRemovals`
+- `deck_provider_support.dart` passou a encapsular tambem parsing/cache/listagem de decks (`readFreshDeckDetailsFromCache`, `storeDeckDetailsInCache`, `syncDeckColorIdentityToList`, `applyCachedColorIdentitiesToDeckList`, `decksMissingColorIdentity`, `parseDeckDetailsResponse`, `parseDeckListResponse`)
+- `deck_provider.dart` caiu para `1233` linhas e `deck_provider_support.dart` subiu para `883` linhas, mantendo a malha verde do provider e o smoke da `DeckDetailsScreen`
+- `deck_provider_support_test.dart` foi ampliado para cobrir cache fresco, helpers de identidade de cor, parse de respostas de detalhes/lista, normalizacao de criacao, geracao por prompt e resolucao de cartas por nome
+- `deck_provider_support.dart` passou a encapsular tambem `parseAddCardResponse`, `incrementDeckCardCount`, `parseDeckAiAnalysisResponse`, `applyAiAnalysisToSelectedDeck` e `applyAiAnalysisToDeckList`
+- `deck_provider.dart` caiu para `1207` linhas, delegando tambem mutacao incremental de contagem local e atualizacao de analise de IA
+- `deck_provider_test.dart` ganhou cobertura direta para `addCardToDeck` e `refreshAiAnalysis`, mantendo a smoke da `DeckDetailsScreen` verde
+- `deck_provider_support.dart` passou a encapsular tambem os parsers simples de I/O do deck (`parseOptimizationOptionsResponse`, `parseDeckValidationResponse`, `parseDeckPricingResponse`, `ensureSuccessfulDeckMutationResponse`)
+- `deck_provider.dart` caiu para `1168` linhas, reduzindo boilerplate repetido em `fetchOptimizationOptions`, `updateDeckDescription`, `updateDeckStrategy`, `validateDeck`, `replaceCardEdition` e `fetchDeckPricing`
+- `deck_provider_support_test.dart` ganhou cobertura desses parsers simples, e a suíte focada do provider continuou verde junto com a smoke da `DeckDetailsScreen`
+- o caminho de persistencia final do optimize foi unificado em `_persistDeckCardsPayload`, removendo duplicacao entre `_saveOptimizedCards` e `applyOptimizationWithIds`
+- `deck_provider.dart` caiu para `1167` linhas mantendo `flutter analyze` e a suíte focada do app core verdes
+- `deck_provider_support.dart` passou a encapsular tambem `NamedOptimizationApplyResult` e `buildNamedOptimizationApplyResult`, tirando do provider o miolo puro de remocao/adicao/checagem de mudança no `applyOptimization`
+- `deck_provider.dart` caiu para `1144` linhas e `deck_provider_support.dart` subiu para `1098` linhas mantendo `flutter analyze` e a suíte focada do app core verdes
+- `deck_provider_support_test.dart` ganhou cobertura direta do miolo puro de `applyOptimization`, verificando remoção, adição e skip por identidade de cor
+- `deck_provider_support.dart` passou a encapsular tambem as requests simples de I/O do core:
+  - `addCardToDeckRequest`
+  - `fetchOptimizationOptionsRequest`
+  - `validateDeckRequest`
+  - `fetchDeckPricingRequest`
+  - `refreshAiAnalysisRequest`
+  - `updateDeckDescriptionRequest`
+  - `updateDeckStrategyRequest`
+  - `replaceCardEditionRequest`
+  - `importDeckFromListRequest`
+  - `validateImportListRequest`
+  - `importListToDeckRequest`
+  - `togglePublicRequest`
+  - `exportDeckAsTextRequest`
+  - `copyPublicDeckRequest`
+- `deck_provider.dart` caiu para `1095` linhas e ficou mais próximo de orquestração pura, enquanto `deck_provider_support_test.dart` ganhou cobertura direta desses request helpers
+- `Sentry` backend foi ligado em `server/lib/observability.dart` e no middleware global, com propagação de `x-request-id` via `server/lib/request_trace.dart`
+- `Sentry` app foi ligado em `app/lib/core/observability/app_observability.dart`, com captura global de erros, observer de rota e `x-request-id` em `app/lib/core/api/api_client.dart`
+- `server/.env.example` foi atualizado com as chaves mínimas de observabilidade e o setup ficou registrado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`
+- o smoke real do backend foi promovido para `./scripts/validate_sentry_backend_ingestion.sh`, confirmando ingestão real por `event_id` no Sentry
+- `server/.env.example` passou a formalizar também os placeholders operacionais de EasyPanel e Sentry (`SENTRY_AUTH_TOKEN`, slugs de projeto e `EASYPANEL_*`)
+- o runbook operacional de deploy foi formalizado em `docs/EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md`
+- a validação real de ingestão do app segue pendente; o smoke mobile e o script já existem, mas o build macOS local ainda ficou preso no ciclo nativo e não devolveu `event_id`
+- `GET /ready` foi publicado em `server/routes/ready/index.dart`, compartilhando os checks reais de readiness já usados em `/health/ready`
 - blocos ja extraidos:
   - payload parser e normalizacao
   - deterministic-first response/cache/fallback
@@ -133,7 +185,13 @@ Fila oficial restante da Sprint 1, na ordem:
 1. reduzir responsabilidade concentrada nos pontos gigantes restantes do app core:
    - `app/lib/features/decks/screens/deck_details_screen.dart`
    - `app/lib/features/decks/providers/deck_provider.dart`
-2. so depois retomar frentes fora do deck builder
+2. focar agora no que ainda resta concentrado em `deck_provider.dart`, principalmente:
+   - reduzir o boilerplate restante do bloco de optimize/aplicacao ainda local
+   - limpeza final de estado compartilhado / mutacoes restantes (`deleteDeck`, persistencia pos-optimize e fetch/update de deck ainda concentrados)
+3. ao fechar esse recorte do app core, retomar os bloqueadores operacionais restantes da Sprint 2:
+   - validar ingestao real do app no Sentry
+   - confirmar `/ready` no ambiente publicado
+   - revisar o checklist de go-live
 
 Regra pratica:
 
