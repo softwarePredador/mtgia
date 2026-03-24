@@ -86,6 +86,14 @@ Esse script:
 - injeta `SENTRY_MOBILE_DSN` ou fallback para `SENTRY_DSN`
 - executa o smoke de integração do app
 - imprime `SENTRY_MOBILE_SMOKE_TAG=smoke_id:...` para busca posterior no Sentry
+- encerra com timeout configurável (`MOBILE_SENTRY_BUILD_TIMEOUT_SECONDS`, default `120`)
+- em caso de bloqueio no build/toolchain, imprime `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1`
+
+Validação completa com ingestão:
+
+```bash
+./scripts/validate_sentry_mobile_ingestion.sh
+```
 
 ## Exemplo de backend local
 
@@ -120,15 +128,19 @@ Validação real executada em `2026-03-24`:
 
 - `dart run bin/sentry_smoke.dart` -> evento enviado com sucesso
 - `./scripts/validate_sentry_backend_ingestion.sh` -> ingestão confirmada por `event_id`
-- último `event_id` observado localmente: `2e20bce6e7244d089e6ce59f88166bf8`
-- última tag de correlação gerada: `smoke_id:mtgia-smoke-19d20a4744a`
+- último `event_id` observado localmente: `70168f941de24cf4923eb87bb6d38a5d`
+- última tag de correlação gerada: `smoke_id:mtgia-smoke-19d2119aadd`
 
 Esses valores servem como evidência da primeira ingestão real do backend nesta rodada.
 
 ## O que falta validar operacionalmente
 
 - ingestão real no projeto Sentry do app
-- finalizar o smoke mobile em device/toolchain real; o build macOS local está operacional, mas ainda ficou preso no ciclo nativo de compilação e não devolveu `event_id`
+- finalizar o smoke mobile em device/toolchain real; tanto o build macOS local quanto a tentativa no emulador Android (`emulator-5554`) ficaram presos no ciclo nativo de compilação e nao devolveram `event_id`
+- retry desta rodada em `macos` confirmou o mesmo bloqueio: mais de `60s` em build nativo, apenas com warnings do SDK Swift do `Sentry`, sem chegar à execução do teste
+- a versao atual do smoke mobile ja classifica esse caso de forma repetível: em `macos`, com `MOBILE_SENTRY_BUILD_TIMEOUT_SECONDS=20`, o script encerrou com `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1` e `exit 124`
+- no Android, o bloqueio de incompatibilidade Kotlin foi corrigido ao atualizar `org.jetbrains.kotlin.android` para `2.2.0` em `app/android/settings.gradle.kts`
+- após esse ajuste, o smoke em `emulator-5554` deixou de falhar por compilação Kotlin incompatível, mas ainda nao concluiu dentro da janela de `240s`/`300s`, sem chegar a emitir `SENTRY_MOBILE_EVENT_ID`
 - correlação manual de um erro entre:
   - app request
   - `x-request-id`
@@ -154,6 +166,23 @@ Validação local executada em `2026-03-24`:
 - `x-request-id` gerado automaticamente quando ausente
 - `x-request-id` preservado quando enviado pelo cliente
 - `GET /ready` publicado compartilhando a mesma lógica de readiness
+- o smoke operacional repetível do domínio publicado ficou formalizado em:
+
+```bash
+./scripts/validate_request_id_ready.sh
+```
+
+O script exige uma URL explícita via uma destas variáveis no `server/.env`:
+
+- `API_BASE_URL`
+- `PUBLIC_API_BASE_URL`
+- `EASYPANEL_DOMAIN`
+
+Validação publicada executada nesta rodada:
+
+- `bash scripts/validate_request_id_ready.sh` -> `READY_VALIDATION_OK=1`
+- `/health`, `/health/ready` e `/ready` responderam `200`
+- o mesmo `x-request-id` foi ecoado nas 3 respostas
 
 ## Próximo passo natural
 

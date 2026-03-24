@@ -94,24 +94,28 @@ Essas variáveis não são lidas diretamente pelo app em runtime no EasyPanel, m
    - `./scripts/validate_sentry_backend_ingestion.sh`
 4. Subir/redeployar o serviço backend no EasyPanel.
 5. Validar no domínio publicado:
-   - `GET /health`
-   - `GET /ready`
-   - `GET /` com e sem `x-request-id`
+   - `bash scripts/validate_request_id_ready.sh`
 6. Confirmar logs e ausência de segredos em payloads de erro.
+
+Precondição para o script:
+
+- `API_BASE_URL`, `PUBLIC_API_BASE_URL` ou `EASYPANEL_DOMAIN` preenchido no `server/.env`
 
 ## Smoke operacional pós-deploy
 
 ### Liveness e readiness
 
-1. `GET /health`
-2. `GET /health/ready`
-3. `GET /ready`
+1. `bash scripts/validate_request_id_ready.sh`
 
 Esperado:
 
 - `200 OK`
 - `x-request-id` presente na resposta
 - quando enviado pelo cliente, o mesmo `x-request-id` deve voltar
+
+Status atual:
+
+- `bash scripts/validate_request_id_ready.sh` já fechou verde no domínio publicado
 
 ### Observabilidade backend
 

@@ -8,13 +8,16 @@ class _FakeApiClient extends ApiClient {
     Map<String, ApiResponse Function(Map<String, dynamic>)>? postHandlers,
     Map<String, ApiResponse Function()>? getHandlers,
     Map<String, ApiResponse Function(Map<String, dynamic>)>? putHandlers,
+    Map<String, ApiResponse Function()>? deleteHandlers,
   }) : _postHandlers = postHandlers ?? const {},
        _getHandlers = getHandlers ?? const {},
-       _putHandlers = putHandlers ?? const {};
+       _putHandlers = putHandlers ?? const {},
+       _deleteHandlers = deleteHandlers ?? const {};
 
   final Map<String, ApiResponse Function(Map<String, dynamic>)> _postHandlers;
   final Map<String, ApiResponse Function()> _getHandlers;
   final Map<String, ApiResponse Function(Map<String, dynamic>)> _putHandlers;
+  final Map<String, ApiResponse Function()> _deleteHandlers;
   final List<String> postCalls = [];
   final List<Map<String, dynamic>> postBodies = [];
   final List<String> putCalls = [];
@@ -53,6 +56,15 @@ class _FakeApiClient extends ApiClient {
       throw UnimplementedError('No PUT handler for $endpoint');
     }
     return handler(body);
+  }
+
+  @override
+  Future<ApiResponse> delete(String endpoint) async {
+    final handler = _deleteHandlers[endpoint];
+    if (handler == null) {
+      throw UnimplementedError('No DELETE handler for $endpoint');
+    }
+    return handler();
   }
 }
 
@@ -527,6 +539,40 @@ void main() {
       },
     );
 
+    test('deleteDeck removes item from list and clears selected deck', () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks': () => ApiResponse(200, [
+            {
+              'id': 'deck-1',
+              'name': 'Smoke Deck',
+              'format': 'commander',
+              'is_public': false,
+              'created_at': '2026-03-23T00:00:00.000Z',
+              'card_count': 37,
+            },
+          ]),
+          '/decks/deck-1': () => ApiResponse(
+            200,
+            _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+          ),
+        },
+        deleteHandlers: {
+          '/decks/deck-1': () => ApiResponse(204, const {}),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+      await provider.fetchDecks();
+      await provider.fetchDeckDetails('deck-1');
+
+      final deleted = await provider.deleteDeck('deck-1');
+
+      expect(deleted, isTrue);
+      expect(provider.decks, isEmpty);
+      expect(provider.selectedDeck, isNull);
+    });
+
     test('refreshAiAnalysis updates selected deck and list', () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
@@ -566,6 +612,40 @@ void main() {
       expect(result['synergy_score'], 87);
       expect(provider.selectedDeck?.synergyScore, 87);
       expect(provider.decks.single.synergyScore, 87);
+    });
+
+    test('copyPublicDeck refreshes deck list on success', () async {
+      var decksFetchCount = 0;
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks': () {
+            decksFetchCount += 1;
+            return ApiResponse(200, [
+              {
+                'id': 'deck-copy',
+                'name': 'Copied Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-23T00:00:00.000Z',
+                'card_count': 37,
+              },
+            ]);
+          },
+        },
+        postHandlers: {
+          '/community/decks/public-1': (_) => ApiResponse(201, {
+            'deck': {'id': 'deck-copy'},
+          }),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+
+      final result = await provider.copyPublicDeck('public-1');
+
+      expect(result['success'], isTrue);
+      expect(decksFetchCount, 1);
+      expect(provider.decks.single.id, 'deck-copy');
     });
   });
 }

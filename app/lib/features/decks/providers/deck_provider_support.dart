@@ -68,8 +68,39 @@ class DeckListFetchState {
   final String? errorMessage;
 }
 
+class DeckDeleteResult {
+  const DeckDeleteResult({required this.isSuccess, this.errorMessage});
+
+  final bool isSuccess;
+  final String? errorMessage;
+}
+
+class DeckDeleteState {
+  const DeckDeleteState({
+    required this.decks,
+    required this.selectedDeck,
+  });
+
+  final List<Deck> decks;
+  final DeckDetails? selectedDeck;
+}
+
 class DeckAddCardResult {
   const DeckAddCardResult({required this.isSuccess, this.errorMessage});
+
+  final bool isSuccess;
+  final String? errorMessage;
+}
+
+class DeckMutationResult {
+  const DeckMutationResult({required this.isSuccess, this.errorMessage});
+
+  final bool isSuccess;
+  final String? errorMessage;
+}
+
+class DeckCreateResult {
+  const DeckCreateResult({required this.isSuccess, this.errorMessage});
 
   final bool isSuccess;
   final String? errorMessage;
@@ -89,6 +120,109 @@ class DeckAiAnalysisPayload {
   final String? weaknesses;
 }
 
+class DeckColorIdentityEnrichmentResult {
+  const DeckColorIdentityEnrichmentResult({
+    required this.detailsByDeckId,
+    required this.failedDeckIds,
+  });
+
+  final Map<String, DeckDetails> detailsByDeckId;
+  final List<String> failedDeckIds;
+}
+
+class DeckListHydrationResult {
+  const DeckListHydrationResult({
+    required this.decks,
+    required this.missingColorIdentityDecks,
+  });
+
+  final List<Deck> decks;
+  final List<Deck> missingColorIdentityDecks;
+}
+
+class DeckColorIdentityApplyResult {
+  const DeckColorIdentityApplyResult({
+    required this.decks,
+    required this.cachedDetails,
+    required this.enrichedCount,
+  });
+
+  final List<Deck> decks;
+  final List<DeckDetails> cachedDetails;
+  final int enrichedCount;
+}
+
+class OptimizeDeckRequestResult {
+  const OptimizeDeckRequestResult._({
+    required this.isAsync,
+    this.result,
+    this.jobId,
+    this.pollIntervalMs,
+    this.totalStages,
+  });
+
+  const OptimizeDeckRequestResult.completed(Map<String, dynamic> result)
+    : this._(isAsync: false, result: result);
+
+  const OptimizeDeckRequestResult.async({
+    required String jobId,
+    required int pollIntervalMs,
+    required int totalStages,
+  }) : this._(
+         isAsync: true,
+         jobId: jobId,
+         pollIntervalMs: pollIntervalMs,
+         totalStages: totalStages,
+       );
+
+  final bool isAsync;
+  final Map<String, dynamic>? result;
+  final String? jobId;
+  final int? pollIntervalMs;
+  final int? totalStages;
+}
+
+class RebuildDeckRequestResult {
+  const RebuildDeckRequestResult({
+    required this.payload,
+    this.draftDeckId,
+  });
+
+  final Map<String, dynamic> payload;
+  final String? draftDeckId;
+}
+
+class DeckPersistResult {
+  const DeckPersistResult({
+    required this.validation,
+    required this.elapsedMilliseconds,
+  });
+
+  final Map<String, dynamic> validation;
+  final int elapsedMilliseconds;
+}
+
+class OptimizeJobPollResult {
+  const OptimizeJobPollResult.completed(this.result)
+    : isCompleted = true,
+      stage = null,
+      stageNumber = null,
+      totalStages = null;
+
+  const OptimizeJobPollResult.pending({
+    required this.stage,
+    required this.stageNumber,
+    required this.totalStages,
+  }) : isCompleted = false,
+       result = null;
+
+  final bool isCompleted;
+  final Map<String, dynamic>? result;
+  final String? stage;
+  final int? stageNumber;
+  final int? totalStages;
+}
+
 class NamedOptimizationApplyResult {
   const NamedOptimizationApplyResult({
     required this.currentCards,
@@ -99,6 +233,16 @@ class NamedOptimizationApplyResult {
   final Map<String, Map<String, dynamic>> currentCards;
   final List<String> skippedForIdentity;
   final bool hasStructuralChange;
+}
+
+class NamedOptimizationPayloadResult {
+  const NamedOptimizationPayloadResult({
+    required this.cardsPayload,
+    required this.skippedForIdentity,
+  });
+
+  final List<Map<String, dynamic>> cardsPayload;
+  final List<String> skippedForIdentity;
 }
 
 Map<String, Map<String, dynamic>> buildCurrentCardsMap(DeckDetails deck) {
@@ -178,6 +322,17 @@ List<Deck> applyCachedColorIdentitiesToDeckList(
   }).toList();
 }
 
+DeckListHydrationResult buildDeckListHydrationResult(
+  List<Deck> fetchedDecks,
+  Map<String, DeckDetails> cache,
+) {
+  final hydratedDecks = applyCachedColorIdentitiesToDeckList(fetchedDecks, cache);
+  return DeckListHydrationResult(
+    decks: hydratedDecks,
+    missingColorIdentityDecks: decksMissingColorIdentity(hydratedDecks),
+  );
+}
+
 List<Deck> decksMissingColorIdentity(List<Deck> decks) {
   return decks
       .where((deck) => deck.colorIdentity.isEmpty && deck.cardCount > 0)
@@ -213,6 +368,14 @@ DeckDetailsFetchState parseDeckDetailsResponse(ApiResponse response) {
   );
 }
 
+Future<DeckDetailsFetchState> fetchDeckDetailsRequest(
+  ApiClient apiClient,
+  String deckId,
+) async {
+  final response = await apiClient.get('/decks/$deckId');
+  return parseDeckDetailsResponse(response);
+}
+
 DeckListFetchState parseDeckListResponse(ApiResponse response) {
   if (response.statusCode == 200) {
     final data = response.data as List<dynamic>;
@@ -236,6 +399,120 @@ DeckListFetchState parseDeckListResponse(ApiResponse response) {
     decks: null,
     errorMessage: 'Erro ao carregar decks: ${response.statusCode}',
   );
+}
+
+Future<DeckListFetchState> fetchDeckListRequest(ApiClient apiClient) async {
+  final response = await apiClient.get('/decks');
+  return parseDeckListResponse(response);
+}
+
+Future<DeckColorIdentityEnrichmentResult> fetchMissingDeckColorIdentities(
+  ApiClient apiClient,
+  List<Deck> decks,
+) async {
+  final detailsByDeckId = <String, DeckDetails>{};
+  final failedDeckIds = <String>[];
+
+  for (final deck in decks) {
+    try {
+      final state = await fetchDeckDetailsRequest(apiClient, deck.id);
+      final details = state.selectedDeck;
+      if (details != null && details.colorIdentity.isNotEmpty) {
+        detailsByDeckId[deck.id] = details;
+      }
+    } catch (_) {
+      failedDeckIds.add(deck.id);
+    }
+  }
+
+  return DeckColorIdentityEnrichmentResult(
+    detailsByDeckId: detailsByDeckId,
+    failedDeckIds: failedDeckIds,
+  );
+}
+
+DeckColorIdentityApplyResult applyDeckColorIdentityEnrichment(
+  List<Deck> decks,
+  DeckColorIdentityEnrichmentResult result,
+) {
+  var nextDecks = decks;
+  final cachedDetails = <DeckDetails>[];
+
+  for (final details in result.detailsByDeckId.values) {
+    cachedDetails.add(details);
+    nextDecks = syncDeckColorIdentityToList(
+      nextDecks,
+      details.id,
+      details.colorIdentity,
+    );
+  }
+
+  return DeckColorIdentityApplyResult(
+    decks: nextDecks,
+    cachedDetails: cachedDetails,
+    enrichedCount: cachedDetails.length,
+  );
+}
+
+DeckDeleteResult parseDeleteDeckResponse(ApiResponse response) {
+  if (response.statusCode == 200 || response.statusCode == 204) {
+    return const DeckDeleteResult(isSuccess: true);
+  }
+  return DeckDeleteResult(
+    isSuccess: false,
+    errorMessage: 'Erro ao deletar deck: ${response.statusCode}',
+  );
+}
+
+Future<DeckDeleteResult> deleteDeckRequest(
+  ApiClient apiClient,
+  String deckId,
+) async {
+  final response = await apiClient.delete('/decks/$deckId');
+  return parseDeleteDeckResponse(response);
+}
+
+DeckDeleteState applyDeckDeletionToState(
+  List<Deck> decks,
+  DeckDetails? selectedDeck,
+  String deckId,
+) {
+  return DeckDeleteState(
+    decks: decks.where((deck) => deck.id != deckId).toList(),
+    selectedDeck:
+        selectedDeck != null && selectedDeck.id == deckId ? null : selectedDeck,
+  );
+}
+
+DeckCreateResult parseCreateDeckResponse(ApiResponse response) {
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return const DeckCreateResult(isSuccess: true);
+  }
+  return DeckCreateResult(
+    isSuccess: false,
+    errorMessage: extractApiError(
+      response.data,
+      fallback: 'Erro ao criar deck: ${response.statusCode}',
+    ),
+  );
+}
+
+Future<DeckCreateResult> createDeckRequest(
+  ApiClient apiClient, {
+  required String name,
+  required String format,
+  String? description,
+  required bool isPublic,
+  required List<Map<String, dynamic>> cards,
+}) async {
+  final response = await apiClient.post('/decks', {
+    'name': name,
+    'format': format,
+    'description': description,
+    'is_public': isPublic,
+    'cards': cards,
+  });
+  return parseCreateDeckResponse(response);
 }
 
 DeckAddCardResult parseAddCardResponse(ApiResponse response) {
@@ -265,6 +542,68 @@ Future<DeckAddCardResult> addCardToDeckRequest(
     'condition': condition,
   });
   return parseAddCardResponse(response);
+}
+
+Future<DeckMutationResult> addCardsBulkRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  required List<Map<String, dynamic>> cards,
+}) async {
+  final response = await apiClient.post('/decks/$deckId/cards/bulk', {
+    'cards': cards,
+  });
+  return parseDeckMutationResponse(
+    response,
+    fallbackMessage: 'Falha ao adicionar em lote',
+  );
+}
+
+DeckMutationResult parseDeckMutationResponse(
+  ApiResponse response, {
+  required String fallbackMessage,
+}) {
+  if (response.statusCode == 200) {
+    return const DeckMutationResult(isSuccess: true);
+  }
+
+  final data = response.data;
+  final message =
+      (data is Map && data['error'] != null)
+          ? data['error'].toString()
+          : '$fallbackMessage: ${response.statusCode}';
+  return DeckMutationResult(isSuccess: false, errorMessage: message);
+}
+
+Future<DeckMutationResult> removeCardFromDeckRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  required List<Map<String, dynamic>> cardsPayload,
+}) async {
+  final response = await apiClient.put('/decks/$deckId', {'cards': cardsPayload});
+  return parseDeckMutationResponse(
+    response,
+    fallbackMessage: 'Falha ao remover carta',
+  );
+}
+
+Future<DeckMutationResult> setDeckCardQuantityRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  required String cardId,
+  required int quantity,
+  required bool replaceSameName,
+  required String condition,
+}) async {
+  final response = await apiClient.post('/decks/$deckId/cards/set', {
+    'card_id': cardId,
+    'quantity': quantity,
+    'replace_same_name': replaceSameName,
+    'condition': condition,
+  });
+  return parseDeckMutationResponse(
+    response,
+    fallbackMessage: 'Falha ao atualizar carta',
+  );
 }
 
 List<Deck> incrementDeckCardCount(
@@ -350,6 +689,25 @@ Future<Map<String, dynamic>> validateDeckRequest(
   return parseDeckValidationResponse(response);
 }
 
+Future<DeckPersistResult> persistDeckCardsPayloadWithValidation(
+  ApiClient apiClient, {
+  required String deckId,
+  required List<Map<String, dynamic>> cardsPayload,
+}) async {
+  final stopwatch = Stopwatch()..start();
+  await persistDeckCardsPayloadRequest(
+    apiClient,
+    deckId: deckId,
+    cardsPayload: cardsPayload,
+  );
+  stopwatch.stop();
+  final validation = await validateDeckRequest(apiClient, deckId);
+  return DeckPersistResult(
+    validation: validation,
+    elapsedMilliseconds: stopwatch.elapsedMilliseconds,
+  );
+}
+
 Map<String, dynamic> parseDeckPricingResponse(ApiResponse response) {
   if (response.statusCode == 200) {
     return (response.data as Map).cast<String, dynamic>();
@@ -386,6 +744,20 @@ void ensureSuccessfulDeckMutationResponse(
           ? data['error'].toString()
           : '$fallbackMessage: ${response.statusCode}';
   throw Exception(msg);
+}
+
+Future<void> persistDeckCardsPayloadRequest(
+  ApiClient apiClient, {
+  required String deckId,
+  required List<Map<String, dynamic>> cardsPayload,
+}) async {
+  final response = await apiClient.put('/decks/$deckId', {
+    'cards': cardsPayload,
+  });
+  ensureSuccessfulDeckMutationResponse(
+    response,
+    fallbackMessage: 'Falha ao atualizar deck',
+  );
 }
 
 Future<void> updateDeckDescriptionRequest(
@@ -561,6 +933,203 @@ Future<void> saveOptimizeDebugSnapshot({
   } catch (_) {
     // Silencioso: não deve quebrar fluxo do app.
   }
+}
+
+Map<String, dynamic> buildOptimizeRequestPayload({
+  required String deckId,
+  required String archetype,
+  int? bracket,
+  required bool keepTheme,
+}) {
+  return <String, dynamic>{
+    'deck_id': deckId,
+    'archetype': archetype,
+    if (bracket != null) 'bracket': bracket,
+    'keep_theme': keepTheme,
+  };
+}
+
+Future<OptimizeDeckRequestResult> requestOptimizeDeck(
+  ApiClient apiClient, {
+  required String deckId,
+  required String archetype,
+  int? bracket,
+  required bool keepTheme,
+}) async {
+  final payload = buildOptimizeRequestPayload(
+    deckId: deckId,
+    archetype: archetype,
+    bracket: bracket,
+    keepTheme: keepTheme,
+  );
+
+  await saveOptimizeDebugSnapshot(request: payload);
+  AppLogger.debug('🧪 [AI Optimize] request=$payload');
+
+  final response = await apiClient.post('/ai/optimize', payload);
+
+  if (response.statusCode == 200) {
+    final data = asDynamicMap(response.data);
+    await saveOptimizeDebugSnapshot(response: data);
+    AppLogger.debug('🧪 [AI Optimize] response=$data');
+    return OptimizeDeckRequestResult.completed(data);
+  }
+
+  if (response.statusCode == 202) {
+    final data = asDynamicMap(response.data);
+    final jobId = data['job_id']?.toString();
+    if (jobId == null || jobId.isEmpty) {
+      throw Exception('Job assíncrono inválido retornado pelo servidor.');
+    }
+    final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
+    final totalStages = data['total_stages'] as int? ?? 6;
+    AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
+    return OptimizeDeckRequestResult.async(
+      jobId: jobId,
+      pollIntervalMs: pollInterval,
+      totalStages: totalStages,
+    );
+  }
+
+  if (response.statusCode == 422) {
+    final data = asDynamicMap(response.data);
+    await saveOptimizeDebugSnapshot(response: {
+      'statusCode': 422,
+      'data': data,
+    });
+    final qualityError = asDynamicMap(data['quality_error']);
+    final errorMsg =
+        data['error'] as String? ??
+        qualityError['message'] as String? ??
+        'A otimização não atingiu a qualidade mínima.';
+    final code = qualityError['code'] as String? ?? 'QUALITY_ERROR';
+    AppLogger.warning('⚠️ [AI Optimize] quality gate: $code — $errorMsg');
+    throw buildDeckAiFlowException(
+      data,
+      fallbackMessage: errorMsg,
+      fallbackCode: code,
+    );
+  }
+
+  await saveOptimizeDebugSnapshot(response: {
+    'statusCode': response.statusCode,
+    'data': response.data,
+  });
+  throw Exception('Falha ao otimizar deck: ${response.statusCode}');
+}
+
+Map<String, dynamic> buildRebuildDeckRequestPayload({
+  required String deckId,
+  String? archetype,
+  String? theme,
+  int? bracket,
+  required String rebuildScope,
+  required String saveMode,
+  required List<String> mustKeep,
+  required List<String> mustAvoid,
+}) {
+  return <String, dynamic>{
+    'deck_id': deckId,
+    if (archetype != null && archetype.trim().isNotEmpty)
+      'archetype': archetype,
+    if (theme != null && theme.trim().isNotEmpty) 'theme': theme,
+    if (bracket != null) 'bracket': bracket,
+    'rebuild_scope': rebuildScope,
+    'save_mode': saveMode,
+    if (mustKeep.isNotEmpty) 'must_keep': mustKeep,
+    if (mustAvoid.isNotEmpty) 'must_avoid': mustAvoid,
+  };
+}
+
+Future<RebuildDeckRequestResult> requestRebuildDeck(
+  ApiClient apiClient, {
+  required String deckId,
+  String? archetype,
+  String? theme,
+  int? bracket,
+  required String rebuildScope,
+  required String saveMode,
+  required List<String> mustKeep,
+  required List<String> mustAvoid,
+}) async {
+  final payload = buildRebuildDeckRequestPayload(
+    deckId: deckId,
+    archetype: archetype,
+    theme: theme,
+    bracket: bracket,
+    rebuildScope: rebuildScope,
+    saveMode: saveMode,
+    mustKeep: mustKeep,
+    mustAvoid: mustAvoid,
+  );
+
+  final response = await apiClient.post(
+    '/ai/rebuild',
+    payload,
+    timeout: const Duration(minutes: 4),
+  );
+
+  if (response.statusCode == 200) {
+    final data = asDynamicMap(response.data);
+    final draftDeckId = data['draft_deck_id']?.toString();
+    return RebuildDeckRequestResult(payload: data, draftDeckId: draftDeckId);
+  }
+
+  if (response.statusCode == 422) {
+    final data = asDynamicMap(response.data);
+    throw buildDeckAiFlowException(
+      data,
+      fallbackMessage:
+          data['error']?.toString() ?? 'A reconstrução guiada falhou.',
+      fallbackCode: 'REBUILD_FAILED',
+    );
+  }
+
+  throw Exception('Falha ao reconstruir deck: ${response.statusCode}');
+}
+
+Future<OptimizeJobPollResult> pollOptimizeJobRequest(
+  ApiClient apiClient,
+  String jobId,
+) async {
+  final response = await apiClient.get('/ai/optimize/jobs/$jobId');
+
+  if (response.statusCode == 200) {
+    final data = asDynamicMap(response.data);
+    final status = data['status'] as String?;
+    if (status == 'completed') {
+      final resultMap = asDynamicMap(data['result']);
+      await saveOptimizeDebugSnapshot(response: resultMap);
+      return OptimizeJobPollResult.completed(resultMap);
+    }
+    if (status == 'failed') {
+      final qualityError = asDynamicMap(data['quality_error']);
+      final errorMsg =
+          data['error'] as String? ??
+          qualityError['message'] as String? ??
+          'Otimização falhou no servidor.';
+      AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $errorMsg');
+      throw buildDeckAiFlowException(
+        data,
+        fallbackMessage: errorMsg,
+        fallbackCode:
+            qualityError['code']?.toString() ?? 'OPTIMIZE_JOB_FAILED',
+      );
+    }
+    return OptimizeJobPollResult.pending(
+      stage: data['stage'] as String? ?? 'Processando...',
+      stageNumber: data['stage_number'] as int? ?? 0,
+      totalStages: data['total_stages'] as int? ?? 6,
+    );
+  }
+
+  if (response.statusCode == 404) {
+    throw Exception('Job de otimização expirou ou não foi encontrado.');
+  }
+
+  throw Exception(
+    'Falha ao consultar job de otimização: ${response.statusCode}',
+  );
 }
 
 List<Map<String, dynamic>> buildOptimizedCardPayload({
@@ -792,6 +1361,45 @@ NamedOptimizationApplyResult buildNamedOptimizationApplyResult({
   );
 }
 
+Future<NamedOptimizationPayloadResult> buildNamedOptimizationPayload(
+  ApiClient apiClient, {
+  required DeckDetails deck,
+  required List<String> cardsToRemove,
+  required List<String> cardsToAdd,
+}) async {
+  final cardsToAddIds = await resolveOptimizationAdditions(apiClient, cardsToAdd);
+  final cardsToRemoveIds = await resolveOptimizationRemovals(
+    apiClient,
+    cardsToRemove,
+  );
+
+  if (cardsToAdd.isNotEmpty && cardsToAddIds.isEmpty) {
+    throw Exception(
+      'Nenhuma das cartas sugeridas para adicionar foi encontrada no banco. Tente novamente.',
+    );
+  }
+  if (cardsToRemove.isNotEmpty && cardsToRemoveIds.isEmpty) {
+    throw Exception(
+      'Nenhuma das cartas sugeridas para remover foi encontrada no banco. Tente novamente.',
+    );
+  }
+
+  final applyResult = buildNamedOptimizationApplyResult(
+    deck: deck,
+    cardsToRemoveIds: cardsToRemoveIds,
+    cardsToAddIds: cardsToAddIds,
+  );
+
+  if (!applyResult.hasStructuralChange) {
+    throw Exception('Nenhuma mudança aplicável foi encontrada para este deck.');
+  }
+
+  return NamedOptimizationPayloadResult(
+    cardsPayload: applyResult.currentCards.values.toList(),
+    skippedForIdentity: applyResult.skippedForIdentity,
+  );
+}
+
 Map<String, dynamic> buildImportDeckRequestBody({
   required String name,
   required String format,
@@ -857,6 +1465,20 @@ Future<Map<String, dynamic>> importDeckFromListRequest(
 
 Map<String, dynamic> buildConnectionFailureResult(Object error) {
   return {'success': false, 'error': 'Erro de conexão: $error'};
+}
+
+Map<String, dynamic> buildExportConnectionFailureResult(Object error) {
+  return {'error': 'Erro de conexão: $error'};
+}
+
+Future<Map<String, dynamic>> runConnectionSafeMapRequest(
+  Future<Map<String, dynamic>> Function() operation,
+) async {
+  try {
+    return await operation();
+  } catch (error) {
+    return buildConnectionFailureResult(error);
+  }
 }
 
 Map<String, dynamic> parseValidateImportListResponse(ApiResponse response) {

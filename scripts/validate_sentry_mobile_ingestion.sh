@@ -21,7 +21,17 @@ tmp_output="$(mktemp)"
 response_file="$(mktemp)"
 trap 'rm -f "$tmp_output" "$response_file"' EXIT
 
-"$ROOT_DIR/scripts/validate_sentry_mobile_local.sh" "$@" | tee "$tmp_output"
+local_exit_code=0
+if ! "$ROOT_DIR/scripts/validate_sentry_mobile_local.sh" "$@" | tee "$tmp_output"; then
+  local_exit_code=$?
+fi
+
+if [[ "$local_exit_code" -ne 0 ]]; then
+  if grep -q 'SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1' "$tmp_output"; then
+    echo "Validacao mobile bloqueada por toolchain/build antes da ingestao no Sentry." >&2
+  fi
+  exit "$local_exit_code"
+fi
 
 event_line="$(grep -o 'SENTRY_MOBILE_EVENT_ID=[^[:space:]]*' "$tmp_output" | tail -n1 || true)"
 smoke_line="$(grep -o 'SENTRY_MOBILE_SMOKE_TAG=smoke_id:[^[:space:]]*' "$tmp_output" | tail -n1 || true)"

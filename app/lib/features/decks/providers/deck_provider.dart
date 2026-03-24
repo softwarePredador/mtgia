@@ -54,30 +54,23 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required String cardId,
   }) async {
-    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
-      await fetchDeckDetails(deckId);
-    }
-    final deck = _selectedDeck;
+    final deck = await _ensureDeckLoadedForMutation(deckId);
     if (deck == null) throw Exception('Deck não encontrado');
 
     final currentCards = buildCurrentCardsMap(deck);
     currentCards.remove(cardId);
 
-    final response = await _apiClient.put('/decks/$deckId', {
-      'cards': currentCards.values.toList(),
-    });
+    final result = await removeCardFromDeckRequest(
+      _apiClient,
+      deckId: deckId,
+      cardsPayload: currentCards.values.toList(),
+    );
 
-    if (response.statusCode != 200) {
-      final data = response.data;
-      final msg =
-          (data is Map && data['error'] != null)
-              ? data['error'].toString()
-              : 'Falha ao remover carta: ${response.statusCode}';
-      throw Exception(msg);
+    if (!result.isSuccess) {
+      throw Exception(result.errorMessage);
     }
 
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
   }
 
   Future<void> updateDeckCardEntry({
@@ -96,20 +89,17 @@ class DeckProvider extends ChangeNotifier {
     // Commander/Brawl (ou quando explicitamente pedido): resolve duplicatas por NOME no backend.
     // Isso garante que, se o deck já estiver com 2 edições da mesma carta, o usuário consegue corrigir.
     if (consolidateSameName) {
-      final response = await _apiClient.post('/decks/$deckId/cards/set', {
-        'card_id': newCardId,
-        'quantity': quantity,
-        'replace_same_name': true,
-        'condition': condition,
-      });
+      final result = await setDeckCardQuantityRequest(
+        _apiClient,
+        deckId: deckId,
+        cardId: newCardId,
+        quantity: quantity,
+        replaceSameName: true,
+        condition: condition,
+      );
 
-      if (response.statusCode != 200) {
-        final data = response.data;
-        final msg =
-            (data is Map && data['error'] != null)
-                ? data['error'].toString()
-                : 'Falha ao atualizar carta: ${response.statusCode}';
-        throw Exception(msg);
+      if (!result.isSuccess) {
+        throw Exception(result.errorMessage);
       }
     } else {
       // Outros formatos: se trocou a edição, troca primeiro; depois faz SET absoluto.
@@ -121,25 +111,21 @@ class DeckProvider extends ChangeNotifier {
         );
       }
 
-      final response = await _apiClient.post('/decks/$deckId/cards/set', {
-        'card_id': newCardId,
-        'quantity': quantity,
-        'replace_same_name': false,
-        'condition': condition,
-      });
+      final result = await setDeckCardQuantityRequest(
+        _apiClient,
+        deckId: deckId,
+        cardId: newCardId,
+        quantity: quantity,
+        replaceSameName: false,
+        condition: condition,
+      );
 
-      if (response.statusCode != 200) {
-        final data = response.data;
-        final msg =
-            (data is Map && data['error'] != null)
-                ? data['error'].toString()
-                : 'Falha ao atualizar carta: ${response.statusCode}';
-        throw Exception(msg);
+      if (!result.isSuccess) {
+        throw Exception(result.errorMessage);
       }
     }
 
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
   }
 
   /// Busca detalhes de um deck específico (com cache)
@@ -175,8 +161,7 @@ class DeckProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiClient.get('/decks/$deckId');
-      final state = parseDeckDetailsResponse(response);
+      final state = await fetchDeckDetailsRequest(_apiClient, deckId);
       _selectedDeck = state.selectedDeck;
       _detailsErrorMessage = state.errorMessage;
       _detailsStatusCode = state.statusCode;
@@ -187,7 +172,11 @@ class DeckProvider extends ChangeNotifier {
           cacheTimes: _deckDetailsCacheTime,
           deck: state.selectedDeck!,
         );
-        _syncColorIdentityToList(deckId, state.selectedDeck!.colorIdentity);
+        _decks = syncDeckColorIdentityToList(
+          _decks,
+          deckId,
+          state.selectedDeck!.colorIdentity,
+        );
       }
     } catch (e) {
       _detailsErrorMessage = 'Erro de conexão: $e';
@@ -197,56 +186,34 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
-  /// Propaga a color identity obtida dos detalhes para o item correspondente
-  /// na lista de decks, para que os pips WUBRG apareçam na listagem.
-  void _syncColorIdentityToList(String deckId, List<String> colorIdentity) {
-    _decks = syncDeckColorIdentityToList(_decks, deckId, colorIdentity);
-  }
-
-  /// Aplica color identity do cache de detalhes para todos os decks na lista
-  /// que ainda não possuem essa informação.
-  void _applyCachedColorIdentities() {
-    _decks = applyCachedColorIdentitiesToDeckList(_decks, _deckDetailsCache);
-  }
-
   /// Busca color identity em background para decks que ainda não a possuem.
   /// Carrega os detalhes de cada deck sem color_identity e propaga para a lista.
-  Future<void> fetchMissingColorIdentities() async {
-    final missing = decksMissingColorIdentity(_decks);
+  Future<void> fetchMissingColorIdentities([List<Deck>? targetDecks]) async {
+    final missing = targetDecks ?? decksMissingColorIdentity(_decks);
     if (missing.isEmpty) return;
 
     debugPrint(
       '[DeckProvider] Fetching color identity for ${missing.length} deck(s)...',
     );
-    var enriched = 0;
-
-    for (final deck in missing) {
-      try {
-        final response = await _apiClient.get('/decks/${deck.id}');
-        if (response.statusCode == 200) {
-          final details = DeckDetails.fromJson(
-            response.data as Map<String, dynamic>,
-          );
-          storeDeckDetailsInCache(
-            cache: _deckDetailsCache,
-            cacheTimes: _deckDetailsCacheTime,
-            deck: details,
-          );
-          // Sync to list
-          if (details.colorIdentity.isNotEmpty) {
-            _syncColorIdentityToList(deck.id, details.colorIdentity);
-            enriched++;
-          }
-          debugPrint(
-            '[DeckProvider] Deck "${deck.name}" → colors: ${details.colorIdentity}',
-          );
-        }
-      } catch (e) {
-        debugPrint(
-          '[DeckProvider] Failed to fetch colors for "${deck.name}": $e',
-        );
-      }
+    final result = await fetchMissingDeckColorIdentities(_apiClient, missing);
+    for (final deck in missing.where(
+      (deck) => result.failedDeckIds.contains(deck.id),
+    )) {
+      debugPrint('[DeckProvider] Failed to fetch colors for "${deck.name}".');
     }
+
+    final applyResult = applyDeckColorIdentityEnrichment(_decks, result);
+    for (final details in applyResult.cachedDetails) {
+      storeDeckDetailsInCache(
+        cache: _deckDetailsCache,
+        cacheTimes: _deckDetailsCacheTime,
+        deck: details,
+      );
+      debugPrint('[DeckProvider] Deck "${details.name}" → colors: ${details.colorIdentity}');
+    }
+
+    final enriched = applyResult.enrichedCount;
+    _decks = applyResult.decks;
     debugPrint(
       '[DeckProvider] Color enrichment done: $enriched/${missing.length} decks.',
     );
@@ -264,18 +231,16 @@ class DeckProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiClient.get('/decks');
-      final state = parseDeckListResponse(response);
+      final state = await fetchDeckListRequest(_apiClient);
       if (state.decks != null) {
-        _decks = state.decks!;
+        final hydration = buildDeckListHydrationResult(
+          state.decks!,
+          _deckDetailsCache,
+        );
+        _decks = hydration.decks;
         _errorMessage = null;
-        // Aplica color identity do cache de detalhes para decks que o servidor
-        // ainda não retorna color_identity (até deploy da nova rota)
-        _applyCachedColorIdentities();
-
-        // Busca color identity em background para decks que ainda não a possuem
-        // (não bloqueia a UI — roda em paralelo)
-        fetchMissingColorIdentities();
+        // Busca color identity em background para decks que ainda não a possuem.
+        fetchMissingColorIdentities(hydration.missingColorIdentityDecks);
       } else {
         _errorMessage = state.errorMessage;
       }
@@ -301,15 +266,16 @@ class DeckProvider extends ChangeNotifier {
         _apiClient,
         cards ?? [],
       );
-      final response = await _apiClient.post('/decks', {
-        'name': name,
-        'format': format,
-        'description': description,
-        'is_public': isPublic,
-        'cards': normalizedCards,
-      });
+      final result = await createDeckRequest(
+        _apiClient,
+        name: name,
+        format: format,
+        description: description,
+        isPublic: isPublic,
+        cards: normalizedCards,
+      );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (result.isSuccess) {
         await fetchDecks(); // Recarrega a lista
         await _trackActivationEvent(
           'deck_created',
@@ -319,11 +285,7 @@ class DeckProvider extends ChangeNotifier {
         return true;
       }
 
-      final msg = extractApiError(
-        response.data,
-        fallback: 'Erro ao criar deck: ${response.statusCode}',
-      );
-      _errorMessage = msg;
+      _errorMessage = result.errorMessage;
       notifyListeners();
       return false;
     } catch (e) {
@@ -336,14 +298,20 @@ class DeckProvider extends ChangeNotifier {
   /// Deleta um deck
   Future<bool> deleteDeck(String deckId) async {
     try {
-      final response = await _apiClient.delete('/decks/$deckId');
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        _decks.removeWhere((deck) => deck.id == deckId);
+      final result = await deleteDeckRequest(_apiClient, deckId);
+      if (result.isSuccess) {
+        final nextState = applyDeckDeletionToState(
+          _decks,
+          _selectedDeck,
+          deckId,
+        );
+        _decks = nextState.decks;
+        _selectedDeck = nextState.selectedDeck;
+        invalidateDeckCache(deckId);
         notifyListeners();
         return true;
       }
-      _errorMessage = 'Erro ao deletar deck: ${response.statusCode}';
+      _errorMessage = result.errorMessage;
       notifyListeners();
       return false;
     } catch (e) {
@@ -361,10 +329,8 @@ class DeckProvider extends ChangeNotifier {
     bool isCommander = false,
     String condition = 'NM',
   }) async {
-    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
-      await fetchDeckDetails(deckId);
-    }
-    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
+    final deck = await _ensureDeckLoadedForMutation(deckId);
+    if (deck == null) {
       _errorMessage =
           'Deck não carregado. Abra os detalhes do deck e tente novamente.';
       notifyListeners();
@@ -387,8 +353,7 @@ class DeckProvider extends ChangeNotifier {
           delta: isCommander ? 1 : quantity,
         );
 
-        invalidateDeckCache(deckId);
-        await fetchDeckDetails(deckId);
+        await _refreshDeckDetailsAfterMutation(deckId);
 
         return true;
       }
@@ -416,79 +381,40 @@ class DeckProvider extends ChangeNotifier {
     bool keepTheme = true,
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
-    try {
-      onProgress?.call('Preparando análise do deck...', 0, 5);
+    onProgress?.call('Preparando análise do deck...', 0, 5);
 
-      final payload = <String, dynamic>{
-        'deck_id': deckId,
+    final requestResult = await requestOptimizeDeck(
+      _apiClient,
+      deckId: deckId,
+      archetype: archetype,
+      bracket: bracket,
+      keepTheme: keepTheme,
+    );
+
+    if (requestResult.isAsync) {
+      onProgress?.call(
+        'Preparando referências do commander...',
+        1,
+        requestResult.totalStages ?? 6,
+      );
+      return _pollOptimizeJob(
+        requestResult.jobId!,
+        pollInterval: requestResult.pollIntervalMs ?? 2000,
+        onProgress: onProgress,
+      );
+    }
+
+    await _trackActivationEvent(
+      'deck_optimized',
+      deckId: deckId,
+      source: 'deck_provider.optimizeDeck',
+      metadata: {
         'archetype': archetype,
         if (bracket != null) 'bracket': bracket,
         'keep_theme': keepTheme,
-      };
-
-      // Debug snapshot (sem token): útil para você colar o JSON de request/response.
-      await saveOptimizeDebugSnapshot(request: payload);
-      AppLogger.debug('🧪 [AI Optimize] request=$payload');
-
-      final response = await _apiClient.post('/ai/optimize', payload);
-
-      if (response.statusCode == 200) {
-        final data = asDynamicMap(response.data);
-        await saveOptimizeDebugSnapshot(response: data);
-        AppLogger.debug('🧪 [AI Optimize] response=$data');
-        await _trackActivationEvent(
-          'deck_optimized',
-          deckId: deckId,
-          source: 'deck_provider.optimizeDeck',
-          metadata: {
-            'archetype': archetype,
-            if (bracket != null) 'bracket': bracket,
-            'keep_theme': keepTheme,
-          },
-        );
-        return data;
-      } else if (response.statusCode == 202) {
-        // Async job: servidor processará em background
-        final data = asDynamicMap(response.data);
-        final jobId = data['job_id'] as String;
-        final pollInterval = data['poll_interval_ms'] as int? ?? 2000;
-        AppLogger.debug('🧪 [AI Optimize] async job criado: $jobId');
-        onProgress?.call(
-          'Preparando referências do commander...',
-          1,
-          data['total_stages'] as int? ?? 6,
-        );
-        return await _pollOptimizeJob(
-          jobId,
-          pollInterval: pollInterval,
-          onProgress: onProgress,
-        );
-      } else if (response.statusCode == 422) {
-        final data = asDynamicMap(response.data);
-        await saveOptimizeDebugSnapshot(
-          response: {'statusCode': 422, 'data': data},
-        );
-        final qualityError = asDynamicMap(data['quality_error']);
-        final errorMsg =
-            data['error'] as String? ??
-            qualityError['message'] as String? ??
-            'A otimização não atingiu a qualidade mínima.';
-        final code = qualityError['code'] as String? ?? 'QUALITY_ERROR';
-        AppLogger.warning('⚠️ [AI Optimize] quality gate: $code — $errorMsg');
-        throw buildDeckAiFlowException(
-          data,
-          fallbackMessage: errorMsg,
-          fallbackCode: code,
-        );
-      } else {
-        await saveOptimizeDebugSnapshot(
-          response: {'statusCode': response.statusCode, 'data': response.data},
-        );
-        throw Exception('Falha ao otimizar deck: ${response.statusCode}');
-      }
-    } catch (e) {
-      rethrow;
-    }
+      },
+    );
+    return requestResult.result!;
   }
 
   Future<Map<String, dynamic>> rebuildDeck(
@@ -501,53 +427,32 @@ class DeckProvider extends ChangeNotifier {
     List<String> mustKeep = const <String>[],
     List<String> mustAvoid = const <String>[],
   }) async {
-    final payload = <String, dynamic>{
-      'deck_id': deckId,
-      if (archetype != null && archetype.trim().isNotEmpty)
-        'archetype': archetype,
-      if (theme != null && theme.trim().isNotEmpty) 'theme': theme,
-      if (bracket != null) 'bracket': bracket,
-      'rebuild_scope': rebuildScope,
-      'save_mode': saveMode,
-      if (mustKeep.isNotEmpty) 'must_keep': mustKeep,
-      if (mustAvoid.isNotEmpty) 'must_avoid': mustAvoid,
-    };
-
-    final response = await _apiClient.post(
-      '/ai/rebuild',
-      payload,
-      timeout: const Duration(minutes: 4),
+    final result = await requestRebuildDeck(
+      _apiClient,
+      deckId: deckId,
+      archetype: archetype,
+      theme: theme,
+      bracket: bracket,
+      rebuildScope: rebuildScope,
+      saveMode: saveMode,
+      mustKeep: mustKeep,
+      mustAvoid: mustAvoid,
     );
 
-    if (response.statusCode == 200) {
-      final data = asDynamicMap(response.data);
-      final draftDeckId = data['draft_deck_id']?.toString();
-      if (draftDeckId != null && draftDeckId.isNotEmpty) {
-        await _trackActivationEvent(
-          'deck_rebuild_created',
-          deckId: draftDeckId,
-          source: 'deck_provider.rebuildDeck',
-          metadata: {
-            'source_deck_id': deckId,
-            'rebuild_scope_selected': data['rebuild_scope_selected'],
-            'save_mode': saveMode,
-          },
-        );
-      }
-      return data;
-    }
-
-    if (response.statusCode == 422) {
-      final data = asDynamicMap(response.data);
-      throw buildDeckAiFlowException(
-        data,
-        fallbackMessage:
-            data['error']?.toString() ?? 'A reconstrução guiada falhou.',
-        fallbackCode: 'REBUILD_FAILED',
+    final draftDeckId = result.draftDeckId;
+    if (draftDeckId != null && draftDeckId.isNotEmpty) {
+      await _trackActivationEvent(
+        'deck_rebuild_created',
+        deckId: draftDeckId,
+        source: 'deck_provider.rebuildDeck',
+        metadata: {
+          'source_deck_id': deckId,
+          'rebuild_scope_selected': result.payload['rebuild_scope_selected'],
+          'save_mode': saveMode,
+        },
       );
     }
-
-    throw Exception('Falha ao reconstruir deck: ${response.statusCode}');
+    return result.payload;
   }
 
   /// Faz polling no job de otimização até completar ou falhar.
@@ -560,42 +465,18 @@ class DeckProvider extends ChangeNotifier {
     const maxPolls = 60; // 60 × 5s = 5 min timeout
     for (var i = 0; i < maxPolls; i++) {
       await Future.delayed(Duration(milliseconds: pollInterval));
-      final response = await _apiClient.get('/ai/optimize/jobs/$jobId');
-      if (response.statusCode == 200) {
-        final data = asDynamicMap(response.data);
-        final status = data['status'] as String?;
-        if (status == 'completed') {
-          final result = data['result'];
-          final resultMap = asDynamicMap(result);
-          await saveOptimizeDebugSnapshot(response: resultMap);
-          AppLogger.debug(
-            '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
-          );
-          return resultMap;
-        } else if (status == 'failed') {
-          final qualityError = asDynamicMap(data['quality_error']);
-          final errorMsg =
-              data['error'] as String? ??
-              qualityError['message'] as String? ??
-              'Otimização falhou no servidor.';
-          AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $errorMsg');
-          throw buildDeckAiFlowException(
-            data,
-            fallbackMessage: errorMsg,
-            fallbackCode:
-                qualityError['code']?.toString() ?? 'OPTIMIZE_JOB_FAILED',
-          );
-        } else {
-          // Still processing — update progress
-          onProgress?.call(
-            data['stage'] as String? ?? 'Processando...',
-            data['stage_number'] as int? ?? 0,
-            data['total_stages'] as int? ?? 6,
-          );
-        }
-      } else if (response.statusCode == 404) {
-        throw Exception('Job de otimização expirou ou não foi encontrado.');
+      final result = await pollOptimizeJobRequest(_apiClient, jobId);
+      if (result.isCompleted) {
+        AppLogger.debug(
+          '🧪 [AI Optimize] job $jobId completed after ${i + 1} polls',
+        );
+        return result.result!;
       }
+      onProgress?.call(
+        result.stage ?? 'Processando...',
+        result.stageNumber ?? 0,
+        result.totalStages ?? 6,
+      );
     }
     throw Exception('Timeout: a otimização demorou mais de 5 minutos.');
   }
@@ -604,18 +485,16 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required List<Map<String, dynamic>> cards,
   }) async {
-    final response = await _apiClient.post('/decks/$deckId/cards/bulk', {
-      'cards': cards,
-    });
-    if (response.statusCode == 200) {
-      invalidateDeckCache(deckId);
-      await fetchDeckDetails(deckId);
+    final result = await addCardsBulkRequest(
+      _apiClient,
+      deckId: deckId,
+      cards: cards,
+    );
+    if (result.isSuccess) {
+      await _refreshDeckDetailsAfterMutation(deckId);
       return true;
     }
-    if (response.data is Map && (response.data as Map)['error'] != null) {
-      throw Exception((response.data as Map)['error'].toString());
-    }
-    throw Exception('Falha ao adicionar em lote : ${response.statusCode}');
+    throw Exception(result.errorMessage);
   }
 
   /// Atualiza apenas a descrição do deck via PUT
@@ -628,8 +507,7 @@ class DeckProvider extends ChangeNotifier {
       deckId: deckId,
       description: description,
     );
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
     return true;
   }
 
@@ -644,8 +522,7 @@ class DeckProvider extends ChangeNotifier {
       archetype: archetype,
       bracket: bracket,
     );
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
   }
 
   /// Valida o deck no servidor (modo estrito: Commander=100 e com comandante).
@@ -663,8 +540,7 @@ class DeckProvider extends ChangeNotifier {
       oldCardId: oldCardId,
       newCardId: newCardId,
     );
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
     return true;
   }
 
@@ -714,25 +590,10 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> generateDeck({
     required String prompt,
     required String format,
-  }) async {
-    try {
-      return await generateDeckFromPrompt(
-        _apiClient,
-        prompt: prompt,
-        format: format,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
+  }) => generateDeckFromPrompt(_apiClient, prompt: prompt, format: format);
 
   Future<DeckDetails> _ensureDeckLoadedForOptimization(String deckId) async {
-    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
-      AppLogger.debug('📥 [DeckProvider] Buscando detalhes do deck...');
-      await fetchDeckDetails(deckId);
-    }
-
-    final deck = _selectedDeck;
+    final deck = await _ensureDeckLoadedForMutation(deckId);
     if (deck == null) {
       throw Exception('Deck não encontrado');
     }
@@ -745,27 +606,21 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> cardsPayload,
   }) async {
     AppLogger.debug('💾 [DeckProvider] Salvando alterações no servidor...');
-    final stopwatch = Stopwatch()..start();
-    final response = await _apiClient.put('/decks/$deckId', {
-      'cards': cardsPayload,
-    });
-    stopwatch.stop();
-    AppLogger.debug(
-      '⏱️ [DeckProvider] Tempo de resposta do servidor: ${stopwatch.elapsedMilliseconds}ms',
+    final result = await persistDeckCardsPayloadWithValidation(
+      _apiClient,
+      deckId: deckId,
+      cardsPayload: cardsPayload,
     );
-
-    ensureSuccessfulDeckMutationResponse(
-      response,
-      fallbackMessage: 'Falha ao atualizar deck',
+    AppLogger.debug(
+      '⏱️ [DeckProvider] Tempo de resposta do servidor: ${result.elapsedMilliseconds}ms',
     );
 
     AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
 
     try {
-      final validation = await validateDeck(deckId);
-      final isValid = validation['valid'] as bool? ?? false;
+      final isValid = result.validation['valid'] as bool? ?? false;
       if (!isValid) {
-        final errors = (validation['errors'] as List?)?.join(', ') ?? '';
+        final errors = (result.validation['errors'] as List?)?.join(', ') ?? '';
         AppLogger.warning(
           '[DeckProvider] Deck salvo mas com avisos de validação: $errors',
         );
@@ -776,8 +631,7 @@ class DeckProvider extends ChangeNotifier {
       );
     }
 
-    invalidateDeckCache(deckId);
-    await fetchDeckDetails(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId);
     return true;
   }
 
@@ -795,67 +649,21 @@ class DeckProvider extends ChangeNotifier {
         '📋 [DeckProvider] Remover: ${cardsToRemove.length} cartas | Adicionar: ${cardsToAdd.length} cartas',
       );
 
-      // 1. Buscar o deck atual para pegar a lista de cartas
-      await _ensureDeckLoadedForOptimization(deckId);
-
-      // 2. Construir lista atual de cartas em formato de map
-      final currentCards = buildCurrentCardsMap(_selectedDeck!);
-
-      // 3. Buscar IDs das cartas a adicionar pelo nome (EM PARALELO)
-      final cardsToAddIds = await resolveOptimizationAdditions(
+      final deck = await _ensureDeckLoadedForOptimization(deckId);
+      final payloadResult = await buildNamedOptimizationPayload(
         _apiClient,
-        cardsToAdd,
+        deck: deck,
+        cardsToRemove: cardsToRemove,
+        cardsToAdd: cardsToAdd,
       );
-
-      // 4. Buscar IDs das cartas a remover pelo nome (EM PARALELO)
-      final cardsToRemoveIds = await resolveOptimizationRemovals(
-        _apiClient,
-        cardsToRemove,
-      );
-
-      if (cardsToAdd.isNotEmpty && cardsToAddIds.isEmpty) {
-        throw Exception(
-          'Nenhuma das cartas sugeridas para adicionar foi encontrada no banco. Tente novamente.',
-        );
-      }
-      if (cardsToRemove.isNotEmpty && cardsToRemoveIds.isEmpty) {
-        throw Exception(
-          'Nenhuma das cartas sugeridas para remover foi encontrada no banco. Tente novamente.',
-        );
-      }
-
-      // 5. Remover as cartas da lista atual
-      AppLogger.debug('✂️ [DeckProvider] Removendo cartas...');
-
-      // 6. Adicionar as novas cartas
-      AppLogger.debug(
-        '➕ [DeckProvider] Adicionando ${cardsToAddIds.length} cartas...',
-      );
-
-      final applyResult = buildNamedOptimizationApplyResult(
-        deck: _selectedDeck!,
-        cardsToRemoveIds: cardsToRemoveIds,
-        cardsToAddIds: cardsToAddIds,
-      );
-      for (final cardId in applyResult.skippedForIdentity) {
+      for (final cardId in payloadResult.skippedForIdentity) {
         AppLogger.debug(
           '⛔️ [DeckProvider] Pulando fora da identidade do comandante: $cardId',
         );
       }
-      currentCards
-        ..clear()
-        ..addAll(applyResult.currentCards);
-
-      if (!applyResult.hasStructuralChange) {
-        throw Exception(
-          'Nenhuma mudança aplicável foi encontrada para este deck.',
-        );
-      }
-
-      // 7. Atualizar o deck via API
       return _persistDeckCardsPayload(
         deckId: deckId,
-        cardsPayload: currentCards.values.toList(),
+        cardsPayload: payloadResult.cardsPayload,
       );
     } catch (e) {
       AppLogger.error('[DeckProvider] Erro fatal na otimização', e);
@@ -873,26 +681,22 @@ class DeckProvider extends ChangeNotifier {
     try {
       AppLogger.debug('🚀 [DeckProvider] Otimização rápida com IDs diretos');
 
-      // 1. Buscar deck atual
-      if (_selectedDeck == null || _selectedDeck!.id != deckId) {
-        await fetchDeckDetails(deckId);
-      }
-      if (_selectedDeck == null) throw Exception('Deck não encontrado');
+      final deck = await _ensureDeckLoadedForOptimization(deckId);
 
       AppLogger.debug(
-        '👑 [DeckProvider] Commanders no deck: ${_selectedDeck!.commander.length}',
+        '👑 [DeckProvider] Commanders no deck: ${deck.commander.length}',
       );
-      for (final commander in _selectedDeck!.commander) {
+      for (final commander in deck.commander) {
         AppLogger.debug(
           '  Commander: ${commander.name} (id=${commander.id}, qty=${commander.quantity})',
         );
       }
       AppLogger.debug(
-        '🃏 [DeckProvider] MainBoard entries: ${_selectedDeck!.mainBoard.length}',
+        '🃏 [DeckProvider] MainBoard entries: ${deck.mainBoard.length}',
       );
 
       final cardsPayload = buildOptimizedCardPayload(
-        deck: _selectedDeck!,
+        deck: deck,
         removalsDetailed: removalsDetailed,
         additionsDetailed: additionsDetailed,
       );
@@ -989,17 +793,9 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> validateImportList({
     required String format,
     required String list,
-  }) async {
-    try {
-      return await validateImportListRequest(
-        _apiClient,
-        format: format,
-        list: list,
-      );
-    } catch (e) {
-      return buildConnectionFailureResult(e);
-    }
-  }
+  }) => runConnectionSafeMapRequest(
+    () => validateImportListRequest(_apiClient, format: format, list: list),
+  );
 
   /// Importa uma lista de cartas para um deck EXISTENTE
   /// Se replaceAll=true, substitui todas as cartas; senão, adiciona às existentes
@@ -1008,22 +804,32 @@ class DeckProvider extends ChangeNotifier {
     required String list,
     bool replaceAll = false,
   }) async {
-    try {
-      final result = await importListToDeckRequest(
+    final result = await runConnectionSafeMapRequest(
+      () => importListToDeckRequest(
         _apiClient,
         deckId: deckId,
         list: list,
         replaceAll: replaceAll,
-      );
+      ),
+    );
 
-      if (result['success'] == true) {
-        invalidateDeckCache(deckId);
-      }
-
-      return result;
-    } catch (e) {
-      return buildConnectionFailureResult(e);
+    if (result['success'] == true) {
+      invalidateDeckCache(deckId);
     }
+    return result;
+  }
+
+  Future<DeckDetails?> _ensureDeckLoadedForMutation(String deckId) async {
+    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
+      AppLogger.debug('📥 [DeckProvider] Buscando detalhes do deck...');
+      await fetchDeckDetails(deckId);
+    }
+    return _selectedDeck;
+  }
+
+  Future<void> _refreshDeckDetailsAfterMutation(String deckId) async {
+    invalidateDeckCache(deckId);
+    await fetchDeckDetails(deckId);
   }
 
   // ───── Social / Sharing ─────
@@ -1063,21 +869,19 @@ class DeckProvider extends ChangeNotifier {
     try {
       return await exportDeckAsTextRequest(_apiClient, deckId);
     } catch (e) {
-      return {'error': 'Erro de conexão: $e'};
+      return buildExportConnectionFailureResult(e);
     }
   }
 
   /// Copia um deck público para a conta do usuário autenticado
   Future<Map<String, dynamic>> copyPublicDeck(String deckId) async {
-    try {
-      final result = await copyPublicDeckRequest(_apiClient, deckId);
-      if (result['success'] == true) {
-        await fetchDecks();
-      }
-      return result;
-    } catch (e) {
-      return buildConnectionFailureResult(e);
+    final result = await runConnectionSafeMapRequest(
+      () => copyPublicDeckRequest(_apiClient, deckId),
+    );
+    if (result['success'] == true) {
+      await fetchDecks();
     }
+    return result;
   }
 
   /// Limpa todo o estado do provider (chamado no logout)

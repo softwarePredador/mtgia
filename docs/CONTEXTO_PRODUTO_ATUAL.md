@@ -42,12 +42,16 @@ Esses documentos continuam como apoio e historico, mas nao devem redefinir a pri
 
 Enquanto este documento nao mudar, a proxima task dominante do projeto e:
 
-1. continuar reduzindo responsabilidade concentrada em `deck_provider.dart` e `deck_details_screen.dart`, priorizando extracao de semantica/fluxo reutilizavel antes de mexer na navegacao
-2. subir smoke/widget tests reais da UI do fluxo `deck details -> optimize -> preview -> apply -> validate` e `needs_repair -> rebuild_guided -> abrir draft`
+1. fechar o residual final de orquestracao no `deck_provider.dart`, sem reabrir escopo em `deck_details_screen.dart`
+2. retomar o bloqueio operacional remanescente da Sprint 2:
+   - validar ingestao real do app no `Sentry`
+   - confirmar correlacao ponta a ponta de `x-request-id` com request real do app
+   - revisar o `CHECKLIST_GO_LIVE_FINAL.md` com base no que ja esta efetivamente entregue
 
 Sequencia imediata ja definida:
 
-3. so depois retomar frentes fora do deck builder
+3. so depois promover carga basica/thresholds do fluxo core
+4. so depois retomar frentes fora do deck builder
 
 Excecao documentada em `2026-03-24`:
 
@@ -154,13 +158,42 @@ Progresso atual documentado da Sprint 1:
   - `exportDeckAsTextRequest`
   - `copyPublicDeckRequest`
 - `deck_provider.dart` caiu para `1095` linhas e ficou mais próximo de orquestração pura, enquanto `deck_provider_support_test.dart` ganhou cobertura direta desses request helpers
+- `deck_provider_support.dart` passou a encapsular tambem `createDeckRequest`, `removeCardFromDeckRequest`, `setDeckCardQuantityRequest` e o parse padronizado de mutacoes simples de deck
+- `deck_provider_support.dart` passou a encapsular tambem o enrichment assíncrono de `color_identity` para decks ainda sem cor carregada
+- `deck_provider.dart` caiu para `1074` linhas, deixando `createDeck`, `removeCardFromDeck`, `updateDeckCardEntry` e parte do enrichment de cor mais próximos de orquestração e mantendo a suite focada do app core verde
+- `deck_provider_support.dart` passou a encapsular tambem o request/parser completo de `optimizeDeck`, incluindo respostas `200`, `202` e `422`
+- `deck_provider.dart` caiu para `1035` linhas, deixando o provider mais focado em orquestração e polling, sem carregar mais o parse inline do `POST /ai/optimize`
+- `deck_provider_support.dart` passou a encapsular tambem o request/parser completo de `rebuildDeck` e a persistência pós-apply com validação (`persistDeckCardsPayloadWithValidation`)
+- `deck_provider.dart` caiu para `1011` linhas, deixando o provider mais perto de orquestração pura no fluxo de IA e persistência final de deck
+- `deck_provider_support.dart` passou a encapsular tambem o polling de jobs assíncronos do optimize (`pollOptimizeJobRequest`)
+- `deck_provider.dart` caiu para `987` linhas, saindo da faixa de mil linhas e deixando o provider concentrado quase só em orquestração, estado e mutações residuais
+- `deck_provider_support.dart` passou a encapsular tambem `addCardsBulkRequest`, reduzindo mais um wrapper de mutação simples
+- `deck_provider.dart` caiu para `976` linhas, consolidando o recorte estrutural do app core e deixando o restante do arquivo em estado residual
+- `deck_provider.dart` caiu para `966` linhas, deixando o provider abaixo da faixa crítica e mais próximo de orquestração pura
+- `deck_provider.dart` caiu para `908` linhas, com o miolo nomeado de `applyOptimization` extraído para `buildNamedOptimizationPayload`
+- `deck_provider.dart` caiu para `899` linhas, consolidando helpers privados de refresh/carga (`_refreshDeckDetailsAfterMutation`, `_ensureDeckLoadedForMutation`) e removendo a duplicacao residual entre mutacoes simples e `applyOptimizationWithIds`
+- `deck_provider_support.dart` passou a encapsular tambem a mutacao pura de delete (`applyDeckDeletionToState`) e wrappers seguros de resultado (`runConnectionSafeMapRequest`, `buildExportConnectionFailureResult`)
+- `deck_provider_support.dart` passou a encapsular tambem a hidratação da lista e do enrichment de `color_identity` (`buildDeckListHydrationResult`, `applyDeckColorIdentityEnrichment`)
+- `deck_provider_test.dart` ganhou cobertura direta para `copyPublicDeck`, e `deck_provider_support_test.dart` ganhou cobertura dedicada para o recorte de delete e falhas de conexão
+- `deck_provider_support_test.dart` agora também cobre diretamente o helper `buildNamedOptimizationPayload`
+- `deck_provider_support_test.dart` agora também cobre diretamente a hidratação da lista e a aplicação de enrichment de `color_identity`
+- a malha focada do app core foi revalidada em conjunto (`deck_provider_support_test`, `deck_provider_test`, `deck_details_screen_smoke_test`, `api_client_request_id_test`) e seguiu verde depois do recorte final do provider
 - `Sentry` backend foi ligado em `server/lib/observability.dart` e no middleware global, com propagação de `x-request-id` via `server/lib/request_trace.dart`
 - `Sentry` app foi ligado em `app/lib/core/observability/app_observability.dart`, com captura global de erros, observer de rota e `x-request-id` em `app/lib/core/api/api_client.dart`
 - `server/.env.example` foi atualizado com as chaves mínimas de observabilidade e o setup ficou registrado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`
 - o smoke real do backend foi promovido para `./scripts/validate_sentry_backend_ingestion.sh`, confirmando ingestão real por `event_id` no Sentry
+- o smoke real do backend foi revalidado novamente nesta rodada, com novo `event_id` confirmado (`70168f941de24cf4923eb87bb6d38a5d`)
 - `server/.env.example` passou a formalizar também os placeholders operacionais de EasyPanel e Sentry (`SENTRY_AUTH_TOKEN`, slugs de projeto e `EASYPANEL_*`)
 - o runbook operacional de deploy foi formalizado em `docs/EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md`
-- a validação real de ingestão do app segue pendente; o smoke mobile e o script já existem, mas o build macOS local ainda ficou preso no ciclo nativo e não devolveu `event_id`
+- o ambiente publicado respondeu `200` em `GET /health` e `GET /ready` em `2026-03-24`, com `x-request-id` gerado pelo backend e eco de um `x-request-id` manual no response (`manual-req-20260324`)
+- o smoke operacional repetível de readiness/request-id foi formalizado em `scripts/validate_request_id_ready.sh`, com fallback explícito de `API_BASE_URL`/`PUBLIC_API_BASE_URL`/`EASYPANEL_DOMAIN`
+- o smoke publicado de readiness/request-id foi validado com sucesso nesta rodada (`READY_VALIDATION_OK=1`), confirmando `200` em `/health`, `/health/ready` e `/ready` com eco do mesmo `x-request-id`
+- a validação real de ingestão do app segue pendente; o smoke mobile e o script já existem, mas as tentativas em macOS local e no emulador Android (`emulator-5554`) ficaram presas no ciclo nativo de compilação e não devolveram `event_id`
+- o retry desta rodada em `macos` também ficou preso por mais de `60s` na fase de build nativo, apenas emitindo warnings do SDK Swift do `Sentry`, sem chegar ao teste nem gerar `event_id`
+- `validate_sentry_mobile_local.sh` agora fecha com timeout configurável (`MOBILE_SENTRY_BUILD_TIMEOUT_SECONDS`, default `120`) e marca explicitamente `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1` quando o bloqueio for de toolchain/build
+- a classificação foi revalidada nesta rodada: em `macos`, com timeout reduzido para `20s`, o smoke encerrou com `exit 124` e `SENTRY_MOBILE_TOOLCHAIN_BLOCKED=1`, confirmando que a pendência atual é de execução/toolchain e não de integração de código
+- o smoke Android avançou um passo: a falha de Kotlin incompatível foi corrigida ao atualizar `app/android/settings.gradle.kts` para `org.jetbrains.kotlin.android` `2.2.0`
+- mesmo assim, o retry real em `emulator-5554` não concluiu dentro de `240s`/`300s`, então a pendência do app segue operacional, agora concentrada em tempo/execução do target mobile e não mais em quebra imediata de build por versão de Kotlin
 - `GET /ready` foi publicado em `server/routes/ready/index.dart`, compartilhando os checks reais de readiness já usados em `/health/ready`
 - blocos ja extraidos:
   - payload parser e normalizacao
@@ -186,11 +219,10 @@ Fila oficial restante da Sprint 1, na ordem:
    - `app/lib/features/decks/screens/deck_details_screen.dart`
    - `app/lib/features/decks/providers/deck_provider.dart`
 2. focar agora no que ainda resta concentrado em `deck_provider.dart`, principalmente:
-   - reduzir o boilerplate restante do bloco de optimize/aplicacao ainda local
-   - limpeza final de estado compartilhado / mutacoes restantes (`deleteDeck`, persistencia pos-optimize e fetch/update de deck ainda concentrados)
+   - apenas limpeza residual de estado compartilhado (`fetchMissingColorIdentities`, `fetchDecks/fetchDeckDetails` e mutacoes finas)
 3. ao fechar esse recorte do app core, retomar os bloqueadores operacionais restantes da Sprint 2:
    - validar ingestao real do app no Sentry
-   - confirmar `/ready` no ambiente publicado
+   - fechar a correlacao ponta a ponta de `x-request-id` entre app e backend publicado
    - revisar o checklist de go-live
 
 Regra pratica:
