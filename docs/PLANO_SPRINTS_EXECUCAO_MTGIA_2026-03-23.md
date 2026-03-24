@@ -95,10 +95,42 @@ Atualizacao da rodada atual:
 - task 6 avancou com a extracao do contrato de IA, snapshots de debug e do builder de payload de aplicacao para `deck_provider_support.dart`
 - `deck_details_screen.dart` iniciou recorte da semantica de loading/motivos do optimize para `deck_optimize_ui_support.dart`
 - `deck_details_screen.dart` passou a mover tambem componentes compartilhados de UI para `deck_ui_components.dart`, reduzindo dependencias locais do arquivo gigante
+- `deck_details_screen.dart` extraiu tambem widgets do fluxo de optimize para `deck_optimize_sheet_widgets.dart` e parsing/apresentacao do resultado para `deck_optimize_flow_support.dart`
+- o arquivo `deck_details_screen.dart` caiu para `3587` linhas sem regressao no smoke do provider nem nos testes dos novos suportes
+- `deck_optimize_flow_support.dart` agora cobre tambem o plano puro de rebuild e o plano puro de aplicacao, com teste direto no app para bulk/ids/fallback
+- `deck_details_screen.dart` passou a mover tambem as secoes da sheet de optimize para `deck_optimize_sections.dart`, reduzindo o arquivo para `3423` linhas
+- `deck_details_screen.dart` agora delega o corpo principal da sheet de optimize para `OptimizationSheetBody`, chegando a `3378` linhas
+- `deck_optimize_flow_support.dart` ganhou executor puro do plano de aplicacao e teste dedicado de dispatch, reduzindo mais o peso do handler de optimize na tela
+- `deck_details_screen.dart` moveu os loading dialogs do fluxo de optimize/rebuild/apply para `deck_optimize_dialogs.dart`
+- `deck_optimize_flow_support.dart` ganhou executor puro do rebuild guiado e dispatch do erro de IA por tipo de outcome, com cobertura dedicada
+- `deck_optimize_dialogs.dart` passou a abrir tambem o preview de confirmacao do optimize
+- `deck_details_screen.dart` caiu para `3297` linhas sem regressao funcional no smoke do provider nem nos testes dos novos suportes
+- `deck_optimize_flow_support.dart` passou a encapsular tambem o request de optimize com mapeamento de progresso e montagem de `preview/applyPlan`
+- `deck_details_screen.dart` caiu para `3289` linhas, mantendo o fluxo verde e reduzindo mais a responsabilidade inline do handler principal
+- `deck_optimize_flow_support.dart` passou a encapsular tambem o caminho confirmado de aplicacao (`apply + updateDeckStrategy`), com cobertura dedicada
+- `deck_details_screen.dart` caiu para `3285` linhas, mantendo a malha verde e reduzindo mais a responsabilidade inline do fluxo de optimize
+- `deck_optimize_dialogs.dart` passou a encapsular tambem os feedbacks do fluxo de optimize (`sem mudancas`, `debug copiado`, `sucesso`, `erro`)
+- `deck_details_screen.dart` caiu para `3269` linhas, reduzindo mais os efeitos de UI repetidos inline
+- `deck_optimize_dialogs.dart` passou a encapsular tambem feedbacks do rebuild guiado e o boilerplate de loading do optimize/apply
+- `deck_details_screen.dart` caiu para `3242` linhas, mantendo os testes verdes e reduzindo mais o boilerplate inline do fluxo
+- `deck_optimize_flow_support.dart` passou a encapsular tambem a orquestracao do rebuild guiado com callbacks para `preview`, `draft pronto`, `erro de IA` e `erro generico`
+- `deck_details_screen.dart` caiu para `3237` linhas, reduzindo mais a coordenacao manual inline do fluxo de rebuild
+- `deck_optimize_dialogs.dart` passou a encapsular tambem o `SnackBar` generico do fluxo de IA e o dialogo de falha do rebuild
+- `deck_details_screen.dart` caiu para `3230` linhas, mantendo a malha verde e reduzindo mais feedbacks inline do fluxo
+- `deck_provider_support.dart` passou a cobrir tambem resolucao paralela por nome, snapshots estruturais e a aplicacao pura de remocoes/adicoes com identidade do comandante, com teste dedicado
+- `deck_provider.dart` passou a delegar tambem carregamento do deck, resolucao de nomes e salvamento/validacao do `applyOptimization`, reduzindo o arquivo para `1560` linhas
+- `deck_optimize_flow_support.dart` passou a encapsular tambem a orquestracao composta do optimize (`request -> preview -> apply -> success/error`), reduzindo `deck_details_screen.dart` para `3207` linhas com cobertura dedicada
+- `deck_optimize_flow_support.dart` passou a encapsular tambem o fluxo composto de `needs_repair/rebuild`, reduzindo `deck_details_screen.dart` para `3180` linhas com cobertura dedicada de rebuild e roteamento de falha
+- widgets auxiliares de `deck_details_screen.dart` (`pricing row`, `mana/oracle`, `color identity pips`) foram extraidos para `deck_details_aux_widgets.dart`, reduzindo o arquivo para `2910` linhas
+- os fluxos de explicação de carta e picker de edição foram extraídos para `deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `2726` linhas com cobertura dedicada em `deck_details_dialogs_test.dart`
+- o diálogo de edição de carta foi extraído para `deck_card_edit_dialog.dart`, reduzindo `deck_details_screen.dart` para `2532` linhas com cobertura dedicada em `deck_card_edit_dialog_test.dart`
+- a aba `Visão Geral` foi extraída para `deck_details_overview_tab.dart`, reduzindo `deck_details_screen.dart` para `2108` linhas com cobertura dedicada em `deck_details_overview_tab_test.dart`
+- o diálogo completo de detalhes da carta foi extraído para `deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `1970` linhas e ampliando `deck_details_dialogs_test.dart` para cobrir `explicar`, `trocar edição` e `ver detalhes`
 
 Subfila tecnica atual da Sprint 1:
 
 1. continuar quebrando `deck_provider.dart` e `deck_details_screen.dart` em suporte de fluxo, contrato e apresentacao
+2. focar agora nos handlers e menus restantes de `deck_details_screen.dart`, principalmente `descricao`, `import/export/share` e acoes auxiliares fora do fluxo de optimize
 
 Critério de saida:
 

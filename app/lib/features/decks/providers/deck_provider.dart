@@ -1026,6 +1026,139 @@ class DeckProvider extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>?> _searchFirstCardByName(String cardName) async {
+    final encoded = Uri.encodeQueryComponent(cardName);
+    final searchResponse = await _apiClient.get('/cards?name=$encoded&limit=1');
+
+    if (searchResponse.statusCode != 200) {
+      return null;
+    }
+
+    final results = extractCardSearchResults(searchResponse.data);
+    if (results.isEmpty) {
+      return null;
+    }
+
+    return results.first;
+  }
+
+  Future<DeckDetails> _ensureDeckLoadedForOptimization(String deckId) async {
+    if (_selectedDeck == null || _selectedDeck!.id != deckId) {
+      AppLogger.debug('📥 [DeckProvider] Buscando detalhes do deck...');
+      await fetchDeckDetails(deckId);
+    }
+
+    final deck = _selectedDeck;
+    if (deck == null) {
+      throw Exception('Deck não encontrado');
+    }
+
+    return deck;
+  }
+
+  Future<List<Map<String, dynamic>>> _resolveOptimizationAdditions(
+    List<String> cardsToAdd,
+  ) async {
+    AppLogger.debug('🔍 [DeckProvider] Buscando IDs das cartas a adicionar...');
+    return resolveCardNamesInParallel<Map<String, dynamic>>(
+      cardNames: cardsToAdd,
+      resolver: (cardName) async {
+        try {
+          AppLogger.debug('  🔎 Buscando: $cardName');
+          final card = await _searchFirstCardByName(cardName);
+
+          if (card != null) {
+            AppLogger.debug('  ✅ Encontrado: $cardName -> ${card['id']}');
+            return {
+              'card_id': card['id'],
+              'quantity': 1,
+              'is_commander': false,
+              'type_line': card['type_line'] ?? '',
+              'color_identity':
+                  (card['color_identity'] as List?)
+                      ?.map((e) => e.toString())
+                      .toList() ??
+                  const <String>[],
+            };
+          }
+          AppLogger.debug('  ❌ Não encontrado: $cardName');
+        } catch (e) {
+          AppLogger.warning('Erro ao buscar $cardName: $e');
+        }
+        return null;
+      },
+    );
+  }
+
+  Future<List<String>> _resolveOptimizationRemovals(
+    List<String> cardsToRemove,
+  ) async {
+    AppLogger.debug('🔍 [DeckProvider] Buscando IDs das cartas a remover...');
+    return resolveCardNamesInParallel<String>(
+      cardNames: cardsToRemove,
+      resolver: (cardName) async {
+        try {
+          AppLogger.debug('  🔎 Buscando para remover: $cardName');
+          final card = await _searchFirstCardByName(cardName);
+
+          if (card != null) {
+            AppLogger.debug(
+              '  ✅ Encontrado para remoção: $cardName -> ${card['id']}',
+            );
+            return card['id'] as String;
+          }
+        } catch (e) {
+          AppLogger.warning('Erro ao buscar $cardName: $e');
+        }
+        return null;
+      },
+    );
+  }
+
+  Future<bool> _saveOptimizedCards({
+    required String deckId,
+    required Map<String, Map<String, dynamic>> currentCards,
+  }) async {
+    AppLogger.debug('💾 [DeckProvider] Salvando alterações no servidor...');
+    final stopwatch = Stopwatch()..start();
+    final response = await _apiClient.put('/decks/$deckId', {
+      'cards': currentCards.values.toList(),
+    });
+    stopwatch.stop();
+    AppLogger.debug(
+      '⏱️ [DeckProvider] Tempo de resposta do servidor: ${stopwatch.elapsedMilliseconds}ms',
+    );
+
+    if (response.statusCode != 200) {
+      String errorMsg = 'Falha ao atualizar deck: ${response.statusCode}';
+      if (response.data is Map && response.data['error'] != null) {
+        errorMsg = response.data['error'].toString();
+      }
+      throw Exception(errorMsg);
+    }
+
+    AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
+
+    try {
+      final validation = await validateDeck(deckId);
+      final isValid = validation['valid'] as bool? ?? false;
+      if (!isValid) {
+        final errors = (validation['errors'] as List?)?.join(', ') ?? '';
+        AppLogger.warning(
+          '[DeckProvider] Deck salvo mas com avisos de validação: $errors',
+        );
+      }
+    } catch (validationError) {
+      AppLogger.warning(
+        '[DeckProvider] Não foi possível validar deck após salvar: $validationError',
+      );
+    }
+
+    invalidateDeckCache(deckId);
+    await fetchDeckDetails(deckId);
+    return true;
+  }
+
   /// Aplica as sugestões de otimização ao deck
   /// Recebe uma lista de cartas para remover e adicionar (por nome)
   /// Busca os IDs das cartas e atualiza o deck
@@ -1041,126 +1174,16 @@ class DeckProvider extends ChangeNotifier {
       );
 
       // 1. Buscar o deck atual para pegar a lista de cartas
-      if (_selectedDeck == null || _selectedDeck!.id != deckId) {
-        AppLogger.debug('📥 [DeckProvider] Buscando detalhes do deck...');
-        await fetchDeckDetails(deckId);
-      }
-
-      if (_selectedDeck == null) {
-        throw Exception('Deck não encontrado');
-      }
+      await _ensureDeckLoadedForOptimization(deckId);
 
       // 2. Construir lista atual de cartas em formato de map
-      final currentCards = <String, Map<String, dynamic>>{};
-
-      for (final commander in _selectedDeck!.commander) {
-        currentCards[commander.id] = {
-          'card_id': commander.id,
-          'quantity': commander.quantity,
-          'is_commander': true,
-        };
-      }
-
-      for (final entry in _selectedDeck!.mainBoard.entries) {
-        for (final card in entry.value) {
-          if (!card.isCommander) {
-            currentCards[card.id] = {
-              'card_id': card.id,
-              'quantity': card.quantity,
-              'is_commander': false,
-            };
-          }
-        }
-      }
+      final currentCards = buildCurrentCardsMap(_selectedDeck!);
 
       // 3. Buscar IDs das cartas a adicionar pelo nome (EM PARALELO)
-      AppLogger.debug(
-        '🔍 [DeckProvider] Buscando IDs das cartas a adicionar...',
-      );
-      final cardsToAddIds = <Map<String, dynamic>>[];
-
-      final addFutures = cardsToAdd.map((cardName) async {
-        try {
-          AppLogger.debug('  🔎 Buscando: $cardName');
-          final encoded = Uri.encodeQueryComponent(cardName);
-          final searchResponse = await _apiClient.get(
-            '/cards?name=$encoded&limit=1',
-          );
-
-          if (searchResponse.statusCode == 200) {
-            // Verifica se o corpo da resposta é um Map com chave 'data' (formato paginado) ou Lista direta
-            List results = [];
-            if (searchResponse.data is Map &&
-                searchResponse.data['data'] is List) {
-              results = searchResponse.data['data'] as List;
-            } else if (searchResponse.data is List) {
-              results = searchResponse.data as List;
-            }
-
-            if (results.isNotEmpty) {
-              final card = results[0] as Map<String, dynamic>;
-              AppLogger.debug('  ✅ Encontrado: $cardName -> ${card['id']}');
-              return {
-                'card_id': card['id'],
-                'quantity': 1,
-                'is_commander': false,
-                'type_line': card['type_line'] ?? '',
-                'color_identity':
-                    (card['color_identity'] as List?)
-                        ?.map((e) => e.toString())
-                        .toList() ??
-                    const <String>[],
-              };
-            } else {
-              AppLogger.debug('  ❌ Não encontrado: $cardName');
-            }
-          }
-        } catch (e) {
-          AppLogger.warning('Erro ao buscar $cardName: $e');
-        }
-        return null;
-      });
-
-      final addResults = await Future.wait(addFutures);
-      cardsToAddIds.addAll(addResults.whereType<Map<String, dynamic>>());
+      final cardsToAddIds = await _resolveOptimizationAdditions(cardsToAdd);
 
       // 4. Buscar IDs das cartas a remover pelo nome (EM PARALELO)
-      AppLogger.debug('🔍 [DeckProvider] Buscando IDs das cartas a remover...');
-      final cardsToRemoveIds = <String>[];
-
-      final removeFutures = cardsToRemove.map((cardName) async {
-        try {
-          AppLogger.debug('  🔎 Buscando para remover: $cardName');
-          final encoded = Uri.encodeQueryComponent(cardName);
-          final searchResponse = await _apiClient.get(
-            '/cards?name=$encoded&limit=1',
-          );
-
-          if (searchResponse.statusCode == 200) {
-            List results = [];
-            if (searchResponse.data is Map &&
-                searchResponse.data['data'] is List) {
-              results = searchResponse.data['data'] as List;
-            } else if (searchResponse.data is List) {
-              results = searchResponse.data as List;
-            }
-
-            if (results.isNotEmpty) {
-              final card = results[0] as Map<String, dynamic>;
-              AppLogger.debug(
-                '  ✅ Encontrado para remoção: $cardName -> ${card['id']}',
-              );
-              return card['id'] as String;
-            }
-          }
-        } catch (e) {
-          AppLogger.warning('Erro ao buscar $cardName: $e');
-        }
-        return null;
-      });
-
-      final removeResults = await Future.wait(removeFutures);
-      cardsToRemoveIds.addAll(removeResults.whereType<String>());
+      final cardsToRemoveIds = await _resolveOptimizationRemovals(cardsToRemove);
 
       if (cardsToAdd.isNotEmpty && cardsToAddIds.isEmpty) {
         throw Exception(
@@ -1176,90 +1199,48 @@ class DeckProvider extends ChangeNotifier {
       // 5. Remover as cartas da lista atual
       AppLogger.debug('✂️ [DeckProvider] Removendo cartas...');
 
-      final beforeSnapshot =
-          currentCards.values
-              .map(
-                (c) =>
-                    '${c['card_id']}::${c['quantity']}::${c['is_commander']}',
-              )
-              .toSet();
-
-      // Contar quantas cópias de cada ID devem ser removidas
-      final removalCounts = <String, int>{};
-      for (final id in cardsToRemoveIds) {
-        removalCounts[id] = (removalCounts[id] ?? 0) + 1;
-      }
-
-      // Aplicar remoção (decrementando quantidade ou removendo item)
-      for (final idToRemove in removalCounts.keys) {
-        if (currentCards.containsKey(idToRemove)) {
-          final existing = currentCards[idToRemove]!;
-          final currentQty = existing['quantity'] as int;
-          final removeQty = removalCounts[idToRemove]!;
-
-          final newQty = currentQty - removeQty;
-
-          if (newQty <= 0) {
-            currentCards.remove(idToRemove);
-          } else {
-            currentCards[idToRemove] = {...existing, 'quantity': newQty};
-          }
-        }
-      }
+      final beforeSnapshot = buildCurrentCardSnapshot(currentCards);
+      final removalCounts = buildRemovalCounts(cardsToRemoveIds);
+      applyRemovalCountsToCurrentCards(
+        currentCards: currentCards,
+        removalCounts: removalCounts,
+      );
 
       // 6. Adicionar as novas cartas
       AppLogger.debug(
         '➕ [DeckProvider] Adicionando ${cardsToAddIds.length} cartas...',
       );
 
-      final format = _selectedDeck?.format.toLowerCase() ?? '';
-      final isCommander = format == 'commander' || format == 'brawl';
-      final defaultLimit = isCommander ? 1 : 4;
+      final format = _selectedDeck?.format ?? '';
+      final normalizedFormat = format.toLowerCase();
+      final isCommander =
+          normalizedFormat == 'commander' || normalizedFormat == 'brawl';
       final commanderIdentity =
           isCommander ? getCommanderIdentitySet(_selectedDeck) : null;
-
-      for (final cardToAdd in cardsToAddIds) {
-        final cardId = cardToAdd['card_id'] as String;
-        final typeLine =
-            (cardToAdd['type_line'] as String? ?? '').toLowerCase();
-        final isBasicLand = typeLine.contains('basic land');
-        final limit = isBasicLand ? 99 : defaultLimit;
-
-        if (commanderIdentity != null) {
-          final identity =
-              (cardToAdd['color_identity'] as List?)
-                  ?.map((e) => e.toString())
-                  .toList() ??
-              const <String>[];
-          final ok = identity.every(
-            (c) => commanderIdentity.contains(c.toUpperCase()),
-          );
-          if (!ok) {
-            AppLogger.debug(
-              '⛔️ [DeckProvider] Pulando fora da identidade do comandante: $cardId',
-            );
-            continue;
-          }
-        }
-
-        if (currentCards.containsKey(cardId)) {
-          final existing = currentCards[cardId]!;
-          final newQuantity = (existing['quantity'] as int) + 1;
-          if (newQuantity <= limit) {
-            currentCards[cardId] = {...existing, 'quantity': newQuantity};
-          }
-        } else {
-          currentCards[cardId] = cardToAdd;
-        }
-      }
-
-      final afterSnapshot =
-          currentCards.values
-              .map(
-                (c) =>
-                    '${c['card_id']}::${c['quantity']}::${c['is_commander']}',
+      final skippedForIdentity =
+          cardsToAddIds
+              .where(
+                (card) => !isCardWithinCommanderIdentity(
+                  card,
+                  commanderIdentity: commanderIdentity,
+                ),
               )
-              .toSet();
+              .map((card) => card['card_id'])
+              .whereType<String>()
+              .toList();
+      for (final cardId in skippedForIdentity) {
+        AppLogger.debug(
+          '⛔️ [DeckProvider] Pulando fora da identidade do comandante: $cardId',
+        );
+      }
+      applyAdditionsToCurrentCards(
+        currentCards: currentCards,
+        cardsToAdd: cardsToAddIds,
+        format: normalizedFormat,
+        commanderIdentity: commanderIdentity,
+      );
+
+      final afterSnapshot = buildCurrentCardSnapshot(currentCards);
       if (beforeSnapshot.length == afterSnapshot.length &&
           beforeSnapshot.containsAll(afterSnapshot)) {
         throw Exception(
@@ -1268,46 +1249,7 @@ class DeckProvider extends ChangeNotifier {
       }
 
       // 7. Atualizar o deck via API
-      AppLogger.debug('💾 [DeckProvider] Salvando alterações no servidor...');
-      final stopwatch = Stopwatch()..start();
-      final response = await _apiClient.put('/decks/$deckId', {
-        'cards': currentCards.values.toList(),
-      });
-      stopwatch.stop();
-      AppLogger.debug(
-        '⏱️ [DeckProvider] Tempo de resposta do servidor: ${stopwatch.elapsedMilliseconds}ms',
-      );
-
-      if (response.statusCode == 200) {
-        AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
-
-        // 8. Validar o deck após salvar (garante integridade)
-        try {
-          final validation = await validateDeck(deckId);
-          final isValid = validation['valid'] as bool? ?? false;
-          if (!isValid) {
-            final errors = (validation['errors'] as List?)?.join(', ') ?? '';
-            AppLogger.warning(
-              '[DeckProvider] Deck salvo mas com avisos de validação: $errors',
-            );
-          }
-        } catch (validationError) {
-          // Validação falhou, mas deck já foi salvo - apenas log
-          AppLogger.warning(
-            '[DeckProvider] Não foi possível validar deck após salvar: $validationError',
-          );
-        }
-
-        invalidateDeckCache(deckId);
-        await fetchDeckDetails(deckId);
-        return true;
-      } else {
-        String errorMsg = 'Falha ao atualizar deck: ${response.statusCode}';
-        if (response.data is Map && response.data['error'] != null) {
-          errorMsg = response.data['error'].toString();
-        }
-        throw Exception(errorMsg);
-      }
+      return _saveOptimizedCards(deckId: deckId, currentCards: currentCards);
     } catch (e) {
       AppLogger.error('[DeckProvider] Erro fatal na otimização', e);
       rethrow;

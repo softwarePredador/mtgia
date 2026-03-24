@@ -75,6 +75,37 @@ Progresso atual documentado da Sprint 1:
 - task 6 avancou com extracao do contrato de IA, snapshots de debug e montagem do payload de aplicacao para `app/lib/features/decks/providers/deck_provider_support.dart`
 - `deck_details_screen.dart` iniciou o recorte da camada de semantica do optimize para `app/lib/features/decks/widgets/deck_optimize_ui_support.dart`
 - `deck_details_screen.dart` tambem iniciou a extracao dos componentes compartilhados de UI de deck para `app/lib/features/decks/widgets/deck_ui_components.dart`
+- `deck_details_screen.dart` perdeu o preview/dialogs/cards do fluxo de optimize para `deck_optimize_sheet_widgets.dart` e o parsing/apresentacao do resultado para `deck_optimize_flow_support.dart`
+- `deck_details_screen.dart` caiu para `3587` linhas na rodada atual, deixando de concentrar toda a camada visual do fluxo de optimize
+- `deck_optimize_flow_support.dart` passou a concentrar tambem a decisao pura de rebuild guiado e o plano de aplicacao (`bulk`, `ids` ou `fallback por nomes`), com teste dedicado no app
+- `deck_details_screen.dart` extraiu tambem as secoes da sheet de optimize para `deck_optimize_sections.dart`, reduzindo o arquivo para `3423` linhas
+- `deck_details_screen.dart` passou a delegar o corpo principal da sheet de optimize para `OptimizationSheetBody`, reduzindo o arquivo para `3378` linhas
+- `deck_optimize_flow_support.dart` passou a executar tambem o plano de aplicacao via callbacks (`bulk`, `ids`, `fallback por nomes`), mantendo a tela fora da decisao de dispatch e ampliando a malha de testes do app
+- `deck_details_screen.dart` moveu os loading dialogs do fluxo de optimize/rebuild/apply para `app/lib/features/decks/widgets/deck_optimize_dialogs.dart`
+- `deck_optimize_flow_support.dart` passou a executar tambem o rebuild guiado via request/outcome puro e o dispatch do erro de IA (`needs_repair`, `near_peak`, `no_safe_upgrade_found`, `generic`), com testes dedicados
+- `deck_optimize_dialogs.dart` passou a encapsular tambem a abertura do preview de confirmacao do optimize
+- `deck_details_screen.dart` caiu para `3297` linhas, mantendo o fluxo principal intacto e reduzindo mais a camada de efeito inline
+- `deck_optimize_flow_support.dart` passou a centralizar tambem o pedido de optimize com traducao de progresso e normalizacao de `preview/applyPlan`
+- `deck_details_screen.dart` caiu para `3289` linhas, deixando menos logica inline no handler de optimize
+- `deck_optimize_flow_support.dart` passou a executar tambem o caminho confirmado de `apply + updateDeckStrategy`, com teste dedicado
+- `deck_details_screen.dart` caiu para `3285` linhas, reduzindo mais o handler principal sem mudar o contrato do fluxo
+- `deck_optimize_dialogs.dart` passou a centralizar tambem os feedbacks de optimize (`sem mudancas`, `debug copiado`, `sucesso`, `erro de aplicacao`)
+- `deck_details_screen.dart` caiu para `3269` linhas, com menos efeitos de UI repetidos inline no fluxo principal
+- `deck_optimize_dialogs.dart` passou a centralizar tambem feedbacks do rebuild guiado e o boilerplate de loading do optimize/apply
+- `deck_details_screen.dart` caiu para `3242` linhas, mantendo a malha verde e deixando menos boilerplate de UI no fluxo
+- `deck_optimize_flow_support.dart` passou a encapsular tambem a orquestracao do rebuild guiado via callbacks de `preview`, `draft pronto`, `erro de IA` e `erro generico`
+- `deck_details_screen.dart` caiu para `3237` linhas, reduzindo mais a coordenacao manual do fluxo de rebuild
+- `deck_optimize_dialogs.dart` passou a centralizar tambem o ultimo `SnackBar` generico do fluxo de IA e o dialogo de falha especifico do rebuild
+- `deck_details_screen.dart` caiu para `3230` linhas, com menos feedbacks e erros inline no fluxo de optimize/rebuild
+- `deck_provider_support.dart` passou a encapsular tambem a resolucao paralela por nome, snapshots estruturais e a aplicacao pura de remocoes/adicoes com identidade do comandante, com cobertura dedicada em `deck_provider_support_test.dart`
+- `deck_provider.dart` passou a delegar tambem carregamento do deck, resolucao de nomes e salvamento/validacao final do `applyOptimization`, reduzindo o arquivo para `1560` linhas sem regressao no smoke do app core
+- `deck_optimize_flow_support.dart` passou a orquestrar tambem o fluxo composto de optimize (`request -> preview -> apply -> success/error`), e `deck_details_screen.dart` caiu para `3207` linhas com teste dedicado para esse caminho
+- `deck_optimize_flow_support.dart` passou a encapsular tambem o fluxo composto de `needs_repair/rebuild`, e `deck_details_screen.dart` caiu para `3180` linhas com cobertura dedicada para rebuild e roteamento de falha
+- widgets auxiliares de deck details (`pricing row`, `mana/oracle`, `color identity pips`) foram movidos para `app/lib/features/decks/widgets/deck_details_aux_widgets.dart`, reduzindo `deck_details_screen.dart` para `2910` linhas
+- os diálogos/fluxos de explicação de carta e picker de edição saíram para `app/lib/features/decks/widgets/deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `2726` linhas e adicionando cobertura dedicada em `deck_details_dialogs_test.dart`
+- o diálogo de edição de carta saiu para `app/lib/features/decks/widgets/deck_card_edit_dialog.dart`, reduzindo `deck_details_screen.dart` para `2532` linhas e adicionando cobertura dedicada em `deck_card_edit_dialog_test.dart`
+- a aba `Visão Geral` saiu para `app/lib/features/decks/widgets/deck_details_overview_tab.dart`, reduzindo `deck_details_screen.dart` para `2108` linhas e adicionando cobertura dedicada em `deck_details_overview_tab_test.dart`
+- o diálogo completo de detalhes da carta foi movido para `app/lib/features/decks/widgets/deck_details_dialogs.dart`, reduzindo `deck_details_screen.dart` para `1970` linhas e ampliando `deck_details_dialogs_test.dart` com cobertura das ações `explicar`, `trocar edição` e `ver detalhes`
 - blocos ja extraidos:
   - payload parser e normalizacao
   - deterministic-first response/cache/fallback
@@ -117,7 +148,7 @@ Se um pedido novo nao disser o contrario:
 
 ## Ultima Atualizacao
 
-- data: 2026-03-23
+- data: 2026-03-24
 - status: ativo
 - prioridade atual: consolidar confiabilidade do core de decks e mapear riscos de usabilidade/performance das telas
 - regra funcional nova: o formato escolhido no onboarding precisa chegar intacto nas telas de geracao e importacao

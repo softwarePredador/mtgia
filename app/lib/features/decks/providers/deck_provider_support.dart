@@ -83,6 +83,32 @@ Set<String>? getCommanderIdentitySet(DeckDetails? deck) {
   return identity.map((e) => e.toUpperCase()).toSet();
 }
 
+List<Map<String, dynamic>> extractCardSearchResults(dynamic responseData) {
+  if (responseData is Map && responseData['data'] is List) {
+    return (responseData['data'] as List)
+        .whereType<Map>()
+        .map((item) => item.cast<String, dynamic>())
+        .toList();
+  }
+
+  if (responseData is List) {
+    return responseData
+        .whereType<Map>()
+        .map((item) => item.cast<String, dynamic>())
+        .toList();
+  }
+
+  return const <Map<String, dynamic>>[];
+}
+
+Future<List<T>> resolveCardNamesInParallel<T>({
+  required List<String> cardNames,
+  required Future<T?> Function(String cardName) resolver,
+}) async {
+  final results = await Future.wait(cardNames.map(resolver));
+  return results.whereType<T>().toList();
+}
+
 Map<String, dynamic> asDynamicMap(dynamic value) {
   if (value is Map<String, dynamic>) return value;
   if (value is Map) return value.cast<String, dynamic>();
@@ -224,4 +250,94 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
   }
 
   return currentCards.values.toList();
+}
+
+Map<String, int> buildRemovalCounts(List<String> cardIds) {
+  final removalCounts = <String, int>{};
+  for (final id in cardIds) {
+    removalCounts[id] = (removalCounts[id] ?? 0) + 1;
+  }
+  return removalCounts;
+}
+
+Set<String> buildCurrentCardSnapshot(
+  Map<String, Map<String, dynamic>> currentCards,
+) {
+  return currentCards.values
+      .map((c) => '${c['card_id']}::${c['quantity']}::${c['is_commander']}')
+      .toSet();
+}
+
+void applyRemovalCountsToCurrentCards({
+  required Map<String, Map<String, dynamic>> currentCards,
+  required Map<String, int> removalCounts,
+}) {
+  for (final idToRemove in removalCounts.keys) {
+    if (!currentCards.containsKey(idToRemove)) continue;
+    final existing = currentCards[idToRemove]!;
+    final currentQty = existing['quantity'] as int? ?? 0;
+    final removeQty = removalCounts[idToRemove] ?? 0;
+    final newQty = currentQty - removeQty;
+
+    if (newQty <= 0) {
+      currentCards.remove(idToRemove);
+    } else {
+      currentCards[idToRemove] = {...existing, 'quantity': newQty};
+    }
+  }
+}
+
+bool isCardWithinCommanderIdentity(
+  Map<String, dynamic> card, {
+  required Set<String>? commanderIdentity,
+}) {
+  if (commanderIdentity == null) return true;
+  final identity =
+      (card['color_identity'] as List?)?.map((e) => e.toString()).toList() ??
+      const <String>[];
+  return identity.every((c) => commanderIdentity.contains(c.toUpperCase()));
+}
+
+int applyAdditionsToCurrentCards({
+  required Map<String, Map<String, dynamic>> currentCards,
+  required List<Map<String, dynamic>> cardsToAdd,
+  required String format,
+  required Set<String>? commanderIdentity,
+}) {
+  final normalizedFormat = format.toLowerCase();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+  final defaultLimit = isCommander ? 1 : 4;
+  var applied = 0;
+
+  for (final cardToAdd in cardsToAdd) {
+    final cardId = cardToAdd['card_id'] as String?;
+    if (cardId == null || cardId.isEmpty) continue;
+
+    if (!isCardWithinCommanderIdentity(
+      cardToAdd,
+      commanderIdentity: commanderIdentity,
+    )) {
+      continue;
+    }
+
+    final typeLine = (cardToAdd['type_line'] as String? ?? '').toLowerCase();
+    final isBasicLand = typeLine.contains('basic land');
+    final limit = isBasicLand ? 99 : defaultLimit;
+
+    if (currentCards.containsKey(cardId)) {
+      final existing = currentCards[cardId]!;
+      final newQuantity = (existing['quantity'] as int? ?? 0) + 1;
+      if (newQuantity <= limit) {
+        currentCards[cardId] = {...existing, 'quantity': newQuantity};
+        applied++;
+      }
+      continue;
+    }
+
+    currentCards[cardId] = cardToAdd;
+    applied++;
+  }
+
+  return applied;
 }
