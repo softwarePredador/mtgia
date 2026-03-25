@@ -249,6 +249,7 @@ Progresso atual documentado da Sprint 1:
 - o recorte novo do clone empurrou tambem `High Roll` e `D20` para takeover real do painel: o numero deixou de viver como badge e passou a dominar o quadrante do jogador como estado temporario de mesa, com fundo comemorativo para vencedor e supressao dos badges/controles secundarios durante o evento
 - o `SET LIFE` tambem foi trazido mais para o benchmark: deixou de usar frame/modal em caixa e agora abre como keypad flutuante sobre a mesa, com numero branco grande, botoes circulares e acao `CANCEL / SET LIFE` no rodape
 - o `SETTINGS` tambem deixou de parecer configuracao genérica: `PLAYERS` saiu para overlay proprio, os presets de vida foram separados em `MULTI-PLAYER` e `TWO-PLAYER`, e entraram as secoes cruas `GAME MODES` / `GAMEPLAY` no mesmo tom da captura de referencia
+- o frame compartilhado dos overlays de mesa tambem foi simplificado nesta rodada: menos caixa central com borda e mais conteudo flutuando sobre a mesa, aproximando `DICE`, `HISTORY`, `CARD SEARCH`, `PLAYERS` e `SETTINGS` do comportamento visual cru do benchmark
 - a malha focada da frente foi revalidada apos esse primeiro recorte de shell:
   - `flutter analyze lib/features/home/life_counter_screen.dart test/features/home/life_counter_screen_test.dart`
   - `flutter test test/features/home/life_counter_screen_test.dart`

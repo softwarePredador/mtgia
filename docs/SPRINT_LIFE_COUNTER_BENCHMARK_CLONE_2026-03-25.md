@@ -667,6 +667,10 @@ Esta sprint so pode ser marcada como `DONE` quando:
   - presets de vida separados para `MULTI-PLAYER` e `TWO-PLAYER`
   - secoes cruas `GAME MODES` e `GAMEPLAY`
   - leitura mais de lista de mesa do que de card configuravel
+- o frame compartilhado dos overlays tambem foi simplificado:
+  - menos caixa central com borda
+  - mais conteudo flutuando sobre a mesa
+  - `DICE`, `HISTORY`, `CARD SEARCH`, `PLAYERS` e `SETTINGS` agora respiram mais como overlay de jogo do que como modal premium de app
 - `KO'D!`, `COMMANDER DOWN.` e `TOXIC OUT.` ja usam takeover real de painel
 - o `High Roll` e o `D20` deixaram de ser badge nesta rodada e passaram a takeover de painel:
   - numero gigante como protagonista

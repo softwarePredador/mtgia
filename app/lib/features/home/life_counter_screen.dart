@@ -1733,89 +1733,79 @@ class _TableOverlayFrame extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: SafeArea(
-        child: Center(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                key: frameKey,
-                width: width,
-                constraints: BoxConstraints(maxHeight: maxHeight),
-                padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF050505),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    width: 2,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: width, maxHeight: maxHeight),
+              child: Stack(
+                children: [
+                  Container(
+                    key: frameKey,
+                    width: width,
+                    padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.98),
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            subtitle!,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.66),
+                              fontSize: AppTheme.fontSm,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3,
+                              letterSpacing: 0.15,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 18),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            child: child,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.34),
-                      blurRadius: 30,
-                      offset: const Offset(0, 20),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.96),
-                        fontSize: AppTheme.fontLg,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.4,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        subtitle!,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                          letterSpacing: 0.2,
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(999),
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Ink(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFF2C77),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ],
-                    const SizedBox(height: 18),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: child,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: -18,
-                right: 14,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Ink(
-                      width: 46,
-                      height: 46,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFF2C77),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close_rounded,
-                        color: Colors.white,
-                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -4154,15 +4144,36 @@ class _ToolActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton.tonalIcon(
+    return Material(
       key: buttonKey,
-      onPressed: onTap,
-      icon: Icon(icon),
-      label: Text(label),
-      style: FilledButton.styleFrom(
-        backgroundColor: AppTheme.surfaceElevated,
-        foregroundColor: AppTheme.textPrimary,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.44),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppTheme.fontMd,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
