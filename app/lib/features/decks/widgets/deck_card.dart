@@ -60,9 +60,10 @@ class DeckCard extends StatelessWidget {
     final theme = Theme.of(context);
     final commanderImageUrl = deck.commanderImageUrl?.trim();
     final commanderName = deck.commanderName?.trim();
+    final hasCommanderArt =
+        commanderImageUrl != null && commanderImageUrl.isNotEmpty;
     final hasCommander =
-        (commanderName?.isNotEmpty ?? false) ||
-        (commanderImageUrl?.isNotEmpty ?? false);
+        (commanderName?.isNotEmpty ?? false) || hasCommanderArt;
     final accentColor = _formatAccentColor(deck.format);
     final maxCards = _getMaxCards(deck.format);
     final progress =
@@ -87,7 +88,7 @@ class DeckCard extends StatelessWidget {
             highlightColor: accentColor.withValues(alpha: 0.04),
             child: Stack(
               children: [
-                if (commanderImageUrl != null && commanderImageUrl.isNotEmpty)
+                if (hasCommanderArt)
                   Positioned.fill(
                     child: IgnorePointer(
                       child: CachedCardImage(
@@ -104,28 +105,13 @@ class DeckCard extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           AppTheme.backgroundAbyss.withValues(
-                            alpha:
-                                hasCommander &&
-                                        commanderImageUrl != null &&
-                                        commanderImageUrl.isNotEmpty
-                                    ? 0.3
-                                    : 0.0,
+                            alpha: hasCommanderArt ? 0.3 : 0.0,
                           ),
                           AppTheme.surfaceSlate.withValues(
-                            alpha:
-                                hasCommander &&
-                                        commanderImageUrl != null &&
-                                        commanderImageUrl.isNotEmpty
-                                    ? 0.82
-                                    : 1,
+                            alpha: hasCommanderArt ? 0.82 : 1,
                           ),
                           AppTheme.backgroundAbyss.withValues(
-                            alpha:
-                                hasCommander &&
-                                        commanderImageUrl != null &&
-                                        commanderImageUrl.isNotEmpty
-                                    ? 0.92
-                                    : 0.0,
+                            alpha: hasCommanderArt ? 0.92 : 0.0,
                           ),
                         ],
                       ),
@@ -170,52 +156,76 @@ class DeckCard extends StatelessWidget {
 
                           // ── Name + meta ──
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  deck.name,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.textPrimary,
-                                    height: 1.2,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (commanderName != null &&
-                                    commanderName.isNotEmpty) ...[
-                                  const SizedBox(height: 4),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: hasCommanderArt ? 10 : 0,
+                                vertical: hasCommanderArt ? 8 : 0,
+                              ),
+                              decoration:
+                                  hasCommanderArt
+                                      ? BoxDecoration(
+                                        color: AppTheme.backgroundAbyss
+                                            .withValues(alpha: 0.42),
+                                        borderRadius: BorderRadius.circular(
+                                          AppTheme.radiusMd,
+                                        ),
+                                        border: Border.all(
+                                          color: AppTheme.outlineMuted
+                                              .withValues(alpha: 0.35),
+                                          width: 0.5,
+                                        ),
+                                      )
+                                      : null,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    'Comandante: $commanderName',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.25,
-                                    ),
-                                    maxLines: 1,
+                                    deck.name,
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppTheme.textPrimary,
+                                          height: 1.2,
+                                        ),
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                                const SizedBox(height: 6),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 6,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    _FormatChip(
-                                      format: deck.format,
-                                      accentColor: accentColor,
+                                  if (commanderName != null &&
+                                      commanderName.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Comandante: $commanderName',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: AppTheme.textSecondary,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.25,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    if (deck.colorIdentity.isNotEmpty)
-                                      _ColorIdentityRow(
-                                        colors: deck.colorIdentity,
-                                      ),
-                                    if (deck.isPublic)
-                                      const _PublicStatusChip(),
                                   ],
-                                ),
-                              ],
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      _FormatChip(
+                                        format: deck.format,
+                                        accentColor: accentColor,
+                                      ),
+                                      if (deck.colorIdentity.isNotEmpty)
+                                        _ColorIdentityRow(
+                                          colors: deck.colorIdentity,
+                                        ),
+                                      if (deck.isPublic)
+                                        const _PublicStatusChip(),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
 
@@ -240,14 +250,35 @@ class DeckCard extends StatelessWidget {
                         deck.description!.trim().isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                        child: Text(
-                          deck.description!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textSecondary,
-                            height: 1.3,
+                        child: Container(
+                          width: double.infinity,
+                          padding:
+                              hasCommanderArt
+                                  ? const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  )
+                                  : EdgeInsets.zero,
+                          decoration:
+                              hasCommanderArt
+                                  ? BoxDecoration(
+                                    color: AppTheme.backgroundAbyss.withValues(
+                                      alpha: 0.34,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusMd,
+                                    ),
+                                  )
+                                  : null,
+                          child: Text(
+                            deck.description!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -276,65 +307,88 @@ class DeckCard extends StatelessWidget {
                     // ── Footer stats ──
                     Padding(
                       padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
-                      child: Row(
-                        children: [
-                          // Card count
-                          Icon(
-                            isComplete
-                                ? Icons.check_circle_outline
-                                : Icons.layers_outlined,
-                            size: 14,
-                            color:
-                                isComplete
-                                    ? AppTheme.success
-                                    : AppTheme.textSecondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            maxCards != null
-                                ? '${deck.cardCount}/$maxCards'
-                                : '${deck.cardCount} cartas',
-                            style: TextStyle(
-                              fontSize: AppTheme.fontSm,
-                              fontWeight: FontWeight.w600,
+                      child: Container(
+                        width: double.infinity,
+                        padding:
+                            hasCommanderArt
+                                ? const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                )
+                                : EdgeInsets.zero,
+                        decoration:
+                            hasCommanderArt
+                                ? BoxDecoration(
+                                  color: AppTheme.backgroundAbyss.withValues(
+                                    alpha: 0.34,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusMd,
+                                  ),
+                                )
+                                : null,
+                        child: Row(
+                          children: [
+                            // Card count
+                            Icon(
+                              isComplete
+                                  ? Icons.check_circle_outline
+                                  : Icons.layers_outlined,
+                              size: 14,
                               color:
                                   isComplete
                                       ? AppTheme.success
                                       : AppTheme.textSecondary,
                             ),
-                          ),
-
-                          // Synergy score
-                          if (deck.synergyScore != null &&
-                              deck.synergyScore! > 0) ...[
-                            const SizedBox(width: 16),
-                            Icon(
-                              Icons.auto_awesome,
-                              size: 14,
-                              color: AppTheme.scoreColor(deck.synergyScore!),
-                            ),
                             const SizedBox(width: 4),
                             Text(
-                              '${deck.synergyScore}%',
+                              maxCards != null
+                                  ? '${deck.cardCount}/$maxCards'
+                                  : '${deck.cardCount} cartas',
                               style: TextStyle(
                                 fontSize: AppTheme.fontSm,
                                 fontWeight: FontWeight.w600,
+                                color:
+                                    isComplete
+                                        ? AppTheme.success
+                                        : AppTheme.textSecondary,
+                              ),
+                            ),
+
+                            // Synergy score
+                            if (deck.synergyScore != null &&
+                                deck.synergyScore! > 0) ...[
+                              const SizedBox(width: 16),
+                              Icon(
+                                Icons.auto_awesome,
+                                size: 14,
                                 color: AppTheme.scoreColor(deck.synergyScore!),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${deck.synergyScore}%',
+                                style: TextStyle(
+                                  fontSize: AppTheme.fontSm,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.scoreColor(
+                                    deck.synergyScore!,
+                                  ),
+                                ),
+                              ),
+                            ],
+
+                            const Spacer(),
+
+                            // Time ago
+                            Text(
+                              _timeAgo(deck.createdAt),
+                              style: TextStyle(
+                                fontSize: AppTheme.fontXs,
+                                color: AppTheme.textHint,
                               ),
                             ),
                           ],
-
-                          const Spacer(),
-
-                          // Time ago
-                          Text(
-                            _timeAgo(deck.createdAt),
-                            style: TextStyle(
-                              fontSize: AppTheme.fontXs,
-                              color: AppTheme.textHint,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],

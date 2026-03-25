@@ -117,14 +117,16 @@ void main() {
     var optimizationTapped = 0;
     var commanderTapped = 0;
     var importTapped = 0;
+    var cardsOpened = 0;
+    var analysisOpened = 0;
     String? editedDescription;
 
     await tester.pumpWidget(
       createSubject(
         deck: makeDeck(),
         onValidationTap: () => validationTapped++,
-        onOpenCards: () {},
-        onOpenAnalysis: () {},
+        onOpenCards: () => cardsOpened++,
+        onOpenAnalysis: () => analysisOpened++,
         onForcePricingRefresh: () {},
         onShowPricingDetails: () {},
         onTogglePublic: () {},
@@ -137,9 +139,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Boros Tokens'), findsOneWidget);
+    expect(find.text('99 cartas'), findsOneWidget);
+    expect(find.text('Abrir cartas'), findsOneWidget);
+    expect(find.text('Abrir análise'), findsOneWidget);
+    expect(find.text('Otimizar'), findsOneWidget);
     expect(find.text('Descrição'), findsOneWidget);
     expect(find.text('Estratégia'), findsOneWidget);
     expect(find.text('Selecionar'), findsOneWidget);
+
+    await tester.tap(find.text('Abrir cartas'));
+    await tester.pumpAndSettle();
+    expect(cardsOpened, 1);
+
+    await tester.tap(find.text('Abrir análise'));
+    await tester.pumpAndSettle();
+    expect(analysisOpened, 1);
 
     await tester.tap(find.text('Inválido'));
     await tester.pumpAndSettle();
@@ -236,6 +250,7 @@ void main() {
 
     expect(find.text('Talrand Tempo'), findsOneWidget);
     expect(find.text('Comandante: Talrand, Sky Summoner'), findsOneWidget);
+    expect(find.text('100 cartas • Bracket 2 • tempo'), findsOneWidget);
     expect(find.text('Público'), findsOneWidget);
     expect(find.text('Válido'), findsOneWidget);
   });

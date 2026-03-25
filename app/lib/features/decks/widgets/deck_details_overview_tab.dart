@@ -80,9 +80,21 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     return imageUrl;
   }
 
+  String get _heroSummary {
+    final parts = <String>['$totalCards cartas'];
+    if (deck.bracket != null) {
+      parts.add('Bracket ${deck.bracket}');
+    }
+    if (_hasArchetype) {
+      parts.add(deck.archetype!);
+    }
+    return parts.join(' • ');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasHeroArtwork = _heroCommanderImageUrl != null;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -144,29 +156,64 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    deck.name,
-                                    style: theme.textTheme.headlineMedium
-                                        ?.copyWith(
-                                          color: AppTheme.textPrimary,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                  ),
-                                  if (_heroCommander != null) ...[
+                              child: Container(
+                                padding:
+                                    hasHeroArtwork
+                                        ? const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 10,
+                                        )
+                                        : EdgeInsets.zero,
+                                decoration:
+                                    hasHeroArtwork
+                                        ? BoxDecoration(
+                                          color: AppTheme.backgroundAbyss
+                                              .withValues(alpha: 0.42),
+                                          borderRadius: BorderRadius.circular(
+                                            AppTheme.radiusMd,
+                                          ),
+                                          border: Border.all(
+                                            color: AppTheme.outlineMuted
+                                                .withValues(alpha: 0.35),
+                                            width: 0.5,
+                                          ),
+                                        )
+                                        : null,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      deck.name,
+                                      style: theme.textTheme.headlineMedium
+                                          ?.copyWith(
+                                            color: AppTheme.textPrimary,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    if (_heroCommander != null) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Comandante: ${_heroCommander!.name}',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: AppTheme.textPrimary
+                                                  .withValues(alpha: 0.88),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ],
                                     const SizedBox(height: 6),
                                     Text(
-                                      'Comandante: ${_heroCommander!.name}',
-                                      style: theme.textTheme.bodyMedium
+                                      _heroSummary,
+                                      style: theme.textTheme.bodySmall
                                           ?.copyWith(
-                                            color: AppTheme.textSecondary,
+                                            color: AppTheme.textPrimary
+                                                .withValues(alpha: 0.76),
                                             fontWeight: FontWeight.w500,
                                           ),
                                     ),
                                   ],
-                                ],
+                                ),
                               ),
                             ),
                             if (_heroCommanderImageUrl != null) ...[
@@ -266,6 +313,12 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               onImportList: onImportList,
             )
           else ...[
+            _OverviewQuickActions(
+              onOpenCards: onOpenCards,
+              onOpenAnalysis: onOpenAnalysis,
+              onOptimize: onShowOptimizationOptions,
+            ),
+            const SizedBox(height: 12),
             DeckProgressIndicator(
               deck: deck,
               totalCards: totalCards,
@@ -317,7 +370,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
             Text(
               'Depois que o deck ganhar base, os diagnósticos e recomendações aparecem aqui.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textPrimary.withValues(alpha: 0.76),
               ),
             ),
             const SizedBox(height: 8),
@@ -356,7 +409,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                   child: Text(
                     deck.description!,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textPrimary.withValues(alpha: 0.86),
                     ),
                   ),
                 ),
@@ -379,7 +432,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                   child: Text(
                     'Toque para adicionar uma descrição ao deck...',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.outline,
+                      color: AppTheme.textPrimary.withValues(alpha: 0.6),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -562,6 +615,43 @@ class DeckDetailsOverviewTab extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _OverviewQuickActions extends StatelessWidget {
+  final VoidCallback onOpenCards;
+  final VoidCallback onOpenAnalysis;
+  final VoidCallback onOptimize;
+
+  const _OverviewQuickActions({
+    required this.onOpenCards,
+    required this.onOpenAnalysis,
+    required this.onOptimize,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        FilledButton.icon(
+          onPressed: onOpenCards,
+          icon: const Icon(Icons.layers_outlined),
+          label: const Text('Abrir cartas'),
+        ),
+        OutlinedButton.icon(
+          onPressed: onOpenAnalysis,
+          icon: const Icon(Icons.analytics_outlined),
+          label: const Text('Abrir análise'),
+        ),
+        OutlinedButton.icon(
+          onPressed: onOptimize,
+          icon: const Icon(Icons.auto_fix_high),
+          label: const Text('Otimizar'),
+        ),
+      ],
     );
   }
 }

@@ -118,199 +118,217 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     _recalculateIfNeeded(effectiveDeck);
     final manaCurve = _cachedManaCurve;
     final colorCounts = _cachedColorCounts;
+    final hasAiSummary =
+        (effectiveDeck.synergyScore ?? 0) > 0 ||
+        ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ||
+        ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty);
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Seção de IA
-          Row(
-            children: [
-              Expanded(
-                child: Text('Sinergia', style: theme.textTheme.titleLarge),
-              ),
-              IconButton(
-                tooltip: 'Atualizar análise',
-                onPressed:
-                    _isRefreshingAi ? null : () => _refreshAi(force: true),
-                icon: const Icon(Icons.refresh),
-              ),
-            ],
+          Text(
+            'Análise do deck',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Resumo de sinergia, curva e pressão de cor para apoiar decisões reais no deck.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _AnalysisActionBar(
+            hasAnalysis: hasAiSummary,
+            isRefreshing: _isRefreshingAi,
+            onRefresh: () => _refreshAi(force: hasAiSummary),
           ),
           if (_isRefreshingAi) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             const LinearProgressIndicator(),
             const SizedBox(height: 8),
-            Text('Analisando o deck...', style: theme.textTheme.bodySmall),
-            const SizedBox(height: 16),
-          ],
-          if ((effectiveDeck.synergyScore ?? 0) > 0 ||
-              ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ||
-              ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty)) ...[
-            if (effectiveDeck.synergyScore != null) ...[
-              _AnalysisCard(
-                title: 'Score de sinergia',
-                score: effectiveDeck.synergyScore!,
-                color: AppTheme.manaViolet,
-              ),
-              const SizedBox(height: 16),
-            ],
-            if ((effectiveDeck.strengths ?? '').trim().isNotEmpty) ...[
-              Text('Pontos Fortes', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Text(effectiveDeck.strengths!),
-              const SizedBox(height: 16),
-            ],
-            if ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty) ...[
-              Text('Pontos Fracos', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Text(effectiveDeck.weaknesses!),
-              const SizedBox(height: 16),
-            ],
-          ] else ...[
             Text(
-              'Ainda não existe uma análise de sinergia para este deck.',
-              style: theme.textTheme.bodyMedium,
+              'Atualizando leitura do deck...',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
             ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: _isRefreshingAi ? null : () => _refreshAi(),
-              icon: const Icon(Icons.auto_awesome),
-              label: const Text('Gerar análise'),
-            ),
-            const SizedBox(height: 24),
           ],
-
-          const Divider(),
           const SizedBox(height: 16),
-
-          // Seção Matemática (Nova)
-          Text('Curva de Mana', style: theme.textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          Text(
-            'Distribuição de custo das mágicas (sem terrenos)',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 24),
-          if (manaCurve.every((v) => v == 0)) ...[
-            Container(
-              height: 100,
-              alignment: Alignment.center,
-              child: Text(
-                'Adicione mágicas ao deck para ver a curva de mana.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.outline,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ] else ...[
-            SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY:
-                      (manaCurve.reduce((a, b) => a > b ? a : b) + 1)
-                          .toDouble(),
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (group) => AppTheme.surfaceSlate,
-                    ),
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final index = value.toInt();
-                          if (index == 7) return const Text('7+');
-                          return Text(index.toString());
-                        },
-                      ),
-                    ),
-                    leftTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  gridData: const FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  barGroups: List.generate(8, (index) {
-                    return BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: manaCurve[index].toDouble(),
-                          color: theme.colorScheme.primary,
-                          width: 16,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(AppTheme.radiusXs),
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 32),
-
-          Text('Distribuição de Cores', style: theme.textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          Text(
-            'Baseado nos símbolos de mana das cartas',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 24),
-          if (colorCounts.values.every((v) => v == 0)) ...[
-            Container(
-              height: 100,
-              alignment: Alignment.center,
-              child: Text(
-                'Adicione mágicas coloridas para ver a distribuição de cores.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.outline,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ] else ...[
-            SizedBox(
-              height: 200,
-              child: Row(
+          if (hasAiSummary) ...[
+            _SectionCard(
+              title: 'Leitura de sinergia',
+              subtitle: 'Resumo qualitativo da IA sobre o plano atual do deck.',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: PieChart(
-                      PieChartData(
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 40,
-                        sections: _buildPieSections(colorCounts),
-                      ),
+                  if (effectiveDeck.synergyScore != null) ...[
+                    _AnalysisCard(
+                      title: 'Score de sinergia',
+                      score: effectiveDeck.synergyScore!,
+                      color: AppTheme.manaViolet,
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildLegend(colorCounts),
-                  ),
+                    const SizedBox(height: 14),
+                  ],
+                  if ((effectiveDeck.strengths ?? '').trim().isNotEmpty)
+                    _InsightBlock(
+                      title: 'Pontos fortes',
+                      icon: Icons.trending_up,
+                      accent: AppTheme.success,
+                      text: effectiveDeck.strengths!,
+                    ),
+                  if ((effectiveDeck.strengths ?? '').trim().isNotEmpty &&
+                      (effectiveDeck.weaknesses ?? '').trim().isNotEmpty)
+                    const SizedBox(height: 12),
+                  if ((effectiveDeck.weaknesses ?? '').trim().isNotEmpty)
+                    _InsightBlock(
+                      title: 'Pontos fracos',
+                      icon: Icons.warning_amber_rounded,
+                      accent: AppTheme.warning,
+                      text: effectiveDeck.weaknesses!,
+                    ),
                 ],
               ),
             ),
+          ] else ...[
+            _SectionCard(
+              title: 'Sinergia ainda não gerada',
+              subtitle:
+                  'A IA ainda não resumiu os pontos fortes e fracos desta lista.',
+              child: Text(
+                'Use "Gerar análise" para produzir uma leitura executiva do plano do deck antes de otimizar.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.35,
+                ),
+              ),
+            ),
           ],
+          const SizedBox(height: 20),
+          _SectionCard(
+            title: 'Curva de mana',
+            subtitle:
+                'Distribuição de custo das mágicas, sem considerar terrenos.',
+            child:
+                manaCurve.every((v) => v == 0)
+                    ? SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: Text(
+                          'Adicione mágicas ao deck para ver a curva de mana.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.outline,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                    : SizedBox(
+                      height: 200,
+                      child: BarChart(
+                        BarChartData(
+                          alignment: BarChartAlignment.spaceAround,
+                          maxY:
+                              (manaCurve.reduce((a, b) => a > b ? a : b) + 1)
+                                  .toDouble(),
+                          barTouchData: BarTouchData(
+                            enabled: true,
+                            touchTooltipData: BarTouchTooltipData(
+                              getTooltipColor: (group) => AppTheme.surfaceSlate,
+                            ),
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                getTitlesWidget: (value, meta) {
+                                  final index = value.toInt();
+                                  if (index == 7) return const Text('7+');
+                                  return Text(index.toString());
+                                },
+                              ),
+                            ),
+                            leftTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            topTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          gridData: const FlGridData(show: false),
+                          borderData: FlBorderData(show: false),
+                          barGroups: List.generate(8, (index) {
+                            return BarChartGroupData(
+                              x: index,
+                              barRods: [
+                                BarChartRodData(
+                                  toY: manaCurve[index].toDouble(),
+                                  color: theme.colorScheme.primary,
+                                  width: 16,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(AppTheme.radiusXs),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+          ),
+          const SizedBox(height: 20),
+          _SectionCard(
+            title: 'Distribuição de cores',
+            subtitle:
+                'Leitura baseada nos símbolos de mana das mágicas do deck.',
+            child:
+                colorCounts.values.every((v) => v == 0)
+                    ? SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: Text(
+                          'Adicione mágicas coloridas para ver a distribuição de cores.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.outline,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                    : SizedBox(
+                      height: 200,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: PieChart(
+                              PieChartData(
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 40,
+                                sections: _buildPieSections(colorCounts),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _buildLegend(colorCounts),
+                          ),
+                        ],
+                      ),
+                    ),
+          ),
         ],
       ),
     );
@@ -369,6 +387,146 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
         ),
       );
     }).toList();
+  }
+}
+
+class _AnalysisActionBar extends StatelessWidget {
+  final bool hasAnalysis;
+  final bool isRefreshing;
+  final VoidCallback onRefresh;
+
+  const _AnalysisActionBar({
+    required this.hasAnalysis,
+    required this.isRefreshing,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        FilledButton.icon(
+          onPressed: isRefreshing ? null : onRefresh,
+          icon: Icon(hasAnalysis ? Icons.refresh : Icons.auto_awesome),
+          label: Text(hasAnalysis ? 'Atualizar análise' : 'Gerar análise'),
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  const _SectionCard({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.65),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightBlock extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color accent;
+  final String text;
+
+  const _InsightBlock({
+    required this.title,
+    required this.icon,
+    required this.accent,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.25), width: 0.7),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: accent),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            text,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textPrimary.withValues(alpha: 0.88),
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

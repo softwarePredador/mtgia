@@ -8,6 +8,7 @@ Este diretório concentra a documentação que ainda orienta decisão e execuç�
 2. [MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md](MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md)
 3. [CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md](CONTRATO_OPTIMIZE_REBUILD_2026-03-23.md)
 4. [AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md](AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md)
+5. [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
 
 ## O que cada documento faz
 
@@ -36,6 +37,12 @@ Este diretório concentra a documentação que ainda orienta decisão e execuç�
   - riscos de UX, lógica e performance
   - recomendações de priorização
 
+- [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
+  - sprint formal de revisão de produto e direção visual
+  - checklist por tela
+  - critérios de aceite visual, de produto e técnico
+  - ordem oficial de execução por waves
+
 - [../server/doc/RESOLUTION_CORPUS_WORKFLOW.md](../server/doc/RESOLUTION_CORPUS_WORKFLOW.md)
   - operacao do corpus estavel Commander
   - gate recorrente de release do fluxo optimize -> rebuild -> validate
@@ -48,6 +55,7 @@ Esses documentos continuam úteis, mas não definem a prioridade principal sozin
 - [../CHECKLIST_GO_LIVE_FINAL.md](../CHECKLIST_GO_LIVE_FINAL.md)
 - [../CHECKLIST_EXECUCAO.md](../CHECKLIST_EXECUCAO.md)
 - [PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md](PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md)
+- [SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md](SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md)
 - [PLANO_ABSORCAO_OPERACIONAL_REDIS_SENTRY_EASYPANEL_2026-03-23.md](PLANO_ABSORCAO_OPERACIONAL_REDIS_SENTRY_EASYPANEL_2026-03-23.md)
 - [SENTRY_SETUP_MTGIA_2026-03-24.md](SENTRY_SETUP_MTGIA_2026-03-24.md)
 - [EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md](EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md)

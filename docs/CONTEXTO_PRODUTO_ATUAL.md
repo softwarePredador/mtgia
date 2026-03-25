@@ -194,6 +194,11 @@ Progresso atual documentado da Sprint 1:
 - `deck_card_test.dart` foi adicionado para cobrir explicitamente esse estado com comandante, e `deck_card_overflow_test.dart` continuou verde com o novo fundo
 - a aba `Cartas` de `deck_details_screen.dart` agora inclui uma seção `Comandante` no topo quando o deck possui commander, em vez de renderizar apenas `mainBoard`
 - `deck_details_screen_smoke_test.dart` passou a cobrir explicitamente a presença do comandante na tab `Cartas`
+- `deck_details_overview_tab.dart` ganhou hero com painel translúcido de leitura sobre a arte do comandante, resumo rápido (`cartas • bracket • arquétipo`) e ações rápidas (`Abrir cartas`, `Abrir análise`, `Otimizar`)
+- os textos secundários da `Visão Geral` ficaram menos apagados e a tela passou a ficar mais acionável sem perder o background do comandante
+- `deck_details_overview_tab_test.dart` foi ampliado para cobrir as ações rápidas e o resumo do hero
+- `deck_analysis_tab.dart` foi reorganizada para leitura executiva: barra de ação clara (`Gerar/Atualizar análise`), seção de sinergia em card próprio, insights de fortes/fracos em blocos separados e matemática (`Curva de mana` / `Distribuição de cores`) em seções mais legíveis
+- `deck_analysis_tab_test.dart` foi adicionado para cobrir os estados `Leitura pronta` e `Leitura pendente`
 - `Sentry` backend foi ligado em `server/lib/observability.dart` e no middleware global, com propagação de `x-request-id` via `server/lib/request_trace.dart`
 - `Sentry` app foi ligado em `app/lib/core/observability/app_observability.dart`, com captura global de erros, observer de rota e `x-request-id` em `app/lib/core/api/api_client.dart`
 - `server/.env.example` foi atualizado com as chaves mínimas de observabilidade e o setup ficou registrado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`
@@ -458,5 +463,7 @@ Leitura executiva:
 Auditoria visual complementar:
 
 - a auditoria completa de ruído visual e uso de cores foi consolidada em `docs/AUDITORIA_RUIDO_VISUAL_CORES_2026-03-25.md`
+- a auditoria foi promovida a sprint formal em `docs/SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md`, com waves, checklist por tela e critérios explícitos de aceite visual, de produto e técnico
 - conclusao principal: a paleta base é boa, mas algumas telas ainda gastam cor demais
 - o primeiro alvo recomendado de limpeza visual continua sendo o core de deck, especialmente o estado vazio/inicial de `deck_details`
+- regra oficial nova: tela deve ser aceita como composição de produto em viewport real, não apenas como soma de componentes corretos em isolamento
