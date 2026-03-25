@@ -414,6 +414,208 @@ Ao longo da sprint, cada rodada deve deixar:
 3. atualização em `docs/CONTEXTO_PRODUTO_ATUAL.md`
 4. atualização nesta sprint quando uma tela mudar de estado
 
+## Registro de execução atual
+
+### Tela
+
+`app/lib/features/decks/widgets/deck_details_overview_tab.dart`
+
+### Status
+
+`IN_PROGRESS`
+
+### Diagnóstico atual
+
+- o hero ainda concentrava semântica demais no primeiro viewport
+- o chip `Inválido` competia com nome, arte, botões e status de progresso
+- a validação estava correta tecnicamente, mas posicionada no lugar errado na composição
+- a tela precisava separar melhor:
+  - identidade do deck
+  - ações rápidas
+  - saúde/status do deck
+
+### Mudança aplicada nesta rodada
+
+- o chip de validação saiu do hero
+- a validação foi movida para o `DeckProgressIndicator`, mantendo o acesso por toque
+- o hero ficou menos congestionado sem perder informação
+- a hierarquia do primeiro viewport ficou mais coerente:
+  - identidade
+  - ações
+  - status
+- a ordem da `Visão Geral` foi reorganizada para privilegiar decisão antes de detalhe:
+  - status
+  - direção do deck (`Estratégia`)
+  - identidade concreta do deck (`Comandante`)
+  - contexto editável (`Descrição`)
+  - diagnóstico
+  - mão inicial
+- a descrição deixou de competir com pricing/diagnóstico e passou a aparecer como contexto do plano do deck, não como detalhe tardio
+- o `Pricing` foi rebaixado para o fim da `Visão Geral`, saindo do primeiro scroll e deixando de competir com a leitura estratégica do deck
+- o bloco `Comandante` subiu para perto de `Estratégia`, para que a tela apresente primeiro identidade e plano antes de entrar em contexto e técnica
+- as ações redundantes `Abrir cartas` e `Abrir análise` foram removidas do topo da `Visão Geral`, porque a navegação já é resolvida pelo `TabBar`
+- o topo da `Visão Geral` passou a ter apenas uma ação dominante de mudança de estado: `Otimizar deck`
+- o hero teve tipografia e thumb suavizadas para melhorar leitura em viewport pequeno
+- o CTA `Otimizar deck` deixou de ser um bloco pesado chapado e passou a funcionar como ação tonal, ainda dominante mas menos agressiva
+- o `DeckProgressIndicator` foi redesenhado para parecer menos “card de sistema” e mais status de produto
+- o bloco `Comandante` foi refinado com superfície mais limpa, melhor proporção de imagem/texto e badge inválida menos berrante
+- `Estratégia` e `Descrição` passaram a compartilhar a mesma família de superfície e ganharam subtítulos editoriais, deixando de parecer placeholders utilitários
+- o `DeckDiagnosticPanel` saiu do modo “dashboard técnico” e passou a funcionar como resumo executivo, com cabeçalho responsivo, métricas mais legíveis e insights em cards coerentes com a família visual da tela
+
+### Aceite parcial desta rodada
+
+- visual: `OK` para o recorte de hero + ordem do primeiro scroll + CTA único + superfícies refinadas + família consistente entre seções + diagnóstico integrado
+- produto: `OK` para o recorte de status + identidade + direção antes de contexto, técnica e mercado, sem redundância de navegação
+- técnico: `OK`
+
+### Riscos restantes
+
+- ainda é necessário validar o primeiro viewport em device real depois desse recorte
+- a tela continua `IN_PROGRESS` dentro da sprint até a composição completa da `Visão Geral` fechar
+
+### Tela
+
+`app/lib/features/decks/screens/deck_details_screen.dart`
+
+### Status
+
+`IN_PROGRESS`
+
+### Diagnóstico atual
+
+- a `Visão Geral` já está mais madura, mas a tab `Cartas` ainda carregava densidade demais por linha
+- quantidade, nome, tipo, set, condição e erro competiam ao mesmo tempo no mesmo tile
+- a seção `Comandante` já existia, mas o card das cartas ainda parecia técnico e pouco editorial
+
+### Mudança aplicada nesta rodada
+
+- os cabeçalhos das seções da tab `Cartas` passaram a usar título + badge de contagem, em vez de texto compacto único
+- depois disso, os próprios cabeçalhos foram simplificados para linhas editoriais sem caixa, reduzindo ainda mais camadas e deixando o foco visual nas cartas
+- os tiles de carta ganharam superfície mais limpa e coerente com o resto da tela
+- a quantidade virou pill discreta, em vez de disputar a linha do título
+- set, condição e inválida passaram a ser metadados secundários em pills, reduzindo ruído
+- o estado inválido deixou de aparecer como selo agressivo no canto e passou a ficar integrado ao bloco de metadados
+- o card introdutório de `Deck principal` foi removido por excesso de camada visual; a diferenciação do comandante passou a acontecer no próprio tile, com assinatura visual sutil (borda/fundo/ícone) em vez de texto explicativo redundante
+
+### Aceite parcial desta rodada
+
+- visual: `OK` para o recorte da tab `Cartas`
+- produto: `OK` para o recorte de leitura e escaneabilidade da lista
+- técnico: `OK`
+
+### Riscos restantes
+
+- ainda é necessário validar em device real a densidade de tiles com cartas de nome muito longo
+- ainda é necessário validar se o destaque sutil do comandante continua suficiente em listas longas e com artes mais ruidosas
+
+### Tela
+
+`app/lib/features/decks/widgets/deck_analysis_tab.dart`
+
+### Status
+
+`IN_PROGRESS`
+
+### Diagnóstico atual
+
+- a aba `Análise` já estava mais útil do que antes, mas ainda carregava sensação de dashboard técnico
+- havia excesso de superfície dentro de superfície, especialmente no bloco de score de sinergia
+- a barra de ação ainda estava funcional, porém pouco integrada ao restante da composição
+
+### Mudança aplicada nesta rodada
+
+- a barra de ação foi suavizada: estado (`Leitura pronta` / `Leitura pendente`) agora aparece como selo tonal, e a ação principal ficou menos pesada
+- os `SectionCard`s ficaram mais leves, com borda mais contida e menos peso de painel técnico
+- os blocos de insight (`Pontos fortes` / `Pontos fracos`) foram suavizados para reforçar o tom minimalista
+- o card de score de sinergia deixou de parecer um `Card` genérico dentro de outro card e passou a usar uma superfície tonal própria, mais integrada ao conjunto
+- `Curva de mana` e `Distribuição de cores` deixaram de competir como dois painéis de mesmo nível e passaram a viver dentro de um único bloco `Base de mana`, com subtítulos internos
+- a legenda da distribuição de cores foi reduzida para uma leitura mais discreta, com tipografia mais leve e menos peso visual que o gráfico
+
+### Aceite parcial desta rodada
+
+- visual: `OK` para reduzir a sensação de dashboard
+- produto: `OK` para manter a legibilidade dos dados sem aumentar ruído
+- técnico: `OK`
+
+### Riscos restantes
+
+- ainda é necessário validar em device real se a aba ficou leve o suficiente no primeiro scroll
+- ainda é necessário validar em device real se a nova legenda continua legível com combinações de cor mais densas
+
+### Tela
+
+`app/lib/features/community/screens/community_screen.dart`
+
+### Status
+
+`IN_PROGRESS`
+
+### Diagnóstico atual
+
+- a tela já usa a paleta correta, mas ainda concentrava saturação demais em cards e chips
+- formato, owner, score de sinergia e avatar competiam entre si em vários cards
+- os filtros da aba `Explorar` também estavam mais chamativos do que o necessário para uma superfície de descoberta
+
+### Mudança aplicada nesta rodada
+
+- os `FilterChip`s da aba `Explorar` foram suavizados: seleção menos chapada e borda mais discreta
+- os cards de decks públicos e feed perderam saturação nos chips de formato e score de sinergia
+- o dono do deck deixou de parecer link chamativo com sublinhado e passou a usar destaque mais contido
+- os avatares e ícones de métricas da busca de usuários ficaram menos berrantes e mais neutros
+- na aba `Cotações`, o ouro deixou de dominar tabs, loading e header; alta/queda passou a ficar mais concentrada no badge de mudança e menos espalhada pelo card inteiro
+
+### Aceite parcial desta rodada
+
+- visual: `OK` para redução de saturação
+- produto: `OK` para manter escaneabilidade sem chamar atenção demais para metadados
+- técnico: `OK`
+
+### Riscos restantes
+
+- ainda é necessário validar em device real se o feed de decks ficou leve o suficiente com artes mais variadas
+- ainda é necessário validar em device real se a aba `Cotações` ainda mantém contraste suficiente sem o ouro tão dominante
+
+### Tela
+
+`app/lib/features/home/life_counter_screen.dart`
+
+### Status
+
+`IN_PROGRESS`
+
+### Diagnóstico atual
+
+- o `life counter` usa a paleta certa, mas ainda concentra muitos acentos simultâneos no hub central e nos badges auxiliares
+- ouro, violeta, verde e vermelho apareciam ao mesmo tempo no núcleo da mesa, competindo com a informação principal de vida
+- os estados auxiliares estavam mais chamativos do que a função exigia
+
+### Mudança aplicada nesta rodada
+
+- o hub central foi neutralizado: medalhão menos dourado, glow reduzido e contraste mais sóbrio
+- os chips de status (`Storm`, `Monarca`, `Iniciativa`, `1º jogador`) ficaram mais contidos, com fundo neutro e borda/acento mais leves
+- os botões secundários do hub perderam borda colorida dominante
+- badges de poison/commander/iniciativa ficaram mais discretas, usando base neutra com borda suave em vez de preenchimento saturado
+- a primeira entrega funcional prioritária do `life counter` entrou em `Ferramentas de Mesa`: `Roll-off` por jogador
+- o `roll-off` agora gera um valor de `D20` para cada jogador, destaca visualmente o maior resultado, detecta empate e, quando houver vencedor único, define automaticamente o `1º jogador`
+- o hub expandido `Mesa Commander` agora expõe utilidades rápidas de uso recorrente (`D20`, `Moeda`, `1º jogador`) sem depender da sheet de `Tools`
+- o próprio hub passou a exibir o último resultado/evento de mesa, evitando ação “cega” quando essas utilidades são usadas direto ali
+- o bloco central da vida passou a funcionar como affordance contextual do jogador: tocar no número abre um mini hub oculto com atalhos locais (`D20` do jogador e `Morto/Reviver`)
+- essa decisão reduz dependência de modal e usa um gesto que já é naturalmente esperado pelo usuário: se há atalho do jogador, ele fica no núcleo da vida
+- o `D20` individual deixou de ser só evento textual: cada painel agora mantém e exibe o último resultado (`D20 N`) no próprio card do jogador
+- isso permite leitura paralela de múltiplos resultados na mesa quando mais de um jogador usar o atalho local
+
+### Aceite parcial desta rodada
+
+- visual: `OK` para reduzir ruído no centro da mesa
+- produto: `OK` para manter legibilidade e ação rápida, com uma utilidade de mesa mais próxima do uso real de Commander
+- técnico: `OK`
+
+### Riscos restantes
+
+- ainda é necessário revisar se os painéis dos jogadores estão com contraste e saturação no ponto
+- ainda é necessário validar em device real se o hub central já não chama mais atenção do que os totais de vida
+- ainda faltam os próximos passos de usabilidade prioritária: `poison inline`, `commander tax inline` e acesso mais curto a `commander damage`
+
 ## Registro por tela
 
 Cada tela deve terminar com estes campos preenchidos:

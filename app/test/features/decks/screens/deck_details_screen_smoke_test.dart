@@ -354,7 +354,16 @@ void main() {
     await tester.tap(find.text('Cartas'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Comandante (1)'), findsOneWidget);
+    expect(find.text('Comandante'), findsOneWidget);
+    expect(
+      find.byIcon(Icons.workspace_premium_rounded),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Carta que define identidade e regras do deck.'),
+      findsNothing,
+    );
+    expect(find.text('Deck principal'), findsNothing);
     expect(find.text('Talrand, Sky Summoner'), findsOneWidget);
   });
 

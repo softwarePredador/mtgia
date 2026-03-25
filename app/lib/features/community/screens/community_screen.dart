@@ -328,11 +328,14 @@ class _ExploreTabState extends State<_ExploreTab>
           ),
         ),
         selected: isSelected,
-        selectedColor: AppTheme.primarySoft,
+        selectedColor: AppTheme.surfaceElevated,
         backgroundColor: AppTheme.surfaceSlate,
-        checkmarkColor: AppTheme.backgroundAbyss,
+        checkmarkColor: AppTheme.primarySoft,
         side: BorderSide(
-          color: isSelected ? AppTheme.primarySoft : AppTheme.outlineMuted,
+          color:
+              isSelected
+                  ? AppTheme.primarySoft.withValues(alpha: 0.45)
+                  : AppTheme.outlineMuted,
         ),
         onSelected: (_) {
           setState(() => _selectedFormat = format);
@@ -733,16 +736,17 @@ class _CommunityDeckCard extends StatelessWidget {
                             style: TextStyle(
                               color:
                                   deck.ownerId != null
-                                      ? AppTheme.primarySoft
+                                      ? AppTheme.textPrimary.withValues(
+                                        alpha: 0.92,
+                                      )
                                       : AppTheme.textSecondary.withValues(
                                         alpha: 0.8,
                                       ),
                               fontSize: AppTheme.fontSm,
-                              decoration:
+                              fontWeight:
                                   deck.ownerId != null
-                                      ? TextDecoration.underline
-                                      : null,
-                              decorationColor: AppTheme.primarySoft,
+                                      ? FontWeight.w500
+                                      : FontWeight.w400,
                             ),
                           ),
                         ),
@@ -753,15 +757,18 @@ class _CommunityDeckCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.manaViolet.withValues(alpha: 0.2),
+                            color: AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(
                               AppTheme.radiusXs,
+                            ),
+                            border: Border.all(
+                              color: AppTheme.primarySoft.withValues(alpha: 0.22),
                             ),
                           ),
                           child: Text(
                             _capitalize(deck.format),
                             style: const TextStyle(
-                              color: AppTheme.manaViolet,
+                              color: AppTheme.primarySoft,
                               fontSize: AppTheme.fontXs,
                               fontWeight: FontWeight.w600,
                             ),
@@ -781,17 +788,40 @@ class _CommunityDeckCard extends StatelessWidget {
                         ),
                         if (deck.synergyScore != null) ...[
                           const SizedBox(width: 12),
-                          Icon(
-                            Icons.auto_awesome,
-                            size: 14,
-                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${deck.synergyScore}%',
-                            style: TextStyle(
-                              color: AppTheme.mythicGold.withValues(alpha: 0.8),
-                              fontSize: AppTheme.fontSm,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusXs,
+                              ),
+                              border: Border.all(
+                                color: AppTheme.mythicGold.withValues(alpha: 0.18),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.auto_awesome,
+                                  size: 12,
+                                  color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${deck.synergyScore}%',
+                                  style: TextStyle(
+                                    color: AppTheme.textSecondary.withValues(
+                                      alpha: 0.9,
+                                    ),
+                                    fontSize: AppTheme.fontSm,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -881,15 +911,18 @@ class _FollowingDeckCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.manaViolet.withValues(alpha: 0.2),
+                            color: AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(
                               AppTheme.radiusXs,
+                            ),
+                            border: Border.all(
+                              color: AppTheme.primarySoft.withValues(alpha: 0.22),
                             ),
                           ),
                           child: Text(
                             _capitalize(deck.format),
                             style: const TextStyle(
-                              color: AppTheme.manaViolet,
+                              color: AppTheme.primarySoft,
                               fontSize: AppTheme.fontXs,
                               fontWeight: FontWeight.w600,
                             ),
@@ -905,17 +938,40 @@ class _FollowingDeckCard extends StatelessWidget {
                         ),
                         if (deck.synergyScore != null) ...[
                           const SizedBox(width: 8),
-                          Icon(
-                            Icons.auto_awesome,
-                            size: 12,
-                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${deck.synergyScore}%',
-                            style: TextStyle(
-                              color: AppTheme.mythicGold.withValues(alpha: 0.8),
-                              fontSize: AppTheme.fontSm,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusXs,
+                              ),
+                              border: Border.all(
+                                color: AppTheme.mythicGold.withValues(alpha: 0.18),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.auto_awesome,
+                                  size: 11,
+                                  color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${deck.synergyScore}%',
+                                  style: TextStyle(
+                                    color: AppTheme.textSecondary.withValues(
+                                      alpha: 0.9,
+                                    ),
+                                    fontSize: AppTheme.fontSm,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -964,7 +1020,7 @@ class _UserCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
+                backgroundColor: AppTheme.surfaceElevated,
                 backgroundImage:
                     user.avatarUrl != null
                         ? CachedNetworkImageProvider(user.avatarUrl!)
@@ -974,7 +1030,7 @@ class _UserCard extends StatelessWidget {
                         ? Text(
                           user.username[0].toUpperCase(),
                           style: const TextStyle(
-                            color: AppTheme.manaViolet,
+                            color: AppTheme.primarySoft,
                             fontWeight: FontWeight.bold,
                             fontSize: AppTheme.fontXl,
                           ),
@@ -1008,7 +1064,7 @@ class _UserCard extends StatelessWidget {
                         Icon(
                           Icons.style,
                           size: 13,
-                          color: AppTheme.primarySoft.withValues(alpha: 0.7),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.72),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -1022,7 +1078,7 @@ class _UserCard extends StatelessWidget {
                         Icon(
                           Icons.people,
                           size: 13,
-                          color: AppTheme.manaViolet.withValues(alpha: 0.7),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.72),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -1092,7 +1148,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(color: AppTheme.mythicGold),
+                CircularProgressIndicator(color: AppTheme.primarySoft),
                 SizedBox(height: 16),
                 Text(
                   'Carregando cotações...',
@@ -1127,7 +1183,8 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     icon: const Icon(Icons.refresh),
                     label: const Text('Tentar novamente'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.manaViolet,
+                      backgroundColor: AppTheme.surfaceElevated,
+                      foregroundColor: AppTheme.textPrimary,
                     ),
                   ),
                 ],
@@ -1156,7 +1213,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                   const Icon(
                     Icons.hourglass_top,
                     size: 48,
-                    color: AppTheme.mythicGold,
+                    color: AppTheme.primarySoft,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -1191,8 +1248,8 @@ class _CotacoesTabState extends State<_CotacoesTab>
               color: AppTheme.surfaceElevated,
               child: TabBar(
                 controller: _subTabController,
-                indicatorColor: AppTheme.mythicGold,
-                labelColor: AppTheme.mythicGold,
+                indicatorColor: AppTheme.primarySoft,
+                labelColor: AppTheme.textPrimary,
                 unselectedLabelColor: AppTheme.textSecondary,
                 tabs: const [
                   Tab(
@@ -1282,13 +1339,16 @@ class _CotacoesTabState extends State<_CotacoesTab>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: AppTheme.mythicGold.withValues(alpha: 0.15),
+              color: AppTheme.surfaceSlate,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(
+                color: AppTheme.primarySoft.withValues(alpha: 0.18),
+              ),
             ),
             child: Text(
               '${data.totalTracked} cartas',
               style: const TextStyle(
-                color: AppTheme.mythicGold,
+                color: AppTheme.primarySoft,
                 fontSize: AppTheme.fontSm,
                 fontWeight: FontWeight.bold,
               ),
@@ -1317,7 +1377,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
     required MarketProvider provider,
   }) {
     return RefreshIndicator(
-      color: AppTheme.mythicGold,
+      color: AppTheme.primarySoft,
       backgroundColor: AppTheme.surfaceSlate,
       onRefresh: () => provider.refresh(),
       child: ListView.builder(
@@ -1338,7 +1398,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
               border: Border.all(
                 color:
                     index < 3
-                        ? changeColor.withValues(alpha: 0.3)
+                        ? AppTheme.outlineMuted.withValues(alpha: 0.45)
                         : AppTheme.outlineMuted.withValues(alpha: 0.3),
               ),
             ),
@@ -1353,15 +1413,24 @@ class _CotacoesTabState extends State<_CotacoesTab>
                     decoration: BoxDecoration(
                       color:
                           index < 3
-                              ? changeColor.withValues(alpha: 0.2)
+                              ? AppTheme.surfaceElevated
                               : AppTheme.surfaceElevated,
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border:
+                          index < 3
+                              ? Border.all(
+                                color: changeColor.withValues(alpha: 0.2),
+                              )
+                              : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '#${index + 1}',
                       style: TextStyle(
-                        color: index < 3 ? changeColor : AppTheme.textSecondary,
+                        color:
+                            index < 3
+                                ? AppTheme.textPrimary.withValues(alpha: 0.9)
+                                : AppTheme.textSecondary,
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1446,7 +1515,9 @@ class _CotacoesTabState extends State<_CotacoesTab>
                               Text(
                                 _rarityLabel(mover.rarity!),
                                 style: TextStyle(
-                                  color: _rarityColor(mover.rarity!),
+                                  color: _rarityColor(
+                                    mover.rarity!,
+                                  ).withValues(alpha: 0.82),
                                   fontSize: AppTheme.fontSm,
                                 ),
                               ),
@@ -1475,9 +1546,12 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: changeColor.withValues(alpha: 0.15),
+                          color: AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(
                             AppTheme.radiusSm,
+                          ),
+                          border: Border.all(
+                            color: changeColor.withValues(alpha: 0.22),
                           ),
                         ),
                         child: Row(
@@ -1500,7 +1574,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                       Text(
                         '$changePrefix\$${mover.changeUsd.toStringAsFixed(2)}',
                         style: TextStyle(
-                          color: changeColor.withValues(alpha: 0.7),
+                          color: AppTheme.textSecondary.withValues(alpha: 0.78),
                           fontSize: AppTheme.fontXs,
                         ),
                       ),

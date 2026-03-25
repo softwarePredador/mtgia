@@ -25,7 +25,6 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final String Function(int bracket) bracketLabel;
   final VoidCallback onValidationTap;
   final VoidCallback onOpenCards;
-  final VoidCallback onOpenAnalysis;
   final VoidCallback onForcePricingRefresh;
   final VoidCallback onShowPricingDetails;
   final VoidCallback onTogglePublic;
@@ -50,7 +49,6 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.bracketLabel,
     required this.onValidationTap,
     required this.onOpenCards,
-    required this.onOpenAnalysis,
     required this.onForcePricingRefresh,
     required this.onShowPricingDetails,
     required this.onTogglePublic,
@@ -60,9 +58,6 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.onEditDescription,
     required this.onShowCardDetails,
   });
-
-  bool get _hasDescription =>
-      deck.description != null && deck.description!.trim().isNotEmpty;
 
   bool get _hasArchetype =>
       deck.archetype != null && deck.archetype!.trim().isNotEmpty;
@@ -168,7 +163,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                                     hasHeroArtwork
                                         ? BoxDecoration(
                                           color: AppTheme.backgroundAbyss
-                                              .withValues(alpha: 0.42),
+                                              .withValues(alpha: 0.48),
                                           borderRadius: BorderRadius.circular(
                                             AppTheme.radiusMd,
                                           ),
@@ -184,31 +179,39 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                                   children: [
                                     Text(
                                       deck.name,
-                                      style: theme.textTheme.headlineMedium
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.headlineSmall
                                           ?.copyWith(
                                             color: AppTheme.textPrimary,
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w800,
+                                            height: 1.05,
                                           ),
                                     ),
                                     if (_heroCommander != null) ...[
                                       const SizedBox(height: 6),
                                       Text(
                                         'Comandante: ${_heroCommander!.name}',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                         style: theme.textTheme.bodyMedium
                                             ?.copyWith(
                                               color: AppTheme.textPrimary
-                                                  .withValues(alpha: 0.88),
-                                              fontWeight: FontWeight.w600,
+                                                  .withValues(alpha: 0.92),
+                                              fontWeight: FontWeight.w500,
+                                              height: 1.25,
                                             ),
                                       ),
                                     ],
                                     const SizedBox(height: 6),
                                     Text(
                                       _heroSummary,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             color: AppTheme.textPrimary
-                                                .withValues(alpha: 0.76),
+                                                .withValues(alpha: 0.82),
                                             fontWeight: FontWeight.w500,
                                           ),
                                     ),
@@ -217,14 +220,14 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                               ),
                             ),
                             if (_heroCommanderImageUrl != null) ...[
-                              const SizedBox(width: 14),
+                              const SizedBox(width: 10),
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(
                                   AppTheme.radiusMd,
                                 ),
                                 child: Container(
-                                  width: 56,
-                                  height: 78,
+                                  width: 48,
+                                  height: 68,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(
                                       AppTheme.radiusMd,
@@ -244,7 +247,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                             ],
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -266,22 +269,6 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                 ),
-                              )
-                            else if (!_isEmptyDeck && validationResult != null)
-                              DeckMetaChip(
-                                onTap: onValidationTap,
-                                label:
-                                    validationResult!['ok'] == true
-                                        ? 'Válido'
-                                        : 'Inválido',
-                                color:
-                                    validationResult!['ok'] == true
-                                        ? AppTheme.success
-                                        : theme.colorScheme.error,
-                                icon:
-                                    validationResult!['ok'] == true
-                                        ? Icons.verified
-                                        : Icons.warning_amber_rounded,
                               ),
                             DeckMetaChip(
                               onTap: onTogglePublic,
@@ -313,57 +300,68 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               onImportList: onImportList,
             )
           else ...[
-            _OverviewQuickActions(
-              onOpenCards: onOpenCards,
-              onOpenAnalysis: onOpenAnalysis,
-              onOptimize: onShowOptimizationOptions,
-            ),
-            const SizedBox(height: 12),
+            _OverviewQuickActions(onOptimize: onShowOptimizationOptions),
+            const SizedBox(height: 16),
             DeckProgressIndicator(
               deck: deck,
               totalCards: totalCards,
               maxCards: maxCards,
               hasCommander: deck.commander.isNotEmpty,
               onTap: onOpenCards,
+              semanticBadgeLabel:
+                  !_isEmptyDeck && !isValidating && validationResult != null
+                      ? (validationResult!['ok'] == true
+                          ? 'Válido'
+                          : 'Inválido')
+                      : null,
+              semanticBadgeColor:
+                  !_isEmptyDeck && !isValidating && validationResult != null
+                      ? (validationResult!['ok'] == true
+                          ? AppTheme.success
+                          : theme.colorScheme.error)
+                      : null,
+              semanticBadgeIcon:
+                  !_isEmptyDeck && !isValidating && validationResult != null
+                      ? (validationResult!['ok'] == true
+                          ? Icons.verified
+                          : Icons.warning_amber_rounded)
+                      : null,
+              onSemanticBadgeTap:
+                  !_isEmptyDeck && !isValidating && validationResult != null
+                      ? onValidationTap
+                      : null,
             ),
-            const SizedBox(height: 12),
-            DeckPricingRow(
-              pricing: pricing,
-              isLoading: isPricingLoading,
-              onForceRefresh: onForcePricingRefresh,
-              onShowDetails: onShowPricingDetails,
-            ),
-            const SizedBox(height: 12),
-            DeckDiagnosticPanel(deck: deck, onOpenAnalysis: onOpenAnalysis),
-            SampleHandWidget(deck: deck, compact: true),
+            const SizedBox(height: 16),
             if (isCommanderFormat && deck.commander.isEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color: AppTheme.outlineMuted.withValues(alpha: 0.7),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: AppTheme.warning),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Text(
-                        'Selecione um comandante para aplicar regras e filtros de identidade de cor.',
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: onSelectCommander,
-                      child: const Text('Selecionar'),
-                    ),
-                  ],
-                ),
-              ),
+              _CommanderPrompt(onSelectCommander: onSelectCommander),
+              const SizedBox(height: 16),
             ],
+            _StrategySummaryCard(
+              hasArchetype: _hasArchetype,
+              archetype: deck.archetype,
+              bracket: deck.bracket,
+              bracketLabel: bracketLabel,
+              onTap: onShowOptimizationOptions,
+            ),
+            const SizedBox(height: 16),
+            if (deck.commander.isNotEmpty) ...[
+              _CommanderSection(
+                commander: deck.commander,
+                isCardInvalid: isCardInvalid,
+                onShowCardDetails: onShowCardDetails,
+                onChangeCommander:
+                    () => context.go('/decks/$deckId/search?mode=commander'),
+              ),
+              const SizedBox(height: 16),
+            ],
+            _DescriptionSection(
+              description: deck.description,
+              onEditDescription: onEditDescription,
+            ),
+            const SizedBox(height: 16),
+            DeckDiagnosticPanel(deck: deck),
+            const SizedBox(height: 16),
+            SampleHandWidget(deck: deck, compact: true),
           ],
           const SizedBox(height: 16),
           if (_isEmptyDeck) ...[
@@ -376,242 +374,13 @@ class DeckDetailsOverviewTab extends StatelessWidget {
             const SizedBox(height: 8),
           ],
           if (!_isEmptyDeck) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: Text('Descrição', style: theme.textTheme.titleMedium),
-                ),
-                TextButton.icon(
-                  onPressed: () => onEditDescription(deck.description),
-                  icon: Icon(
-                    _hasDescription ? Icons.edit : Icons.add,
-                    size: 16,
-                  ),
-                  label: Text(_hasDescription ? 'Editar' : 'Adicionar'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            if (_hasDescription)
-              InkWell(
-                onTap: () => onEditDescription(deck.description),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    deck.description!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textPrimary.withValues(alpha: 0.86),
-                    ),
-                  ),
-                ),
-              )
-            else
-              InkWell(
-                onTap: () => onEditDescription(null),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  child: Text(
-                    'Toque para adicionar uma descrição ao deck...',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textPrimary.withValues(alpha: 0.6),
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
-              ),
             const SizedBox(height: 24),
-            if (deck.commander.isNotEmpty) ...[
-              Text('Comandante', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              ...deck.commander.map(
-                (card) => Card(
-                  shape:
-                      isCardInvalid(card)
-                          ? RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusMd,
-                            ),
-                            side: BorderSide(
-                              color: theme.colorScheme.error,
-                              width: 2,
-                            ),
-                          )
-                          : null,
-                  color:
-                      isCardInvalid(card)
-                          ? theme.colorScheme.error.withValues(alpha: 0.08)
-                          : null,
-                  child: Stack(
-                    children: [
-                      ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusSm,
-                          ),
-                          child: CachedCardImage(
-                            imageUrl: card.imageUrl,
-                            width: 44,
-                            height: 62,
-                          ),
-                        ),
-                        title: Text(card.name),
-                        subtitle: Text(card.typeLine),
-                        onTap: () => onShowCardDetails(card),
-                      ),
-                      if (isCardInvalid(card))
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.error,
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusSm,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.warning_amber_rounded,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  'Inválida',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: AppTheme.fontXs,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed:
-                      () => context.go('/decks/$deckId/search?mode=commander'),
-                  icon: const Icon(Icons.swap_horiz),
-                  label: const Text('Trocar comandante'),
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Text('Estratégia', style: theme.textTheme.titleMedium),
-                ),
-                TextButton.icon(
-                  onPressed: onShowOptimizationOptions,
-                  icon: const Icon(Icons.tune, size: 18),
-                  label: Text(_hasArchetype ? 'Alterar' : 'Definir'),
-                ),
-              ],
+            DeckPricingRow(
+              pricing: pricing,
+              isLoading: isPricingLoading,
+              onForceRefresh: onForcePricingRefresh,
+              onShowDetails: onShowPricingDetails,
             ),
-            const SizedBox(height: 8),
-            InkWell(
-              onTap: onShowOptimizationOptions,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      _hasArchetype
-                          ? theme.colorScheme.primaryContainer.withValues(
-                            alpha: 0.3,
-                          )
-                          : theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color:
-                        _hasArchetype
-                            ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                            : theme.colorScheme.outline.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _hasArchetype ? Icons.psychology : Icons.help_outline,
-                      color:
-                          _hasArchetype
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.outline,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _hasArchetype ? deck.archetype! : 'Não definida',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  _hasArchetype
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.outline,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            deck.bracket != null
-                                ? 'Bracket: ${deck.bracket} • ${bracketLabel(deck.bracket!)}'
-                                : 'Bracket não definido',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.chevron_right, color: theme.colorScheme.outline),
-                  ],
-                ),
-              ),
-            ),
-            if (!_hasArchetype) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Toque para definir a estratégia do deck',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.outline,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
           ],
         ],
       ),
@@ -619,39 +388,469 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   }
 }
 
-class _OverviewQuickActions extends StatelessWidget {
-  final VoidCallback onOpenCards;
-  final VoidCallback onOpenAnalysis;
-  final VoidCallback onOptimize;
+class _CommanderSection extends StatelessWidget {
+  final List<DeckCardItem> commander;
+  final bool Function(DeckCardItem card) isCardInvalid;
+  final ValueChanged<DeckCardItem> onShowCardDetails;
+  final VoidCallback onChangeCommander;
 
-  const _OverviewQuickActions({
-    required this.onOpenCards,
-    required this.onOpenAnalysis,
-    required this.onOptimize,
+  const _CommanderSection({
+    required this.commander,
+    required this.isCardInvalid,
+    required this.onShowCardDetails,
+    required this.onChangeCommander,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FilledButton.icon(
-          onPressed: onOpenCards,
-          icon: const Icon(Icons.layers_outlined),
-          label: const Text('Abrir cartas'),
+        Row(
+          children: [
+            Expanded(
+              child: Text('Comandante', style: theme.textTheme.titleMedium),
+            ),
+            TextButton.icon(
+              onPressed: onChangeCommander,
+              icon: const Icon(Icons.swap_horiz, size: 18),
+              label: const Text('Trocar'),
+            ),
+          ],
         ),
-        OutlinedButton.icon(
-          onPressed: onOpenAnalysis,
-          icon: const Icon(Icons.analytics_outlined),
-          label: const Text('Abrir análise'),
-        ),
-        OutlinedButton.icon(
-          onPressed: onOptimize,
-          icon: const Icon(Icons.auto_fix_high),
-          label: const Text('Otimizar'),
+        const SizedBox(height: 8),
+        ...commander.map(
+          (card) => InkWell(
+            onTap: () => onShowCardDetails(card),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color:
+                      isCardInvalid(card)
+                          ? theme.colorScheme.error.withValues(alpha: 0.32)
+                          : AppTheme.outlineMuted.withValues(alpha: 0.65),
+                  width: isCardInvalid(card) ? 1.2 : 0.9,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    child: CachedCardImage(
+                      imageUrl: card.imageUrl,
+                      width: 52,
+                      height: 72,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textPrimary,
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          card.typeLine,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.92,
+                            ),
+                            height: 1.25,
+                          ),
+                        ),
+                        if (isCardInvalid(card)) ...[
+                          const SizedBox(height: 8),
+                          _InlineCommanderBadge(
+                            label: 'Inválida',
+                            color: theme.colorScheme.error,
+                            icon: Icons.warning_amber_rounded,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _InlineCommanderBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData icon;
+
+  const _InlineCommanderBadge({
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: color.withValues(alpha: 0.24)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DescriptionSection extends StatelessWidget {
+  final String? description;
+  final ValueChanged<String?> onEditDescription;
+
+  const _DescriptionSection({
+    required this.description,
+    required this.onEditDescription,
+  });
+
+  bool get _hasDescription =>
+      description != null && description!.trim().isNotEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+          width: 0.9,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Descrição', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Resumo curto do plano e da intenção do deck.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => onEditDescription(description),
+                icon: Icon(_hasDescription ? Icons.edit : Icons.add, size: 16),
+                label: Text(_hasDescription ? 'Editar' : 'Adicionar'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (_hasDescription)
+            InkWell(
+              onTap: () => onEditDescription(description),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.72),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Text(
+                  description!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textPrimary.withValues(alpha: 0.9),
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            )
+          else
+            InkWell(
+              onTap: () => onEditDescription(null),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.72),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+                  ),
+                ),
+                child: Text(
+                  'Toque para adicionar uma descrição ao deck...',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary.withValues(alpha: 0.82),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OverviewQuickActions extends StatelessWidget {
+  final VoidCallback onOptimize;
+
+  const _OverviewQuickActions({required this.onOptimize});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onOptimize,
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+          side: BorderSide(
+            color: theme.colorScheme.primary.withValues(alpha: 0.28),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          ),
+        ),
+        icon: Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
+        label: Text(
+          'Otimizar deck',
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CommanderPrompt extends StatelessWidget {
+  final VoidCallback onSelectCommander;
+
+  const _CommanderPrompt({required this.onSelectCommander});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: AppTheme.warning),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'Selecione um comandante para aplicar regras e filtros de identidade de cor.',
+            ),
+          ),
+          TextButton(
+            onPressed: onSelectCommander,
+            child: const Text('Selecionar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StrategySummaryCard extends StatelessWidget {
+  final bool hasArchetype;
+  final String? archetype;
+  final int? bracket;
+  final String Function(int bracket) bracketLabel;
+  final VoidCallback onTap;
+
+  const _StrategySummaryCard({
+    required this.hasArchetype,
+    required this.archetype,
+    required this.bracket,
+    required this.bracketLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final toneColor =
+        hasArchetype ? theme.colorScheme.primary : AppTheme.primarySoft;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.6),
+          width: 0.9,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Estratégia', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      hasArchetype
+                          ? 'Direção principal que orienta análise e otimização.'
+                          : 'Defina o plano do deck para melhorar recomendações.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: onTap,
+                icon: const Icon(Icons.tune, size: 18),
+                label: Text(hasArchetype ? 'Alterar' : 'Definir'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color: toneColor.withValues(alpha: hasArchetype ? 0.3 : 0.22),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: toneColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    child: Icon(
+                      hasArchetype
+                          ? Icons.psychology
+                          : Icons.auto_awesome_outlined,
+                      color: toneColor,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          hasArchetype ? archetype! : 'Não definida',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          bracket != null
+                              ? 'Bracket: $bracket • ${bracketLabel(bracket!)}'
+                              : 'Bracket não definido',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary.withValues(
+                              alpha: 0.92,
+                            ),
+                          ),
+                        ),
+                        if (!hasArchetype) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Toque para escolher um plano de jogo antes de otimizar.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: toneColor.withValues(alpha: 0.92),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: toneColor.withValues(alpha: 0.85),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

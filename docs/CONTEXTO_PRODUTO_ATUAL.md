@@ -32,6 +32,8 @@ Esses documentos continuam como apoio e historico, mas nao devem redefinir a pri
 - `docs/README.md`
 - `docs/AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md`
 - `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md`
+- `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md`
+- `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md`
 - `README.md`
 - `ROADMAP.md`
 - `CHECKLIST_GO_LIVE_FINAL.md`
@@ -199,6 +201,69 @@ Progresso atual documentado da Sprint 1:
 - `deck_details_overview_tab_test.dart` foi ampliado para cobrir as ações rápidas e o resumo do hero
 - `deck_analysis_tab.dart` foi reorganizada para leitura executiva: barra de ação clara (`Gerar/Atualizar análise`), seção de sinergia em card próprio, insights de fortes/fracos em blocos separados e matemática (`Curva de mana` / `Distribuição de cores`) em seções mais legíveis
 - `deck_analysis_tab_test.dart` foi adicionado para cobrir os estados `Leitura pronta` e `Leitura pendente`
+- primeiro corte formal da `Wave 1` da sprint de produto/UX foi executado em `deck_details_overview_tab.dart`: o chip `Inválido/Válido` saiu do hero e foi movido para o `DeckProgressIndicator`, reduzindo concorrência visual no primeiro viewport
+- `deck_progress_indicator.dart` agora aceita badge semântico opcional, permitindo manter informação de validação sem poluir o topo do hero
+- segundo corte formal da `Wave 1` reorganizou a ordem da `Visão Geral` em `deck_details_overview_tab.dart`: `Estratégia` e `Descrição` subiram para antes de `Diagnóstico`, `Mão inicial` e `Pricing`, deixando a tela mais editorial e orientada a decisão
+- `deck_details_overview_tab_test.dart` passou a validar hierarquia visual mínima entre `Selecionar comandante`, `Estratégia` e `Descrição`, para evitar regressão da composição do primeiro scroll
+- terceiro corte formal da `Wave 1` rebaixou o `Pricing` para o fim da `Visão Geral` em `deck_details_overview_tab.dart`, tratando custo como informação complementar e não mais como bloco do primeiro scroll
+- `deck_details_overview_tab_test.dart` passou a garantir também que `Custo` fique abaixo de `Descrição`, protegendo essa hierarquia de produto contra regressão
+- quarto corte formal da `Wave 1` subiu o bloco `Comandante` para junto de `Estratégia` em `deck_details_overview_tab.dart`, deixando identidade concreta e plano do deck lado a lado na leitura principal
+- `deck_details_overview_tab_test.dart` passou a validar a ordem entre `Estratégia`, `Comandante` e `Descrição` em decks com comandante
+- quinto corte formal da `Wave 1` removeu as ações redundantes `Abrir cartas` e `Abrir análise` do topo da `Visão Geral`; a tela agora usa o `TabBar` como navegação e mantém só `Otimizar deck` como CTA dominante
+- `deck_details_overview_tab_test.dart` passou a validar a ausência desses CTAs redundantes e a presença do CTA único `Otimizar deck`
+- sexto corte formal da `Wave 1` refinou o acabamento visual da `Visão Geral`: hero com tipografia mais forte e thumb menos invasiva, CTA `Otimizar deck` mais leve, `DeckProgressIndicator` menos técnico e bloco `Comandante` com melhor proporção visual
+- sétimo corte formal da `Wave 1` alinhou `Estratégia` e `Descrição` à mesma família visual em `deck_details_overview_tab.dart`, com superfícies consistentes e subtítulos que explicam melhor a utilidade de cada seção
+- oitavo corte formal da `Wave 1` redesenhou `deck_diagnostic_panel.dart` para uma leitura mais executiva: cabeçalho responsivo, selo-resumo, cards de métrica menos técnicos e insights em superfícies coerentes com a `Visão Geral`
+- primeiro corte formal da revisão da `deck_details_screen.dart` fora da `Visão Geral` entrou na tab `Cartas`: títulos de seção com badge de contagem, tiles de carta com menos ruído, quantidade/set/condição como metadados secundários e estado `Inválida` integrado ao card
+- `deck_details_screen_smoke_test.dart` foi alinhado ao novo cabeçalho da seção `Comandante` e continuou verde com a smoke completa da tela
+- segundo corte formal da revisão da `deck_details_screen.dart` na tab `Cartas` removeu o bloco introdutório redundante e passou a diferenciar o comandante no próprio tile, com assinatura visual sutil (borda/fundo/ícone), reduzindo camadas desnecessárias sem perder semântica
+- terceiro corte formal da revisão da `deck_details_screen.dart` na tab `Cartas` simplificou os cabeçalhos de seção para linhas editoriais sem caixa, reforçando o tom minimalista e deixando mais peso visual nas cartas do que nos contêineres
+- primeiro corte formal da revisão de `deck_analysis_tab.dart` suavizou a sensação de dashboard: barra de ação mais integrada, `SectionCard`s menos pesados, insights menos gritados e score de sinergia sem aparência de `card dentro de card`
+- segundo corte formal da revisão de `deck_analysis_tab.dart` consolidou `Curva de mana` e `Distribuição de cores` em uma única seção `Base de mana`, reduzindo competição entre painéis de mesmo nível e deixando a leitura mais editorial
+- terceiro corte formal da revisão de `deck_analysis_tab.dart` reduziu o peso visual da legenda da distribuição de cores, deixando o gráfico como protagonista e a legenda como apoio discreto
+- primeiro corte formal da revisão de `community_screen.dart` reduziu saturação visual fora do core de decks: filtros mais contidos, chips de formato e score menos berrantes, links/avatares/metadados mais neutros nos cards da comunidade
+- segundo corte formal da revisão de `community_screen.dart` suavizou a aba `Cotações`: tabs menos douradas, badge de contagem mais neutra e variação de preço concentrada no selo de mudança, em vez de tingir múltiplos pontos do card ao mesmo tempo
+- primeiro corte formal da revisão de `life_counter_screen.dart` reduziu saturação no hub central e nos badges auxiliares, para que o foco volte aos totais de vida e não ao ornamento cromático da mesa
+- primeira entrega funcional prioritária do `life_counter_screen.dart` entrou em `Ferramentas de Mesa`: `Roll-off` por jogador, com um `D20` por player, destaque visual para o maior resultado, detecção de empate e definição automática do `1º jogador` quando houver vencedor único
+- `life_counter_screen_test.dart` foi ampliado para cobrir o fluxo do `Roll-off`, garantindo a renderização de um resultado por jogador dentro da sheet de ferramentas
+- o hub expandido `Mesa Commander` agora concentra mais utilidades de uso recorrente: `D20`, `Moeda` e `1º jogador` passaram a existir direto no hub, e o último resultado da mesa é exibido ali mesmo
+- `life_counter_screen_test.dart` também passou a cobrir o uso direto do `D20` no hub, reforçando a direção de produto de usar o máximo possível sem abrir a sheet de `Tools`
+- o núcleo da vida em cada `PlayerPanel` agora abre um mini hub oculto contextual do jogador: toque no número revela atalhos locais (`D20` individual e `Morto/Reviver`) sem abrir modal
+- `life_counter_screen_test.dart` passou a cobrir também esse gesto no bloco da vida, garantindo que os atalhos do jogador apareçam e que `Morto` zere a vida imediatamente
+- o `D20` individual do `PlayerPanel` agora deixa um rastro visual útil de mesa: cada jogador mantém no próprio card um badge com o último resultado (`D20 N`), em vez de depender apenas do texto do evento global
+- `life_counter_screen_test.dart` também passou a validar esse badge no card do jogador após o uso do atalho local
+- a comparação inicial com o app benchmark analisado em `dddddd/` foi consolidada em `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md`, mas essa leitura foi superada na mesma data
+- a direcao ativa do `life counter` agora esta formalizada em `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md`: o objetivo deixou de ser "superar sem copiar" e passou a ser `clonar o benchmark o mais fielmente possivel e so depois customizar`
+- a pasta `dddddd/` passou a ser tratada como benchmark ampliado, com `10` capturas usadas como fonte de verdade para layout, hierarquia, hub central, rail inferior, overlays e estados especiais
+- a mesma sprint do clone passou a incorporar tambem motion/feedback de evento; foi decidido explicitamente nao abrir uma sprint separada de animacao para o `life counter`
+- veredito operacional atual da frente: a nossa logica de jogo ja e suficiente para sustentar o clone; o gargalo agora e de shell visual/interacional da mesa, nao de regra de negocio
+- a `Wave 1` do clone do `life counter` ja foi iniciada: a mesa perdeu o gradiente/backdrop autoral, adotou base `black-first`, quadrantes mais `full-bleed`, paleta do benchmark e um primeiro corte de hub central mais proximo da referencia
+- a mesma frente ja recebeu o segundo corte estrutural: o hub central virou menu radial/petal, `PLAYERS` ganhou entrada dedicada e a barra inferior de mesa (`DICE`, `HISTORY`, `CARD SEARCH`) entrou na shell principal
+- a mesma frente recebeu o terceiro corte estrutural: `SETTINGS` e `TABLE TOOLS` deixaram de abrir como `sheet` generica e passaram a usar overlays centrados na propria mesa, na mesma familia visual do clone; `HISTORY` e `CARD SEARCH` foram alinhados a essa shell
+- `PLAYERS` tambem foi trazido para a mesma familia de overlay clone, removendo a ultima divergencia grande entre os overlays centrais da mesa e deixando `DICE`/`SET LIFE` como os proximos gaps dessa frente
+- `DICE` e `SET LIFE` deixaram de ser gaps abertos nesta rodada: o rail agora abre um overlay dedicado `DICE`, e o toque no numero central do jogador abre um keypad `SET LIFE`; os atalhos locais do jogador foram preservados como gesto secundario (`long press`) no life core
+- pendencia residual formal da frente: o `life counter` ja esta muito melhor em shell e interacao, mas ainda nao atingiu o benchmark em motion e presenca de evento; isso agora faz parte da mesma sprint ativa
+- a `Wave 9` da mesma sprint foi iniciada nesta rodada: o `PlayerPanel` ganhou transicao animada de estado e o `High Roll` passou a ter takeover mais presente no proprio painel, com glow/rampa visual acima do estado anterior puramente funcional
+- o segundo corte da `Wave 9` tambem ja entrou: os overlays centrais da mesa agora usam o mesmo motion compartilhado (`fade + scale + slide`), reforcando a sensacao de surgir da mesa em vez de trocar de tela
+- a `Wave 5` tambem saiu do estado conceitual e entrou no codigo: `KO'D!`, `COMMANDER DOWN.` e poison lethal (`TOXIC OUT.`) agora usam takeover real de painel em vez de badge lateral
+- o recorte novo do clone empurrou tambem `High Roll` e `D20` para takeover real do painel: o numero deixou de viver como badge e passou a dominar o quadrante do jogador como estado temporario de mesa, com fundo comemorativo para vencedor e supressao dos badges/controles secundarios durante o evento
+- a malha focada da frente foi revalidada apos esse primeiro recorte de shell:
+  - `flutter analyze lib/features/home/life_counter_screen.dart test/features/home/life_counter_screen_test.dart`
+  - `flutter test test/features/home/life_counter_screen_test.dart`
+  - ambos verdes em `2026-03-25`
+- primeira entrega oficial da Fase 1 da sprint de mesa foi concluída: `poison inline` entrou no mini hub do núcleo da vida, com `Poison +` e `Poison -` sem depender da sheet de contadores
+- `life_counter_screen_test.dart` passou a cobrir também o ajuste inline de poison e a renderização do badge local de veneno no card do jogador
+- segunda entrega oficial da Fase 1 da sprint de mesa foi concluída: `commander tax inline` entrou no mesmo mini hub do núcleo da vida, com `Tax +` e `Tax -` sem depender da sheet
+- `life_counter_screen_test.dart` passou a cobrir também o badge local `Tax +N` após uso do atalho inline
+- terceira entrega oficial da Fase 1 da sprint de mesa foi concluída: `Morto/Reviver` ganhou estado visual forte no card do jogador, com overlay explícito `MORTO` e desaturação parcial do painel
+- `life_counter_screen_test.dart` passou a validar também a presença do estado visual `MORTO` após o atalho local zerar a vida
+- a Fase 2 da sprint de mesa foi iniciada e já entrou no estado útil de `High Roll`: o `Mesa Commander` agora tem CTA explícito de `High Roll`, a rolagem distribui um `HIGH N` por jogador no próprio card e o vencedor/empate recebe status visual local
+- quando o `High Roll` termina com vencedor único, o `1º jogador` é derivado automaticamente do resultado e o evento fica resumido também no hub central
+- `life_counter_screen_test.dart` passou a cobrir o `High Roll` direto do hub e a presença dos badges/resultados locais por jogador
+- a Fase 2 foi concluída nesta rodada: quando houver empate no `High Roll`, o hub e a sheet passam a oferecer `Desempatar`, rerrolando apenas os jogadores empatados e mantendo o fluxo claramente legível no próprio card e na `Tools` sheet
+- o resumo local da sheet também diferencia `High Roll` inicial de `Desempate do High Roll`, e a suíte do `life_counter` ganhou teste determinístico para esse tie-break
+- a Fase 3 foi iniciada: `commander damage` agora pode ser aberto direto do mini hub do núcleo da vida via atalho `Cmd dmg`, sem depender de navegar pela sheet completa de contadores
+- esse fluxo novo abre uma sheet rápida e dedicada por jogador, focada só em dano por fonte, e o badge total de `commander damage` no card reage imediatamente às alterações
 - `Sentry` backend foi ligado em `server/lib/observability.dart` e no middleware global, com propagação de `x-request-id` via `server/lib/request_trace.dart`
 - `Sentry` app foi ligado em `app/lib/core/observability/app_observability.dart`, com captura global de erros, observer de rota e `x-request-id` em `app/lib/core/api/api_client.dart`
 - `server/.env.example` foi atualizado com as chaves mínimas de observabilidade e o setup ficou registrado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`

@@ -211,10 +211,18 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
           ],
           const SizedBox(height: 20),
           _SectionCard(
-            title: 'Curva de mana',
+            title: 'Base de mana',
             subtitle:
-                'Distribuição de custo das mágicas, sem considerar terrenos.',
-            child:
+                'Curva e pressão de cor agrupadas em uma leitura única do deck.',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _AnalysisSubsectionHeader(
+                  title: 'Curva de mana',
+                  subtitle:
+                      'Distribuição de custo das mágicas, sem considerar terrenos.',
+                ),
+                const SizedBox(height: 10),
                 manaCurve.every((v) => v == 0)
                     ? SizedBox(
                       height: 100,
@@ -285,13 +293,15 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                         ),
                       ),
                     ),
-          ),
-          const SizedBox(height: 20),
-          _SectionCard(
-            title: 'Distribuição de cores',
-            subtitle:
-                'Leitura baseada nos símbolos de mana das mágicas do deck.',
-            child:
+                const SizedBox(height: 18),
+                Divider(color: AppTheme.outlineMuted.withValues(alpha: 0.35)),
+                const SizedBox(height: 18),
+                const _AnalysisSubsectionHeader(
+                  title: 'Distribuição de cores',
+                  subtitle:
+                      'Leitura baseada nos símbolos de mana das mágicas do deck.',
+                ),
+                const SizedBox(height: 10),
                 colorCounts.values.every((v) => v == 0)
                     ? SizedBox(
                       height: 100,
@@ -323,11 +333,13 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _buildLegend(colorCounts),
+                            children: _buildLegend(context, colorCounts),
                           ),
                         ],
                       ),
                     ),
+              ],
+            ),
           ),
         ],
       ),
@@ -356,8 +368,8 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
     }).toList();
   }
 
-  List<Widget> _buildLegend(Map<String, int> counts) {
-    final namesMap = {
+  List<Widget> _buildLegend(BuildContext context, Map<String, int> counts) {
+    const namesMap = {
       'W': 'Branco',
       'U': 'Azul',
       'B': 'Preto',
@@ -365,24 +377,40 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
       'G': 'Verde',
       'C': 'Incolor',
     };
+    final textTheme = Theme.of(context).textTheme;
 
     final colorsMap = AppTheme.wubrg;
 
     return counts.entries.where((e) => e.value > 0).map((entry) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 12,
-              height: 12,
+              width: 10,
+              height: 10,
               decoration: BoxDecoration(
                 color: colorsMap[entry.key],
                 shape: BoxShape.circle,
               ),
             ),
             const SizedBox(width: 8),
-            Text('${namesMap[entry.key]}: ${entry.value}'),
+            Text(
+              namesMap[entry.key]!,
+              style: textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary.withValues(alpha: 0.94),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '${entry.value}',
+              style: textTheme.bodySmall?.copyWith(
+                color: AppTheme.textPrimary.withValues(alpha: 0.82),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       );
@@ -403,18 +431,40 @@ class _AnalysisActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final theme = Theme.of(context);
+    final accent = hasAnalysis ? AppTheme.success : theme.colorScheme.primary;
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Expanded(
-          child: Text(
-            hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                hasAnalysis ? Icons.check_circle_outline : Icons.pending_outlined,
+                size: 16,
+                color: accent,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                hasAnalysis ? 'Leitura pronta' : 'Leitura pendente',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
-        FilledButton.icon(
+        FilledButton.tonalIcon(
           onPressed: isRefreshing ? null : onRefresh,
           icon: Icon(hasAnalysis ? Icons.refresh : Icons.auto_awesome),
           label: Text(hasAnalysis ? 'Atualizar análise' : 'Gerar análise'),
@@ -443,11 +493,11 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+        color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.65),
-          width: 0.8,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+          width: 0.7,
         ),
       ),
       child: Column(
@@ -496,9 +546,9 @@ class _InsightBlock extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.12),
+        color: accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.25), width: 0.7),
+        border: Border.all(color: accent.withValues(alpha: 0.18), width: 0.7),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,6 +580,40 @@ class _InsightBlock extends StatelessWidget {
   }
 }
 
+class _AnalysisSubsectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _AnalysisSubsectionHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          subtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: AppTheme.textSecondary.withValues(alpha: 0.94),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _AnalysisCard extends StatelessWidget {
   final String title;
   final int score;
@@ -543,33 +627,48 @@ class _AnalysisCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircularProgressIndicator(
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: color.withValues(alpha: 0.18), width: 0.7),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 42,
+            height: 42,
+            child: CircularProgressIndicator(
               value: score / 100,
+              strokeWidth: 4,
               color: color,
-              backgroundColor: color.withValues(alpha: 0.2),
+              backgroundColor: color.withValues(alpha: 0.18),
             ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleMedium),
-                Text(
-                  '$score/100',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
+          ),
+          const SizedBox(width: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textSecondary.withValues(alpha: 0.96),
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$score/100',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -62,7 +62,6 @@ void main() {
     required DeckDetails deck,
     required VoidCallback onValidationTap,
     required VoidCallback onOpenCards,
-    required VoidCallback onOpenAnalysis,
     required VoidCallback onForcePricingRefresh,
     required VoidCallback onShowPricingDetails,
     required VoidCallback onTogglePublic,
@@ -95,7 +94,6 @@ void main() {
             bracketLabel: (_) => 'Casual',
             onValidationTap: onValidationTap,
             onOpenCards: onOpenCards,
-            onOpenAnalysis: onOpenAnalysis,
             onForcePricingRefresh: onForcePricingRefresh,
             onShowPricingDetails: onShowPricingDetails,
             onTogglePublic: onTogglePublic,
@@ -118,7 +116,6 @@ void main() {
     var commanderTapped = 0;
     var importTapped = 0;
     var cardsOpened = 0;
-    var analysisOpened = 0;
     String? editedDescription;
 
     await tester.pumpWidget(
@@ -126,7 +123,6 @@ void main() {
         deck: makeDeck(),
         onValidationTap: () => validationTapped++,
         onOpenCards: () => cardsOpened++,
-        onOpenAnalysis: () => analysisOpened++,
         onForcePricingRefresh: () {},
         onShowPricingDetails: () {},
         onTogglePublic: () {},
@@ -140,20 +136,23 @@ void main() {
 
     expect(find.text('Boros Tokens'), findsOneWidget);
     expect(find.text('99 cartas'), findsOneWidget);
-    expect(find.text('Abrir cartas'), findsOneWidget);
-    expect(find.text('Abrir análise'), findsOneWidget);
-    expect(find.text('Otimizar'), findsOneWidget);
+    expect(find.text('Abrir cartas'), findsNothing);
+    expect(find.text('Abrir análise'), findsNothing);
+    expect(find.text('Otimizar deck'), findsOneWidget);
     expect(find.text('Descrição'), findsOneWidget);
     expect(find.text('Estratégia'), findsOneWidget);
     expect(find.text('Selecionar'), findsOneWidget);
 
-    await tester.tap(find.text('Abrir cartas'));
-    await tester.pumpAndSettle();
-    expect(cardsOpened, 1);
+    final commanderPromptTop = tester.getTopLeft(
+      find.text(
+        'Selecione um comandante para aplicar regras e filtros de identidade de cor.',
+      ),
+    );
+    final strategyTop = tester.getTopLeft(find.text('Estratégia'));
+    final descriptionTop = tester.getTopLeft(find.text('Descrição'));
 
-    await tester.tap(find.text('Abrir análise'));
-    await tester.pumpAndSettle();
-    expect(analysisOpened, 1);
+    expect(commanderPromptTop.dy, lessThan(strategyTop.dy));
+    expect(strategyTop.dy, lessThan(descriptionTop.dy));
 
     await tester.tap(find.text('Inválido'));
     await tester.pumpAndSettle();
@@ -169,11 +168,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(commanderTapped, 1);
 
-    await tester.ensureVisible(find.text('Definir'));
-    await tester.tap(find.text('Definir'));
+    await tester.ensureVisible(find.text('Otimizar deck'));
+    await tester.tap(find.text('Otimizar deck'));
     await tester.pumpAndSettle();
     expect(optimizationTapped, 1);
 
+    expect(cardsOpened, 0);
     expect(importTapped, 0);
   });
 
@@ -191,7 +191,6 @@ void main() {
         validationResult: null,
         onValidationTap: () {},
         onOpenCards: () => cardsTapped++,
-        onOpenAnalysis: () {},
         onForcePricingRefresh: () {},
         onShowPricingDetails: () {},
         onTogglePublic: () {},
@@ -236,7 +235,6 @@ void main() {
         validationResult: const {'ok': true},
         onValidationTap: () {},
         onOpenCards: () {},
-        onOpenAnalysis: () {},
         onForcePricingRefresh: () {},
         onShowPricingDetails: () {},
         onTogglePublic: () {},
@@ -253,5 +251,12 @@ void main() {
     expect(find.text('100 cartas • Bracket 2 • tempo'), findsOneWidget);
     expect(find.text('Público'), findsOneWidget);
     expect(find.text('Válido'), findsOneWidget);
+
+    final strategyTop = tester.getTopLeft(find.text('Estratégia'));
+    final commanderSectionTop = tester.getTopLeft(find.text('Comandante'));
+    final descriptionTop = tester.getTopLeft(find.text('Descrição'));
+
+    expect(strategyTop.dy, lessThan(commanderSectionTop.dy));
+    expect(commanderSectionTop.dy, lessThan(descriptionTop.dy));
   });
 }

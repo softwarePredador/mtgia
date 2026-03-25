@@ -190,7 +190,8 @@ void main() {
       await tester.pumpWidget(createSubject(makeHealthyCommanderDeck()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Diagnóstico rápido'), findsOneWidget);
+      expect(find.text('Leitura rápida do deck'), findsOneWidget);
+      expect(find.text('Indicadores principais'), findsOneWidget);
       expect(find.text('Terrenos'), findsOneWidget);
       expect(find.text('Ramp'), findsOneWidget);
       expect(find.text('Compra'), findsOneWidget);
@@ -206,7 +207,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Ver análise'), findsOneWidget);
+      expect(find.text('Análise completa'), findsOneWidget);
     });
 
     testWidgets('avoids overflow and surfaces warnings for a greedy deck', (

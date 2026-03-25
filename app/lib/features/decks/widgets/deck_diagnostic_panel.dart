@@ -19,6 +19,14 @@ class DeckDiagnosticPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final snapshot = _DeckDiagnosticSnapshot.fromDeck(deck);
+    final hasWarnings = snapshot.metrics.any(
+      (metric) =>
+          identical(metric.tone, _DiagnosticTone.danger) ||
+          identical(metric.tone, _DiagnosticTone.warn),
+    );
+    final summaryTone =
+        hasWarnings ? _DiagnosticTone.warn : _DiagnosticTone.good;
+    final summaryLabel = hasWarnings ? 'Pontos de atenção' : 'Base saudável';
 
     return Container(
       width: double.infinity,
@@ -34,38 +42,78 @@ class DeckDiagnosticPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Diagnóstico rápido',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w700,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 420;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Leitura rápida do deck',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Resumo local de mana, curva e interação para orientar os próximos ajustes.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Leitura local do deck principal para mana, curva e peças-chave.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (onOpenAnalysis != null)
-                TextButton.icon(
-                  onPressed: onOpenAnalysis,
-                  icon: const Icon(Icons.analytics_outlined, size: 18),
-                  label: const Text('Ver análise'),
-                ),
-            ],
+                      if (!isCompact) ...[
+                        const SizedBox(width: 12),
+                        _DiagnosticSummaryBadge(
+                          label: summaryLabel,
+                          tone: summaryTone,
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      if (isCompact)
+                        _DiagnosticSummaryBadge(
+                          label: summaryLabel,
+                          tone: summaryTone,
+                        ),
+                      if (onOpenAnalysis != null)
+                        TextButton.icon(
+                          onPressed: onOpenAnalysis,
+                          icon: const Icon(Icons.analytics_outlined, size: 18),
+                          label: const Text('Análise completa'),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 16),
+          Text(
+            'Indicadores principais',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
           LayoutBuilder(
             builder: (context, constraints) {
               final columns =
@@ -93,7 +141,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            'Leitura rápida',
+            'Diagnóstico textual',
             style: theme.textTheme.titleSmall?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w700,
@@ -116,57 +164,97 @@ class _DiagnosticMetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: metric.tone.background,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: metric.tone.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            metric.label,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: AppTheme.textSecondary,
-              fontWeight: FontWeight.w600,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 170;
+
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceSlate.withValues(alpha: 0.92),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: metric.tone.border.withValues(alpha: 0.68),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  metric.value,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
+              if (isCompact) ...[
+                Text(
+                  metric.label,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(height: 8),
+                _MetricToneBadge(label: metric.status, tone: metric.tone),
+              ] else
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        metric.label,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: _MetricToneBadge(
+                          label: metric.status,
+                          tone: metric.tone,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      metric.value,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: metric.tone.background,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    child: Icon(
+                      metric.icon,
+                      size: 16,
+                      color: metric.tone.foreground,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(metric.icon, size: 18, color: metric.tone.foreground),
+              const SizedBox(height: 8),
+              Text(
+                metric.target,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary.withValues(alpha: 0.9),
+                  height: 1.3,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            metric.status,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: metric.tone.foreground,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            metric.target,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppTheme.textSecondary,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -180,15 +268,21 @@ class _DiagnosticInsightRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: insight.tone.border.withValues(alpha: 0.58)),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.only(top: 2),
-            width: 24,
-            height: 24,
+            width: 26,
+            height: 26,
             decoration: BoxDecoration(
               color: insight.tone.background,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -206,6 +300,60 @@ class _DiagnosticInsightRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DiagnosticSummaryBadge extends StatelessWidget {
+  final String label;
+  final _DiagnosticTone tone;
+
+  const _DiagnosticSummaryBadge({required this.label, required this.tone});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: tone.background,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: tone.border.withValues(alpha: 0.62)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: tone.foreground,
+          fontSize: AppTheme.fontSm,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _MetricToneBadge extends StatelessWidget {
+  final String label;
+  final _DiagnosticTone tone;
+
+  const _MetricToneBadge({required this.label, required this.tone});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: tone.background,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: tone.border.withValues(alpha: 0.62)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: tone.foreground,
+          fontSize: AppTheme.fontSm,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
