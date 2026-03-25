@@ -242,6 +242,16 @@ Estado do app core em `2026-03-24`:
 - `deck_provider_test.dart` agora também cobre `copyPublicDeck`, e `deck_provider_support_test.dart` cobre diretamente o recorte de delete e falhas de conexão
 - `deck_provider_support_test.dart` agora também cobre diretamente o helper `buildNamedOptimizationPayload`
 - `deck_provider_support_test.dart` agora também cobre diretamente a hidratação da lista e a aplicação de enrichment de `color_identity`
+- o estado de deck recém-criado vazio foi convertido em onboarding calmo na `DeckDetailsOverviewTab`, removendo chip `Inválido`, diagnóstico/painéis vermelhos e requests automáticos de `pricing`/`validate` enquanto `totalCards == 0`
+- a suíte do app passou a cobrir esse caso explicitamente em `deck_details_overview_tab_test.dart` e `deck_details_screen_smoke_test.dart`
+- a `DeckImportScreen` passou por recorte funcional de ruído visual: hero neutro sem gradiente concorrente, pills discretos de origem, contador de lista mais calmo e erro inline menos agressivo
+- a suíte do app agora cobre também esse recorte em `deck_import_screen_test.dart`
+- a `HomeScreen` passou por recorte funcional de ruído visual: um CTA principal dominante, grade de ações rápidas mais neutra e empty state sem competir como segundo hero
+- a suíte do app agora cobre também esse recorte em `home_screen_test.dart`
+- `login_screen.dart`, `register_screen.dart` e `splash_screen.dart` passaram por recorte funcional de ruído visual, reduzindo glow/camadas simultâneas e concentrando o peso visual no CTA principal
+- a suíte do app agora cobre esse recorte em `auth_screens_test.dart`
+- `scanned_card_preview.dart` passou por recorte funcional de ruído visual, com badges menos concorrentes e `CardNotFoundWidget` menos agressivo
+- a suíte do app agora cobre esse recorte em `scanned_card_preview_test.dart`
 - ambiente publicado revalidado em `2026-03-24`:
   - `GET /health` -> `200`
   - `GET /ready` -> `200`
@@ -433,16 +443,43 @@ Critério de saida:
 - Sprint 5 ainda pode andar parcialmente junto da Sprint 1, mas so no fluxo core
 - Sprint 6 e Sprint 7 devem ficar depois do endurecimento tecnico principal
 
+## Estado Atual Em 2026-03-25
+
+Sprint 1 do core esta estruturalmente fechada.
+
+O que saiu da faixa critica:
+
+- backend de `optimize/rebuild`
+- corpus recorrente e gate de qualidade
+- `deck_details_screen.dart`
+- `deck_provider.dart`
+
+Recorte mais recente:
+
+- `deck_provider.dart` ficou em `899` linhas
+- `deck_provider_support.dart` virou barrel de `6` linhas
+- o suporte foi quebrado em modulos por dominio:
+  - `deck_provider_support_common.dart`
+  - `deck_provider_support_fetch.dart`
+  - `deck_provider_support_mutation.dart`
+  - `deck_provider_support_ai.dart`
+  - `deck_provider_support_import.dart`
+  - `deck_provider_support_generation.dart`
+
+Validacao mais recente:
+
+- `flutter analyze` verde para provider/support/tests focados
+- `flutter test` verde para a malha focada do app core
+
 ## Proximo passo imediato
 
-O proximo passo dominante continua sendo:
+O proximo passo dominante agora e operacional:
 
-1. seguir na modularizacao de `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server/routes/ai/optimize/index.dart`
+1. fechar a validacao real do `Sentry` mobile em target/toolchain que conclua o build
+2. revisar o `CHECKLIST_GO_LIVE_FINAL.md` com essa pendencia como ultimo bloqueio dominante
 
-Depois disso, manter a fila oficial desta forma:
+Depois disso, a fila correta passa a ser:
 
-2. gate recorrente do corpus
-3. casos dirigidos restantes
-4. smoke do app do fluxo core
-
-Esses quatro itens juntos ainda pertencem a Sprint 1.
+3. carga basica e thresholds do fluxo core
+4. worker/assincrono/Redis
+5. so depois design system e superficies secundarias

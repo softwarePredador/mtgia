@@ -20,7 +20,7 @@ trap 'rm -f "$tmp_output"' EXIT
 cd "$ROOT_DIR/app"
 
 flutter test integration_test/mobile_sentry_smoke_test.dart \
-  --dart-define=API_BASE_URL="${API_BASE_URL:-https://evolution-cartinhas.8ktevp.easypanel.host}" \
+  --dart-define=API_BASE_URL="${API_BASE_URL:-http://127.0.0.1:8080}" \
   --dart-define=SENTRY_DSN="${SENTRY_MOBILE_DSN:-${SENTRY_DSN:-}}" \
   --dart-define=SENTRY_ENVIRONMENT="${SENTRY_ENVIRONMENT:-development}" \
   --dart-define=SENTRY_RELEASE="${SENTRY_RELEASE:-manaloom@local}" \

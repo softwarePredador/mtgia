@@ -122,17 +122,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _QuickAction(
                           icon: Icons.add_rounded,
                           label: 'Novo Deck',
-                          color: theme.colorScheme.primary,
+                          accentColor: AppTheme.primarySoft,
+                          highlighted: true,
                           onTap: () => context.go('/decks'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _QuickAction(
-                          icon: Icons.auto_awesome,
-                          label: 'Gerar com IA',
-                          color: theme.colorScheme.secondary,
-                          onTap: () => context.go('/decks/generate'),
+                          icon: Icons.content_paste,
+                          label: 'Importar lista',
+                          accentColor: AppTheme.primarySoft,
+                          highlighted: true,
+                          onTap: () => context.go('/decks/import'),
                         ),
                       ),
                     ],
@@ -142,10 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: _QuickAction(
-                          icon: Icons.content_paste,
-                          label: 'Importar',
-                          color: AppTheme.mythicGold,
-                          onTap: () => context.go('/decks/import'),
+                          icon: Icons.auto_awesome,
+                          label: 'Gerar com IA',
+                          accentColor: AppTheme.primarySoft,
+                          highlighted: true,
+                          onTap: () => context.go('/decks/generate'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -153,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _QuickAction(
                           icon: Icons.collections_bookmark,
                           label: 'Minha Coleção',
-                          color: AppTheme.primarySoft,
+                          accentColor: AppTheme.textSecondary,
                           onTap: () => context.go('/collection'),
                         ),
                       ),
@@ -166,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _QuickAction(
                           icon: Icons.favorite,
                           label: 'Vida',
-                          color: AppTheme.error,
+                          accentColor: AppTheme.textSecondary,
                           onTap: () => context.go('/life-counter'),
                         ),
                       ),
@@ -175,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _QuickAction(
                           icon: Icons.store,
                           label: 'Marketplace',
-                          color: AppTheme.success,
+                          accentColor: AppTheme.textSecondary,
                           onTap: () => context.go('/collection?tab=1'),
                         ),
                       ),
@@ -220,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Decks',
                             value: '${deckStats.total}',
                             icon: Icons.style,
-                            color: theme.colorScheme.primary,
+                            color: AppTheme.primarySoft,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -229,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Formatos',
                             value: '${deckStats.formats}',
                             icon: Icons.category,
-                            color: theme.colorScheme.secondary,
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                       ],
@@ -336,12 +339,12 @@ class _SectionHeader extends StatelessWidget {
           width: 3,
           height: 18,
           decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient,
+            color: AppTheme.primarySoft,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 16, color: AppTheme.manaViolet),
+        Icon(icon, size: 16, color: AppTheme.textSecondary),
         const SizedBox(width: 6),
         Text(
           label,
@@ -423,13 +426,15 @@ class _GradientButton extends StatelessWidget {
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color color;
+  final Color accentColor;
+  final bool highlighted;
   final VoidCallback onTap;
 
   const _QuickAction({
     required this.icon,
     required this.label,
-    required this.color,
+    required this.accentColor,
+    this.highlighted = false,
     required this.onTap,
   });
 
@@ -440,24 +445,46 @@ class _QuickAction extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        splashColor: color.withValues(alpha: 0.08),
-        highlightColor: color.withValues(alpha: 0.04),
+        splashColor: accentColor.withValues(alpha: 0.08),
+        highlightColor: accentColor.withValues(alpha: 0.04),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceSlate,
+            color:
+                highlighted
+                    ? AppTheme.primarySoft.withValues(alpha: 0.05)
+                    : AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+            border: Border.all(
+              color:
+                  highlighted
+                      ? AppTheme.primarySoft.withValues(alpha: 0.24)
+                      : AppTheme.outlineMuted,
+              width: 0.5,
+            ),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
+                  color:
+                      highlighted
+                          ? accentColor.withValues(alpha: 0.14)
+                          : AppTheme.surfaceElevated,
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color:
+                        highlighted
+                            ? accentColor.withValues(alpha: 0.18)
+                            : AppTheme.outlineMuted.withValues(alpha: 0.55),
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 22),
+                child: Icon(
+                  icon,
+                  color: highlighted ? accentColor : AppTheme.textSecondary,
+                  size: 22,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -575,32 +602,45 @@ class _EmptyDecksState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ShaderMask(
-            shaderCallback:
-                (bounds) => AppTheme.primaryGradient.createShader(bounds),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppTheme.primarySoft.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
             child: const Icon(
               Icons.style_outlined,
-              size: 48,
-              color: Colors.white,
+              size: 28,
+              color: AppTheme.primarySoft,
             ),
           ),
           const SizedBox(height: 12),
           Text('Nenhum deck criado ainda', style: theme.textTheme.titleSmall),
           const SizedBox(height: 4),
           Text(
-            'Crie seu primeiro deck ou gere um com IA!',
+            'Comece criando um deck manualmente ou importando uma lista que você já usa.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
-          _GradientButton(
-            icon: Icons.flag_outlined,
-            label: 'Iniciar fluxo guiado',
-            gradient: AppTheme.primaryGradient,
-            glowColor: AppTheme.manaViolet,
-            onTap: () => context.go('/onboarding/core-flow'),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: () => context.go('/decks'),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Abrir decks'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => context.go('/decks/import'),
+                icon: const Icon(Icons.content_paste_rounded),
+                label: const Text('Importar lista'),
+              ),
+            ],
           ),
         ],
       ),

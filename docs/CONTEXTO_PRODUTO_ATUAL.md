@@ -178,6 +178,22 @@ Progresso atual documentado da Sprint 1:
 - `deck_provider_support_test.dart` agora também cobre diretamente o helper `buildNamedOptimizationPayload`
 - `deck_provider_support_test.dart` agora também cobre diretamente a hidratação da lista e a aplicação de enrichment de `color_identity`
 - a malha focada do app core foi revalidada em conjunto (`deck_provider_support_test`, `deck_provider_test`, `deck_details_screen_smoke_test`, `api_client_request_id_test`) e seguiu verde depois do recorte final do provider
+- a `DeckDetailsOverviewTab` agora trata deck recém-criado vazio como estado de onboarding, não de erro: sem chip `Inválido`, sem diagnóstico/painéis vermelhos e sem descrição/estratégia antes da primeira base de cartas
+- a `DeckDetailsScreen` deixou de disparar `pricing` e `validate` automáticos quando `totalCards == 0`, evitando ruído visual e requests desnecessários no deck vazio
+- a suíte do app ganhou cobertura dedicada para esse estado em `deck_details_overview_tab_test.dart` e `deck_details_screen_smoke_test.dart`
+- a `DeckImportScreen` perdeu o hero em gradiente concorrente e passou a usar onboarding mais neutro, com fontes suportadas em pills discretos e contador de lista menos agressivo
+- o erro inline da importação foi suavizado: continua semântico, mas agora em superfície elevada com texto primário/secundário, sem bloco vermelho dominante antes de qualquer revisão manual
+- `deck_import_screen_test.dart` passou a cobrir o estado inicial mais calmo e o erro inline revisado
+- a `HomeScreen` perdeu a competição de seis acentos simultâneos no primeiro viewport: o CTA principal continua dominante, enquanto a grade de ações rápidas foi neutralizada para usar poucos tons e o empty state virou apoio, não um segundo hero
+- `home_screen_test.dart` passou a cobrir a nova pilha de CTA e o empty state neutro da home
+- `login_screen.dart`, `register_screen.dart` e `splash_screen.dart` foram suavizadas para manter o branding com menos glow/camadas simultâneas, concentrando o peso visual no CTA principal e não mais em logo+título+card ao mesmo tempo
+- `auth_screens_test.dart` passou a cobrir o shell visual novo de login e registro
+- `scanned_card_preview.dart` passou a usar badges mais neutras e um estado de `CardNotFoundWidget` menos agressivo, reduzindo a concorrência entre confiança, condição, foil e erro
+- `scanned_card_preview_test.dart` passou a cobrir o preview principal e o estado de carta não encontrada
+- `deck_card.dart` agora usa a arte do comandante como assinatura visual sutil na lista de decks, com overlay escuro controlado e linha secundária `Comandante: ...`, sem quebrar a leitura nem o teste de overflow
+- `deck_card_test.dart` foi adicionado para cobrir explicitamente esse estado com comandante, e `deck_card_overflow_test.dart` continuou verde com o novo fundo
+- a aba `Cartas` de `deck_details_screen.dart` agora inclui uma seção `Comandante` no topo quando o deck possui commander, em vez de renderizar apenas `mainBoard`
+- `deck_details_screen_smoke_test.dart` passou a cobrir explicitamente a presença do comandante na tab `Cartas`
 - `Sentry` backend foi ligado em `server/lib/observability.dart` e no middleware global, com propagação de `x-request-id` via `server/lib/request_trace.dart`
 - `Sentry` app foi ligado em `app/lib/core/observability/app_observability.dart`, com captura global de erros, observer de rota e `x-request-id` em `app/lib/core/api/api_client.dart`
 - `server/.env.example` foi atualizado com as chaves mínimas de observabilidade e o setup ficou registrado em `docs/SENTRY_SETUP_MTGIA_2026-03-24.md`
@@ -406,3 +422,41 @@ Decisao sobre comandantes:
 - a proxima expansao, quando vier, deve ser dirigida por cobertura de comportamento e nao por volume
 
 As tasks acima continuam sendo a fila oficial do core.
+
+## Aditivo - Estado Atual Em 2026-03-25
+
+Estado consolidado:
+
+- o core de `optimize/rebuild` ja saiu da zona critica
+- o corpus recorrente segue como gate estavel
+- `deck_details_screen.dart` ficou em `1445` linhas e perdeu os blocos mais pesados de UI/efeitos
+- `deck_provider.dart` ficou em `899` linhas e entrou em fase residual
+- `deck_provider_support.dart` deixou de ser um arquivo unico de quase `1900` linhas e virou barrel com suporte por dominio:
+  - `deck_provider_support_common.dart`
+  - `deck_provider_support_fetch.dart`
+  - `deck_provider_support_mutation.dart`
+  - `deck_provider_support_ai.dart`
+  - `deck_provider_support_import.dart`
+  - `deck_provider_support_generation.dart`
+
+Validacao mais recente:
+
+- `flutter analyze` verde para provider/support/tests focados
+- `flutter test` verde para:
+  - `test/features/decks/providers/deck_provider_support_test.dart`
+  - `test/features/decks/providers/deck_provider_test.dart`
+  - `test/features/decks/screens/deck_details_screen_smoke_test.dart`
+  - `test/core/api/api_client_request_id_test.dart`
+
+Leitura executiva:
+
+- o gargalo principal deixou de ser o app core estrutural
+- a pendencia dominante voltou a ser operacional:
+  - validacao real do `Sentry` mobile
+  - correlacao final ponta a ponta de observabilidade em alvo mobile real
+
+Auditoria visual complementar:
+
+- a auditoria completa de ruído visual e uso de cores foi consolidada em `docs/AUDITORIA_RUIDO_VISUAL_CORES_2026-03-25.md`
+- conclusao principal: a paleta base é boa, mas algumas telas ainda gastam cor demais
+- o primeiro alvo recomendado de limpeza visual continua sendo o core de deck, especialmente o estado vazio/inicial de `deck_details`

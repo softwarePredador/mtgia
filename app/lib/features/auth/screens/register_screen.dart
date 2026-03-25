@@ -80,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
+                    color: AppTheme.surfaceElevated.withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     border: Border.all(
                       color: AppTheme.outlineMuted,
@@ -88,9 +88,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: 24,
-                        offset: const Offset(0, 14),
+                        color: Colors.black.withValues(alpha: 0.18),
+                        blurRadius: 16,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
@@ -99,18 +99,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Título com gradiente
-                        ShaderMask(
-                          shaderCallback:
-                              (bounds) =>
-                                  AppTheme.primaryGradient.createShader(bounds),
-                          child: Text(
-                            'Criar Conta',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
                             ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primarySoft.withValues(
+                                alpha: 0.14,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusXl,
+                              ),
+                            ),
+                            child: Text(
+                              'Comece no ManaLoom',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: AppTheme.primarySoft,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Criar Conta',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -344,7 +362,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: Text(
                                 'Entrar',
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: AppTheme.primarySoft,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

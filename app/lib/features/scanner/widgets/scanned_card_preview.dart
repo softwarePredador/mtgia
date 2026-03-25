@@ -51,10 +51,9 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -96,19 +95,20 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         constraints: const BoxConstraints(maxHeight: 360),
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-        child: card.imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                child: CachedNetworkImage(
-                  imageUrl: card.imageUrl!,
-                  fit: BoxFit.contain,
-                  placeholder: (_, __) => _imagePlaceholder(),
-                  errorWidget: (_, __, ___) => _imagePlaceholder(
-                    icon: Icons.image_not_supported,
+        child:
+            card.imageUrl != null
+                ? ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  child: CachedNetworkImage(
+                    imageUrl: card.imageUrl!,
+                    fit: BoxFit.contain,
+                    placeholder: (_, __) => _imagePlaceholder(),
+                    errorWidget:
+                        (_, __, ___) =>
+                            _imagePlaceholder(icon: Icons.image_not_supported),
                   ),
-                ),
-              )
-            : _imagePlaceholder(icon: Icons.style),
+                )
+                : _imagePlaceholder(icon: Icons.style),
       ),
     );
   }
@@ -121,10 +121,13 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       ),
       child: Center(
-        child: icon == Icons.hourglass_empty
-            ? const CircularProgressIndicator(
-                strokeWidth: 2, color: AppTheme.primarySoft)
-            : Icon(icon, size: 48, color: AppTheme.textSecondary),
+        child:
+            icon == Icons.hourglass_empty
+                ? const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.primarySoft,
+                )
+                : Icon(icon, size: 48, color: AppTheme.textSecondary),
       ),
     );
   }
@@ -178,12 +181,12 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(
-              color: _confidenceColor(widget.result.confidence)
-                  .withValues(alpha: 0.15),
+              color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               border: Border.all(
-                color: _confidenceColor(widget.result.confidence)
-                    .withValues(alpha: 0.4),
+                color: _confidenceColor(
+                  widget.result.confidence,
+                ).withValues(alpha: 0.28),
               ),
             ),
             child: Text(
@@ -204,25 +207,36 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
   Widget _buildActionBar(DeckCardItem card, double bottomPad) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8 + bottomPad),
+      padding: EdgeInsets.only(
+        left: 12,
+        right: 12,
+        top: 8,
+        bottom: 8 + bottomPad,
+      ),
       decoration: const BoxDecoration(
         color: AppTheme.surfaceSlate,
-        border: Border(top: BorderSide(color: AppTheme.outlineMuted, width: 0.5)),
+        border: Border(
+          top: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        ),
       ),
       child: Row(
         children: [
           // Foil
           if (card.foil == true) ...[
-            _badge(Icons.auto_awesome, 'Foil',
-                AppTheme.manaViolet.withValues(alpha: 0.7), AppTheme.manaViolet.withValues(alpha: 0.2)),
+            _badge(
+              Icons.auto_awesome,
+              'Foil',
+              AppTheme.textSecondary,
+              AppTheme.surfaceElevated,
+            ),
             const SizedBox(width: 8),
           ],
           // Condition
           _badge(
             Icons.shield_outlined,
             card.condition.code,
-            _conditionColor(card.condition),
-            _conditionColor(card.condition).withValues(alpha: 0.12),
+            _conditionBadgeColor(card.condition),
+            AppTheme.surfaceElevated,
           ),
           const SizedBox(width: 8),
           // Set code (tappable)
@@ -235,7 +249,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
               Icons.layers_outlined,
               card.setCode.toUpperCase(),
               AppTheme.textSecondary,
-              AppTheme.outlineMuted,
+              AppTheme.surfaceElevated,
               chevron: widget.foundCards.length > 1,
             ),
           ),
@@ -259,7 +273,9 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: const BoxDecoration(
         color: AppTheme.surfaceSlate,
-        border: Border(top: BorderSide(color: AppTheme.outlineMuted, width: 0.5)),
+        border: Border(
+          top: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -268,7 +284,11 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                const Icon(Icons.layers, size: 14, color: AppTheme.textSecondary),
+                const Icon(
+                  Icons.layers,
+                  size: 14,
+                  color: AppTheme.textSecondary,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   '${widget.foundCards.length} edições',
@@ -281,8 +301,11 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
                 const Spacer(),
                 GestureDetector(
                   onTap: () => setState(() => _showEditions = false),
-                  child: const Icon(Icons.keyboard_arrow_down,
-                      size: 20, color: AppTheme.textSecondary),
+                  child: const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 20,
+                    color: AppTheme.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -323,39 +346,45 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
     return AppTheme.error;
   }
 
-  Color _conditionColor(CardCondition c) {
+  Color _conditionBadgeColor(CardCondition c) {
     switch (c) {
-      case CardCondition.nm:
-        return AppTheme.success;
-      case CardCondition.lp:
-        return AppTheme.primarySoft;
-      case CardCondition.mp:
-        return AppTheme.mythicGold;
       case CardCondition.hp:
         return AppTheme.warning;
       case CardCondition.dmg:
         return AppTheme.error;
+      default:
+        return AppTheme.textSecondary;
     }
   }
 
   // Small reusable builders to avoid deep widget trees
-  Widget _badge(IconData icon, String label, Color color, Color bg,
-      {bool chevron = false}) {
+  Widget _badge(
+    IconData icon,
+    String label,
+    Color color,
+    Color bg, {
+    bool chevron = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.25), width: 0.5),
+        border: Border.all(color: color.withValues(alpha: 0.18), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 4),
-          Text(label,
-              style: TextStyle(
-                  color: color, fontSize: AppTheme.fontSm, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           if (chevron) ...[
             const SizedBox(width: 2),
             Icon(Icons.expand_more, size: 14, color: color),
@@ -367,7 +396,7 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
 
   Widget _iconBtn(IconData icon, VoidCallback onTap) {
     return Material(
-      color: AppTheme.outlineMuted,
+      color: AppTheme.surfaceElevated,
       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -394,11 +423,14 @@ class _ScannedCardPreviewState extends State<ScannedCardPreview>
             children: [
               Icon(Icons.add, size: 18, color: Colors.white),
               SizedBox(width: 2),
-              Text('+1',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: AppTheme.fontLg,
-                      fontWeight: FontWeight.w700)),
+              Text(
+                '+1',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: AppTheme.fontLg,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ],
           ),
         ),
@@ -450,40 +482,49 @@ class _ManaCostIcons extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: symbols.map((m) {
-        final s = m.group(1)!;
-        return Container(
-          width: 16,
-          height: 16,
-          margin: const EdgeInsets.only(left: 2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _manaColor(s),
-          ),
-          child: Center(
-            child: Text(
-              s,
-              style: TextStyle(
-                fontSize: AppTheme.fontXs,
-                fontWeight: FontWeight.w700,
-                color: s.toUpperCase() == 'B' ? Colors.white : Colors.black87,
+      children:
+          symbols.map((m) {
+            final s = m.group(1)!;
+            return Container(
+              width: 16,
+              height: 16,
+              margin: const EdgeInsets.only(left: 2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _manaColor(s),
               ),
-            ),
-          ),
-        );
-      }).toList(),
+              child: Center(
+                child: Text(
+                  s,
+                  style: TextStyle(
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w700,
+                    color:
+                        s.toUpperCase() == 'B' ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 
   Color _manaColor(String s) {
     switch (s.toUpperCase()) {
-      case 'W': return AppTheme.manaW;
-      case 'U': return AppTheme.manaU;
-      case 'B': return AppTheme.manaB;
-      case 'R': return AppTheme.manaR;
-      case 'G': return AppTheme.manaG;
-      case 'C': return AppTheme.manaC;
-      default:  return AppTheme.disabled;
+      case 'W':
+        return AppTheme.manaW;
+      case 'U':
+        return AppTheme.manaU;
+      case 'B':
+        return AppTheme.manaB;
+      case 'R':
+        return AppTheme.manaR;
+      case 'G':
+        return AppTheme.manaG;
+      case 'C':
+        return AppTheme.manaC;
+      default:
+        return AppTheme.disabled;
     }
   }
 }
@@ -502,9 +543,10 @@ class _EditionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isSelected
-          ? AppTheme.manaViolet.withValues(alpha: 0.12)
-          : Colors.transparent,
+      color:
+          isSelected
+              ? AppTheme.primarySoft.withValues(alpha: 0.12)
+              : Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -516,16 +558,19 @@ class _EditionTile extends StatelessWidget {
                 child: SizedBox(
                   width: 28,
                   height: 40,
-                  child: card.imageUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: card.imageUrl!,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) =>
-                              Container(color: AppTheme.surfaceSlate),
-                          errorWidget: (_, __, ___) =>
-                              Container(color: AppTheme.surfaceSlate),
-                        )
-                      : Container(color: AppTheme.surfaceSlate),
+                  child:
+                      card.imageUrl != null
+                          ? CachedNetworkImage(
+                            imageUrl: card.imageUrl!,
+                            fit: BoxFit.cover,
+                            placeholder:
+                                (_, __) =>
+                                    Container(color: AppTheme.surfaceSlate),
+                            errorWidget:
+                                (_, __, ___) =>
+                                    Container(color: AppTheme.surfaceSlate),
+                          )
+                          : Container(color: AppTheme.surfaceSlate),
                 ),
               ),
               const SizedBox(width: 12),
@@ -536,7 +581,7 @@ class _EditionTile extends StatelessWidget {
                     Text(
                       card.setCode.toUpperCase(),
                       style: TextStyle(
-                        color: isSelected ? AppTheme.manaViolet : Colors.white,
+                        color: isSelected ? AppTheme.primarySoft : Colors.white,
                         fontSize: AppTheme.fontMd,
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -558,8 +603,11 @@ class _EditionTile extends StatelessWidget {
               _RarityDot(rarity: card.rarity),
               const SizedBox(width: 8),
               if (isSelected)
-                const Icon(Icons.check_circle,
-                    size: 16, color: AppTheme.manaViolet),
+                const Icon(
+                  Icons.check_circle,
+                  size: 16,
+                  color: AppTheme.primarySoft,
+                ),
             ],
           ),
         ),
@@ -604,25 +652,23 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.error.withValues(alpha: 0.9),
+        color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border:
-            Border.all(color: AppTheme.error.withValues(alpha: 0.4)),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.35)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.search_off, color: Colors.white, size: 48),
+          const Icon(Icons.search_off, color: AppTheme.error, size: 48),
           const SizedBox(height: 12),
           Text(
             widget.errorMessage ?? 'Carta não encontrada',
             style: const TextStyle(
-              color: Colors.white,
+              color: AppTheme.textPrimary,
               fontSize: AppTheme.fontLg,
               fontWeight: FontWeight.bold,
             ),
@@ -632,24 +678,27 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
             const SizedBox(height: 8),
             Text(
               'Detectado: "${widget.detectedName}"',
-              style: const TextStyle(color: Colors.white70, fontSize: AppTheme.fontSm),
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontSm,
+              ),
             ),
           ],
           const SizedBox(height: 16),
           TextField(
             controller: _searchController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppTheme.textPrimary),
             decoration: InputDecoration(
               hintText: 'Digite o nome correto',
               hintStyle: const TextStyle(color: AppTheme.textSecondary),
               filled: true,
-              fillColor: Colors.black26,
+              fillColor: AppTheme.surfaceSlate,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 borderSide: BorderSide.none,
               ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.search, color: Colors.white),
+                icon: const Icon(Icons.search, color: AppTheme.primarySoft),
                 onPressed: () => widget.onManualSearch(_searchController.text),
               ),
             ),
@@ -664,8 +713,10 @@ class _CardNotFoundWidgetState extends State<CardNotFoundWidget> {
                   icon: const Icon(Icons.camera_alt),
                   label: const Text('Tentar Novamente'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white54),
+                    foregroundColor: AppTheme.textPrimary,
+                    side: BorderSide(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
               ),

@@ -11,7 +11,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -20,19 +21,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
     _controller.forward();
 
@@ -66,17 +69,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.backgroundAbyss,
-              theme.colorScheme.surface,
-              theme.colorScheme.primary.withValues(alpha: 0.3),
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -85,67 +78,47 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo com gradiente
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.colorScheme.primary,
-                          theme.colorScheme.secondary,
-                        ],
+                      color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
+                      border: Border.all(
+                        color: AppTheme.outlineMuted.withValues(alpha: 0.8),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.5),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        ),
-                      ],
                     ),
                     child: const Icon(
                       Icons.auto_awesome,
-                      size: 80,
-                      color: Colors.white,
+                      size: 64,
+                      color: AppTheme.primarySoft,
                     ),
                   ),
                   const SizedBox(height: 32),
-                  
-                  // Nome do App
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [
-                        theme.colorScheme.primary,
-                        theme.colorScheme.secondary,
-                      ],
-                    ).createShader(bounds),
-                    child: Text(
-                      'ManaLoom',
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+
+                  Text(
+                    'ManaLoom',
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   Text(
                     'Teça sua estratégia perfeita',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.secondary,
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 48),
-                  
-                  // Loading indicator
+
                   SizedBox(
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.colorScheme.secondary,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppTheme.primarySoft,
                       ),
                     ),
                   ),

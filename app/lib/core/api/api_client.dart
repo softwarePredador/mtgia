@@ -28,9 +28,9 @@ class ApiResponse {
 
 class ApiClient {
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
-
-  /// URL do servidor de produção (EasyPanel / Digital Ocean).
-  static const String _productionUrl = 'https://evolution-cartinhas.8ktevp.easypanel.host';
+  static const String _debugAndroidEmulatorUrl = 'http://10.0.2.2:8080';
+  static const String _debugLocalhostUrl = 'http://127.0.0.1:8080';
+  static const String _releaseFallbackUrl = '';
 
   // ──────────────────────────────────────────
   // Cache do token em memória (evita SharedPreferences a cada request)
@@ -53,20 +53,31 @@ class ApiClient {
       return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
     }
 
-    // Em debug, usamos EasyPanel por padrão para alinhar com ambiente remoto.
-    // Para forçar outro host, use --dart-define=API_BASE_URL=...
     if (kDebugMode) {
-      return _productionUrl;
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        return _debugAndroidEmulatorUrl;
+      }
+      return _debugLocalhostUrl;
     }
 
-    // Release/profile: usa produção.
-    return _productionUrl;
+    return _releaseFallbackUrl;
   }
 
   /// Log da URL base resolvida (chamado uma vez no boot)
   static void debugLogBaseUrl() {
     debugPrint('[🌐 ApiClient] baseUrl = $baseUrl');
     debugPrint('[🌐 ApiClient] platform = $defaultTargetPlatform | kIsWeb=$kIsWeb | kDebugMode=$kDebugMode');
+    if (_envBaseUrl.trim().isEmpty) {
+      if (kDebugMode) {
+        debugPrint(
+          '[🌐 ApiClient] fallback de debug ativo; em device físico ou backend remoto use --dart-define=API_BASE_URL=https://seu-host',
+        );
+      } else if (baseUrl.isEmpty) {
+        debugPrint(
+          '[⚠️ ApiClient] API_BASE_URL ausente em release/profile; configure --dart-define=API_BASE_URL=https://seu-host',
+        );
+      }
+    }
   }
 
   static String generateRequestId({DateTime? now, Random? random}) {
@@ -119,6 +130,7 @@ class ApiClient {
   }
 
   Future<ApiResponse> get(String endpoint) async {
+    _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
@@ -177,6 +189,7 @@ class ApiClient {
   }
 
   Future<ApiResponse> post(String endpoint, Map<String, dynamic> body, {Duration? timeout}) async {
+    _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
@@ -240,6 +253,7 @@ class ApiClient {
   }
 
   Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
@@ -295,6 +309,7 @@ class ApiClient {
   }
 
   Future<ApiResponse> patch(String endpoint, Map<String, dynamic> body) async {
+    _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
@@ -346,6 +361,7 @@ class ApiClient {
   }
 
   Future<ApiResponse> delete(String endpoint) async {
+    _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
     final headers = _getHeaders(requestId: requestId);
@@ -416,6 +432,14 @@ class ApiClient {
       durationMs: durationMs,
       requestId: requestId,
       responseRequestId: response.headers['x-request-id'],
+    );
+  }
+
+  void _ensureBaseUrlConfigured() {
+    if (baseUrl.isNotEmpty) return;
+    throw StateError(
+      'API_BASE_URL não configurado. Em debug use --dart-define=API_BASE_URL=http://seu-host:8080 '
+      'para backend remoto/device físico; em release/profile configure a URL pública da API no build.',
     );
   }
 }

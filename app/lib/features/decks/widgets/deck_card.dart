@@ -59,8 +59,9 @@ class DeckCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final commanderImageUrl = deck.commanderImageUrl?.trim();
+    final commanderName = deck.commanderName?.trim();
     final hasCommander =
-        (deck.commanderName?.trim().isNotEmpty ?? false) ||
+        (commanderName?.isNotEmpty ?? false) ||
         (commanderImageUrl?.isNotEmpty ?? false);
     final accentColor = _formatAccentColor(deck.format);
     final maxCards = _getMaxCards(deck.format);
@@ -75,200 +76,271 @@ class DeckCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          splashColor: accentColor.withValues(alpha: 0.08),
-          highlightColor: accentColor.withValues(alpha: 0.04),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 6, 0),
-                child: Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            splashColor: accentColor.withValues(alpha: 0.08),
+            highlightColor: accentColor.withValues(alpha: 0.04),
+            child: Stack(
+              children: [
+                if (commanderImageUrl != null && commanderImageUrl.isNotEmpty)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CachedCardImage(
+                        imageUrl: commanderImageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.backgroundAbyss.withValues(
+                            alpha:
+                                hasCommander &&
+                                        commanderImageUrl != null &&
+                                        commanderImageUrl.isNotEmpty
+                                    ? 0.3
+                                    : 0.0,
+                          ),
+                          AppTheme.surfaceSlate.withValues(
+                            alpha:
+                                hasCommander &&
+                                        commanderImageUrl != null &&
+                                        commanderImageUrl.isNotEmpty
+                                    ? 0.82
+                                    : 1,
+                          ),
+                          AppTheme.backgroundAbyss.withValues(
+                            alpha:
+                                hasCommander &&
+                                        commanderImageUrl != null &&
+                                        commanderImageUrl.isNotEmpty
+                                    ? 0.92
+                                    : 0.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Commander thumbnail ──
-                    if (hasCommander) ...[
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusSm,
-                          ),
-                          border: Border.all(
-                            color: AppTheme.outlineMuted,
-                            width: 0.5,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusSm,
-                          ),
-                          child: CachedCardImage(
-                            imageUrl: commanderImageUrl,
-                            width: 48,
-                            height: 67,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-
-                    // ── Name + meta ──
-                    Expanded(
-                      child: Column(
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 6, 0),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            deck.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
-                              height: 1.2,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              _FormatChip(
-                                format: deck.format,
-                                accentColor: accentColor,
+                          // ── Commander thumbnail ──
+                          if (hasCommander) ...[
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusSm,
+                                ),
+                                border: Border.all(
+                                  color: AppTheme.outlineMuted.withValues(
+                                    alpha: 0.75,
+                                  ),
+                                  width: 0.5,
+                                ),
                               ),
-                              if (deck.colorIdentity.isNotEmpty)
-                                _ColorIdentityRow(colors: deck.colorIdentity),
-                              if (deck.isPublic) const _PublicStatusChip(),
-                            ],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusSm,
+                                ),
+                                child: CachedCardImage(
+                                  imageUrl: commanderImageUrl,
+                                  width: 48,
+                                  height: 67,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+
+                          // ── Name + meta ──
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  deck.name,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.textPrimary,
+                                    height: 1.2,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (commanderName != null &&
+                                    commanderName.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Comandante: $commanderName',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.25,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    _FormatChip(
+                                      format: deck.format,
+                                      accentColor: accentColor,
+                                    ),
+                                    if (deck.colorIdentity.isNotEmpty)
+                                      _ColorIdentityRow(
+                                        colors: deck.colorIdentity,
+                                      ),
+                                    if (deck.isPublic)
+                                      const _PublicStatusChip(),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // ── Menu button ──
+                          IconButton(
+                            icon: const Icon(Icons.more_vert, size: 20),
+                            onPressed: () => _showDeckMenu(context),
+                            color: AppTheme.textHint,
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
                           ),
                         ],
                       ),
                     ),
 
-                    // ── Menu button ──
-                    IconButton(
-                      icon: const Icon(Icons.more_vert, size: 20),
-                      onPressed: () => _showDeckMenu(context),
-                      color: AppTheme.textHint,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ── Description ──
-              if (deck.description != null &&
-                  deck.description!.trim().isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                  child: Text(
-                    deck.description!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-
-              // ── Progress bar (thin) ──
-              if (progress != null) ...[
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 3,
-                      backgroundColor: AppTheme.outlineMuted.withValues(
-                        alpha: 0.5,
-                      ),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        isComplete ? AppTheme.success : accentColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-
-              // ── Footer stats ──
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
-                child: Row(
-                  children: [
-                    // Card count
-                    Icon(
-                      isComplete
-                          ? Icons.check_circle_outline
-                          : Icons.layers_outlined,
-                      size: 14,
-                      color:
-                          isComplete
-                              ? AppTheme.success
-                              : AppTheme.textSecondary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      maxCards != null
-                          ? '${deck.cardCount}/$maxCards'
-                          : '${deck.cardCount} cartas',
-                      style: TextStyle(
-                        fontSize: AppTheme.fontSm,
-                        fontWeight: FontWeight.w600,
-                        color:
-                            isComplete
-                                ? AppTheme.success
-                                : AppTheme.textSecondary,
-                      ),
-                    ),
-
-                    // Synergy score
-                    if (deck.synergyScore != null &&
-                        deck.synergyScore! > 0) ...[
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.auto_awesome,
-                        size: 14,
-                        color: AppTheme.scoreColor(deck.synergyScore!),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${deck.synergyScore}%',
-                        style: TextStyle(
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.scoreColor(deck.synergyScore!),
+                    // ── Description ──
+                    if (deck.description != null &&
+                        deck.description!.trim().isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+                        child: Text(
+                          deck.description!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                            height: 1.3,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
 
-                    const Spacer(),
+                    // ── Progress bar (thin) ──
+                    if (progress != null) ...[
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 3,
+                            backgroundColor: AppTheme.outlineMuted.withValues(
+                              alpha: 0.5,
+                            ),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isComplete ? AppTheme.success : accentColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
 
-                    // Time ago
-                    Text(
-                      _timeAgo(deck.createdAt),
-                      style: TextStyle(
-                        fontSize: AppTheme.fontXs,
-                        color: AppTheme.textHint,
+                    // ── Footer stats ──
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+                      child: Row(
+                        children: [
+                          // Card count
+                          Icon(
+                            isComplete
+                                ? Icons.check_circle_outline
+                                : Icons.layers_outlined,
+                            size: 14,
+                            color:
+                                isComplete
+                                    ? AppTheme.success
+                                    : AppTheme.textSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            maxCards != null
+                                ? '${deck.cardCount}/$maxCards'
+                                : '${deck.cardCount} cartas',
+                            style: TextStyle(
+                              fontSize: AppTheme.fontSm,
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  isComplete
+                                      ? AppTheme.success
+                                      : AppTheme.textSecondary,
+                            ),
+                          ),
+
+                          // Synergy score
+                          if (deck.synergyScore != null &&
+                              deck.synergyScore! > 0) ...[
+                            const SizedBox(width: 16),
+                            Icon(
+                              Icons.auto_awesome,
+                              size: 14,
+                              color: AppTheme.scoreColor(deck.synergyScore!),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${deck.synergyScore}%',
+                              style: TextStyle(
+                                fontSize: AppTheme.fontSm,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.scoreColor(deck.synergyScore!),
+                              ),
+                            ),
+                          ],
+
+                          const Spacer(),
+
+                          // Time ago
+                          Text(
+                            _timeAgo(deck.createdAt),
+                            style: TextStyle(
+                              fontSize: AppTheme.fontXs,
+                              color: AppTheme.textHint,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

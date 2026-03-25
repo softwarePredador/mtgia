@@ -301,9 +301,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                       ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
                       : 'Digite pelo menos 3 letras para começar a busca.',
               accent:
-                  query.length >= 3
-                      ? AppTheme.warning
-                      : AppTheme.primarySoft,
+                  query.length >= 3 ? AppTheme.warning : AppTheme.primarySoft,
             );
           }
 
@@ -339,20 +337,22 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                           ? isCommanderEligible
                           : allowedByIdentity);
               return ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CardDetailScreen(card: card),
+                leading: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CardDetailScreen(card: card),
+                      ),
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    child: CachedCardImage(
+                      imageUrl: card.imageUrl,
+                      width: 40,
+                      height: 56,
                     ),
-                  );
-                },
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  child: CachedCardImage(
-                    imageUrl: card.imageUrl,
-                    width: 40,
-                    height: 56,
                   ),
                 ),
                 title: Text(card.name),
@@ -431,6 +431,7 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                 trailing: IconButton(
+                  tooltip: 'Adicionar',
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed:
                       canAdd

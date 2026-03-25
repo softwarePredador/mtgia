@@ -71,6 +71,12 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   bool get _isCommanderFormat =>
       _selectedFormat == 'commander' || _selectedFormat == 'brawl';
 
+  int get _detectedCount =>
+      _listController.text
+          .split('\n')
+          .where((line) => line.trim().isNotEmpty)
+          .length;
+
   Future<void> _importDeck() async {
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(
@@ -265,7 +271,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   if (notFound.isNotEmpty) ...[
                     DeckDialogSectionCard(
                       title: '${notFound.length} cartas não identificadas',
-                      accent: theme.colorScheme.error,
+                      accent: AppTheme.warning,
                       icon: Icons.search_off_rounded,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,13 +348,15 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
   }
 
   void _pasteExample() {
-    _listController.text = '''1 Sol Ring
+    setState(() {
+      _listController.text = '''1 Sol Ring
 1 Arcane Signet
 1 Command Tower
 1 Lightning Greaves
 4 Island
 4 Mountain
 1 Counterspell''';
+    });
   }
 
   @override
@@ -368,21 +376,13 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header com IA
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.2),
-                    theme.colorScheme.secondary.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                  color: AppTheme.outlineMuted.withValues(alpha: 0.7),
                 ),
               ),
               child: Column(
@@ -390,35 +390,54 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.content_paste,
-                        color: theme.colorScheme.primary,
-                        size: 24,
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primarySoft.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.content_paste_rounded,
+                          color: AppTheme.primarySoft,
+                          size: 20,
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Importar Lista',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.fontLg,
-                          color: theme.colorScheme.primary,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Importar Lista',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Cole sua lista e transforme isso em um deck editável em poucos passos.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.textSecondary,
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    'Cole sua lista de qualquer fonte:\n'
-                    '• Moxfield, Archidekt, EDHRec\n'
-                    '• MTGA/MTGO\n'
-                    '• Texto simples',
-                    style: TextStyle(
-                      fontSize: AppTheme.fontMd,
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.85,
-                      ),
-                      height: 1.4,
-                    ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: const [
+                      _ImportSourcePill(label: 'Moxfield / Archidekt / EDHRec'),
+                      _ImportSourcePill(label: 'MTGA / MTGO'),
+                      _ImportSourcePill(label: 'Texto simples'),
+                    ],
                   ),
                 ],
               ),
@@ -499,11 +518,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Lista de Cartas
             Row(
               children: [
-                Icon(
-                  Icons.list_alt,
-                  size: 20,
-                  color: theme.colorScheme.secondary,
-                ),
+                Icon(Icons.list_alt, size: 20, color: AppTheme.primarySoft),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
@@ -519,11 +534,11 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   icon: Icon(
                     Icons.help_outline,
                     size: 18,
-                    color: theme.colorScheme.tertiary,
+                    color: AppTheme.primarySoft,
                   ),
                   label: Text(
                     'Exemplo',
-                    style: TextStyle(color: theme.colorScheme.tertiary),
+                    style: const TextStyle(color: AppTheme.primarySoft),
                   ),
                 ),
               ],
@@ -551,60 +566,96 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Contador de linhas com feedback inteligente
             Builder(
               builder: (context) {
-                final detectedCount =
-                    _listController.text
-                        .split('\n')
-                        .where((l) => l.trim().isNotEmpty)
-                        .length;
-                final hasCards = detectedCount > 0;
-                return Row(
-                  children: [
-                    Icon(
-                      hasCards
-                          ? Icons.check_circle_outline
-                          : Icons.radio_button_unchecked,
-                      size: 14,
+                final hasCards = _detectedCount > 0;
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        hasCards
+                            ? AppTheme.primarySoft.withValues(alpha: 0.10)
+                            : AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    border: Border.all(
                       color:
                           hasCards
-                              ? theme.colorScheme.secondary
-                              : theme.colorScheme.onSurface.withValues(
-                                alpha: 0.4,
-                              ),
+                              ? AppTheme.primarySoft.withValues(alpha: 0.28)
+                              : AppTheme.outlineMuted.withValues(alpha: 0.55),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$detectedCount cartas detectadas',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
-                        fontSize: AppTheme.fontSm,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            // Erro
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              Card(
-                color: AppTheme.error.withValues(alpha: 0.15),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: AppTheme.error),
-                      const SizedBox(width: 8),
+                      Icon(
+                        hasCards
+                            ? Icons.check_circle_outline
+                            : Icons.info_outline,
+                        size: 16,
+                        color:
+                            hasCards
+                                ? AppTheme.primarySoft
+                                : AppTheme.textSecondary,
+                      ),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          _error!,
-                          style: TextStyle(color: AppTheme.error),
+                          hasCards
+                              ? '${_detectedCount.toString()} cartas detectadas'
+                              : 'Cole a lista ou use um exemplo para começar',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color:
+                                hasCards
+                                    ? AppTheme.textPrimary
+                                    : AppTheme.textSecondary,
+                          ),
                         ),
                       ),
                     ],
                   ),
+                );
+              },
+            ),
+
+            if (_error != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(
+                    color: AppTheme.error.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.error_outline_rounded, color: AppTheme.error),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Não foi possível importar agora',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _error!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -665,7 +716,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
             // Texto auxiliar
             Text(
-              'Cartas serão validadas automaticamente',
+              'As cartas reconhecidas entram no deck e o restante volta como revisão.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppTheme.fontSm,
@@ -673,6 +724,33 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ImportSourcePill extends StatelessWidget {
+  final String label;
+
+  const _ImportSourcePill({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: AppTheme.textSecondary,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

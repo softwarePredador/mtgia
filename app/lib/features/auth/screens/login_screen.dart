@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated.withValues(alpha: 0.9),
+                    color: AppTheme.surfaceElevated.withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     border: Border.all(
                       color: AppTheme.outlineMuted,
@@ -85,9 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: 24,
-                        offset: const Offset(0, 14),
+                        color: Colors.black.withValues(alpha: 0.18),
+                        blurRadius: 16,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
@@ -97,45 +97,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Logo com glow
                         Center(
                           child: Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: AppTheme.primaryGradient,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.manaViolet.withValues(
-                                    alpha: 0.45,
-                                  ),
-                                  blurRadius: 24,
-                                  spreadRadius: 4,
+                              color: AppTheme.surfaceSlate,
+                              border: Border.all(
+                                color: AppTheme.outlineMuted.withValues(
+                                  alpha: 0.75,
                                 ),
-                              ],
+                              ),
                             ),
                             child: const Icon(
                               Icons.auto_awesome,
-                              size: 48,
-                              color: Colors.white,
+                              size: 40,
+                              color: AppTheme.primarySoft,
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        // Título com gradiente
-                        ShaderMask(
-                          shaderCallback:
-                              (bounds) =>
-                                  AppTheme.primaryGradient.createShader(bounds),
-                          child: Text(
-                            'ManaLoom',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
+                        Text(
+                          'ManaLoom',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -298,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Text(
                                 'Criar conta',
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: AppTheme.primarySoft,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

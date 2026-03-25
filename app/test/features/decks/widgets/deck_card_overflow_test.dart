@@ -44,11 +44,7 @@ void main() {
           width: width,
           height: height,
           child: SingleChildScrollView(
-            child: DeckCard(
-              deck: deck,
-              onTap: () {},
-              onDelete: () {},
-            ),
+            child: DeckCard(deck: deck, onTap: () {}, onDelete: () {}),
           ),
         ),
       ),
@@ -62,45 +58,51 @@ void main() {
     final screenWidths = [280.0, 320.0, 360.0, 375.0, 411.0];
 
     for (final width in screenWidths) {
-      testWidgets(
-        'sem overflow em largura $width — deck básico Commander',
-        (tester) async {
-          final deck = makeDeck(
-            name: 'Krenko Goblins',
-            format: 'commander',
-            cardCount: 87,
-            colorIdentity: ['R'],
-          );
-          await tester.pumpWidget(buildTestWidget(deck, width: width));
-          await tester.pumpAndSettle();
+      testWidgets('sem overflow em largura $width — deck básico Commander', (
+        tester,
+      ) async {
+        final deck = makeDeck(
+          name: 'Krenko Goblins',
+          format: 'commander',
+          cardCount: 87,
+          colorIdentity: ['R'],
+        );
+        await tester.pumpWidget(buildTestWidget(deck, width: width));
+        await tester.pumpAndSettle();
 
-          // Se houver overflow, Flutter levanta FlutterError
-          expect(tester.takeException(), isNull);
-        },
-      );
+        // Se houver overflow, Flutter levanta FlutterError
+        expect(tester.takeException(), isNull);
+      });
     }
 
-    testWidgets('sem overflow — 5 cores WUBRG + público + commander thumbnail', (tester) async {
-      final deck = makeDeck(
-        name: 'Kenrith, the Returned King',
-        format: 'commander',
-        cardCount: 100,
-        synergyScore: 85,
-        isPublic: true,
-        commanderName: 'Kenrith, the Returned King',
-        colorIdentity: ['W', 'U', 'B', 'R', 'G'],
-      );
-      // Menor largura (iPhone SE)
-      await tester.pumpWidget(buildTestWidget(deck, width: 320));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    });
+    testWidgets(
+      'sem overflow — 5 cores WUBRG + público + commander thumbnail',
+      (tester) async {
+        final deck = makeDeck(
+          name: 'Kenrith, the Returned King',
+          format: 'commander',
+          cardCount: 100,
+          synergyScore: 85,
+          isPublic: true,
+          commanderName: 'Kenrith, the Returned King',
+          colorIdentity: ['W', 'U', 'B', 'R', 'G'],
+        );
+        // Menor largura (iPhone SE)
+        await tester.pumpWidget(buildTestWidget(deck, width: 320));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-    testWidgets('sem overflow — nome muito longo + 5 cores + público', (tester) async {
+    testWidgets('sem overflow — nome muito longo + 5 cores + público', (
+      tester,
+    ) async {
       final deck = makeDeck(
-        name: 'Breya, Etherium Shaper — Ultimate Artifacts & Thopters Commander Combo Deck',
+        name:
+            'Breya, Etherium Shaper — Ultimate Artifacts & Thopters Commander Combo Deck',
         format: 'commander',
-        description: 'Este é um deck extremamente focado em combos com artefatos e thopters para gerar valor infinito.',
+        description:
+            'Este é um deck extremamente focado em combos com artefatos e thopters para gerar valor infinito.',
         cardCount: 100,
         synergyScore: 92,
         isPublic: true,
@@ -112,18 +114,21 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('sem overflow — formato longo (commander) + cores + tela 280px', (tester) async {
-      final deck = makeDeck(
-        name: 'Goblin Deck',
-        format: 'commander',
-        cardCount: 42,
-        isPublic: true,
-        colorIdentity: ['R', 'G'],
-      );
-      await tester.pumpWidget(buildTestWidget(deck, width: 280));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    });
+    testWidgets(
+      'sem overflow — formato longo (commander) + cores + tela 280px',
+      (tester) async {
+        final deck = makeDeck(
+          name: 'Goblin Deck',
+          format: 'commander',
+          cardCount: 42,
+          isPublic: true,
+          colorIdentity: ['R', 'G'],
+        );
+        await tester.pumpWidget(buildTestWidget(deck, width: 280));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('sem overflow — deck sem cartas e sem cores', (tester) async {
       final deck = makeDeck(
@@ -137,22 +142,33 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('sem overflow — deck Modern sem commander + synergy + público', (tester) async {
-      final deck = makeDeck(
-        name: 'Tron Control with Urzas',
-        format: 'modern',
-        cardCount: 60,
-        synergyScore: 78,
-        isPublic: true,
-        colorIdentity: ['G', 'R'],
-      );
-      await tester.pumpWidget(buildTestWidget(deck, width: 320));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    });
+    testWidgets(
+      'sem overflow — deck Modern sem commander + synergy + público',
+      (tester) async {
+        final deck = makeDeck(
+          name: 'Tron Control with Urzas',
+          format: 'modern',
+          cardCount: 60,
+          synergyScore: 78,
+          isPublic: true,
+          colorIdentity: ['G', 'R'],
+        );
+        await tester.pumpWidget(buildTestWidget(deck, width: 320));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('sem overflow — todos os formatos em 320px', (tester) async {
-      final formats = ['commander', 'standard', 'modern', 'pioneer', 'legacy', 'vintage', 'pauper'];
+      final formats = [
+        'commander',
+        'standard',
+        'modern',
+        'pioneer',
+        'legacy',
+        'vintage',
+        'pauper',
+      ];
       for (final format in formats) {
         final deck = makeDeck(
           name: 'Deck de $format',
@@ -163,16 +179,22 @@ void main() {
         );
         await tester.pumpWidget(buildTestWidget(deck, width: 320));
         await tester.pumpAndSettle();
-        expect(tester.takeException(), isNull,
-            reason: 'Overflow no formato $format em 320px');
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'Overflow no formato $format em 320px',
+        );
       }
     });
 
-    testWidgets('sem overflow — descrição longa em tela estreita', (tester) async {
+    testWidgets('sem overflow — descrição longa em tela estreita', (
+      tester,
+    ) async {
       final deck = makeDeck(
         name: 'Goblins',
         format: 'legacy',
-        description: 'Um deck extremamente agressivo focado em goblins tribais com líderes que geram tokens e buffs massivos para toda a board.',
+        description:
+            'Um deck extremamente agressivo focado em goblins tribais com líderes que geram tokens e buffs massivos para toda a board.',
         cardCount: 60,
         synergyScore: 65,
         colorIdentity: ['R'],

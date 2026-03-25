@@ -99,7 +99,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final deckProvider = context.read<DeckProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -260,8 +259,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           }
           _pricing ??= _pricingFromDeck(deck);
 
+          final format = deck.format.toLowerCase();
+          final isCommanderFormat = format == 'commander' || format == 'brawl';
+          final maxCards =
+              format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
+          final totalCards = _totalCards(deck);
+          final hasMeaningfulDeckState = totalCards > 0;
+
           // Auto-load pricing when deck is ready
-          if (!_pricingAutoLoaded && !_isPricingLoading) {
+          if (hasMeaningfulDeckState &&
+              !_pricingAutoLoaded &&
+              !_isPricingLoading) {
             _pricingAutoLoaded = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) _loadPricing(force: false);
@@ -269,18 +277,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           }
 
           // Auto-validate deck when ready
-          if (!_validationAutoLoaded && !_isValidating) {
+          if (hasMeaningfulDeckState &&
+              !_validationAutoLoaded &&
+              !_isValidating) {
             _validationAutoLoaded = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) _autoValidateDeck();
             });
           }
-
-          final format = deck.format.toLowerCase();
-          final isCommanderFormat = format == 'commander' || format == 'brawl';
-          final maxCards =
-              format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
-          final totalCards = _totalCards(deck);
 
           return TabBarView(
             controller: _tabController,
@@ -332,6 +336,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     () => _showOptimizationOptions(context),
                 onSelectCommander:
                     () => context.go('/decks/${widget.deckId}/search'),
+                onImportList: () => _showImportListDialog(context),
                 onEditDescription: _showEditDescriptionDialog,
                 onShowCardDetails: (card) => _showCardDetails(context, card),
               ),
@@ -387,371 +392,21 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         ),
                       ),
                     ),
-                  ...deck.mainBoard.entries.map((entry) {
-                    // Ordena cartas inválidas para o topo do grupo
-                    final sortedCards = List<DeckCardItem>.from(entry.value);
-                    if (_invalidCardNames.isNotEmpty) {
-                      sortedCards.sort((a, b) {
-                        final aInvalid = _isCardInvalid(a) ? 0 : 1;
-                        final bInvalid = _isCardInvalid(b) ? 0 : 1;
-                        return aInvalid.compareTo(bInvalid);
-                      });
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Text(
-                            '${entry.key} (${entry.value.length})',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        ...sortedCards
-                            .where((card) => !_hiddenCardIds.contains(card.id))
-                            .map(
-                              (card) => Dismissible(
-                                key: ValueKey('deck-card-${card.id}'),
-                                direction: DismissDirection.horizontal,
-                                background: Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(
-                                      AppTheme.radiusMd,
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.edit, color: Colors.white),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Editar',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                secondaryBackground: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.error,
-                                    borderRadius: BorderRadius.circular(
-                                      AppTheme.radiusMd,
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Excluir',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Icon(Icons.delete, color: Colors.white),
-                                    ],
-                                  ),
-                                ),
-                                confirmDismiss: (direction) async {
-                                  if (direction ==
-                                      DismissDirection.startToEnd) {
-                                    await _showEditCardDialog(
-                                      context,
-                                      card,
-                                      deckFormat: deck.format,
-                                    );
-                                    return false;
-                                  }
-
-                                  if (direction ==
-                                      DismissDirection.endToStart) {
-                                    final confirmed = await _confirmRemoveCard(
-                                      context,
-                                      card,
-                                    );
-                                    if (confirmed != true) return false;
-
-                                    if (mounted) {
-                                      setState(
-                                        () => _hiddenCardIds.add(card.id),
-                                      );
-                                    }
-
-                                    try {
-                                      await deckProvider.removeCardFromDeck(
-                                        deckId: widget.deckId,
-                                        cardId: card.id,
-                                      );
-                                      if (!mounted) return true;
-                                      if (!context.mounted) return true;
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Carta removida: ${card.name}',
-                                          ),
-                                          backgroundColor:
-                                              theme.colorScheme.primary,
-                                        ),
-                                      );
-                                      return true;
-                                    } catch (e) {
-                                      if (mounted) {
-                                        setState(
-                                          () => _hiddenCardIds.remove(card.id),
-                                        );
-                                        if (!context.mounted) return false;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Erro ao remover: $e',
-                                            ),
-                                            backgroundColor:
-                                                theme.colorScheme.error,
-                                          ),
-                                        );
-                                      }
-                                      return false;
-                                    }
-                                  }
-
-                                  return false;
-                                },
-                                child: Card(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  shape:
-                                      _isCardInvalid(card)
-                                          ? RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              AppTheme.radiusMd,
-                                            ),
-                                            side: BorderSide(
-                                              color: theme.colorScheme.error,
-                                              width: 2,
-                                            ),
-                                          )
-                                          : null,
-                                  color:
-                                      _isCardInvalid(card)
-                                          ? theme.colorScheme.error.withValues(
-                                            alpha: 0.08,
-                                          )
-                                          : null,
-                                  child: Stack(
-                                    children: [
-                                      ListTile(
-                                        contentPadding: const EdgeInsets.all(8),
-                                        leading: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            AppTheme.radiusXs,
-                                          ),
-                                          child: CachedCardImage(
-                                            imageUrl: card.imageUrl,
-                                            width: 40,
-                                            height: 56,
-                                          ),
-                                        ),
-                                        title: Row(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 6,
-                                                    vertical: 2,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    theme
-                                                        .colorScheme
-                                                        .primaryContainer,
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                      AppTheme.radiusMd,
-                                                    ),
-                                              ),
-                                              child: Text(
-                                                '${card.quantity}x',
-                                                style: theme
-                                                    .textTheme
-                                                    .labelSmall
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color:
-                                                          theme
-                                                              .colorScheme
-                                                              .onPrimaryContainer,
-                                                    ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                card.name,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  color: AppTheme.textPrimary,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              card.typeLine,
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                    color:
-                                                        AppTheme.textSecondary,
-                                                  ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                ManaCostRow(
-                                                  cost: card.manaCost,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                if (card.setCode.isNotEmpty)
-                                                  Text(
-                                                    card.setCode.toUpperCase(),
-                                                    style: theme
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          color:
-                                                              theme
-                                                                  .colorScheme
-                                                                  .outline,
-                                                        ),
-                                                  ),
-                                                if (card.condition !=
-                                                    CardCondition.nm) ...[
-                                                  const SizedBox(width: 6),
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 4,
-                                                          vertical: 1,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: _conditionColor(
-                                                        card.condition,
-                                                      ).withValues(alpha: 0.15),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            AppTheme.radiusXs,
-                                                          ),
-                                                      border: Border.all(
-                                                        color: _conditionColor(
-                                                          card.condition,
-                                                        ),
-                                                        width: 0.5,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      card.condition.code,
-                                                      style: theme
-                                                          .textTheme
-                                                          .labelSmall
-                                                          ?.copyWith(
-                                                            fontSize:
-                                                                AppTheme.fontXs,
-                                                            color:
-                                                                _conditionColor(
-                                                                  card.condition,
-                                                                ),
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        onTap:
-                                            () =>
-                                                _showCardDetails(context, card),
-                                      ),
-                                      if (_isCardInvalid(card))
-                                        Positioned(
-                                          top: 4,
-                                          right: 4,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 2,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: theme.colorScheme.error,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    AppTheme.radiusSm,
-                                                  ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Icon(
-                                                  Icons.warning_amber_rounded,
-                                                  size: 12,
-                                                  color: Colors.white,
-                                                ),
-                                                const SizedBox(width: 3),
-                                                Text(
-                                                  'Inválida',
-                                                  style: theme
-                                                      .textTheme
-                                                      .labelSmall
-                                                      ?.copyWith(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize:
-                                                            AppTheme.fontXs,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        const SizedBox(height: 8),
-                      ],
-                    );
-                  }),
+                  if (deck.commander.isNotEmpty)
+                    _buildCardSection(
+                      context,
+                      title: 'Comandante',
+                      cards: deck.commander,
+                      deckFormat: deck.format,
+                    ),
+                  ...deck.mainBoard.entries.map(
+                    (entry) => _buildCardSection(
+                      context,
+                      title: entry.key,
+                      cards: entry.value,
+                      deckFormat: deck.format,
+                    ),
+                  ),
                 ],
               ),
 
@@ -771,6 +426,311 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
+  Widget _buildCardSection(
+    BuildContext context, {
+    required String title,
+    required List<DeckCardItem> cards,
+    required String deckFormat,
+  }) {
+    if (cards.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final deckProvider = context.read<DeckProvider>();
+    final sortedCards = List<DeckCardItem>.from(cards);
+    if (_invalidCardNames.isNotEmpty) {
+      sortedCards.sort((a, b) {
+        final aInvalid = _isCardInvalid(a) ? 0 : 1;
+        final bInvalid = _isCardInvalid(b) ? 0 : 1;
+        return aInvalid.compareTo(bInvalid);
+      });
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            '$title (${cards.length})',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ...sortedCards
+            .where((card) => !_hiddenCardIds.contains(card.id))
+            .map(
+              (card) => _buildDeckCardTile(
+                context,
+                card: card,
+                deckFormat: deckFormat,
+                deckProvider: deckProvider,
+              ),
+            ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildDeckCardTile(
+    BuildContext context, {
+    required DeckCardItem card,
+    required String deckFormat,
+    required DeckProvider deckProvider,
+  }) {
+    final theme = Theme.of(context);
+
+    return Dismissible(
+      key: ValueKey('deck-card-${card.id}'),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.edit, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'Editar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Excluir',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.delete, color: Colors.white),
+          ],
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          await _showEditCardDialog(context, card, deckFormat: deckFormat);
+          return false;
+        }
+
+        if (direction == DismissDirection.endToStart) {
+          final confirmed = await _confirmRemoveCard(context, card);
+          if (confirmed != true) return false;
+
+          if (mounted) {
+            setState(() => _hiddenCardIds.add(card.id));
+          }
+
+          try {
+            await deckProvider.removeCardFromDeck(
+              deckId: widget.deckId,
+              cardId: card.id,
+            );
+            if (!mounted) return true;
+            if (!context.mounted) return true;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Carta removida: ${card.name}'),
+                backgroundColor: theme.colorScheme.primary,
+              ),
+            );
+            return true;
+          } catch (e) {
+            if (mounted) {
+              setState(() => _hiddenCardIds.remove(card.id));
+              if (!context.mounted) return false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Erro ao remover: $e'),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+            }
+            return false;
+          }
+        }
+
+        return false;
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        shape:
+            _isCardInvalid(card)
+                ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  side: BorderSide(color: theme.colorScheme.error, width: 2),
+                )
+                : null,
+        color:
+            _isCardInvalid(card)
+                ? theme.colorScheme.error.withValues(alpha: 0.08)
+                : null,
+        child: Stack(
+          children: [
+            ListTile(
+              contentPadding: const EdgeInsets.all(8),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                child: CachedCardImage(
+                  imageUrl: card.imageUrl,
+                  width: 40,
+                  height: 56,
+                ),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    ),
+                    child: Text(
+                      '${card.quantity}x',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      card.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  Text(
+                    card.typeLine,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      ManaCostRow(cost: card.manaCost),
+                      const SizedBox(width: 8),
+                      if (card.setCode.isNotEmpty)
+                        Text(
+                          card.setCode.toUpperCase(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
+                        ),
+                      if (card.condition != CardCondition.nm) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _conditionColor(
+                              card.condition,
+                            ).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusXs,
+                            ),
+                            border: Border.all(
+                              color: _conditionColor(card.condition),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(
+                            card.condition.code,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: AppTheme.fontXs,
+                              color: _conditionColor(card.condition),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+              onTap: () => _showCardDetails(context, card),
+            ),
+            if (_isCardInvalid(card))
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'Inválida',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.fontXs,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _showEditDescriptionDialog(String? currentDescription) async {
     final result = await showDeckDescriptionEditorDialog(
       context: context,
@@ -784,7 +744,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       await executeDeckDescriptionUpdate(
         deckId: widget.deckId,
         description: result,
-        updateDeckDescription: context.read<DeckProvider>().updateDeckDescription,
+        updateDeckDescription:
+            context.read<DeckProvider>().updateDeckDescription,
         showSnackBar: ({required message, required backgroundColor}) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -951,9 +912,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       },
       onError: (message) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       },
     );
   }
@@ -963,15 +924,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       deckId: widget.deckId,
       importListToDeck:
-          ({
-            required deckId,
-            required list,
-            required replaceAll,
-          }) => context.read<DeckProvider>().importListToDeck(
-            deckId: deckId,
-            list: list,
-            replaceAll: replaceAll,
-          ),
+          ({required deckId, required list, required replaceAll}) =>
+              context.read<DeckProvider>().importListToDeck(
+                deckId: deckId,
+                list: list,
+                replaceAll: replaceAll,
+              ),
       refreshDeckDetails:
           (deckId) => context.read<DeckProvider>().fetchDeckDetails(
             deckId,
@@ -1044,13 +1002,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     await showDeckEditionPicker(
       context: context,
       card: card,
-      loadPrintings:
-          context.read<CardProvider>().resolveAndFetchPrintings,
+      loadPrintings: context.read<CardProvider>().resolveAndFetchPrintings,
       onReplaceEdition:
-          (newCardId) => _replaceEdition(
-            oldCardId: card.id,
-            newCardId: newCardId,
-          ),
+          (newCardId) =>
+              _replaceEdition(oldCardId: card.id, newCardId: newCardId),
     );
   }
 
@@ -1100,22 +1055,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       card: card,
       deckFormat: deckFormat,
-      loadPrintings:
-          context.read<CardProvider>().resolveAndFetchPrintings,
-      onSave: ({
-        required selectedCardId,
-        required quantity,
-        required selectedCondition,
-        required consolidateSameName,
-      }) => deckProvider.updateDeckCardEntry(
-        deckId: widget.deckId,
-        oldCardId: card.id,
-        newCardId: selectedCardId,
-        quantity: quantity,
-        cardName: card.name,
-        consolidateSameName: consolidateSameName,
-        condition: selectedCondition.code,
-      ),
+      loadPrintings: context.read<CardProvider>().resolveAndFetchPrintings,
+      onSave:
+          ({
+            required selectedCardId,
+            required quantity,
+            required selectedCondition,
+            required consolidateSameName,
+          }) => deckProvider.updateDeckCardEntry(
+            deckId: widget.deckId,
+            oldCardId: card.id,
+            newCardId: selectedCardId,
+            quantity: quantity,
+            cardName: card.name,
+            consolidateSameName: consolidateSameName,
+            condition: selectedCondition.code,
+          ),
       onSaved: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1142,8 +1097,6 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     if (pricing == null) return;
     await showDeckPricingDetailsSheet(context: context, pricing: pricing);
   }
-
-  
 }
 
 /// Retorna cor indicativa da condição da carta (TCGPlayer standard).

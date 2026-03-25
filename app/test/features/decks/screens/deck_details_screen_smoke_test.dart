@@ -66,10 +66,14 @@ class _FakeApiClient extends ApiClient {
 }
 
 class _IdleDeckProvider extends DeckProvider {
-  _IdleDeckProvider({required ApiClient apiClient}) : super(apiClient: apiClient);
+  _IdleDeckProvider({required ApiClient apiClient})
+    : super(apiClient: apiClient);
 
   @override
-  Future<void> fetchDeckDetails(String deckId, {bool forceRefresh = false}) async {
+  Future<void> fetchDeckDetails(
+    String deckId, {
+    bool forceRefresh = false,
+  }) async {
     // Mantém a tela sem deck carregado para exercitar o estado vazio.
   }
 }
@@ -82,7 +86,10 @@ class _LoadingDeckProvider extends DeckProvider {
   bool get isLoading => true;
 
   @override
-  Future<void> fetchDeckDetails(String deckId, {bool forceRefresh = false}) async {
+  Future<void> fetchDeckDetails(
+    String deckId, {
+    bool forceRefresh = false,
+  }) async {
     // Mantém a tela em loading para exercitar o estado.
   }
 }
@@ -194,9 +201,7 @@ Future<void> _pumpScreen(
           create: (_) => AuthProvider(apiClient: apiClient),
         ),
       ],
-      child: const MaterialApp(
-        home: DeckDetailsScreen(deckId: 'deck-1'),
-      ),
+      child: const MaterialApp(home: DeckDetailsScreen(deckId: 'deck-1')),
     ),
   );
 }
@@ -231,7 +236,10 @@ void main() {
       await _pumpScreen(tester, apiClient: apiClient, provider: provider);
       await tester.pumpAndSettle();
 
-      expect(find.text('Sessão expirada. Faça login novamente.'), findsOneWidget);
+      expect(
+        find.text('Sessão expirada. Faça login novamente.'),
+        findsOneWidget,
+      );
       expect(find.text('Fazer login novamente'), findsOneWidget);
     },
   );
@@ -250,10 +258,7 @@ void main() {
             return ApiResponse(
               200,
               _buildDeckDetailsJson(
-                {
-                  'spell-1': 1,
-                  'land-1': 36,
-                },
+                {'spell-1': 1, 'land-1': 36},
                 deckId: 'deck-1',
                 name: 'Recovered Deck',
               ),
@@ -286,6 +291,71 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Deck não encontrado'), findsOneWidget);
+  });
+
+  testWidgets(
+    'DeckDetailsScreen shows calm onboarding state for a newly created empty deck',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1':
+              () => ApiResponse(200, {
+                'id': 'deck-1',
+                'name': 'Novo Deck',
+                'format': 'commander',
+                'description': null,
+                'archetype': null,
+                'is_public': false,
+                'created_at': '2026-03-25T00:00:00.000Z',
+                'color_identity': const <String>[],
+                'stats': const {'total_cards': 0},
+                'commander': const <Map<String, dynamic>>[],
+                'main_board': const <String, dynamic>{},
+              }),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+      await _pumpScreen(tester, apiClient: apiClient, provider: provider);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Novo Deck'), findsOneWidget);
+      expect(find.text('Deck pronto para começar'), findsOneWidget);
+      expect(find.text('Selecionar comandante'), findsOneWidget);
+      expect(find.text('Buscar cartas'), findsOneWidget);
+      expect(find.text('Colar lista'), findsOneWidget);
+      expect(find.text('Inválido'), findsNothing);
+      expect(find.text('Estratégia'), findsNothing);
+      expect(apiClient.postCalls, isEmpty);
+    },
+  );
+
+  testWidgets('DeckDetailsScreen shows commander section in Cartas tab', (
+    tester,
+  ) async {
+    final apiClient = _FakeApiClient(
+      getHandlers: {
+        '/decks/deck-1':
+            () => ApiResponse(
+              200,
+              _buildDeckDetailsJson(
+                {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
+                deckId: 'deck-1',
+                name: 'Talrand Tempo',
+              ),
+            ),
+      },
+    );
+
+    final provider = DeckProvider(apiClient: apiClient);
+    await _pumpScreen(tester, apiClient: apiClient, provider: provider);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Cartas'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Comandante (1)'), findsOneWidget);
+    expect(find.text('Talrand, Sky Summoner'), findsOneWidget);
   });
 
   testWidgets(
@@ -436,11 +506,7 @@ void main() {
               () => ApiResponse(
                 200,
                 _buildDeckDetailsJson(
-                  {
-                    'remove-1': 1,
-                    'spell-1': 1,
-                    'land-1': 36,
-                  },
+                  {'remove-1': 1, 'spell-1': 1, 'land-1': 36},
                   deckId: 'deck-1',
                   name: 'Broken Deck',
                 ),
@@ -449,11 +515,7 @@ void main() {
               () => ApiResponse(
                 200,
                 _buildDeckDetailsJson(
-                  {
-                    'add-1': 1,
-                    'spell-1': 1,
-                    'land-1': 37,
-                  },
+                  {'add-1': 1, 'spell-1': 1, 'land-1': 37},
                   deckId: 'draft-1',
                   name: 'Draft Deck',
                 ),
