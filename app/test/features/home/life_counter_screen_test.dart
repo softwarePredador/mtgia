@@ -91,8 +91,10 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('SETTINGS'), findsOneWidget);
-      expect(find.text('PLAYERS'), findsOneWidget);
-      expect(find.text('STARTING LIFE'), findsOneWidget);
+      expect(find.text('MULTI-PLAYER STARTING LIFE'), findsOneWidget);
+      expect(find.text('TWO-PLAYER STARTING LIFE'), findsOneWidget);
+      expect(find.text('GAME MODES'), findsOneWidget);
+      expect(find.text('GAMEPLAY'), findsOneWidget);
     });
 
     testWidgets('runs D20 directly from mesa commander hub', (tester) async {
@@ -133,24 +135,23 @@ void main() {
       );
     });
 
-    testWidgets(
-      'rotates upper players when switching to four-player tabletop',
-      (tester) async {
-        SharedPreferences.setMockInitialValues({});
-        await tester.pumpWidget(createSubject());
-        await tester.pumpAndSettle();
+    testWidgets('rotates upper players when switching to four-player tabletop', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('life-counter-hub-settings')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('life-counter-settings-player-4')));
-        await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-players')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-players-option-4')));
+      await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('life-counter-life-core-3')), findsOneWidget);
-        expect(find.byType(RotatedBox), findsNWidgets(2));
-      },
-    );
+      expect(find.byKey(const Key('life-counter-life-core-3')), findsOneWidget);
+      expect(find.byType(RotatedBox), findsNWidgets(2));
+    });
 
     testWidgets('shows commander casts with current tax in counters sheet', (
       tester,

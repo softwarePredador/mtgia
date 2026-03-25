@@ -62,7 +62,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   final Random _runtimeRandom = Random();
 
   int _playerCount = 2;
-  int _startingLife = 20;
+  int _startingLifeTwoPlayer = 20;
+  int _startingLifeMultiPlayer = 40;
   bool _isHubExpanded = false;
 
   late List<int> _lives;
@@ -99,6 +100,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   ];
 
   Random get _random => widget.randomOverride ?? _runtimeRandom;
+  int get _startingLife =>
+      _playerCount == 2 ? _startingLifeTwoPlayer : _startingLifeMultiPlayer;
 
   @override
   void initState() {
@@ -435,9 +438,17 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     _persistSession();
   }
 
-  void _setStartingLife(int life) {
+  void _setTwoPlayerStartingLife(int life) {
     setState(() {
-      _startingLife = life;
+      _startingLifeTwoPlayer = life;
+      _initAll();
+    });
+    _persistSession();
+  }
+
+  void _setMultiPlayerStartingLife(int life) {
+    setState(() {
+      _startingLifeMultiPlayer = life;
       _initAll();
     });
     _persistSession();
@@ -448,6 +459,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     final payload = <String, dynamic>{
       'player_count': _playerCount,
       'starting_life': _startingLife,
+      'starting_life_two_player': _startingLifeTwoPlayer,
+      'starting_life_multi_player': _startingLifeMultiPlayer,
       'lives': _lives,
       'poison': _poison,
       'energy': _energy,
@@ -476,12 +489,19 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       final payload = decoded.cast<String, dynamic>();
       final playerCount = (payload['player_count'] as num?)?.toInt();
       final startingLife = (payload['starting_life'] as num?)?.toInt();
-      if (playerCount == null ||
-          startingLife == null ||
-          playerCount < 2 ||
-          playerCount > 4) {
+      final startingLifeTwoPlayer =
+          (payload['starting_life_two_player'] as num?)?.toInt();
+      final startingLifeMultiPlayer =
+          (payload['starting_life_multi_player'] as num?)?.toInt();
+      if (playerCount == null || playerCount < 2 || playerCount > 4) {
         return;
       }
+      final restoredTwoPlayerLife =
+          startingLifeTwoPlayer ??
+          (playerCount == 2 ? (startingLife ?? 20) : 20);
+      final restoredMultiPlayerLife =
+          startingLifeMultiPlayer ??
+          (playerCount > 2 ? (startingLife ?? 40) : 40);
 
       final lives = _readIntList(payload['lives'], playerCount);
       final poison = _readIntList(payload['poison'], playerCount);
@@ -531,7 +551,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       if (!mounted) return;
       setState(() {
         _playerCount = playerCount;
-        _startingLife = startingLife;
+        _startingLifeTwoPlayer = restoredTwoPlayerLife;
+        _startingLifeMultiPlayer = restoredMultiPlayerLife;
         _lives = lives;
         _poison = poison;
         _energy = energy;
@@ -645,17 +666,15 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     }
     _showTableOverlayDialog(
       barrierLabel: 'Fechar configurações',
-      builder:
+        builder:
           (ctx) => _SettingsSheet(
-            playerCount: _playerCount,
-            startingLife: _startingLife,
-            onPlayerCountChanged: (count) {
-              _setPlayerCount(count);
-              Navigator.of(ctx).pop();
+            twoPlayerStartingLife: _startingLifeTwoPlayer,
+            multiPlayerStartingLife: _startingLifeMultiPlayer,
+            onTwoPlayerStartingLifeChanged: (life) {
+              _setTwoPlayerStartingLife(life);
             },
-            onStartingLifeChanged: (life) {
-              _setStartingLife(life);
-              Navigator.of(ctx).pop();
+            onMultiPlayerStartingLifeChanged: (life) {
+              _setMultiPlayerStartingLife(life);
             },
           ),
     );
@@ -1679,6 +1698,7 @@ class _PlayersOverlay extends StatelessWidget {
         children: [
           for (final count in const [2, 3, 4]) ...[
             _PlayerLayoutPreview(
+              previewKey: Key('life-counter-players-option-$count'),
               playerCount: count,
               selected: selectedPlayerCount == count,
               onTap: () => onSelected(count),
@@ -1822,61 +1842,14 @@ class _OverlaySectionHeading extends StatelessWidget {
   }
 }
 
-class _OverlayChoicePill extends StatelessWidget {
-  final Key? pillKey;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _OverlayChoicePill({
-    this.pillKey,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      key: pillKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFF2C77) : Colors.black,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color:
-                  selected
-                      ? const Color(0xFFFF2C77)
-                      : Colors.white.withValues(alpha: 0.72),
-              width: 1.6,
-            ),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.96),
-              fontSize: AppTheme.fontMd,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _PlayerLayoutPreview extends StatelessWidget {
+  final Key? previewKey;
   final int playerCount;
   final bool selected;
   final VoidCallback onTap;
 
   const _PlayerLayoutPreview({
+    this.previewKey,
     required this.playerCount,
     required this.selected,
     required this.onTap,
@@ -1885,6 +1858,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      key: previewKey,
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -4743,16 +4717,16 @@ class _RoundButton extends StatelessWidget {
 
 /// Overlay de mesa para configurar número de jogadores e vida inicial.
 class _SettingsSheet extends StatelessWidget {
-  final int playerCount;
-  final int startingLife;
-  final ValueChanged<int> onPlayerCountChanged;
-  final ValueChanged<int> onStartingLifeChanged;
+  final int twoPlayerStartingLife;
+  final int multiPlayerStartingLife;
+  final ValueChanged<int> onTwoPlayerStartingLifeChanged;
+  final ValueChanged<int> onMultiPlayerStartingLifeChanged;
 
   const _SettingsSheet({
-    required this.playerCount,
-    required this.startingLife,
-    required this.onPlayerCountChanged,
-    required this.onStartingLifeChanged,
+    required this.twoPlayerStartingLife,
+    required this.multiPlayerStartingLife,
+    required this.onTwoPlayerStartingLifeChanged,
+    required this.onMultiPlayerStartingLifeChanged,
   });
 
   @override
@@ -4760,56 +4734,226 @@ class _SettingsSheet extends StatelessWidget {
     return _TableOverlayFrame(
       frameKey: const Key('life-counter-settings-overlay'),
       title: 'SETTINGS',
-      subtitle: 'Table setup mirrored from the benchmark shell.',
-      width: 316,
-      maxHeight: 430,
+      width: 336,
+      maxHeight: 560,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _OverlaySectionHeading('PLAYERS'),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children:
-                [2, 3, 4].map((count) {
-                  return _OverlayChoicePill(
-                    pillKey: Key('life-counter-settings-player-$count'),
-                    label: '$count',
-                    selected: count == playerCount,
-                    onTap: () => onPlayerCountChanged(count),
-                  );
-                }).toList(),
+          const _OverlaySectionHeading('MULTI-PLAYER STARTING LIFE'),
+          const SizedBox(height: 10),
+          _StartingLifePresetRow(
+            prefix: 'life-counter-settings-multi',
+            selectedLife: multiPlayerStartingLife,
+            onSelected: onMultiPlayerStartingLifeChanged,
           ),
-          const SizedBox(height: 22),
-          const _OverlaySectionHeading('STARTING LIFE'),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children:
-                [20, 25, 30, 40].map((life) {
-                  return _OverlayChoicePill(
-                    pillKey: Key('life-counter-settings-life-$life'),
-                    label: '$life',
-                    selected: life == startingLife,
-                    onTap: () => onStartingLifeChanged(life),
-                  );
-                }).toList(),
+          const SizedBox(height: 24),
+          const _OverlaySectionHeading('TWO-PLAYER STARTING LIFE'),
+          const SizedBox(height: 10),
+          _StartingLifePresetRow(
+            prefix: 'life-counter-settings-two-player',
+            selectedLife: twoPlayerStartingLife,
+            onSelected: onTwoPlayerStartingLifeChanged,
           ),
-          const SizedBox(height: 16),
-          Text(
-            '20 STANDARD / MODERN\n25 BRAWL\n30 OATHBREAKER\n40 COMMANDER',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.62),
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w600,
-              height: 1.45,
-              letterSpacing: 0.2,
-            ),
+          const SizedBox(height: 28),
+          const _OverlaySectionHeading('GAME MODES'),
+          const SizedBox(height: 12),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-mode-planechase'),
+            label: 'ENABLE PLANECHASE',
+          ),
+          const SizedBox(height: 10),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-mode-archenemy'),
+            label: 'ENABLE ARCHENEMY',
+          ),
+          const SizedBox(height: 10),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-mode-bounty'),
+            label: 'ENABLE BOUNTY',
+          ),
+          const SizedBox(height: 28),
+          const _OverlaySectionHeading('GAMEPLAY'),
+          const SizedBox(height: 12),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-gameplay-turn-tracker'),
+            label: 'ENABLE TURN TRACKER',
+          ),
+          const SizedBox(height: 10),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-gameplay-high-roll'),
+            label: 'HIGH-ROLL AT GAME START',
+          ),
+          const SizedBox(height: 10),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-gameplay-game-timer'),
+            label: 'ENABLE GAME TIMER',
+          ),
+          const SizedBox(height: 10),
+          const _SettingsToggleRow(
+            rowKey: Key('life-counter-settings-gameplay-auto-kill'),
+            label: 'AUTO-KILL',
+            subtitle: 'Kill player from life, poison, or commander damage',
+            selected: true,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StartingLifePresetRow extends StatelessWidget {
+  final String prefix;
+  final int selectedLife;
+  final ValueChanged<int> onSelected;
+
+  const _StartingLifePresetRow({
+    required this.prefix,
+    required this.selectedLife,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final life in const [40, 30, 20]) ...[
+          _StartingLifePresetButton(
+            buttonKey: Key('$prefix-$life'),
+            life: life,
+            selected: selectedLife == life,
+            onTap: () => onSelected(life),
+          ),
+          if (life != 20) const SizedBox(width: 10),
+        ],
+        const SizedBox(width: 10),
+        Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: const Icon(Icons.edit_rounded, color: Colors.white, size: 20),
+        ),
+      ],
+    );
+  }
+}
+
+class _StartingLifePresetButton extends StatelessWidget {
+  final Key buttonKey;
+  final int life;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _StartingLifePresetButton({
+    required this.buttonKey,
+    required this.life,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: buttonKey,
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Ink(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFFFC81E) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? const Color(0xFFFFC81E) : Colors.white,
+              width: 2,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              '$life',
+              style: TextStyle(
+                color: selected ? Colors.black : Colors.white,
+                fontSize: AppTheme.fontLg,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.4,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsToggleRow extends StatelessWidget {
+  final Key rowKey;
+  final String label;
+  final String? subtitle;
+  final bool selected;
+
+  const _SettingsToggleRow({
+    required this.rowKey,
+    required this.label,
+    this.subtitle,
+    this.selected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      key: rowKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          margin: const EdgeInsets.only(top: 1),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: selected ? const Color(0xFF1C78FF) : Colors.white,
+              width: 2.2,
+            ),
+            color: selected ? const Color(0xFF1C78FF) : Colors.transparent,
+          ),
+          child:
+              selected
+                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
+                  : null,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppTheme.fontMd,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.4,
+                ),
+              ),
+              if (subtitle != null)
+                Text(
+                  subtitle!.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.48),
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

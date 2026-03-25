@@ -657,6 +657,16 @@ Esta sprint so pode ser marcada como `DONE` quando:
   - rail inferior
   - overlays centrados sobre a mesa
 - `SET LIFE` e `DICE` ja pertencem a essa mesma familia visual
+- o `SET LIFE` desta rodada saiu do frame/card e virou keypad flutuante:
+  - numero branco grande
+  - botoes circulares
+  - `CANCEL / SET LIFE` no rodape
+  - composicao alinhada a captura `13.50.32`
+- o `SETTINGS` tambem convergiu melhor para o benchmark:
+  - `PLAYERS` saiu dele e ficou como overlay proprio
+  - presets de vida separados para `MULTI-PLAYER` e `TWO-PLAYER`
+  - secoes cruas `GAME MODES` e `GAMEPLAY`
+  - leitura mais de lista de mesa do que de card configuravel
 - `KO'D!`, `COMMANDER DOWN.` e `TOXIC OUT.` ja usam takeover real de painel
 - o `High Roll` e o `D20` deixaram de ser badge nesta rodada e passaram a takeover de painel:
   - numero gigante como protagonista
