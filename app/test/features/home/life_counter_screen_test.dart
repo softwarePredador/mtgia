@@ -599,10 +599,7 @@ void main() {
         160,
         scrollable: find.byType(Scrollable).last,
       );
-      final rollOffButton = tester.widget<ButtonStyleButton>(
-        find.byKey(const Key('life-counter-tool-rolloff')),
-      );
-      rollOffButton.onPressed!.call();
+      await tester.tap(find.byKey(const Key('life-counter-tool-rolloff')));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-rolloff-results')),
@@ -660,10 +657,7 @@ void main() {
         findsOneWidget,
       );
 
-      final rerollButton = tester.widget<ButtonStyleButton>(
-        find.byKey(const Key('life-counter-rolloff-reroll-ties')),
-      );
-      rerollButton.onPressed!.call();
+      await tester.tap(find.byKey(const Key('life-counter-rolloff-reroll-ties')));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('life-counter-rolloff-results')), findsOneWidget);

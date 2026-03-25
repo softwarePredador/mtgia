@@ -671,6 +671,11 @@ Esta sprint so pode ser marcada como `DONE` quando:
   - menos caixa central com borda
   - mais conteudo flutuando sobre a mesa
   - `DICE`, `HISTORY`, `CARD SEARCH`, `PLAYERS` e `SETTINGS` agora respiram mais como overlay de jogo do que como modal premium de app
+- o `DICE` tambem convergiu:
+  - lista vertical de acoes
+  - borda branca crua
+  - `HIGH ROLL` como opcao de mesmo peso estrutural
+  - ultimo evento sem card ornamental
 - `KO'D!`, `COMMANDER DOWN.` e `TOXIC OUT.` ja usam takeover real de painel
 - o `High Roll` e o `D20` deixaram de ser badge nesta rodada e passaram a takeover de painel:
   - numero gigante como protagonista

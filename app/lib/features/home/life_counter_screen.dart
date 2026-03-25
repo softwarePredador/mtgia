@@ -1941,15 +1941,15 @@ class _SimpleTableOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return _TableOverlayFrame(
       title: title,
-      subtitle: 'Overlay direto sobre a mesa, sem sair da partida.',
       width: 304,
-      maxHeight: 320,
+      maxHeight: 260,
       child: Text(
         body,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.84),
-          fontSize: AppTheme.fontSm,
-          height: 1.45,
+          color: Colors.white.withValues(alpha: 0.86),
+          fontSize: AppTheme.fontMd,
+          height: 1.35,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -3649,79 +3649,118 @@ class _DiceOverlay extends StatelessWidget {
     return _TableOverlayFrame(
       frameKey: const Key('life-counter-dice-overlay'),
       title: 'DICE',
-      subtitle: 'Quick random tools without leaving the table.',
       width: 320,
-      maxHeight: 420,
+      maxHeight: 440,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-dice-roll-d20'),
-                icon: Icons.casino_outlined,
-                label: 'D20',
-                onTap: () {
-                  onRollD20();
-                  Navigator.of(context).pop();
-                },
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-dice-roll-coin'),
-                icon: Icons.flip_camera_android_rounded,
-                label: 'COIN',
-                onTap: () {
-                  onRollCoin();
-                  Navigator.of(context).pop();
-                },
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-dice-roll-first-player'),
-                icon: Icons.person_search_rounded,
-                label: 'ROLL 1ST',
-                onTap: () {
-                  onRollFirstPlayer();
-                  Navigator.of(context).pop();
-                },
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-dice-roll-high-roll'),
-                icon: Icons.casino_rounded,
-                label: hasPendingHighRollTie ? 'TIEBREAK' : 'HIGH ROLL',
-                onTap: () {
-                  onHighRoll();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-dice-roll-d20'),
+            icon: Icons.casino_outlined,
+            label: 'D20',
+            onTap: () {
+              onRollD20();
+              Navigator.of(context).pop();
+            },
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-dice-roll-coin'),
+            icon: Icons.flip_camera_android_rounded,
+            label: 'COIN',
+            onTap: () {
+              onRollCoin();
+              Navigator.of(context).pop();
+            },
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-dice-roll-first-player'),
+            icon: Icons.person_search_rounded,
+            label: 'ROLL 1ST',
+            onTap: () {
+              onRollFirstPlayer();
+              Navigator.of(context).pop();
+            },
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-dice-roll-high-roll'),
+            icon: Icons.casino_rounded,
+            label: hasPendingHighRollTie ? 'TIEBREAK' : 'HIGH ROLL',
+            accent: const Color(0xFF40B9FF),
+            onTap: () {
+              onHighRoll();
+              Navigator.of(context).pop();
+            },
           ),
           if (lastTableEvent != null) ...[
             const SizedBox(height: 18),
-            Container(
+            Text(
               key: const Key('life-counter-dice-last-event'),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                lastTableEvent!,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.86),
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w700,
-                  height: 1.35,
-                ),
+              lastTableEvent!,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.66),
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
               ),
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _DiceActionRow extends StatelessWidget {
+  final Key buttonKey;
+  final IconData icon;
+  final String label;
+  final Color? accent;
+  final VoidCallback onTap;
+
+  const _DiceActionRow({
+    required this.buttonKey,
+    required this.icon,
+    required this.label,
+    this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = accent ?? Colors.white;
+    return Material(
+      key: buttonKey,
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Ink(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.38),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor, width: 2),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: borderColor, size: 18),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: AppTheme.fontMd,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
