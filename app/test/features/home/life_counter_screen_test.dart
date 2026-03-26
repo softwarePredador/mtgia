@@ -35,6 +35,19 @@ void main() {
     );
   }
 
+  Future<void> triggerHubPetal(WidgetTester tester, Key key) async {
+    final inkWellFinder = find.descendant(
+      of: find.byKey(key),
+      matching: find.byType(InkWell),
+    );
+    expect(inkWellFinder, findsOneWidget);
+    final inkWell = tester.widget<InkWell>(inkWellFinder);
+    expect(inkWell.onTap, isNotNull);
+    inkWell.onTap!.call();
+    await tester.pump();
+    await tester.pumpAndSettle();
+  }
+
   group('LifeCounterScreen tabletop UX', () {
     testWidgets('uses a central control hub to open table settings', (
       tester,
@@ -54,24 +67,24 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('life-counter-hub-quick-d20')),
-        findsOneWidget,
-      );
-      expect(
         find.byKey(const Key('life-counter-hub-quick-high-roll')),
         findsOneWidget,
       );
+      expect(find.byKey(const Key('life-counter-hub-tools')), findsOneWidget);
+      expect(find.byKey(const Key('life-counter-hub-reset')), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-hub-quick-d20')),
+        findsNothing,
+      );
       expect(
         find.byKey(const Key('life-counter-hub-quick-coin')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-quick-first-player')),
-        findsOneWidget,
+        findsNothing,
       );
-      expect(find.byKey(const Key('life-counter-hub-tools')), findsOneWidget);
-      expect(find.byKey(const Key('life-counter-hub-undo')), findsOneWidget);
-      expect(find.byKey(const Key('life-counter-hub-reset')), findsOneWidget);
+      expect(find.byKey(const Key('life-counter-hub-undo')), findsNothing);
       expect(find.byKey(const Key('life-counter-bottom-rail')), findsOneWidget);
       expect(find.byKey(const Key('life-counter-rail-dice')), findsOneWidget);
       expect(
@@ -83,35 +96,29 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.byKey(const Key('life-counter-hub-settings')));
-      await tester.pumpAndSettle();
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-settings'),
+      );
 
       expect(
         find.byKey(const Key('life-counter-settings-overlay')),
         findsOneWidget,
       );
-      expect(find.text('SETTINGS'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-settings-overlay')),
+          matching: find.text('SETTINGS'),
+        ),
+        findsOneWidget,
+      );
       expect(find.text('MULTI-PLAYER STARTING LIFE'), findsOneWidget);
       expect(find.text('TWO-PLAYER STARTING LIFE'), findsOneWidget);
       expect(find.text('GAME MODES'), findsOneWidget);
       expect(find.text('GAMEPLAY'), findsOneWidget);
     });
 
-    testWidgets('runs D20 directly from mesa commander hub', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      await tester.pumpWidget(createSubject());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-hub-quick-d20')));
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
-      expect(find.textContaining('D20:'), findsOneWidget);
-    });
-
-    testWidgets('runs High Roll directly from mesa commander hub', (
+    testWidgets('runs D20 from the dice rail instead of a second hub', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -120,8 +127,30 @@ void main() {
 
       await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-hub-quick-high-roll')));
+      await tester.tap(find.byKey(const Key('life-counter-rail-dice')));
       await tester.pumpAndSettle();
+      expect(find.byKey(const Key('life-counter-dice-overlay')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('life-counter-dice-roll-d20')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('life-counter-dice-overlay')), findsNothing);
+    });
+
+    testWidgets('runs High Roll directly from mesa commander hub', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(
+        createSubject(randomOverride: _SequenceRandom([2, 10])),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-quick-high-roll'),
+      );
 
       expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
       expect(find.textContaining('High Roll'), findsWidgets);
@@ -131,6 +160,20 @@ void main() {
       );
       expect(
         find.byKey(const Key('life-counter-player-high-roll-event-1')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-high-roll-event-0')),
+          matching: find.text('HIGH ROLL'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-high-roll-event-1')),
+          matching: find.text('WINNER'),
+        ),
         findsOneWidget,
       );
     });
@@ -153,6 +196,32 @@ void main() {
       expect(find.byType(RotatedBox), findsNWidgets(2));
     });
 
+    testWidgets('uses a wide bottom lane for three-player tabletop', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-players')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-players-option-3')));
+      await tester.pumpAndSettle();
+
+      final topSlotSize = tester.getSize(
+        find.byKey(const Key('life-counter-player-slot-0')),
+      );
+      final bottomSlotSize = tester.getSize(
+        find.byKey(const Key('life-counter-player-slot-2')),
+      );
+
+      expect(find.byType(RotatedBox), findsNWidgets(2));
+      expect(bottomSlotSize.width, greaterThan(topSlotSize.width * 1.8));
+      expect(bottomSlotSize.height, greaterThan(topSlotSize.height));
+    });
+
     testWidgets('shows commander casts with current tax in counters sheet', (
       tester,
     ) async {
@@ -160,15 +229,22 @@ void main() {
       await tester.pumpWidget(createSubject());
       await tester.pumpAndSettle();
 
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-1')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('life-counter-counters-1')));
       await tester.pumpAndSettle();
 
-      expect(find.text('Commander casts'), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-counters-overlay')),
+        findsOneWidget,
+      );
+      expect(find.text('TRACKERS'), findsOneWidget);
+      expect(find.text('CAST TAX'), findsOneWidget);
       expect(
         find.byKey(const Key('life-counter-commander-casts-sublabel')),
         findsOneWidget,
       );
-      expect(find.text('Taxa atual: 0 mana'), findsOneWidget);
+      expect(find.text('Current tax: 0 mana'), findsOneWidget);
     });
 
     testWidgets('applies quick +5 and -5 adjustments on player panels', (
@@ -227,6 +303,10 @@ void main() {
       );
       expect(
         find.byKey(const Key('life-counter-player-tax-minus-1')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('life-counter-counters-1')),
         findsOneWidget,
       );
       expect(
@@ -303,7 +383,13 @@ void main() {
         find.byKey(const Key('life-counter-player-roll-event-1')),
         findsOneWidget,
       );
-      expect(find.text('D20'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-roll-event-1')),
+          matching: find.text('D20'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('updates poison inline from the player life hub', (tester) async {
@@ -320,14 +406,19 @@ void main() {
 
       expect(
         find.byKey(const Key('life-counter-player-poison-badge-1')),
+        findsNothing,
+      );
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-1')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-counters-1')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('life-counter-poison-value')),
         findsOneWidget,
       );
       expect(
-        find.descendant(
-          of: find.byKey(const Key('life-counter-player-poison-badge-1')),
-          matching: find.text('1'),
-        ),
-        findsOneWidget,
+        tester.widget<Text>(find.byKey(const Key('life-counter-poison-value'))).data,
+        '1',
       );
     });
 
@@ -345,15 +436,17 @@ void main() {
 
       expect(
         find.byKey(const Key('life-counter-player-tax-badge-1')),
-        findsOneWidget,
+        findsNothing,
       );
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-1')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-counters-1')));
+      await tester.pumpAndSettle();
       expect(
-        find.descendant(
-          of: find.byKey(const Key('life-counter-player-tax-badge-1')),
-          matching: find.text('Tax +2'),
-        ),
+        find.byKey(const Key('life-counter-commander-casts-sublabel')),
         findsOneWidget,
       );
+      expect(find.text('Current tax: +2 mana'), findsOneWidget);
     });
 
     testWidgets('opens quick commander damage flow from the life hub', (
@@ -377,10 +470,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byKey(const Key('life-counter-commander-damage-quick-sheet')),
+        find.byKey(const Key('life-counter-commander-damage-quick-overlay')),
         findsOneWidget,
       );
-      expect(find.text('Dano de comandante rapido'), findsOneWidget);
+      expect(find.text('COMMANDER DAMAGE'), findsOneWidget);
 
       await tester.tap(
         find.byKey(const Key('life-counter-quick-commander-damage-plus-0')),
@@ -393,16 +486,7 @@ void main() {
       );
       expect(
         find.byKey(const Key('life-counter-player-commander-damage-badge-1')),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: find.byKey(
-            const Key('life-counter-player-commander-damage-badge-1'),
-          ),
-          matching: find.text('1'),
-        ),
-        findsOneWidget,
+        findsNothing,
       );
     });
 
@@ -493,6 +577,106 @@ void main() {
       expect(find.text('TOXIC OUT.'), findsOneWidget);
     });
 
+    testWidgets('shows decked out and answer left as full panel takeovers', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'life_counter_session_v1': jsonEncode({
+          'player_count': 2,
+          'starting_life': 40,
+          'lives': [40, 40],
+          'poison': [0, 0],
+          'energy': [0, 0],
+          'experience': [0, 0],
+          'commander_casts': [0, 0],
+          'player_special_states': ['decked_out', 'answer_left'],
+          'last_player_rolls': [null, null],
+          'last_high_rolls': [null, null],
+          'commander_damage': [
+            [0, 0],
+            [0, 0],
+          ],
+          'storm_count': 0,
+          'monarch_player': null,
+          'initiative_player': null,
+          'first_player_index': null,
+          'last_table_event': null,
+        }),
+      });
+
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-player-decked-out-0')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('life-counter-player-answer-left-1')),
+        findsOneWidget,
+      );
+      expect(find.text('DECKED OUT.'), findsOneWidget);
+      expect(find.text('ANSWER LEFT.'), findsOneWidget);
+    });
+
+    testWidgets('revives a player back to normal actions from a takeover state', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'life_counter_session_v1': jsonEncode({
+          'player_count': 2,
+          'starting_life': 40,
+          'lives': [40, 40],
+          'poison': [0, 0],
+          'energy': [0, 0],
+          'experience': [0, 0],
+          'commander_casts': [0, 0],
+          'player_special_states': ['decked_out', 'none'],
+          'last_player_rolls': [null, null],
+          'last_high_rolls': [null, null],
+          'commander_damage': [
+            [0, 0],
+            [0, 0],
+          ],
+          'storm_count': 0,
+          'monarch_player': null,
+          'initiative_player': null,
+          'first_player_index': null,
+          'last_table_event': null,
+        }),
+      });
+
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-player-decked-out-0')),
+        findsOneWidget,
+      );
+
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-0')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-player-toggle-dead-0')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-player-decked-out-0')),
+        findsNothing,
+      );
+
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-0')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-player-mark-decked-0')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('life-counter-player-mark-left-0')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('manages tabletop tools from the central hub', (tester) async {
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
@@ -502,8 +686,10 @@ void main() {
 
       await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-hub-tools')));
-      await tester.pumpAndSettle();
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-tools'),
+      );
 
       expect(find.byKey(const Key('life-counter-tools-overlay')), findsOneWidget);
       expect(find.text('TABLE TOOLS'), findsOneWidget);
@@ -542,21 +728,29 @@ void main() {
       hubToggle.onTap!.call();
       await tester.pumpAndSettle();
 
+      expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-hub-last-event')),
+          matching: find.textContaining('Primeiro jogador'),
+        ),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const Key('life-counter-hub-status-storm')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-monarch')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-initiative')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-first-player')),
-        findsOneWidget,
+        findsNothing,
       );
     });
 
@@ -584,6 +778,36 @@ void main() {
       );
     });
 
+    testWidgets('opens card search overlay from the bottom rail', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-rail-card-search')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-card-search-overlay')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('life-counter-card-search-input')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(
+          const Key(
+            'life-counter-card-search-suggestion-sol-ring',
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('roll-off shows one result card per player', (tester) async {
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(createSubject());
@@ -591,8 +815,10 @@ void main() {
 
       await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-hub-tools')));
-      await tester.pumpAndSettle();
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-tools'),
+      );
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-tool-rolloff')),
@@ -639,12 +865,30 @@ void main() {
 
       await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-hub-quick-high-roll')));
-      await tester.pumpAndSettle();
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-quick-high-roll'),
+      );
 
       expect(find.textContaining('empatado'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('life-counter-hub-tools')));
-      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-high-roll-event-0')),
+          matching: find.text('TIE'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-high-roll-event-1')),
+          matching: find.text('TIE'),
+        ),
+        findsOneWidget,
+      );
+      await triggerHubPetal(
+        tester,
+        const Key('life-counter-hub-tools'),
+      );
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-rolloff-reroll-ties')),
@@ -687,7 +931,13 @@ void main() {
         find.byKey(const Key('life-counter-player-high-roll-event-0')),
         findsOneWidget,
       );
-      expect(find.text('WINNER'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-high-roll-event-0')),
+          matching: find.text('WINNER'),
+        ),
+        findsOneWidget,
+      );
       expect(find.textContaining('Desempate do High Roll'), findsWidgets);
     });
 
@@ -718,26 +968,56 @@ void main() {
 
       expect(find.text('31'), findsOneWidget);
       expect(find.text('27'), findsOneWidget);
-      expect(find.text('Tax +4'), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-player-tax-badge-0')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('life-counter-player-poison-badge-0')),
+        findsNothing,
+      );
+
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-0')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-counters-0')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('life-counter-poison-value')), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.byKey(const Key('life-counter-poison-value'))).data,
+        '1',
+      );
+      expect(find.text('Current tax: +4 mana'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close_rounded).last);
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
       await tester.pumpAndSettle();
 
+      expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-hub-last-event')),
+          matching: find.textContaining('Primeiro jogador: Jogador 2'),
+        ),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const Key('life-counter-hub-status-storm')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-monarch')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-initiative')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('life-counter-hub-status-first-player')),
-        findsOneWidget,
+        findsNothing,
       );
     });
   });

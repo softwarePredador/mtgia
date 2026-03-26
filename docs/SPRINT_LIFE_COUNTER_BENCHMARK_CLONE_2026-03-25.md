@@ -45,6 +45,28 @@ Resumo da mudanca de criterio:
 - antes: `superar benchmark sem copiar`
 - agora: `copiar o benchmark o mais fielmente possivel e depois customizar`
 
+## Regra complementar de motion
+
+Nesta sprint, motion nao e detalhe opcional.
+
+O clone so pode ser aceito se copiar tambem a sensacao de vida do benchmark.
+Nao basta acertar layout, cores e hierarquia com uma mesa estatica.
+
+Regras praticas:
+
+1. nenhuma rodada pode simplificar a mesa a ponto de matar transicoes que reforcam leitura
+2. `High Roll` precisa continuar parecendo evento, nao troca seca de texto
+3. overlays precisam continuar surgindo da mesa, nao aparecer como tela dura
+4. estados especiais precisam continuar tendo takeover com presenca visual
+5. qualquer recorte estrutural futuro deve preservar ou melhorar o motion existente
+6. "ficar mais parecido com a imagem" nao autoriza remover vida visual do fluxo
+
+Criterio executivo novo:
+
+- nao aceitar "clone estatico"
+- a mesa precisa ficar mais parecida com o benchmark e continuar viva
+- motion serve leitura, estado e evento; nao e enfeite descartavel
+
 ## Fonte de verdade visual
 
 As capturas abaixo formam o benchmark oficial desta sprint:
@@ -593,6 +615,139 @@ Status atual:
 2. polimento de animacao
 3. persistencia visual de resultados
 4. refinamento de copy
+
+## Checklist executavel por arquivo
+
+Esta secao converte a sprint em fila de implementacao concreta.
+
+### Arquivo atual obrigatorio
+
+#### `app/lib/features/home/life_counter_screen.dart`
+
+Responsabilidade durante a sprint:
+
+1. fechar a geometria real da mesa `2p/3p/4p` em side-by-side com o benchmark
+2. garantir que o estado normal do painel fique cru:
+   - numero gigante
+   - `+` e `-` discretos
+   - sem semantica extra vazando no painel base
+3. reduzir o que ainda tem cheiro de app no painel:
+   - badges residuais
+   - botao de contadores no estado base
+   - affordances tecnicas demais
+4. fechar o hub central para ficar reconhecivel lado a lado:
+   - hexagono
+   - petalas
+   - espacos
+   - angulos
+   - pesos visuais
+5. fechar o rail inferior no mesmo idioma do benchmark
+6. transformar `High Roll` em takeover completo de painel
+7. completar a familia de estados especiais em painel cheio:
+   - `KO'D!`
+   - `COMMANDER DOWN.`
+   - `TOXIC OUT.`
+   - `DECKED OUT.`
+   - `ANSWER LEFT.`
+   - equivalentes MTG que forem mantidos
+8. eliminar os `showModalBottomSheet` residuais e migrar tudo que for mesa para overlay
+9. preservar a sensacao de evento:
+   - `AnimatedSwitcher`
+   - `AnimatedContainer`
+   - reveal do valor
+   - entrada/saida de overlay
+   - takeover dos estados especiais
+
+Trechos atuais que nao podem ficar como destino final do clone:
+
+- badges do painel em `_buildBadgesRow`
+- botao de counters no painel base
+- `showModalBottomSheet` de counters
+- `showModalBottomSheet` de commander damage quick
+
+### Arquivos novos recomendados para extracao
+
+O clone pode ate ser fechado no arquivo atual, mas a execucao fica mais segura se a tela for quebrada nestes modulos.
+
+#### `app/lib/features/home/widgets/life_counter_table_layout.dart`
+
+Tasks:
+
+1. extrair a shell da mesa
+2. concentrar layout `2p/3p/4p`
+3. concentrar rotacoes dos paines superiores
+4. permitir ajuste fino de geometria sem misturar logica de jogo
+
+#### `app/lib/features/home/widgets/life_counter_control_hub.dart`
+
+Tasks:
+
+1. extrair hub central fechado e expandido
+2. extrair petalas e micro-acoes
+3. extrair rail inferior
+4. fechar o side-by-side do centro da mesa sem carregar o arquivo principal
+5. manter motion do abrir/fechar como criterio obrigatorio
+
+#### `app/lib/features/home/widgets/life_counter_player_panel.dart`
+
+Tasks:
+
+1. extrair painel normal do jogador
+2. extrair takeover de evento (`High Roll`, `D20`)
+3. extrair takeover de estados especiais
+4. controlar claramente o que pode aparecer no estado base e o que so entra em modo especial
+5. manter o numero como protagonista absoluto
+
+#### `app/lib/features/home/widgets/life_counter_overlays.dart`
+
+Tasks:
+
+1. extrair overlays de `Players`, `Settings`, `Set Life`, `Dice`, `History` e `Card Search`
+2. migrar `Counters` e `Commander Damage Quick` para a mesma familia visual
+3. garantir que todas as superficies parecam mesa e nao modal padrao
+4. manter transicao compartilhada de entrada e saida
+
+#### `app/lib/features/home/widgets/life_counter_motion.dart`
+
+Tasks:
+
+1. centralizar duracoes, curvas e transicoes da mesa
+2. impedir regressao para uma implementacao estatica durante o recorte
+3. dar o mesmo contrato de motion para:
+   - hub
+   - overlays
+   - `High Roll`
+   - takeover de derrota/estado especial
+   - `Set Life`
+
+### Arquivo de teste obrigatorio
+
+#### `app/test/features/home/life_counter_screen_test.dart`
+
+Tasks:
+
+1. manter a suite atual verde durante toda a sprint
+2. adicionar cobertura para o estado base mais cru:
+   - sem textos auxiliares indevidos no painel inicial
+   - sem badges residuais quando o painel esta em modo normal
+3. adicionar cobertura para `High Roll` como takeover dominante
+4. adicionar cobertura para todos os estados especiais que faltarem entrar
+5. adicionar cobertura para overlays migrados de `sheet` para mesa
+6. proteger explicitamente a regra de motion por comportamento:
+   - overlay nasce da mesa
+   - takeover substitui o estado anterior
+   - evento nao volta a parecer badge comum
+
+## Ordem executavel recomendada
+
+1. extrair layout da mesa
+2. extrair painel do jogador
+3. extrair hub + rail
+4. extrair overlays
+5. migrar counters/commander damage para overlay
+6. completar estados especiais faltantes
+7. revisar motion e transicoes
+8. revalidar side-by-side com `dddddd/`
 
 ## Termos de aceite
 

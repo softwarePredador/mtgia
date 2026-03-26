@@ -113,6 +113,26 @@ flutter test test/features/decks/models/deck_card_item_test.dart \
 flutter test
 ```
 
+### Prova visual do life counter clone
+
+```bash
+flutter test test/features/home/life_counter_clone_proof_test.dart --update-goldens
+powershell -ExecutionPolicy Bypass -File tool/generate_life_counter_clone_proof.ps1
+flutter test test/features/home/life_counter_clone_proof_test.dart
+```
+
+Essa suite gera a prova side-by-side do clone:
+
+- screenshots atuais do app em `test/features/home/goldens/`
+- benchmarks convertidos em `test/features/home/benchmarks/`
+- provas side-by-side finais em `test/features/home/proofs/`
+
+Leitura de aceite:
+
+- a mesa, o hub e os overlays precisam bater visualmente na leitura imediata
+- banners promocionais do app de referencia nao entram como criterio de aceite
+- qualquer regressao visual relevante passa a aparecer no diff do golden
+
 ## Proximo salto de cobertura
 
 Para colocar o app no mesmo nivel de exigencia do backend, as proximas suites devem cobrir:

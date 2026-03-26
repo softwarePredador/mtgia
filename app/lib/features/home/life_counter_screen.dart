@@ -1,11 +1,15 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../cards/providers/card_provider.dart';
+import '../cards/screens/card_detail_screen.dart';
+import '../decks/models/deck_card_item.dart';
 
 /// Snapshot of all player state for undo support.
 class _GameSnapshot {
@@ -14,6 +18,7 @@ class _GameSnapshot {
   final List<int> energy;
   final List<int> experience;
   final List<int> commanderCasts;
+  final List<_PlayerSpecialState> playerSpecialStates;
   final List<int?> lastPlayerRolls;
   final List<int?> lastHighRolls;
   final List<List<int>> commanderDamage;
@@ -29,6 +34,7 @@ class _GameSnapshot {
     required this.energy,
     required this.experience,
     required this.commanderCasts,
+    required this.playerSpecialStates,
     required this.lastPlayerRolls,
     required this.lastHighRolls,
     required this.commanderDamage,
@@ -40,6 +46,8 @@ class _GameSnapshot {
   });
 }
 
+enum _PlayerSpecialState { none, deckedOut, answerLeft }
+
 /// Contador de vida completo para partidas de Magic: The Gathering.
 ///
 /// Suporta 2, 3 ou 4 jogadores, com:
@@ -47,11 +55,16 @@ class _GameSnapshot {
 /// - Veneno / Poison counters (10 = derrota)
 /// - Dano de Comandante por oponente (21 = derrota)
 /// - Energy e Experience counters
-/// - Histórico com undo
+/// - HistÃ³rico com undo
 class LifeCounterScreen extends StatefulWidget {
   final Random? randomOverride;
+  final bool initialHubExpanded;
 
-  const LifeCounterScreen({super.key, this.randomOverride});
+  const LifeCounterScreen({
+    super.key,
+    this.randomOverride,
+    this.initialHubExpanded = false,
+  });
 
   @override
   State<LifeCounterScreen> createState() => _LifeCounterScreenState();
@@ -59,6 +72,7 @@ class LifeCounterScreen extends StatefulWidget {
 
 class _LifeCounterScreenState extends State<LifeCounterScreen> {
   static const _sessionPrefsKey = 'life_counter_session_v1';
+  static const double _tableGutter = 4;
   final Random _runtimeRandom = Random();
 
   int _playerCount = 2;
@@ -71,6 +85,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   late List<int> _energy;
   late List<int> _experience;
   late List<int> _commanderCasts;
+  late List<_PlayerSpecialState> _playerSpecialStates;
   late List<int?> _lastPlayerRolls;
   late List<int?> _lastHighRolls;
   Set<int> _highRollWinners = const <int>{};
@@ -106,6 +121,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   @override
   void initState() {
     super.initState();
+    _isHubExpanded = widget.initialHubExpanded;
     _initAll();
     _restorePersistedSession();
   }
@@ -116,6 +132,10 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     _energy = List.generate(_playerCount, (_) => 0);
     _experience = List.generate(_playerCount, (_) => 0);
     _commanderCasts = List.generate(_playerCount, (_) => 0);
+    _playerSpecialStates = List.generate(
+      _playerCount,
+      (_) => _PlayerSpecialState.none,
+    );
     _lastPlayerRolls = List.generate(_playerCount, (_) => null);
     _lastHighRolls = List.generate(_playerCount, (_) => null);
     _highRollWinners = const <int>{};
@@ -139,6 +159,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         energy: List.of(_energy),
         experience: List.of(_experience),
         commanderCasts: List.of(_commanderCasts),
+        playerSpecialStates: List.of(_playerSpecialStates),
         lastPlayerRolls: List.of(_lastPlayerRolls),
         lastHighRolls: List.of(_lastHighRolls),
         commanderDamage: _commanderDamage.map((row) => List.of(row)).toList(),
@@ -152,29 +173,6 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     if (_history.length > _maxHistory) {
       _history.removeAt(0);
     }
-  }
-
-  void _undo() {
-    if (_history.isEmpty) return;
-    HapticFeedback.selectionClick();
-    final snap = _history.removeLast();
-    setState(() {
-      _lives = snap.lives;
-      _poison = snap.poison;
-      _energy = snap.energy;
-      _experience = snap.experience;
-      _commanderCasts = snap.commanderCasts;
-      _lastPlayerRolls = snap.lastPlayerRolls;
-      _lastHighRolls = snap.lastHighRolls;
-      _highRollWinners = _deriveHighRollWinners(snap.lastHighRolls);
-      _commanderDamage = snap.commanderDamage;
-      _stormCount = snap.stormCount;
-      _monarchPlayer = snap.monarchPlayer;
-      _initiativePlayer = snap.initiativePlayer;
-      _firstPlayerIndex = snap.firstPlayerIndex;
-      _lastTableEvent = snap.lastTableEvent;
-    });
-    _persistSession();
   }
 
   void _reset() {
@@ -415,17 +413,61 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   }
 
   void _togglePlayerDefeated(int player) {
+    if (_playerHasTakeoverState(player)) {
+      _revivePlayer(player);
+      return;
+    }
+    _markPlayerKnockedOut(player);
+  }
+
+  bool _playerHasTakeoverState(int player) {
+    return _playerSpecialStates[player] != _PlayerSpecialState.none ||
+        _lives[player] <= 0 ||
+        _poison[player] >= 10 ||
+        _commanderDamage[player].any((damage) => damage >= 21);
+  }
+
+  void _markPlayerKnockedOut(int player) {
     HapticFeedback.mediumImpact();
     _saveSnapshot();
     setState(() {
-      if (_lives[player] > 0) {
-        _lives[player] = 0;
-        _lastTableEvent = '${_playerLabels[player]} marcado como morto';
-      } else {
-        _lives[player] = _startingLife;
-        _lastTableEvent =
-            '${_playerLabels[player]} voltou com $_startingLife de vida';
-      }
+      _playerSpecialStates[player] = _PlayerSpecialState.none;
+      _lives[player] = 0;
+      _lastTableEvent = '${_playerLabels[player]} foi nocauteado';
+    });
+    _persistSession();
+  }
+
+  void _markPlayerDeckedOut(int player) {
+    HapticFeedback.mediumImpact();
+    _saveSnapshot();
+    setState(() {
+      _playerSpecialStates[player] = _PlayerSpecialState.deckedOut;
+      _lastTableEvent = '${_playerLabels[player]} ficou sem grimorio';
+    });
+    _persistSession();
+  }
+
+  void _markPlayerAnswerLeft(int player) {
+    HapticFeedback.mediumImpact();
+    _saveSnapshot();
+    setState(() {
+      _playerSpecialStates[player] = _PlayerSpecialState.answerLeft;
+      _lastTableEvent = '${_playerLabels[player]} deixou a mesa';
+    });
+    _persistSession();
+  }
+
+  void _revivePlayer(int player) {
+    HapticFeedback.mediumImpact();
+    _saveSnapshot();
+    setState(() {
+      _playerSpecialStates[player] = _PlayerSpecialState.none;
+      _lives[player] = _startingLife;
+      _poison[player] = 0;
+      _commanderDamage[player] = List<int>.filled(_playerCount, 0);
+      _lastTableEvent =
+          '${_playerLabels[player]} voltou com $_startingLife de vida';
     });
     _persistSession();
   }
@@ -466,6 +508,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       'energy': _energy,
       'experience': _experience,
       'commander_casts': _commanderCasts,
+      'player_special_states':
+          _playerSpecialStates.map(_encodePlayerSpecialState).toList(),
       'last_player_rolls': _lastPlayerRolls,
       'last_high_rolls': _lastHighRolls,
       'commander_damage': _commanderDamage,
@@ -511,6 +555,10 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         payload['commander_casts'],
         playerCount,
       );
+      final playerSpecialStates = _readPlayerSpecialStateList(
+        payload['player_special_states'],
+        playerCount,
+      );
       final lastPlayerRolls = _readNullableIntList(
         payload['last_player_rolls'],
         playerCount,
@@ -542,6 +590,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           energy == null ||
           experience == null ||
           commanderCasts == null ||
+          playerSpecialStates == null ||
           lastPlayerRolls == null ||
           lastHighRolls == null ||
           commanderDamage == null) {
@@ -558,6 +607,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         _energy = energy;
         _experience = experience;
         _commanderCasts = commanderCasts;
+        _playerSpecialStates = playerSpecialStates;
         _lastPlayerRolls = lastPlayerRolls;
         _lastHighRolls = lastHighRolls;
         _highRollWinners = _deriveHighRollWinners(lastHighRolls);
@@ -570,7 +620,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         _history.clear();
       });
     } catch (_) {
-      // Ignora sessão inválida sem travar a tela.
+      // Ignora sessÃ£o invÃ¡lida sem travar a tela.
     }
   }
 
@@ -665,7 +715,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar configurações',
+      barrierLabel: 'Fechar configuraÃ§Ãµes',
         builder:
           (ctx) => _SettingsSheet(
             twoPlayerStartingLife: _startingLifeTwoPlayer,
@@ -687,7 +737,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       });
     }
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar seleção de jogadores',
+      barrierLabel: 'Fechar seleÃ§Ã£o de jogadores',
       builder:
           (ctx) => _PlayersOverlay(
             selectedPlayerCount: _playerCount,
@@ -701,14 +751,14 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 
   void _showHistoryDialog() {
     _showTableOverlayDialog(
-      barrierLabel: 'Fechar histórico',
+      barrierLabel: 'Fechar histÃ³rico',
       builder:
           (ctx) => _SimpleTableOverlay(
             title: 'HISTORY',
             body:
                 _lastTableEvent == null
                     ? 'Nenhum evento de mesa registrado ainda.'
-                    : 'Último evento: $_lastTableEvent\n\nSnapshots salvos: ${_history.length}',
+                    : 'Ãšltimo evento: $_lastTableEvent\n\nSnapshots salvos: ${_history.length}',
           ),
     );
   }
@@ -716,12 +766,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   void _showCardSearchDialog() {
     _showTableOverlayDialog(
       barrierLabel: 'Fechar busca de cartas',
-      builder:
-          (ctx) => const _SimpleTableOverlay(
-            title: 'CARD SEARCH',
-            body:
-                'Entrada reservada para a adaptação MTG dentro da shell clonada. Nesta fase, o foco é convergir a mesa ao benchmark.',
-          ),
+      builder: (ctx) => const _CardSearchOverlay(),
     );
   }
 
@@ -788,18 +833,11 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
-  void _showCountersSheet(int playerIndex) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppTheme.surfaceSlate,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppTheme.radiusLg),
-        ),
-      ),
+  void _showCountersDialog(int playerIndex) {
+    _showTableOverlayDialog(
+      barrierLabel: 'Fechar contadores',
       builder:
-          (ctx) => _CountersSheet(
+          (ctx) => _CountersOverlay(
             playerIndex: playerIndex,
             playerCount: _playerCount,
             playerColor: _playerColors[playerIndex],
@@ -824,18 +862,52 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
-  void _showCommanderDamageQuickSheet(int playerIndex) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppTheme.surfaceSlate,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppTheme.radiusLg),
-        ),
-      ),
+  List<_PlayerSpecialState>? _readPlayerSpecialStateList(
+    dynamic value,
+    int expectedLength,
+  ) {
+    if (value == null) {
+      return List<_PlayerSpecialState>.generate(
+        expectedLength,
+        (_) => _PlayerSpecialState.none,
+      );
+    }
+    if (value is! List || value.length != expectedLength) return null;
+    final parsed = <_PlayerSpecialState>[];
+    for (final item in value) {
+      if (item is! String) return null;
+      parsed.add(_decodePlayerSpecialState(item));
+    }
+    return parsed;
+  }
+
+  String _encodePlayerSpecialState(_PlayerSpecialState state) {
+    switch (state) {
+      case _PlayerSpecialState.none:
+        return 'none';
+      case _PlayerSpecialState.deckedOut:
+        return 'decked_out';
+      case _PlayerSpecialState.answerLeft:
+        return 'answer_left';
+    }
+  }
+
+  _PlayerSpecialState _decodePlayerSpecialState(String value) {
+    switch (value) {
+      case 'decked_out':
+        return _PlayerSpecialState.deckedOut;
+      case 'answer_left':
+        return _PlayerSpecialState.answerLeft;
+      default:
+        return _PlayerSpecialState.none;
+    }
+  }
+
+  void _showCommanderDamageQuickDialog(int playerIndex) {
+    _showTableOverlayDialog(
+      barrierLabel: 'Fechar dano de comandante rapido',
       builder:
-          (ctx) => _CommanderDamageQuickSheet(
+          (ctx) => _CommanderDamageQuickOverlay(
             playerIndex: playerIndex,
             playerCount: _playerCount,
             playerLabel: _playerLabels[playerIndex],
@@ -853,7 +925,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     _showTableOverlayDialog(
       barrierLabel: 'Fechar set life',
       builder:
-          (ctx) => _SetLifeOverlay(
+          (ctx) => _BenchmarkSetLifeOverlay(
             playerLabel: _playerLabels[playerIndex],
             initialLife: _lives[playerIndex],
             onApply: (life) {
@@ -877,10 +949,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                 color: Colors.black,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(3, 3, 3, 6),
-                  child:
-                      _playerCount <= 2
-                          ? _buildTwoPlayers()
-                          : _buildGridPlayers(),
+                  child: _buildTablePlayers(),
                 ),
               ),
             ),
@@ -888,22 +957,6 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
               child: Center(
                 child: _TableControlHub(
                   isExpanded: _isHubExpanded,
-                  playerCount: _playerCount,
-                  startingLife: _startingLife,
-                  canUndo: _history.isNotEmpty,
-                  stormCount: _stormCount,
-                  monarchLabel:
-                      _monarchPlayer == null
-                          ? null
-                          : 'Monarca ${_playerLabels[_monarchPlayer!]}',
-                  initiativeLabel:
-                      _initiativePlayer == null
-                          ? null
-                          : 'Iniciativa ${_playerLabels[_initiativePlayer!]}',
-                  firstPlayerLabel:
-                      _firstPlayerIndex == null
-                          ? null
-                          : '1º ${_playerLabels[_firstPlayerIndex!]}',
                   lastTableEvent: _lastTableEvent,
                   onToggle: () {
                     setState(() {
@@ -915,10 +968,6 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
                   onTools: _showTableToolsSheet,
                   hasPendingHighRollTie: _highRollWinners.length > 1,
                   onQuickHighRoll: _runOrRerollHighRoll,
-                  onQuickCoin: _rollCoinFlip,
-                  onQuickD20: _rollD20,
-                  onQuickFirstPlayer: _rollFirstPlayer,
-                  onUndo: _history.isNotEmpty ? _undo : null,
                   onReset: _reset,
                 ),
               ),
@@ -929,14 +978,24 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
               bottom: 10,
               child: IgnorePointer(
                 ignoring: !_isHubExpanded,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 180),
-                  opacity: _isHubExpanded ? 1 : 0,
-                  child: Center(
-                    child: _TableBottomRail(
-                      onDice: _showDiceDialog,
-                      onHistory: _showHistoryDialog,
-                      onCardSearch: _showCardSearchDialog,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  offset: _isHubExpanded ? Offset.zero : const Offset(0, 0.2),
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutBack,
+                    scale: _isHubExpanded ? 1 : 0.94,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: _isHubExpanded ? 1 : 0,
+                      child: Center(
+                        child: _TableBottomRail(
+                          onDice: _showDiceDialog,
+                          onHistory: _showHistoryDialog,
+                          onCardSearch: _showCardSearchDialog,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -948,251 +1007,137 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
+  Widget _buildTablePlayers() {
+    switch (_playerCount) {
+      case 2:
+        return _buildTwoPlayers();
+      case 3:
+        return _buildThreePlayers();
+      default:
+        return _buildFourPlayers();
+    }
+  }
+
   Widget _buildTwoPlayers() {
     return Column(
-      children: List.generate(_playerCount, (i) {
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(3, i == 0 ? 0 : 3, 3, 3),
-            child: _PlayerPanel(
-              panelIndex: i,
-              label: _playerLabels[i],
-              life: _lives[i],
-              poison: _poison[i],
-              commanderTax: _commanderCasts[i] * 2,
-              commanderDamageTotal: _totalCommanderDamage(i),
-              commanderDamageLeadSourceLabel: _commanderDamageLeadSourceLabel(i),
-              commanderDamageLeadSourceValue: _commanderDamageLeadSourceValue(i),
-              lastPlayerRoll: _lastPlayerRolls[i],
-              highRollValue: _lastHighRolls[i],
-              isHighRollWinner: _highRollWinners.contains(i),
-              isHighRollTie:
-                  _highRollWinners.length > 1 && _highRollWinners.contains(i),
-              isMonarch: _monarchPlayer == i,
-              hasInitiative: _initiativePlayer == i,
-              color: _playerColors[i],
-              onIncrement: () => _changeLife(i, 1),
-              onQuickIncrement: () => _changeLife(i, 5),
-              onDecrement: () => _changeLife(i, -1),
-              onQuickDecrement: () => _changeLife(i, -5),
-              onPoisonIncrement: () => _changePoison(i, 1),
-              onPoisonDecrement: () => _changePoison(i, -1),
-              onCommanderTaxIncrement: () => _changeCommanderCasts(i, 1),
-              onCommanderTaxDecrement: () => _changeCommanderCasts(i, -1),
-              onOpenCommanderDamageQuick:
-                  () => _showCommanderDamageQuickSheet(i),
-              onOpenSetLife: () => _showSetLifeDialog(i),
-              onPlayerRollD20: () => _rollPlayerD20(i),
-              onToggleDefeated: () => _togglePlayerDefeated(i),
-              onCountersTap: () => _showCountersSheet(i),
-              quickPlusKey: Key('life-counter-quick-plus-$i'),
-              quickMinusKey: Key('life-counter-quick-minus-$i'),
-              countersKey: Key('life-counter-counters-$i'),
-              quarterTurns: i == 0 && _playerCount == 2 ? 2 : 0,
-            ),
-          ),
-        );
-      }),
+      children: [
+        Expanded(child: _buildPlayerSlot(0, quarterTurns: 2)),
+        const SizedBox(height: _tableGutter),
+        Expanded(child: _buildPlayerSlot(1)),
+      ],
     );
   }
 
-  Widget _buildGridPlayers() {
+  Widget _buildThreePlayers() {
+    return Column(
+      children: [
+        Expanded(
+          flex: 47,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildPlayerSlot(0, compact: true, quarterTurns: 2),
+              ),
+              const SizedBox(width: _tableGutter),
+              Expanded(
+                child: _buildPlayerSlot(1, compact: true, quarterTurns: 2),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: _tableGutter),
+        Expanded(
+          flex: 53,
+          child: _buildPlayerSlot(2),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFourPlayers() {
     return Column(
       children: [
         Expanded(
           child: Row(
             children: [
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
-                  child: _PlayerPanel(
-                    panelIndex: 0,
-                    label: _playerLabels[0],
-                    life: _lives[0],
-                    poison: _poison[0],
-                    commanderTax: _commanderCasts[0] * 2,
-                    commanderDamageTotal: _totalCommanderDamage(0),
-                    commanderDamageLeadSourceLabel:
-                        _commanderDamageLeadSourceLabel(0),
-                    commanderDamageLeadSourceValue:
-                        _commanderDamageLeadSourceValue(0),
-                    lastPlayerRoll: _lastPlayerRolls[0],
-                    highRollValue: _lastHighRolls[0],
-                    isHighRollWinner: _highRollWinners.contains(0),
-                    isHighRollTie:
-                        _highRollWinners.length > 1 &&
-                        _highRollWinners.contains(0),
-                    isMonarch: _monarchPlayer == 0,
-                    hasInitiative: _initiativePlayer == 0,
-                    color: _playerColors[0],
-                    onIncrement: () => _changeLife(0, 1),
-                    onQuickIncrement: () => _changeLife(0, 5),
-                    onDecrement: () => _changeLife(0, -1),
-                    onQuickDecrement: () => _changeLife(0, -5),
-                    onPoisonIncrement: () => _changePoison(0, 1),
-                    onPoisonDecrement: () => _changePoison(0, -1),
-                    onCommanderTaxIncrement: () => _changeCommanderCasts(0, 1),
-                    onCommanderTaxDecrement: () => _changeCommanderCasts(0, -1),
-                    onOpenCommanderDamageQuick:
-                        () => _showCommanderDamageQuickSheet(0),
-                    onOpenSetLife: () => _showSetLifeDialog(0),
-                    onPlayerRollD20: () => _rollPlayerD20(0),
-                    onToggleDefeated: () => _togglePlayerDefeated(0),
-                    onCountersTap: () => _showCountersSheet(0),
-                    quickPlusKey: const Key('life-counter-quick-plus-0'),
-                    quickMinusKey: const Key('life-counter-quick-minus-0'),
-                    countersKey: const Key('life-counter-counters-0'),
-                    compact: true,
-                    quarterTurns: 2,
-                  ),
-                ),
+                child: _buildPlayerSlot(0, compact: true, quarterTurns: 2),
               ),
+              const SizedBox(width: _tableGutter),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(3, 0, 0, 3),
-                  child: _PlayerPanel(
-                    panelIndex: 1,
-                    label: _playerLabels[1],
-                    life: _lives[1],
-                    poison: _poison[1],
-                    commanderTax: _commanderCasts[1] * 2,
-                    commanderDamageTotal: _totalCommanderDamage(1),
-                    commanderDamageLeadSourceLabel:
-                        _commanderDamageLeadSourceLabel(1),
-                    commanderDamageLeadSourceValue:
-                        _commanderDamageLeadSourceValue(1),
-                    lastPlayerRoll: _lastPlayerRolls[1],
-                    highRollValue: _lastHighRolls[1],
-                    isHighRollWinner: _highRollWinners.contains(1),
-                    isHighRollTie:
-                        _highRollWinners.length > 1 &&
-                        _highRollWinners.contains(1),
-                    isMonarch: _monarchPlayer == 1,
-                    hasInitiative: _initiativePlayer == 1,
-                    color: _playerColors[1],
-                    onIncrement: () => _changeLife(1, 1),
-                    onQuickIncrement: () => _changeLife(1, 5),
-                    onDecrement: () => _changeLife(1, -1),
-                    onQuickDecrement: () => _changeLife(1, -5),
-                    onPoisonIncrement: () => _changePoison(1, 1),
-                    onPoisonDecrement: () => _changePoison(1, -1),
-                    onCommanderTaxIncrement: () => _changeCommanderCasts(1, 1),
-                    onCommanderTaxDecrement: () => _changeCommanderCasts(1, -1),
-                    onOpenCommanderDamageQuick:
-                        () => _showCommanderDamageQuickSheet(1),
-                    onOpenSetLife: () => _showSetLifeDialog(1),
-                    onPlayerRollD20: () => _rollPlayerD20(1),
-                    onToggleDefeated: () => _togglePlayerDefeated(1),
-                    onCountersTap: () => _showCountersSheet(1),
-                    quickPlusKey: const Key('life-counter-quick-plus-1'),
-                    quickMinusKey: const Key('life-counter-quick-minus-1'),
-                    countersKey: const Key('life-counter-counters-1'),
-                    compact: true,
-                    quarterTurns: 2,
-                  ),
-                ),
+                child: _buildPlayerSlot(1, compact: true, quarterTurns: 2),
               ),
             ],
           ),
         ),
+        const SizedBox(height: _tableGutter),
         Expanded(
           child: Row(
             children: [
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 3, 3, 0),
-                  child: _PlayerPanel(
-                    panelIndex: 2,
-                    label: _playerLabels[2],
-                    life: _lives[2],
-                    poison: _poison[2],
-                    commanderTax: _commanderCasts[2] * 2,
-                    commanderDamageTotal: _totalCommanderDamage(2),
-                    commanderDamageLeadSourceLabel:
-                        _commanderDamageLeadSourceLabel(2),
-                    commanderDamageLeadSourceValue:
-                        _commanderDamageLeadSourceValue(2),
-                    lastPlayerRoll: _lastPlayerRolls[2],
-                    highRollValue: _lastHighRolls[2],
-                    isHighRollWinner: _highRollWinners.contains(2),
-                    isHighRollTie:
-                        _highRollWinners.length > 1 &&
-                        _highRollWinners.contains(2),
-                    isMonarch: _monarchPlayer == 2,
-                    hasInitiative: _initiativePlayer == 2,
-                    color: _playerColors[2],
-                    onIncrement: () => _changeLife(2, 1),
-                    onQuickIncrement: () => _changeLife(2, 5),
-                    onDecrement: () => _changeLife(2, -1),
-                    onQuickDecrement: () => _changeLife(2, -5),
-                    onPoisonIncrement: () => _changePoison(2, 1),
-                    onPoisonDecrement: () => _changePoison(2, -1),
-                    onCommanderTaxIncrement: () => _changeCommanderCasts(2, 1),
-                    onCommanderTaxDecrement: () => _changeCommanderCasts(2, -1),
-                    onOpenCommanderDamageQuick:
-                        () => _showCommanderDamageQuickSheet(2),
-                    onOpenSetLife: () => _showSetLifeDialog(2),
-                    onPlayerRollD20: () => _rollPlayerD20(2),
-                    onToggleDefeated: () => _togglePlayerDefeated(2),
-                    onCountersTap: () => _showCountersSheet(2),
-                    quickPlusKey: const Key('life-counter-quick-plus-2'),
-                    quickMinusKey: const Key('life-counter-quick-minus-2'),
-                    countersKey: const Key('life-counter-counters-2'),
-                    compact: true,
-                    quarterTurns: 0,
-                  ),
-                ),
+                child: _buildPlayerSlot(2, compact: true),
               ),
-              if (_playerCount >= 4)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(3, 3, 0, 0),
-                    child: _PlayerPanel(
-                      panelIndex: 3,
-                      label: _playerLabels[3],
-                      life: _lives[3],
-                      poison: _poison[3],
-                      commanderTax: _commanderCasts[3] * 2,
-                      commanderDamageTotal: _totalCommanderDamage(3),
-                      commanderDamageLeadSourceLabel:
-                          _commanderDamageLeadSourceLabel(3),
-                      commanderDamageLeadSourceValue:
-                          _commanderDamageLeadSourceValue(3),
-                      lastPlayerRoll: _lastPlayerRolls[3],
-                      highRollValue: _lastHighRolls[3],
-                      isHighRollWinner: _highRollWinners.contains(3),
-                      isHighRollTie:
-                          _highRollWinners.length > 1 &&
-                          _highRollWinners.contains(3),
-                      isMonarch: _monarchPlayer == 3,
-                      hasInitiative: _initiativePlayer == 3,
-                      color: _playerColors[3],
-                      onIncrement: () => _changeLife(3, 1),
-                      onQuickIncrement: () => _changeLife(3, 5),
-                      onDecrement: () => _changeLife(3, -1),
-                      onQuickDecrement: () => _changeLife(3, -5),
-                      onPoisonIncrement: () => _changePoison(3, 1),
-                      onPoisonDecrement: () => _changePoison(3, -1),
-                      onCommanderTaxIncrement: () => _changeCommanderCasts(3, 1),
-                      onCommanderTaxDecrement: () => _changeCommanderCasts(3, -1),
-                      onOpenCommanderDamageQuick:
-                          () => _showCommanderDamageQuickSheet(3),
-                      onOpenSetLife: () => _showSetLifeDialog(3),
-                      onPlayerRollD20: () => _rollPlayerD20(3),
-                      onToggleDefeated: () => _togglePlayerDefeated(3),
-                      onCountersTap: () => _showCountersSheet(3),
-                      quickPlusKey: const Key('life-counter-quick-plus-3'),
-                      quickMinusKey: const Key('life-counter-quick-minus-3'),
-                      countersKey: const Key('life-counter-counters-3'),
-                      compact: true,
-                      quarterTurns: 0,
-                    ),
-                  ),
-                ),
+              const SizedBox(width: _tableGutter),
+              Expanded(
+                child: _buildPlayerSlot(3, compact: true),
+              ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPlayerSlot(
+    int playerIndex, {
+    bool compact = false,
+    int quarterTurns = 0,
+  }) {
+    return KeyedSubtree(
+      key: Key('life-counter-player-slot-$playerIndex'),
+      child: _PlayerPanel(
+        panelIndex: playerIndex,
+        label: _playerLabels[playerIndex],
+        life: _lives[playerIndex],
+        poison: _poison[playerIndex],
+        commanderTax: _commanderCasts[playerIndex] * 2,
+        commanderDamageTotal: _totalCommanderDamage(playerIndex),
+        commanderDamageLeadSourceLabel:
+            _commanderDamageLeadSourceLabel(playerIndex),
+        commanderDamageLeadSourceValue:
+            _commanderDamageLeadSourceValue(playerIndex),
+        lastPlayerRoll: _lastPlayerRolls[playerIndex],
+        highRollValue: _lastHighRolls[playerIndex],
+        specialState: _playerSpecialStates[playerIndex],
+        isHighRollWinner: _highRollWinners.contains(playerIndex),
+        isHighRollTie:
+            _highRollWinners.length > 1 &&
+            _highRollWinners.contains(playerIndex),
+        isMonarch: _monarchPlayer == playerIndex,
+        hasInitiative: _initiativePlayer == playerIndex,
+        color: _playerColors[playerIndex],
+        onIncrement: () => _changeLife(playerIndex, 1),
+        onQuickIncrement: () => _changeLife(playerIndex, 5),
+        onDecrement: () => _changeLife(playerIndex, -1),
+        onQuickDecrement: () => _changeLife(playerIndex, -5),
+        onPoisonIncrement: () => _changePoison(playerIndex, 1),
+        onPoisonDecrement: () => _changePoison(playerIndex, -1),
+        onCommanderTaxIncrement: () => _changeCommanderCasts(playerIndex, 1),
+        onCommanderTaxDecrement: () => _changeCommanderCasts(playerIndex, -1),
+        onOpenCommanderDamageQuick:
+            () => _showCommanderDamageQuickDialog(playerIndex),
+        onOpenSetLife: () => _showSetLifeDialog(playerIndex),
+        onPlayerRollD20: () => _rollPlayerD20(playerIndex),
+        onToggleDefeated: () => _togglePlayerDefeated(playerIndex),
+        onMarkDeckedOut: () => _markPlayerDeckedOut(playerIndex),
+        onMarkAnswerLeft: () => _markPlayerAnswerLeft(playerIndex),
+        onCountersTap: () => _showCountersDialog(playerIndex),
+        quickPlusKey: Key('life-counter-quick-plus-$playerIndex'),
+        quickMinusKey: Key('life-counter-quick-minus-$playerIndex'),
+        countersKey: Key('life-counter-counters-$playerIndex'),
+        quarterTurns: quarterTurns,
+        compact: compact,
+      ),
     );
   }
 
@@ -1235,75 +1180,57 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 class _TableControlHub extends StatelessWidget {
   final bool isExpanded;
   final bool hasPendingHighRollTie;
-  final int playerCount;
-  final int startingLife;
-  final bool canUndo;
-  final int stormCount;
-  final String? monarchLabel;
-  final String? initiativeLabel;
-  final String? firstPlayerLabel;
   final String? lastTableEvent;
   final VoidCallback onToggle;
   final VoidCallback onPlayers;
   final VoidCallback onSettings;
   final VoidCallback onTools;
   final VoidCallback onQuickHighRoll;
-  final VoidCallback onQuickCoin;
-  final VoidCallback onQuickD20;
-  final VoidCallback onQuickFirstPlayer;
-  final VoidCallback? onUndo;
   final VoidCallback onReset;
 
   const _TableControlHub({
     required this.isExpanded,
     required this.hasPendingHighRollTie,
-    required this.playerCount,
-    required this.startingLife,
-    required this.canUndo,
-    required this.stormCount,
-    required this.monarchLabel,
-    required this.initiativeLabel,
-    required this.firstPlayerLabel,
     required this.lastTableEvent,
     required this.onToggle,
     required this.onPlayers,
     required this.onSettings,
     required this.onTools,
     required this.onQuickHighRoll,
-    required this.onQuickCoin,
-    required this.onQuickD20,
-    required this.onQuickFirstPlayer,
-    required this.onUndo,
     required this.onReset,
   });
 
   @override
   Widget build(BuildContext context) {
-    final statusChips = <Widget>[
-      if (stormCount > 0)
-        _HubStatusChip(
-          chipKey: const Key('life-counter-hub-status-storm'),
-          label: 'Storm $stormCount',
-          color: AppTheme.warning,
-        ),
-      if (monarchLabel != null)
-        _HubStatusChip(
-          chipKey: const Key('life-counter-hub-status-monarch'),
-          label: monarchLabel!,
-          color: AppTheme.mythicGold,
-        ),
-      if (initiativeLabel != null)
-        _HubStatusChip(
-          chipKey: const Key('life-counter-hub-status-initiative'),
-          label: initiativeLabel!,
-          color: AppTheme.success,
-        ),
-      if (firstPlayerLabel != null)
-        _HubStatusChip(
-          chipKey: const Key('life-counter-hub-status-first-player'),
-          label: firstPlayerLabel!,
-          color: AppTheme.primarySoft,
-        ),
+    const petalSpecs = [
+      _HubPetalSpec(
+        key: Key('life-counter-hub-players'),
+        label: 'PLAYERS',
+        color: Color(0xFF44E063),
+        offset: Offset(-84, 0),
+        rotation: -pi / 2,
+      ),
+      _HubPetalSpec(
+        key: Key('life-counter-hub-reset'),
+        label: 'RESTART',
+        color: Color(0xFFFFE277),
+        offset: Offset(0, -84),
+        rotation: 0,
+      ),
+      _HubPetalSpec(
+        key: Key('life-counter-hub-quick-high-roll'),
+        label: '',
+        color: Color(0xFF40B9FF),
+        offset: Offset(0, 84),
+        rotation: 0,
+      ),
+      _HubPetalSpec(
+        key: Key('life-counter-hub-settings'),
+        label: 'SETTINGS',
+        color: Color(0xFFB9B4FF),
+        offset: Offset(84, 0),
+        rotation: pi / 2,
+      ),
     ];
 
     return AnimatedSize(
@@ -1313,169 +1240,199 @@ class _TableControlHub extends StatelessWidget {
         key: const Key('life-counter-control-hub'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (isExpanded && statusChips.isNotEmpty) ...[
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 280),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 6,
-                runSpacing: 6,
-                children: statusChips,
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
           SizedBox(
-            width: isExpanded ? 300 : 80,
-            height: isExpanded ? 230 : 80,
+            width: isExpanded ? 260 : 74,
+            height: isExpanded ? 260 : 74,
             child: Stack(
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                if (isExpanded) ...[
-                  Positioned(
-                    left: 30,
-                    top: 70,
-                    child: Transform.rotate(
-                      angle: -pi / 2.6,
-                      child: _HubPetalAction(
-                        buttonKey: const Key('life-counter-hub-players'),
-                        label: 'PLAYERS',
-                        color: const Color(0xFF44E063),
-                        onTap: onPlayers,
-                      ),
-                    ),
+                _HubToolsFrame(
+                  isExpanded: isExpanded,
+                  onTap: onTools,
+                ),
+                _HubOrbitPetal(
+                  isExpanded: isExpanded,
+                  spec: petalSpecs[0],
+                  onTap: onPlayers,
+                ),
+                _HubOrbitPetal(
+                  isExpanded: isExpanded,
+                  spec: petalSpecs[1],
+                  onTap: onReset,
+                ),
+                _HubOrbitPetal(
+                  isExpanded: isExpanded,
+                  spec: petalSpecs[2].copyWith(
+                    label:
+                        hasPendingHighRollTie ? 'DESMP' : 'HIGH ROLL',
                   ),
-                  Positioned(
-                    top: 26,
-                    child: Transform.rotate(
-                      angle: -0.34,
-                      child: _HubPetalAction(
-                        buttonKey: const Key('life-counter-hub-reset'),
-                        label: 'RESTART',
-                        color: const Color(0xFFFFE277),
-                        onTap: onReset,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 24,
-                    top: 68,
-                    child: Transform.rotate(
-                      angle: 0.28,
-                      child: _HubPetalAction(
-                        buttonKey: const Key('life-counter-hub-quick-high-roll'),
-                        label:
-                            hasPendingHighRollTie
-                                ? 'DESMP'
-                                : 'HIGH ROLL',
-                        color: const Color(0xFF40B9FF),
-                        onTap: onQuickHighRoll,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 50,
-                    bottom: 54,
-                    child: Transform.rotate(
-                      angle: pi / 2.2,
-                      child: _HubPetalAction(
-                        buttonKey: const Key('life-counter-hub-settings'),
-                        label: 'SETTINGS',
-                        color: const Color(0xFFB9B4FF),
-                        onTap: onSettings,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 92,
-                    bottom: 24,
-                    child: Transform.rotate(
-                      angle: pi,
-                      child: _HubPetalAction(
-                        buttonKey: const Key('life-counter-hub-tools'),
-                        label: 'HELP',
-                        color: const Color(0xFFFF2C77),
-                        onTap: onTools,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -4,
-                    left: 18,
-                    right: 18,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _HubMiniUtility(
-                          buttonKey: const Key('life-counter-hub-quick-d20'),
-                          label: 'D20',
-                          onTap: onQuickD20,
-                        ),
-                        const SizedBox(width: 6),
-                        _HubMiniUtility(
-                          buttonKey: const Key('life-counter-hub-quick-coin'),
-                          label: 'COIN',
-                          onTap: onQuickCoin,
-                        ),
-                        const SizedBox(width: 6),
-                        _HubMiniUtility(
-                          buttonKey: const Key(
-                            'life-counter-hub-quick-first-player',
-                          ),
-                          label: '1ST',
-                          onTap: onQuickFirstPlayer,
-                        ),
-                        const SizedBox(width: 6),
-                        _HubMiniUtility(
-                          buttonKey: const Key('life-counter-hub-undo'),
-                          label: 'UNDO',
-                          enabled: canUndo,
-                          onTap: onUndo,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  onTap: onQuickHighRoll,
+                ),
+                _HubOrbitPetal(
+                  isExpanded: isExpanded,
+                  spec: petalSpecs[3],
+                  onTap: onSettings,
+                ),
                 _HubMedallion(isExpanded: isExpanded, onTap: onToggle),
               ],
             ),
           ),
           if (isExpanded && lastTableEvent != null) ...[
-            const SizedBox(height: 10),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 260),
-              child: Container(
-                key: const Key('life-counter-hub-last-event'),
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.88),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    width: 0.8,
+            const SizedBox(height: 6),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              switchInCurve: Curves.easeOutCubic,
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.08),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
                   ),
-                ),
-                child: Text(
-                  lastTableEvent!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    fontSize: AppTheme.fontSm,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
+                );
+              },
+              child: ConstrainedBox(
+                key: ValueKey(lastTableEvent),
+                constraints: const BoxConstraints(maxWidth: 260),
+                child: Container(
+                  key: const Key('life-counter-hub-last-event'),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.88),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 0.8,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.24),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    lastTableEvent!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontSize: AppTheme.fontSm,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ),
               ),
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _HubToolsFrame extends StatelessWidget {
+  final bool isExpanded;
+  final VoidCallback onTap;
+
+  const _HubToolsFrame({
+    required this.isExpanded,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: !isExpanded,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: isExpanded ? 1 : 0),
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) {
+            return Align(
+              alignment: Alignment.center,
+              child: Opacity(
+                opacity: value,
+                child: Transform.scale(
+                  scale: 0.94 + (0.06 * value),
+                  child: child,
+                ),
+              ),
+            );
+          },
+          child: Material(
+            key: const Key('life-counter-hub-tools'),
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: onTap,
+              child: SizedBox(
+                width: 132,
+                height: 132,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFFFFD54A).withValues(alpha: 0.12),
+                            Colors.transparent,
+                            const Color(0xFF9640FF).withValues(alpha: 0.08),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: const SizedBox(width: 132, height: 132),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.black.withValues(alpha: 0.16),
+                          width: 1.4,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 14,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const SizedBox(width: 116, height: 116),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: const SizedBox(width: 104, height: 104),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1493,51 +1450,101 @@ class _HubMedallion extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         key: const Key('life-counter-hub-toggle'),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: SizedBox(
-          width: isExpanded ? 76 : 68,
-          height: isExpanded ? 76 : 68,
+          width: isExpanded ? 84 : 72,
+          height: isExpanded ? 84 : 72,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Transform.rotate(
-                angle: pi / 4,
-                child: Container(
-                  width: isExpanded ? 58 : 52,
-                  height: isExpanded ? 58 : 52,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: isExpanded ? 84 : 72,
+                height: isExpanded ? 84 : 72,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.24),
+                      blurRadius: isExpanded ? 20 : 14,
+                      spreadRadius: 1.5,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFFFFDD78).withValues(
+                        alpha: isExpanded ? 0.08 : 0.04,
+                      ),
+                      blurRadius: isExpanded ? 16 : 10,
+                    ),
+                  ],
+                ),
+                child: ClipPath(
+                  clipper: const _HexagonClipper(),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.92),
-                      width: 2.2,
                     ),
                   ),
                 ),
               ),
-              Transform.rotate(
-                angle: pi / 4,
-                child: Container(
-                  width: isExpanded ? 44 : 40,
-                  height: isExpanded ? 44 : 40,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFF7CBFF),
-                        Color(0xFFB4F1FF),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: isExpanded ? 76 : 64,
+                height: isExpanded ? 76 : 64,
+                child: ClipPath(
+                  clipper: const _HexagonClipper(),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF0B0B0B),
+                          Color(0xFF191919),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: isExpanded ? 64 : 54,
+                height: isExpanded ? 64 : 54,
+                child: ClipPath(
+                  clipper: const _HexagonClipper(),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFFFFE7F6).withValues(alpha: 0.98),
+                          const Color(0xFFD6F4FF).withValues(alpha: 0.96),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
               Icon(
                 isExpanded ? Icons.close_rounded : Icons.menu_rounded,
                 color: Colors.black,
-                size: isExpanded ? 30 : 28,
+                size: isExpanded ? 26 : 23,
               ),
             ],
           ),
@@ -1547,40 +1554,10 @@ class _HubMedallion extends StatelessWidget {
   }
 }
 
-class _HubStatusChip extends StatelessWidget {
-  final Key? chipKey;
-  final String label;
-  final Color color;
-
-  const _HubStatusChip({
-    this.chipKey,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: chipKey,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.92),
-          fontSize: AppTheme.fontXs,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
-}
-
 class _HubPetalAction extends StatelessWidget {
+  static const double _pillWidth = 98;
+  static const double _pillHeight = 38;
+
   final Key? buttonKey;
   final String label;
   final Color color;
@@ -1604,70 +1581,42 @@ class _HubPetalAction extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          width: _pillWidth,
+          height: _pillHeight,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color:
-                  enabled
-                      ? Colors.black.withValues(alpha: 0.9)
-                      : Colors.black.withValues(alpha: 0.35),
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.7,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HubMiniUtility extends StatelessWidget {
-  final Key? buttonKey;
-  final String label;
-  final bool enabled;
-  final VoidCallback? onTap;
-
-  const _HubMiniUtility({
-    this.buttonKey,
-    required this.label,
-    this.enabled = true,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        onTap: enabled ? onTap : null,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.92),
-            borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
-              width: 0.8,
+              color: Colors.black.withValues(alpha: 0.12),
+              width: 0.7,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color:
-                  enabled
-                      ? Colors.white.withValues(alpha: 0.92)
-                      : Colors.white.withValues(alpha: 0.3),
-              fontSize: AppTheme.fontXs,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.6,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color:
+                        enabled
+                            ? Colors.black.withValues(alpha: 0.9)
+                            : Colors.black.withValues(alpha: 0.35),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.7,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -1956,6 +1905,344 @@ class _SimpleTableOverlay extends StatelessWidget {
   }
 }
 
+class _CardSearchOverlay extends StatefulWidget {
+  const _CardSearchOverlay();
+
+  @override
+  State<_CardSearchOverlay> createState() => _CardSearchOverlayState();
+}
+
+class _CardSearchOverlayState extends State<_CardSearchOverlay> {
+  static const _suggestions = [
+    'Sol Ring',
+    'Command Tower',
+    'Cyclonic Rift',
+    'Swords to Plowshares',
+  ];
+
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _runSearch(BuildContext context, String query) {
+    context.read<CardProvider>().searchCards(query.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CardProvider(),
+      child: Builder(
+        builder: (context) {
+          return _TableOverlayFrame(
+            frameKey: const Key('life-counter-card-search-overlay'),
+            title: 'CARD SEARCH',
+            subtitle:
+                'Lookup real de cartas sem sair da mesa. Digite 3 letras ou use um atalho.',
+            width: 348,
+            maxHeight: 620,
+            child: Consumer<CardProvider>(
+              builder: (context, provider, _) {
+                final hasQuery = _controller.text.trim().length >= 3;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      key: const Key('life-counter-card-search-input'),
+                      controller: _controller,
+                      textInputAction: TextInputAction.search,
+                      onChanged: (value) {
+                        setState(() {});
+                        if (value.trim().length >= 3) {
+                          _runSearch(context, value);
+                        } else {
+                          provider.clearSearch();
+                        }
+                      },
+                      onSubmitted: (value) => _runSearch(context, value),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.96),
+                        fontWeight: FontWeight.w700,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search cards',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.34),
+                          fontWeight: FontWeight.w600,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: Colors.white.withValues(alpha: 0.72),
+                        ),
+                        suffixIcon:
+                            _controller.text.isEmpty
+                                ? null
+                                : IconButton(
+                                  key: const Key(
+                                    'life-counter-card-search-clear',
+                                  ),
+                                  onPressed: () {
+                                    _controller.clear();
+                                    provider.clearSearch();
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.white.withValues(alpha: 0.72),
+                                  ),
+                                ),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.05),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF40B9FF),
+                            width: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final suggestion in _suggestions)
+                          _CardSearchSuggestionChip(
+                            chipKey: Key(
+                              'life-counter-card-search-suggestion-${suggestion.toLowerCase().replaceAll(' ', '-')}',
+                            ),
+                            label: suggestion,
+                            onTap: () {
+                              _controller.text = suggestion;
+                              setState(() {});
+                              _runSearch(context, suggestion);
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    if (!hasQuery)
+                      Text(
+                        'Use o rail para consultar oracle text, tipos e detalhes sem perder a mesa.',
+                        key: const Key('life-counter-card-search-hint'),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.68),
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
+                        ),
+                      )
+                    else if (provider.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (provider.errorMessage != null)
+                      Text(
+                        provider.errorMessage!,
+                        key: const Key('life-counter-card-search-error'),
+                        style: TextStyle(
+                          color: AppTheme.error.withValues(alpha: 0.92),
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    else if (provider.searchResults.isEmpty)
+                      Text(
+                        'No cards found for "${_controller.text.trim()}".',
+                        key: const Key('life-counter-card-search-empty'),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.62),
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    else
+                      Column(
+                        key: const Key('life-counter-card-search-results'),
+                        children: [
+                          for (int i = 0;
+                              i < provider.searchResults.length && i < 8;
+                              i++)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: _CardSearchResultTile(
+                                tileKey: Key(
+                                  'life-counter-card-search-result-$i',
+                                ),
+                                card: provider.searchResults[i],
+                              ),
+                            ),
+                        ],
+                      ),
+                  ],
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CardSearchSuggestionChip extends StatelessWidget {
+  final Key chipKey;
+  final String label;
+  final VoidCallback onTap;
+
+  const _CardSearchSuggestionChip({
+    required this.chipKey,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: chipKey,
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.86),
+              fontSize: AppTheme.fontXs,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CardSearchResultTile extends StatelessWidget {
+  final Key tileKey;
+  final DeckCardItem card;
+
+  const _CardSearchResultTile({
+    required this.tileKey,
+    required this.card,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: tileKey,
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => CardDetailScreen(card: card),
+            ),
+          );
+        },
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.style_rounded,
+                  color: Colors.white.withValues(alpha: 0.72),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      card.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.96),
+                        fontSize: AppTheme.fontMd,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      [
+                        if (card.typeLine.trim().isNotEmpty) card.typeLine,
+                        if (card.setCode.trim().isNotEmpty)
+                          card.setCode.toUpperCase(),
+                      ].join('  â€¢  '),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.62),
+                        fontSize: AppTheme.fontSm,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Icon(
+                Icons.open_in_new_rounded,
+                color: Colors.white.withValues(alpha: 0.72),
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _TableBottomRail extends StatelessWidget {
   final VoidCallback onDice;
   final VoidCallback onHistory;
@@ -1971,10 +2258,21 @@ class _TableBottomRail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('life-counter-bottom-rail'),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF7F4EC),
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -2027,15 +2325,22 @@ class _BottomRailPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(999),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 16, color: Colors.white),
+              Icon(icon, size: 15, color: Colors.white),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -2043,7 +2348,7 @@ class _BottomRailPill extends StatelessWidget {
                   color: Colors.white,
                   fontSize: AppTheme.fontSm,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 0.4,
+                  letterSpacing: 0.55,
                 ),
               ),
             ],
@@ -2054,12 +2359,118 @@ class _BottomRailPill extends StatelessWidget {
   }
 }
 
+class _HubOrbitPetal extends StatelessWidget {
+  final bool isExpanded;
+  final _HubPetalSpec spec;
+  final VoidCallback onTap;
+
+  const _HubOrbitPetal({
+    required this.isExpanded,
+    required this.spec,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: !isExpanded,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: isExpanded ? 1 : 0),
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutBack,
+          builder: (context, value, child) {
+            final easedOpacity = Curves.easeOut.transform(value.clamp(0, 1));
+            final offset = Offset.lerp(Offset.zero, spec.offset, value)!;
+            return Align(
+              alignment: Alignment.center,
+              child: Transform.translate(
+                offset: offset,
+                child: Transform.rotate(
+                  angle: spec.rotation * value,
+                  child: Opacity(
+                    opacity: easedOpacity,
+                    child: Transform.scale(
+                      scale: 0.78 + (0.22 * value),
+                      child: child,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          child: _HubPetalAction(
+            buttonKey: spec.key,
+            label: spec.label,
+            color: spec.color,
+            onTap: onTap,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HubPetalSpec {
+  final Key key;
+  final String label;
+  final Color color;
+  final Offset offset;
+  final double rotation;
+
+  const _HubPetalSpec({
+    required this.key,
+    required this.label,
+    required this.color,
+    required this.offset,
+    required this.rotation,
+  });
+
+  _HubPetalSpec copyWith({
+    Key? key,
+    String? label,
+    Color? color,
+    Offset? offset,
+    double? rotation,
+  }) {
+    return _HubPetalSpec(
+      key: key ?? this.key,
+      label: label ?? this.label,
+      color: color ?? this.color,
+      offset: offset ?? this.offset,
+      rotation: rotation ?? this.rotation,
+    );
+  }
+}
+
+class _HexagonClipper extends CustomClipper<Path> {
+  const _HexagonClipper();
+
+  @override
+  Path getClip(Size size) {
+    final width = size.width;
+    final height = size.height;
+
+    return Path()
+      ..moveTo(width * 0.26, 0)
+      ..lineTo(width * 0.74, 0)
+      ..lineTo(width, height * 0.5)
+      ..lineTo(width * 0.74, height)
+      ..lineTo(width * 0.26, height)
+      ..lineTo(0, height * 0.5)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
 // ---------------------------------------------------------------------------
 // Player Panel
 // ---------------------------------------------------------------------------
 
 /// Painel de um jogador individual com vida, indicadores de poison/commander,
-/// e botão para abrir contadores extras.
+/// e botÃ£o para abrir contadores extras.
 class _PlayerPanel extends StatefulWidget {
   final int panelIndex;
   final String label;
@@ -2071,6 +2482,7 @@ class _PlayerPanel extends StatefulWidget {
   final int? commanderDamageLeadSourceValue;
   final int? lastPlayerRoll;
   final int? highRollValue;
+  final _PlayerSpecialState specialState;
   final bool isHighRollWinner;
   final bool isHighRollTie;
   final bool isMonarch;
@@ -2088,6 +2500,8 @@ class _PlayerPanel extends StatefulWidget {
   final VoidCallback onOpenSetLife;
   final VoidCallback onPlayerRollD20;
   final VoidCallback onToggleDefeated;
+  final VoidCallback onMarkDeckedOut;
+  final VoidCallback onMarkAnswerLeft;
   final VoidCallback onCountersTap;
   final Key? quickPlusKey;
   final Key? quickMinusKey;
@@ -2106,6 +2520,7 @@ class _PlayerPanel extends StatefulWidget {
     required this.commanderDamageLeadSourceValue,
     required this.lastPlayerRoll,
     required this.highRollValue,
+    required this.specialState,
     required this.isHighRollWinner,
     required this.isHighRollTie,
     required this.isMonarch,
@@ -2123,6 +2538,8 @@ class _PlayerPanel extends StatefulWidget {
     required this.onOpenSetLife,
     required this.onPlayerRollD20,
     required this.onToggleDefeated,
+    required this.onMarkDeckedOut,
+    required this.onMarkAnswerLeft,
     required this.onCountersTap,
     this.quickPlusKey,
     this.quickMinusKey,
@@ -2140,11 +2557,19 @@ class _PlayerPanelState extends State<_PlayerPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final isDefeated = widget.life <= 0;
-    final isCommanderLethal = widget.commanderDamageTotal >= 21;
-    final isPoisonLethal = widget.poison >= 10;
+    final isDeckedOut = widget.specialState == _PlayerSpecialState.deckedOut;
+    final hasAnswerLeft = widget.specialState == _PlayerSpecialState.answerLeft;
+    final isDefeated = widget.life <= 0 && !isDeckedOut && !hasAnswerLeft;
+    final isCommanderLethal =
+        !isDeckedOut && !hasAnswerLeft && widget.commanderDamageTotal >= 21;
+    final isPoisonLethal =
+        !isDeckedOut && !hasAnswerLeft && widget.poison >= 10;
     final hasPanelTakeoverState =
-        isDefeated || isCommanderLethal || isPoisonLethal;
+        isDefeated ||
+        isDeckedOut ||
+        hasAnswerLeft ||
+        isCommanderLethal ||
+        isPoisonLethal;
     final hasHighRoll = widget.highRollValue != null;
     final hasPlayerRoll = widget.lastPlayerRoll != null && !hasHighRoll;
     final hasEventTakeover =
@@ -2164,7 +2589,11 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             ? 'D20'
             : null;
     final baseColor =
-        isDefeated
+        isDeckedOut
+            ? const Color(0xFF4A3A12)
+            : hasAnswerLeft
+            ? const Color(0xFF1D1D1D)
+            : isDefeated
             ? const Color(0xFF5B3A6C)
             : isCommanderLethal
             ? const Color(0xFF341217)
@@ -2332,6 +2761,8 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                         },
                         child: _buildLifeCoreContent(
                           isDefeated: isDefeated,
+                          isDeckedOut: isDeckedOut,
+                          hasAnswerLeft: hasAnswerLeft,
                           isCommanderLethal: isCommanderLethal,
                           isPoisonLethal: isPoisonLethal,
                           hasHighRoll: hasHighRoll,
@@ -2374,7 +2805,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-poison-plus-${widget.panelIndex}',
                               ),
                               icon: Icons.coronavirus_outlined,
-                              label: 'Poison +',
+                              label: 'TOX +',
                               compact: widget.compact,
                               onTap: () {
                                 widget.onPoisonIncrement();
@@ -2389,7 +2820,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-poison-minus-${widget.panelIndex}',
                               ),
                               icon: Icons.remove_circle_outline_rounded,
-                              label: 'Poison -',
+                              label: 'TOX -',
                               compact: widget.compact,
                               onTap: () {
                                 widget.onPoisonDecrement();
@@ -2404,7 +2835,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-tax-plus-${widget.panelIndex}',
                               ),
                               icon: Icons.add_circle_outline_rounded,
-                              label: 'Tax +',
+                              label: 'TAX +',
                               compact: widget.compact,
                               onTap: () {
                                 widget.onCommanderTaxIncrement();
@@ -2419,7 +2850,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-tax-minus-${widget.panelIndex}',
                               ),
                               icon: Icons.remove_circle_outline_rounded,
-                              label: 'Tax -',
+                              label: 'TAX -',
                               compact: widget.compact,
                               onTap: () {
                                 widget.onCommanderTaxDecrement();
@@ -2434,10 +2865,23 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-commander-damage-${widget.panelIndex}',
                               ),
                               icon: Icons.shield_outlined,
-                              label: 'Cmd dmg',
+                              label: 'MARKS',
                               compact: widget.compact,
                               onTap: () {
                                 widget.onOpenCommanderDamageQuick();
+                                setState(() {
+                                  _showLifeActions = false;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            _PlayerInlineAction(
+                              actionKey: widget.countersKey,
+                              icon: Icons.dashboard_customize_outlined,
+                              label: 'TRACK',
+                              compact: widget.compact,
+                              onTap: () {
+                                widget.onCountersTap();
                                 setState(() {
                                   _showLifeActions = false;
                                 });
@@ -2449,12 +2893,12 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 'life-counter-player-toggle-dead-${widget.panelIndex}',
                               ),
                               icon:
-                                  isDefeated
+                                  hasPanelTakeoverState
                                       ? Icons.favorite_rounded
                                       : Icons.dangerous_rounded,
-                              label: isDefeated ? 'Reviver' : 'Morto',
+                              label: hasPanelTakeoverState ? 'Reviver' : 'KO\'D!',
                               compact: widget.compact,
-                              destructive: !isDefeated,
+                              destructive: !hasPanelTakeoverState,
                               onTap: () {
                                 widget.onToggleDefeated();
                                 setState(() {
@@ -2462,35 +2906,59 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                                 });
                               },
                             ),
+                            if (!hasPanelTakeoverState) ...[
+                              const SizedBox(width: 8),
+                              _PlayerInlineAction(
+                                actionKey: Key(
+                                  'life-counter-player-mark-decked-${widget.panelIndex}',
+                                ),
+                                icon: Icons.auto_stories_rounded,
+                                label: 'Decked',
+                                compact: widget.compact,
+                                destructive: true,
+                                onTap: () {
+                                  widget.onMarkDeckedOut();
+                                  setState(() {
+                                    _showLifeActions = false;
+                                  });
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              _PlayerInlineAction(
+                                actionKey: Key(
+                                  'life-counter-player-mark-left-${widget.panelIndex}',
+                                ),
+                                icon: Icons.exit_to_app_rounded,
+                                label: 'Left',
+                                compact: widget.compact,
+                                destructive: true,
+                                onTap: () {
+                                  widget.onMarkAnswerLeft();
+                                  setState(() {
+                                    _showLifeActions = false;
+                                  });
+                                },
+                              ),
+                            ],
                           ],
                         ),
                       ),
                     ),
-                  if (!_showLifeActions &&
-                      !hasPanelTakeoverState &&
-                      !hasEventTakeover)
-                    _buildBadgesRow(isCommanderLethal: isCommanderLethal),
                   ],
                 ),
               ),
             ),
           ),
-          if (!_showLifeActions && !hasPanelTakeoverState && !hasEventTakeover)
-            Positioned(
-              right: 6,
-              bottom: 6,
-              child: _CountersButton(
-                buttonKey: widget.countersKey,
-                onTap: widget.onCountersTap,
-                compact: widget.compact,
-              ),
-            ),
           if (hasPanelTakeoverState)
             Positioned.fill(
               child: IgnorePointer(
                 child: _PanelTakeoverOverlay(
                   overlayKey: Key(
-                    isDefeated
+                    isDeckedOut
+                        ? 'life-counter-player-decked-out-${widget.panelIndex}'
+                        : hasAnswerLeft
+                        ? 'life-counter-player-answer-left-${widget.panelIndex}'
+                        : isDefeated
                         ? 'life-counter-player-defeated-${widget.panelIndex}'
                         : isCommanderLethal
                         ? 'life-counter-player-commander-lethal-${widget.panelIndex}'
@@ -2498,19 +2966,31 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   ),
                   compact: widget.compact,
                   color:
-                      isDefeated
+                      isDeckedOut
+                          ? const Color(0xFF2F2407)
+                          : hasAnswerLeft
+                          ? const Color(0xFF121212)
+                          : isDefeated
                           ? const Color(0xFF1D1025)
                           : isCommanderLethal
                           ? const Color(0xFF2B090F)
                           : const Color(0xFF0C2414),
                   accent:
-                      isDefeated
+                      isDeckedOut
+                          ? const Color(0xFFFFD36A)
+                          : hasAnswerLeft
+                          ? const Color(0xFFEDEDED)
+                          : isDefeated
                           ? const Color(0xFFFF5AA9)
                           : isCommanderLethal
                           ? const Color(0xFFFF5B61)
                           : const Color(0xFF6BFF8D),
                   title:
-                      isDefeated
+                      isDeckedOut
+                          ? 'DECKED OUT.'
+                          : hasAnswerLeft
+                          ? 'ANSWER LEFT.'
+                          : isDefeated
                           ? 'KO\'D!'
                           : isCommanderLethal
                           ? 'COMMANDER DOWN.'
@@ -2530,6 +3010,8 @@ class _PlayerPanelState extends State<_PlayerPanel> {
 
   Widget _buildLifeCoreContent({
     required bool isDefeated,
+    required bool isDeckedOut,
+    required bool hasAnswerLeft,
     required bool isCommanderLethal,
     required bool isPoisonLethal,
     required bool hasHighRoll,
@@ -2538,10 +3020,16 @@ class _PlayerPanelState extends State<_PlayerPanel> {
     required String? eventLabel,
     required String? eventValue,
   }) {
-    if (isDefeated || isCommanderLethal || isPoisonLethal) {
+    if (
+      isDefeated ||
+      isDeckedOut ||
+      hasAnswerLeft ||
+      isCommanderLethal ||
+      isPoisonLethal
+    ) {
       return SizedBox(
         key: ValueKey(
-          'life-core-special-${widget.panelIndex}-$isDefeated-$isCommanderLethal-$isPoisonLethal',
+          'life-core-special-${widget.panelIndex}-$isDefeated-$isDeckedOut-$hasAnswerLeft-$isCommanderLethal-$isPoisonLethal',
         ),
         width: widget.compact ? 90 : 110,
         height: widget.compact ? 90 : 110,
@@ -2588,154 +3076,6 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBadgesRow({required bool isCommanderLethal}) {
-    final badges = <Widget>[];
-
-    if (widget.lastPlayerRoll != null) {
-      badges.add(
-        _TextBadgeChip(
-          chipKey: Key('life-counter-player-roll-badge-${widget.panelIndex}'),
-          label: 'D20 ${widget.lastPlayerRoll}',
-          color: AppTheme.primarySoft,
-          compact: widget.compact,
-        ),
-      );
-    }
-
-    if (widget.highRollValue != null) {
-      badges.add(
-        _TextBadgeChip(
-          chipKey: Key(
-            'life-counter-player-high-roll-badge-${widget.panelIndex}',
-          ),
-          label: 'HIGH ${widget.highRollValue}',
-          color: widget.isHighRollTie ? AppTheme.warning : AppTheme.primarySoft,
-          compact: widget.compact,
-        ),
-      );
-      if (widget.isHighRollWinner) {
-        badges.add(
-          _TextBadgeChip(
-            chipKey: Key(
-              'life-counter-player-high-roll-status-${widget.panelIndex}',
-            ),
-            label: widget.isHighRollTie ? 'EMPATE' : 'VENCEU',
-            color: widget.isHighRollTie ? AppTheme.warning : AppTheme.primarySoft,
-            compact: widget.compact,
-          ),
-        );
-      }
-    }
-
-    if (widget.poison > 0) {
-      badges.add(
-        _BadgeChip(
-          chipKey: Key('life-counter-player-poison-badge-${widget.panelIndex}'),
-          icon: Icons.coronavirus,
-          value: widget.poison,
-          color: AppTheme.success,
-          isLethal: widget.poison >= 10,
-          compact: widget.compact,
-        ),
-      );
-    }
-
-    if (widget.commanderTax > 0) {
-      badges.add(
-        _TextBadgeChip(
-          chipKey: Key('life-counter-player-tax-badge-${widget.panelIndex}'),
-          label: 'Tax +${widget.commanderTax}',
-          color: AppTheme.warning,
-          compact: widget.compact,
-        ),
-      );
-    }
-
-    if (widget.isMonarch) {
-      badges.add(
-        _TextBadgeChip(
-          label: 'Monarca',
-          color: AppTheme.mythicGold,
-          compact: widget.compact,
-        ),
-      );
-    }
-
-    if (widget.hasInitiative) {
-      badges.add(
-        _TextBadgeChip(
-          label: 'Iniciativa',
-          color: AppTheme.success,
-          compact: widget.compact,
-        ),
-      );
-    }
-
-    if (widget.commanderDamageTotal > 0) {
-      badges.add(
-        _BadgeChip(
-          chipKey: Key(
-            'life-counter-player-commander-damage-badge-${widget.panelIndex}',
-          ),
-          icon: Icons.shield,
-          value: widget.commanderDamageTotal,
-          color: AppTheme.mythicGold,
-          isLethal: widget.commanderDamageTotal >= 21,
-          compact: widget.compact,
-        ),
-      );
-      if (widget.commanderDamageLeadSourceLabel != null &&
-          widget.commanderDamageLeadSourceValue != null) {
-        badges.add(
-          _TextBadgeChip(
-            chipKey: Key(
-              'life-counter-player-commander-source-badge-${widget.panelIndex}',
-            ),
-            label:
-                '${widget.commanderDamageLeadSourceLabel} ${widget.commanderDamageLeadSourceValue}',
-            color:
-                widget.commanderDamageLeadSourceValue! >= 21
-                    ? AppTheme.error
-                    : AppTheme.mythicGold,
-            compact: widget.compact,
-          ),
-        );
-      }
-      if (!isCommanderLethal && widget.commanderDamageTotal >= 21) {
-        badges.add(
-          _TextBadgeChip(
-            chipKey: Key(
-              'life-counter-player-commander-lethal-badge-${widget.panelIndex}',
-            ),
-            label: 'CMD LETAL',
-            color: AppTheme.error,
-            compact: widget.compact,
-          ),
-        );
-      }
-    }
-
-    if (badges.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 2),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 240),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        child: Wrap(
-          key: ValueKey(
-            'life-counter-badges-${widget.panelIndex}-${widget.poison}-${widget.commanderTax}-${widget.commanderDamageTotal}-${widget.lastPlayerRoll}-${widget.highRollValue}-${widget.isHighRollWinner}-${widget.isHighRollTie}-${widget.isMonarch}-${widget.hasInitiative}',
-          ),
-          alignment: WrapAlignment.center,
-          spacing: 6,
-          runSpacing: 4,
-          children: badges,
-        ),
-      ),
     );
   }
 }
@@ -2958,14 +3298,15 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valueColor = Colors.black.withValues(alpha: 0.96);
-    final caption =
+    final eventLabel = kind == 'd20' ? 'D20' : 'HIGH ROLL';
+    final resultLabel =
         kind == 'd20'
-            ? 'D20'
+            ? null
             : isTie
             ? 'TIE'
             : isWinner
             ? 'WINNER'
-            : '';
+            : null;
 
     final background =
         isWinner
@@ -2979,11 +3320,22 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                 Color(0xFFB5C8FF),
               ],
             )
+            : isTie
+            ? const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFFC55A),
+                Color(0xFFFFE596),
+                Color(0xFFFFB764),
+              ],
+            )
             : LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               end: Alignment.bottomCenter,
               colors: [
-                Color.alphaBlend(Colors.white.withValues(alpha: 0.18), color),
+                Color.alphaBlend(Colors.white.withValues(alpha: 0.08), color),
+                Color.alphaBlend(Colors.black.withValues(alpha: 0.18), color),
                 color,
               ],
             );
@@ -3000,11 +3352,27 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               gradient: background,
+              border: Border.all(
+                color:
+                    isWinner
+                        ? Colors.white.withValues(alpha: 0.42)
+                        : isTie
+                        ? Colors.black.withValues(alpha: 0.12)
+                        : Colors.white.withValues(alpha: 0.08),
+                width: isWinner ? 2 : 1.1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: accent.withValues(alpha: isWinner ? 0.24 * progress : 0.14 * progress),
-                  blurRadius: isWinner ? 30 : 18,
-                  spreadRadius: isWinner ? 2 : 0,
+                  color: accent.withValues(
+                    alpha:
+                        isWinner
+                            ? 0.28 * progress
+                            : isTie
+                            ? 0.2 * progress
+                            : 0.12 * progress,
+                  ),
+                  blurRadius: isWinner ? 34 : isTie ? 26 : 18,
+                  spreadRadius: isWinner ? 3 : isTie ? 1 : 0,
                 ),
               ],
             ),
@@ -3012,9 +3380,54 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
               children: [
                 if (isWinner)
                   ..._buildConfetti(progress),
+                if (isTie)
+                  ..._buildTieMarkers(progress),
+                Positioned(
+                  top: compact ? 12 : 16,
+                  left: 0,
+                  right: 0,
+                  child: Transform.translate(
+                    offset: Offset(0, 8 * (1 - progress)),
+                    child: Opacity(
+                      opacity: Curves.easeOut.transform(progress),
+                      child: Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 10 : 12,
+                            vertical: compact ? 5 : 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(
+                              alpha: kind == 'd20' ? 0.16 : 0.72,
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            eventLabel,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color:
+                                  kind == 'd20'
+                                      ? valueColor.withValues(alpha: 0.8)
+                                      : Colors.white.withValues(alpha: 0.94),
+                              fontSize:
+                                  compact ? AppTheme.fontXs : AppTheme.fontSm,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.4,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Center(
                   child: Transform.scale(
-                    scale: 0.9 + (0.1 * progress),
+                    scale: 0.88 + (0.12 * progress),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: compact ? 10 : 14,
@@ -3025,28 +3438,82 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              value,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: valueColor,
-                                fontSize: compact ? 150 : 220,
-                                fontWeight: FontWeight.w900,
-                                height: 0.78,
-                                letterSpacing: -8,
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withValues(
+                                      alpha:
+                                          isWinner
+                                              ? 0.26 * progress
+                                              : isTie
+                                              ? 0.18 * progress
+                                              : 0.06 * progress,
+                                    ),
+                                    blurRadius: compact ? 34 : 46,
+                                    spreadRadius: compact ? 2 : 3,
+                                  ),
+                                ],
                               ),
-                            ),
-                            if (caption.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 child: Text(
-                                  caption,
+                                  value,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: valueColor.withValues(alpha: 0.72),
-                                    fontSize: compact ? AppTheme.fontSm : AppTheme.fontMd,
+                                    color: valueColor,
+                                    fontSize: compact ? 156 : 228,
                                     fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.6,
+                                    height: 0.78,
+                                    letterSpacing: -9,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (resultLabel != null)
+                              Padding(
+                                padding: EdgeInsets.only(top: compact ? 2 : 6),
+                                child: Transform.translate(
+                                  offset: Offset(0, 8 * (1 - progress)),
+                                  child: Opacity(
+                                    opacity: Curves.easeOut.transform(progress),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: compact ? 10 : 14,
+                                        vertical: compact ? 5 : 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(
+                                          alpha: isTie ? 0.82 : 0.76,
+                                        ),
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: isTie ? 0.14 : 0.18,
+                                          ),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        resultLabel,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.96,
+                                          ),
+                                          fontSize:
+                                              compact
+                                                  ? AppTheme.fontXs
+                                                  : AppTheme.fontSm,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 1.8,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -3103,151 +3570,39 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
         ),
     ];
   }
-}
 
-// ---------------------------------------------------------------------------
-// Badge Chip (poison/commander indicators on player panel)
-// ---------------------------------------------------------------------------
-class _BadgeChip extends StatelessWidget {
-  final Key? chipKey;
-  final IconData icon;
-  final int value;
-  final Color color;
-  final bool isLethal;
-  final bool compact;
+  List<Widget> _buildTieMarkers(double progress) {
+    const positions = [
+      (-0.78, -0.72),
+      (0.78, -0.72),
+      (-0.82, 0.68),
+      (0.82, 0.68),
+    ];
 
-  const _BadgeChip({
-    this.chipKey,
-    required this.icon,
-    required this.value,
-    required this.color,
-    required this.isLethal,
-    required this.compact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bgColor =
-        isLethal
-            ? AppTheme.error.withValues(alpha: 0.2)
-            : AppTheme.backgroundAbyss.withValues(alpha: 0.42);
-    final fgColor =
-        isLethal ? AppTheme.textPrimary : color.withValues(alpha: 0.92);
-    final sz = compact ? 10.0 : 12.0;
-
-    return Container(
-      key: chipKey,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(
-          color:
-              isLethal
-                  ? AppTheme.error.withValues(alpha: 0.3)
-                  : color.withValues(alpha: 0.22),
-          width: 0.8,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: sz, color: fgColor),
-          const SizedBox(width: 3),
-          Text(
-            '$value',
-            style: TextStyle(
-              color: fgColor,
-              fontSize: sz,
-              fontWeight: FontWeight.bold,
+    return [
+      for (final position in positions)
+        Align(
+          alignment: Alignment(position.$1, position.$2),
+          child: Opacity(
+            opacity: 0.62 * progress,
+            child: Transform.rotate(
+              angle: pi / 4,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    width: 0.8,
+                  ),
+                ),
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TextBadgeChip extends StatelessWidget {
-  final Key? chipKey;
-  final String label;
-  final Color color;
-  final bool compact;
-
-  const _TextBadgeChip({
-    this.chipKey,
-    required this.label,
-    required this.color,
-    required this.compact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final fgColor = color.withValues(alpha: 0.92);
-    return Container(
-      key: chipKey,
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 6 : 8,
-        vertical: compact ? 2 : 3,
-      ),
-      decoration: BoxDecoration(
-        color: AppTheme.backgroundAbyss.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.22), width: 0.8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: fgColor,
-          fontSize: compact ? AppTheme.fontXs : AppTheme.fontSm,
-          fontWeight: FontWeight.w700,
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Counters button (opens the counters bottom sheet)
-// ---------------------------------------------------------------------------
-class _CountersButton extends StatelessWidget {
-  final Key? buttonKey;
-  final VoidCallback onTap;
-  final bool compact;
-
-  const _CountersButton({
-    this.buttonKey,
-    required this.onTap,
-    required this.compact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        key: buttonKey,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        onTap: onTap,
-        child: Container(
-          width: compact ? 38 : 40,
-          height: compact ? 38 : 40,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.74),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
-              width: 0.8,
-            ),
-          ),
-          child: Icon(
-            Icons.dashboard_customize,
-            color: Colors.white.withValues(alpha: 0.86),
-            size: compact ? 18 : 19,
-          ),
-        ),
-      ),
-    );
+    ];
   }
 }
 
@@ -3978,7 +4333,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                           ),
                           _SetLifeKeypadButton(
                             buttonKey: const Key('life-counter-set-life-backspace'),
-                            label: '⌫',
+                            label: 'âŒ«',
                             onTap: _backspace,
                           ),
                         ],
@@ -4073,9 +4428,338 @@ class _SetLifeKeypadButton extends StatelessWidget {
                     destructive
                         ? const Color(0xFFFF2C77)
                         : Colors.white.withValues(alpha: 0.96),
-                fontSize: label == '⌫' ? 22 : 30,
+                fontSize: label == 'âŒ«' ? 22 : 30,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.4,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BenchmarkSetLifeOverlay extends StatefulWidget {
+  final String playerLabel;
+  final int initialLife;
+  final ValueChanged<int> onApply;
+
+  const _BenchmarkSetLifeOverlay({
+    required this.playerLabel,
+    required this.initialLife,
+    required this.onApply,
+  });
+
+  @override
+  State<_BenchmarkSetLifeOverlay> createState() =>
+      _BenchmarkSetLifeOverlayState();
+}
+
+class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
+  late String _buffer;
+
+  @override
+  void initState() {
+    super.initState();
+    _buffer = widget.initialLife.toString();
+  }
+
+  void _appendDigit(String digit) {
+    setState(() {
+      if (_buffer == '0') {
+        _buffer = digit;
+      } else if (_buffer.length < 3) {
+        _buffer += digit;
+      }
+    });
+  }
+
+  void _clear() {
+    setState(() {
+      _buffer = '0';
+    });
+  }
+
+  void _backspace() {
+    setState(() {
+      if (_buffer.length <= 1) {
+        _buffer = '0';
+      } else {
+        _buffer = _buffer.substring(0, _buffer.length - 1);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayValue = _buffer.isEmpty ? '0' : _buffer;
+    final parsedValue = int.tryParse(displayValue) ?? 0;
+    final hasChanges = parsedValue != widget.initialLife;
+
+    return Material(
+      color: Colors.transparent,
+      child: SafeArea(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.76),
+                ),
+              ),
+            ),
+            Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                builder: (context, progress, child) {
+                  return Opacity(
+                    opacity: progress,
+                    child: Transform.translate(
+                      offset: Offset(0, 18 * (1 - progress)),
+                      child: Transform.scale(
+                        scale: 0.96 + (0.04 * progress),
+                        child: child,
+                      ),
+                    ),
+                  );
+                },
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 338),
+                  child: Column(
+                    key: const Key('life-counter-set-life-overlay'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.playerLabel.toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.28),
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.8,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        key: const Key('life-counter-set-life-shell'),
+                        padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.72),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.34),
+                              blurRadius: 36,
+                              offset: const Offset(0, 18),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              key: const Key('life-counter-set-life-display'),
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 180),
+                                  transitionBuilder: (child, animation) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: const Offset(0, 0.08),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    displayValue,
+                                    key: ValueKey(displayValue),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 76,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -3.4,
+                                      height: 0.88,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            SizedBox(
+                              width: 270,
+                              child: Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 14,
+                                runSpacing: 14,
+                                children: [
+                                  for (final digit in [
+                                    '1',
+                                    '2',
+                                    '3',
+                                    '4',
+                                    '5',
+                                    '6',
+                                    '7',
+                                    '8',
+                                    '9',
+                                  ])
+                                    _BenchmarkSetLifeKeypadButton(
+                                      buttonKey: Key(
+                                        'life-counter-set-life-digit-$digit',
+                                      ),
+                                      label: digit,
+                                      onTap: () => _appendDigit(digit),
+                                    ),
+                                  _BenchmarkSetLifeKeypadButton(
+                                    buttonKey: const Key(
+                                      'life-counter-set-life-clear',
+                                    ),
+                                    label: 'C',
+                                    onTap: _clear,
+                                    destructive: true,
+                                  ),
+                                  _BenchmarkSetLifeKeypadButton(
+                                    buttonKey: const Key(
+                                      'life-counter-set-life-digit-0',
+                                    ),
+                                    label: '0',
+                                    onTap: () => _appendDigit('0'),
+                                  ),
+                                  _BenchmarkSetLifeKeypadButton(
+                                    buttonKey: const Key(
+                                      'life-counter-set-life-backspace',
+                                    ),
+                                    label: 'DEL',
+                                    onTap: _backspace,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text(
+                                    'CANCEL',
+                                    style: TextStyle(
+                                      color: Color(0xFFFF2C77),
+                                      fontSize: AppTheme.fontMd,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 26),
+                                TextButton(
+                                  key: const Key('life-counter-set-life-apply'),
+                                  onPressed: () => widget.onApply(parsedValue),
+                                  child: Text(
+                                    'SET LIFE',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: hasChanges ? 0.72 : 0.38,
+                                      ),
+                                      fontSize: AppTheme.fontMd,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
+  final Key buttonKey;
+  final String label;
+  final bool destructive;
+  final VoidCallback onTap;
+
+  const _BenchmarkSetLifeKeypadButton({
+    required this.buttonKey,
+    required this.label,
+    this.destructive = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: buttonKey,
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Ink(
+          width: 62,
+          height: 62,
+          decoration: BoxDecoration(
+            color: const Color(0xFF171717),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: destructive ? 0.06 : 0.08),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color:
+                    destructive
+                        ? const Color(0xFFFF2C77)
+                        : Colors.white.withValues(alpha: 0.96),
+                fontSize: label == 'DEL' ? 17 : 30,
+                fontWeight: FontWeight.w900,
+                letterSpacing: label == 'DEL' ? 1.2 : 0.4,
               ),
             ),
           ),
@@ -4219,9 +4903,9 @@ class _ToolActionButton extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Counters Bottom Sheet (poison, commander damage, energy, experience)
+// Counters Overlay (poison, commander damage, energy, experience)
 // ---------------------------------------------------------------------------
-class _CountersSheet extends StatefulWidget {
+class _CountersOverlay extends StatefulWidget {
   final int playerIndex;
   final int playerCount;
   final Color playerColor;
@@ -4239,7 +4923,7 @@ class _CountersSheet extends StatefulWidget {
   final ValueChanged<int> onCommanderCastsChanged;
   final Function(int source, int delta) onCommanderDamageChanged;
 
-  const _CountersSheet({
+  const _CountersOverlay({
     required this.playerIndex,
     required this.playerCount,
     required this.playerColor,
@@ -4259,10 +4943,10 @@ class _CountersSheet extends StatefulWidget {
   });
 
   @override
-  State<_CountersSheet> createState() => _CountersSheetState();
+  State<_CountersOverlay> createState() => _CountersOverlayState();
 }
 
-class _CountersSheetState extends State<_CountersSheet> {
+class _CountersOverlayState extends State<_CountersOverlay> {
   late int _poison;
   late int _energy;
   late int _experience;
@@ -4318,135 +5002,105 @@ class _CountersSheetState extends State<_CountersSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.65,
-      minChildSize: 0.4,
-      maxChildSize: 0.85,
-      expand: false,
-      builder:
-          (ctx, scrollController) => Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: ListView(
-              controller: scrollController,
-              children: [
-                // Handle
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.outlineMuted,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Text(
-                  'Contadores — ${widget.playerLabel}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: widget.playerColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // ── Poison ──
-                _CounterRow(
-                  icon: Icons.coronavirus,
-                  label: 'Veneno (Poison)',
-                  sublabel: _poison >= 10 ? '☠ LETAL (≥10)' : '10 = derrota',
-                  value: _poison,
-                  color: AppTheme.success,
-                  isLethal: _poison >= 10,
-                  onIncrement: () => _updatePoison(1),
-                  onDecrement: () => _updatePoison(-1),
-                ),
-                const SizedBox(height: 12),
-
-                _CounterRow(
-                  rowKey: const Key('life-counter-commander-casts-row'),
-                  sublabelKey: const Key(
-                    'life-counter-commander-casts-sublabel',
-                  ),
-                  icon: Icons.local_fire_department_outlined,
-                  label: 'Commander casts',
-                  sublabel:
-                      _commanderCasts == 0
-                          ? 'Taxa atual: 0 mana'
-                          : 'Taxa atual: +${_commanderCasts * 2} mana',
-                  value: _commanderCasts,
-                  color: AppTheme.warning,
-                  onIncrement: () => _updateCommanderCasts(1),
-                  onDecrement: () => _updateCommanderCasts(-1),
-                ),
-                const SizedBox(height: 12),
-
-                // ── Commander Damage ──
-                Text(
-                  '⚔ Dano de Comandante',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.mythicGold,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '21 de uma mesma fonte = derrota',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textHint,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ...List.generate(widget.playerCount, (sourceIdx) {
-                  if (sourceIdx == widget.playerIndex) {
-                    return const SizedBox.shrink();
-                  }
-                  final dmg = _cmdDamage[sourceIdx];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _CounterRow(
-                      icon: Icons.shield,
-                      label: 'De ${widget.playerLabels[sourceIdx]}',
-                      sublabel: dmg >= 21 ? '☠ LETAL (≥21)' : null,
-                      value: dmg,
-                      color: widget.playerColors[sourceIdx],
-                      isLethal: dmg >= 21,
-                      onIncrement: () => _updateCmdDamage(sourceIdx, 1),
-                      onDecrement: () => _updateCmdDamage(sourceIdx, -1),
-                    ),
-                  );
-                }),
-                const SizedBox(height: 12),
-
-                // ── Energy ──
-                _CounterRow(
-                  icon: Icons.bolt,
-                  label: 'Energia (Energy)',
-                  value: _energy,
-                  color: AppTheme.mythicGold,
-                  onIncrement: () => _updateEnergy(1),
-                  onDecrement: () => _updateEnergy(-1),
-                ),
-                const SizedBox(height: 12),
-
-                // ── Experience ──
-                _CounterRow(
-                  icon: Icons.star,
-                  label: 'Experiência (Experience)',
-                  value: _experience,
-                  color: AppTheme.primarySoft,
-                  onIncrement: () => _updateExperience(1),
-                  onDecrement: () => _updateExperience(-1),
-                ),
-                const SizedBox(height: 24),
-              ],
+    return _TableOverlayFrame(
+      frameKey: const Key('life-counter-counters-overlay'),
+      title: 'TRACKERS',
+      subtitle: 'Mesa-first trackers for ${widget.playerLabel}.',
+      width: 356,
+      maxHeight: 640,
+      child: Column(
+        key: const Key('life-counter-counters-sheet'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _OverlaySectionHeading(
+            widget.playerLabel.toUpperCase(),
+          ),
+          const SizedBox(height: 12),
+          _CounterRow(
+            rowKey: const Key('life-counter-poison-row'),
+            valueKey: const Key('life-counter-poison-value'),
+            icon: Icons.coronavirus,
+            label: 'TOXIC',
+            sublabel: _poison >= 10 ? 'â˜  LETAL (â‰¥10)' : '10 = derrota',
+            value: _poison,
+            color: AppTheme.success,
+            isLethal: _poison >= 10,
+            onIncrement: () => _updatePoison(1),
+            onDecrement: () => _updatePoison(-1),
+          ),
+          const SizedBox(height: 12),
+          _CounterRow(
+            rowKey: const Key('life-counter-commander-casts-row'),
+            sublabelKey: const Key(
+              'life-counter-commander-casts-sublabel',
+            ),
+            valueKey: const Key('life-counter-commander-casts-value'),
+            icon: Icons.local_fire_department_outlined,
+            label: 'CAST TAX',
+            sublabel:
+                _commanderCasts == 0
+                    ? 'Current tax: 0 mana'
+                    : 'Current tax: +${_commanderCasts * 2} mana',
+            value: _commanderCasts,
+            color: AppTheme.warning,
+            onIncrement: () => _updateCommanderCasts(1),
+            onDecrement: () => _updateCommanderCasts(-1),
+          ),
+          const SizedBox(height: 18),
+          const _OverlaySectionHeading('COMMANDER DAMAGE'),
+          const SizedBox(height: 6),
+          Text(
+            '21 de uma mesma fonte = derrota',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
             ),
           ),
+          const SizedBox(height: 10),
+          ...List.generate(widget.playerCount, (sourceIdx) {
+            if (sourceIdx == widget.playerIndex) {
+              return const SizedBox.shrink();
+            }
+            final dmg = _cmdDamage[sourceIdx];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _CounterRow(
+                icon: Icons.shield,
+                label: 'De ${widget.playerLabels[sourceIdx]}',
+                sublabel: dmg >= 21 ? 'â˜  LETAL (â‰¥21)' : null,
+                value: dmg,
+                color: widget.playerColors[sourceIdx],
+                isLethal: dmg >= 21,
+                onIncrement: () => _updateCmdDamage(sourceIdx, 1),
+                onDecrement: () => _updateCmdDamage(sourceIdx, -1),
+              ),
+            );
+          }),
+          const SizedBox(height: 10),
+          _CounterRow(
+            icon: Icons.bolt,
+            label: 'ENERGY',
+            value: _energy,
+            color: AppTheme.mythicGold,
+            onIncrement: () => _updateEnergy(1),
+            onDecrement: () => _updateEnergy(-1),
+          ),
+          const SizedBox(height: 12),
+          _CounterRow(
+            icon: Icons.star,
+            label: 'XP',
+            value: _experience,
+            color: AppTheme.primarySoft,
+            onIncrement: () => _updateExperience(1),
+            onDecrement: () => _updateExperience(-1),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _CommanderDamageQuickSheet extends StatefulWidget {
+class _CommanderDamageQuickOverlay extends StatefulWidget {
   final int playerIndex;
   final int playerCount;
   final String playerLabel;
@@ -4455,7 +5109,7 @@ class _CommanderDamageQuickSheet extends StatefulWidget {
   final List<String> playerLabels;
   final Function(int source, int delta) onCommanderDamageChanged;
 
-  const _CommanderDamageQuickSheet({
+  const _CommanderDamageQuickOverlay({
     required this.playerIndex,
     required this.playerCount,
     required this.playerLabel,
@@ -4466,11 +5120,12 @@ class _CommanderDamageQuickSheet extends StatefulWidget {
   });
 
   @override
-  State<_CommanderDamageQuickSheet> createState() =>
-      _CommanderDamageQuickSheetState();
+  State<_CommanderDamageQuickOverlay> createState() =>
+      _CommanderDamageQuickOverlayState();
 }
 
-class _CommanderDamageQuickSheetState extends State<_CommanderDamageQuickSheet> {
+class _CommanderDamageQuickOverlayState
+    extends State<_CommanderDamageQuickOverlay> {
   late List<int> _cmdDamage;
 
   @override
@@ -4494,107 +5149,81 @@ class _CommanderDamageQuickSheetState extends State<_CommanderDamageQuickSheet> 
         if (i != widget.playerIndex && _cmdDamage[i] >= 21) i,
     ];
 
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        child: Column(
-          key: const Key('life-counter-commander-damage-quick-sheet'),
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: AppTheme.outlineMuted,
-                  borderRadius: BorderRadius.circular(2),
+    return _TableOverlayFrame(
+      frameKey: const Key('life-counter-commander-damage-quick-overlay'),
+      title: 'COMMANDER DAMAGE',
+      subtitle: 'Dano de comandante rapido para ${widget.playerLabel}.',
+      width: 340,
+      maxHeight: 560,
+      child: Column(
+        key: const Key('life-counter-commander-damage-quick-sheet'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (lethalSources.isNotEmpty) ...[
+            Container(
+              key: const Key(
+                'life-counter-quick-commander-damage-lethal-summary',
+              ),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(
+                  color: AppTheme.error.withValues(alpha: 0.34),
+                  width: 0.9,
+                ),
+              ),
+              child: Text(
+                lethalSources.length == 1
+                    ? 'LETAL por dano de comandante de ${widget.playerLabels[lethalSources.first]}.'
+                    : 'LETAL por dano de comandante de ${lethalSources.map((i) => widget.playerLabels[i]).join(', ')}.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-            Text(
-              'Dano de comandante rapido',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Ajuste o dano recebido por ${widget.playerLabel} sem abrir a sheet completa.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textHint,
-              ),
-            ),
-            if (lethalSources.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                key: const Key(
-                  'life-counter-quick-commander-damage-lethal-summary',
-                ),
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.error.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color: AppTheme.error.withValues(alpha: 0.34),
-                    width: 0.9,
-                  ),
-                ),
-                child: Text(
-                  lethalSources.length == 1
-                      ? 'LETAL por dano de comandante de ${widget.playerLabels[lethalSources.first]}.'
-                      : 'LETAL por dano de comandante de ${lethalSources.map((i) => widget.playerLabels[i]).join(', ')}.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            ...List.generate(widget.playerCount, (sourceIdx) {
-              if (sourceIdx == widget.playerIndex) {
-                return const SizedBox.shrink();
-              }
-              final dmg = _cmdDamage[sourceIdx];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _CounterRow(
-                  rowKey: Key(
-                    'life-counter-quick-commander-damage-row-$sourceIdx',
-                  ),
-                  icon: Icons.shield_rounded,
-                  label: 'De ${widget.playerLabels[sourceIdx]}',
-                  sublabel:
-                      dmg >= 21
-                          ? '☠ LETAL (≥21)'
-                          : 'Commander damage por fonte',
-                  value: dmg,
-                  color: widget.playerColors[sourceIdx],
-                  isLethal: dmg >= 21,
-                  decrementKey: Key(
-                    'life-counter-quick-commander-damage-minus-$sourceIdx',
-                  ),
-                  incrementKey: Key(
-                    'life-counter-quick-commander-damage-plus-$sourceIdx',
-                  ),
-                  valueKey: Key(
-                    'life-counter-quick-commander-damage-value-$sourceIdx',
-                  ),
-                  onIncrement: () => _updateCmdDamage(sourceIdx, 1),
-                  onDecrement: () => _updateCmdDamage(sourceIdx, -1),
-                ),
-              );
-            }),
+            const SizedBox(height: 14),
           ],
-        ),
+          ...List.generate(widget.playerCount, (sourceIdx) {
+            if (sourceIdx == widget.playerIndex) {
+              return const SizedBox.shrink();
+            }
+            final dmg = _cmdDamage[sourceIdx];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _CounterRow(
+                rowKey: Key(
+                  'life-counter-quick-commander-damage-row-$sourceIdx',
+                ),
+                icon: Icons.shield_rounded,
+                label: 'De ${widget.playerLabels[sourceIdx]}',
+                sublabel:
+                    dmg >= 21
+                        ? 'â˜  LETAL (â‰¥21)'
+                        : 'Commander damage por fonte',
+                value: dmg,
+                color: widget.playerColors[sourceIdx],
+                isLethal: dmg >= 21,
+                decrementKey: Key(
+                  'life-counter-quick-commander-damage-minus-$sourceIdx',
+                ),
+                incrementKey: Key(
+                  'life-counter-quick-commander-damage-plus-$sourceIdx',
+                ),
+                valueKey: Key(
+                  'life-counter-quick-commander-damage-value-$sourceIdx',
+                ),
+                onIncrement: () => _updateCmdDamage(sourceIdx, 1),
+                onDecrement: () => _updateCmdDamage(sourceIdx, -1),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -4765,7 +5394,7 @@ class _RoundButton extends StatelessWidget {
 // Settings Overlay
 // ---------------------------------------------------------------------------
 
-/// Overlay de mesa para configurar número de jogadores e vida inicial.
+/// Overlay de mesa para configurar nÃºmero de jogadores e vida inicial.
 class _SettingsSheet extends StatelessWidget {
   final int twoPlayerStartingLife;
   final int multiPlayerStartingLife;
@@ -5007,3 +5636,4 @@ class _SettingsToggleRow extends StatelessWidget {
     );
   }
 }
+
