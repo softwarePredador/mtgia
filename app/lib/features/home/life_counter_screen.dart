@@ -50,7 +50,7 @@ enum _PlayerSpecialState { none, deckedOut, answerLeft }
 
 /// Contador de vida completo para partidas de Magic: The Gathering.
 ///
-/// Suporta 2, 3 ou 4 jogadores, com:
+/// Suporta 2 a 6 jogadores, com:
 /// - Vida (life total)
 /// - Veneno / Poison counters (10 = derrota)
 /// - Dano de Comandante por oponente (21 = derrota)
@@ -72,7 +72,7 @@ class LifeCounterScreen extends StatefulWidget {
 
 class _LifeCounterScreenState extends State<LifeCounterScreen> {
   static const _sessionPrefsKey = 'life_counter_session_v1';
-  static const double _tableGutter = 4;
+  static const double _tableGutter = 3;
   final Random _runtimeRandom = Random();
 
   int _playerCount = 2;
@@ -105,6 +105,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     Color(0xFFFF0A5B),
     Color(0xFFCF7AEF),
     Color(0xFF4B57FF),
+    Color(0xFF44E063),
+    Color(0xFF40B9FF),
   ];
 
   static const _playerLabels = [
@@ -112,6 +114,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     'Jogador 2',
     'Jogador 3',
     'Jogador 4',
+    'Jogador 5',
+    'Jogador 6',
   ];
 
   Random get _random => widget.randomOverride ?? _runtimeRandom;
@@ -537,7 +541,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           (payload['starting_life_two_player'] as num?)?.toInt();
       final startingLifeMultiPlayer =
           (payload['starting_life_multi_player'] as num?)?.toInt();
-      if (playerCount == null || playerCount < 2 || playerCount > 4) {
+      if (playerCount == null || playerCount < 2 || playerCount > 6) {
         return;
       }
       final restoredTwoPlayerLife =
@@ -753,12 +757,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     _showTableOverlayDialog(
       barrierLabel: 'Fechar histÃ³rico',
       builder:
-          (ctx) => _SimpleTableOverlay(
-            title: 'HISTORY',
-            body:
-                _lastTableEvent == null
-                    ? 'Nenhum evento de mesa registrado ainda.'
-                    : 'Ãšltimo evento: $_lastTableEvent\n\nSnapshots salvos: ${_history.length}',
+          (ctx) => _HistoryOverlay(
+            lastTableEvent: _lastTableEvent,
+            snapshotCount: _history.length,
           ),
     );
   }
@@ -936,6 +937,59 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
+  int _quarterTurnsForSeat(int playerIndex) {
+    if (_playerCount == 2) {
+      return playerIndex == 0 ? 2 : 0;
+    }
+    if (_playerCount == 5) {
+      switch (playerIndex) {
+        case 0:
+          return 2;
+        case 1:
+        case 3:
+          return 1;
+        default:
+          return 3;
+      }
+    }
+    if (_playerCount == 6) {
+      switch (playerIndex) {
+        case 0:
+          return 2;
+        case 5:
+          return 0;
+        case 1:
+        case 3:
+          return 1;
+        default:
+          return 3;
+      }
+    }
+    return playerIndex.isEven ? 1 : 3;
+  }
+
+  Alignment get _hubAlignmentForLayout {
+    switch (_playerCount) {
+      case 5:
+        return const Alignment(0, 0.12);
+      case 6:
+        return const Alignment(0, 0.04);
+      default:
+        return Alignment.center;
+    }
+  }
+
+  double get _hubScaleFactorForLayout {
+    switch (_playerCount) {
+      case 5:
+        return 0.9;
+      case 6:
+        return 0.82;
+      default:
+        return 1;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -948,14 +1002,16 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
               child: ColoredBox(
                 color: Colors.black,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(3, 3, 3, 6),
+                  padding: const EdgeInsets.fromLTRB(2, 2, 2, 4),
                   child: _buildTablePlayers(),
                 ),
               ),
             ),
             Positioned.fill(
-              child: Center(
+              child: Align(
+                alignment: _hubAlignmentForLayout,
                 child: _TableControlHub(
+                  scaleFactor: _hubScaleFactorForLayout,
                   isExpanded: _isHubExpanded,
                   lastTableEvent: _lastTableEvent,
                   onToggle: () {
@@ -1013,6 +1069,10 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         return _buildTwoPlayers();
       case 3:
         return _buildThreePlayers();
+      case 5:
+        return _buildFivePlayers();
+      case 6:
+        return _buildSixPlayers();
       default:
         return _buildFourPlayers();
     }
@@ -1021,7 +1081,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   Widget _buildTwoPlayers() {
     return Column(
       children: [
-        Expanded(child: _buildPlayerSlot(0, quarterTurns: 2)),
+        Expanded(child: _buildPlayerSlot(0, quarterTurns: _quarterTurnsForSeat(0))),
         const SizedBox(height: _tableGutter),
         Expanded(child: _buildPlayerSlot(1)),
       ],
@@ -1032,23 +1092,33 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     return Column(
       children: [
         Expanded(
-          flex: 47,
+          flex: 44,
           child: Row(
             children: [
               Expanded(
-                child: _buildPlayerSlot(0, compact: true, quarterTurns: 2),
+                child: _buildPlayerSlot(
+                  0,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(0),
+                ),
               ),
               const SizedBox(width: _tableGutter),
               Expanded(
-                child: _buildPlayerSlot(1, compact: true, quarterTurns: 2),
+                child: _buildPlayerSlot(
+                  1,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(1),
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: _tableGutter),
         Expanded(
-          flex: 53,
-          child: _buildPlayerSlot(2),
+          flex: 56,
+          child: _buildPlayerSlot(2, quarterTurns: _quarterTurnsForSeat(2)),
         ),
       ],
     );
@@ -1061,11 +1131,19 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           child: Row(
             children: [
               Expanded(
-                child: _buildPlayerSlot(0, compact: true, quarterTurns: 2),
+                child: _buildPlayerSlot(
+                  0,
+                  compact: true,
+                  quarterTurns: _quarterTurnsForSeat(0),
+                ),
               ),
               const SizedBox(width: _tableGutter),
               Expanded(
-                child: _buildPlayerSlot(1, compact: true, quarterTurns: 2),
+                child: _buildPlayerSlot(
+                  1,
+                  compact: true,
+                  quarterTurns: _quarterTurnsForSeat(1),
+                ),
               ),
             ],
           ),
@@ -1075,11 +1153,21 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
           child: Row(
             children: [
               Expanded(
-                child: _buildPlayerSlot(2, compact: true),
+                child: _buildPlayerSlot(
+                  2,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(2),
+                ),
               ),
               const SizedBox(width: _tableGutter),
               Expanded(
-                child: _buildPlayerSlot(3, compact: true),
+                child: _buildPlayerSlot(
+                  3,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(3),
+                ),
               ),
             ],
           ),
@@ -1088,9 +1176,133 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
+  Widget _buildFivePlayers() {
+    return _buildRingPlayers(
+      topCenterPlayer: 0,
+      upperLeftPlayer: 1,
+      upperRightPlayer: 2,
+      lowerLeftPlayer: 3,
+      lowerRightPlayer: 4,
+    );
+  }
+
+  Widget _buildSixPlayers() {
+    return _buildRingPlayers(
+      topCenterPlayer: 0,
+      upperLeftPlayer: 1,
+      upperRightPlayer: 2,
+      lowerLeftPlayer: 3,
+      lowerRightPlayer: 4,
+      bottomCenterPlayer: 5,
+    );
+  }
+
+  Widget _buildRingPlayers({
+    int? topCenterPlayer,
+    int? bottomCenterPlayer,
+    required int upperLeftPlayer,
+    required int upperRightPlayer,
+    required int lowerLeftPlayer,
+    required int lowerRightPlayer,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+        final centerWell =
+            (min(width * 0.38, height * 0.24)).clamp(150.0, 184.0).toDouble();
+        final sideWidth = (width - centerWell - (_tableGutter * 2)) / 2;
+        final bandHeight = (height - centerWell - (_tableGutter * 2)) / 2;
+        final centerX = sideWidth + _tableGutter;
+        final rightX = width - sideWidth;
+        final lowerY = height - bandHeight;
+
+        return Stack(
+          children: [
+            if (topCenterPlayer != null)
+              Positioned(
+                left: centerX,
+                top: 0,
+                width: centerWell,
+                height: bandHeight,
+                child: _buildPlayerSlot(
+                  topCenterPlayer,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(topCenterPlayer),
+                ),
+              ),
+            Positioned(
+              left: 0,
+              top: 0,
+              width: sideWidth,
+              height: bandHeight,
+              child: _buildPlayerSlot(
+                upperLeftPlayer,
+                compact: true,
+                dense: true,
+                quarterTurns: _quarterTurnsForSeat(upperLeftPlayer),
+              ),
+            ),
+            Positioned(
+              left: rightX,
+              top: 0,
+              width: sideWidth,
+              height: bandHeight,
+              child: _buildPlayerSlot(
+                upperRightPlayer,
+                compact: true,
+                dense: true,
+                quarterTurns: _quarterTurnsForSeat(upperRightPlayer),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              top: lowerY,
+              width: sideWidth,
+              height: bandHeight,
+              child: _buildPlayerSlot(
+                lowerLeftPlayer,
+                compact: true,
+                dense: true,
+                quarterTurns: _quarterTurnsForSeat(lowerLeftPlayer),
+              ),
+            ),
+            Positioned(
+              left: rightX,
+              top: lowerY,
+              width: sideWidth,
+              height: bandHeight,
+              child: _buildPlayerSlot(
+                lowerRightPlayer,
+                compact: true,
+                dense: true,
+                quarterTurns: _quarterTurnsForSeat(lowerRightPlayer),
+              ),
+            ),
+            if (bottomCenterPlayer != null)
+              Positioned(
+                left: centerX,
+                top: lowerY,
+                width: centerWell,
+                height: bandHeight,
+                child: _buildPlayerSlot(
+                  bottomCenterPlayer,
+                  compact: true,
+                  dense: true,
+                  quarterTurns: _quarterTurnsForSeat(bottomCenterPlayer),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildPlayerSlot(
     int playerIndex, {
     bool compact = false,
+    bool dense = false,
     int quarterTurns = 0,
   }) {
     return KeyedSubtree(
@@ -1137,6 +1349,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         countersKey: Key('life-counter-counters-$playerIndex'),
         quarterTurns: quarterTurns,
         compact: compact,
+        dense: dense,
       ),
     );
   }
@@ -1178,6 +1391,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
 }
 
 class _TableControlHub extends StatelessWidget {
+  final double scaleFactor;
   final bool isExpanded;
   final bool hasPendingHighRollTie;
   final String? lastTableEvent;
@@ -1189,6 +1403,7 @@ class _TableControlHub extends StatelessWidget {
   final VoidCallback onReset;
 
   const _TableControlHub({
+    required this.scaleFactor,
     required this.isExpanded,
     required this.hasPendingHighRollTie,
     required this.lastTableEvent,
@@ -1202,36 +1417,47 @@ class _TableControlHub extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const petalSpecs = [
+    final petalSpecs = [
       _HubPetalSpec(
         key: Key('life-counter-hub-players'),
         label: 'PLAYERS',
         color: Color(0xFF44E063),
-        offset: Offset(-84, 0),
+        offset: Offset(-76, 2) * scaleFactor,
         rotation: -pi / 2,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-reset'),
         label: 'RESTART',
         color: Color(0xFFFFE277),
-        offset: Offset(0, -84),
-        rotation: 0,
+        offset: Offset(-16, -58) * scaleFactor,
+        rotation: -0.72,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-quick-high-roll'),
         label: '',
         color: Color(0xFF40B9FF),
-        offset: Offset(0, 84),
-        rotation: 0,
+        offset: Offset(34, -56) * scaleFactor,
+        rotation: 0.68,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-settings'),
         label: 'SETTINGS',
         color: Color(0xFFB9B4FF),
-        offset: Offset(84, 0),
+        offset: Offset(76, 4) * scaleFactor,
         rotation: pi / 2,
       ),
+      _HubPetalSpec(
+        key: Key('life-counter-hub-tools'),
+        label: 'HELP',
+        color: Color(0xFFFF2C77),
+        offset: Offset(0, 70) * scaleFactor,
+        rotation: pi,
+      ),
     ];
+
+    final hubSize = (isExpanded ? 236 : 68) * scaleFactor;
+    final lastEventMaxWidth = 224 * scaleFactor;
+    final lastEventTopGap = 2 * scaleFactor;
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 220),
@@ -1241,27 +1467,26 @@ class _TableControlHub extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: isExpanded ? 260 : 74,
-            height: isExpanded ? 260 : 74,
+            width: hubSize,
+            height: hubSize,
             child: Stack(
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                _HubToolsFrame(
-                  isExpanded: isExpanded,
-                  onTap: onTools,
-                ),
                 _HubOrbitPetal(
+                  scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
                   spec: petalSpecs[0],
                   onTap: onPlayers,
                 ),
                 _HubOrbitPetal(
+                  scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
                   spec: petalSpecs[1],
                   onTap: onReset,
                 ),
                 _HubOrbitPetal(
+                  scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
                   spec: petalSpecs[2].copyWith(
                     label:
@@ -1270,16 +1495,27 @@ class _TableControlHub extends StatelessWidget {
                   onTap: onQuickHighRoll,
                 ),
                 _HubOrbitPetal(
+                  scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
                   spec: petalSpecs[3],
                   onTap: onSettings,
                 ),
-                _HubMedallion(isExpanded: isExpanded, onTap: onToggle),
+                _HubOrbitPetal(
+                  scaleFactor: scaleFactor,
+                  isExpanded: isExpanded,
+                  spec: petalSpecs[4],
+                  onTap: onTools,
+                ),
+                _HubMedallion(
+                  scaleFactor: scaleFactor,
+                  isExpanded: isExpanded,
+                  onTap: onToggle,
+                ),
               ],
             ),
           ),
           if (isExpanded && lastTableEvent != null) ...[
-            const SizedBox(height: 6),
+            SizedBox(height: lastEventTopGap),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               switchInCurve: Curves.easeOutCubic,
@@ -1297,40 +1533,19 @@ class _TableControlHub extends StatelessWidget {
               },
               child: ConstrainedBox(
                 key: ValueKey(lastTableEvent),
-                constraints: const BoxConstraints(maxWidth: 260),
-                child: Container(
+                constraints: BoxConstraints(maxWidth: lastEventMaxWidth),
+                child: Text(
                   key: const Key('life-counter-hub-last-event'),
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.88),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      width: 0.8,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    lastTableEvent!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      fontSize: AppTheme.fontSm,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
+                  lastTableEvent!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.76),
+                    fontSize: AppTheme.fontSm,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.45,
+                    height: 1.2,
                   ),
                 ),
               ),
@@ -1342,110 +1557,24 @@ class _TableControlHub extends StatelessWidget {
   }
 }
 
-class _HubToolsFrame extends StatelessWidget {
+class _HubMedallion extends StatelessWidget {
+  final double scaleFactor;
   final bool isExpanded;
   final VoidCallback onTap;
 
-  const _HubToolsFrame({
+  const _HubMedallion({
+    required this.scaleFactor,
     required this.isExpanded,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: IgnorePointer(
-        ignoring: !isExpanded,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween<double>(end: isExpanded ? 1 : 0),
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, child) {
-            return Align(
-              alignment: Alignment.center,
-              child: Opacity(
-                opacity: value,
-                child: Transform.scale(
-                  scale: 0.94 + (0.06 * value),
-                  child: child,
-                ),
-              ),
-            );
-          },
-          child: Material(
-            key: const Key('life-counter-hub-tools'),
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: onTap,
-              child: SizedBox(
-                width: 132,
-                height: 132,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            const Color(0xFFFFD54A).withValues(alpha: 0.12),
-                            Colors.transparent,
-                            const Color(0xFF9640FF).withValues(alpha: 0.08),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: const SizedBox(width: 132, height: 132),
-                    ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.black.withValues(alpha: 0.16),
-                          width: 1.4,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 14,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const SizedBox(width: 116, height: 116),
-                    ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: const SizedBox(width: 104, height: 104),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+    final outerSize = (isExpanded ? 76 : 66) * scaleFactor;
+    final middleSize = (isExpanded ? 68 : 58) * scaleFactor;
+    final innerSize = (isExpanded ? 56 : 48) * scaleFactor;
+    final iconSize = (isExpanded ? 26 : 23) * scaleFactor;
 
-class _HubMedallion extends StatelessWidget {
-  final bool isExpanded;
-  final VoidCallback onTap;
-
-  const _HubMedallion({required this.isExpanded, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1453,29 +1582,22 @@ class _HubMedallion extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: SizedBox(
-          width: isExpanded ? 84 : 72,
-          height: isExpanded ? 84 : 72,
+          width: outerSize,
+          height: outerSize,
           child: Stack(
             alignment: Alignment.center,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                width: isExpanded ? 84 : 72,
-                height: isExpanded ? 84 : 72,
+                width: outerSize,
+                height: outerSize,
                 decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.24),
-                      blurRadius: isExpanded ? 20 : 14,
-                      spreadRadius: 1.5,
-                      offset: const Offset(0, 8),
-                    ),
-                    BoxShadow(
-                      color: const Color(0xFFFFDD78).withValues(
-                        alpha: isExpanded ? 0.08 : 0.04,
-                      ),
-                      blurRadius: isExpanded ? 16 : 10,
+                      color: Colors.black.withValues(alpha: 0.14),
+                      blurRadius: isExpanded ? 12 : 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -1491,20 +1613,13 @@ class _HubMedallion extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                width: isExpanded ? 76 : 64,
-                height: isExpanded ? 76 : 64,
+                width: middleSize,
+                height: middleSize,
                 child: ClipPath(
                   clipper: const _HexagonClipper(),
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFF0B0B0B),
-                          Color(0xFF191919),
-                        ],
-                      ),
+                      color: const Color(0xFF0E0E0E),
                     ),
                   ),
                 ),
@@ -1512,8 +1627,8 @@ class _HubMedallion extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                width: isExpanded ? 64 : 54,
-                height: isExpanded ? 64 : 54,
+                width: innerSize,
+                height: innerSize,
                 child: ClipPath(
                   clipper: const _HexagonClipper(),
                   child: DecoratedBox(
@@ -1530,13 +1645,6 @@ class _HubMedallion extends StatelessWidget {
                         color: Colors.black.withValues(alpha: 0.1),
                         width: 1,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -1544,7 +1652,7 @@ class _HubMedallion extends StatelessWidget {
               Icon(
                 isExpanded ? Icons.close_rounded : Icons.menu_rounded,
                 color: Colors.black,
-                size: isExpanded ? 26 : 23,
+                size: iconSize,
               ),
             ],
           ),
@@ -1555,18 +1663,17 @@ class _HubMedallion extends StatelessWidget {
 }
 
 class _HubPetalAction extends StatelessWidget {
-  static const double _pillWidth = 98;
-  static const double _pillHeight = 38;
-
   final Key? buttonKey;
   final String label;
   final Color color;
+  final double scaleFactor;
   final VoidCallback? onTap;
 
   const _HubPetalAction({
     this.buttonKey,
     required this.label,
     required this.color,
+    required this.scaleFactor,
     required this.onTap,
   });
 
@@ -1581,26 +1688,19 @@ class _HubPetalAction extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Ink(
-          width: _pillWidth,
-          height: _pillHeight,
+          width: 90 * scaleFactor,
+          height: 34 * scaleFactor,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: Colors.black.withValues(alpha: 0.12),
-              width: 0.7,
+              width: 0.6,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-              ),
-            ],
           ),
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 10 * scaleFactor),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
@@ -1611,9 +1711,9 @@ class _HubPetalAction extends StatelessWidget {
                         enabled
                             ? Colors.black.withValues(alpha: 0.9)
                             : Colors.black.withValues(alpha: 0.35),
-                    fontSize: 10,
+                    fontSize: 9.6 * scaleFactor,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 0.7,
+                    letterSpacing: 0.65,
                   ),
                 ),
               ),
@@ -1640,19 +1740,19 @@ class _PlayersOverlay extends StatelessWidget {
       frameKey: const Key('life-counter-players-overlay'),
       title: 'PLAYERS',
       subtitle: 'Pick the board layout before the round starts.',
-      width: 284,
-      maxHeight: 460,
+      width: 292,
+      maxHeight: 540,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (final count in const [2, 3, 4]) ...[
+          for (final count in const [2, 3, 4, 5, 6]) ...[
             _PlayerLayoutPreview(
               previewKey: Key('life-counter-players-option-$count'),
               playerCount: count,
               selected: selectedPlayerCount == count,
               onTap: () => onSelected(count),
             ),
-            if (count != 4) const SizedBox(height: 18),
+            if (count != 6) const SizedBox(height: 14),
           ],
         ],
       ),
@@ -1803,8 +1903,8 @@ class _PlayerLayoutPreview extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(28),
         child: Ink(
-          width: 180,
-          height: 88,
+          width: 176,
+          height: 72,
           decoration: BoxDecoration(
             color: selected ? const Color(0xFFFF2C77) : Colors.transparent,
             borderRadius: BorderRadius.circular(28),
@@ -1817,7 +1917,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             child: _PlayerLayoutGlyph(playerCount: playerCount),
           ),
         ),
@@ -1833,9 +1933,9 @@ class _PlayerLayoutGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tileColor = playerCount == 4 ? Colors.black : Colors.white;
+    final tileColor = playerCount >= 4 ? Colors.black : Colors.white;
     final tileAlt =
-        playerCount == 4
+        playerCount >= 4
             ? Colors.black.withValues(alpha: 0.82)
             : Colors.white.withValues(alpha: 0.9);
 
@@ -1871,6 +1971,48 @@ class _PlayerLayoutGlyph extends StatelessWidget {
       );
     }
 
+    if (playerCount == 5 || playerCount == 6) {
+      Widget strip() {
+        return Container(
+          margin: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: tileAlt,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        );
+      }
+
+      return Stack(
+        children: [
+          Align(
+            alignment: const Alignment(0, -0.82),
+            child: SizedBox(width: 54, height: 16, child: strip()),
+          ),
+          Align(
+            alignment: const Alignment(-0.72, -0.36),
+            child: SizedBox(width: 48, height: 24, child: strip()),
+          ),
+          Align(
+            alignment: const Alignment(0.72, -0.36),
+            child: SizedBox(width: 48, height: 24, child: strip()),
+          ),
+          Align(
+            alignment: const Alignment(-0.72, 0.46),
+            child: SizedBox(width: 48, height: 24, child: strip()),
+          ),
+          Align(
+            alignment: const Alignment(0.72, 0.46),
+            child: SizedBox(width: 48, height: 24, child: strip()),
+          ),
+          if (playerCount == 6)
+            Align(
+              alignment: const Alignment(0, 0.88),
+              child: SizedBox(width: 54, height: 16, child: strip()),
+            ),
+        ],
+      );
+    }
+
     return Column(
       children: [
         Expanded(child: Row(children: [tile(), tile()])),
@@ -1880,26 +2022,70 @@ class _PlayerLayoutGlyph extends StatelessWidget {
   }
 }
 
-class _SimpleTableOverlay extends StatelessWidget {
-  final String title;
-  final String body;
+class _HistoryOverlay extends StatelessWidget {
+  final String? lastTableEvent;
+  final int snapshotCount;
 
-  const _SimpleTableOverlay({required this.title, required this.body});
+  const _HistoryOverlay({
+    required this.lastTableEvent,
+    required this.snapshotCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     return _TableOverlayFrame(
-      title: title,
+      frameKey: const Key('life-counter-history-overlay'),
+      title: 'HISTORY',
       width: 304,
-      maxHeight: 260,
-      child: Text(
-        body,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.86),
-          fontSize: AppTheme.fontMd,
-          height: 1.35,
-          fontWeight: FontWeight.w700,
-        ),
+      maxHeight: 280,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _OverlaySectionHeading('LAST EVENT'),
+          const SizedBox(height: 10),
+          Text(
+            lastTableEvent == null ? 'NO TABLE EVENT.' : lastTableEvent!,
+            key: const Key('life-counter-history-last-event'),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: AppTheme.fontMd,
+              height: 1.3,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 18),
+          const _OverlaySectionHeading('SNAPSHOTS'),
+          const SizedBox(height: 10),
+          Text(
+            '$snapshotCount SAVED',
+            key: const Key('life-counter-history-snapshot-count'),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.72),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OverlayPlainText extends StatelessWidget {
+  final String body;
+
+  const _OverlayPlainText({required this.body});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      body,
+      style: TextStyle(
+        color: Colors.white.withValues(alpha: 0.86),
+        fontSize: AppTheme.fontMd,
+        height: 1.35,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
@@ -1941,8 +2127,6 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
           return _TableOverlayFrame(
             frameKey: const Key('life-counter-card-search-overlay'),
             title: 'CARD SEARCH',
-            subtitle:
-                'Lookup real de cartas sem sair da mesa. Digite 3 letras ou use um atalho.',
             width: 348,
             maxHeight: 620,
             child: Consumer<CardProvider>(
@@ -1966,17 +2150,19 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                       onSubmitted: (value) => _runSearch(context, value),
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.96),
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.2,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Search cards',
+                        hintText: 'SEARCH CARDS',
                         hintStyle: TextStyle(
                           color: Colors.white.withValues(alpha: 0.34),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
                         ),
                         prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: Colors.white.withValues(alpha: 0.72),
+                          color: Colors.white.withValues(alpha: 0.82),
                         ),
                         suffixIcon:
                             _controller.text.isEmpty
@@ -1992,28 +2178,30 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                                   },
                                   icon: Icon(
                                     Icons.close_rounded,
-                                    color: Colors.white.withValues(alpha: 0.72),
+                                    color: Colors.white.withValues(alpha: 0.82),
                                   ),
                                 ),
                         filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.05),
+                        fillColor: Colors.black.withValues(alpha: 0.28),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 1.8,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.08),
+                            color: Colors.white.withValues(alpha: 0.94),
+                            width: 1.8,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
                             color: Color(0xFF40B9FF),
-                            width: 1.2,
+                            width: 2,
                           ),
                         ),
                       ),
@@ -2039,15 +2227,8 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                     ),
                     const SizedBox(height: 18),
                     if (!hasQuery)
-                      Text(
-                        'Use o rail para consultar oracle text, tipos e detalhes sem perder a mesa.',
-                        key: const Key('life-counter-card-search-hint'),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.68),
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w600,
-                          height: 1.35,
-                        ),
+                      const _OverlayPlainText(
+                        body: 'TYPE 3 LETTERS OR USE A TABLE SHORTCUT.',
                       )
                     else if (provider.isLoading)
                       const Padding(
@@ -2061,18 +2242,14 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                         style: TextStyle(
                           color: AppTheme.error.withValues(alpha: 0.92),
                           fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
                         ),
                       )
                     else if (provider.searchResults.isEmpty)
-                      Text(
-                        'No cards found for "${_controller.text.trim()}".',
-                        key: const Key('life-counter-card-search-empty'),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.62),
-                          fontSize: AppTheme.fontSm,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      _OverlayPlainText(
+                        body:
+                            'NO CARD FOUND FOR "${_controller.text.trim().toUpperCase()}".',
                       )
                     else
                       Column(
@@ -2125,11 +2302,11 @@ class _CardSearchSuggestionChip extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.22),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1,
+              color: Colors.white.withValues(alpha: 0.94),
+              width: 1.5,
             ),
           ),
           child: Text(
@@ -2173,11 +2350,11 @@ class _CardSearchResultTile extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(18),
+            color: Colors.black.withValues(alpha: 0.24),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1,
+              color: Colors.white.withValues(alpha: 0.94),
+              width: 1.3,
             ),
           ),
           child: Row(
@@ -2360,11 +2537,13 @@ class _BottomRailPill extends StatelessWidget {
 }
 
 class _HubOrbitPetal extends StatelessWidget {
+  final double scaleFactor;
   final bool isExpanded;
   final _HubPetalSpec spec;
   final VoidCallback onTap;
 
   const _HubOrbitPetal({
+    required this.scaleFactor,
     required this.isExpanded,
     required this.spec,
     required this.onTap,
@@ -2403,6 +2582,7 @@ class _HubOrbitPetal extends StatelessWidget {
             buttonKey: spec.key,
             label: spec.label,
             color: spec.color,
+            scaleFactor: scaleFactor,
             onTap: onTap,
           ),
         ),
@@ -2508,6 +2688,7 @@ class _PlayerPanel extends StatefulWidget {
   final Key? countersKey;
   final int quarterTurns;
   final bool compact;
+  final bool dense;
 
   const _PlayerPanel({
     required this.panelIndex,
@@ -2546,6 +2727,7 @@ class _PlayerPanel extends StatefulWidget {
     this.countersKey,
     this.quarterTurns = 0,
     this.compact = false,
+    this.dense = false,
   });
 
   @override
@@ -2554,6 +2736,53 @@ class _PlayerPanel extends StatefulWidget {
 
 class _PlayerPanelState extends State<_PlayerPanel> {
   bool _showLifeActions = false;
+
+  bool get _isDenseCompact => widget.compact && widget.dense;
+
+  double get _coreStageWidth => _isDenseCompact ? 132 : widget.compact ? 156 : 214;
+  double get _coreStageHeight => _isDenseCompact ? 108 : widget.compact ? 126 : 176;
+
+  Alignment get _normalCoreAlignment {
+    final horizontal =
+        widget.quarterTurns == 1
+            ? (_isDenseCompact ? 0.04 : widget.compact ? 0.05 : 0.035)
+            : widget.quarterTurns == 3
+            ? (_isDenseCompact ? -0.04 : widget.compact ? -0.05 : -0.035)
+            : 0.0;
+    final vertical = _isDenseCompact ? -0.04 : widget.compact ? -0.055 : -0.038;
+    return Alignment(horizontal, vertical);
+  }
+
+  Alignment get _actionsCoreAlignment {
+    final horizontal =
+        widget.quarterTurns == 1
+            ? (_isDenseCompact ? 0.022 : widget.compact ? 0.03 : 0.02)
+            : widget.quarterTurns == 3
+            ? (_isDenseCompact ? -0.022 : widget.compact ? -0.03 : -0.02)
+            : 0.0;
+    final vertical = _isDenseCompact ? -0.018 : widget.compact ? -0.03 : -0.02;
+    return Alignment(horizontal, vertical);
+  }
+
+  Alignment get _eventTakeoverAlignment {
+    final horizontal =
+        widget.quarterTurns == 1
+            ? (_isDenseCompact ? 0.014 : widget.compact ? 0.02 : 0.015)
+            : widget.quarterTurns == 3
+            ? (_isDenseCompact ? -0.014 : widget.compact ? -0.02 : -0.015)
+            : 0.0;
+    return Alignment(horizontal, 0.0);
+  }
+
+  Alignment get _specialTakeoverAlignment {
+    final horizontal =
+        widget.quarterTurns == 1
+            ? (_isDenseCompact ? 0.008 : widget.compact ? 0.012 : 0.008)
+            : widget.quarterTurns == 3
+            ? (_isDenseCompact ? -0.008 : widget.compact ? -0.012 : -0.008)
+            : 0.0;
+    return Alignment(horizontal, 0.0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2610,6 +2839,161 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         isLightPanel
             ? Colors.black.withValues(alpha: 0.46)
             : Colors.white.withValues(alpha: 0.38);
+    final quickActions = <Widget>[
+      _PlayerInlineAction(
+        actionKey: Key('life-counter-player-roll-d20-${widget.panelIndex}'),
+        icon: Icons.casino_outlined,
+        label: 'D20',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onPlayerRollD20();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key('life-counter-player-poison-plus-${widget.panelIndex}'),
+        icon: Icons.coronavirus_outlined,
+        label: 'TOX +',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onPoisonIncrement();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key('life-counter-player-poison-minus-${widget.panelIndex}'),
+        icon: Icons.remove_circle_outline_rounded,
+        label: 'TOX -',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onPoisonDecrement();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key('life-counter-player-tax-plus-${widget.panelIndex}'),
+        icon: Icons.add_circle_outline_rounded,
+        label: 'TAX +',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onCommanderTaxIncrement();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key('life-counter-player-tax-minus-${widget.panelIndex}'),
+        icon: Icons.remove_circle_outline_rounded,
+        label: 'TAX -',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onCommanderTaxDecrement();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key(
+          'life-counter-player-commander-damage-${widget.panelIndex}',
+        ),
+        icon: Icons.shield_outlined,
+        label: 'MARKS',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onOpenCommanderDamageQuick();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: widget.countersKey,
+        icon: Icons.dashboard_customize_outlined,
+        label: 'TRACK',
+        compact: widget.compact,
+        dense: widget.dense,
+        onTap: () {
+          widget.onCountersTap();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      _PlayerInlineAction(
+        actionKey: Key(
+          'life-counter-player-toggle-dead-${widget.panelIndex}',
+        ),
+        icon:
+            hasPanelTakeoverState
+                ? Icons.favorite_rounded
+                : Icons.dangerous_rounded,
+        label: hasPanelTakeoverState ? 'REVIVE' : 'KO\'D!',
+        compact: widget.compact,
+        dense: widget.dense,
+        destructive: !hasPanelTakeoverState,
+        onTap: () {
+          widget.onToggleDefeated();
+          setState(() {
+            _showLifeActions = false;
+          });
+        },
+      ),
+      if (!hasPanelTakeoverState)
+        _PlayerInlineAction(
+          actionKey: Key(
+            'life-counter-player-mark-decked-${widget.panelIndex}',
+          ),
+          icon: Icons.auto_stories_rounded,
+          label: 'DECKED',
+          compact: widget.compact,
+          dense: widget.dense,
+          destructive: true,
+          onTap: () {
+            widget.onMarkDeckedOut();
+            setState(() {
+              _showLifeActions = false;
+            });
+          },
+        ),
+      if (!hasPanelTakeoverState)
+        _PlayerInlineAction(
+          actionKey: Key(
+            'life-counter-player-mark-left-${widget.panelIndex}',
+          ),
+          icon: Icons.exit_to_app_rounded,
+          label: 'LEFT',
+          compact: widget.compact,
+          dense: widget.dense,
+          destructive: true,
+          onTap: () {
+            widget.onMarkAnswerLeft();
+            setState(() {
+              _showLifeActions = false;
+            });
+          },
+        ),
+    ];
+    final quickActionsRowChildren = <Widget>[];
+    for (int i = 0; i < quickActions.length; i++) {
+      if (i > 0) {
+        quickActionsRowChildren.add(const SizedBox(width: 8));
+      }
+      quickActionsRowChildren.add(quickActions[i]);
+    }
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
@@ -2637,6 +3021,8 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                         : 'life-counter-player-roll-event-${widget.panelIndex}',
                   ),
                   compact: widget.compact,
+                  dense: widget.dense,
+                  contentAlignment: _eventTakeoverAlignment,
                   color: baseColor,
                   accent: highRollAccent,
                   value: eventValue!,
@@ -2648,7 +3034,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             ),
           if (!_showLifeActions && !hasPanelTakeoverState)
             Positioned(
-              top: widget.compact ? 18 : 20,
+              top: _isDenseCompact ? 12 : widget.compact ? 18 : 20,
               left: 0,
               right: 0,
               child: Align(
@@ -2659,13 +3045,14 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   semanticLabel: '+5',
                   color: supportingColor,
                   compact: widget.compact,
+                  dense: widget.dense,
                   onTap: widget.onQuickIncrement,
                 ),
               ),
             ),
           if (!_showLifeActions && !hasPanelTakeoverState)
             Positioned(
-              bottom: 8,
+              bottom: _isDenseCompact ? 4 : 8,
               left: 0,
               right: 0,
               child: Align(
@@ -2676,6 +3063,7 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                   semanticLabel: '-5',
                   color: supportingColor,
                   compact: widget.compact,
+                  dense: widget.dense,
                   onTap: widget.onQuickDecrement,
                 ),
               ),
@@ -2699,14 +3087,13 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             ),
           ),
           Align(
-            alignment: Alignment.center,
+            alignment:
+                _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   InkWell(
                     key: Key('life-counter-life-core-${widget.panelIndex}'),
                     borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -2716,236 +3103,130 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                         _showLifeActions = !_showLifeActions;
                       });
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 6,
-                      ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 360),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          final fade = CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeOut,
-                          );
-                          final scale = Tween<double>(
-                            begin: 0.82,
-                            end: 1,
-                          ).animate(
-                            CurvedAnimation(
+                    child: SizedBox(
+                      width: _coreStageWidth,
+                      height: _coreStageHeight,
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 360),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder: (child, animation) {
+                            final fade = CurvedAnimation(
                               parent: animation,
-                              curve: Curves.easeOutBack,
-                            ),
-                          );
-                          final slide = Tween<Offset>(
-                            begin: const Offset(0, 0.06),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          );
-                          return FadeTransition(
-                            opacity: fade,
-                            child: SlideTransition(
-                              position: slide,
-                              child: ScaleTransition(
-                                scale: scale,
-                                child: child,
+                              curve: Curves.easeOut,
+                            );
+                            final scale = Tween<double>(
+                              begin: 0.82,
+                              end: 1,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutBack,
                               ),
-                            ),
-                          );
-                        },
-                        child: _buildLifeCoreContent(
-                          isDefeated: isDefeated,
-                          isDeckedOut: isDeckedOut,
-                          hasAnswerLeft: hasAnswerLeft,
-                          isCommanderLethal: isCommanderLethal,
-                          isPoisonLethal: isPoisonLethal,
-                          hasHighRoll: hasHighRoll,
-                          dominantValueColor: dominantValueColor,
-                          supportingColor: supportingColor,
-                          eventLabel: eventLabel,
-                          eventValue: eventValue,
+                            );
+                            final slide = Tween<Offset>(
+                              begin: const Offset(0, 0.05),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutCubic,
+                              ),
+                            );
+                            return FadeTransition(
+                              opacity: fade,
+                              child: SlideTransition(
+                                position: slide,
+                                child: ScaleTransition(
+                                  scale: scale,
+                                  child: child,
+                                ),
+                              ),
+                            );
+                          },
+                          child: _buildLifeCoreContent(
+                            isDefeated: isDefeated,
+                            isDeckedOut: isDeckedOut,
+                            hasAnswerLeft: hasAnswerLeft,
+                            isCommanderLethal: isCommanderLethal,
+                            isPoisonLethal: isPoisonLethal,
+                            hasHighRoll: hasHighRoll,
+                            dominantValueColor: dominantValueColor,
+                            supportingColor: supportingColor,
+                            eventLabel: eventLabel,
+                            eventValue: eventValue,
+                          ),
                         ),
                       ),
                     ),
                   ),
                   if (_showLifeActions)
-                    SizedBox(
-                      height: widget.compact ? 42 : 48,
-                      child: SingleChildScrollView(
-                        key: Key(
-                          'life-counter-player-quick-actions-${widget.panelIndex}',
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-roll-d20-${widget.panelIndex}',
-                              ),
-                              icon: Icons.casino_outlined,
-                              label: 'D20',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onPlayerRollD20();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
+                    _isDenseCompact
+                        ? SizedBox(
+                          height: 78,
+                          child: SingleChildScrollView(
+                            key: Key(
+                              'life-counter-player-quick-actions-${widget.panelIndex}',
                             ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-poison-plus-${widget.panelIndex}',
-                              ),
-                              icon: Icons.coronavirus_outlined,
-                              label: 'TOX +',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onPoisonIncrement();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-poison-minus-${widget.panelIndex}',
-                              ),
-                              icon: Icons.remove_circle_outline_rounded,
-                              label: 'TOX -',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onPoisonDecrement();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-tax-plus-${widget.panelIndex}',
-                              ),
-                              icon: Icons.add_circle_outline_rounded,
-                              label: 'TAX +',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onCommanderTaxIncrement();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-tax-minus-${widget.panelIndex}',
-                              ),
-                              icon: Icons.remove_circle_outline_rounded,
-                              label: 'TAX -',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onCommanderTaxDecrement();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-commander-damage-${widget.panelIndex}',
-                              ),
-                              icon: Icons.shield_outlined,
-                              label: 'MARKS',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onOpenCommanderDamageQuick();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: widget.countersKey,
-                              icon: Icons.dashboard_customize_outlined,
-                              label: 'TRACK',
-                              compact: widget.compact,
-                              onTap: () {
-                                widget.onCountersTap();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayerInlineAction(
-                              actionKey: Key(
-                                'life-counter-player-toggle-dead-${widget.panelIndex}',
-                              ),
-                              icon:
-                                  hasPanelTakeoverState
-                                      ? Icons.favorite_rounded
-                                      : Icons.dangerous_rounded,
-                              label: hasPanelTakeoverState ? 'Reviver' : 'KO\'D!',
-                              compact: widget.compact,
-                              destructive: !hasPanelTakeoverState,
-                              onTap: () {
-                                widget.onToggleDefeated();
-                                setState(() {
-                                  _showLifeActions = false;
-                                });
-                              },
-                            ),
-                            if (!hasPanelTakeoverState) ...[
-                              const SizedBox(width: 8),
-                              _PlayerInlineAction(
-                                actionKey: Key(
-                                  'life-counter-player-mark-decked-${widget.panelIndex}',
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _PlayerCounterConsoleStrip(
+                                  poison: widget.poison,
+                                  commanderTax: widget.commanderTax,
+                                  commanderDamageTotal:
+                                      widget.commanderDamageTotal,
+                                  compact: widget.compact,
+                                  dense: widget.dense,
                                 ),
-                                icon: Icons.auto_stories_rounded,
-                                label: 'Decked',
-                                compact: widget.compact,
-                                destructive: true,
-                                onTap: () {
-                                  widget.onMarkDeckedOut();
-                                  setState(() {
-                                    _showLifeActions = false;
-                                  });
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              _PlayerInlineAction(
-                                actionKey: Key(
-                                  'life-counter-player-mark-left-${widget.panelIndex}',
+                                const SizedBox(height: 6),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: _coreStageWidth + 72,
+                                  ),
+                                  child: Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: quickActions,
+                                  ),
                                 ),
-                                icon: Icons.exit_to_app_rounded,
-                                label: 'Left',
+                              ],
+                            ),
+                          ),
+                        )
+                        : Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _PlayerCounterConsoleStrip(
+                                poison: widget.poison,
+                                commanderTax: widget.commanderTax,
+                                commanderDamageTotal:
+                                    widget.commanderDamageTotal,
                                 compact: widget.compact,
-                                destructive: true,
-                                onTap: () {
-                                  widget.onMarkAnswerLeft();
-                                  setState(() {
-                                    _showLifeActions = false;
-                                  });
-                                },
+                                dense: widget.dense,
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                height: widget.compact ? 42 : 48,
+                                child: SingleChildScrollView(
+                                  key: Key(
+                                    'life-counter-player-quick-actions-${widget.panelIndex}',
+                                  ),
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: quickActionsRowChildren,
+                                  ),
+                                ),
                               ),
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
@@ -2965,6 +3246,8 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                         : 'life-counter-player-poison-lethal-${widget.panelIndex}',
                   ),
                   compact: widget.compact,
+                  dense: widget.dense,
+                  contentAlignment: _specialTakeoverAlignment,
                   color:
                       isDeckedOut
                           ? const Color(0xFF2F2407)
@@ -3031,8 +3314,8 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         key: ValueKey(
           'life-core-special-${widget.panelIndex}-$isDefeated-$isDeckedOut-$hasAnswerLeft-$isCommanderLethal-$isPoisonLethal',
         ),
-        width: widget.compact ? 90 : 110,
-        height: widget.compact ? 90 : 110,
+        width: _coreStageWidth,
+        height: _coreStageHeight,
       );
     }
 
@@ -3041,41 +3324,54 @@ class _PlayerPanelState extends State<_PlayerPanel> {
         key: ValueKey(
           'life-core-event-${widget.panelIndex}-$eventLabel-$eventValue',
         ),
-        width: widget.compact ? 90 : 110,
-        height: widget.compact ? 90 : 110,
+        width: _coreStageWidth,
+        height: _coreStageHeight,
       );
     }
 
     if (_showLifeActions) {
-      return Text(
+      return SizedBox(
         key: ValueKey('life-core-actions-${widget.panelIndex}'),
-        'SET LIFE',
-        style: TextStyle(
-          color: supportingColor,
-          fontSize: widget.compact ? AppTheme.fontSm : AppTheme.fontMd,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.4,
+        width: _coreStageWidth,
+        height: _coreStageHeight,
+        child: Center(
+          child: Text(
+            'SET LIFE',
+            style: TextStyle(
+              color: supportingColor,
+              fontSize:
+                  _isDenseCompact
+                      ? AppTheme.fontXs
+                      : widget.compact
+                      ? AppTheme.fontSm
+                      : AppTheme.fontMd,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.4,
+            ),
+          ),
         ),
       );
     }
 
-    return Column(
+    return SizedBox(
       key: ValueKey(
         'life-core-${widget.panelIndex}-$eventLabel-$eventValue-${widget.life}-${widget.isHighRollWinner}-${widget.isHighRollTie}',
       ),
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
+      width: _coreStageWidth,
+      height: _coreStageHeight,
+      child: Center(
+        child: Text(
           '${widget.life}',
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: dominantValueColor,
-            fontSize: widget.compact ? 96 : 144,
+            fontSize: _isDenseCompact ? 96 : widget.compact ? 112 : 164,
             fontWeight: FontWeight.w900,
-            height: 0.92,
-            letterSpacing: -5,
+            height: 0.88,
+            letterSpacing: _isDenseCompact ? -4.6 : widget.compact ? -5.4 : -6.8,
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -3085,6 +3381,7 @@ class _PlayerInlineAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool compact;
+  final bool dense;
   final bool destructive;
   final VoidCallback onTap;
 
@@ -3093,6 +3390,7 @@ class _PlayerInlineAction extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.compact,
+    this.dense = false,
     this.destructive = false,
     required this.onTap,
   });
@@ -3100,6 +3398,7 @@ class _PlayerInlineAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = destructive ? AppTheme.error : AppTheme.textPrimary;
+    final isDenseCompact = compact && dense;
 
     return Material(
       key: actionKey,
@@ -3109,8 +3408,8 @@ class _PlayerInlineAction extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           padding: EdgeInsets.symmetric(
-            horizontal: compact ? 10 : 12,
-            vertical: compact ? 8 : 9,
+            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
+            vertical: isDenseCompact ? 6 : compact ? 8 : 9,
           ),
           decoration: BoxDecoration(
             color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
@@ -3123,18 +3422,165 @@ class _PlayerInlineAction extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: compact ? 14 : 16, color: accent),
+              Icon(icon, size: isDenseCompact ? 12 : compact ? 14 : 16, color: accent),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   color: accent,
-                  fontSize: compact ? AppTheme.fontXs : AppTheme.fontSm,
+                  fontSize:
+                      isDenseCompact
+                          ? AppTheme.fontXs - 1
+                          : compact
+                          ? AppTheme.fontXs
+                          : AppTheme.fontSm,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayerCounterConsoleStrip extends StatelessWidget {
+  final int poison;
+  final int commanderTax;
+  final int commanderDamageTotal;
+  final bool compact;
+  final bool dense;
+
+  const _PlayerCounterConsoleStrip({
+    required this.poison,
+    required this.commanderTax,
+    required this.commanderDamageTotal,
+    required this.compact,
+    this.dense = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDenseCompact = compact && dense;
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: isDenseCompact ? 6 : 8,
+      runSpacing: 6,
+      children: [
+        _PlayerCounterConsoleStat(
+          label: 'TOX',
+          value: '$poison',
+          compact: compact,
+          dense: dense,
+          accent: const Color(0xFF6BFF8D),
+          isActive: poison > 0,
+        ),
+        _PlayerCounterConsoleStat(
+          label: 'TAX',
+          value: '+$commanderTax',
+          compact: compact,
+          dense: dense,
+          accent: AppTheme.primarySoft,
+          isActive: commanderTax > 0,
+        ),
+        _PlayerCounterConsoleStat(
+          label: 'MARKS',
+          value: '$commanderDamageTotal',
+          compact: compact,
+          dense: dense,
+          accent:
+              commanderDamageTotal >= 21
+                  ? AppTheme.error
+                  : const Color(0xFFFFB3A8),
+          isActive: commanderDamageTotal > 0,
+        ),
+      ],
+    );
+  }
+}
+
+class _PlayerCounterConsoleStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool compact;
+  final bool dense;
+  final Color accent;
+  final bool isActive;
+
+  const _PlayerCounterConsoleStat({
+    required this.label,
+    required this.value,
+    required this.compact,
+    this.dense = false,
+    required this.accent,
+    required this.isActive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDenseCompact = compact && dense;
+    final baseColor =
+        isActive
+            ? accent.withValues(alpha: 0.18)
+            : Colors.black.withValues(alpha: 0.34);
+    final borderColor =
+        isActive
+            ? accent.withValues(alpha: 0.42)
+            : Colors.white.withValues(alpha: 0.12);
+    final labelColor =
+        isActive
+            ? accent.withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.5);
+    final valueColor =
+        isActive
+            ? Colors.white.withValues(alpha: 0.96)
+            : Colors.white.withValues(alpha: 0.7);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: baseColor,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: borderColor, width: 0.9),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
+          vertical: isDenseCompact ? 4 : compact ? 5 : 6,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: labelColor,
+                fontSize:
+                    isDenseCompact
+                        ? AppTheme.fontXs - 2
+                        : compact
+                        ? AppTheme.fontXs - 1
+                        : AppTheme.fontXs,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              value,
+              style: TextStyle(
+                color: valueColor,
+                fontSize:
+                    isDenseCompact
+                        ? AppTheme.fontXs
+                        : compact
+                        ? AppTheme.fontSm
+                        : AppTheme.fontMd,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -3147,6 +3593,7 @@ class _LifeQuickAdjustButton extends StatelessWidget {
   final String? semanticLabel;
   final Color color;
   final bool compact;
+  final bool dense;
   final VoidCallback onTap;
 
   const _LifeQuickAdjustButton({
@@ -3155,14 +3602,16 @@ class _LifeQuickAdjustButton extends StatelessWidget {
     this.semanticLabel,
     required this.color,
     required this.compact,
+    this.dense = false,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDenseCompact = compact && dense;
     return SizedBox(
-      width: compact ? 54 : 60,
-      height: compact ? 38 : 42,
+      width: isDenseCompact ? 44 : compact ? 54 : 60,
+      height: isDenseCompact ? 30 : compact ? 38 : 42,
       child: Semantics(
         label: semanticLabel ?? label,
         button: true,
@@ -3182,7 +3631,7 @@ class _LifeQuickAdjustButton extends StatelessWidget {
                   label,
                   style: TextStyle(
                     color: color,
-                    fontSize: compact ? 26 : 30,
+                    fontSize: isDenseCompact ? 22 : compact ? 26 : 30,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -3198,6 +3647,8 @@ class _LifeQuickAdjustButton extends StatelessWidget {
 class _PanelTakeoverOverlay extends StatelessWidget {
   final Key overlayKey;
   final bool compact;
+  final bool dense;
+  final Alignment contentAlignment;
   final Color color;
   final Color accent;
   final String title;
@@ -3205,6 +3656,8 @@ class _PanelTakeoverOverlay extends StatelessWidget {
   const _PanelTakeoverOverlay({
     required this.overlayKey,
     required this.compact,
+    required this.dense,
+    required this.contentAlignment,
     required this.color,
     required this.accent,
     required this.title,
@@ -3212,6 +3665,7 @@ class _PanelTakeoverOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDenseCompact = compact && dense;
     return TweenAnimationBuilder<double>(
       key: overlayKey,
       tween: Tween<double>(begin: 0, end: 1),
@@ -3238,12 +3692,13 @@ class _PanelTakeoverOverlay extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: accent.withValues(alpha: 0.22 * value),
-                  blurRadius: compact ? 22 : 32,
-                  spreadRadius: compact ? 1 : 2,
+                  blurRadius: isDenseCompact ? 16 : compact ? 22 : 32,
+                  spreadRadius: isDenseCompact ? 0.6 : compact ? 1 : 2,
                 ),
               ],
             ),
-            child: Center(
+            child: Align(
+              alignment: contentAlignment,
               child: Transform.scale(
                 scale: 0.92 + (0.08 * value),
                 child: Padding(
@@ -3256,7 +3711,7 @@ class _PanelTakeoverOverlay extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.98),
-                          fontSize: compact ? 34 : 44,
+                          fontSize: isDenseCompact ? 26 : compact ? 34 : 44,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.8,
                           height: 0.95,
@@ -3277,6 +3732,8 @@ class _PanelTakeoverOverlay extends StatelessWidget {
 class _PanelEventTakeoverOverlay extends StatelessWidget {
   final Key overlayKey;
   final bool compact;
+  final bool dense;
+  final Alignment contentAlignment;
   final Color color;
   final Color accent;
   final String value;
@@ -3287,6 +3744,8 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
   const _PanelEventTakeoverOverlay({
     required this.overlayKey,
     required this.compact,
+    required this.dense,
+    required this.contentAlignment,
     required this.color,
     required this.accent,
     required this.value,
@@ -3297,6 +3756,7 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDenseCompact = compact && dense;
     final valueColor = Colors.black.withValues(alpha: 0.96);
     final eventLabel = kind == 'd20' ? 'D20' : 'HIGH ROLL';
     final resultLabel =
@@ -3371,8 +3831,30 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                             ? 0.2 * progress
                             : 0.12 * progress,
                   ),
-                  blurRadius: isWinner ? 34 : isTie ? 26 : 18,
-                  spreadRadius: isWinner ? 3 : isTie ? 1 : 0,
+                  blurRadius:
+                      isDenseCompact
+                          ? isWinner
+                              ? 24
+                              : isTie
+                              ? 18
+                              : 12
+                          : isWinner
+                          ? 34
+                          : isTie
+                          ? 26
+                          : 18,
+                  spreadRadius:
+                      isDenseCompact
+                          ? isWinner
+                              ? 1.5
+                              : isTie
+                              ? 0.6
+                              : 0
+                          : isWinner
+                          ? 3
+                          : isTie
+                          ? 1
+                          : 0,
                 ),
               ],
             ),
@@ -3383,7 +3865,7 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                 if (isTie)
                   ..._buildTieMarkers(progress),
                 Positioned(
-                  top: compact ? 12 : 16,
+                  top: isDenseCompact ? 8 : compact ? 12 : 16,
                   left: 0,
                   right: 0,
                   child: Transform.translate(
@@ -3393,8 +3875,8 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                       child: Center(
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: compact ? 10 : 12,
-                            vertical: compact ? 5 : 6,
+                            horizontal: isDenseCompact ? 8 : compact ? 10 : 12,
+                            vertical: isDenseCompact ? 4 : compact ? 5 : 6,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(
@@ -3415,7 +3897,11 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                       ? valueColor.withValues(alpha: 0.8)
                                       : Colors.white.withValues(alpha: 0.94),
                               fontSize:
-                                  compact ? AppTheme.fontXs : AppTheme.fontSm,
+                                  isDenseCompact
+                                      ? AppTheme.fontXs - 1
+                                      : compact
+                                      ? AppTheme.fontXs
+                                      : AppTheme.fontSm,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.4,
                             ),
@@ -3425,13 +3911,14 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                     ),
                   ),
                 ),
-                Center(
+                Align(
+                  alignment: contentAlignment,
                   child: Transform.scale(
                     scale: 0.88 + (0.12 * progress),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: compact ? 10 : 14,
-                        vertical: compact ? 18 : 24,
+                        horizontal: isDenseCompact ? 8 : compact ? 10 : 14,
+                        vertical: isDenseCompact ? 12 : compact ? 18 : 24,
                       ),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
@@ -3451,8 +3938,8 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                               ? 0.18 * progress
                                               : 0.06 * progress,
                                     ),
-                                    blurRadius: compact ? 34 : 46,
-                                    spreadRadius: compact ? 2 : 3,
+                                    blurRadius: isDenseCompact ? 22 : compact ? 34 : 46,
+                                    spreadRadius: isDenseCompact ? 1 : compact ? 2 : 3,
                                   ),
                                 ],
                               ),
@@ -3466,25 +3953,29 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: valueColor,
-                                    fontSize: compact ? 156 : 228,
+                                    fontSize: isDenseCompact ? 120 : compact ? 156 : 228,
                                     fontWeight: FontWeight.w900,
                                     height: 0.78,
-                                    letterSpacing: -9,
+                                    letterSpacing: isDenseCompact ? -6.5 : -9,
                                   ),
                                 ),
                               ),
                             ),
                             if (resultLabel != null)
                               Padding(
-                                padding: EdgeInsets.only(top: compact ? 2 : 6),
+                                padding: EdgeInsets.only(
+                                  top: isDenseCompact ? 0 : compact ? 2 : 6,
+                                ),
                                 child: Transform.translate(
                                   offset: Offset(0, 8 * (1 - progress)),
                                   child: Opacity(
                                     opacity: Curves.easeOut.transform(progress),
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: compact ? 10 : 14,
-                                        vertical: compact ? 5 : 6,
+                                        horizontal:
+                                            isDenseCompact ? 8 : compact ? 10 : 14,
+                                        vertical:
+                                            isDenseCompact ? 4 : compact ? 5 : 6,
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withValues(
@@ -3506,7 +3997,9 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                             alpha: 0.96,
                                           ),
                                           fontSize:
-                                              compact
+                                              isDenseCompact
+                                                  ? AppTheme.fontXs - 1
+                                                  : compact
                                                   ? AppTheme.fontXs
                                                   : AppTheme.fontSm,
                                           fontWeight: FontWeight.w900,
@@ -3780,7 +4273,7 @@ class _TableToolsSheetState extends State<_TableToolsSheet> {
     return _TableOverlayFrame(
       frameKey: const Key('life-counter-tools-overlay'),
       title: 'TABLE TOOLS',
-      subtitle: 'Mesa-first controls layered over the battlefield.',
+      subtitle: 'LIVE STATE AND STARTER TOOLS.',
       width: 348,
       maxHeight: 620,
       child: Column(
@@ -3850,129 +4343,96 @@ class _TableToolsSheetState extends State<_TableToolsSheet> {
           const SizedBox(height: 18),
           const _OverlaySectionHeading('QUICK TOOLS'),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-tool-coin'),
-                icon: Icons.flip_camera_android_rounded,
-                label: 'COIN',
-                onTap: _runCoinFlip,
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-tool-d20'),
-                icon: Icons.casino_outlined,
-                label: 'D20',
-                onTap: _runD20,
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-tool-first-player'),
-                icon: Icons.person_search_rounded,
-                label: 'ROLL 1ST',
-                onTap: _runFirstPlayerRoll,
-              ),
-              _ToolActionButton(
-                buttonKey: const Key('life-counter-tool-rolloff'),
-                icon: Icons.casino_rounded,
-                label: _rollOffWinners.length > 1 ? 'TIEBREAK' : 'HIGH ROLL',
-                onTap: _runRollOff,
-              ),
-            ],
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-tool-rolloff'),
+            label: _rollOffWinners.length > 1 ? 'TIEBREAK' : 'HIGH ROLL',
+            detail:
+                _rollOffWinners.length > 1
+                    ? 'REROLL TIED PLAYERS'
+                    : 'ROLL EVERY PLAYER',
+            accent: const Color(0xFF40B9FF),
+            emphasized: true,
+            onTap: _runRollOff,
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-tool-d20'),
+            label: 'D20',
+            detail: 'TABLE DIE',
+            onTap: _runD20,
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-tool-coin'),
+            label: 'COIN',
+            detail: 'HEADS OR TAILS',
+            onTap: _runCoinFlip,
+          ),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-tool-first-player'),
+            label: 'ROLL 1ST',
+            detail: 'SET STARTING PLAYER',
+            onTap: _runFirstPlayerRoll,
           ),
           if (_rollOffResults != null) ...[
             const SizedBox(height: 18),
-            Container(
+            Column(
               key: const Key('life-counter-rolloff-results'),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 1,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _OverlaySectionHeading('HIGH ROLL'),
+                const SizedBox(height: 6),
+                Text(
+                  _rollOffWinners.length == 1
+                      ? 'WINNER HIGHLIGHTED BELOW.'
+                      : 'TIE DETECTED. REROLL TIED PLAYERS.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'HIGH ROLL',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _rollOffWinners.length == 1
-                        ? 'Winning result is highlighted below.'
-                        : 'Tie detected. Reroll only tied players.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (int i = 0; i < widget.playerCount; i++)
-                        _RollOffPlayerResult(
-                          resultKey: Key('life-counter-rolloff-player-$i'),
-                          label: widget.playerLabels[i],
-                          value: _rollOffResults![i]!,
-                          isWinner: _rollOffWinners.contains(i),
-                        ),
-                    ],
-                  ),
-                  if (_rollOffWinners.length > 1) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        key: const Key('life-counter-rolloff-reroll-ties'),
-                        onPressed: _rerollTiedPlayers,
-                        icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('REROLL TIES'),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (int i = 0; i < widget.playerCount; i++)
+                      _RollOffPlayerResult(
+                        resultKey: Key('life-counter-rolloff-player-$i'),
+                        label: widget.playerLabels[i],
+                        value: _rollOffResults![i]!,
+                        isWinner: _rollOffWinners.contains(i),
                       ),
-                    ),
                   ],
+                ),
+                if (_rollOffWinners.length > 1) ...[
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      key: const Key('life-counter-rolloff-reroll-ties'),
+                      onPressed: _rerollTiedPlayers,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('REROLL TIES'),
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
           ],
           if (_lastTableEvent != null) ...[
             const SizedBox(height: 18),
-            Container(
+            const _OverlaySectionHeading('LAST EVENT'),
+            const SizedBox(height: 8),
+            Text(
               key: const Key('life-counter-table-event'),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline_rounded,
-                    color: AppTheme.textSecondary,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      _lastTableEvent!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
+              _lastTableEvent!,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
               ),
             ),
           ],
@@ -4009,10 +4469,29 @@ class _DiceOverlay extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const _OverlaySectionHeading('PRIMARY'),
+          const SizedBox(height: 10),
+          _DiceActionRow(
+            buttonKey: const Key('life-counter-dice-roll-high-roll'),
+            label: hasPendingHighRollTie ? 'TIEBREAK' : 'HIGH ROLL',
+            detail:
+                hasPendingHighRollTie
+                    ? 'REROLL ONLY TIED PLAYERS'
+                    : 'ROLL ALL PLAYERS',
+            accent: const Color(0xFF40B9FF),
+            emphasized: true,
+            onTap: () {
+              onHighRoll();
+              Navigator.of(context).pop();
+            },
+          ),
+          const SizedBox(height: 18),
+          const _OverlaySectionHeading('QUICK ROLLS'),
+          const SizedBox(height: 10),
           _DiceActionRow(
             buttonKey: const Key('life-counter-dice-roll-d20'),
-            icon: Icons.casino_outlined,
             label: 'D20',
+            detail: 'TABLE DIE',
             onTap: () {
               onRollD20();
               Navigator.of(context).pop();
@@ -4021,8 +4500,8 @@ class _DiceOverlay extends StatelessWidget {
           const SizedBox(height: 10),
           _DiceActionRow(
             buttonKey: const Key('life-counter-dice-roll-coin'),
-            icon: Icons.flip_camera_android_rounded,
             label: 'COIN',
+            detail: 'HEADS OR TAILS',
             onTap: () {
               onRollCoin();
               Navigator.of(context).pop();
@@ -4031,34 +4510,26 @@ class _DiceOverlay extends StatelessWidget {
           const SizedBox(height: 10),
           _DiceActionRow(
             buttonKey: const Key('life-counter-dice-roll-first-player'),
-            icon: Icons.person_search_rounded,
             label: 'ROLL 1ST',
+            detail: 'CHOOSE STARTING PLAYER',
             onTap: () {
               onRollFirstPlayer();
               Navigator.of(context).pop();
             },
           ),
-          const SizedBox(height: 10),
-          _DiceActionRow(
-            buttonKey: const Key('life-counter-dice-roll-high-roll'),
-            icon: Icons.casino_rounded,
-            label: hasPendingHighRollTie ? 'TIEBREAK' : 'HIGH ROLL',
-            accent: const Color(0xFF40B9FF),
-            onTap: () {
-              onHighRoll();
-              Navigator.of(context).pop();
-            },
-          ),
           if (lastTableEvent != null) ...[
             const SizedBox(height: 18),
+            const _OverlaySectionHeading('LAST EVENT'),
+            const SizedBox(height: 10),
             Text(
               key: const Key('life-counter-dice-last-event'),
               lastTableEvent!,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.66),
-                fontSize: AppTheme.fontSm,
-                fontWeight: FontWeight.w700,
-                height: 1.3,
+                color: Colors.white.withValues(alpha: 0.86),
+                fontSize: AppTheme.fontMd,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
+                letterSpacing: 0.1,
               ),
             ),
           ],
@@ -4070,16 +4541,18 @@ class _DiceOverlay extends StatelessWidget {
 
 class _DiceActionRow extends StatelessWidget {
   final Key buttonKey;
-  final IconData icon;
   final String label;
+  final String detail;
   final Color? accent;
+  final bool emphasized;
   final VoidCallback onTap;
 
   const _DiceActionRow({
     required this.buttonKey,
-    required this.icon,
     required this.label,
+    required this.detail,
     this.accent,
+    this.emphasized = false,
     required this.onTap,
   });
 
@@ -4090,27 +4563,69 @@ class _DiceActionRow extends StatelessWidget {
       key: buttonKey,
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
         onTap: onTap,
         child: Ink(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: emphasized ? 18 : 16,
+            vertical: emphasized ? 18 : 14,
+          ),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.38),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
+            borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
             border: Border.all(color: borderColor, width: 2),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: borderColor, size: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: emphasized ? 26 : 22,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: emphasized ? 0.8 : 0.5,
+                        height: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      detail,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.68),
+                        fontSize: AppTheme.fontXs,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.7,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(width: 10),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: AppTheme.fontMd,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.4,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: borderColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: borderColor.withValues(alpha: 0.7),
+                    width: 1.2,
+                  ),
+                ),
+                child: Text(
+                  emphasized ? 'RUN' : 'GO',
+                  style: TextStyle(
+                    color: borderColor,
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.8,
+                  ),
                 ),
               ),
             ],
@@ -4852,56 +5367,6 @@ class _PlayerSelectionCard extends StatelessWidget {
   }
 }
 
-class _ToolActionButton extends StatelessWidget {
-  final Key? buttonKey;
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ToolActionButton({
-    this.buttonKey,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      key: buttonKey,
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.44),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: AppTheme.fontMd,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Counters Overlay (poison, commander damage, energy, experience)
 // ---------------------------------------------------------------------------
@@ -5152,8 +5617,8 @@ class _CommanderDamageQuickOverlayState
     return _TableOverlayFrame(
       frameKey: const Key('life-counter-commander-damage-quick-overlay'),
       title: 'COMMANDER DAMAGE',
-      subtitle: 'Dano de comandante rapido para ${widget.playerLabel}.',
-      width: 340,
+      subtitle: 'MARKS BY SOURCE FOR ${widget.playerLabel.toUpperCase()}.',
+      width: 332,
       maxHeight: 560,
       child: Column(
         key: const Key('life-counter-commander-damage-quick-sheet'),
@@ -5170,11 +5635,11 @@ class _CommanderDamageQuickOverlayState
                 vertical: 10,
               ),
               decoration: BoxDecoration(
-                color: AppTheme.error.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                color: AppTheme.error.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: AppTheme.error.withValues(alpha: 0.34),
-                  width: 0.9,
+                  color: AppTheme.error.withValues(alpha: 0.28),
+                  width: 1,
                 ),
               ),
               child: Text(
@@ -5195,20 +5660,11 @@ class _CommanderDamageQuickOverlayState
             }
             final dmg = _cmdDamage[sourceIdx];
             return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _CounterRow(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _CommanderDamageQuickRow(
                 rowKey: Key(
                   'life-counter-quick-commander-damage-row-$sourceIdx',
                 ),
-                icon: Icons.shield_rounded,
-                label: 'De ${widget.playerLabels[sourceIdx]}',
-                sublabel:
-                    dmg >= 21
-                        ? 'â˜  LETAL (â‰¥21)'
-                        : 'Commander damage por fonte',
-                value: dmg,
-                color: widget.playerColors[sourceIdx],
-                isLethal: dmg >= 21,
                 decrementKey: Key(
                   'life-counter-quick-commander-damage-minus-$sourceIdx',
                 ),
@@ -5218,11 +5674,123 @@ class _CommanderDamageQuickOverlayState
                 valueKey: Key(
                   'life-counter-quick-commander-damage-value-$sourceIdx',
                 ),
+                label: widget.playerLabels[sourceIdx],
+                value: dmg,
+                color: widget.playerColors[sourceIdx],
+                isLethal: dmg >= 21,
                 onIncrement: () => _updateCmdDamage(sourceIdx, 1),
                 onDecrement: () => _updateCmdDamage(sourceIdx, -1),
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommanderDamageQuickRow extends StatelessWidget {
+  final Key rowKey;
+  final Key decrementKey;
+  final Key incrementKey;
+  final Key valueKey;
+  final String label;
+  final int value;
+  final Color color;
+  final bool isLethal;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+
+  const _CommanderDamageQuickRow({
+    required this.rowKey,
+    required this.decrementKey,
+    required this.incrementKey,
+    required this.valueKey,
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.isLethal,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = isLethal ? AppTheme.error : color;
+    return Container(
+      key: rowKey,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color:
+            isLethal
+                ? AppTheme.error.withValues(alpha: 0.12)
+                : Colors.black.withValues(alpha: 0.24),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color:
+              isLethal
+                  ? AppTheme.error.withValues(alpha: 0.34)
+                  : Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontSm,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  isLethal ? 'COMMANDER LETHAL' : 'MARKS FROM THIS SOURCE',
+                  style: TextStyle(
+                    color:
+                        isLethal
+                            ? AppTheme.error.withValues(alpha: 0.92)
+                            : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontXs,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _RoundButton(
+            buttonKey: decrementKey,
+            icon: Icons.remove,
+            color: accent,
+            onTap: value > 0 ? onDecrement : null,
+          ),
+          SizedBox(
+            width: 44,
+            child: Center(
+              child: Text(
+                key: valueKey,
+                '$value',
+                style: TextStyle(
+                  color: isLethal ? AppTheme.error : AppTheme.textPrimary,
+                  fontSize: AppTheme.fontXl,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+          _RoundButton(
+            buttonKey: incrementKey,
+            icon: Icons.add,
+            color: accent,
+            onTap: onIncrement,
+          ),
         ],
       ),
     );
@@ -5235,8 +5803,6 @@ class _CommanderDamageQuickOverlayState
 class _CounterRow extends StatelessWidget {
   final Key? rowKey;
   final Key? sublabelKey;
-  final Key? incrementKey;
-  final Key? decrementKey;
   final Key? valueKey;
   final IconData icon;
   final String label;
@@ -5250,8 +5816,6 @@ class _CounterRow extends StatelessWidget {
   const _CounterRow({
     this.rowKey,
     this.sublabelKey,
-    this.incrementKey,
-    this.decrementKey,
     this.valueKey,
     required this.icon,
     required this.label,
@@ -5311,7 +5875,6 @@ class _CounterRow extends StatelessWidget {
           ),
           // Minus button
           _RoundButton(
-            buttonKey: decrementKey,
             icon: Icons.remove,
             color: color,
             onTap: value > 0 ? onDecrement : null,
@@ -5333,7 +5896,6 @@ class _CounterRow extends StatelessWidget {
           ),
           // Plus button
           _RoundButton(
-            buttonKey: incrementKey,
             icon: Icons.add,
             color: color,
             onTap: onIncrement,
@@ -5636,4 +6198,3 @@ class _SettingsToggleRow extends StatelessWidget {
     );
   }
 }
-

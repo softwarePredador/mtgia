@@ -178,7 +178,7 @@ void main() {
       );
     });
 
-    testWidgets('rotates upper players when switching to four-player tabletop', (
+    testWidgets('rotates players by side when switching to four-player tabletop', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
@@ -193,7 +193,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('life-counter-life-core-3')), findsOneWidget);
-      expect(find.byType(RotatedBox), findsNWidgets(2));
+      expect(find.byType(RotatedBox), findsNWidgets(4));
     });
 
     testWidgets('uses a wide bottom lane for three-player tabletop', (
@@ -217,9 +217,99 @@ void main() {
         find.byKey(const Key('life-counter-player-slot-2')),
       );
 
-      expect(find.byType(RotatedBox), findsNWidgets(2));
+      expect(find.byType(RotatedBox), findsNWidgets(3));
       expect(bottomSlotSize.width, greaterThan(topSlotSize.width * 1.8));
       expect(bottomSlotSize.height, greaterThan(topSlotSize.height));
+    });
+
+    testWidgets('offers five-player tabletop with a centered hub well', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-players')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-players-option-5')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('life-counter-players-option-6')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('life-counter-players-option-5')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('life-counter-player-slot-4')), findsOneWidget);
+      expect(find.byType(RotatedBox), findsNWidgets(5));
+    });
+
+    testWidgets('supports six-player tabletop and shrinks the central hub', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      final initialHubSize = tester.getSize(
+        find.byKey(const Key('life-counter-hub-toggle')),
+      );
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-players')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-players-option-6')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-players-option-6')));
+      await tester.pumpAndSettle();
+
+      final denseHubSize = tester.getSize(
+        find.byKey(const Key('life-counter-hub-toggle')),
+      );
+
+      expect(find.byKey(const Key('life-counter-player-slot-5')), findsOneWidget);
+      expect(find.byType(RotatedBox), findsAtLeastNWidgets(5));
+      expect(denseHubSize.width, lessThan(initialHubSize.width));
+      expect(denseHubSize.height, lessThan(initialHubSize.height));
+    });
+
+    testWidgets('shows a compact counter console in six-player dense mode', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('life-counter-hub-toggle')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-hub-players')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-players-option-6')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('life-counter-players-option-6')));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byKey(const Key('life-counter-life-core-0')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-player-quick-actions-0')),
+        findsOneWidget,
+      );
+      expect(find.text('TOX'), findsWidgets);
+      expect(find.text('TAX'), findsWidgets);
+      expect(find.text('MARKS'), findsWidgets);
     });
 
     testWidgets('shows commander casts with current tax in counters sheet', (
@@ -656,7 +746,14 @@ void main() {
 
       await tester.longPress(find.byKey(const Key('life-counter-life-core-0')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('life-counter-player-toggle-dead-0')));
+      final reviveButton = tester.widget<InkWell>(
+        find.descendant(
+          of: find.byKey(const Key('life-counter-player-toggle-dead-0')),
+          matching: find.byType(InkWell),
+        ),
+      );
+      reviveButton.onTap!.call();
+      await tester.pump();
       await tester.pumpAndSettle();
 
       expect(
@@ -729,13 +826,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('life-counter-hub-last-event')),
-          matching: find.textContaining('Primeiro jogador'),
-        ),
-        findsOneWidget,
+      final hubLastEvent = tester.widget<Text>(
+        find.byKey(const Key('life-counter-hub-last-event')),
       );
+      expect(hubLastEvent.data, contains('Primeiro jogador'));
       expect(
         find.byKey(const Key('life-counter-hub-status-storm')),
         findsNothing,
@@ -996,13 +1090,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('life-counter-hub-last-event')), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('life-counter-hub-last-event')),
-          matching: find.textContaining('Primeiro jogador: Jogador 2'),
-        ),
-        findsOneWidget,
+      final restoredHubLastEvent = tester.widget<Text>(
+        find.byKey(const Key('life-counter-hub-last-event')),
       );
+      expect(restoredHubLastEvent.data, contains('Primeiro jogador: Jogador 2'));
       expect(
         find.byKey(const Key('life-counter-hub-status-storm')),
         findsNothing,

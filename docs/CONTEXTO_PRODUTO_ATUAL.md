@@ -34,6 +34,7 @@ Esses documentos continuam como apoio e historico, mas nao devem redefinir a pri
 - `docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md`
 - `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md`
 - `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md`
+- `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md`
 - `README.md`
 - `ROADMAP.md`
 - `CHECKLIST_GO_LIVE_FINAL.md`
@@ -128,6 +129,7 @@ Progresso atual documentado da Sprint 1:
   - `deck details -> optimize -> preview -> apply -> validate`
   - `needs_repair -> rebuild_guided -> abrir draft`
 - a `DeckDetailsScreen` agora tem cobertura real de estados `loading`, `unauthorized`, `retry/error` e `empty`, usando providers de teste e fake API sem depender apenas do smoke feliz
+- a task operacional de refinamento final do clone do `life counter` foi formalizada em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md`, travando a ordem correta de perfeicao: geometria da mesa -> centragem/rotacao optica -> hub central -> overlays -> event takeovers -> encaixe final dos contadores MTG -> motion final
 - o update de descricao, a confirmacao de remocao e a sheet de pricing saíram do `deck_details_screen.dart` para helpers/dialogs dedicados, reduzindo a tela para `1445` linhas com cobertura ampliada em `deck_details_actions_test.dart` e `deck_details_dialogs_test.dart`
 - `deck_provider_support.dart` passou a encapsular tambem `extractApiError`, `normalizeCreateDeckCards`, `generateDeckFromPrompt`, `searchFirstCardByName`, `resolveOptimizationAdditions` e `resolveOptimizationRemovals`
 - `deck_provider_support.dart` passou a encapsular tambem parsing/cache/listagem de decks (`readFreshDeckDetailsFromCache`, `storeDeckDetailsInCache`, `syncDeckColorIdentityToList`, `applyCachedColorIdentitiesToDeckList`, `decksMissingColorIdentity`, `parseDeckDetailsResponse`, `parseDeckListResponse`)
@@ -251,6 +253,16 @@ Progresso atual documentado da Sprint 1:
 - o `SETTINGS` tambem deixou de parecer configuracao genérica: `PLAYERS` saiu para overlay proprio, os presets de vida foram separados em `MULTI-PLAYER` e `TWO-PLAYER`, e entraram as secoes cruas `GAME MODES` / `GAMEPLAY` no mesmo tom da captura de referencia
 - o frame compartilhado dos overlays de mesa tambem foi simplificado nesta rodada: menos caixa central com borda e mais conteudo flutuando sobre a mesa, aproximando `DICE`, `HISTORY`, `CARD SEARCH`, `PLAYERS` e `SETTINGS` do comportamento visual cru do benchmark
 - o `DICE` tambem foi endurecido na mesma direcao: saiu do grid de botoes com cara de utilitario de app e foi para lista vertical crua, com borda branca, `HIGH ROLL` no mesmo peso estrutural e ultimo evento sem card ornamental
+- a rotacao dos paines do `life counter` tambem avancou nesta rodada: a frente saiu da logica antiga `topo 180 / base normal` e passou a girar os paineis por assento em `3p/4p`, aproximando a leitura lateral do benchmark
+- a `TASK_LIFE_COUNTER_PERFEICAO_2026-03-26` ja iniciou execucao no codigo: gutters da mesa foram reduzidos, o layout `3p` passou a privilegiar mais a faixa inferior e o miolo dos numerais ganhou um palco central fixo para aproximar geometria e massa visual do benchmark antes do ajuste optico fino
+- a mesma task ja avancou tambem em centragem optica: o `life counter` agora aplica vieses pequenos por assento e por estado (`normal`, `SET LIFE`, takeover de evento e takeover especial), reduzindo o desalinhamento percebido apos a rotacao lateral dos paineis
+- o hub central do `life counter` tambem avancou na direcao do clone: saiu o frame oculto de tools e entrou uma petala `HELP` real, o centro perdeu parte do brilho premium e a legenda de ultimo evento ficou mais seca, aproximando a anatomia do benchmark
+- `HISTORY` e `CARD SEARCH` tambem avancaram na direcao do clone do `life counter`: o historico virou overlay seco de estado de mesa e a busca perdeu parte do acabamento de app, com input/chips/resultados mais crus e mais alinhados ao benchmark
+- o `DICE` tambem recebeu um recorte mais fiel ao benchmark: `HIGH ROLL` virou a acao primaria dominante do overlay, enquanto `D20`, `COIN` e `ROLL 1ST` foram rebaixados para utilitarios secos, com o ultimo evento exibido como texto cru em vez de card ornamental
+- o `life counter` agora passou a assumir `2p` ate `6p` como contrato de mesa: o overlay `PLAYERS` ganhou as opcoes `5` e `6`, a shell ganhou geometria em anel para os layouts densos, e o hub central passou a reduzir escala/ajustar alinhamento para nao colidir com a massa principal dos paineis
+- a mesma frente ja recebeu o primeiro polimento fino dessa expansao: `5p/6p` nao reutilizam mais apenas o `compact` antigo; o `PlayerPanel` passou a aplicar `dense mode` proprio, reduzindo palco do numero, takeover e atalhos locais para manter leitura e brutalidade de mesa na nova densidade
+- o encaixe MTG dentro dessa densidade tambem avancou: ao abrir os atalhos do `life core` em `5p/6p`, o jogador agora ve primeiro um console curto `TOX / TAX / MARKS`, e so depois a malha de acoes, o que puxa `poison`, `commander tax` e `commander damage` para uma leitura mais nativa da shell clone
+- os overlays secundarios do `life counter` tambem comecaram a perder cheiro de app: `TABLE TOOLS` foi endurecido para uma lista mais seca de mesa e o `COMMANDER DAMAGE` rapido passou a usar linhas por fonte mais cruas, reduzindo a sensacao de `counter row` generica dentro do clone
 - a malha focada da frente foi revalidada apos esse primeiro recorte de shell:
   - `flutter analyze lib/features/home/life_counter_screen.dart test/features/home/life_counter_screen_test.dart`
   - `flutter test test/features/home/life_counter_screen_test.dart`

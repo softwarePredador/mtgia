@@ -3,6 +3,7 @@
 > Documento operacional criado em `2026-03-25`.
 > Status: `ACTIVE`.
 > Esta sprint substitui a direcao visual e interacional definida em `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md` para a frente `life counter`.
+> Task complementar ativa: `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md`.
 
 ## Objetivo
 
@@ -218,6 +219,62 @@ O benchmark evita a sensacao de "sair da partida".
 Hoje isso nao esta resolvido como rail persistente na mesa.
 
 6. os estados especiais ainda nao sao um sistema
+
+## Avanco documentado em 2026-03-26
+
+Primeiro corte formal da `TASK_LIFE_COUNTER_PERFEICAO_2026-03-26` executado:
+
+- a mesa ganhou um recorte inicial de geometria mais fiel ao benchmark
+- gutters externos e internos foram reduzidos para ampliar os quadrantes
+- o layout `3p` passou a favorecer mais a faixa larga inferior
+- o miolo numerico do painel ganhou um palco central fixo, reduzindo a dependencia de alinhamento apenas matematico
+- o valor de vida foi ampliado, especialmente em `compact`, aproximando a massa visual dos numerais do benchmark
+
+Leitura desta rodada:
+
+- ainda nao e o ajuste optico final
+- mas a frente saiu do estadio "numero grande solto no centro" e entrou em "stage central dominado"
+- o proximo passo continua sendo centragem optica e revisao fina da massa visual por assento
+- a camada de contadores MTG em `5p/6p` tambem foi puxada para a shell clone: o long press do life core agora abre um console denso com resumo `TOX / TAX / MARKS` antes dos atalhos, evitando que `poison`, `tax` e `commander damage` reaparecam como chip soup na mesa mais cheia
+- `TABLE TOOLS` e o `COMMANDER DAMAGE` rapido tambem avancaram na mesma direcao: menos card ornamental, mais lista seca / placar por fonte, mantendo os mesmos fluxos mas com leitura mais brutal de mesa
+
+Segundo corte formal da `TASK_LIFE_COUNTER_PERFEICAO_2026-03-26` executado:
+
+- o painel do jogador passou a aplicar centragem optica por assento em vez de depender apenas de `Alignment.center`
+- o miolo normal, o modo `SET LIFE`, o takeover de evento e o takeover de estado especial agora usam vieses pequenos e conscientes por `quarterTurns`
+- isso reduz a sensacao de numero "matematicamente centralizado, mas visualmente ligeiramente fora" depois da rotacao lateral
+
+Leitura desta rodada:
+
+- a Fase A saiu do ajuste de proporcao e entrou em alinhamento optico real
+- o proximo passo continua sendo revisar lado a lado se o hub central ainda precisa acompanhar essa nova base
+
+Terceiro corte formal da `TASK_LIFE_COUNTER_PERFEICAO_2026-03-26` executado:
+
+- o hub central deixou de depender do frame escondido de tools e passou a usar uma petala `HELP` real
+- a topologia do centro foi aproximada do benchmark:
+  - `PLAYERS` lateral
+  - `RESTART` diagonal superior
+  - `HIGH ROLL` diagonal superior oposta
+  - `SETTINGS` lateral
+  - `HELP` na base
+- o hexagono central perdeu parte do brilho/gradiente premium
+- o ultimo evento deixou de parecer card elegante e passou a agir mais como legenda seca de mesa
+
+Leitura desta rodada:
+
+- o centro agora esta menos autoral e mais benchmark-first
+- o proximo passo da Fase A deixa de ser o hub como estrutura e passa a ser polimento fino da composicao dele no side-by-side
+
+Quarto corte formal da `TASK_LIFE_COUNTER_PERFEICAO_2026-03-26` executado:
+
+- `HISTORY` deixou de ser texto solto e virou overlay seco de estado de mesa (`LAST EVENT` + `SNAPSHOTS`)
+- `CARD SEARCH` perdeu subtitulo explicativo e ganhou input, chips e resultados mais crus, com bordas brancas mais fortes e menos aparencia de card elegante
+
+Leitura desta rodada:
+
+- os overlays residuais comecaram a entrar na mesma familia do clone
+- o proximo passo natural agora e revisar `DICE` e depois o polimento final dos contadores MTG dentro dessa shell
 - `KO'D!` avancou
 - mas ainda nao existe familia completa no mesmo padrao brutal do benchmark
 
@@ -827,10 +884,18 @@ Esta sprint so pode ser marcada como `DONE` quando:
   - mais conteudo flutuando sobre a mesa
   - `DICE`, `HISTORY`, `CARD SEARCH`, `PLAYERS` e `SETTINGS` agora respiram mais como overlay de jogo do que como modal premium de app
 - o `DICE` tambem convergiu:
-  - lista vertical de acoes
-  - borda branca crua
-  - `HIGH ROLL` como opcao de mesmo peso estrutural
-  - ultimo evento sem card ornamental
+  - overlay agora trabalha com uma hierarquia mais fiel ao benchmark
+  - `HIGH ROLL` subiu para acao primaria dominante
+  - `D20`, `COIN` e `ROLL 1ST` foram rebaixados para utilitarios secos
+  - ultimo evento virou bloco textual cru, sem tratamento de card
+- a geometria de rotacao dos paines tambem avancou:
+  - a logica antiga de `topo 180 / base normal` saiu do caminho para `3p/4p`
+  - o clone agora gira por assento/coluna, mais proximo da leitura lateral do benchmark
+- o escopo de mesa desta sprint tambem foi ampliado e executado:
+  - `PLAYERS` agora oferece `2` ate `6` jogadores
+  - `5p/6p` usam geometria em anel para preservar vazio central
+  - o hub central reduz escala e ajusta posicao nos layouts densos
+  - o `PlayerPanel` tambem ganhou `dense mode` proprio para `5p/6p`, evitando que vida/takeover/atalhos apenas "espremam" o mesmo compacto antigo
 - `KO'D!`, `COMMANDER DOWN.` e `TOXIC OUT.` ja usam takeover real de painel
 - o `High Roll` e o `D20` deixaram de ser badge nesta rodada e passaram a takeover de painel:
   - numero gigante como protagonista
