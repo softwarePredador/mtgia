@@ -90,6 +90,12 @@ flutter:
   assets:
     - assets/symbols/
 
+  fonts:
+    - family: Dosis
+      fonts:
+        - asset: assets/fonts/Dosis.ttf
+          weight: 700
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -136,6 +136,185 @@ void main() {
       expect(find.byKey(const Key('life-counter-dice-overlay')), findsNothing);
     });
 
+    testWidgets('quick life controls stay left and right in two-player tabletop', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      final topMinusCenter = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-0')),
+      );
+      final topPlusCenter = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-0')),
+      );
+      final bottomMinusCenter = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-1')),
+      );
+      final bottomPlusCenter = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-1')),
+      );
+
+      expect((topPlusCenter.dy - topMinusCenter.dy).abs(), lessThan(18));
+      expect(topPlusCenter.dx, greaterThan(topMinusCenter.dx));
+
+      expect((bottomPlusCenter.dy - bottomMinusCenter.dy).abs(), lessThan(18));
+      expect(bottomPlusCenter.dx, greaterThan(bottomMinusCenter.dx));
+    });
+
+    testWidgets('shows +5 and -5 labels on quick life controls', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      expect(find.text('+5'), findsNWidgets(2));
+      expect(find.text('-5'), findsNWidgets(2));
+    });
+
+    testWidgets('uses left side for -1 and right side for +1 on player panels', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      final decrementZone = tester.widget<InkWell>(
+        find.byKey(const Key('life-counter-decrement-zone-1')),
+      );
+      decrementZone.onTap!.call();
+      await tester.pumpAndSettle();
+
+      expect(find.text('19'), findsOneWidget);
+
+      final incrementZone = tester.widget<InkWell>(
+        find.byKey(const Key('life-counter-increment-zone-1')),
+      );
+      incrementZone.onTap!.call();
+      await tester.pumpAndSettle();
+
+      expect(find.text('20'), findsNWidgets(2));
+    });
+
+    testWidgets('shows -1 and +1 indicators in left and right screen space', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'life_counter_session_v1': jsonEncode({
+          'player_count': 4,
+          'starting_life': 40,
+          'starting_life_two_player': 20,
+          'starting_life_multi_player': 40,
+          'lives': [40, 40, 40, 40],
+          'poison': [0, 0, 0, 0],
+          'energy': [0, 0, 0, 0],
+          'experience': [0, 0, 0, 0],
+          'commander_casts': [0, 0, 0, 0],
+          'player_special_states': ['none', 'none', 'none', 'none'],
+          'last_player_rolls': [null, null, null, null],
+          'last_high_rolls': [null, null, null, null],
+          'commander_damage': [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          'storm_count': 0,
+          'monarch_player': null,
+          'initiative_player': null,
+          'first_player_index': null,
+          'last_table_event': null,
+        }),
+      });
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      for (final index in [0, 1, 2, 3]) {
+        final minusCenter = tester.getCenter(
+          find.byKey(Key('life-counter-step-minus-$index')),
+        );
+        final plusCenter = tester.getCenter(
+          find.byKey(Key('life-counter-step-plus-$index')),
+        );
+
+        expect((plusCenter.dy - minusCenter.dy).abs(), lessThan(18));
+        expect(plusCenter.dx, greaterThan(minusCenter.dx));
+      }
+    });
+
+    testWidgets('quick life controls stay left and right in four-player tabletop', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'life_counter_session_v1': jsonEncode({
+          'player_count': 4,
+          'starting_life': 40,
+          'starting_life_two_player': 20,
+          'starting_life_multi_player': 40,
+          'lives': [40, 40, 40, 40],
+          'poison': [0, 0, 0, 0],
+          'energy': [0, 0, 0, 0],
+          'experience': [0, 0, 0, 0],
+          'commander_casts': [0, 0, 0, 0],
+          'player_special_states': ['none', 'none', 'none', 'none'],
+          'last_player_rolls': [null, null, null, null],
+          'last_high_rolls': [null, null, null, null],
+          'commander_damage': [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          'storm_count': 0,
+          'monarch_player': null,
+          'initiative_player': null,
+          'first_player_index': null,
+          'last_table_event': null,
+        }),
+      });
+      await tester.pumpWidget(createSubject());
+      await tester.pumpAndSettle();
+
+      final player0Minus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-0')),
+      );
+      final player0Plus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-0')),
+      );
+      final player1Minus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-1')),
+      );
+      final player1Plus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-1')),
+      );
+      final player2Minus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-2')),
+      );
+      final player2Plus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-2')),
+      );
+      final player3Minus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-minus-3')),
+      );
+      final player3Plus = tester.getCenter(
+        find.byKey(const Key('life-counter-quick-plus-3')),
+      );
+
+      expect((player0Plus.dy - player0Minus.dy).abs(), lessThan(18));
+      expect(player0Plus.dx, greaterThan(player0Minus.dx));
+
+      expect((player1Plus.dy - player1Minus.dy).abs(), lessThan(18));
+      expect(player1Plus.dx, greaterThan(player1Minus.dx));
+
+      expect((player2Plus.dy - player2Minus.dy).abs(), lessThan(18));
+      expect(player2Plus.dx, greaterThan(player2Minus.dx));
+
+      expect((player3Plus.dy - player3Minus.dy).abs(), lessThan(18));
+      expect(player3Plus.dx, greaterThan(player3Minus.dx));
+    });
+
     testWidgets('runs High Roll directly from mesa commander hub', (
       tester,
     ) async {

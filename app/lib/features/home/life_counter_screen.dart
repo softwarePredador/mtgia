@@ -11,6 +11,8 @@ import '../cards/providers/card_provider.dart';
 import '../cards/screens/card_detail_screen.dart';
 import '../decks/models/deck_card_item.dart';
 
+const _tableDisplayFontFamily = 'Dosis';
+
 /// Snapshot of all player state for undo support.
 class _GameSnapshot {
   final List<int> lives;
@@ -73,6 +75,9 @@ class LifeCounterScreen extends StatefulWidget {
 class _LifeCounterScreenState extends State<LifeCounterScreen> {
   static const _sessionPrefsKey = 'life_counter_session_v1';
   static const double _tableGutter = 3;
+  static final RegExp _setLifeEventPattern = RegExp(
+    r'^Jogador \d+ ajustado para \d+ de vida$',
+  );
   final Random _runtimeRandom = Random();
 
   int _playerCount = 2;
@@ -203,8 +208,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     _saveSnapshot();
     setState(() {
       _lives[player] = normalizedLife;
-      _lastTableEvent =
-          '${_playerLabels[player]} ajustado para $normalizedLife de vida';
+      _lastTableEvent = null;
     });
     _persistSession();
   }
@@ -588,7 +592,9 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         payload['first_player_index'],
         playerCount,
       );
-      final lastTableEvent = payload['last_table_event'] as String?;
+      final lastTableEvent = _sanitizeLastTableEvent(
+        payload['last_table_event'] as String?,
+      );
       if (lives == null ||
           poison == null ||
           energy == null ||
@@ -623,9 +629,20 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         _lastTableEvent = lastTableEvent;
         _history.clear();
       });
+      if (payload['last_table_event'] != lastTableEvent) {
+        _persistSession();
+      }
     } catch (_) {
       // Ignora sessÃ£o invÃ¡lida sem travar a tela.
     }
+  }
+
+  String? _sanitizeLastTableEvent(String? event) {
+    if (event == null) return null;
+    if (_setLifeEventPattern.hasMatch(event)) {
+      return null;
+    }
+    return event;
   }
 
   List<int>? _readIntList(dynamic value, int expectedLength) {
@@ -999,11 +1016,32 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: ColoredBox(
-                color: Colors.black,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(2, 2, 2, 4),
-                  child: _buildTablePlayers(),
+              child: IgnorePointer(
+                ignoring: _isHubExpanded,
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(2, 2, 2, 4),
+                    child: _buildTablePlayers(),
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: !_isHubExpanded,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  opacity: _isHubExpanded ? 1 : 0,
+                  child: const AbsorbPointer(
+                    absorbing: true,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0xA6000000),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1344,6 +1382,8 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
         onMarkDeckedOut: () => _markPlayerDeckedOut(playerIndex),
         onMarkAnswerLeft: () => _markPlayerAnswerLeft(playerIndex),
         onCountersTap: () => _showCountersDialog(playerIndex),
+        incrementZoneKey: Key('life-counter-increment-zone-$playerIndex'),
+        decrementZoneKey: Key('life-counter-decrement-zone-$playerIndex'),
         quickPlusKey: Key('life-counter-quick-plus-$playerIndex'),
         quickMinusKey: Key('life-counter-quick-minus-$playerIndex'),
         countersKey: Key('life-counter-counters-$playerIndex'),
@@ -1422,43 +1462,36 @@ class _TableControlHub extends StatelessWidget {
         key: Key('life-counter-hub-players'),
         label: 'PLAYERS',
         color: Color(0xFF44E063),
-        offset: Offset(-76, 2) * scaleFactor,
+        offset: Offset(-84 * scaleFactor, 0),
         rotation: -pi / 2,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-reset'),
         label: 'RESTART',
         color: Color(0xFFFFE277),
-        offset: Offset(-16, -58) * scaleFactor,
-        rotation: -0.72,
+        offset: Offset(0, -84 * scaleFactor),
+        rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-quick-high-roll'),
-        label: '',
+        label: 'HIGH ROLL',
         color: Color(0xFF40B9FF),
-        offset: Offset(34, -56) * scaleFactor,
-        rotation: 0.68,
+        offset: Offset(0, 84 * scaleFactor),
+        rotation: 0,
       ),
       _HubPetalSpec(
         key: Key('life-counter-hub-settings'),
         label: 'SETTINGS',
         color: Color(0xFFB9B4FF),
-        offset: Offset(76, 4) * scaleFactor,
+        offset: Offset(84 * scaleFactor, 0),
         rotation: pi / 2,
       ),
-      _HubPetalSpec(
-        key: Key('life-counter-hub-tools'),
-        label: 'HELP',
-        color: Color(0xFFFF2C77),
-        offset: Offset(0, 70) * scaleFactor,
-        rotation: pi,
-      ),
+    
     ];
 
-    final hubSize = (isExpanded ? 236 : 68) * scaleFactor;
+    final hubSize = (isExpanded ? 256 : 68) * scaleFactor;
     final lastEventMaxWidth = 224 * scaleFactor;
-    final lastEventTopGap = 2 * scaleFactor;
-
+    final lastEventTopGap = 8 * scaleFactor;
     return AnimatedSize(
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
@@ -1489,8 +1522,7 @@ class _TableControlHub extends StatelessWidget {
                   scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
                   spec: petalSpecs[2].copyWith(
-                    label:
-                        hasPendingHighRollTie ? 'DESMP' : 'HIGH ROLL',
+                    label: hasPendingHighRollTie ? 'DESMP' : 'HIGH ROLL',
                   ),
                   onTap: onQuickHighRoll,
                 ),
@@ -1500,10 +1532,9 @@ class _TableControlHub extends StatelessWidget {
                   spec: petalSpecs[3],
                   onTap: onSettings,
                 ),
-                _HubOrbitPetal(
+                _HubToolsFrame(
                   scaleFactor: scaleFactor,
                   isExpanded: isExpanded,
-                  spec: petalSpecs[4],
                   onTap: onTools,
                 ),
                 _HubMedallion(
@@ -1557,6 +1588,56 @@ class _TableControlHub extends StatelessWidget {
   }
 }
 
+class _HubToolsFrame extends StatelessWidget {
+  final double scaleFactor;
+  final bool isExpanded;
+  final VoidCallback onTap;
+
+  const _HubToolsFrame({
+    required this.scaleFactor,
+    required this.isExpanded,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final frameSize = 98 * scaleFactor;
+    final radius = 20 * scaleFactor;
+
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: !isExpanded,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: isExpanded ? 1 : 0),
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) {
+            return Align(
+              alignment: Alignment.center,
+              child: Opacity(
+                opacity: value,
+                child: Transform.scale(
+                  scale: 0.92 + (0.08 * value),
+                  child: child,
+                ),
+              ),
+            );
+          },
+          child: Material(
+            key: const Key('life-counter-hub-tools'),
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(radius),
+              onTap: onTap,
+              child: SizedBox(width: frameSize, height: frameSize),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _HubMedallion extends StatelessWidget {
   final double scaleFactor;
   final bool isExpanded;
@@ -1570,95 +1651,226 @@ class _HubMedallion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final outerSize = (isExpanded ? 76 : 66) * scaleFactor;
-    final middleSize = (isExpanded ? 68 : 58) * scaleFactor;
-    final innerSize = (isExpanded ? 56 : 48) * scaleFactor;
-    final iconSize = (isExpanded ? 26 : 23) * scaleFactor;
+    final outerSize = (isExpanded ? 86 : 72) * scaleFactor;
+    final ringSize = outerSize * 0.86;
+    final iconSize = (isExpanded ? 28 : 23) * scaleFactor;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         key: const Key('life-counter-hub-toggle'),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(999),
         onTap: onTap,
-        child: SizedBox(
-          width: outerSize,
-          height: outerSize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                width: outerSize,
-                height: outerSize,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.14),
-                      blurRadius: isExpanded ? 12 : 8,
-                      offset: const Offset(0, 4),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          opacity: isExpanded ? 1 : 0.92,
+          child: SizedBox(
+            width: outerSize,
+            height: outerSize,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: outerSize * 1.26,
+                  height: outerSize * 1.26,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF9CE9FF).withValues(
+                          alpha: isExpanded ? 0.2 : 0.11,
+                        ),
+                        blurRadius: isExpanded ? 24 : 14,
+                        spreadRadius: isExpanded ? 2 : 0,
+                      ),
+                    ],
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  width: outerSize,
+                  height: outerSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: isExpanded ? 0.32 : 0.2),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.24),
+                        blurRadius: isExpanded ? 20 : 14,
+                        spreadRadius: 1.5 * scaleFactor,
+                        offset: Offset(0, 8 * scaleFactor),
+                      ),
+                      BoxShadow(
+                        color: const Color(0xFFFFE69A).withValues(
+                          alpha: isExpanded ? 0.08 : 0.04,
+                        ),
+                        blurRadius: isExpanded ? 12 : 8,
+                      ),
+                    ],
+                  ),
+                  child: CustomPaint(
+                    painter: _HubMedallionPainter(
+                      progress: isExpanded ? 1 : 0,
+                    ),
+                    child: SizedBox(
+                      width: outerSize,
+                      height: outerSize,
+                    ),
+                  ),
+                ),
+                Container(
+                  width: ringSize,
+                  height: ringSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: isExpanded ? 0.3 : 0.2),
+                      width: 1.1,
+                    ),
+                  ),
+                ),
+                Icon(
+                  isExpanded ? Icons.close_rounded : Icons.menu_rounded,
+                  color: const Color(0xFF0D1117),
+                  size: iconSize,
+                  shadows: [
+                    Shadow(
+                      color: Colors.white.withValues(alpha: 0.36),
+                      blurRadius: 6,
                     ),
                   ],
                 ),
-                child: ClipPath(
-                  clipper: const _HexagonClipper(),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.92),
-                    ),
-                  ),
-                ),
-              ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                width: middleSize,
-                height: middleSize,
-                child: ClipPath(
-                  clipper: const _HexagonClipper(),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0E0E0E),
-                    ),
-                  ),
-                ),
-              ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                width: innerSize,
-                height: innerSize,
-                child: ClipPath(
-                  clipper: const _HexagonClipper(),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFFFFE7F6).withValues(alpha: 0.98),
-                          const Color(0xFFD6F4FF).withValues(alpha: 0.96),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Icon(
-                isExpanded ? Icons.close_rounded : Icons.menu_rounded,
-                color: Colors.black,
-                size: iconSize,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _HubMedallionPainter extends CustomPainter {
+  final double progress;
+
+  const _HubMedallionPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final shellPath = _scaledHexagonPath(size, 0.92);
+    final corePath = _scaledHexagonPath(size, 0.72 + (0.02 * progress));
+    final ringPath = _scaledHexagonPath(size, 0.8);
+
+    final shellFill =
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF04070E),
+              Color(0xFF121A2B),
+            ],
+          ).createShader(Offset.zero & size)
+          ..isAntiAlias = true;
+
+    final shellStroke =
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFEAFDFF),
+              Color(0xFFB9D7FF),
+            ],
+          ).createShader(Offset.zero & size)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.4
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true;
+
+    final coreFill =
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFDF4FF),
+              Color(0xFFD7EDFF),
+            ],
+          ).createShader(Offset.zero & size)
+          ..isAntiAlias = true;
+
+    final coreStroke =
+        Paint()
+          ..color = Colors.black.withValues(alpha: 0.1)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1
+          ..strokeJoin = StrokeJoin.round
+          ..isAntiAlias = true;
+
+            final ringStroke =
+            Paint()
+              ..color = const Color(0xFFE5FCFF).withValues(alpha: 0.56 + (0.2 * progress))
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.1
+              ..strokeJoin = StrokeJoin.round
+              ..isAntiAlias = true;
+
+    final glow =
+        Paint()
+              ..color = const Color(0xFF97EEFF).withValues(alpha: 0.12 + (0.05 * progress))
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+
+    canvas.drawPath(shellPath.shift(const Offset(0, 2)), glow);
+    canvas.drawPath(shellPath, shellFill);
+    canvas.drawPath(shellPath, shellStroke);
+            canvas.drawPath(ringPath, ringStroke);
+    canvas.drawPath(corePath, coreFill);
+    canvas.drawPath(corePath, coreStroke);
+
+    final topHighlight =
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white.withValues(alpha: 0.18),
+              Colors.transparent,
+            ],
+          ).createShader(Rect.fromCenter(
+            center: center.translate(0, -size.height * 0.16),
+            width: size.width * 0.42,
+            height: size.height * 0.24,
+          ))
+          ..isAntiAlias = true;
+
+    canvas.save();
+    canvas.clipPath(corePath);
+    canvas.drawRect(
+      Rect.fromCenter(
+        center: center.translate(0, -size.height * 0.16),
+        width: size.width * 0.42,
+        height: size.height * 0.24,
+      ),
+      topHighlight,
+    );
+    canvas.restore();
+
+    final centerGlow =
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.28 + (0.12 * progress))
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawCircle(center, size.width * 0.05, centerGlow);
+  }
+
+  @override
+  bool shouldRepaint(covariant _HubMedallionPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }
 
@@ -1680,40 +1892,54 @@ class _HubPetalAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
+    final visualOpacity = enabled ? 1.0 : 0.58;
+    final topTint = Color.lerp(color, Colors.white, 0.2) ?? color;
+    final bottomTint = Color.lerp(color, Colors.black, 0.12) ?? color;
 
     return Material(
       key: buttonKey,
-      color: Colors.transparent,
+      color: const Color.fromARGB(0, 0, 0, 0),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: Ink(
-          width: 90 * scaleFactor,
-          height: 34 * scaleFactor,
+          width: 102 * scaleFactor,
+          height: 40 * scaleFactor,
           decoration: BoxDecoration(
-            color: color,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                topTint.withValues(alpha: visualOpacity),
+                bottomTint.withValues(alpha: visualOpacity),
+              ],
+            ),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: Colors.black.withValues(alpha: 0.12),
-              width: 0.6,
+              color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
+              width: 0.9,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
+                blurRadius: 3 * scaleFactor,
+                offset: Offset.zero,
+              ),
+            ],
           ),
           child: Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10 * scaleFactor),
+              padding: EdgeInsets.symmetric(horizontal: 12 * scaleFactor),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   label,
                   maxLines: 1,
                   style: TextStyle(
-                    color:
-                        enabled
-                            ? Colors.black.withValues(alpha: 0.9)
-                            : Colors.black.withValues(alpha: 0.35),
-                    fontSize: 9.6 * scaleFactor,
+                    color: Colors.black.withValues(alpha: 0.9 * visualOpacity),
+                    fontSize: 13.4 * scaleFactor,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 0.65,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ),
@@ -2623,26 +2849,36 @@ class _HubPetalSpec {
   }
 }
 
-class _HexagonClipper extends CustomClipper<Path> {
-  const _HexagonClipper();
+Path _scaledHexagonPath(Size size, double scale) {
+  final centerX = size.width / 2;
+  final centerY = size.height / 2;
+  final points = <Offset>[
+    Offset(size.width * 0.26, 0),
+    Offset(size.width * 0.74, 0),
+    Offset(size.width, size.height * 0.5),
+    Offset(size.width * 0.74, size.height),
+    Offset(size.width * 0.26, size.height),
+    Offset(0, size.height * 0.5),
+  ];
 
-  @override
-  Path getClip(Size size) {
-    final width = size.width;
-    final height = size.height;
+  final scaledPoints =
+      points
+          .map(
+            (point) => Offset(
+              centerX + ((point.dx - centerX) * scale),
+              centerY + ((point.dy - centerY) * scale),
+            ),
+          )
+          .toList();
 
-    return Path()
-      ..moveTo(width * 0.26, 0)
-      ..lineTo(width * 0.74, 0)
-      ..lineTo(width, height * 0.5)
-      ..lineTo(width * 0.74, height)
-      ..lineTo(width * 0.26, height)
-      ..lineTo(0, height * 0.5)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  return Path()
+    ..moveTo(scaledPoints[0].dx, scaledPoints[0].dy)
+    ..lineTo(scaledPoints[1].dx, scaledPoints[1].dy)
+    ..lineTo(scaledPoints[2].dx, scaledPoints[2].dy)
+    ..lineTo(scaledPoints[3].dx, scaledPoints[3].dy)
+    ..lineTo(scaledPoints[4].dx, scaledPoints[4].dy)
+    ..lineTo(scaledPoints[5].dx, scaledPoints[5].dy)
+    ..close();
 }
 
 // ---------------------------------------------------------------------------
@@ -2683,6 +2919,8 @@ class _PlayerPanel extends StatefulWidget {
   final VoidCallback onMarkDeckedOut;
   final VoidCallback onMarkAnswerLeft;
   final VoidCallback onCountersTap;
+  final Key? incrementZoneKey;
+  final Key? decrementZoneKey;
   final Key? quickPlusKey;
   final Key? quickMinusKey;
   final Key? countersKey;
@@ -2722,6 +2960,8 @@ class _PlayerPanel extends StatefulWidget {
     required this.onMarkDeckedOut,
     required this.onMarkAnswerLeft,
     required this.onCountersTap,
+    this.incrementZoneKey,
+    this.decrementZoneKey,
     this.quickPlusKey,
     this.quickMinusKey,
     this.countersKey,
@@ -2782,6 +3022,24 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             ? (_isDenseCompact ? -0.008 : widget.compact ? -0.012 : -0.008)
             : 0.0;
     return Alignment(horizontal, 0.0);
+  }
+
+  Alignment _screenSpaceQuickAdjustAlignment(bool isPlus) {
+    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral = _isDenseCompact ? 0.68 : widget.compact ? 0.74 : 0.8;
+    return Alignment(
+      base.x + (isPlus ? lateral : -lateral),
+      base.y,
+    );
+  }
+
+  Alignment _screenSpaceStepIndicatorAlignment(bool isPlus) {
+    final base = _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment;
+    final lateral = _isDenseCompact ? 0.42 : widget.compact ? 0.46 : 0.52;
+    return Alignment(
+      base.x + (isPlus ? lateral : -lateral),
+      base.y,
+    );
   }
 
   @override
@@ -3032,60 +3290,6 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                 ),
               ),
             ),
-          if (!_showLifeActions && !hasPanelTakeoverState)
-            Positioned(
-              top: _isDenseCompact ? 12 : widget.compact ? 18 : 20,
-              left: 0,
-              right: 0,
-              child: Align(
-                alignment: Alignment.center,
-                child: _LifeQuickAdjustButton(
-                  buttonKey: widget.quickPlusKey,
-                  label: '+',
-                  semanticLabel: '+5',
-                  color: supportingColor,
-                  compact: widget.compact,
-                  dense: widget.dense,
-                  onTap: widget.onQuickIncrement,
-                ),
-              ),
-            ),
-          if (!_showLifeActions && !hasPanelTakeoverState)
-            Positioned(
-              bottom: _isDenseCompact ? 4 : 8,
-              left: 0,
-              right: 0,
-              child: Align(
-                alignment: Alignment.center,
-                child: _LifeQuickAdjustButton(
-                  buttonKey: widget.quickMinusKey,
-                  label: '-',
-                  semanticLabel: '-5',
-                  color: supportingColor,
-                  compact: widget.compact,
-                  dense: widget.dense,
-                  onTap: widget.onQuickDecrement,
-                ),
-              ),
-            ),
-          Positioned.fill(
-            child: Column(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: widget.onIncrement,
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: widget.onDecrement,
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-              ],
-            ),
-          ),
           Align(
             alignment:
                 _showLifeActions ? _actionsCoreAlignment : _normalCoreAlignment,
@@ -3285,10 +3489,128 @@ class _PlayerPanelState extends State<_PlayerPanel> {
       ),
     );
 
-    if (widget.quarterTurns != 0) {
-      return RotatedBox(quarterTurns: widget.quarterTurns, child: content);
-    }
-    return content;
+    final rotatedContent =
+        widget.quarterTurns != 0
+            ? RotatedBox(quarterTurns: widget.quarterTurns, child: content)
+            : content;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (!_showLifeActions && !hasPanelTakeoverState)
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final centerGap =
+                    (_coreStageWidth + (_isDenseCompact ? 34 : widget.compact ? 40 : 54))
+                        .clamp(120.0, constraints.maxWidth);
+                final sideWidth = ((constraints.maxWidth - centerGap) / 2).clamp(
+                  0.0,
+                  constraints.maxWidth,
+                );
+
+                return Row(
+                  children: [
+                    SizedBox(
+                      width: sideWidth,
+                      child: InkWell(
+                        key: widget.decrementZoneKey,
+                        onTap: widget.onDecrement,
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                    SizedBox(
+                      width: constraints.maxWidth - (sideWidth * 2),
+                      child: const IgnorePointer(child: SizedBox.expand()),
+                    ),
+                    SizedBox(
+                      width: sideWidth,
+                      child: InkWell(
+                        key: widget.incrementZoneKey,
+                        onTap: widget.onIncrement,
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        rotatedContent,
+        if (!_showLifeActions && !hasPanelTakeoverState)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: _screenSpaceStepIndicatorAlignment(false),
+                child: Text(
+                  '-',
+                  key: Key('life-counter-step-minus-${widget.panelIndex}'),
+                  style: TextStyle(
+                    color: supportingColor,
+                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (!_showLifeActions && !hasPanelTakeoverState)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: _screenSpaceStepIndicatorAlignment(true),
+                child: Text(
+                  '+',
+                  key: Key('life-counter-step-plus-${widget.panelIndex}'),
+                  style: TextStyle(
+                    color: supportingColor,
+                    fontSize: _isDenseCompact ? 20 : widget.compact ? 24 : 28,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (!_showLifeActions && !hasPanelTakeoverState)
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: false,
+              child: Align(
+                alignment: _screenSpaceQuickAdjustAlignment(true),
+                child: _LifeQuickAdjustButton(
+                  buttonKey: widget.quickPlusKey,
+                  label: '+5',
+                  semanticLabel: '+5',
+                  color: supportingColor,
+                  compact: widget.compact,
+                  dense: widget.dense,
+                  onTap: widget.onQuickIncrement,
+                ),
+              ),
+            ),
+          ),
+        if (!_showLifeActions && !hasPanelTakeoverState)
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: false,
+              child: Align(
+                alignment: _screenSpaceQuickAdjustAlignment(false),
+                child: _LifeQuickAdjustButton(
+                  buttonKey: widget.quickMinusKey,
+                  label: '-5',
+                  semanticLabel: '-5',
+                  color: supportingColor,
+                  compact: widget.compact,
+                  dense: widget.dense,
+                  onTap: widget.onQuickDecrement,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _buildLifeCoreContent({
@@ -3364,11 +3686,13 @@ class _PlayerPanelState extends State<_PlayerPanel> {
           '${widget.life}',
           textAlign: TextAlign.center,
           style: TextStyle(
+            fontFamily: _tableDisplayFontFamily,
             color: dominantValueColor,
-            fontSize: _isDenseCompact ? 96 : widget.compact ? 112 : 164,
+            fontSize: _isDenseCompact ? 104 : widget.compact ? 126 : 184,
             fontWeight: FontWeight.w900,
             height: 0.88,
-            letterSpacing: _isDenseCompact ? -4.6 : widget.compact ? -5.4 : -6.8,
+            letterSpacing:
+                _isDenseCompact ? -2.4 : widget.compact ? -3.1 : -3.8,
           ),
         ),
       ),
@@ -3610,7 +3934,7 @@ class _LifeQuickAdjustButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDenseCompact = compact && dense;
     return SizedBox(
-      width: isDenseCompact ? 44 : compact ? 54 : 60,
+      width: isDenseCompact ? 56 : compact ? 68 : 82,
       height: isDenseCompact ? 30 : compact ? 38 : 42,
       child: Semantics(
         label: semanticLabel ?? label,
@@ -3627,12 +3951,15 @@ class _LifeQuickAdjustButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Center(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: isDenseCompact ? 22 : compact ? 26 : 30,
-                    fontWeight: FontWeight.w800,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: isDenseCompact ? 18 : compact ? 22 : 24,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ),
@@ -3952,11 +4279,13 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                   value,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
+                                    fontFamily: _tableDisplayFontFamily,
                                     color: valueColor,
-                                    fontSize: isDenseCompact ? 120 : compact ? 156 : 228,
+                                    fontSize: isDenseCompact ? 128 : compact ? 168 : 246,
                                     fontWeight: FontWeight.w900,
                                     height: 0.78,
-                                    letterSpacing: isDenseCompact ? -6.5 : -9,
+                                    letterSpacing:
+                                        isDenseCompact ? -2.6 : compact ? -3.2 : -4.0,
                                   ),
                                 ),
                               ),
