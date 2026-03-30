@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'lotus/lotus_host_controller.dart';
+import 'lotus/lotus_host_overlays.dart';
 import 'lotus/lotus_runtime_flags.dart';
 
 class LotusLifeCounterScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class LotusLifeCounterScreen extends StatefulWidget {
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   late final LotusHostController _hostController;
   DateTime? _lastShellMessageAt;
+  OverlayEntry? _loadingOverlayEntry;
+  OverlayEntry? _errorOverlayEntry;
 
   @override
   void initState() {
@@ -25,19 +28,104 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       onAppReviewRequested: _handleAppReviewRequested,
       onShellMessageRequested: _handleShellMessageRequested,
     );
+    _hostController.isLoading.addListener(_syncLoadingOverlay);
+    _hostController.errorMessage.addListener(_syncErrorOverlay);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
 
+      _syncLoadingOverlay();
+      _syncErrorOverlay();
       unawaited(_hostController.loadBundle());
     });
   }
 
   @override
   void dispose() {
+    _hostController.isLoading.removeListener(_syncLoadingOverlay);
+    _hostController.errorMessage.removeListener(_syncErrorOverlay);
+    _removeLoadingOverlay();
+    _removeErrorOverlay();
     _hostController.dispose();
     super.dispose();
+  }
+
+  void _syncLoadingOverlay() {
+    if (!mounted) {
+      return;
+    }
+
+    if (_hostController.isLoading.value) {
+      _ensureLoadingOverlay();
+      return;
+    }
+
+    _removeLoadingOverlay();
+  }
+
+  void _syncErrorOverlay() {
+    if (!mounted) {
+      return;
+    }
+
+    final errorMessage = _hostController.errorMessage.value;
+    if (errorMessage == null) {
+      _removeErrorOverlay();
+      return;
+    }
+
+    _ensureErrorOverlay();
+    _errorOverlayEntry?.markNeedsBuild();
+  }
+
+  void _ensureLoadingOverlay() {
+    if (_loadingOverlayEntry != null) {
+      return;
+    }
+
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) {
+      return;
+    }
+
+    _loadingOverlayEntry = OverlayEntry(
+      builder: (context) => const LotusLoadingOverlay(),
+    );
+    overlay.insert(_loadingOverlayEntry!);
+  }
+
+  void _removeLoadingOverlay() {
+    _loadingOverlayEntry?.remove();
+    _loadingOverlayEntry = null;
+  }
+
+  void _ensureErrorOverlay() {
+    if (_errorOverlayEntry != null) {
+      return;
+    }
+
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) {
+      return;
+    }
+
+    _errorOverlayEntry = OverlayEntry(
+      builder:
+          (context) => LotusErrorOverlay(
+            message: _hostController.errorMessage.value ?? '',
+            onRetry: () {
+              _removeErrorOverlay();
+              unawaited(_hostController.loadBundle());
+            },
+          ),
+    );
+    overlay.insert(_errorOverlayEntry!);
+  }
+
+  void _removeErrorOverlay() {
+    _errorOverlayEntry?.remove();
+    _errorOverlayEntry = null;
   }
 
   void _handleAppReviewRequested(String message) {
