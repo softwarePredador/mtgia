@@ -24,7 +24,6 @@ It does not touch:
 Files:
 
 - `app/assets/lotus/index.html`
-- `app/android/app/src/main/assets/lotus/index.html`
 
 Behavior:
 
@@ -37,7 +36,6 @@ Behavior:
 Files:
 
 - `app/assets/lotus/js/platform.js`
-- `app/android/app/src/main/assets/lotus/js/platform.js`
 
 Behavior:
 
@@ -57,6 +55,11 @@ Behavior:
 ## Why this matters
 
 Before this step, the gameplay surface was already mostly isolated, but the static shell still contained a full Lotus-owned landing page. That shell is now replaced by a ManaLoom-owned fallback, which reduces residual brand leakage without increasing gameplay risk.
+
+Runtime note:
+
+- `app/assets/lotus/` is the live runtime source of truth
+- the local Android mirror is no longer treated as a sync target for this shell step
 
 ## Next recommended task
 

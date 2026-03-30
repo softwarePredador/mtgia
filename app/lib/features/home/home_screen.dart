@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/widgets/shell_app_bar_actions.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import 'life_counter_route.dart';
 import '../auth/providers/auth_provider.dart';
 import '../decks/models/deck.dart';
 import '../decks/providers/deck_provider.dart';
@@ -170,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.favorite,
                           label: 'Vida',
                           accentColor: AppTheme.textSecondary,
-                          onTap: () => context.push('/life-counter'),
+                          onTap: () => context.push(lifeCounterRoutePath),
                         ),
                       ),
                       const SizedBox(width: 12),

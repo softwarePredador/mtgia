@@ -2,21 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../core/observability/app_observability.dart';
+import 'life_counter_route.dart';
+import 'lotus/lotus_host.dart';
 import 'lotus/lotus_host_controller.dart';
 import 'lotus/lotus_host_overlays.dart';
 import 'lotus/lotus_runtime_flags.dart';
 
 class LotusLifeCounterScreen extends StatefulWidget {
-  const LotusLifeCounterScreen({super.key});
+  const LotusLifeCounterScreen({super.key, this.hostFactory});
+
+  final LotusHostFactory? hostFactory;
 
   @override
   State<LotusLifeCounterScreen> createState() => _LotusLifeCounterScreenState();
 }
 
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
-  late final LotusHostController _hostController;
+  late final LotusHost _hostController;
   DateTime? _lastShellMessageAt;
   OverlayEntry? _loadingOverlayEntry;
   OverlayEntry? _errorOverlayEntry;
@@ -24,9 +28,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   @override
   void initState() {
     super.initState();
-    _hostController = LotusHostController(
+    _hostController =
+        (widget.hostFactory ?? LotusHostController.new)(
       onAppReviewRequested: _handleAppReviewRequested,
       onShellMessageRequested: _handleShellMessageRequested,
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'opened',
+        category: 'life_counter.screen',
+        data: {
+          'route': lifeCounterRoutePath,
+          'implementation': 'embedded_lotus',
+        },
+      ),
     );
     _hostController.isLoading.addListener(_syncLoadingOverlay);
     _hostController.errorMessage.addListener(_syncErrorOverlay);
@@ -47,6 +62,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     _hostController.errorMessage.removeListener(_syncErrorOverlay);
     _removeLoadingOverlay();
     _removeErrorOverlay();
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'closed',
+        category: 'life_counter.screen',
+        data: {
+          'route': lifeCounterRoutePath,
+          'implementation': 'embedded_lotus',
+        },
+      ),
+    );
     _hostController.dispose();
     super.dispose();
   }
@@ -130,6 +155,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   void _handleAppReviewRequested(String message) {
     debugPrint('$lotusLogPrefix AppReview requested: $message');
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'app_review_requested',
+        category: 'life_counter.shell',
+        data: {
+          'message': message,
+        },
+      ),
+    );
   }
 
   void _handleShellMessageRequested(String message) {
@@ -145,23 +179,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
     _lastShellMessageAt = now;
 
-    String displayMessage = 'Lotus external shortcut hidden in ManaLoom.';
+    var displayMessage =
+        'External shortcut disabled while ManaLoom owns the life counter shell.';
     try {
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
         final type = decoded['type'];
         if (type == 'blocked-window-open' || type == 'blocked-link') {
           displayMessage =
-              'This Lotus shortcut is disabled while ManaLoom owns the shell.';
+              'External shortcut disabled while ManaLoom owns the life counter shell.';
         }
-      } else if (message.startsWith('Lotus external link blocked:')) {
+      } else if (message.startsWith('ManaLoom blocked an external link:')) {
         displayMessage =
-            'This Lotus shortcut is disabled while ManaLoom owns the shell.';
+            'External shortcut disabled while ManaLoom owns the life counter shell.';
       }
     } catch (_) {
-      if (message.startsWith('Lotus external link blocked:')) {
+      if (message.startsWith('ManaLoom blocked an external link:')) {
         displayMessage =
-            'This Lotus shortcut is disabled while ManaLoom owns the shell.';
+            'External shortcut disabled while ManaLoom owns the life counter shell.';
       }
     }
 
@@ -182,7 +217,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       backgroundColor: Colors.black,
       // A plain body avoids the zero-sized viewport issue we hit when wrapping
       // this PlatformView in a Stack on Android.
-      body: WebViewWidget(controller: _hostController.webViewController),
+      body: _hostController.buildView(context),
     );
   }
 }

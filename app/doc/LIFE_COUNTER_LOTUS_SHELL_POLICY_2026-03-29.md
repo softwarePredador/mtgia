@@ -71,7 +71,9 @@ Suppressed selectors today:
 - `.lotus`
 - `.patreon`
 - `.feedback-btn-wrapper`
+- `.feedback-btn`
 - `.patreon-btn-wrapper`
+- `.patreon-btn`
 
 Rationale:
 

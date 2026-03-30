@@ -32,6 +32,13 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_LOTUS_STATIC_SHELL_REPLACEMENT_2026-03-29.md`
 - `app/doc/LIFE_COUNTER_LOTUS_GAMEPLAY_COPY_AUDIT_2026-03-29.md`
 
+Estado vivo do contador hoje:
+
+- runtime source-of-truth: `app/assets/lotus/`
+- implementacao oficial: `app/lib/features/home/lotus_life_counter_screen.dart`
+- rota viva: `app/lib/features/home/life_counter_route.dart`
+- o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
+
 ## Comandos
 
 ```bash

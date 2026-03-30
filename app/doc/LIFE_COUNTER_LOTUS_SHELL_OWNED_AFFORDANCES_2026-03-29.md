@@ -37,7 +37,7 @@ Behavior:
 - if the main frame fails to load, the host now shows an owned recovery state
 - the user gets a clear retry action without exposing WebView internals
 
-### 3. Owned feedback for blocked Lotus shortcuts
+### 3. Owned feedback for blocked external shortcuts
 
 Files:
 

@@ -17,7 +17,10 @@ This plan assumes:
 - route: `app/lib/main.dart`
 - host screen: `app/lib/features/home/lotus_life_counter_screen.dart`
 - Flutter bundle copy: `app/assets/lotus/`
-- Android runtime bundle: `app/android/app/src/main/assets/lotus/`
+- route constant: `app/lib/features/home/life_counter_route.dart`
+- local Android asset mirror: `app/android/app/src/main/assets/lotus/`
+  - stale local artifact only
+  - not an active runtime contract
 - legacy Flutter implementation kept only as fallback/reference:
   - `app/lib/features/home/life_counter_screen.dart`
 
@@ -97,7 +100,8 @@ Work:
 
 - keep `/life-counter` pointing to `LotusLifeCounterScreen`
 - treat `life_counter_screen.dart` as legacy
-- keep `app/assets/lotus/` and `android/app/src/main/assets/lotus/` in sync
+- keep `app/assets/lotus/` as the only runtime source of truth
+- do not treat `android/app/src/main/assets/lotus/` as an active runtime requirement
 - preserve emulator screenshots and parity evidence for regression checking
 
 Exit criteria:

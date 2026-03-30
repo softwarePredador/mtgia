@@ -133,6 +133,29 @@ Leitura de aceite:
 - banners promocionais do app de referencia nao entram como criterio de aceite
 - qualquer regressao visual relevante passa a aparecer no diff do golden
 
+## Life counter vivo
+
+O caminho oficial do contador hoje nao e mais `LifeCounterScreen`.
+
+Cobertura principal atual:
+
+- `test/features/home/lotus_life_counter_screen_test.dart`
+- `integration_test/life_counter_webview_smoke_test.dart`
+
+Escopo:
+
+- boot do host
+- erro de bundle e `Retry`
+- feedback do shell
+- rota viva `/life-counter`
+
+Suites legadas mantidas como referencia/paridade historica:
+
+- `test/features/home/life_counter_screen_test.dart`
+- `test/features/home/life_counter_clone_proof_test.dart`
+
+Essas suites continuam uteis para comparacao visual e de UX, mas nao sao mais a confianca principal da feature ativa em producao.
+
 ## Proximo salto de cobertura
 
 Para colocar o app no mesmo nivel de exigencia do backend, as proximas suites devem cobrir:

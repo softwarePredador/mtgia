@@ -96,15 +96,10 @@ flutter:
     - assets/lotus/cordova-js-src/plugin/ios/
     - assets/lotus/css/
     - assets/lotus/fonts/
-    - assets/lotus/icon/android/
-    - assets/lotus/icon/ios/
     - assets/lotus/images/
     - assets/lotus/images/dice/
-    - assets/lotus/images/screenshots/
-    - assets/lotus/images/social/
     - assets/lotus/js/
     - assets/lotus/plugins/cordova-plugin-insomnia/www/
-    - assets/lotus/splash/ios/
 
   fonts:
     - family: Dosis

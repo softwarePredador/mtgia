@@ -9,20 +9,20 @@ Use this after changes to:
 - `lotus_life_counter_screen.dart`
 - `app/lib/features/home/lotus/**`
 - `app/assets/lotus/**`
-- `app/android/app/src/main/assets/lotus/**`
 - route/bootstrap behavior for `/life-counter`
 
 ## Preconditions
 
 - emulator is running
 - `com.mtgia.mtg_app` can be installed
-- the app still boots directly into `/life-counter` in debug
+- when needed, debug boot into `/life-counter` is enabled explicitly
 
 ## Build
 
 ```bash
 flutter analyze
 flutter build apk --debug
+flutter run --dart-define=DEBUG_BOOT_INTO_LIFE_COUNTER=true
 ```
 
 ## Optional bridge probe
@@ -94,7 +94,7 @@ Investigate immediately if any of the following happen:
 
 If behavior regresses, verify these first:
 
-1. `app/assets/lotus/` and `app/android/app/src/main/assets/lotus/` are still in sync
-2. `index.html` differs from the original only by the `cordova.js` -> `flutter_bootstrap.js` swap
+1. `app/assets/lotus/` is still the runtime source of truth
+2. `index.html` is still the minimal ManaLoom-owned fallback shell
 3. `/life-counter` still routes to `LotusLifeCounterScreen`
-4. debug boot flag for life counter is still active when expected
+4. debug boot flag for life counter is enabled only when expected

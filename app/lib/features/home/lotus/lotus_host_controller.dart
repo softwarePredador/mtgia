@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/observability/app_observability.dart';
+import 'lotus_host.dart';
 import 'lotus_js_bridges.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
 
-class LotusHostController {
+class LotusHostController implements LotusHost {
   static const String _bundleLoadErrorMessage =
       'ManaLoom could not open the embedded life counter. '
       'Check the local bundle and try again.';
@@ -21,12 +24,13 @@ class LotusHostController {
        _onShellMessageRequested = onShellMessageRequested {
     _configure(
       onAppReviewRequested: onAppReviewRequested,
-      onShellMessageRequested: onShellMessageRequested,
     );
   }
 
   final WebViewController webViewController;
+  @override
   final ValueNotifier<bool> isLoading;
+  @override
   final ValueNotifier<String?> errorMessage;
   final LotusShellMessageCallback _onShellMessageRequested;
 
@@ -35,19 +39,62 @@ class LotusHostController {
   bool _didInjectDebugBundleFailure = false;
   Timer? _loadingOverlayFallbackTimer;
 
+  @override
+  Widget buildView(BuildContext context) {
+    return WebViewWidget(controller: webViewController);
+  }
+
+  @override
   Future<void> loadBundle() async {
+    final isRetry = errorMessage.value != null;
+    final bundleEntry = _resolveBundleEntry();
     errorMessage.value = null;
     isLoading.value = true;
+    unawaited(
+      AppObservability.instance.recordEvent(
+        isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
+        category: 'life_counter.host',
+        data: {
+          'entry': bundleEntry,
+          'is_retry': isRetry,
+        },
+      ),
+    );
 
     try {
-      await webViewController.loadFlutterAsset(_resolveBundleEntry());
-    } catch (error) {
+      await webViewController.loadFlutterAsset(bundleEntry);
+    } catch (error, stackTrace) {
       debugPrint('$lotusLogPrefix load bundle error: $error');
       errorMessage.value = _bundleLoadErrorMessage;
       dismissLoadingOverlay();
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'bundle_load_failed',
+          category: 'life_counter.host',
+          level: SentryLevel.error,
+          data: {
+            'error': error.toString(),
+          },
+        ),
+      );
+      unawaited(
+        AppObservability.instance.captureException(
+          error,
+          stackTrace: stackTrace,
+          tags: const {
+            'source': 'life_counter_host',
+            'stage': 'bundle_load',
+          },
+          extras: {
+            'entry': bundleEntry,
+            'is_retry': isRetry,
+          },
+        ),
+      );
     }
   }
 
+  @override
   void dispose() {
     _isDisposed = true;
     _loadingOverlayFallbackTimer?.cancel();
@@ -57,24 +104,18 @@ class LotusHostController {
 
   void _configure({
     required LotusAppReviewCallback onAppReviewRequested,
-    required LotusShellMessageCallback onShellMessageRequested,
   }) {
     LotusJavaScriptBridges.register(
       webViewController,
       onAppReviewRequested: onAppReviewRequested,
-      onShellMessageRequested: onShellMessageRequested,
+      onShellMessageRequested: _handleShellMessage,
     );
 
     webViewController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.black)
       ..enableZoom(false)
-      ..setOnConsoleMessage((message) {
-        debugPrint(
-          '$lotusLogPrefix console '
-          '${message.level.name}: ${message.message}',
-        );
-      })
+      ..setOnConsoleMessage(_handleConsoleMessage)
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: _handleProgress,
@@ -105,6 +146,12 @@ class LotusHostController {
   }
 
   void _handlePageFinished(String _) {
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'bundle_load_succeeded',
+        category: 'life_counter.host',
+      ),
+    );
     Future<void>.delayed(
       const Duration(milliseconds: 300),
       dismissLoadingOverlay,
@@ -118,6 +165,18 @@ class LotusHostController {
     debugPrint(
       '$lotusLogPrefix WebView error: '
       '${error.errorCode} ${error.description}',
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'web_resource_error',
+        category: 'life_counter.host',
+        level: SentryLevel.error,
+        data: {
+          'code': error.errorCode,
+          'description': error.description,
+          'is_main_frame': error.isForMainFrame ?? true,
+        },
+      ),
     );
 
     if (error.isForMainFrame ?? true) {
@@ -138,6 +197,15 @@ class LotusHostController {
 
     debugPrint(
       '$lotusLogPrefix blocked top-level navigation to ${request.url}',
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'blocked_top_level_navigation',
+        category: 'life_counter.shell',
+        data: {
+          'url': request.url,
+        },
+      ),
     );
     _notifyBlockedNavigation(request.url);
     return NavigationDecision.prevent;
@@ -270,6 +338,124 @@ class LotusHostController {
 
   void _notifyBlockedNavigation(String url) {
     _onShellMessageRequested('ManaLoom blocked an external link: $url');
+  }
+
+  void _handleConsoleMessage(JavaScriptConsoleMessage message) {
+    debugPrint(
+      '$lotusLogPrefix console ${message.level.name}: ${message.message}',
+    );
+    _recordConsoleEvent(message.message);
+  }
+
+  void _recordConsoleEvent(String message) {
+    final normalizedMessage = message.trim();
+    final markers = <String, ({String category, String name})>{
+      'Start Cordova Plugins': (
+        category: 'life_counter.host',
+        name: 'cordova_plugins_started',
+      ),
+      'Turn and Time Tracker added': (
+        category: 'life_counter.gameplay',
+        name: 'turn_tracker_enabled',
+      ),
+      'Planechase: Open Settings': (
+        category: 'life_counter.settings',
+        name: 'planechase_settings_opened',
+      ),
+      'Archenemy: Open Settings': (
+        category: 'life_counter.settings',
+        name: 'archenemy_settings_opened',
+      ),
+      'Bounty: Click Settings': (
+        category: 'life_counter.settings',
+        name: 'bounty_settings_opened',
+      ),
+      'Life History Overlay': (
+        category: 'life_counter.history',
+        name: 'history_overlay_opened',
+      ),
+      'Card Search Overlay': (
+        category: 'life_counter.search',
+        name: 'card_search_overlay_opened',
+      ),
+    };
+
+    for (final entry in markers.entries) {
+      if (!normalizedMessage.contains(entry.key)) {
+        continue;
+      }
+
+      unawaited(
+        AppObservability.instance.recordEvent(
+          entry.value.name,
+          category: entry.value.category,
+          data: {
+            'console_message': normalizedMessage,
+          },
+        ),
+      );
+      return;
+    }
+  }
+
+  void _handleShellMessage(String message) {
+    final payload = _tryDecodeShellPayload(message);
+    if (payload == null) {
+      _onShellMessageRequested(message);
+      return;
+    }
+
+    final type = payload['type'];
+    if (type == 'analytics') {
+      final name = payload['name'];
+      final category = payload['category'];
+      if (name is String && category is String) {
+        final data = <String, Object?>{};
+        final rawData = payload['data'];
+        if (rawData is Map) {
+          for (final entry in rawData.entries) {
+            final key = entry.key;
+            if (key is String) {
+              data[key] = entry.value;
+            }
+          }
+        }
+
+        unawaited(
+          AppObservability.instance.recordEvent(
+            name,
+            category: category,
+            data: data,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (type == 'blocked-link' || type == 'blocked-window-open') {
+      final href = payload['href'];
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'blocked_external_link',
+          category: 'life_counter.shell',
+          data: {
+            'type': type,
+            'href': href,
+          },
+        ),
+      );
+    }
+
+    _onShellMessageRequested(message);
+  }
+
+  Map<String, dynamic>? _tryDecodeShellPayload(String message) {
+    try {
+      final decoded = lotusDecodeShellPayload(message);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   String _resolveBundleEntry() {

@@ -120,6 +120,33 @@ class AppObservability {
 
   Future<void> clearUserContext() => setUserContext(null);
 
+  Future<void> recordEvent(
+    String message, {
+    String category = 'app',
+    SentryLevel level = SentryLevel.info,
+    Map<String, Object?>? data,
+  }) async {
+    if (kDebugMode) {
+      debugPrint(
+        '[Observability] breadcrumb '
+        'category=$category message=$message data=${data ?? const <String, Object?>{}}',
+      );
+    }
+
+    if (!isEnabled) {
+      return;
+    }
+
+    await Sentry.addBreadcrumb(
+      Breadcrumb(
+        category: category,
+        message: message,
+        level: level,
+        data: data,
+      ),
+    );
+  }
+
   Future<SentryId?> captureException(
     Object error, {
     StackTrace? stackTrace,

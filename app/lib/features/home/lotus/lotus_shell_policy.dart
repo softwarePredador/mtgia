@@ -46,6 +46,8 @@ bool lotusShouldPreventNavigation(NavigationRequest request) {
   return true;
 }
 
+Object? lotusDecodeShellPayload(String payload) => jsonDecode(payload);
+
 String get lotusShellCleanupScript {
   final blockedHosts = jsonEncode(lotusBlockedExternalHosts.toList()..sort());
   final suppressedSelectors = jsonEncode(lotusSuppressedShellSelectors);
@@ -56,6 +58,7 @@ String get lotusShellCleanupScript {
   const SUPPRESSED_SELECTORS = $suppressedSelectors;
   const STYLE_ID = 'manaloom-lotus-shell-policy';
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
+  const TELEMETRY_ATTR = 'data-manaloom-telemetry-seen';
   const SHELL_CHANNEL = 'FlutterManaLoomShellBridge';
   document.title = 'ManaLoom Life Counter';
   const postShellMessage = (payload) => {
@@ -67,6 +70,14 @@ String get lotusShellCleanupScript {
         window[SHELL_CHANNEL].postMessage(JSON.stringify(payload));
       }
     } catch (_) {}
+  };
+  const postAnalytics = (name, category, data = {}) => {
+    postShellMessage({
+      type: 'analytics',
+      name,
+      category,
+      data,
+    });
   };
 
   const isBlockedUrl = (rawUrl) => {
@@ -140,6 +151,31 @@ String get lotusShellCleanupScript {
       return;
     }
 
+    const trackedClick = event.target.closest(
+      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn'
+    );
+    if (trackedClick) {
+      let name = null;
+      if (trackedClick.matches('.menu-button')) {
+        name = 'menu_button_pressed';
+      } else if (trackedClick.matches('.life-history-btn')) {
+        name = 'history_shortcut_pressed';
+      } else if (trackedClick.matches('.card-search-btn')) {
+        name = 'card_search_shortcut_pressed';
+      } else if (
+        trackedClick.matches('.settings') ||
+        trackedClick.matches('.overlay-settings-btn')
+      ) {
+        name = 'settings_shortcut_pressed';
+      }
+
+      if (name) {
+        postAnalytics(name, 'life_counter.shell', {
+          selector: trackedClick.className || trackedClick.tagName,
+        });
+      }
+    }
+
     const link = event.target.closest('a[href]');
     if (!link) {
       return;
@@ -184,6 +220,27 @@ String get lotusShellCleanupScript {
     ensureStyle();
     suppressShell(document);
     protectBlockedLinks(document);
+    observeUiSurface('.menu-button-overlay', 'menu_overlay_opened');
+    observeUiSurface('.settings-overlay', 'settings_overlay_opened');
+    observeUiSurface('.life-history-overlay', 'history_overlay_opened');
+    observeUiSurface('.search-overlay', 'card_search_overlay_opened');
+  };
+
+  const observeUiSurface = (selector, eventName) => {
+    document.querySelectorAll(selector).forEach((node) => {
+      if (!(node instanceof Element)) {
+        return;
+      }
+
+      if (node.getAttribute(TELEMETRY_ATTR) === 'true') {
+        return;
+      }
+
+      node.setAttribute(TELEMETRY_ATTR, 'true');
+      postAnalytics(eventName, 'life_counter.shell', {
+        selector,
+      });
+    });
   };
 
   let applyQueued = false;

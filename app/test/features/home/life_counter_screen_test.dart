@@ -1,3 +1,5 @@
+// Legacy reference suite for the retired native clone path.
+// The live counter coverage now targets `LotusLifeCounterScreen`.
 import 'dart:convert';
 import 'dart:math';
 

@@ -1,3 +1,5 @@
+// Legacy parity suite kept for historical visual comparison only.
+// The live counter coverage now targets `LotusLifeCounterScreen`.
 import 'dart:convert';
 import 'dart:math';
 

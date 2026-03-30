@@ -46,13 +46,14 @@ import 'features/messages/screens/message_inbox_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
+import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
 
 final bool _debugBootIntoLifeCounter =
     kDebugMode &&
     const bool.fromEnvironment(
       'DEBUG_BOOT_INTO_LIFE_COUNTER',
-      defaultValue: true,
+      defaultValue: false,
     );
 
 void main() async {
@@ -121,7 +122,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     ApiClient.debugLogBaseUrl();
 
     _router = GoRouter(
-      initialLocation: _debugBootIntoLifeCounter ? '/life-counter' : '/',
+      initialLocation: _debugBootIntoLifeCounter ? lifeCounterRoutePath : '/',
       refreshListenable: _authProvider,
       observers: [
         PerformanceNavigatorObserver(),
@@ -136,7 +137,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         // Sempre permite a Splash (ela decide para onde ir).
         if (location == '/') return null;
 
-        if (_debugBootIntoLifeCounter && location == '/life-counter') {
+        if (_debugBootIntoLifeCounter && location == lifeCounterRoutePath) {
           debugPrint('[🧭 Router] → null (debug life counter direto)');
           return null;
         }
@@ -148,7 +149,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
               location == '/' ||
               location == '/login' ||
               location == '/register' ||
-              (_debugBootIntoLifeCounter && location == '/life-counter');
+              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
           if (!isBootSafeRoute) {
             debugPrint('[🧭 Router] → / (status=$status, aguardando auth)');
             return '/';
@@ -170,7 +171,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/messages') ||
             location.startsWith('/notifications') ||
             location.startsWith('/onboarding') ||
-            location.startsWith('/life-counter');
+            location.startsWith(lifeCounterRoutePath);
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -198,7 +199,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ),
 
         GoRoute(
-          path: '/life-counter',
+          path: lifeCounterRoutePath,
           builder: (context, state) => const LotusLifeCounterScreen(),
         ),
 
