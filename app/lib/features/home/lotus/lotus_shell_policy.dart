@@ -59,6 +59,8 @@ String get lotusShellCleanupScript {
   const STYLE_ID = 'manaloom-lotus-shell-policy';
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
   const TELEMETRY_ATTR = 'data-manaloom-telemetry-seen';
+  const PLAYER_STATE_ATTR = 'data-manaloom-player-state-seen';
+  const PLAYER_APPEARANCE_ATTR = 'data-manaloom-player-appearance-seen';
   const SHELL_CHANNEL = 'FlutterManaLoomShellBridge';
   document.title = 'ManaLoom Life Counter';
   const postShellMessage = (payload) => {
@@ -78,6 +80,111 @@ String get lotusShellCleanupScript {
       category,
       data,
     });
+  };
+  const resolvePlayerCards = () =>
+    Array.from(document.querySelectorAll('.player-card')).filter(
+      (node) => !node.classList.contains('empty-player-card')
+    );
+  const resolveTargetPlayerIndex = (node) => {
+    if (!(node instanceof Element)) {
+      return null;
+    }
+
+    const playerCard = node.closest('.player-card');
+    if (!(playerCard instanceof Element)) {
+      return null;
+    }
+
+    const playerCards = resolvePlayerCards();
+    const targetPlayerIndex = playerCards.indexOf(playerCard);
+    return targetPlayerIndex >= 0 ? targetPlayerIndex : null;
+  };
+  const openNativePlayerState = (node, source) => {
+    if (!(node instanceof Element)) {
+      return false;
+    }
+
+    const targetPlayerIndex = resolveTargetPlayerIndex(node);
+    if (targetPlayerIndex == null) {
+      return false;
+    }
+
+    postAnalytics('player_state_surface_pressed', 'life_counter.shell', {
+      selector: node.className || node.tagName,
+      source,
+      target_player_index: targetPlayerIndex,
+    });
+    postShellMessage({
+      type: 'open-native-player-state',
+      source,
+      targetPlayerIndex,
+    });
+    return true;
+  };
+  const openNativePlayerAppearance = (node, source) => {
+    if (!(node instanceof Element)) {
+      return false;
+    }
+
+    const targetPlayerIndex = resolveTargetPlayerIndex(node);
+    if (targetPlayerIndex == null) {
+      return false;
+    }
+
+    postAnalytics('player_background_surface_pressed', 'life_counter.shell', {
+      selector: node.className || node.tagName,
+      source,
+      target_player_index: targetPlayerIndex,
+    });
+    postShellMessage({
+      type: 'open-native-player-appearance',
+      source,
+      targetPlayerIndex,
+    });
+    return true;
+  };
+  const observePlayerStateSurface = (root = document) => {
+    root.querySelectorAll('.player-card-inner.option-card').forEach((node) => {
+      if (!(node instanceof Element)) {
+        return;
+      }
+
+      if (node.getAttribute(PLAYER_STATE_ATTR) === 'true') {
+        return;
+      }
+
+      node.setAttribute(PLAYER_STATE_ATTR, 'true');
+      openNativePlayerState(node, 'player_option_card_presented');
+    });
+  };
+  const observePlayerAppearanceSurface = (root = document) => {
+    root.querySelectorAll('.player-card-inner.color-card').forEach((node) => {
+      if (!(node instanceof Element)) {
+        return;
+      }
+
+      if (node.getAttribute(PLAYER_APPEARANCE_ATTR) === 'true') {
+        return;
+      }
+
+      node.setAttribute(PLAYER_APPEARANCE_ATTR, 'true');
+      openNativePlayerAppearance(node, 'player_background_color_card_presented');
+    });
+  };
+  const resolvePlayerCounterKey = (node) => {
+    if (!(node instanceof Element)) {
+      return null;
+    }
+
+    const ignoredClasses = new Set([
+      'counter',
+      'clicked',
+      'commander-damage-counter',
+    ]);
+    const candidate = Array.from(node.classList).find(
+      (className) => !ignoredClasses.has(className)
+    );
+    return candidate || null;
   };
 
   const isBlockedUrl = (rawUrl) => {
@@ -152,10 +259,17 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock'
+      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter'
+    );
+    const playerStateClick = event.target.closest(
+      '.player-card-inner.option-card, .player-card-inner .killed-overlay'
+    );
+    const playerAppearanceClick = event.target.closest(
+      '.option-entry.background, .background.option-entry'
     );
     if (trackedClick) {
       let name = null;
+      const playerCounterKey = resolvePlayerCounterKey(trackedClick);
       if (trackedClick.matches('.menu-button')) {
         name = 'menu_button_pressed';
       } else if (trackedClick.matches('.life-history-btn')) {
@@ -178,11 +292,19 @@ String get lotusShellCleanupScript {
         trackedClick.matches('.current-time-clock.with-game-timer')
       ) {
         name = 'game_timer_surface_pressed';
+      } else if (trackedClick.matches('.commander-damage-counter')) {
+        name = 'commander_damage_surface_pressed';
+      } else if (
+        trackedClick.matches('.counters-on-card .counter') &&
+        !trackedClick.matches('.commander-damage-counter')
+      ) {
+        name = 'player_counter_surface_pressed';
       }
 
       if (name) {
         postAnalytics(name, 'life_counter.shell', {
           selector: trackedClick.className || trackedClick.tagName,
+          ...(playerCounterKey ? { counter_key: playerCounterKey } : {}),
         });
       }
 
@@ -245,6 +367,72 @@ String get lotusShellCleanupScript {
         });
         return;
       }
+
+      if (trackedClick.matches('.commander-damage-counter')) {
+        event.preventDefault();
+        event.stopPropagation();
+        const playerCards = Array.from(
+          document.querySelectorAll('.player-card')
+        ).filter((node) => !node.classList.contains('empty-player-card'));
+        const playerCard = trackedClick.closest('.player-card');
+        const targetPlayerIndex =
+          playerCard == null ? null : playerCards.indexOf(playerCard);
+        postShellMessage({
+          type: 'open-native-commander-damage',
+          source: name || 'commander_damage_surface_pressed',
+          targetPlayerIndex:
+            targetPlayerIndex != null && targetPlayerIndex >= 0
+              ? targetPlayerIndex
+              : null,
+        });
+        return;
+      }
+
+      if (
+        trackedClick.matches('.counters-on-card .counter') &&
+        !trackedClick.matches('.commander-damage-counter')
+      ) {
+        const playerCards = Array.from(
+          document.querySelectorAll('.player-card')
+        ).filter((node) => !node.classList.contains('empty-player-card'));
+        const playerCard = trackedClick.closest('.player-card');
+        const targetPlayerIndex =
+          playerCard == null ? null : playerCards.indexOf(playerCard);
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-player-counter',
+          source: name || 'player_counter_surface_pressed',
+          targetPlayerIndex:
+            targetPlayerIndex != null && targetPlayerIndex >= 0
+              ? targetPlayerIndex
+              : null,
+          counterKey: playerCounterKey,
+        });
+        return;
+      }
+    }
+
+    if (playerStateClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      openNativePlayerState(
+        playerStateClick,
+        playerStateClick.matches('.player-card-inner.option-card')
+          ? 'player_state_surface_pressed'
+          : 'killed_overlay_pressed'
+      );
+      return;
+    }
+
+    if (playerAppearanceClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      openNativePlayerAppearance(
+        playerAppearanceClick,
+        'player_background_surface_pressed'
+      );
+      return;
     }
 
     const link = event.target.closest('a[href]');
@@ -291,6 +479,8 @@ String get lotusShellCleanupScript {
     ensureStyle();
     suppressShell(document);
     protectBlockedLinks(document);
+    observePlayerStateSurface(document);
+    observePlayerAppearanceSurface(document);
     observeUiSurface('.menu-button-overlay', 'menu_overlay_opened');
     observeUiSurface('.settings-overlay', 'settings_overlay_opened');
     observeUiSurface('.life-history-overlay', 'history_overlay_opened');
@@ -348,6 +538,8 @@ String get lotusShellCleanupScript {
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
     });
   }
 

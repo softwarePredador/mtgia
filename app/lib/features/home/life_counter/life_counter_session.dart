@@ -7,8 +7,109 @@ const int lifeCounterMinPlayers = 2;
 const int lifeCounterMaxPlayers = 6;
 const int lifeCounterDefaultTwoPlayerStartingLife = 20;
 const int lifeCounterDefaultMultiPlayerStartingLife = 40;
+const List<String> lifeCounterDefaultPlayerBackgrounds = <String>[
+  '#FFB51E',
+  '#FF0A5B',
+  '#CF7AEF',
+  '#4B57FF',
+  '#44E063',
+  '#40B9FF',
+];
 
 enum LifeCounterPlayerSpecialState { none, deckedOut, answerLeft }
+
+@immutable
+class LifeCounterPlayerAppearance {
+  const LifeCounterPlayerAppearance({
+    required this.background,
+    this.nickname = '',
+    this.backgroundImage,
+    this.backgroundImagePartner,
+  });
+
+  final String background;
+  final String nickname;
+  final String? backgroundImage;
+  final String? backgroundImagePartner;
+
+  LifeCounterPlayerAppearance copyWith({
+    String? background,
+    String? nickname,
+    String? backgroundImage,
+    bool clearBackgroundImage = false,
+    String? backgroundImagePartner,
+    bool clearBackgroundImagePartner = false,
+  }) {
+    return LifeCounterPlayerAppearance(
+      background: background ?? this.background,
+      nickname: nickname ?? this.nickname,
+      backgroundImage:
+          clearBackgroundImage
+              ? null
+              : backgroundImage ?? this.backgroundImage,
+      backgroundImagePartner:
+          clearBackgroundImagePartner
+              ? null
+              : backgroundImagePartner ?? this.backgroundImagePartner,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'background': background,
+      'nickname': nickname,
+      'background_image': backgroundImage,
+      'background_image_partner': backgroundImagePartner,
+    };
+  }
+
+  static LifeCounterPlayerAppearance? tryFromJson(dynamic raw) {
+    if (raw is! Map) {
+      return null;
+    }
+
+    final payload = raw.cast<String, dynamic>();
+    final background = payload['background'] as String?;
+    if (background == null || background.trim().isEmpty) {
+      return null;
+    }
+
+    return LifeCounterPlayerAppearance(
+      background: background.trim(),
+      nickname: (payload['nickname'] as String? ?? '').trim(),
+      backgroundImage: _readOptionalString(payload['background_image']),
+      backgroundImagePartner: _readOptionalString(
+        payload['background_image_partner'],
+      ),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LifeCounterPlayerAppearance &&
+        other.background == background &&
+        other.nickname == nickname &&
+        other.backgroundImage == backgroundImage &&
+        other.backgroundImagePartner == backgroundImagePartner;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    background,
+    nickname,
+    backgroundImage,
+    backgroundImagePartner,
+  );
+
+  static String? _readOptionalString(dynamic value) {
+    if (value is! String) {
+      return null;
+    }
+
+    final normalized = value.trim();
+    return normalized.isEmpty ? null : normalized;
+  }
+}
 
 @immutable
 class LifeCounterCommanderDamageDetail {
@@ -131,6 +232,7 @@ class LifeCounterSession {
     required this.commanderCasts,
     this.commanderCastDetails,
     this.playerExtraCounters = const <Map<String, int>>[],
+    this.playerAppearances = const <LifeCounterPlayerAppearance>[],
     required this.partnerCommanders,
     required this.playerSpecialStates,
     required this.lastPlayerRolls,
@@ -178,6 +280,14 @@ class LifeCounterSession {
         normalizedPlayerCount,
         (_) => <String, int>{},
       ),
+      playerAppearances: List<LifeCounterPlayerAppearance>.generate(
+        normalizedPlayerCount,
+        (index) => LifeCounterPlayerAppearance(
+          background:
+              lifeCounterDefaultPlayerBackgrounds[index %
+                  lifeCounterDefaultPlayerBackgrounds.length],
+        ),
+      ),
       partnerCommanders: List<bool>.filled(normalizedPlayerCount, false),
       playerSpecialStates: List<LifeCounterPlayerSpecialState>.filled(
         normalizedPlayerCount,
@@ -218,6 +328,7 @@ class LifeCounterSession {
   final List<int> commanderCasts;
   final List<LifeCounterCommanderCastDetail>? commanderCastDetails;
   final List<Map<String, int>> playerExtraCounters;
+  final List<LifeCounterPlayerAppearance> playerAppearances;
   final List<bool> partnerCommanders;
   final List<LifeCounterPlayerSpecialState> playerSpecialStates;
   final List<int?> lastPlayerRolls;
@@ -284,6 +395,21 @@ class LifeCounterSession {
     return List<Map<String, int>>.generate(playerCount, (_) => <String, int>{});
   }
 
+  List<LifeCounterPlayerAppearance> get resolvedPlayerAppearances {
+    if (playerAppearances.length == playerCount) {
+      return playerAppearances;
+    }
+
+    return List<LifeCounterPlayerAppearance>.generate(
+      playerCount,
+      (index) => LifeCounterPlayerAppearance(
+        background:
+            lifeCounterDefaultPlayerBackgrounds[index %
+                lifeCounterDefaultPlayerBackgrounds.length],
+      ),
+    );
+  }
+
   LifeCounterSession copyWith({
     int? playerCount,
     int? startingLifeTwoPlayer,
@@ -295,6 +421,7 @@ class LifeCounterSession {
     List<int>? commanderCasts,
     List<LifeCounterCommanderCastDetail>? commanderCastDetails,
     List<Map<String, int>>? playerExtraCounters,
+    List<LifeCounterPlayerAppearance>? playerAppearances,
     List<bool>? partnerCommanders,
     List<LifeCounterPlayerSpecialState>? playerSpecialStates,
     List<int?>? lastPlayerRolls,
@@ -332,6 +459,7 @@ class LifeCounterSession {
       commanderCasts: commanderCasts ?? this.commanderCasts,
       commanderCastDetails: commanderCastDetails ?? this.commanderCastDetails,
       playerExtraCounters: playerExtraCounters ?? this.playerExtraCounters,
+      playerAppearances: playerAppearances ?? this.playerAppearances,
       partnerCommanders: partnerCommanders ?? this.partnerCommanders,
       playerSpecialStates: playerSpecialStates ?? this.playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls ?? this.lastPlayerRolls,
@@ -380,7 +508,9 @@ class LifeCounterSession {
       'commander_casts': commanderCasts,
       'commander_cast_details':
           resolvedCommanderCastDetails.map((entry) => entry.toJson()).toList(),
-      'player_extra_counters': playerExtraCounters,
+      'player_extra_counters': resolvedPlayerExtraCounters,
+      'player_appearances':
+          resolvedPlayerAppearances.map((entry) => entry.toJson()).toList(),
       'partner_commanders': partnerCommanders,
       'player_special_states':
           playerSpecialStates.map(_encodePlayerSpecialState).toList(),
@@ -467,6 +597,10 @@ class LifeCounterSession {
       payload['player_extra_counters'],
       playerCount,
     );
+    final playerAppearances = _readPlayerAppearanceList(
+      payload['player_appearances'],
+      playerCount,
+    );
     final partnerCommanders = _readBoolList(
       payload['partner_commanders'],
       playerCount,
@@ -543,6 +677,7 @@ class LifeCounterSession {
         commanderCasts == null ||
         commanderCastDetails == null ||
         playerExtraCounters == null ||
+        playerAppearances == null ||
         partnerCommanders == null ||
         playerSpecialStates == null ||
         lastPlayerRolls == null ||
@@ -563,6 +698,7 @@ class LifeCounterSession {
       commanderCasts: commanderCasts,
       commanderCastDetails: commanderCastDetails,
       playerExtraCounters: playerExtraCounters,
+      playerAppearances: playerAppearances,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls,
@@ -654,6 +790,37 @@ class LifeCounterSession {
         entry[key] = numericValue;
       }
       parsed.add(entry);
+    }
+
+    return parsed;
+  }
+
+  static List<LifeCounterPlayerAppearance>? _readPlayerAppearanceList(
+    dynamic value,
+    int expectedLength,
+  ) {
+    if (value == null) {
+      return List<LifeCounterPlayerAppearance>.generate(
+        expectedLength,
+        (index) => LifeCounterPlayerAppearance(
+          background:
+              lifeCounterDefaultPlayerBackgrounds[index %
+                  lifeCounterDefaultPlayerBackgrounds.length],
+        ),
+      );
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <LifeCounterPlayerAppearance>[];
+    for (var index = 0; index < value.length; index += 1) {
+      final appearance = LifeCounterPlayerAppearance.tryFromJson(value[index]);
+      if (appearance == null) {
+        return null;
+      }
+      parsed.add(appearance);
     }
 
     return parsed;

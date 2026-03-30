@@ -44,6 +44,7 @@ Estado vivo do contador hoje:
 - shells nativas atuais do contador: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_history_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart`
 - shell nativa atual do turn tracker: `app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart`
 - shell nativa atual de timer/clock: `app/lib/features/home/life_counter/life_counter_native_game_timer_sheet.dart`
+- shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
 - engine propria do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_engine.dart`
@@ -62,6 +63,17 @@ Estado vivo do contador hoje:
   - `integration_test/life_counter_table_state_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_commander_cast_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_extra_counters_roundtrip_smoke_test.dart`
+  - `integration_test/life_counter_native_commander_damage_smoke_test.dart`
+  - `integration_test/life_counter_native_player_counter_smoke_test.dart`
+  - `integration_test/life_counter_native_player_state_smoke_test.dart`
+- takeover atual do runtime de jogador:
+  - `option-card` do Lotus abre a shell nativa de estado do jogador
+  - `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
+  - `color-card` e a entrada de background do Lotus abrem a shell nativa de aparencia do jogador
+- transporte proprio atual de aparencia do jogador:
+  - `app/lib/features/home/life_counter/life_counter_player_appearance_transfer.dart`
+  - export/import de perfil de aparencia via clipboard pela shell nativa
+  - perfis salvos de aparencia em `app/lib/features/home/life_counter/life_counter_player_appearance_profile_store.dart`
 - o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
 - `Sprint 3` de `timer + clock` esta fechado
 - `Sprint 4` esta em andamento, focado em `commander damage`, counters e runtime de jogador

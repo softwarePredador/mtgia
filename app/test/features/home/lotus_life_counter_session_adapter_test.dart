@@ -37,7 +37,11 @@ void main() {
           'players': jsonEncode([
             {
               'name': 'Player 1',
+              'nickname': 'Archenemy',
               'life': 38,
+              'background': '#123456',
+              'backgroundImage': 'indexeddb://imageDatabase/images/10',
+              'backgroundImagePartner': false,
               'alive': true,
               'partnerCommander': false,
               'counters': {
@@ -56,7 +60,11 @@ void main() {
             },
             {
               'name': 'Player 2',
+              'nickname': '',
               'life': 31,
+              'background': '#654321',
+              'backgroundImage': false,
+              'backgroundImagePartner': 'indexeddb://imageDatabase/images/11',
               'alive': true,
               'partnerCommander': true,
               'counters': {
@@ -123,6 +131,16 @@ void main() {
         {},
         {},
       ]);
+      expect(session.resolvedPlayerAppearances[0], const LifeCounterPlayerAppearance(
+        background: '#123456',
+        nickname: 'Archenemy',
+        backgroundImage: 'indexeddb://imageDatabase/images/10',
+      ));
+      expect(session.resolvedPlayerAppearances[1], const LifeCounterPlayerAppearance(
+        background: '#654321',
+        nickname: '',
+        backgroundImagePartner: 'indexeddb://imageDatabase/images/11',
+      ));
       expect(session.partnerCommanders, const [false, true, false, false]);
       expect(session.playerSpecialStates, const [
         LifeCounterPlayerSpecialState.none,
@@ -188,6 +206,20 @@ void main() {
             {'rad': 1},
             {},
             {'tickets': 2},
+          ],
+          playerAppearances: [
+            LifeCounterPlayerAppearance(
+              background: '#123456',
+              nickname: 'Archenemy',
+              backgroundImage: 'indexeddb://imageDatabase/images/10',
+            ),
+            LifeCounterPlayerAppearance(
+              background: '#654321',
+              nickname: 'Two-Headed',
+              backgroundImagePartner: 'indexeddb://imageDatabase/images/11',
+            ),
+            LifeCounterPlayerAppearance(background: '#111111'),
+            LifeCounterPlayerAppearance(background: '#222222'),
           ],
           partnerCommanders: [false, true, false, false],
           playerSpecialStates: [
@@ -268,6 +300,16 @@ void main() {
       );
       expect(players, hasLength(4));
       expect((players[1] as Map<String, dynamic>)['life'], 31);
+      expect((players[0] as Map<String, dynamic>)['nickname'], 'Archenemy');
+      expect((players[0] as Map<String, dynamic>)['background'], '#123456');
+      expect(
+        (players[0] as Map<String, dynamic>)['backgroundImage'],
+        'indexeddb://imageDatabase/images/10',
+      );
+      expect(
+        (players[1] as Map<String, dynamic>)['backgroundImagePartner'],
+        'indexeddb://imageDatabase/images/11',
+      );
       expect(
         ((players[1] as Map<String, dynamic>)['counters']
             as Map<String, dynamic>)['tax-1'],

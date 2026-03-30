@@ -14,6 +14,7 @@ abstract class LotusHost {
   ValueListenable<String?> get errorMessage;
 
   Widget buildView(BuildContext context);
+  void suppressStaleBeforeUnloadSnapshot();
   Future<void> loadBundle();
   void dispose();
 }

@@ -13,6 +13,7 @@ Estado atual do contador:
   - card search
   - turn tracker shell
   - game timer shell
+  - player appearance shell
 - validacao automatizada atual cobre:
   - bootstrap/reopen do contador vivo
   - reboot dedicado do snapshot persistido do contador vivo
@@ -133,11 +134,26 @@ Progresso fechado ate agora:
 - `storm`, `monarch` e `initiative` preservados por chave auxiliar nossa no snapshot vivo
 - `commander tax` preservado com detalhe proprio de `commander_one_casts` e `commander_two_casts`
 - counters arbitrarios do Lotus preservados em `player_extra_counters`
+- shells nativas de runtime de jogador ja assumidas:
+  - `commander damage`
+  - `player appearance`
+  - `player counters`
+  - `player state`
+- takeover do `option-card` do Lotus abre a shell nativa de estado do jogador
+- `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
+- takeover do `color-card` e da entrada de background do Lotus abre a shell nativa de aparencia do jogador
+- `player appearance` agora tambem tem transporte proprio de import/export via clipboard
+- perfis salvos de aparencia agora ficam em store propria ManaLoom
 - smokes reais adicionados:
   - `integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_table_state_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_commander_cast_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_extra_counters_roundtrip_smoke_test.dart`
+  - `integration_test/life_counter_native_commander_damage_smoke_test.dart`
+  - `integration_test/life_counter_native_player_appearance_smoke_test.dart`
+  - `integration_test/life_counter_native_player_appearance_profiles_smoke_test.dart`
+  - `integration_test/life_counter_native_player_counter_smoke_test.dart`
+  - `integration_test/life_counter_native_player_state_smoke_test.dart`
 
 Done when:
 

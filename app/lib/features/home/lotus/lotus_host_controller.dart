@@ -63,10 +63,18 @@ class LotusHostController implements LotusHost {
   bool _didRecordCanonicalSettingsMirrorThisLoad = false;
   bool _didRecordCanonicalGameTimerMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
+  DateTime? _ignoreBeforeUnloadSnapshotUntil;
 
   @override
   Widget buildView(BuildContext context) {
     return WebViewWidget(controller: webViewController);
+  }
+
+  @override
+  void suppressStaleBeforeUnloadSnapshot() {
+    _ignoreBeforeUnloadSnapshotUntil = DateTime.now().add(
+      const Duration(seconds: 2),
+    );
   }
 
   @override
@@ -183,6 +191,13 @@ class LotusHostController implements LotusHost {
       return;
     }
 
+    final reason = payload['reason'] as String?;
+    if (reason == 'beforeunload' &&
+        _ignoreBeforeUnloadSnapshotUntil != null &&
+        DateTime.now().isBefore(_ignoreBeforeUnloadSnapshotUntil!)) {
+      return;
+    }
+
     await _storageSnapshotStore.save(snapshot);
     final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
     final derivedSettings =
@@ -214,7 +229,7 @@ class LotusHostController implements LotusHost {
           category: 'life_counter.storage',
           data: {
             'entry_count': snapshot.entryCount,
-            'reason': payload['reason'],
+            'reason': reason,
           },
         ),
       );

@@ -20,6 +20,8 @@ class LotusLifeCounterSessionAdapter {
   static const String _currentGameMetaKey = 'currentGameMeta';
   static const String _manaloomPlayerSpecialStatesKey =
       '__manaloom_player_special_states';
+  static const String _manaloomPlayerAppearancesKey =
+      '__manaloom_player_appearances';
   static const String _manaloomTableStateKey = '__manaloom_table_state';
   static const Map<int, String> _layoutTypeByPlayerCount = <int, String>{
     2: 'portrait-portrait',
@@ -43,15 +45,6 @@ class LotusLifeCounterSessionAdapter {
           3,
         ],
       };
-  static const List<String> _fallbackPlayerBackgrounds = <String>[
-    '#FFB51E',
-    '#FF0A5B',
-    '#CF7AEF',
-    '#4B57FF',
-    '#44E063',
-    '#40B9FF',
-  ];
-
   static LifeCounterSession? tryBuildSession(LotusStorageSnapshot snapshot) {
     final rawPlayers = _decodeJson(snapshot.values[_playersKey]);
     if (rawPlayers is! List) {
@@ -83,6 +76,10 @@ class LotusLifeCounterSessionAdapter {
       snapshot.values[_manaloomPlayerSpecialStatesKey],
       playerCount,
     );
+    final persistedPlayerAppearances = _decodePlayerAppearances(
+      snapshot.values[_manaloomPlayerAppearancesKey],
+      playerCount,
+    );
     final persistedTableState = _decodeTableState(
       snapshot.values[_manaloomTableStateKey],
       playerCount,
@@ -96,6 +93,7 @@ class LotusLifeCounterSessionAdapter {
     final commanderCasts = <int>[];
     final commanderCastDetails = <LifeCounterCommanderCastDetail>[];
     final playerExtraCounters = <Map<String, int>>[];
+    final playerAppearances = <LifeCounterPlayerAppearance>[];
     final partnerCommanders = <bool>[];
     final playerSpecialStates = <LifeCounterPlayerSpecialState>[];
     final lastPlayerRolls = List<int?>.filled(playerCount, null);
@@ -153,6 +151,20 @@ class LotusLifeCounterSessionAdapter {
       playerExtraCounters.add(_extractExtraCounters(counters));
       partnerCommanders.add(player['partnerCommander'] == true);
       final playerIndex = playerNames.length - 1;
+      final lotusAppearance = LifeCounterPlayerAppearance(
+        background:
+            _readPlayerBackground(playerIndex, player) ??
+            lifeCounterDefaultPlayerBackgrounds[
+                playerIndex % lifeCounterDefaultPlayerBackgrounds.length],
+        nickname: ((player['nickname'] as String?) ?? '').trim(),
+        backgroundImage: _readPlayerImage(player['backgroundImage']),
+        backgroundImagePartner: _readPlayerImage(
+          player['backgroundImagePartner'],
+        ),
+      );
+      playerAppearances.add(
+        persistedPlayerAppearances?[playerIndex] ?? lotusAppearance,
+      );
       final isAlive = player['alive'] != false;
       playerSpecialStates.add(
         _resolvePlayerSpecialState(
@@ -262,6 +274,7 @@ class LotusLifeCounterSessionAdapter {
       commanderCasts: commanderCasts,
       commanderCastDetails: commanderCastDetails,
       playerExtraCounters: playerExtraCounters,
+      playerAppearances: playerAppearances,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls,
@@ -308,6 +321,7 @@ class LotusLifeCounterSessionAdapter {
     final resolvedCommanderDamageDetails =
         session.resolvedCommanderDamageDetails;
     final resolvedPlayerExtraCounters = session.resolvedPlayerExtraCounters;
+    final resolvedPlayerAppearances = session.resolvedPlayerAppearances;
     for (var index = 0; index < session.playerCount; index += 1) {
       final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
       if (session.poison[index] > 0) {
@@ -355,13 +369,14 @@ class LotusLifeCounterSessionAdapter {
         });
       }
 
+      final appearance = resolvedPlayerAppearances[index];
       players.add({
         'name': playerNames[index],
-        'nickname': '',
+        'nickname': appearance.nickname,
         'life': session.lives[index],
-        'background': _fallbackPlayerBackgrounds[index],
-        'backgroundImage': false,
-        'backgroundImagePartner': false,
+        'background': appearance.background,
+        'backgroundImage': appearance.backgroundImage ?? false,
+        'backgroundImagePartner': appearance.backgroundImagePartner ?? false,
         'alive':
             session.playerSpecialStates[index] ==
             LifeCounterPlayerSpecialState.none,
@@ -404,6 +419,11 @@ class LotusLifeCounterSessionAdapter {
       _manaloomPlayerSpecialStatesKey: jsonEncode(
         session.playerSpecialStates
             .map(_encodePlayerSpecialState)
+            .toList(growable: false),
+      ),
+      _manaloomPlayerAppearancesKey: jsonEncode(
+        session.resolvedPlayerAppearances
+            .map((entry) => entry.toJson())
             .toList(growable: false),
       ),
       _manaloomTableStateKey: jsonEncode(
@@ -452,6 +472,107 @@ class LotusLifeCounterSessionAdapter {
     };
   }
 
+  static Map<String, String> buildPlayerRuntimeSnapshotValues(
+    LifeCounterSession session,
+  ) {
+    final playerNames = List<String>.generate(
+      session.playerCount,
+      (index) => 'Player ${index + 1}',
+    );
+    final players = <Map<String, Object?>>[];
+    final resolvedCommanderCastDetails = session.resolvedCommanderCastDetails;
+    final resolvedCommanderDamageDetails =
+        session.resolvedCommanderDamageDetails;
+    final resolvedPlayerExtraCounters = session.resolvedPlayerExtraCounters;
+    final resolvedPlayerAppearances = session.resolvedPlayerAppearances;
+
+    for (var index = 0; index < session.playerCount; index += 1) {
+      final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
+      if (session.poison[index] > 0) {
+        counters['poison'] = session.poison[index];
+      }
+      if (session.energy[index] > 0) {
+        counters['energy'] = session.energy[index];
+      }
+      if (session.experience[index] > 0) {
+        counters['xp'] = session.experience[index];
+      }
+
+      final castDetail = resolvedCommanderCastDetails[index];
+      if (castDetail.commanderOneCasts > 0) {
+        counters['tax-1'] = castDetail.commanderOneCasts * 2;
+      }
+      if (castDetail.commanderTwoCasts > 0) {
+        counters['tax-2'] = castDetail.commanderTwoCasts * 2;
+      }
+      if (counters['tax-1'] == null &&
+          counters['tax-2'] == null &&
+          session.commanderCasts[index] > 0) {
+        counters['tax-1'] = session.commanderCasts[index] * 2;
+      }
+
+      final commanderDamage = <Map<String, Object?>>[];
+      for (var source = 0; source < session.playerCount; source += 1) {
+        final damageDetail = resolvedCommanderDamageDetails[index][source];
+        final totalDamage = damageDetail.totalDamage;
+        if (totalDamage <= 0) {
+          continue;
+        }
+        final damagePayload = <String, int>{};
+        if (damageDetail.commanderOneDamage > 0) {
+          damagePayload['commander1'] = damageDetail.commanderOneDamage;
+        }
+        if (damageDetail.commanderTwoDamage > 0) {
+          damagePayload['commander2'] = damageDetail.commanderTwoDamage;
+        }
+        if (damagePayload.isEmpty && totalDamage > 0) {
+          damagePayload['commander1'] = totalDamage;
+        }
+        commanderDamage.add({
+          'player': playerNames[source],
+          'damage': damagePayload,
+        });
+      }
+
+      final appearance = resolvedPlayerAppearances[index];
+      players.add({
+        'name': playerNames[index],
+        'nickname': appearance.nickname,
+        'life': session.lives[index],
+        'background': appearance.background,
+        'backgroundImage': appearance.backgroundImage ?? false,
+        'backgroundImagePartner': appearance.backgroundImagePartner ?? false,
+        'alive':
+            session.playerSpecialStates[index] ==
+            LifeCounterPlayerSpecialState.none,
+        'partnerCommander': session.partnerCommanders[index],
+        'commanderDamage': commanderDamage,
+        'counters': counters,
+      });
+    }
+
+    return <String, String>{
+      _playersKey: jsonEncode(players),
+      _manaloomPlayerSpecialStatesKey: jsonEncode(
+        session.playerSpecialStates
+            .map(_encodePlayerSpecialState)
+            .toList(growable: false),
+      ),
+      _manaloomPlayerAppearancesKey: jsonEncode(
+        session.resolvedPlayerAppearances
+            .map((entry) => entry.toJson())
+            .toList(growable: false),
+      ),
+      _manaloomTableStateKey: jsonEncode(
+        _encodeTableState(
+          stormCount: session.stormCount,
+          monarchPlayer: session.monarchPlayer,
+          initiativePlayer: session.initiativePlayer,
+        ),
+      ),
+    };
+  }
+
   static Object? _decodeJson(String? raw) {
     if (raw == null || raw.isEmpty) {
       return null;
@@ -483,6 +604,28 @@ class LotusLifeCounterSessionAdapter {
     }
 
     return null;
+  }
+
+  static String? _readPlayerBackground(
+    int playerIndex,
+    Map<String, dynamic> player,
+  ) {
+    final background = (player['background'] as String?)?.trim();
+    if (background != null && background.isNotEmpty) {
+      return background;
+    }
+
+    return lifeCounterDefaultPlayerBackgrounds[
+        playerIndex % lifeCounterDefaultPlayerBackgrounds.length];
+  }
+
+  static String? _readPlayerImage(dynamic value) {
+    if (value is! String) {
+      return null;
+    }
+
+    final normalized = value.trim();
+    return normalized.isEmpty ? null : normalized;
   }
 
   static int? _readOptionalPlayerIndex(dynamic value, int playerCount) {
@@ -569,6 +712,26 @@ class LotusLifeCounterSessionAdapter {
       states.add(_decodePlayerSpecialState(item));
     }
     return states;
+  }
+
+  static List<LifeCounterPlayerAppearance>? _decodePlayerAppearances(
+    String? raw,
+    int playerCount,
+  ) {
+    final decoded = _decodeJson(raw);
+    if (decoded is! List || decoded.length != playerCount) {
+      return null;
+    }
+
+    final appearances = <LifeCounterPlayerAppearance>[];
+    for (final item in decoded) {
+      final appearance = LifeCounterPlayerAppearance.tryFromJson(item);
+      if (appearance == null) {
+        return null;
+      }
+      appearances.add(appearance);
+    }
+    return appearances;
   }
 
   static LifeCounterPlayerSpecialState _resolvePlayerSpecialState({
