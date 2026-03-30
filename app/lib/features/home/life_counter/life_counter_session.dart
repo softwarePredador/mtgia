@@ -11,6 +11,114 @@ const int lifeCounterDefaultMultiPlayerStartingLife = 40;
 enum LifeCounterPlayerSpecialState { none, deckedOut, answerLeft }
 
 @immutable
+class LifeCounterCommanderDamageDetail {
+  const LifeCounterCommanderDamageDetail({
+    required this.commanderOneDamage,
+    required this.commanderTwoDamage,
+  });
+
+  static const zero = LifeCounterCommanderDamageDetail(
+    commanderOneDamage: 0,
+    commanderTwoDamage: 0,
+  );
+
+  final int commanderOneDamage;
+  final int commanderTwoDamage;
+
+  int get totalDamage => commanderOneDamage + commanderTwoDamage;
+
+  @override
+  bool operator ==(Object other) {
+    return other is LifeCounterCommanderDamageDetail &&
+        other.commanderOneDamage == commanderOneDamage &&
+        other.commanderTwoDamage == commanderTwoDamage;
+  }
+
+  @override
+  int get hashCode => Object.hash(commanderOneDamage, commanderTwoDamage);
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'commander_one_damage': commanderOneDamage,
+      'commander_two_damage': commanderTwoDamage,
+    };
+  }
+
+  static LifeCounterCommanderDamageDetail? tryFromJson(dynamic raw) {
+    if (raw is! Map) {
+      return null;
+    }
+
+    final payload = raw.cast<String, dynamic>();
+    final commanderOneDamage =
+        (payload['commander_one_damage'] as num?)?.toInt();
+    final commanderTwoDamage =
+        (payload['commander_two_damage'] as num?)?.toInt();
+    if (commanderOneDamage == null || commanderTwoDamage == null) {
+      return null;
+    }
+
+    return LifeCounterCommanderDamageDetail(
+      commanderOneDamage: commanderOneDamage.clamp(0, 999),
+      commanderTwoDamage: commanderTwoDamage.clamp(0, 999),
+    );
+  }
+}
+
+@immutable
+class LifeCounterCommanderCastDetail {
+  const LifeCounterCommanderCastDetail({
+    required this.commanderOneCasts,
+    required this.commanderTwoCasts,
+  });
+
+  static const zero = LifeCounterCommanderCastDetail(
+    commanderOneCasts: 0,
+    commanderTwoCasts: 0,
+  );
+
+  final int commanderOneCasts;
+  final int commanderTwoCasts;
+
+  int get totalCasts => commanderOneCasts + commanderTwoCasts;
+
+  @override
+  bool operator ==(Object other) {
+    return other is LifeCounterCommanderCastDetail &&
+        other.commanderOneCasts == commanderOneCasts &&
+        other.commanderTwoCasts == commanderTwoCasts;
+  }
+
+  @override
+  int get hashCode => Object.hash(commanderOneCasts, commanderTwoCasts);
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'commander_one_casts': commanderOneCasts,
+      'commander_two_casts': commanderTwoCasts,
+    };
+  }
+
+  static LifeCounterCommanderCastDetail? tryFromJson(dynamic raw) {
+    if (raw is! Map) {
+      return null;
+    }
+
+    final payload = raw.cast<String, dynamic>();
+    final commanderOneCasts = (payload['commander_one_casts'] as num?)?.toInt();
+    final commanderTwoCasts = (payload['commander_two_casts'] as num?)?.toInt();
+    if (commanderOneCasts == null || commanderTwoCasts == null) {
+      return null;
+    }
+
+    return LifeCounterCommanderCastDetail(
+      commanderOneCasts: commanderOneCasts.clamp(0, 999),
+      commanderTwoCasts: commanderTwoCasts.clamp(0, 999),
+    );
+  }
+}
+
+@immutable
 class LifeCounterSession {
   const LifeCounterSession({
     required this.playerCount,
@@ -21,11 +129,14 @@ class LifeCounterSession {
     required this.energy,
     required this.experience,
     required this.commanderCasts,
+    this.commanderCastDetails,
+    this.playerExtraCounters = const <Map<String, int>>[],
     required this.partnerCommanders,
     required this.playerSpecialStates,
     required this.lastPlayerRolls,
     required this.lastHighRolls,
     required this.commanderDamage,
+    this.commanderDamageDetails,
     required this.stormCount,
     required this.monarchPlayer,
     required this.initiativePlayer,
@@ -63,6 +174,10 @@ class LifeCounterSession {
       energy: List<int>.filled(normalizedPlayerCount, 0),
       experience: List<int>.filled(normalizedPlayerCount, 0),
       commanderCasts: List<int>.filled(normalizedPlayerCount, 0),
+      playerExtraCounters: List<Map<String, int>>.generate(
+        normalizedPlayerCount,
+        (_) => <String, int>{},
+      ),
       partnerCommanders: List<bool>.filled(normalizedPlayerCount, false),
       playerSpecialStates: List<LifeCounterPlayerSpecialState>.filled(
         normalizedPlayerCount,
@@ -101,11 +216,14 @@ class LifeCounterSession {
   final List<int> energy;
   final List<int> experience;
   final List<int> commanderCasts;
+  final List<LifeCounterCommanderCastDetail>? commanderCastDetails;
+  final List<Map<String, int>> playerExtraCounters;
   final List<bool> partnerCommanders;
   final List<LifeCounterPlayerSpecialState> playerSpecialStates;
   final List<int?> lastPlayerRolls;
   final List<int?> lastHighRolls;
   final List<List<int>> commanderDamage;
+  final List<List<LifeCounterCommanderDamageDetail>>? commanderDamageDetails;
   final int stormCount;
   final int? monarchPlayer;
   final int? initiativePlayer;
@@ -122,6 +240,50 @@ class LifeCounterSession {
   int get startingLife =>
       playerCount == 2 ? startingLifeTwoPlayer : startingLifeMultiPlayer;
 
+  List<List<LifeCounterCommanderDamageDetail>>
+  get resolvedCommanderDamageDetails {
+    final details = commanderDamageDetails;
+    if (details != null &&
+        details.length == playerCount &&
+        details.every((row) => row.length == playerCount)) {
+      return details;
+    }
+
+    return List<List<LifeCounterCommanderDamageDetail>>.generate(
+      playerCount,
+      (target) => List<LifeCounterCommanderDamageDetail>.generate(
+        playerCount,
+        (source) => LifeCounterCommanderDamageDetail(
+          commanderOneDamage: commanderDamage[target][source],
+          commanderTwoDamage: 0,
+        ),
+      ),
+    );
+  }
+
+  List<LifeCounterCommanderCastDetail> get resolvedCommanderCastDetails {
+    final details = commanderCastDetails;
+    if (details != null && details.length == playerCount) {
+      return details;
+    }
+
+    return List<LifeCounterCommanderCastDetail>.generate(
+      playerCount,
+      (index) => LifeCounterCommanderCastDetail(
+        commanderOneCasts: commanderCasts[index],
+        commanderTwoCasts: 0,
+      ),
+    );
+  }
+
+  List<Map<String, int>> get resolvedPlayerExtraCounters {
+    if (playerExtraCounters.length == playerCount) {
+      return playerExtraCounters;
+    }
+
+    return List<Map<String, int>>.generate(playerCount, (_) => <String, int>{});
+  }
+
   LifeCounterSession copyWith({
     int? playerCount,
     int? startingLifeTwoPlayer,
@@ -131,11 +293,14 @@ class LifeCounterSession {
     List<int>? energy,
     List<int>? experience,
     List<int>? commanderCasts,
+    List<LifeCounterCommanderCastDetail>? commanderCastDetails,
+    List<Map<String, int>>? playerExtraCounters,
     List<bool>? partnerCommanders,
     List<LifeCounterPlayerSpecialState>? playerSpecialStates,
     List<int?>? lastPlayerRolls,
     List<int?>? lastHighRolls,
     List<List<int>>? commanderDamage,
+    List<List<LifeCounterCommanderDamageDetail>>? commanderDamageDetails,
     int? stormCount,
     int? monarchPlayer,
     bool clearMonarchPlayer = false,
@@ -165,11 +330,15 @@ class LifeCounterSession {
       energy: energy ?? this.energy,
       experience: experience ?? this.experience,
       commanderCasts: commanderCasts ?? this.commanderCasts,
+      commanderCastDetails: commanderCastDetails ?? this.commanderCastDetails,
+      playerExtraCounters: playerExtraCounters ?? this.playerExtraCounters,
       partnerCommanders: partnerCommanders ?? this.partnerCommanders,
       playerSpecialStates: playerSpecialStates ?? this.playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls ?? this.lastPlayerRolls,
       lastHighRolls: lastHighRolls ?? this.lastHighRolls,
       commanderDamage: commanderDamage ?? this.commanderDamage,
+      commanderDamageDetails:
+          commanderDamageDetails ?? this.commanderDamageDetails,
       stormCount: stormCount ?? this.stormCount,
       monarchPlayer:
           clearMonarchPlayer ? null : monarchPlayer ?? this.monarchPlayer,
@@ -209,12 +378,19 @@ class LifeCounterSession {
       'energy': energy,
       'experience': experience,
       'commander_casts': commanderCasts,
+      'commander_cast_details':
+          resolvedCommanderCastDetails.map((entry) => entry.toJson()).toList(),
+      'player_extra_counters': playerExtraCounters,
       'partner_commanders': partnerCommanders,
       'player_special_states':
           playerSpecialStates.map(_encodePlayerSpecialState).toList(),
       'last_player_rolls': lastPlayerRolls,
       'last_high_rolls': lastHighRolls,
       'commander_damage': commanderDamage,
+      'commander_damage_details':
+          resolvedCommanderDamageDetails
+              .map((row) => row.map((entry) => entry.toJson()).toList())
+              .toList(),
       'storm_count': stormCount,
       'monarch_player': monarchPlayer,
       'initiative_player': initiativePlayer,
@@ -282,6 +458,15 @@ class LifeCounterSession {
       payload['commander_casts'],
       playerCount,
     );
+    final commanderCastDetails = _readCommanderCastDetailList(
+      payload['commander_cast_details'],
+      playerCount,
+      fallbackList: commanderCasts,
+    );
+    final playerExtraCounters = _readCounterMapList(
+      payload['player_extra_counters'],
+      playerCount,
+    );
     final partnerCommanders = _readBoolList(
       payload['partner_commanders'],
       playerCount,
@@ -301,6 +486,11 @@ class LifeCounterSession {
     final commanderDamage = _readMatrix(
       payload['commander_damage'],
       playerCount,
+    );
+    final commanderDamageDetails = _readCommanderDamageDetailMatrix(
+      payload['commander_damage_details'],
+      playerCount,
+      fallbackMatrix: commanderDamage,
     );
     final stormCount = (payload['storm_count'] as num?)?.toInt() ?? 0;
     final monarchPlayer = _readOptionalPlayerIndex(
@@ -351,11 +541,14 @@ class LifeCounterSession {
         energy == null ||
         experience == null ||
         commanderCasts == null ||
+        commanderCastDetails == null ||
+        playerExtraCounters == null ||
         partnerCommanders == null ||
         playerSpecialStates == null ||
         lastPlayerRolls == null ||
         lastHighRolls == null ||
-        commanderDamage == null) {
+        commanderDamage == null ||
+        commanderDamageDetails == null) {
       return null;
     }
 
@@ -368,11 +561,14 @@ class LifeCounterSession {
       energy: energy,
       experience: experience,
       commanderCasts: commanderCasts,
+      commanderCastDetails: commanderCastDetails,
+      playerExtraCounters: playerExtraCounters,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls,
       lastHighRolls: lastHighRolls,
       commanderDamage: commanderDamage,
+      commanderDamageDetails: commanderDamageDetails,
       stormCount: stormCount.clamp(0, 999),
       monarchPlayer: monarchPlayer,
       initiativePlayer: initiativePlayer,
@@ -423,6 +619,81 @@ class LifeCounterSession {
     return parsed.cast<int>();
   }
 
+  static List<Map<String, int>>? _readCounterMapList(
+    dynamic value,
+    int expectedLength,
+  ) {
+    if (value == null) {
+      return List<Map<String, int>>.generate(
+        expectedLength,
+        (_) => <String, int>{},
+      );
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <Map<String, int>>[];
+    for (final item in value) {
+      if (item is! Map) {
+        return null;
+      }
+
+      final entry = <String, int>{};
+      for (final mapEntry in item.entries) {
+        final key = mapEntry.key;
+        final rawValue = mapEntry.value;
+        if (key is! String) {
+          return null;
+        }
+        final numericValue = (rawValue as num?)?.toInt();
+        if (numericValue == null) {
+          return null;
+        }
+        entry[key] = numericValue;
+      }
+      parsed.add(entry);
+    }
+
+    return parsed;
+  }
+
+  static List<LifeCounterCommanderCastDetail>? _readCommanderCastDetailList(
+    dynamic value,
+    int expectedLength, {
+    required List<int>? fallbackList,
+  }) {
+    if (value == null) {
+      if (fallbackList == null || fallbackList.length != expectedLength) {
+        return null;
+      }
+
+      return List<LifeCounterCommanderCastDetail>.generate(
+        expectedLength,
+        (index) => LifeCounterCommanderCastDetail(
+          commanderOneCasts: fallbackList[index],
+          commanderTwoCasts: 0,
+        ),
+      );
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <LifeCounterCommanderCastDetail>[];
+    for (final item in value) {
+      final detail = LifeCounterCommanderCastDetail.tryFromJson(item);
+      if (detail == null) {
+        return null;
+      }
+      parsed.add(detail);
+    }
+
+    return parsed;
+  }
+
   static List<int?>? _readNullableIntList(dynamic value, int expectedLength) {
     if (value == null) {
       return List<int?>.filled(expectedLength, null);
@@ -467,6 +738,52 @@ class LifeCounterSession {
         return null;
       }
       rows.add(parsed);
+    }
+
+    return rows;
+  }
+
+  static List<List<LifeCounterCommanderDamageDetail>>?
+  _readCommanderDamageDetailMatrix(
+    dynamic value,
+    int expectedLength, {
+    required List<List<int>>? fallbackMatrix,
+  }) {
+    if (value == null) {
+      if (fallbackMatrix == null) {
+        return null;
+      }
+      return List<List<LifeCounterCommanderDamageDetail>>.generate(
+        expectedLength,
+        (target) => List<LifeCounterCommanderDamageDetail>.generate(
+          expectedLength,
+          (source) => LifeCounterCommanderDamageDetail(
+            commanderOneDamage: fallbackMatrix[target][source],
+            commanderTwoDamage: 0,
+          ),
+        ),
+      );
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final rows = <List<LifeCounterCommanderDamageDetail>>[];
+    for (final row in value) {
+      if (row is! List || row.length != expectedLength) {
+        return null;
+      }
+
+      final parsedRow = <LifeCounterCommanderDamageDetail>[];
+      for (final item in row) {
+        final parsed = LifeCounterCommanderDamageDetail.tryFromJson(item);
+        if (parsed == null) {
+          return null;
+        }
+        parsedRow.add(parsed);
+      }
+      rows.add(parsedRow);
     }
 
     return rows;

@@ -53,7 +53,7 @@ final bool _debugBootIntoLifeCounter =
     kDebugMode &&
     const bool.fromEnvironment(
       'DEBUG_BOOT_INTO_LIFE_COUNTER',
-      defaultValue: false,
+      defaultValue: true,
     );
 
 void main() async {

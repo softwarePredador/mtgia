@@ -24,6 +24,27 @@ void main() {
         energy: const [2, 0, 7, 1],
         experience: const [0, 4, 0, 2],
         commanderCasts: const [0, 1, 3, 2],
+        commanderCastDetails: const [
+          LifeCounterCommanderCastDetail.zero,
+          LifeCounterCommanderCastDetail(
+            commanderOneCasts: 1,
+            commanderTwoCasts: 0,
+          ),
+          LifeCounterCommanderCastDetail(
+            commanderOneCasts: 2,
+            commanderTwoCasts: 3,
+          ),
+          LifeCounterCommanderCastDetail(
+            commanderOneCasts: 0,
+            commanderTwoCasts: 2,
+          ),
+        ],
+        playerExtraCounters: const [
+          {'charge': 3},
+          {'rad': 1},
+          {},
+          {'tickets': 2},
+        ],
         partnerCommanders: const [false, true, false, false],
         playerSpecialStates: const [
           LifeCounterPlayerSpecialState.none,
@@ -38,6 +59,44 @@ void main() {
           [5, 0, 0, 0],
           [0, 4, 0, 0],
           [0, 0, 9, 0],
+        ],
+        commanderDamageDetails: const [
+          [
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail(
+              commanderOneDamage: 5,
+              commanderTwoDamage: 2,
+            ),
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail.zero,
+          ],
+          [
+            LifeCounterCommanderDamageDetail(
+              commanderOneDamage: 5,
+              commanderTwoDamage: 0,
+            ),
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail.zero,
+          ],
+          [
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail(
+              commanderOneDamage: 1,
+              commanderTwoDamage: 3,
+            ),
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail.zero,
+          ],
+          [
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail.zero,
+            LifeCounterCommanderDamageDetail(
+              commanderOneDamage: 7,
+              commanderTwoDamage: 2,
+            ),
+            LifeCounterCommanderDamageDetail.zero,
+          ],
         ],
         stormCount: 13,
         monarchPlayer: 1,
@@ -60,84 +119,90 @@ void main() {
       expect(restored!.toJson(), session.toJson());
     });
 
-    test('sanitizes legacy set-life events on load and writes back normalized json', () async {
-      SharedPreferences.setMockInitialValues({
-        legacyLifeCounterSessionPrefsKey: jsonEncode({
-          'player_count': 4,
-          'starting_life': 40,
-          'starting_life_two_player': 20,
-          'starting_life_multi_player': 40,
-          'lives': [40, 40, 40, 40],
-          'poison': [0, 0, 0, 0],
-          'energy': [0, 0, 0, 0],
-          'experience': [0, 0, 0, 0],
-          'commander_casts': [0, 0, 0, 0],
-          'commander_damage': [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          'storm_count': 0,
-          'last_table_event': 'Jogador 3 ajustado para 15 de vida',
-        }),
-      });
-      store = LifeCounterSessionStore();
+    test(
+      'sanitizes legacy set-life events on load and writes back normalized json',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          legacyLifeCounterSessionPrefsKey: jsonEncode({
+            'player_count': 4,
+            'starting_life': 40,
+            'starting_life_two_player': 20,
+            'starting_life_multi_player': 40,
+            'lives': [40, 40, 40, 40],
+            'poison': [0, 0, 0, 0],
+            'energy': [0, 0, 0, 0],
+            'experience': [0, 0, 0, 0],
+            'commander_casts': [0, 0, 0, 0],
+            'commander_damage': [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            'storm_count': 0,
+            'last_table_event': 'Jogador 3 ajustado para 15 de vida',
+          }),
+        });
+        store = LifeCounterSessionStore();
 
-      final restored = await store.load();
-      final prefs = await SharedPreferences.getInstance();
-      final normalizedRaw = prefs.getString(legacyLifeCounterSessionPrefsKey);
+        final restored = await store.load();
+        final prefs = await SharedPreferences.getInstance();
+        final normalizedRaw = prefs.getString(legacyLifeCounterSessionPrefsKey);
 
-      expect(restored, isNotNull);
-      expect(restored!.lastTableEvent, isNull);
-      expect(normalizedRaw, isNotNull);
-      expect(normalizedRaw, contains('"last_table_event":null'));
-    });
+        expect(restored, isNotNull);
+        expect(restored!.lastTableEvent, isNull);
+        expect(normalizedRaw, isNotNull);
+        expect(normalizedRaw, contains('"last_table_event":null'));
+      },
+    );
 
-    test('restores missing optional collections with compatibility defaults', () async {
-      SharedPreferences.setMockInitialValues({
-        legacyLifeCounterSessionPrefsKey: jsonEncode({
-          'player_count': 2,
-          'starting_life': 20,
-          'lives': [17, 5],
-          'poison': [0, 9],
-          'energy': [2, 0],
-          'experience': [0, 1],
-          'commander_casts': [1, 0],
-          'commander_damage': [
-            [0, 3],
-            [7, 0],
-          ],
-          'storm_count': 4,
-          'turn_tracker_active': true,
-          'turn_tracker_ongoing_game': true,
-          'current_turn_player_index': 1,
-          'current_turn_number': 3,
-          'turn_timer_active': true,
-          'turn_timer_seconds': 30,
-        }),
-      });
-      store = LifeCounterSessionStore();
+    test(
+      'restores missing optional collections with compatibility defaults',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          legacyLifeCounterSessionPrefsKey: jsonEncode({
+            'player_count': 2,
+            'starting_life': 20,
+            'lives': [17, 5],
+            'poison': [0, 9],
+            'energy': [2, 0],
+            'experience': [0, 1],
+            'commander_casts': [1, 0],
+            'commander_damage': [
+              [0, 3],
+              [7, 0],
+            ],
+            'storm_count': 4,
+            'turn_tracker_active': true,
+            'turn_tracker_ongoing_game': true,
+            'current_turn_player_index': 1,
+            'current_turn_number': 3,
+            'turn_timer_active': true,
+            'turn_timer_seconds': 30,
+          }),
+        });
+        store = LifeCounterSessionStore();
 
-      final restored = await store.load();
+        final restored = await store.load();
 
-      expect(restored, isNotNull);
-      expect(
-        restored!.playerSpecialStates,
-        everyElement(LifeCounterPlayerSpecialState.none),
-      );
-      expect(restored.lastPlayerRolls, const [null, null]);
-      expect(restored.lastHighRolls, const [null, null]);
-      expect(restored.startingLifeTwoPlayer, 20);
-      expect(restored.startingLifeMultiPlayer, 40);
-      expect(restored.partnerCommanders, const [false, false]);
-      expect(restored.turnTrackerActive, isTrue);
-      expect(restored.turnTrackerOngoingGame, isTrue);
-      expect(restored.currentTurnPlayerIndex, 1);
-      expect(restored.currentTurnNumber, 3);
-      expect(restored.turnTimerActive, isTrue);
-      expect(restored.turnTimerSeconds, 30);
-    });
+        expect(restored, isNotNull);
+        expect(
+          restored!.playerSpecialStates,
+          everyElement(LifeCounterPlayerSpecialState.none),
+        );
+        expect(restored.lastPlayerRolls, const [null, null]);
+        expect(restored.lastHighRolls, const [null, null]);
+        expect(restored.startingLifeTwoPlayer, 20);
+        expect(restored.startingLifeMultiPlayer, 40);
+        expect(restored.partnerCommanders, const [false, false]);
+        expect(restored.turnTrackerActive, isTrue);
+        expect(restored.turnTrackerOngoingGame, isTrue);
+        expect(restored.currentTurnPlayerIndex, 1);
+        expect(restored.currentTurnNumber, 3);
+        expect(restored.turnTimerActive, isTrue);
+        expect(restored.turnTimerSeconds, 30);
+      },
+    );
 
     test('returns null for invalid payloads', () async {
       SharedPreferences.setMockInitialValues({

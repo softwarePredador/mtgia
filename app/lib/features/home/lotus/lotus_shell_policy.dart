@@ -152,7 +152,7 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock.with-game-timer'
+      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock'
     );
     if (trackedClick) {
       let name = null;
@@ -169,6 +169,10 @@ String get lotusShellCleanupScript {
         name = 'settings_shortcut_pressed';
       } else if (trackedClick.matches('.turn-time-tracker')) {
         name = 'turn_tracker_surface_pressed';
+      } else if (
+        trackedClick.matches('.current-time-clock:not(.with-game-timer)')
+      ) {
+        name = 'clock_surface_pressed';
       } else if (
         trackedClick.matches('.game-timer:not(.current-time-clock)') ||
         trackedClick.matches('.current-time-clock.with-game-timer')
@@ -227,13 +231,17 @@ String get lotusShellCleanupScript {
 
       if (
         trackedClick.matches('.game-timer:not(.current-time-clock)') ||
-        trackedClick.matches('.current-time-clock.with-game-timer')
+        trackedClick.matches('.current-time-clock')
       ) {
         event.preventDefault();
         event.stopPropagation();
         postShellMessage({
           type: 'open-native-game-timer',
-          source: name || 'game_timer_surface_pressed',
+          source:
+            name ||
+            (trackedClick.matches('.current-time-clock:not(.with-game-timer)')
+              ? 'clock_surface_pressed'
+              : 'game_timer_surface_pressed'),
         });
         return;
       }

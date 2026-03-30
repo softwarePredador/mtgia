@@ -12,6 +12,7 @@ Estado atual do contador:
   - history
   - card search
   - turn tracker shell
+  - game timer shell
 - validacao automatizada atual cobre:
   - bootstrap/reopen do contador vivo
   - reboot dedicado do snapshot persistido do contador vivo
@@ -20,13 +21,20 @@ Estado atual do contador:
   - history/card search nativos no caminho vivo
   - engine e sheet nativa do turn tracker
   - tracker runtime apos reload do bundle
+  - game timer pausado via bootstrap canonico
+  - game timer ativo com continuidade apos reload
+  - game timer shell no caminho vivo
+  - clock-only surface abrindo a shell nativa do timer
+  - round-trip real de commander damage com partner commander
+  - round-trip real de storm, monarch e initiative
+  - round-trip real de commander tax separado em `tax-1` e `tax-2`
+  - round-trip real de custom counters por jogador
 
 O que ainda continua Lotus-owned:
 
 - runtime central da mesa
 - overlays internos de gameplay
 - commander damage runtime
-- game timer runtime real
 - Planechase, Archenemy e Bounty
 
 ## Sprint 1 - Closed
@@ -66,47 +74,39 @@ Nota de fechamento:
 - o bundle ainda continua dono do runtime visual do tracker na mesa
 - o proximo ganho real deixa de ser tracker e passa a ser `game timer` e `clock`
 
-## Sprint 3 - Timer And Clock Ownership
+## Sprint 3 - Closed
 
-Status: next
-
-Objetivo:
+Objetivo fechado:
 
 - assumir `game timer` e `clock` como superficie/controlador nosso, ainda sem redesenhar a mesa
 
-Escopo:
+Entregas fechadas:
 
-- mapear o contrato real do Lotus para timer/clock
-  - `gameSettings.gameTimer`
-  - `gameSettings.gameTimerMainScreen`
-  - `gameSettings.showClockOnMainScreen`
-  - `turnTracker.turnTimer`
-- `gameTimerState.startTime / isPaused / pausedTime`
-- decidir se:
-  - so sincronizamos a configuracao e runtime no bundle
-  - ou tomamos posse do timer surface com overlay Flutter
-- validar:
-  - start/pause/resume
-  - persistencia apos reload
-  - `showClockOnMainScreen`
-  - `gameTimerMainScreen`
-
-Done when:
-
-- timer e clock tem contrato nosso claro
-- runtime real passa em smoke de configuracao e continuidade
-- nao ha regressao visual na mesa
-
-Progress so far:
-
-- o host ja espelha e reidrata `gameTimerState` via contrato canonico proprio
-- o snapshot de UI ja diferencia:
+- contrato canonico proprio de `gameTimerState`
+- adapter entre `gameTimerState` e snapshot vivo do Lotus
+- engine propria de `start/pause/resume/reset`
+- sheet nativa do `game timer`
+- shell do `clock` apontando para a mesma superficie ManaLoom
+- snapshot de UI capaz de distinguir:
   - game timer real
   - game timer pausado
   - clock
   - clock acoplado ao game timer
+- smokes reais cobrindo:
+  - configuracao visual do timer/clock
+  - timer pausado
+  - timer ativo com continuidade apos reload
+  - abertura do timer shell no caminho vivo
+  - abertura do clock-only surface no caminho vivo
+
+Nota de fechamento:
+
+- a mesa continua visualmente Lotus-faithful
+- o runtime visual interno do timer ainda e o do bundle, mas a superficie e o contrato agora ja estao sob posse ManaLoom
 
 ## Sprint 4 - Commander Damage And Player Runtime
+
+Status: in progress
 
 Objetivo:
 
@@ -117,13 +117,27 @@ Escopo:
 - mapear com mais fidelidade:
   - commander damage por fonte
   - partner commander
+  - commander tax por parceiro
   - counters clicaveis
+  - table state auxiliar de gameplay
   - estados especiais de jogador
 - aumentar o contrato canonico so no que o runtime realmente usa
 - decidir a primeira subfatia viavel para migracao nativa:
   - commander damage shell
   - counters shell
   - overlays auxiliares
+
+Progresso fechado ate agora:
+
+- split real de `commander1/commander2` preservado no contrato canonico
+- `storm`, `monarch` e `initiative` preservados por chave auxiliar nossa no snapshot vivo
+- `commander tax` preservado com detalhe proprio de `commander_one_casts` e `commander_two_casts`
+- counters arbitrarios do Lotus preservados em `player_extra_counters`
+- smokes reais adicionados:
+  - `integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart`
+  - `integration_test/life_counter_table_state_roundtrip_smoke_test.dart`
+  - `integration_test/life_counter_commander_cast_roundtrip_smoke_test.dart`
+  - `integration_test/life_counter_extra_counters_roundtrip_smoke_test.dart`
 
 Done when:
 
@@ -162,9 +176,8 @@ Antes de trocar o runtime central da mesa, precisamos ter:
 
 ## Recommended Order
 
-1. Sprint 3 - Timer And Clock Ownership
-2. Sprint 4 - Commander Damage And Player Runtime
-3. Sprint 5 - Game Modes And Endgame
+1. Sprint 4 - Commander Damage And Player Runtime
+2. Sprint 5 - Game Modes And Endgame
 
 ## Notes
 

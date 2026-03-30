@@ -483,6 +483,60 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
+    testWidgets('opens native game timer from clock shell shortcut', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-game-timer","source":"clock_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Game Timer'), findsOneWidget);
+      expect(find.text('Idle'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-game-timer-start')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-start')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final state = await LifeCounterGameTimerStateStore().load();
+      expect(state, isNotNull);
+      expect(state!.isActive, isTrue);
+      expect(state.isPaused, isFalse);
+      expect(host.loadBundleCallCount, 2);
+    });
+
     testWidgets('shows ManaLoom-owned feedback for blocked external links', (
       tester,
     ) async {

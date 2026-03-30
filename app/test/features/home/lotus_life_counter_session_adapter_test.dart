@@ -20,6 +20,11 @@ void main() {
             'decked_out',
             'answer_left',
           ]),
+          '__manaloom_table_state': jsonEncode({
+            'stormCount': 6,
+            'monarchPlayer': 1,
+            'initiativePlayer': 3,
+          }),
           'turnTracker': jsonEncode({
             'isActive': true,
             'ongoingGame': true,
@@ -27,11 +32,7 @@ void main() {
             'currentPlayerIndex': 3,
             'startingPlayerIndex': 1,
             'currentTurn': 7,
-            'turnTimer': {
-              'isActive': true,
-              'duration': 93,
-              'countDown': [],
-            },
+            'turnTimer': {'isActive': true, 'duration': 93, 'countDown': []},
           }),
           'players': jsonEncode([
             {
@@ -44,13 +45,12 @@ void main() {
                 'energy': 5,
                 'xp': 2,
                 'tax-1': 4,
+                'charge': 3,
               },
               'commanderDamage': [
                 {
                   'player': 'Player 2',
-                  'damage': {
-                    'commander1': 7,
-                  },
+                  'damage': {'commander1': 7},
                 },
               ],
             },
@@ -65,6 +65,7 @@ void main() {
                 'xp': 0,
                 'tax-1': 2,
                 'tax-2': 6,
+                'rad': 1,
               },
               'commanderDamage': [],
             },
@@ -73,18 +74,11 @@ void main() {
               'life': 15,
               'alive': false,
               'partnerCommander': false,
-              'counters': {
-                'poison': 4,
-                'energy': 0,
-                'xp': 3,
-              },
+              'counters': {'poison': 4, 'energy': 0, 'xp': 3},
               'commanderDamage': [
                 {
                   'player': 'Player 4',
-                  'damage': {
-                    'commander1': 3,
-                    'commander2': 2,
-                  },
+                  'damage': {'commander1': 3, 'commander2': 2},
                 },
               ],
             },
@@ -111,18 +105,40 @@ void main() {
       expect(session.energy, const [5, 1, 0, 0]);
       expect(session.experience, const [2, 0, 3, 0]);
       expect(session.commanderCasts, const [2, 3, 0, 0]);
+      expect(session.resolvedCommanderCastDetails, const [
+        LifeCounterCommanderCastDetail(
+          commanderOneCasts: 2,
+          commanderTwoCasts: 0,
+        ),
+        LifeCounterCommanderCastDetail(
+          commanderOneCasts: 1,
+          commanderTwoCasts: 3,
+        ),
+        LifeCounterCommanderCastDetail.zero,
+        LifeCounterCommanderCastDetail.zero,
+      ]);
+      expect(session.playerExtraCounters, const [
+        {'charge': 3},
+        {'rad': 1},
+        {},
+        {},
+      ]);
       expect(session.partnerCommanders, const [false, true, false, false]);
-      expect(
-        session.playerSpecialStates,
-        const [
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.deckedOut,
-          LifeCounterPlayerSpecialState.answerLeft,
-        ],
-      );
+      expect(session.playerSpecialStates, const [
+        LifeCounterPlayerSpecialState.none,
+        LifeCounterPlayerSpecialState.none,
+        LifeCounterPlayerSpecialState.deckedOut,
+        LifeCounterPlayerSpecialState.answerLeft,
+      ]);
       expect(session.commanderDamage[0][1], 7);
       expect(session.commanderDamage[2][3], 5);
+      expect(
+        session.resolvedCommanderDamageDetails[2][3],
+        const LifeCounterCommanderDamageDetail(
+          commanderOneDamage: 3,
+          commanderTwoDamage: 2,
+        ),
+      );
       expect(session.firstPlayerIndex, 2);
       expect(session.turnTrackerActive, isTrue);
       expect(session.turnTrackerOngoingGame, isTrue);
@@ -131,14 +147,13 @@ void main() {
       expect(session.currentTurnNumber, 7);
       expect(session.turnTimerActive, isTrue);
       expect(session.turnTimerSeconds, 93);
+      expect(session.stormCount, 6);
+      expect(session.monarchPlayer, 1);
+      expect(session.initiativePlayer, 3);
     });
 
     test('returns null for snapshots without players payload', () {
-      const snapshot = LotusStorageSnapshot(
-        values: {
-          'playerCount': '4',
-        },
-      );
+      const snapshot = LotusStorageSnapshot(values: {'playerCount': '4'});
 
       final session = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
 
@@ -156,6 +171,24 @@ void main() {
           energy: [0, 5, 0, 1],
           experience: [0, 0, 4, 1],
           commanderCasts: [0, 2, 0, 1],
+          commanderCastDetails: [
+            LifeCounterCommanderCastDetail.zero,
+            LifeCounterCommanderCastDetail(
+              commanderOneCasts: 1,
+              commanderTwoCasts: 3,
+            ),
+            LifeCounterCommanderCastDetail.zero,
+            LifeCounterCommanderCastDetail(
+              commanderOneCasts: 0,
+              commanderTwoCasts: 1,
+            ),
+          ],
+          playerExtraCounters: [
+            {'charge': 3},
+            {'rad': 1},
+            {},
+            {'tickets': 2},
+          ],
           partnerCommanders: [false, true, false, false],
           playerSpecialStates: [
             LifeCounterPlayerSpecialState.none,
@@ -171,9 +204,47 @@ void main() {
             [0, 0, 0, 3],
             [1, 0, 0, 0],
           ],
+          commanderDamageDetails: [
+            [
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail(
+                commanderOneDamage: 4,
+                commanderTwoDamage: 3,
+              ),
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+            ],
+            [
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail(
+                commanderOneDamage: 5,
+                commanderTwoDamage: 0,
+              ),
+              LifeCounterCommanderDamageDetail.zero,
+            ],
+            [
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail(
+                commanderOneDamage: 1,
+                commanderTwoDamage: 2,
+              ),
+            ],
+            [
+              LifeCounterCommanderDamageDetail(
+                commanderOneDamage: 1,
+                commanderTwoDamage: 0,
+              ),
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+              LifeCounterCommanderDamageDetail.zero,
+            ],
+          ],
           stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
+          monarchPlayer: 2,
+          initiativePlayer: 3,
           firstPlayerIndex: 1,
           turnTrackerActive: true,
           turnTrackerOngoingGame: true,
@@ -191,15 +262,42 @@ void main() {
           jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
 
       expect(jsonDecode(values['playerCount']!), 4);
-      expect(jsonDecode(values['layoutType']!), 'portrait-portrait-portrait-portrait');
+      expect(
+        jsonDecode(values['layoutType']!),
+        'portrait-portrait-portrait-portrait',
+      );
       expect(players, hasLength(4));
       expect((players[1] as Map<String, dynamic>)['life'], 31);
       expect(
-        ((players[1] as Map<String, dynamic>)['counters'] as Map<String, dynamic>)['tax-1'],
-        4,
+        ((players[1] as Map<String, dynamic>)['counters']
+            as Map<String, dynamic>)['tax-1'],
+        2,
+      );
+      expect(
+        ((players[1] as Map<String, dynamic>)['counters']
+            as Map<String, dynamic>)['tax-2'],
+        6,
+      );
+      expect(
+        ((players[0] as Map<String, dynamic>)['counters']
+            as Map<String, dynamic>)['charge'],
+        3,
+      );
+      expect(
+        ((players[3] as Map<String, dynamic>)['counters']
+            as Map<String, dynamic>)['tickets'],
+        2,
       );
       expect((players[2] as Map<String, dynamic>)['alive'], isFalse);
       expect((players[1] as Map<String, dynamic>)['partnerCommander'], isTrue);
+      expect(
+        ((players[0] as Map<String, dynamic>)['commanderDamage'] as List)
+            .firstWhere(
+              (entry) =>
+                  (entry as Map<String, dynamic>)['player'] == 'Player 2',
+            )['damage'],
+        {'commander1': 4, 'commander2': 3},
+      );
       expect(turnTracker['isActive'], isTrue);
       expect(turnTracker['ongoingGame'], isTrue);
       expect(turnTracker['autoHighroll'], isTrue);
@@ -214,22 +312,32 @@ void main() {
         (turnTracker['turnTimer'] as Map<String, dynamic>)['duration'],
         45,
       );
-      expect(
-        jsonDecode(values['__manaloom_player_special_states']!),
-        ['none', 'none', 'decked_out', 'answer_left'],
-      );
+      expect(jsonDecode(values['__manaloom_player_special_states']!), [
+        'none',
+        'none',
+        'decked_out',
+        'answer_left',
+      ]);
+      expect(jsonDecode(values['__manaloom_table_state']!), {
+        'stormCount': 0,
+        'monarchPlayer': 2,
+        'initiativePlayer': 3,
+      });
     });
 
     test('uses Lotus-compatible layout keys for different player counts', () {
-      final twoPlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
-        LifeCounterSession.initial(playerCount: 2),
-      );
-      final fivePlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
-        LifeCounterSession.initial(playerCount: 5),
-      );
-      final sixPlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
-        LifeCounterSession.initial(playerCount: 6),
-      );
+      final twoPlayerValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            LifeCounterSession.initial(playerCount: 2),
+          );
+      final fivePlayerValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            LifeCounterSession.initial(playerCount: 5),
+          );
+      final sixPlayerValues =
+          LotusLifeCounterSessionAdapter.buildSnapshotValues(
+            LifeCounterSession.initial(playerCount: 6),
+          );
 
       expect(jsonDecode(twoPlayerValues['layoutType']!), 'portrait-portrait');
       expect(
@@ -321,13 +429,10 @@ void main() {
       final session = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
 
       expect(session, isNotNull);
-      expect(
-        session!.playerSpecialStates,
-        const [
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.answerLeft,
-        ],
-      );
+      expect(session!.playerSpecialStates, const [
+        LifeCounterPlayerSpecialState.none,
+        LifeCounterPlayerSpecialState.answerLeft,
+      ]);
     });
   });
 }

@@ -20,6 +20,7 @@ class LotusLifeCounterSessionAdapter {
   static const String _currentGameMetaKey = 'currentGameMeta';
   static const String _manaloomPlayerSpecialStatesKey =
       '__manaloom_player_special_states';
+  static const String _manaloomTableStateKey = '__manaloom_table_state';
   static const Map<int, String> _layoutTypeByPlayerCount = <int, String>{
     2: 'portrait-portrait',
     3: 'portrait-portrait-landscape',
@@ -82,6 +83,10 @@ class LotusLifeCounterSessionAdapter {
       snapshot.values[_manaloomPlayerSpecialStatesKey],
       playerCount,
     );
+    final persistedTableState = _decodeTableState(
+      snapshot.values[_manaloomTableStateKey],
+      playerCount,
+    );
 
     final playerNames = <String>[];
     final lives = <int>[];
@@ -89,6 +94,8 @@ class LotusLifeCounterSessionAdapter {
     final energy = <int>[];
     final experience = <int>[];
     final commanderCasts = <int>[];
+    final commanderCastDetails = <LifeCounterCommanderCastDetail>[];
+    final playerExtraCounters = <Map<String, int>>[];
     final partnerCommanders = <bool>[];
     final playerSpecialStates = <LifeCounterPlayerSpecialState>[];
     final lastPlayerRolls = List<int?>.filled(playerCount, null);
@@ -97,6 +104,14 @@ class LotusLifeCounterSessionAdapter {
       playerCount,
       (_) => List<int>.filled(playerCount, 0),
     );
+    final commanderDamageDetails =
+        List<List<LifeCounterCommanderDamageDetail>>.generate(
+          playerCount,
+          (_) => List<LifeCounterCommanderDamageDetail>.generate(
+            playerCount,
+            (_) => LifeCounterCommanderDamageDetail.zero,
+          ),
+        );
 
     for (final rawPlayer in rawPlayers) {
       if (rawPlayer is! Map) {
@@ -129,6 +144,13 @@ class LotusLifeCounterSessionAdapter {
                 2)
             .floor(),
       );
+      commanderCastDetails.add(
+        LifeCounterCommanderCastDetail(
+          commanderOneCasts: (commanderOneTax / 2).floor(),
+          commanderTwoCasts: (commanderTwoTax / 2).floor(),
+        ),
+      );
+      playerExtraCounters.add(_extractExtraCounters(counters));
       partnerCommanders.add(player['partnerCommander'] == true);
       final playerIndex = playerNames.length - 1;
       final isAlive = player['alive'] != false;
@@ -174,11 +196,23 @@ class LotusLifeCounterSessionAdapter {
         }
 
         final damageMap = (entry['damage'] as Map).cast<String, dynamic>();
-        var totalDamage = 0;
-        for (final damage in damageMap.values) {
-          totalDamage += _parseNum(damage) ?? 0;
+        final commanderOneDamage = _parseNum(damageMap['commander1']) ?? 0;
+        final commanderTwoDamage = _parseNum(damageMap['commander2']) ?? 0;
+        var totalDamage = commanderOneDamage + commanderTwoDamage;
+        if (totalDamage == 0) {
+          for (final damage in damageMap.values) {
+            totalDamage += _parseNum(damage) ?? 0;
+          }
         }
         commanderDamage[targetIndex][sourceIndex] = totalDamage;
+        commanderDamageDetails[targetIndex][sourceIndex] =
+            LifeCounterCommanderDamageDetail(
+              commanderOneDamage:
+                  commanderOneDamage == 0 && totalDamage > 0
+                      ? totalDamage
+                      : commanderOneDamage,
+              commanderTwoDamage: commanderTwoDamage,
+            );
       }
     }
 
@@ -226,14 +260,17 @@ class LotusLifeCounterSessionAdapter {
       energy: energy,
       experience: experience,
       commanderCasts: commanderCasts,
+      commanderCastDetails: commanderCastDetails,
+      playerExtraCounters: playerExtraCounters,
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls,
       lastHighRolls: lastHighRolls,
       commanderDamage: commanderDamage,
-      stormCount: 0,
-      monarchPlayer: null,
-      initiativePlayer: null,
+      commanderDamageDetails: commanderDamageDetails,
+      stormCount: persistedTableState?.stormCount ?? 0,
+      monarchPlayer: persistedTableState?.monarchPlayer,
+      initiativePlayer: persistedTableState?.initiativePlayer,
       firstPlayerIndex: firstPlayerIndex,
       turnTrackerActive: turnTrackerActive,
       turnTrackerOngoingGame: turnTrackerOngoingGame,
@@ -267,8 +304,12 @@ class LotusLifeCounterSessionAdapter {
       (index) => 'Player ${index + 1}',
     );
     final players = <Map<String, Object?>>[];
+    final resolvedCommanderCastDetails = session.resolvedCommanderCastDetails;
+    final resolvedCommanderDamageDetails =
+        session.resolvedCommanderDamageDetails;
+    final resolvedPlayerExtraCounters = session.resolvedPlayerExtraCounters;
     for (var index = 0; index < session.playerCount; index += 1) {
-      final counters = <String, int>{};
+      final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
       if (session.poison[index] > 0) {
         counters['poison'] = session.poison[index];
       }
@@ -278,19 +319,39 @@ class LotusLifeCounterSessionAdapter {
       if (session.experience[index] > 0) {
         counters['xp'] = session.experience[index];
       }
-      if (session.commanderCasts[index] > 0) {
+      final castDetail = resolvedCommanderCastDetails[index];
+      if (castDetail.commanderOneCasts > 0) {
+        counters['tax-1'] = castDetail.commanderOneCasts * 2;
+      }
+      if (castDetail.commanderTwoCasts > 0) {
+        counters['tax-2'] = castDetail.commanderTwoCasts * 2;
+      }
+      if (counters['tax-1'] == null &&
+          counters['tax-2'] == null &&
+          session.commanderCasts[index] > 0) {
         counters['tax-1'] = session.commanderCasts[index] * 2;
       }
 
       final commanderDamage = <Map<String, Object?>>[];
       for (var source = 0; source < session.playerCount; source += 1) {
-        final damage = session.commanderDamage[index][source];
-        if (damage <= 0) {
+        final damageDetail = resolvedCommanderDamageDetails[index][source];
+        final totalDamage = damageDetail.totalDamage;
+        if (totalDamage <= 0) {
           continue;
+        }
+        final damagePayload = <String, int>{};
+        if (damageDetail.commanderOneDamage > 0) {
+          damagePayload['commander1'] = damageDetail.commanderOneDamage;
+        }
+        if (damageDetail.commanderTwoDamage > 0) {
+          damagePayload['commander2'] = damageDetail.commanderTwoDamage;
+        }
+        if (damagePayload.isEmpty && totalDamage > 0) {
+          damagePayload['commander1'] = totalDamage;
         }
         commanderDamage.add({
           'player': playerNames[source],
-          'damage': <String, int>{'commander1': damage},
+          'damage': damagePayload,
         });
       }
 
@@ -344,6 +405,13 @@ class LotusLifeCounterSessionAdapter {
         session.playerSpecialStates
             .map(_encodePlayerSpecialState)
             .toList(growable: false),
+      ),
+      _manaloomTableStateKey: jsonEncode(
+        _encodeTableState(
+          stormCount: session.stormCount,
+          monarchPlayer: session.monarchPlayer,
+          initiativePlayer: session.initiativePlayer,
+        ),
       ),
       if (settings != null)
         ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
@@ -541,6 +609,65 @@ class LotusLifeCounterSessionAdapter {
     }
   }
 
+  static _LotusEmbeddedTableState? _decodeTableState(
+    String? raw,
+    int playerCount,
+  ) {
+    final decoded = _decodeJson(raw);
+    if (decoded is! Map) {
+      return null;
+    }
+
+    final payload = decoded.cast<String, dynamic>();
+    return _LotusEmbeddedTableState(
+      stormCount: (_parseNum(payload['stormCount']) ?? 0).clamp(0, 999),
+      monarchPlayer: _readOptionalPlayerIndex(
+        payload['monarchPlayer'],
+        playerCount,
+      ),
+      initiativePlayer: _readOptionalPlayerIndex(
+        payload['initiativePlayer'],
+        playerCount,
+      ),
+    );
+  }
+
+  static Map<String, Object?> _encodeTableState({
+    required int stormCount,
+    required int? monarchPlayer,
+    required int? initiativePlayer,
+  }) {
+    return <String, Object?>{
+      'stormCount': stormCount.clamp(0, 999),
+      'monarchPlayer': monarchPlayer,
+      'initiativePlayer': initiativePlayer,
+    };
+  }
+
+  static Map<String, int> _extractExtraCounters(Map<String, dynamic> counters) {
+    final extras = <String, int>{};
+    for (final entry in counters.entries) {
+      if (_isKnownCounterKey(entry.key)) {
+        continue;
+      }
+
+      final parsed = _parseNum(entry.value);
+      if (parsed == null) {
+        continue;
+      }
+      extras[entry.key] = parsed;
+    }
+    return extras;
+  }
+
+  static bool _isKnownCounterKey(String key) {
+    return key == 'poison' ||
+        key == 'energy' ||
+        key == 'xp' ||
+        key == 'tax-1' ||
+        key == 'tax-2';
+  }
+
   static int? _normalizeCanonicalTurnTrackerPlayerIndex(
     LifeCounterSession session,
     int? candidate,
@@ -596,4 +723,16 @@ class LotusLifeCounterSessionAdapter {
       'currentTurn': session.currentTurnNumber,
     };
   }
+}
+
+class _LotusEmbeddedTableState {
+  const _LotusEmbeddedTableState({
+    required this.stormCount,
+    required this.monarchPlayer,
+    required this.initiativePlayer,
+  });
+
+  final int stormCount;
+  final int? monarchPlayer;
+  final int? initiativePlayer;
 }
