@@ -56,7 +56,7 @@ String get lotusShellCleanupScript {
   const SUPPRESSED_SELECTORS = $suppressedSelectors;
   const STYLE_ID = 'manaloom-lotus-shell-policy';
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
-  const SHELL_CHANNEL = 'FlutterLotusShellBridge';
+  const SHELL_CHANNEL = 'FlutterManaLoomShellBridge';
   document.title = 'ManaLoom Life Counter';
   const postShellMessage = (payload) => {
     try {
@@ -152,7 +152,7 @@ String get lotusShellCleanupScript {
 
     event.preventDefault();
     event.stopPropagation();
-    console.log('[LotusShell] Blocked branded link:', href);
+    console.log('[ManaLoomShell] Blocked branded link:', href);
     postShellMessage({
       type: 'blocked-link',
       href,
@@ -165,7 +165,7 @@ String get lotusShellCleanupScript {
 
   window.open = function(url, target, features) {
     if (isBlockedUrl(url)) {
-      console.log('[LotusShell] Blocked branded window.open:', url);
+      console.log('[ManaLoomShell] Blocked branded window.open:', url);
       postShellMessage({
         type: 'blocked-window-open',
         href: url,

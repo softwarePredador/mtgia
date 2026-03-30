@@ -269,7 +269,7 @@ class LotusHostController {
   }
 
   void _notifyBlockedNavigation(String url) {
-    _onShellMessageRequested('Lotus external link blocked: $url');
+    _onShellMessageRequested('ManaLoom blocked an external link: $url');
   }
 
   String _resolveBundleEntry() {

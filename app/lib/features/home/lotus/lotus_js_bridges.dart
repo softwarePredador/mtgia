@@ -12,7 +12,7 @@ class LotusJavaScriptBridges {
 
   static const String clipboardChannelName = 'FlutterClipboardBridge';
   static const String appReviewChannelName = 'FlutterAppReviewBridge';
-  static const String shellChannelName = 'FlutterLotusShellBridge';
+  static const String shellChannelName = 'FlutterManaLoomShellBridge';
 
   static void register(
     WebViewController controller, {
