@@ -211,6 +211,45 @@ void main() {
       },
     );
 
+    testWidgets('opens native quick actions from the menu shortcut', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Quick Actions'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-quick-actions-settings')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Life Counter Settings'), findsOneWidget);
+    });
+
     testWidgets('opens native history from shell shortcut', (tester) async {
       late _FakeLotusHost host;
 
@@ -542,6 +581,55 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
+    testWidgets('opens native dice from shell shortcut', (tester) async {
+      late _FakeLotusHost host;
+
+      await LifeCounterSessionStore().save(
+        LifeCounterSession.initial(playerCount: 4),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-dice","source":"dice_shortcut_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Dice Tools'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-dice-high-roll')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-dice-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lastHighRolls.whereType<int>().length, 4);
+      expect(host.loadBundleCallCount, 2);
+    });
+
     testWidgets('opens native commander damage from shell shortcut', (
       tester,
     ) async {
@@ -845,6 +933,69 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
+    testWidgets('rolls player d20 from the player state hub', (tester) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        LifeCounterSession.initial(playerCount: 4),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":0}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lastPlayerRolls[0], isNotNull);
+      expect(session.lastTableEvent, startsWith('Player 1 rolou D20: '));
+      expect(host.loadBundleCallCount, 2);
+    });
+
     testWidgets('opens native player appearance from shell shortcut', (
       tester,
     ) async {
@@ -922,7 +1073,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Appearance'), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('life-counter-native-player-appearance-apply'),
+        ),
+        findsOneWidget,
+      );
 
       await tester.enterText(
         find.byKey(
@@ -958,6 +1114,139 @@ void main() {
       expect(session.resolvedPlayerAppearances[1].background, '#CF7AEF');
       expect(host.loadBundleCallCount, 2);
     });
+
+    testWidgets(
+      'opens native player appearance from the player state hub',
+      (tester) async {
+        late _FakeLotusHost host;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 32, 25, 11],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            playerAppearances: [
+              LifeCounterPlayerAppearance(background: '#FFB51E'),
+              LifeCounterPlayerAppearance(background: '#FF0A5B'),
+              LifeCounterPlayerAppearance(background: '#CF7AEF'),
+              LifeCounterPlayerAppearance(background: '#4B57FF'),
+            ],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":1}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.byKey(
+            const Key('life-counter-native-player-state-manage-appearance'),
+          ),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(
+          find.byKey(
+            const Key('life-counter-native-player-state-manage-appearance'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-player-state-manage-appearance'),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(
+            const Key('life-counter-native-player-appearance-apply'),
+          ),
+          findsOneWidget,
+        );
+
+        await tester.enterText(
+          find.byKey(
+            const Key('life-counter-native-player-appearance-nickname'),
+          ),
+          'State Hub Pilot',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-player-appearance-apply'),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Player State'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-state-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.resolvedPlayerAppearances[1].nickname, 'State Hub Pilot');
+        expect(host.loadBundleCallCount, 2);
+      },
+    );
 
     testWidgets('exports native player appearance to clipboard', (
       tester,
@@ -1368,12 +1657,22 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Player Appearance'), findsOneWidget);
+        expect(
+          find.byKey(
+            const Key('life-counter-native-player-appearance-apply'),
+          ),
+          findsOneWidget,
+        );
 
         await tester.tap(find.text('Cancel'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Player Appearance'), findsNothing);
+        expect(
+          find.byKey(
+            const Key('life-counter-native-player-appearance-apply'),
+          ),
+          findsNothing,
+        );
         expect(host.loadBundleCallCount, 2);
       },
     );

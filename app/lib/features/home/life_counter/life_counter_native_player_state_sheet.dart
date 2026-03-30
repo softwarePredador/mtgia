@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import 'life_counter_dice_engine.dart';
 import 'life_counter_native_commander_damage_sheet.dart';
+import 'life_counter_native_player_appearance_sheet.dart';
 import 'life_counter_native_player_counter_sheet.dart';
 import 'life_counter_session.dart';
 
@@ -39,6 +43,8 @@ class _LifeCounterNativePlayerStateSheet extends StatefulWidget {
 
 class _LifeCounterNativePlayerStateSheetState
     extends State<_LifeCounterNativePlayerStateSheet> {
+  static final Random _runtimeRandom = Random();
+
   late int _targetPlayerIndex;
   late LifeCounterSession _draftSession;
   late bool _partnerCommander;
@@ -111,6 +117,33 @@ class _LifeCounterNativePlayerStateSheetState
 
     setState(() {
       _draftSession = updatedSession;
+      _syncFromTarget();
+    });
+  }
+
+  Future<void> _openManageAppearance() async {
+    final updatedSession = await showLifeCounterNativePlayerAppearanceSheet(
+      context,
+      initialSession: _buildUpdatedSession(),
+      initialTargetPlayerIndex: _targetPlayerIndex,
+    );
+    if (!mounted || updatedSession == null) {
+      return;
+    }
+
+    setState(() {
+      _draftSession = updatedSession;
+      _syncFromTarget();
+    });
+  }
+
+  void _rollPlayerD20() {
+    setState(() {
+      _draftSession = LifeCounterDiceEngine.runPlayerD20(
+        _buildUpdatedSession(),
+        _targetPlayerIndex,
+        random: _runtimeRandom,
+      );
       _syncFromTarget();
     });
   }
@@ -251,6 +284,22 @@ class _LifeCounterNativePlayerStateSheetState
                               onPressed: _openManageCommanderDamage,
                               icon: const Icon(Icons.shield_outlined),
                               label: const Text('Commander Damage'),
+                            ),
+                            FilledButton.tonalIcon(
+                              key: const Key(
+                                'life-counter-native-player-state-manage-appearance',
+                              ),
+                              onPressed: _openManageAppearance,
+                              icon: const Icon(Icons.palette_outlined),
+                              label: const Text('Player Appearance'),
+                            ),
+                            FilledButton.tonalIcon(
+                              key: const Key(
+                                'life-counter-native-player-state-roll-d20',
+                              ),
+                              onPressed: _rollPlayerD20,
+                              icon: const Icon(Icons.casino_rounded),
+                              label: const Text('Roll D20'),
                             ),
                           ],
                         ),

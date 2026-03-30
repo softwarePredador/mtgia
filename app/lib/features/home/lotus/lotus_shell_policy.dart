@@ -272,6 +272,8 @@ String get lotusShellCleanupScript {
       const playerCounterKey = resolvePlayerCounterKey(trackedClick);
       if (trackedClick.matches('.menu-button')) {
         name = 'menu_button_pressed';
+      } else if (trackedClick.matches('.dice-btn')) {
+        name = 'dice_shortcut_pressed';
       } else if (trackedClick.matches('.life-history-btn')) {
         name = 'history_shortcut_pressed';
       } else if (trackedClick.matches('.card-search-btn')) {
@@ -306,6 +308,26 @@ String get lotusShellCleanupScript {
           selector: trackedClick.className || trackedClick.tagName,
           ...(playerCounterKey ? { counter_key: playerCounterKey } : {}),
         });
+      }
+
+      if (trackedClick.matches('.menu-button')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-quick-actions',
+          source: name || 'menu_button_pressed',
+        });
+        return;
+      }
+
+      if (trackedClick.matches('.dice-btn')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-dice',
+          source: name || 'dice_shortcut_pressed',
+        });
+        return;
       }
 
       if (trackedClick.matches('.life-history-btn')) {

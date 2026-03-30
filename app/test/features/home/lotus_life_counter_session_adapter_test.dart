@@ -24,6 +24,9 @@ void main() {
             'stormCount': 6,
             'monarchPlayer': 1,
             'initiativePlayer': 3,
+            'lastPlayerRolls': [12, null, 4, 18],
+            'lastHighRolls': [17, 8, null, 19],
+            'firstPlayerIndex': 2,
           }),
           'turnTracker': jsonEncode({
             'isActive': true,
@@ -168,6 +171,8 @@ void main() {
       expect(session.stormCount, 6);
       expect(session.monarchPlayer, 1);
       expect(session.initiativePlayer, 3);
+      expect(session.lastPlayerRolls, const [12, null, 4, 18]);
+      expect(session.lastHighRolls, const [17, 8, null, 19]);
     });
 
     test('returns null for snapshots without players payload', () {
@@ -364,6 +369,9 @@ void main() {
         'stormCount': 0,
         'monarchPlayer': 2,
         'initiativePlayer': 3,
+        'lastPlayerRolls': [null, null, null, null],
+        'lastHighRolls': [null, null, null, null],
+        'firstPlayerIndex': 1,
       });
     });
 

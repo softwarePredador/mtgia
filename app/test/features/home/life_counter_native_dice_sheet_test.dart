@@ -1,0 +1,63 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_native_dice_sheet.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
+
+void main() {
+  group('LifeCounterNativeDiceSheet', () {
+    testWidgets('runs high roll and applies the updated session', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      LifeCounterSession? result;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      result = await showLifeCounterNativeDiceSheet(
+                        context,
+                        initialSession: LifeCounterSession.initial(
+                          playerCount: 4,
+                        ),
+                        random: Random(7),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Dice Tools'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-dice-high-roll')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('High Roll Board'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.lastHighRolls.whereType<int>().length, 4);
+      expect(result!.lastTableEvent, startsWith('High Roll'));
+    });
+  });
+}

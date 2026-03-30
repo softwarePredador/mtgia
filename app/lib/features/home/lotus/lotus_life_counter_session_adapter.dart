@@ -96,8 +96,12 @@ class LotusLifeCounterSessionAdapter {
     final playerAppearances = <LifeCounterPlayerAppearance>[];
     final partnerCommanders = <bool>[];
     final playerSpecialStates = <LifeCounterPlayerSpecialState>[];
-    final lastPlayerRolls = List<int?>.filled(playerCount, null);
-    final lastHighRolls = List<int?>.filled(playerCount, null);
+    final lastPlayerRolls =
+        persistedTableState?.lastPlayerRolls ??
+        List<int?>.filled(playerCount, null);
+    final lastHighRolls =
+        persistedTableState?.lastHighRolls ??
+        List<int?>.filled(playerCount, null);
     final commanderDamage = List<List<int>>.generate(
       playerCount,
       (_) => List<int>.filled(playerCount, 0),
@@ -236,7 +240,7 @@ class LotusLifeCounterSessionAdapter {
               playerCount,
               turnTrackerDirection,
             )
-            : null;
+            : persistedTableState?.firstPlayerIndex;
     final currentTurnPlayerIndex =
         turnTracker is Map
             ? _fromLotusTurnTrackerIndex(
@@ -431,6 +435,9 @@ class LotusLifeCounterSessionAdapter {
           stormCount: session.stormCount,
           monarchPlayer: session.monarchPlayer,
           initiativePlayer: session.initiativePlayer,
+          lastPlayerRolls: session.lastPlayerRolls,
+          lastHighRolls: session.lastHighRolls,
+          firstPlayerIndex: session.firstPlayerIndex,
         ),
       ),
       if (settings != null)
@@ -568,6 +575,9 @@ class LotusLifeCounterSessionAdapter {
           stormCount: session.stormCount,
           monarchPlayer: session.monarchPlayer,
           initiativePlayer: session.initiativePlayer,
+          lastPlayerRolls: session.lastPlayerRolls,
+          lastHighRolls: session.lastHighRolls,
+          firstPlayerIndex: session.firstPlayerIndex,
         ),
       ),
     };
@@ -792,6 +802,15 @@ class LotusLifeCounterSessionAdapter {
         payload['initiativePlayer'],
         playerCount,
       ),
+      lastPlayerRolls: _readNullableIntList(
+        payload['lastPlayerRolls'],
+        playerCount,
+      ),
+      lastHighRolls: _readNullableIntList(payload['lastHighRolls'], playerCount),
+      firstPlayerIndex: _readOptionalPlayerIndex(
+        payload['firstPlayerIndex'],
+        playerCount,
+      ),
     );
   }
 
@@ -799,12 +818,32 @@ class LotusLifeCounterSessionAdapter {
     required int stormCount,
     required int? monarchPlayer,
     required int? initiativePlayer,
+    required List<int?> lastPlayerRolls,
+    required List<int?> lastHighRolls,
+    required int? firstPlayerIndex,
   }) {
     return <String, Object?>{
       'stormCount': stormCount.clamp(0, 999),
       'monarchPlayer': monarchPlayer,
       'initiativePlayer': initiativePlayer,
+      'lastPlayerRolls': _normalizeNullableIntList(lastPlayerRolls),
+      'lastHighRolls': _normalizeNullableIntList(lastHighRolls),
+      'firstPlayerIndex': firstPlayerIndex,
     };
+  }
+
+  static List<int?> _readNullableIntList(Object? raw, int playerCount) {
+    if (raw is! List || raw.length != playerCount) {
+      return List<int?>.filled(playerCount, null);
+    }
+
+    return raw
+        .map<int?>((entry) => entry == null ? null : _parseNum(entry))
+        .toList(growable: false);
+  }
+
+  static List<int?> _normalizeNullableIntList(List<int?> values) {
+    return values.map<int?>((entry) => entry).toList(growable: false);
   }
 
   static Map<String, int> _extractExtraCounters(Map<String, dynamic> counters) {
@@ -893,9 +932,15 @@ class _LotusEmbeddedTableState {
     required this.stormCount,
     required this.monarchPlayer,
     required this.initiativePlayer,
+    required this.lastPlayerRolls,
+    required this.lastHighRolls,
+    required this.firstPlayerIndex,
   });
 
   final int stormCount;
   final int? monarchPlayer;
   final int? initiativePlayer;
+  final List<int?> lastPlayerRolls;
+  final List<int?> lastHighRolls;
+  final int? firstPlayerIndex;
 }

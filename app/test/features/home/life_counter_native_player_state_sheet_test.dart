@@ -142,5 +142,105 @@ void main() {
         expect(result, isNotNull);
       },
     );
+
+    testWidgets('opens the nested player appearance hub and returns to state', (
+      tester,
+    ) async {
+      LifeCounterSession? result;
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: LifeCounterSession.initial(playerCount: 4),
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-manage-appearance'),
+        ),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-manage-appearance'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-player-state-manage-appearance'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(
+          const Key('life-counter-native-player-appearance-apply'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Cancel').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+    });
+
+    testWidgets('rolls player d20 from the player state hub', (tester) async {
+      LifeCounterSession? result;
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: LifeCounterSession.initial(playerCount: 4),
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.lastPlayerRolls[0], isNotNull);
+      expect(result!.lastTableEvent, startsWith('Player 1 rolou D20: '));
+    });
   });
 }

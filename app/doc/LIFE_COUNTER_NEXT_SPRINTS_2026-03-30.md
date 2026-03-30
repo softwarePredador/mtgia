@@ -139,11 +139,30 @@ Progresso fechado ate agora:
   - `player appearance`
   - `player counters`
   - `player state`
+- `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para:
+  - `settings`
+  - `history`
+  - `card search`
+  - `turn tracker`
+  - `game timer`
+  - `dice`
+- shell nativa adicional assumida no runtime vivo:
+  - `dice / high roll / coin / roll 1st`
+- `player state` agora funciona como hub para:
+  - `player counters`
+  - `commander damage`
+  - `player appearance`
+  - `player D20`
 - takeover do `option-card` do Lotus abre a shell nativa de estado do jogador
 - `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
 - takeover do `color-card` e da entrada de background do Lotus abre a shell nativa de aparencia do jogador
 - `player appearance` agora tambem tem transporte proprio de import/export via clipboard
 - perfis salvos de aparencia agora ficam em store propria ManaLoom
+- `__manaloom_table_state` agora preserva tambem:
+  - `lastPlayerRolls`
+  - `lastHighRolls`
+  - `firstPlayerIndex` auxiliar
+- `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
 - smokes reais adicionados:
   - `integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_table_state_roundtrip_smoke_test.dart`
@@ -154,6 +173,7 @@ Progresso fechado ate agora:
   - `integration_test/life_counter_native_player_appearance_profiles_smoke_test.dart`
   - `integration_test/life_counter_native_player_counter_smoke_test.dart`
   - `integration_test/life_counter_native_player_state_smoke_test.dart`
+  - `integration_test/life_counter_native_player_state_d20_hub_smoke_test.dart`
 
 Done when:
 

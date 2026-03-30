@@ -52,7 +52,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'round-trips storm monarch and initiative through the live Lotus snapshot',
+    'round-trips table state through the live Lotus snapshot',
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
       final sessionStore = LifeCounterSessionStore();
@@ -82,8 +82,8 @@ void main() {
             LifeCounterPlayerSpecialState.none,
             LifeCounterPlayerSpecialState.none,
           ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
+          lastPlayerRolls: [13, null, 7, 20],
+          lastHighRolls: [18, 11, null, 19],
           commanderDamage: [
             [0, 0, 0, 0],
             [0, 0, 0, 0],
@@ -122,6 +122,9 @@ void main() {
         'stormCount': 9,
         'monarchPlayer': 2,
         'initiativePlayer': 1,
+        'lastPlayerRolls': [13, null, 7, 20],
+        'lastHighRolls': [18, 11, null, 19],
+        'firstPlayerIndex': 0,
       });
 
       await tester.pumpWidget(const SizedBox.shrink());
@@ -142,6 +145,9 @@ void main() {
       expect(restoredSession!.stormCount, 9);
       expect(restoredSession.monarchPlayer, 2);
       expect(restoredSession.initiativePlayer, 1);
+      expect(restoredSession.lastPlayerRolls, [13, null, 7, 20]);
+      expect(restoredSession.lastHighRolls, [18, 11, null, 19]);
+      expect(restoredSession.firstPlayerIndex, 0);
     },
   );
 }
