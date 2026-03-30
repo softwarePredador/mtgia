@@ -715,6 +715,15 @@ void main() {
       expect(find.text('Player Counter'), findsOneWidget);
       expect(find.text('Player 1 · Poison'), findsOneWidget);
 
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-counter-plus')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-counter-plus')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-counter-plus')),
       );
@@ -807,6 +816,15 @@ void main() {
       await tester.tap(find.text('Partner commander'));
       await tester.pumpAndSettle();
 
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-answerLeft')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-answerLeft')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-answerLeft')),
       );

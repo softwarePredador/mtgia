@@ -42,7 +42,10 @@ class _LifeCounterNativePlayerCounterSheet extends StatefulWidget {
 class _LifeCounterNativePlayerCounterSheetState
     extends State<_LifeCounterNativePlayerCounterSheet> {
   late final int _targetPlayerIndex;
-  late int _value;
+  late final TextEditingController _customCounterNameController;
+  late LifeCounterSession _draftSession;
+  late String _selectedCounterKey;
+  String? _customCounterError;
 
   @override
   void initState() {
@@ -51,40 +54,103 @@ class _LifeCounterNativePlayerCounterSheetState
       0,
       widget.initialSession.playerCount - 1,
     );
-    _value = _readCounterValue(
-      widget.initialSession,
-      _targetPlayerIndex,
+    _draftSession = widget.initialSession;
+    _selectedCounterKey = _resolveInitialCounterKey(
       widget.counterKey,
+      _draftSession,
+      _targetPlayerIndex,
     );
+    _customCounterNameController = TextEditingController();
   }
 
-  int get _step => _isTaxCounter(widget.counterKey) ? 2 : 1;
+  @override
+  void dispose() {
+    _customCounterNameController.dispose();
+    super.dispose();
+  }
+
+  int get _currentValue =>
+      _readCounterValue(_draftSession, _targetPlayerIndex, _selectedCounterKey);
+
+  int get _step => _isTaxCounter(_selectedCounterKey) ? 2 : 1;
+
+  List<String> get _availableCounterKeys => _buildAvailableCounterKeys(
+    _draftSession,
+    _targetPlayerIndex,
+    selectedCounterKey: _selectedCounterKey,
+  );
 
   void _changeValue(int delta) {
     setState(() {
-      _value = (_value + delta).clamp(0, 999);
+      final nextValue = (_currentValue + delta).clamp(0, 999);
+      _draftSession = _writeCounterValue(
+        _draftSession,
+        playerIndex: _targetPlayerIndex,
+        counterKey: _selectedCounterKey,
+        value: nextValue,
+      );
     });
   }
 
-  LifeCounterSession _buildUpdatedSession() {
-    return _writeCounterValue(
-      widget.initialSession,
-      playerIndex: _targetPlayerIndex,
-      counterKey: widget.counterKey,
-      value: _value,
+  void _selectCounter(String counterKey) {
+    setState(() {
+      _selectedCounterKey = counterKey;
+      _customCounterError = null;
+    });
+  }
+
+  void _addCustomCounter() {
+    final normalizedKey = _normalizeCustomCounterKey(
+      _customCounterNameController.text,
     );
+    if (normalizedKey == null) {
+      setState(() {
+        _customCounterError = 'Enter a custom counter name to continue.';
+      });
+      return;
+    }
+
+    setState(() {
+      _customCounterError = null;
+      _draftSession = _ensureExtraCounterExists(
+        _draftSession,
+        playerIndex: _targetPlayerIndex,
+        counterKey: normalizedKey,
+      );
+      _selectedCounterKey = normalizedKey;
+      _customCounterNameController.clear();
+    });
+  }
+
+  void _removeSelectedCustomCounter() {
+    if (_isKnownCounterKey(_selectedCounterKey)) {
+      return;
+    }
+
+    setState(() {
+      _draftSession = _removeExtraCounter(
+        _draftSession,
+        playerIndex: _targetPlayerIndex,
+        counterKey: _selectedCounterKey,
+      );
+      _selectedCounterKey = _resolveFallbackCounterKey(
+        _draftSession,
+        _targetPlayerIndex,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final counterLabel = _counterLabel(widget.counterKey);
+    final counterLabel = _counterLabel(_selectedCounterKey);
     final playerLabel = 'Player ${_targetPlayerIndex + 1}';
+    final isCustomCounter = !_isKnownCounterKey(_selectedCounterKey);
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         child: FractionallySizedBox(
-          heightFactor: 0.6,
+          heightFactor: 0.76,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: AppTheme.backgroundAbyss,
@@ -142,15 +208,110 @@ class _LifeCounterNativePlayerCounterSheetState
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ListView(
                       children: [
                         Text(
-                          _counterDescription(widget.counterKey),
+                          _counterDescription(_selectedCounterKey),
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: AppTheme.fontMd,
                             height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        const Text(
+                          'Available counters',
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: AppTheme.fontLg,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _availableCounterKeys
+                              .map(
+                                (counterKey) => ChoiceChip(
+                                  key: Key(
+                                    'life-counter-native-player-counter-chip-$counterKey',
+                                  ),
+                                  label: Text(_counterLabel(counterKey)),
+                                  selected: _selectedCounterKey == counterKey,
+                                  onSelected: (_) => _selectCounter(counterKey),
+                                ),
+                              )
+                              .toList(growable: false),
+                        ),
+                        const SizedBox(height: 20),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            border: Border.all(color: AppTheme.outlineMuted),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Add custom counter',
+                                  style: TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: AppTheme.fontLg,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Create custom counters here so this flow no longer depends on Lotus-only chips.',
+                                  style: TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: AppTheme.fontSm,
+                                    height: 1.35,
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        key: const Key(
+                                          'life-counter-native-player-counter-custom-name',
+                                        ),
+                                        controller:
+                                            _customCounterNameController,
+                                        textInputAction: TextInputAction.done,
+                                        onSubmitted: (_) => _addCustomCounter(),
+                                        decoration: InputDecoration(
+                                          labelText: 'Custom counter name',
+                                          errorText: _customCounterError,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    FilledButton.tonal(
+                                      key: const Key(
+                                        'life-counter-native-player-counter-custom-add',
+                                      ),
+                                      onPressed: _addCustomCounter,
+                                      style: FilledButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 18,
+                                          vertical: 18,
+                                        ),
+                                      ),
+                                      child: const Text('Add'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -189,7 +350,7 @@ class _LifeCounterNativePlayerCounterSheetState
                                 SizedBox(
                                   width: 56,
                                   child: Text(
-                                    '$_value',
+                                    '$_currentValue',
                                     key: const Key(
                                       'life-counter-native-player-counter-value',
                                     ),
@@ -215,7 +376,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             ),
                           ),
                         ),
-                        if (_isTaxCounter(widget.counterKey)) ...[
+                        if (_isTaxCounter(_selectedCounterKey)) ...[
                           const SizedBox(height: 14),
                           const Text(
                             'Commander tax moves in steps of 2 to match the tabletop mana tax.',
@@ -223,6 +384,23 @@ class _LifeCounterNativePlayerCounterSheetState
                               color: AppTheme.textSecondary,
                               fontSize: AppTheme.fontSm,
                               height: 1.35,
+                            ),
+                          ),
+                        ],
+                        if (isCustomCounter) ...[
+                          const SizedBox(height: 14),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              key: const Key(
+                                'life-counter-native-player-counter-custom-remove',
+                              ),
+                              onPressed: _removeSelectedCustomCounter,
+                              icon: const Icon(Icons.delete_outline_rounded),
+                              label: const Text('Remove custom counter'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppTheme.textSecondary,
+                              ),
                             ),
                           ),
                         ],
@@ -255,9 +433,7 @@ class _LifeCounterNativePlayerCounterSheetState
                             'life-counter-native-player-counter-apply',
                           ),
                           onPressed:
-                              () => Navigator.of(
-                                context,
-                              ).pop(_buildUpdatedSession()),
+                              () => Navigator.of(context).pop(_draftSession),
                           style: FilledButton.styleFrom(
                             backgroundColor: AppTheme.manaViolet,
                             foregroundColor: Colors.white,
@@ -276,6 +452,109 @@ class _LifeCounterNativePlayerCounterSheetState
       ),
     );
   }
+}
+
+String _resolveInitialCounterKey(
+  String requestedCounterKey,
+  LifeCounterSession session,
+  int playerIndex,
+) {
+  final availableKeys = _buildAvailableCounterKeys(
+    session,
+    playerIndex,
+    selectedCounterKey: requestedCounterKey,
+  );
+  if (availableKeys.contains(requestedCounterKey)) {
+    return requestedCounterKey;
+  }
+  return _resolveFallbackCounterKey(session, playerIndex);
+}
+
+String _resolveFallbackCounterKey(
+  LifeCounterSession session,
+  int playerIndex,
+) {
+  final keys = _buildAvailableCounterKeys(session, playerIndex);
+  return keys.isEmpty ? 'poison' : keys.first;
+}
+
+List<String> _buildAvailableCounterKeys(
+  LifeCounterSession session,
+  int playerIndex, {
+  String? selectedCounterKey,
+}) {
+  final keys = <String>['poison', 'energy', 'xp', 'tax-1'];
+  if (session.partnerCommanders[playerIndex]) {
+    keys.add('tax-2');
+  }
+
+  final extraKeys = session.resolvedPlayerExtraCounters[playerIndex].keys.toList()
+    ..sort();
+  for (final extraKey in extraKeys) {
+    if (!keys.contains(extraKey)) {
+      keys.add(extraKey);
+    }
+  }
+
+  if (selectedCounterKey != null && !keys.contains(selectedCounterKey)) {
+    keys.add(selectedCounterKey);
+  }
+
+  return keys;
+}
+
+bool _isKnownCounterKey(String counterKey) {
+  return counterKey == 'poison' ||
+      counterKey == 'energy' ||
+      counterKey == 'xp' ||
+      counterKey == 'tax-1' ||
+      counterKey == 'tax-2';
+}
+
+String? _normalizeCustomCounterKey(String raw) {
+  final parts = raw
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList(growable: false);
+  if (parts.isEmpty) {
+    return null;
+  }
+  return parts.join('-');
+}
+
+LifeCounterSession _ensureExtraCounterExists(
+  LifeCounterSession session, {
+  required int playerIndex,
+  required String counterKey,
+}) {
+  if (_isKnownCounterKey(counterKey)) {
+    return session;
+  }
+
+  final extraCounters = session.resolvedPlayerExtraCounters
+      .map((entry) => <String, int>{...entry})
+      .toList(growable: false);
+  extraCounters[playerIndex].putIfAbsent(counterKey, () => 0);
+  return session.copyWith(playerExtraCounters: extraCounters);
+}
+
+LifeCounterSession _removeExtraCounter(
+  LifeCounterSession session, {
+  required int playerIndex,
+  required String counterKey,
+}) {
+  if (_isKnownCounterKey(counterKey)) {
+    return session;
+  }
+
+  final extraCounters = session.resolvedPlayerExtraCounters
+      .map((entry) => <String, int>{...entry})
+      .toList(growable: false);
+  extraCounters[playerIndex].remove(counterKey);
+  return session.copyWith(playerExtraCounters: extraCounters);
 }
 
 int _readCounterValue(
@@ -400,6 +679,6 @@ String _counterDescription(String counterKey) {
     case 'tax-2':
       return 'Commander tax stays mapped to the partner-specific commander cast count.';
     default:
-      return 'Adjust this player-specific counter while the Lotus tabletop remains visually identical.';
+      return 'Adjust or remove this player-specific counter while the Lotus tabletop remains visually identical.';
   }
 }

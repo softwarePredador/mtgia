@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import 'life_counter_native_commander_damage_sheet.dart';
+import 'life_counter_native_player_counter_sheet.dart';
 import 'life_counter_session.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
@@ -38,12 +40,14 @@ class _LifeCounterNativePlayerStateSheet extends StatefulWidget {
 class _LifeCounterNativePlayerStateSheetState
     extends State<_LifeCounterNativePlayerStateSheet> {
   late int _targetPlayerIndex;
+  late LifeCounterSession _draftSession;
   late bool _partnerCommander;
   late LifeCounterPlayerSpecialState _specialState;
 
   @override
   void initState() {
     super.initState();
+    _draftSession = widget.initialSession;
     _targetPlayerIndex = widget.initialTargetPlayerIndex.clamp(
       0,
       widget.initialSession.playerCount - 1,
@@ -52,10 +56,8 @@ class _LifeCounterNativePlayerStateSheetState
   }
 
   void _syncFromTarget() {
-    _partnerCommander =
-        widget.initialSession.partnerCommanders[_targetPlayerIndex];
-    _specialState =
-        widget.initialSession.playerSpecialStates[_targetPlayerIndex];
+    _partnerCommander = _draftSession.partnerCommanders[_targetPlayerIndex];
+    _specialState = _draftSession.playerSpecialStates[_targetPlayerIndex];
   }
 
   void _changeTarget(int playerIndex) {
@@ -66,20 +68,51 @@ class _LifeCounterNativePlayerStateSheetState
   }
 
   LifeCounterSession _buildUpdatedSession() {
-    final partnerCommanders = List<bool>.from(
-      widget.initialSession.partnerCommanders,
-    );
+    final partnerCommanders = List<bool>.from(_draftSession.partnerCommanders);
     final playerSpecialStates = List<LifeCounterPlayerSpecialState>.from(
-      widget.initialSession.playerSpecialStates,
+      _draftSession.playerSpecialStates,
     );
 
     partnerCommanders[_targetPlayerIndex] = _partnerCommander;
     playerSpecialStates[_targetPlayerIndex] = _specialState;
 
-    return widget.initialSession.copyWith(
+    return _draftSession.copyWith(
       partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
     );
+  }
+
+  Future<void> _openManageCounters() async {
+    final updatedSession = await showLifeCounterNativePlayerCounterSheet(
+      context,
+      initialSession: _buildUpdatedSession(),
+      initialTargetPlayerIndex: _targetPlayerIndex,
+      counterKey: 'poison',
+    );
+    if (!mounted || updatedSession == null) {
+      return;
+    }
+
+    setState(() {
+      _draftSession = updatedSession;
+      _syncFromTarget();
+    });
+  }
+
+  Future<void> _openManageCommanderDamage() async {
+    final updatedSession = await showLifeCounterNativeCommanderDamageSheet(
+      context,
+      initialSession: _buildUpdatedSession(),
+      initialTargetPlayerIndex: _targetPlayerIndex,
+    );
+    if (!mounted || updatedSession == null) {
+      return;
+    }
+
+    setState(() {
+      _draftSession = updatedSession;
+      _syncFromTarget();
+    });
   }
 
   @override
@@ -192,6 +225,34 @@ class _LifeCounterNativePlayerStateSheetState
                           onChanged:
                               (value) =>
                                   setState(() => _partnerCommander = value),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _SectionCard(
+                        title: 'Player Tools',
+                        subtitle:
+                            'Open the ManaLoom-owned hubs for counters and commander damage without depending on Lotus-only chips.',
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            FilledButton.tonalIcon(
+                              key: const Key(
+                                'life-counter-native-player-state-manage-counters',
+                              ),
+                              onPressed: _openManageCounters,
+                              icon: const Icon(Icons.tune_rounded),
+                              label: const Text('Manage Counters'),
+                            ),
+                            FilledButton.tonalIcon(
+                              key: const Key(
+                                'life-counter-native-player-state-manage-commander-damage',
+                              ),
+                              onPressed: _openManageCommanderDamage,
+                              icon: const Icon(Icons.shield_outlined),
+                              label: const Text('Commander Damage'),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 18),
