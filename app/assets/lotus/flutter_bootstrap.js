@@ -8,6 +8,7 @@
   var isApplyingStorageBootstrap = false;
   var resolveStorageBootstrap = null;
   var didResolveStorageBootstrap = false;
+  var lotusRuntimeScriptPromise = null;
 
   window.cordova = window.cordova || {
     platformId: platformId,
@@ -136,6 +137,37 @@
     setTimeout(function () {
       queueStorageSnapshot('post_deviceready_sync');
     }, 1200);
+  }
+
+  function ensureLotusRuntimeScriptLoaded() {
+    if (lotusRuntimeScriptPromise) {
+      return lotusRuntimeScriptPromise;
+    }
+
+    lotusRuntimeScriptPromise = new Promise(function (resolve, reject) {
+      var existingScript = document.querySelector(
+        'script[data-manaloom-lotus-runtime="true"]'
+      );
+      if (existingScript) {
+        resolve();
+        return;
+      }
+
+      var runtimeScript = document.createElement('script');
+      runtimeScript.src = 'js/app.min.js';
+      runtimeScript.async = false;
+      runtimeScript.dataset.manaloomLotusRuntime = 'true';
+      runtimeScript.onload = function () {
+        resolve();
+      };
+      runtimeScript.onerror = function (error) {
+        lotusRuntimeScriptPromise = null;
+        reject(error || new Error('Failed to load js/app.min.js'));
+      };
+      document.head.appendChild(runtimeScript);
+    });
+
+    return lotusRuntimeScriptPromise;
   }
 
   function getStorageBridgeChannel() {
@@ -302,10 +334,16 @@
   function prepareAppBoot() {
     applyEmbeddedViewportFrame();
     requestStorageBootstrapSnapshot().finally(function () {
-      requestAnimationFrame(function () {
-        applyEmbeddedViewportFrame();
-        setTimeout(fireDeviceReady, 0);
-      });
+      ensureLotusRuntimeScriptLoaded()
+        .catch(function (error) {
+          console.error('Failed to load Lotus runtime', error);
+        })
+        .finally(function () {
+          requestAnimationFrame(function () {
+            applyEmbeddedViewportFrame();
+            setTimeout(fireDeviceReady, 0);
+          });
+        });
     });
   }
 

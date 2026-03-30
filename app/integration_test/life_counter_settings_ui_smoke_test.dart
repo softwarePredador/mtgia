@@ -146,6 +146,8 @@ void main() {
     expect(enabledUiSnapshot.cleanLookEnabled, isTrue);
     expect(enabledUiSnapshot.regularCounterCount, greaterThan(0));
     expect(enabledUiSnapshot.commanderDamageCounterCount, greaterThan(0));
+    expect(enabledUiSnapshot.gameTimerCount, 1);
+    expect(enabledUiSnapshot.gameTimerPausedCount, 0);
     expect(enabledUiSnapshot.clockCount, 1);
     expect(enabledUiSnapshot.clockWithGameTimerCount, 1);
 
@@ -171,6 +173,8 @@ void main() {
     expect(disabledUiSnapshot.cleanLookEnabled, isFalse);
     expect(disabledUiSnapshot.regularCounterCount, 0);
     expect(disabledUiSnapshot.commanderDamageCounterCount, 0);
+    expect(disabledUiSnapshot.gameTimerCount, 0);
+    expect(disabledUiSnapshot.gameTimerPausedCount, 0);
     expect(disabledUiSnapshot.clockCount, 0);
     expect(disabledUiSnapshot.clockWithGameTimerCount, 0);
   });

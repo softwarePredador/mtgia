@@ -43,10 +43,13 @@ Estado vivo do contador hoje:
 - catalogo proprio de settings por secao/campo: `app/lib/features/home/life_counter/life_counter_settings_catalog.dart`
 - shells nativas atuais do contador: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_history_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart`
 - shell nativa atual do turn tracker: `app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart`
+- reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
+- contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
 - contrato proprio de import/export de history: `app/lib/features/home/life_counter/life_counter_history_transfer.dart`
 - snapshot proprio do `localStorage` do Lotus: `app/lib/features/home/lotus/lotus_storage_snapshot*.dart`
 - adapter do snapshot vivo para sessao canonica: `app/lib/features/home/lotus/lotus_life_counter_session_adapter.dart`
 - adapter do `gameSettings` vivo para configuracao canonica: `app/lib/features/home/lotus/lotus_life_counter_settings_adapter.dart`
+- adapter do `gameTimerState` vivo para contrato canonico: `app/lib/features/home/lotus/lotus_life_counter_game_timer_adapter.dart`
 - o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
 
 ## Comandos

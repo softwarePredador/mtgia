@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/observability/app_observability.dart';
+import 'life_counter/life_counter_game_timer_state.dart';
+import 'life_counter/life_counter_game_timer_state_store.dart';
 import 'life_counter/life_counter_history.dart';
 import 'life_counter/life_counter_history_transfer.dart';
 import 'life_counter/life_counter_native_card_search_sheet.dart';
+import 'life_counter/life_counter_native_game_timer_sheet.dart';
 import 'life_counter/life_counter_native_history_sheet.dart';
 import 'life_counter/life_counter_native_settings_sheet.dart';
 import 'life_counter/life_counter_native_turn_tracker_sheet.dart';
@@ -21,6 +24,7 @@ import 'lotus/lotus_life_counter_session_adapter.dart';
 import 'lotus/lotus_host.dart';
 import 'lotus/lotus_host_controller.dart';
 import 'lotus/lotus_host_overlays.dart';
+import 'lotus/lotus_life_counter_game_timer_adapter.dart';
 import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
@@ -36,6 +40,8 @@ class LotusLifeCounterScreen extends StatefulWidget {
 
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   late final LotusHost _hostController;
+  final LifeCounterGameTimerStateStore _gameTimerStateStore =
+      LifeCounterGameTimerStateStore();
   final LifeCounterSettingsStore _settingsStore = LifeCounterSettingsStore();
   final LifeCounterSessionStore _sessionStore = LifeCounterSessionStore();
   final LotusStorageSnapshotStore _snapshotStore = LotusStorageSnapshotStore();
@@ -46,6 +52,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   bool _isNativeHistorySheetOpen = false;
   bool _isNativeCardSearchSheetOpen = false;
   bool _isNativeTurnTrackerSheetOpen = false;
+  bool _isNativeGameTimerSheetOpen = false;
 
   @override
   void initState() {
@@ -223,6 +230,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
               source:
                   (decoded['source'] as String?) ??
                   'turn_tracker_surface_pressed',
+            ),
+          );
+          return;
+        }
+        if (decoded['type'] == 'open-native-game-timer') {
+          unawaited(
+            _openNativeGameTimerSheet(
+              source:
+                  (decoded['source'] as String?) ??
+                  'game_timer_surface_pressed',
             ),
           );
           return;
@@ -683,6 +700,115 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'current_player_index': session.currentTurnPlayerIndex,
           'starting_player_index': session.firstPlayerIndex,
           'turn_timer_active': session.turnTimerActive,
+        },
+      ),
+    );
+
+    unawaited(_hostController.loadBundle());
+  }
+
+  Future<void> _openNativeGameTimerSheet({required String source}) async {
+    if (!mounted || _isNativeGameTimerSheetOpen) {
+      return;
+    }
+
+    _isNativeGameTimerSheetOpen = true;
+    final initialState =
+        await _gameTimerStateStore.load() ??
+        const LifeCounterGameTimerState(
+          startTimeEpochMs: null,
+          isPaused: false,
+          pausedTimeEpochMs: null,
+        );
+    if (!mounted) {
+      _isNativeGameTimerSheetOpen = false;
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_game_timer_opened',
+        category: 'life_counter.game_timer',
+        data: {
+          'source': source,
+          'is_active': initialState.isActive,
+          'is_paused': initialState.isPaused,
+        },
+      ),
+    );
+
+    final updatedState = await showLifeCounterNativeGameTimerSheet(
+      context,
+      initialState: initialState,
+    );
+    _isNativeGameTimerSheetOpen = false;
+
+    if (!mounted || updatedState == null) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_game_timer_dismissed',
+          category: 'life_counter.game_timer',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    if (updatedState.toJsonString() == initialState.toJsonString()) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_game_timer_dismissed',
+          category: 'life_counter.game_timer',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    await _applyNativeGameTimerState(updatedState, source: source);
+  }
+
+  Future<void> _applyNativeGameTimerState(
+    LifeCounterGameTimerState state, {
+    required String source,
+  }) async {
+    if (state.isActive) {
+      await _gameTimerStateStore.save(state);
+    } else {
+      await _gameTimerStateStore.clear();
+    }
+
+    final snapshot = await _snapshotStore.load();
+    if (snapshot != null) {
+      final mergedValues = <String, String>{...snapshot.values};
+      mergedValues.remove(LotusLifeCounterGameTimerAdapter.gameTimerStateKey);
+      mergedValues.addAll(
+        LotusLifeCounterGameTimerAdapter.buildSnapshotValues(state),
+      );
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(mergedValues),
+        ),
+      );
+    } else if (state.isActive) {
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(
+            LotusLifeCounterGameTimerAdapter.buildSnapshotValues(state),
+          ),
+        ),
+      );
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_game_timer_applied',
+        category: 'life_counter.game_timer',
+        data: {
+          'source': source,
+          'is_active': state.isActive,
+          'is_paused': state.isPaused,
+          'has_paused_time': state.pausedTimeEpochMs != null,
         },
       ),
     );

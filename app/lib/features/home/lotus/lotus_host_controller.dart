@@ -6,9 +6,11 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
+import '../life_counter/life_counter_game_timer_state_store.dart';
 import '../life_counter/life_counter_settings_store.dart';
 import '../life_counter/life_counter_session_store.dart';
 import 'lotus_host.dart';
+import 'lotus_life_counter_game_timer_adapter.dart';
 import 'lotus_js_bridges.dart';
 import 'lotus_life_counter_settings_adapter.dart';
 import 'lotus_life_counter_session_adapter.dart';
@@ -30,6 +32,7 @@ class LotusHostController implements LotusHost {
   }) : webViewController = WebViewController(),
        isLoading = ValueNotifier<bool>(true),
        errorMessage = ValueNotifier<String?>(null),
+       _gameTimerStateStore = LifeCounterGameTimerStateStore(),
        _settingsStore = LifeCounterSettingsStore(),
        _sessionStore = LifeCounterSessionStore(),
        _storageSnapshotStore = LotusStorageSnapshotStore(),
@@ -45,6 +48,7 @@ class LotusHostController implements LotusHost {
   final ValueNotifier<bool> isLoading;
   @override
   final ValueNotifier<String?> errorMessage;
+  final LifeCounterGameTimerStateStore _gameTimerStateStore;
   final LifeCounterSettingsStore _settingsStore;
   final LifeCounterSessionStore _sessionStore;
   final LotusStorageSnapshotStore _storageSnapshotStore;
@@ -57,6 +61,7 @@ class LotusHostController implements LotusHost {
   bool _didRecordStoragePersistThisLoad = false;
   bool _didRecordCanonicalSessionMirrorThisLoad = false;
   bool _didRecordCanonicalSettingsMirrorThisLoad = false;
+  bool _didRecordCanonicalGameTimerMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
 
   @override
@@ -73,6 +78,7 @@ class LotusHostController implements LotusHost {
     _didRecordStoragePersistThisLoad = false;
     _didRecordCanonicalSessionMirrorThisLoad = false;
     _didRecordCanonicalSettingsMirrorThisLoad = false;
+    _didRecordCanonicalGameTimerMirrorThisLoad = false;
     unawaited(
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
@@ -181,15 +187,23 @@ class LotusHostController implements LotusHost {
     final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
     final derivedSettings =
         LotusLifeCounterSettingsAdapter.tryBuildSettings(snapshot);
+    final derivedGameTimer =
+        LotusLifeCounterGameTimerAdapter.tryBuildState(snapshot);
     if (derivedSession != null) {
       await _sessionStore.save(derivedSession);
     }
     if (derivedSettings != null) {
       await _settingsStore.save(derivedSettings);
     }
+    if (derivedGameTimer != null) {
+      await _gameTimerStateStore.save(derivedGameTimer);
+    } else {
+      await _gameTimerStateStore.clear();
+    }
 
     if (_didRecordStoragePersistThisLoad) {
-      if (derivedSettings == null || _didRecordCanonicalSettingsMirrorThisLoad) {
+      if ((derivedSettings == null || _didRecordCanonicalSettingsMirrorThisLoad) &&
+          (derivedGameTimer == null || _didRecordCanonicalGameTimerMirrorThisLoad)) {
         return;
       }
     } else {
@@ -231,6 +245,21 @@ class LotusHostController implements LotusHost {
             'game_timer': derivedSettings.gameTimer,
             'show_counters_on_player_card':
                 derivedSettings.showCountersOnPlayerCard,
+          },
+        ),
+      );
+    }
+
+    if (derivedGameTimer != null && !_didRecordCanonicalGameTimerMirrorThisLoad) {
+      _didRecordCanonicalGameTimerMirrorThisLoad = true;
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'canonical_game_timer_mirrored_from_lotus',
+          category: 'life_counter.game_timer',
+          data: {
+            'is_active': derivedGameTimer.isActive,
+            'is_paused': derivedGameTimer.isPaused,
+            'has_paused_time': derivedGameTimer.pausedTimeEpochMs != null,
           },
         ),
       );
@@ -283,9 +312,13 @@ class LotusHostController implements LotusHost {
   }
 
   Future<Map<String, String>> _buildFallbackBootstrapValues() async {
+    final gameTimerState = await _gameTimerStateStore.load();
     final session = await _sessionStore.load();
     final settings = await _settingsStore.load();
     final values = <String, String>{};
+    if (gameTimerState != null) {
+      values.addAll(LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState));
+    }
     if (settings != null) {
       values.addAll(LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings));
     }
@@ -538,6 +571,18 @@ class LotusHostController implements LotusHost {
           commander_damage_counter_count: document.querySelectorAll(
             '.player-card .commander-damage-counters .commander-damage-counter'
           ).length,
+          game_timer_count: document.querySelectorAll(
+            '.game-timer:not(.current-time-clock)'
+          ).length,
+          game_timer_paused_count: document.querySelectorAll(
+            '.game-timer.paused:not(.current-time-clock)'
+          ).length,
+          game_timer_text: (() => {
+            const node = document.querySelector(
+              '.game-timer:not(.current-time-clock)'
+            );
+            return node ? (node.textContent || '').trim() : '';
+          })(),
           clock_count: document.querySelectorAll('.current-time-clock').length,
           clock_with_game_timer_count: document.querySelectorAll(
             '.current-time-clock.with-game-timer'

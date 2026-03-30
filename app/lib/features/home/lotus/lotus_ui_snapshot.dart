@@ -14,6 +14,9 @@ class LotusUiSnapshot {
     required this.cleanLookEnabled,
     required this.regularCounterCount,
     required this.commanderDamageCounterCount,
+    required this.gameTimerCount,
+    required this.gameTimerPausedCount,
+    required this.gameTimerText,
     required this.clockCount,
     required this.clockWithGameTimerCount,
     required this.playerCardCount,
@@ -26,6 +29,9 @@ class LotusUiSnapshot {
   final bool cleanLookEnabled;
   final int regularCounterCount;
   final int commanderDamageCounterCount;
+  final int gameTimerCount;
+  final int gameTimerPausedCount;
+  final String gameTimerText;
   final int clockCount;
   final int clockWithGameTimerCount;
   final int playerCardCount;
@@ -39,6 +45,9 @@ class LotusUiSnapshot {
       'clean_look_enabled': cleanLookEnabled,
       'regular_counter_count': regularCounterCount,
       'commander_damage_counter_count': commanderDamageCounterCount,
+      'game_timer_count': gameTimerCount,
+      'game_timer_paused_count': gameTimerPausedCount,
+      'game_timer_text': gameTimerText,
       'clock_count': clockCount,
       'clock_with_game_timer_count': clockWithGameTimerCount,
       'player_card_count': playerCardCount,
@@ -74,6 +83,10 @@ class LotusUiSnapshot {
         (payload['regular_counter_count'] as num?)?.toInt();
     final commanderDamageCounterCount =
         (payload['commander_damage_counter_count'] as num?)?.toInt();
+    final gameTimerCount = (payload['game_timer_count'] as num?)?.toInt();
+    final gameTimerPausedCount =
+        (payload['game_timer_paused_count'] as num?)?.toInt();
+    final gameTimerText = payload['game_timer_text'];
     final clockCount = (payload['clock_count'] as num?)?.toInt();
     final clockWithGameTimerCount =
         (payload['clock_with_game_timer_count'] as num?)?.toInt();
@@ -86,6 +99,9 @@ class LotusUiSnapshot {
         cleanLookEnabled is! bool ||
         regularCounterCount == null ||
         commanderDamageCounterCount == null ||
+        gameTimerCount == null ||
+        gameTimerPausedCount == null ||
+        gameTimerText is! String ||
         clockCount == null ||
         clockWithGameTimerCount == null ||
         playerCardCount == null) {
@@ -100,6 +116,9 @@ class LotusUiSnapshot {
       cleanLookEnabled: cleanLookEnabled,
       regularCounterCount: regularCounterCount,
       commanderDamageCounterCount: commanderDamageCounterCount,
+      gameTimerCount: gameTimerCount,
+      gameTimerPausedCount: gameTimerPausedCount,
+      gameTimerText: gameTimerText,
       clockCount: clockCount,
       clockWithGameTimerCount: clockWithGameTimerCount,
       playerCardCount: playerCardCount,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
@@ -411,6 +413,73 @@ void main() {
       final session = await LifeCounterSessionStore().load();
       expect(session, isNotNull);
       expect(session!.turnTrackerActive, isTrue);
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('opens native game timer from shell shortcut', (tester) async {
+      late _FakeLotusHost host;
+
+      await LifeCounterGameTimerStateStore().save(
+        const LifeCounterGameTimerState(
+          startTimeEpochMs: 1_000,
+          isPaused: false,
+          pausedTimeEpochMs: null,
+        ),
+      );
+      await LotusStorageSnapshotStore().save(
+        const LotusStorageSnapshot(
+          values: {
+            'gameTimerState':
+                '{"startTime":1000,"isPaused":false,"pausedTime":0}',
+          },
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Game Timer'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-game-timer-pause')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-pause')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final state = await LifeCounterGameTimerStateStore().load();
+      expect(state, isNotNull);
+      expect(state!.isActive, isTrue);
+      expect(state.isPaused, isTrue);
       expect(host.loadBundleCallCount, 2);
     });
 

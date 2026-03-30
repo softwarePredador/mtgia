@@ -14,17 +14,18 @@ Estado atual do contador:
   - turn tracker shell
 - validacao automatizada atual cobre:
   - bootstrap/reopen do contador vivo
+  - reboot dedicado do snapshot persistido do contador vivo
   - player counts 2, 5 e 6
   - sinais visuais de settings no WebView
   - history/card search nativos no caminho vivo
   - engine e sheet nativa do turn tracker
+  - tracker runtime apos reload do bundle
 
 O que ainda continua Lotus-owned:
 
 - runtime central da mesa
 - overlays internos de gameplay
 - commander damage runtime
-- turn tracker runtime real apos reboot do bundle
 - game timer runtime real
 - Planechase, Archenemy e Bounty
 
@@ -47,40 +48,27 @@ Pendencia que nasceu no fechamento:
 
 - o runtime real do Lotus ainda normaliza o `turnTracker` no reboot, mesmo depois de aplicarmos o estado canonico
 
-## Sprint 2 - Tracker Runtime Ownership
+## Sprint 2 - Closed
 
-Objetivo:
+Objetivo fechado:
 
 - fechar a lacuna entre a shell nativa do turn tracker e o comportamento real do runtime embutido
 
-Escopo:
+Entregas fechadas:
 
-- descobrir quais chaves/flags o Lotus exige para manter o tracker ativo apos reload
-- ajustar bootstrap/snapshot para preservar:
-  - `isActive`
-  - `ongoingGame`
-  - `startingPlayerIndex`
-  - `currentPlayerIndex`
-  - `currentTurn`
-  - `turnTimer`
-- validar runtime real para:
-  - abrir tracker nativo
-  - aplicar start game
-  - reabrir app
-  - manter tracker ativo
-- se necessario, introduzir espelho adicional nosso para hints/flags que o Lotus nao persiste sozinho
+- o runtime do Lotus agora so e carregado depois do bootstrap do snapshot
+- reload do bundle preserva o tracker no caminho vivo
+- reabertura via snapshot persistido ficou validada em smoke dedicado
+- o drift observado no `currentPlayerIndex` foi reduzido a normalizacao esperada do proximo jogador vivo
 
-Done when:
+Nota de fechamento:
 
-- existe smoke de integracao verde para `turn tracker` no caminho vivo
-- o tracker volta ativo apos reload
-- o estado canonico e o snapshot vivo convergem sem drift no caso padrao de 4 jogadores
-
-Risco principal:
-
-- o Lotus pode depender de side effects de boot alem do objeto `turnTracker`
+- o bundle ainda continua dono do runtime visual do tracker na mesa
+- o proximo ganho real deixa de ser tracker e passa a ser `game timer` e `clock`
 
 ## Sprint 3 - Timer And Clock Ownership
+
+Status: next
 
 Objetivo:
 
@@ -89,6 +77,11 @@ Objetivo:
 Escopo:
 
 - mapear o contrato real do Lotus para timer/clock
+  - `gameSettings.gameTimer`
+  - `gameSettings.gameTimerMainScreen`
+  - `gameSettings.showClockOnMainScreen`
+  - `turnTracker.turnTimer`
+- `gameTimerState.startTime / isPaused / pausedTime`
 - decidir se:
   - so sincronizamos a configuracao e runtime no bundle
   - ou tomamos posse do timer surface com overlay Flutter
@@ -103,6 +96,15 @@ Done when:
 - timer e clock tem contrato nosso claro
 - runtime real passa em smoke de configuracao e continuidade
 - nao ha regressao visual na mesa
+
+Progress so far:
+
+- o host ja espelha e reidrata `gameTimerState` via contrato canonico proprio
+- o snapshot de UI ja diferencia:
+  - game timer real
+  - game timer pausado
+  - clock
+  - clock acoplado ao game timer
 
 ## Sprint 4 - Commander Damage And Player Runtime
 
@@ -160,10 +162,9 @@ Antes de trocar o runtime central da mesa, precisamos ter:
 
 ## Recommended Order
 
-1. Sprint 2 - Tracker Runtime Ownership
-2. Sprint 3 - Timer And Clock Ownership
-3. Sprint 4 - Commander Damage And Player Runtime
-4. Sprint 5 - Game Modes And Endgame
+1. Sprint 3 - Timer And Clock Ownership
+2. Sprint 4 - Commander Damage And Player Runtime
+3. Sprint 5 - Game Modes And Endgame
 
 ## Notes
 
