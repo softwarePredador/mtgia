@@ -29,13 +29,22 @@ class LotusHostController {
 
   bool _didRunBridgeProbe = false;
   bool _isDisposed = false;
+  bool _didInjectDebugBundleFailure = false;
   Timer? _loadingOverlayFallbackTimer;
 
-  Future<void> loadBundle() {
+  Future<void> loadBundle() async {
     errorMessage.value = null;
     isLoading.value = true;
 
-    return webViewController.loadFlutterAsset(lotusFlutterAssetEntry);
+    try {
+      await webViewController.loadFlutterAsset(_resolveBundleEntry());
+    } catch (error) {
+      debugPrint('$lotusLogPrefix load bundle error: $error');
+      errorMessage.value =
+          'ManaLoom could not open the embedded life counter. '
+          'Check the local bundle and try again.';
+      dismissLoadingOverlay();
+    }
   }
 
   void dispose() {
@@ -262,5 +271,18 @@ class LotusHostController {
 
   void _notifyBlockedNavigation(String url) {
     _onShellMessageRequested('Lotus external link blocked: $url');
+  }
+
+  String _resolveBundleEntry() {
+    if (debugLotusForceBundleFailure) {
+      return lotusMissingFlutterAssetEntry;
+    }
+
+    if (debugLotusFailFirstBundleLoad && !_didInjectDebugBundleFailure) {
+      _didInjectDebugBundleFailure = true;
+      return lotusMissingFlutterAssetEntry;
+    }
+
+    return lotusFlutterAssetEntry;
   }
 }
