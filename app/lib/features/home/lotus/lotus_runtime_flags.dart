@@ -5,6 +5,11 @@ const bool debugLotusBridgeProbe = bool.fromEnvironment(
   defaultValue: false,
 );
 
+const bool debugLotusDomProbe = bool.fromEnvironment(
+  'DEBUG_LOTUS_DOM_PROBE',
+  defaultValue: false,
+);
+
 const bool debugLotusDisableShellCleanup = bool.fromEnvironment(
   'DEBUG_LOTUS_DISABLE_SHELL_CLEANUP',
   defaultValue: false,
@@ -22,19 +27,11 @@ const bool debugLotusFailFirstBundleLoad = bool.fromEnvironment(
 
 const Duration lotusLoadingOverlayTimeout = Duration(seconds: 6);
 const int lotusLoadingOverlayDismissProgress = 80;
-const String lotusAndroidEntryUrl = 'file:///android_asset/lotus/index.html';
 const String lotusFlutterAssetEntry = 'assets/lotus/index.html';
 const String lotusMissingFlutterAssetEntry = 'assets/lotus/__missing__.html';
 const String lotusLogPrefix = '[LotusLifeCounter]';
 
-bool get lotusShouldLoadFromAndroidAssets =>
-    defaultTargetPlatform == TargetPlatform.android;
-
 bool get lotusShouldRunBridgeProbe => kDebugMode && debugLotusBridgeProbe;
+bool get lotusShouldRunDomProbe => kDebugMode && debugLotusDomProbe;
 
 bool get lotusShouldEnforceShellCleanup => !debugLotusDisableShellCleanup;
-
-String get lotusActiveFlutterAssetEntry =>
-    debugLotusForceBundleFailure
-        ? lotusMissingFlutterAssetEntry
-        : lotusFlutterAssetEntry;

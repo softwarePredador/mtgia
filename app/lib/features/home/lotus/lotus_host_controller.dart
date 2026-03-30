@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -9,6 +8,10 @@ import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
 
 class LotusHostController {
+  static const String _bundleLoadErrorMessage =
+      'ManaLoom could not open the embedded life counter. '
+      'Check the local bundle and try again.';
+
   LotusHostController({
     required LotusAppReviewCallback onAppReviewRequested,
     required LotusShellMessageCallback onShellMessageRequested,
@@ -40,9 +43,7 @@ class LotusHostController {
       await webViewController.loadFlutterAsset(_resolveBundleEntry());
     } catch (error) {
       debugPrint('$lotusLogPrefix load bundle error: $error');
-      errorMessage.value =
-          'ManaLoom could not open the embedded life counter. '
-          'Check the local bundle and try again.';
+      errorMessage.value = _bundleLoadErrorMessage;
       dismissLoadingOverlay();
     }
   }
@@ -120,9 +121,7 @@ class LotusHostController {
     );
 
     if (error.isForMainFrame ?? true) {
-      errorMessage.value =
-          'ManaLoom could not open the embedded life counter. '
-          'Check the local bundle and try again.';
+      errorMessage.value = _bundleLoadErrorMessage;
     }
 
     dismissLoadingOverlay();
@@ -200,7 +199,7 @@ class LotusHostController {
   }
 
   Future<void> _runDomProbeIfNeeded() async {
-    if (!kDebugMode || _isDisposed) {
+    if (!lotusShouldRunDomProbe || _isDisposed) {
       return;
     }
 
