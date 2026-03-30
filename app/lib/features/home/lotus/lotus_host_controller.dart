@@ -6,8 +6,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
+import '../life_counter/life_counter_session_store.dart';
 import 'lotus_host.dart';
 import 'lotus_js_bridges.dart';
+import 'lotus_life_counter_session_adapter.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
 import 'lotus_storage_snapshot.dart';
@@ -24,6 +26,7 @@ class LotusHostController implements LotusHost {
   }) : webViewController = WebViewController(),
        isLoading = ValueNotifier<bool>(true),
        errorMessage = ValueNotifier<String?>(null),
+       _sessionStore = LifeCounterSessionStore(),
        _storageSnapshotStore = LotusStorageSnapshotStore(),
        _onShellMessageRequested = onShellMessageRequested {
     _configure(
@@ -36,6 +39,7 @@ class LotusHostController implements LotusHost {
   final ValueNotifier<bool> isLoading;
   @override
   final ValueNotifier<String?> errorMessage;
+  final LifeCounterSessionStore _sessionStore;
   final LotusStorageSnapshotStore _storageSnapshotStore;
   final LotusShellMessageCallback _onShellMessageRequested;
 
@@ -43,6 +47,7 @@ class LotusHostController implements LotusHost {
   bool _isDisposed = false;
   bool _didInjectDebugBundleFailure = false;
   bool _didRecordStoragePersistThisLoad = false;
+  bool _didRecordCanonicalSessionMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
 
   @override
@@ -57,6 +62,7 @@ class LotusHostController implements LotusHost {
     errorMessage.value = null;
     isLoading.value = true;
     _didRecordStoragePersistThisLoad = false;
+    _didRecordCanonicalSessionMirrorThisLoad = false;
     unawaited(
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
@@ -162,6 +168,10 @@ class LotusHostController implements LotusHost {
     }
 
     await _storageSnapshotStore.save(snapshot);
+    final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
+    if (derivedSession != null) {
+      await _sessionStore.save(derivedSession);
+    }
 
     if (_didRecordStoragePersistThisLoad) {
       return;
@@ -175,6 +185,21 @@ class LotusHostController implements LotusHost {
         data: {
           'entry_count': snapshot.entryCount,
           'reason': payload['reason'],
+        },
+      ),
+    );
+    if (derivedSession == null || _didRecordCanonicalSessionMirrorThisLoad) {
+      return;
+    }
+
+    _didRecordCanonicalSessionMirrorThisLoad = true;
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'canonical_session_mirrored_from_lotus',
+        category: 'life_counter.session',
+        data: {
+          'player_count': derivedSession.playerCount,
+          'starting_life': derivedSession.startingLife,
         },
       ),
     );

@@ -39,6 +39,7 @@ Estado vivo do contador hoje:
 - rota viva: `app/lib/features/home/life_counter_route.dart`
 - contrato proprio de sessao/persistencia: `app/lib/features/home/life_counter/`
 - snapshot proprio do `localStorage` do Lotus: `app/lib/features/home/lotus/lotus_storage_snapshot*.dart`
+- adapter do snapshot vivo para sessao canonica: `app/lib/features/home/lotus/lotus_life_counter_session_adapter.dart`
 - o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
 
 ## Comandos
