@@ -1,5 +1,7 @@
 # Life Counter Sprint - 2026-03-30
 
+Status: closed
+
 ## Goal
 
 Move the live life counter one slice closer to being ManaLoom-owned without changing the current Lotus-faithful tabletop layout.
@@ -97,3 +99,22 @@ Done when:
 1. Move history import/export into ManaLoom-owned contracts.
 2. Harden runtime validation for native search interactions beyond the open-shell smoke.
 3. Keep the central Lotus tabletop untouched until settings/history/search are all owned end-to-end.
+
+## Closure note
+
+This sprint is now closed.
+
+What closed after the original plan:
+
+- history import/export became ManaLoom-owned
+- native card search moved beyond open-shell and got behavior coverage
+- turn tracker gained:
+  - canonical engine
+  - native shell
+  - widget/regression coverage
+
+What remains intentionally outside this closed sprint:
+
+- turn tracker runtime parity on the live Lotus reboot path
+- timer and clock runtime ownership
+- commander damage and central tabletop replacement
