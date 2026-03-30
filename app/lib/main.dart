@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,14 @@ import 'features/messages/screens/message_inbox_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
-import 'features/home/life_counter_screen.dart';
+import 'features/home/lotus_life_counter_screen.dart';
+
+final bool _debugBootIntoLifeCounter =
+    kDebugMode &&
+    const bool.fromEnvironment(
+      'DEBUG_BOOT_INTO_LIFE_COUNTER',
+      defaultValue: true,
+    );
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -113,7 +121,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     ApiClient.debugLogBaseUrl();
 
     _router = GoRouter(
-      initialLocation: '/',
+      initialLocation: _debugBootIntoLifeCounter ? '/life-counter' : '/',
       refreshListenable: _authProvider,
       observers: [
         PerformanceNavigatorObserver(),
@@ -128,13 +136,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         // Sempre permite a Splash (ela decide para onde ir).
         if (location == '/') return null;
 
+        if (_debugBootIntoLifeCounter && location == '/life-counter') {
+          debugPrint('[🧭 Router] → null (debug life counter direto)');
+          return null;
+        }
+
         // Enquanto auth inicializa/carrega, mantém o app em splash/auth.
         // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
         if (status == AuthStatus.loading || status == AuthStatus.initial) {
           final isBootSafeRoute =
               location == '/' ||
               location == '/login' ||
-              location == '/register';
+              location == '/register' ||
+              (_debugBootIntoLifeCounter && location == '/life-counter');
           if (!isBootSafeRoute) {
             debugPrint('[🧭 Router] → / (status=$status, aguardando auth)');
             return '/';
@@ -183,6 +197,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
           builder: (context, state) => const RegisterScreen(),
         ),
 
+        GoRoute(
+          path: '/life-counter',
+          builder: (context, state) => const LotusLifeCounterScreen(),
+        ),
+
         ShellRoute(
           builder: (context, state, child) {
             return MainScaffold(child: child);
@@ -191,10 +210,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             GoRoute(
               path: '/home',
               builder: (context, state) => const HomeScreen(),
-            ),
-            GoRoute(
-              path: '/life-counter',
-              builder: (context, state) => const LifeCounterScreen(),
             ),
             GoRoute(
               path: '/onboarding/core-flow',

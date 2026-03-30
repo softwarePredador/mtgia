@@ -58,6 +58,8 @@ dependencies:
   # Performance Monitoring
   firebase_performance: ^0.10.0+10
   sentry_flutter: ^9.15.0
+  webview_flutter: ^4.13.1
+  webview_flutter_android: ^4.10.15
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +91,20 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/symbols/
+    - assets/lotus/
+    - assets/lotus/cordova-js-src/
+    - assets/lotus/cordova-js-src/plugin/ios/
+    - assets/lotus/css/
+    - assets/lotus/fonts/
+    - assets/lotus/icon/android/
+    - assets/lotus/icon/ios/
+    - assets/lotus/images/
+    - assets/lotus/images/dice/
+    - assets/lotus/images/screenshots/
+    - assets/lotus/images/social/
+    - assets/lotus/js/
+    - assets/lotus/plugins/cordova-plugin-insomnia/www/
+    - assets/lotus/splash/ios/
 
   fonts:
     - family: Dosis
