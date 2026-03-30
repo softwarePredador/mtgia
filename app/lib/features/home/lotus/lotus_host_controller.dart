@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'lotus_host.dart';
 import 'lotus_js_bridges.dart';
 import 'lotus_runtime_flags.dart';
 import 'lotus_shell_policy.dart';
+import 'lotus_storage_snapshot.dart';
+import 'lotus_storage_snapshot_store.dart';
 
 class LotusHostController implements LotusHost {
   static const String _bundleLoadErrorMessage =
@@ -21,6 +24,7 @@ class LotusHostController implements LotusHost {
   }) : webViewController = WebViewController(),
        isLoading = ValueNotifier<bool>(true),
        errorMessage = ValueNotifier<String?>(null),
+       _storageSnapshotStore = LotusStorageSnapshotStore(),
        _onShellMessageRequested = onShellMessageRequested {
     _configure(
       onAppReviewRequested: onAppReviewRequested,
@@ -32,11 +36,13 @@ class LotusHostController implements LotusHost {
   final ValueNotifier<bool> isLoading;
   @override
   final ValueNotifier<String?> errorMessage;
+  final LotusStorageSnapshotStore _storageSnapshotStore;
   final LotusShellMessageCallback _onShellMessageRequested;
 
   bool _didRunBridgeProbe = false;
   bool _isDisposed = false;
   bool _didInjectDebugBundleFailure = false;
+  bool _didRecordStoragePersistThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
 
   @override
@@ -50,6 +56,7 @@ class LotusHostController implements LotusHost {
     final bundleEntry = _resolveBundleEntry();
     errorMessage.value = null;
     isLoading.value = true;
+    _didRecordStoragePersistThisLoad = false;
     unawaited(
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
@@ -109,6 +116,7 @@ class LotusHostController implements LotusHost {
       webViewController,
       onAppReviewRequested: onAppReviewRequested,
       onShellMessageRequested: _handleShellMessage,
+      onStorageMessageRequested: _handleStorageMessage,
     );
 
     webViewController
@@ -129,6 +137,82 @@ class LotusHostController implements LotusHost {
       lotusLoadingOverlayTimeout,
       dismissLoadingOverlay,
     );
+  }
+
+  Future<void> _handleStorageMessage(String message) async {
+    final payload = _tryDecodeShellPayload(message);
+    if (payload == null) {
+      debugPrint('$lotusLogPrefix storage bridge received invalid payload');
+      return;
+    }
+
+    final type = payload['type'];
+    if (type == 'request_bootstrap') {
+      await _sendStorageBootstrapSnapshot();
+      return;
+    }
+
+    if (type != 'persist_snapshot') {
+      return;
+    }
+
+    final snapshot = LotusStorageSnapshot.tryFromJson(payload);
+    if (snapshot == null) {
+      return;
+    }
+
+    await _storageSnapshotStore.save(snapshot);
+
+    if (_didRecordStoragePersistThisLoad) {
+      return;
+    }
+
+    _didRecordStoragePersistThisLoad = true;
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'storage_snapshot_persisted',
+        category: 'life_counter.storage',
+        data: {
+          'entry_count': snapshot.entryCount,
+          'reason': payload['reason'],
+        },
+      ),
+    );
+  }
+
+  Future<void> _sendStorageBootstrapSnapshot() async {
+    final snapshot = await _storageSnapshotStore.load();
+    final payload = <String, Object?>{
+      'type': 'bootstrap_snapshot',
+      'hasSnapshot': snapshot != null,
+      'values': snapshot?.values ?? const <String, String>{},
+    };
+
+    try {
+      await webViewController.runJavaScript(
+        '''
+        if (
+          window.__ManaloomLotusStorageBridge &&
+          typeof window.__ManaloomLotusStorageBridge.receiveBootstrap === 'function'
+        ) {
+          window.__ManaloomLotusStorageBridge.receiveBootstrap(${jsonEncode(payload)});
+        }
+        ''',
+      );
+      unawaited(
+        AppObservability.instance.recordEvent(
+          snapshot == null
+              ? 'storage_bootstrap_missing'
+              : 'storage_bootstrap_restored',
+          category: 'life_counter.storage',
+          data: {
+            'entry_count': snapshot?.entryCount ?? 0,
+          },
+        ),
+      );
+    } catch (error) {
+      debugPrint('$lotusLogPrefix storage bootstrap error: $error');
+    }
   }
 
   void dismissLoadingOverlay() {

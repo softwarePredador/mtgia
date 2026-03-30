@@ -1,15 +1,15 @@
-﻿import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../cards/providers/card_provider.dart';
 import '../cards/screens/card_detail_screen.dart';
 import '../decks/models/deck_card_item.dart';
+import 'life_counter/life_counter_session.dart';
+import 'life_counter/life_counter_session_store.dart';
 
 const _tableDisplayFontFamily = 'Dosis';
 
@@ -61,11 +61,13 @@ enum _PlayerSpecialState { none, deckedOut, answerLeft }
 class LifeCounterScreen extends StatefulWidget {
   final Random? randomOverride;
   final bool initialHubExpanded;
+  final LifeCounterSessionStore? sessionStore;
 
   const LifeCounterScreen({
     super.key,
     this.randomOverride,
     this.initialHubExpanded = false,
+    this.sessionStore,
   });
 
   @override
@@ -73,12 +75,9 @@ class LifeCounterScreen extends StatefulWidget {
 }
 
 class _LifeCounterScreenState extends State<LifeCounterScreen> {
-  static const _sessionPrefsKey = 'life_counter_session_v1';
   static const double _tableGutter = 3;
-  static final RegExp _setLifeEventPattern = RegExp(
-    r'^Jogador \d+ ajustado para \d+ de vida$',
-  );
   final Random _runtimeRandom = Random();
+  late final LifeCounterSessionStore _sessionStore;
 
   int _playerCount = 2;
   int _startingLifeTwoPlayer = 20;
@@ -130,6 +129,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   @override
   void initState() {
     super.initState();
+    _sessionStore = widget.sessionStore ?? LifeCounterSessionStore();
     _isHubExpanded = widget.initialHubExpanded;
     _initAll();
     _restorePersistedSession();
@@ -505,177 +505,38 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   }
 
   Future<void> _persistSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    final payload = <String, dynamic>{
-      'player_count': _playerCount,
-      'starting_life': _startingLife,
-      'starting_life_two_player': _startingLifeTwoPlayer,
-      'starting_life_multi_player': _startingLifeMultiPlayer,
-      'lives': _lives,
-      'poison': _poison,
-      'energy': _energy,
-      'experience': _experience,
-      'commander_casts': _commanderCasts,
-      'player_special_states':
-          _playerSpecialStates.map(_encodePlayerSpecialState).toList(),
-      'last_player_rolls': _lastPlayerRolls,
-      'last_high_rolls': _lastHighRolls,
-      'commander_damage': _commanderDamage,
-      'storm_count': _stormCount,
-      'monarch_player': _monarchPlayer,
-      'initiative_player': _initiativePlayer,
-      'first_player_index': _firstPlayerIndex,
-      'last_table_event': _lastTableEvent,
-    };
-    await prefs.setString(_sessionPrefsKey, jsonEncode(payload));
+    await _sessionStore.save(_buildPersistedSession());
   }
 
   Future<void> _restorePersistedSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_sessionPrefsKey);
-    if (raw == null || raw.isEmpty) return;
-
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! Map) return;
-      final payload = decoded.cast<String, dynamic>();
-      final playerCount = (payload['player_count'] as num?)?.toInt();
-      final startingLife = (payload['starting_life'] as num?)?.toInt();
-      final startingLifeTwoPlayer =
-          (payload['starting_life_two_player'] as num?)?.toInt();
-      final startingLifeMultiPlayer =
-          (payload['starting_life_multi_player'] as num?)?.toInt();
-      if (playerCount == null || playerCount < 2 || playerCount > 6) {
-        return;
-      }
-      final restoredTwoPlayerLife =
-          startingLifeTwoPlayer ??
-          (playerCount == 2 ? (startingLife ?? 20) : 20);
-      final restoredMultiPlayerLife =
-          startingLifeMultiPlayer ??
-          (playerCount > 2 ? (startingLife ?? 40) : 40);
-
-      final lives = _readIntList(payload['lives'], playerCount);
-      final poison = _readIntList(payload['poison'], playerCount);
-      final energy = _readIntList(payload['energy'], playerCount);
-      final experience = _readIntList(payload['experience'], playerCount);
-      final commanderCasts = _readIntList(
-        payload['commander_casts'],
-        playerCount,
-      );
-      final playerSpecialStates = _readPlayerSpecialStateList(
-        payload['player_special_states'],
-        playerCount,
-      );
-      final lastPlayerRolls = _readNullableIntList(
-        payload['last_player_rolls'],
-        playerCount,
-      );
-      final lastHighRolls = _readNullableIntList(
-        payload['last_high_rolls'],
-        playerCount,
-      );
-      final commanderDamage = _readMatrix(
-        payload['commander_damage'],
-        playerCount,
-      );
-      final stormCount = (payload['storm_count'] as num?)?.toInt() ?? 0;
-      final monarchPlayer = _readOptionalPlayerIndex(
-        payload['monarch_player'],
-        playerCount,
-      );
-      final initiativePlayer = _readOptionalPlayerIndex(
-        payload['initiative_player'],
-        playerCount,
-      );
-      final firstPlayerIndex = _readOptionalPlayerIndex(
-        payload['first_player_index'],
-        playerCount,
-      );
-      final lastTableEvent = _sanitizeLastTableEvent(
-        payload['last_table_event'] as String?,
-      );
-      if (lives == null ||
-          poison == null ||
-          energy == null ||
-          experience == null ||
-          commanderCasts == null ||
-          playerSpecialStates == null ||
-          lastPlayerRolls == null ||
-          lastHighRolls == null ||
-          commanderDamage == null) {
-        return;
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _playerCount = playerCount;
-        _startingLifeTwoPlayer = restoredTwoPlayerLife;
-        _startingLifeMultiPlayer = restoredMultiPlayerLife;
-        _lives = lives;
-        _poison = poison;
-        _energy = energy;
-        _experience = experience;
-        _commanderCasts = commanderCasts;
-        _playerSpecialStates = playerSpecialStates;
-        _lastPlayerRolls = lastPlayerRolls;
-        _lastHighRolls = lastHighRolls;
-        _highRollWinners = _deriveHighRollWinners(lastHighRolls);
-        _commanderDamage = commanderDamage;
-        _stormCount = stormCount.clamp(0, 999);
-        _monarchPlayer = monarchPlayer;
-        _initiativePlayer = initiativePlayer;
-        _firstPlayerIndex = firstPlayerIndex;
-        _lastTableEvent = lastTableEvent;
-        _history.clear();
-      });
-      if (payload['last_table_event'] != lastTableEvent) {
-        _persistSession();
-      }
-    } catch (_) {
-      // Ignora sessÃ£o invÃ¡lida sem travar a tela.
+    final session = await _sessionStore.load();
+    if (session == null || !mounted) {
+      return;
     }
-  }
 
-  String? _sanitizeLastTableEvent(String? event) {
-    if (event == null) return null;
-    if (_setLifeEventPattern.hasMatch(event)) {
-      return null;
-    }
-    return event;
-  }
-
-  List<int>? _readIntList(dynamic value, int expectedLength) {
-    if (value is! List || value.length != expectedLength) return null;
-    final parsed = value.map((item) => (item as num?)?.toInt()).toList();
-    if (parsed.any((item) => item == null)) return null;
-    return parsed.cast<int>();
-  }
-
-  List<int?>? _readNullableIntList(dynamic value, int expectedLength) {
-    if (value == null) {
-      return List<int?>.generate(expectedLength, (_) => null);
-    }
-    if (value is! List || value.length != expectedLength) return null;
-    return value.map((item) => (item as num?)?.toInt()).toList();
-  }
-
-  List<List<int>>? _readMatrix(dynamic value, int expectedLength) {
-    if (value is! List || value.length != expectedLength) return null;
-    final rows = <List<int>>[];
-    for (final row in value) {
-      final parsed = _readIntList(row, expectedLength);
-      if (parsed == null) return null;
-      rows.add(parsed);
-    }
-    return rows;
-  }
-
-  int? _readOptionalPlayerIndex(dynamic value, int playerCount) {
-    if (value == null) return null;
-    final parsed = (value as num?)?.toInt();
-    if (parsed == null || parsed < 0 || parsed >= playerCount) return null;
-    return parsed;
+    setState(() {
+      _playerCount = session.playerCount;
+      _startingLifeTwoPlayer = session.startingLifeTwoPlayer;
+      _startingLifeMultiPlayer = session.startingLifeMultiPlayer;
+      _lives = List<int>.of(session.lives);
+      _poison = List<int>.of(session.poison);
+      _energy = List<int>.of(session.energy);
+      _experience = List<int>.of(session.experience);
+      _commanderCasts = List<int>.of(session.commanderCasts);
+      _playerSpecialStates =
+          session.playerSpecialStates.map(_decodePersistedSpecialState).toList();
+      _lastPlayerRolls = List<int?>.of(session.lastPlayerRolls);
+      _lastHighRolls = List<int?>.of(session.lastHighRolls);
+      _highRollWinners = _deriveHighRollWinners(_lastHighRolls);
+      _commanderDamage =
+          session.commanderDamage.map((row) => List<int>.of(row)).toList();
+      _stormCount = session.stormCount;
+      _monarchPlayer = session.monarchPlayer;
+      _initiativePlayer = session.initiativePlayer;
+      _firstPlayerIndex = session.firstPlayerIndex;
+      _lastTableEvent = session.lastTableEvent;
+      _history.clear();
+    });
   }
 
   Future<void> _showTableOverlayDialog({
@@ -880,44 +741,53 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
     );
   }
 
-  List<_PlayerSpecialState>? _readPlayerSpecialStateList(
-    dynamic value,
-    int expectedLength,
-  ) {
-    if (value == null) {
-      return List<_PlayerSpecialState>.generate(
-        expectedLength,
-        (_) => _PlayerSpecialState.none,
-      );
-    }
-    if (value is! List || value.length != expectedLength) return null;
-    final parsed = <_PlayerSpecialState>[];
-    for (final item in value) {
-      if (item is! String) return null;
-      parsed.add(_decodePlayerSpecialState(item));
-    }
-    return parsed;
+  LifeCounterSession _buildPersistedSession() {
+    return LifeCounterSession(
+      playerCount: _playerCount,
+      startingLifeTwoPlayer: _startingLifeTwoPlayer,
+      startingLifeMultiPlayer: _startingLifeMultiPlayer,
+      lives: List<int>.of(_lives),
+      poison: List<int>.of(_poison),
+      energy: List<int>.of(_energy),
+      experience: List<int>.of(_experience),
+      commanderCasts: List<int>.of(_commanderCasts),
+      playerSpecialStates:
+          _playerSpecialStates.map(_encodePersistedSpecialState).toList(),
+      lastPlayerRolls: List<int?>.of(_lastPlayerRolls),
+      lastHighRolls: List<int?>.of(_lastHighRolls),
+      commanderDamage:
+          _commanderDamage.map((row) => List<int>.of(row)).toList(),
+      stormCount: _stormCount,
+      monarchPlayer: _monarchPlayer,
+      initiativePlayer: _initiativePlayer,
+      firstPlayerIndex: _firstPlayerIndex,
+      lastTableEvent: _lastTableEvent,
+    );
   }
 
-  String _encodePlayerSpecialState(_PlayerSpecialState state) {
+  LifeCounterPlayerSpecialState _encodePersistedSpecialState(
+    _PlayerSpecialState state,
+  ) {
     switch (state) {
       case _PlayerSpecialState.none:
-        return 'none';
+        return LifeCounterPlayerSpecialState.none;
       case _PlayerSpecialState.deckedOut:
-        return 'decked_out';
+        return LifeCounterPlayerSpecialState.deckedOut;
       case _PlayerSpecialState.answerLeft:
-        return 'answer_left';
+        return LifeCounterPlayerSpecialState.answerLeft;
     }
   }
 
-  _PlayerSpecialState _decodePlayerSpecialState(String value) {
-    switch (value) {
-      case 'decked_out':
-        return _PlayerSpecialState.deckedOut;
-      case 'answer_left':
-        return _PlayerSpecialState.answerLeft;
-      default:
+  _PlayerSpecialState _decodePersistedSpecialState(
+    LifeCounterPlayerSpecialState state,
+  ) {
+    switch (state) {
+      case LifeCounterPlayerSpecialState.none:
         return _PlayerSpecialState.none;
+      case LifeCounterPlayerSpecialState.deckedOut:
+        return _PlayerSpecialState.deckedOut;
+      case LifeCounterPlayerSpecialState.answerLeft:
+        return _PlayerSpecialState.answerLeft;
     }
   }
 

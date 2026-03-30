@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -6,6 +8,7 @@ import 'lotus_runtime_flags.dart';
 
 typedef LotusAppReviewCallback = void Function(String message);
 typedef LotusShellMessageCallback = void Function(String message);
+typedef LotusStorageMessageCallback = Future<void> Function(String message);
 
 class LotusJavaScriptBridges {
   LotusJavaScriptBridges._();
@@ -13,11 +16,13 @@ class LotusJavaScriptBridges {
   static const String clipboardChannelName = 'FlutterClipboardBridge';
   static const String appReviewChannelName = 'FlutterAppReviewBridge';
   static const String shellChannelName = 'FlutterManaLoomShellBridge';
+  static const String storageChannelName = 'FlutterManaLoomStorageBridge';
 
   static void register(
     WebViewController controller, {
     required LotusAppReviewCallback onAppReviewRequested,
     required LotusShellMessageCallback onShellMessageRequested,
+    required LotusStorageMessageCallback onStorageMessageRequested,
   }) {
     controller
       ..addJavaScriptChannel(
@@ -34,6 +39,12 @@ class LotusJavaScriptBridges {
         shellChannelName,
         onMessageReceived: (message) {
           onShellMessageRequested(message.message);
+        },
+      )
+      ..addJavaScriptChannel(
+        storageChannelName,
+        onMessageReceived: (message) {
+          unawaited(onStorageMessageRequested(message.message));
         },
       );
   }

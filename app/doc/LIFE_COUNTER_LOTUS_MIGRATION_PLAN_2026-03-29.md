@@ -179,6 +179,14 @@ Work:
   - game state
   - settings
   - player customizations
+- storage baseline in progress:
+  - `app/lib/features/home/life_counter/life_counter_session.dart`
+  - `app/lib/features/home/life_counter/life_counter_session_store.dart`
+  - legacy compatibility still comes from `life_counter_session_v1`
+- embedded Lotus storage ownership in progress:
+  - `app/lib/features/home/lotus/lotus_storage_snapshot.dart`
+  - `app/lib/features/home/lotus/lotus_storage_snapshot_store.dart`
+  - host restores and persists the bundle `localStorage` snapshot through Flutter-owned storage
 - decide whether Lotus local storage remains temporary compatibility storage or becomes migrated data
 
 Exit criteria:
