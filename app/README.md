@@ -31,6 +31,7 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_LOTUS_SHELL_OWNED_AFFORDANCES_2026-03-29.md`
 - `app/doc/LIFE_COUNTER_LOTUS_STATIC_SHELL_REPLACEMENT_2026-03-29.md`
 - `app/doc/LIFE_COUNTER_LOTUS_GAMEPLAY_COPY_AUDIT_2026-03-29.md`
+- `app/doc/LIFE_COUNTER_SPRINT_2026-03-30.md`
 
 Estado vivo do contador hoje:
 
@@ -38,8 +39,12 @@ Estado vivo do contador hoje:
 - implementacao oficial: `app/lib/features/home/lotus_life_counter_screen.dart`
 - rota viva: `app/lib/features/home/life_counter_route.dart`
 - contrato proprio de sessao/persistencia: `app/lib/features/home/life_counter/`
+- catalogo proprio de settings por secao/campo: `app/lib/features/home/life_counter/life_counter_settings_catalog.dart`
+- shells nativas atuais do contador: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_history_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart`
+- contrato proprio de import/export de history: `app/lib/features/home/life_counter/life_counter_history_transfer.dart`
 - snapshot proprio do `localStorage` do Lotus: `app/lib/features/home/lotus/lotus_storage_snapshot*.dart`
 - adapter do snapshot vivo para sessao canonica: `app/lib/features/home/lotus/lotus_life_counter_session_adapter.dart`
+- adapter do `gameSettings` vivo para configuracao canonica: `app/lib/features/home/lotus/lotus_life_counter_settings_adapter.dart`
 - o espelho local em `app/android/app/src/main/assets/lotus/` nao e contrato ativo de runtime
 
 ## Comandos

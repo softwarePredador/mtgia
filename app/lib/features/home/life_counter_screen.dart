@@ -751,6 +751,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       energy: List<int>.of(_energy),
       experience: List<int>.of(_experience),
       commanderCasts: List<int>.of(_commanderCasts),
+      partnerCommanders: List<bool>.filled(_playerCount, false),
       playerSpecialStates:
           _playerSpecialStates.map(_encodePersistedSpecialState).toList(),
       lastPlayerRolls: List<int?>.of(_lastPlayerRolls),

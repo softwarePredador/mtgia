@@ -152,7 +152,7 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn'
+      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker'
     );
     if (trackedClick) {
       let name = null;
@@ -167,12 +167,57 @@ String get lotusShellCleanupScript {
         trackedClick.matches('.overlay-settings-btn')
       ) {
         name = 'settings_shortcut_pressed';
+      } else if (trackedClick.matches('.turn-time-tracker')) {
+        name = 'turn_tracker_surface_pressed';
       }
 
       if (name) {
         postAnalytics(name, 'life_counter.shell', {
           selector: trackedClick.className || trackedClick.tagName,
         });
+      }
+
+      if (trackedClick.matches('.life-history-btn')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-history',
+          source: name || 'history_shortcut_pressed',
+        });
+        return;
+      }
+
+      if (trackedClick.matches('.card-search-btn')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-card-search',
+          source: name || 'card_search_shortcut_pressed',
+        });
+        return;
+      }
+
+      if (
+        trackedClick.matches('.settings') ||
+        trackedClick.matches('.overlay-settings-btn')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-settings',
+          source: name || 'settings_shortcut_pressed',
+        });
+        return;
+      }
+
+      if (trackedClick.matches('.turn-time-tracker')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-turn-tracker',
+          source: name || 'turn_tracker_surface_pressed',
+        });
+        return;
       }
     }
 

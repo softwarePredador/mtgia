@@ -24,6 +24,7 @@ void main() {
         energy: const [2, 0, 7, 1],
         experience: const [0, 4, 0, 2],
         commanderCasts: const [0, 1, 3, 2],
+        partnerCommanders: const [false, true, false, false],
         playerSpecialStates: const [
           LifeCounterPlayerSpecialState.none,
           LifeCounterPlayerSpecialState.deckedOut,
@@ -42,6 +43,13 @@ void main() {
         monarchPlayer: 1,
         initiativePlayer: 2,
         firstPlayerIndex: 1,
+        turnTrackerActive: true,
+        turnTrackerOngoingGame: true,
+        turnTrackerAutoHighRoll: false,
+        currentTurnPlayerIndex: 2,
+        currentTurnNumber: 9,
+        turnTimerActive: true,
+        turnTimerSeconds: 125,
         lastTableEvent: 'Primeiro jogador: Jogador 2',
       );
 
@@ -101,6 +109,12 @@ void main() {
             [7, 0],
           ],
           'storm_count': 4,
+          'turn_tracker_active': true,
+          'turn_tracker_ongoing_game': true,
+          'current_turn_player_index': 1,
+          'current_turn_number': 3,
+          'turn_timer_active': true,
+          'turn_timer_seconds': 30,
         }),
       });
       store = LifeCounterSessionStore();
@@ -116,6 +130,13 @@ void main() {
       expect(restored.lastHighRolls, const [null, null]);
       expect(restored.startingLifeTwoPlayer, 20);
       expect(restored.startingLifeMultiPlayer, 40);
+      expect(restored.partnerCommanders, const [false, false]);
+      expect(restored.turnTrackerActive, isTrue);
+      expect(restored.turnTrackerOngoingGame, isTrue);
+      expect(restored.currentTurnPlayerIndex, 1);
+      expect(restored.currentTurnNumber, 3);
+      expect(restored.turnTimerActive, isTrue);
+      expect(restored.turnTimerSeconds, 30);
     });
 
     test('returns null for invalid payloads', () async {

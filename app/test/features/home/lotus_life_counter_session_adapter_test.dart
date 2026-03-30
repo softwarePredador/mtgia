@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/lotus/lotus_life_counter_session_adapter.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 
@@ -12,8 +13,25 @@ void main() {
           'playerCount': '4',
           'startingLife2P': '20',
           'startingLifeMP': '40',
+          'layoutType': jsonEncode('portrait-portrait-portrait-portrait'),
+          '__manaloom_player_special_states': jsonEncode([
+            'none',
+            'none',
+            'decked_out',
+            'answer_left',
+          ]),
           'turnTracker': jsonEncode({
-            'startingPlayerIndex': 2,
+            'isActive': true,
+            'ongoingGame': true,
+            'autoHighroll': true,
+            'currentPlayerIndex': 3,
+            'startingPlayerIndex': 1,
+            'currentTurn': 7,
+            'turnTimer': {
+              'isActive': true,
+              'duration': 93,
+              'countDown': [],
+            },
           }),
           'players': jsonEncode([
             {
@@ -73,7 +91,7 @@ void main() {
             {
               'name': 'Player 4',
               'life': 22,
-              'alive': true,
+              'alive': false,
               'partnerCommander': false,
               'counters': {},
               'commanderDamage': [],
@@ -93,9 +111,26 @@ void main() {
       expect(session.energy, const [5, 1, 0, 0]);
       expect(session.experience, const [2, 0, 3, 0]);
       expect(session.commanderCasts, const [2, 3, 0, 0]);
+      expect(session.partnerCommanders, const [false, true, false, false]);
+      expect(
+        session.playerSpecialStates,
+        const [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.deckedOut,
+          LifeCounterPlayerSpecialState.answerLeft,
+        ],
+      );
       expect(session.commanderDamage[0][1], 7);
       expect(session.commanderDamage[2][3], 5);
       expect(session.firstPlayerIndex, 2);
+      expect(session.turnTrackerActive, isTrue);
+      expect(session.turnTrackerOngoingGame, isTrue);
+      expect(session.turnTrackerAutoHighRoll, isTrue);
+      expect(session.currentTurnPlayerIndex, 1);
+      expect(session.currentTurnNumber, 7);
+      expect(session.turnTimerActive, isTrue);
+      expect(session.turnTimerSeconds, 93);
     });
 
     test('returns null for snapshots without players payload', () {
@@ -108,6 +143,191 @@ void main() {
       final session = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
 
       expect(session, isNull);
+    });
+
+    test('serializes canonical session back into Lotus-compatible storage', () {
+      final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 31, 1, 23],
+          poison: [0, 1, 2, 10],
+          energy: [0, 5, 0, 1],
+          experience: [0, 0, 4, 1],
+          commanderCasts: [0, 2, 0, 1],
+          partnerCommanders: [false, true, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.deckedOut,
+            LifeCounterPlayerSpecialState.answerLeft,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 7, 0, 0],
+            [0, 0, 5, 0],
+            [0, 0, 0, 3],
+            [1, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: 1,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: true,
+          currentTurnPlayerIndex: 3,
+          currentTurnNumber: 6,
+          turnTimerActive: true,
+          turnTimerSeconds: 45,
+          lastTableEvent: null,
+        ),
+      );
+
+      final players = jsonDecode(values['players']!) as List<dynamic>;
+      final turnTracker =
+          jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
+
+      expect(jsonDecode(values['playerCount']!), 4);
+      expect(jsonDecode(values['layoutType']!), 'portrait-portrait-portrait-portrait');
+      expect(players, hasLength(4));
+      expect((players[1] as Map<String, dynamic>)['life'], 31);
+      expect(
+        ((players[1] as Map<String, dynamic>)['counters'] as Map<String, dynamic>)['tax-1'],
+        4,
+      );
+      expect((players[2] as Map<String, dynamic>)['alive'], isFalse);
+      expect((players[1] as Map<String, dynamic>)['partnerCommander'], isTrue);
+      expect(turnTracker['isActive'], isTrue);
+      expect(turnTracker['ongoingGame'], isTrue);
+      expect(turnTracker['autoHighroll'], isTrue);
+      expect(turnTracker['currentPlayerIndex'], 2);
+      expect(turnTracker['startingPlayerIndex'], 3);
+      expect(turnTracker['currentTurn'], 6);
+      expect(
+        (turnTracker['turnTimer'] as Map<String, dynamic>)['isActive'],
+        isTrue,
+      );
+      expect(
+        (turnTracker['turnTimer'] as Map<String, dynamic>)['duration'],
+        45,
+      );
+      expect(
+        jsonDecode(values['__manaloom_player_special_states']!),
+        ['none', 'none', 'decked_out', 'answer_left'],
+      );
+    });
+
+    test('uses Lotus-compatible layout keys for different player counts', () {
+      final twoPlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        LifeCounterSession.initial(playerCount: 2),
+      );
+      final fivePlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        LifeCounterSession.initial(playerCount: 5),
+      );
+      final sixPlayerValues = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        LifeCounterSession.initial(playerCount: 6),
+      );
+
+      expect(jsonDecode(twoPlayerValues['layoutType']!), 'portrait-portrait');
+      expect(
+        jsonDecode(fivePlayerValues['layoutType']!),
+        'portrait-portrait-portrait-portrait-landscape',
+      );
+      expect(
+        jsonDecode(sixPlayerValues['layoutType']!),
+        'portrait-portrait-portrait-portrait-portrait-portrait',
+      );
+    });
+
+    test('normalizes turn tracker bootstrap to the next alive player', () {
+      final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 31, 1, 23],
+          poison: [0, 1, 2, 10],
+          energy: [0, 5, 0, 1],
+          experience: [0, 0, 4, 1],
+          commanderCasts: [0, 2, 0, 1],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.deckedOut,
+            LifeCounterPlayerSpecialState.answerLeft,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 7, 0, 0],
+            [0, 0, 5, 0],
+            [0, 0, 0, 3],
+            [1, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: 1,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: 1,
+          currentTurnNumber: 4,
+          turnTimerActive: true,
+          turnTimerSeconds: 12,
+          lastTableEvent: null,
+        ),
+      );
+
+      final turnTracker =
+          jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
+
+      expect(turnTracker['startingPlayerIndex'], 3);
+      expect(turnTracker['currentPlayerIndex'], 0);
+    });
+
+    test('falls back to answer-left when Lotus only exposes alive false', () {
+      final snapshot = LotusStorageSnapshot(
+        values: {
+          'playerCount': '2',
+          'startingLife2P': '20',
+          'startingLifeMP': '40',
+          'layoutType': jsonEncode('portrait-portrait'),
+          'players': jsonEncode([
+            {
+              'name': 'Player 1',
+              'life': 17,
+              'alive': true,
+              'partnerCommander': false,
+              'counters': <String, Object?>{},
+              'commanderDamage': <Object?>[],
+            },
+            {
+              'name': 'Player 2',
+              'life': 0,
+              'alive': false,
+              'partnerCommander': false,
+              'counters': <String, Object?>{},
+              'commanderDamage': <Object?>[],
+            },
+          ]),
+        },
+      );
+
+      final session = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
+
+      expect(session, isNotNull);
+      expect(
+        session!.playerSpecialStates,
+        const [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.answerLeft,
+        ],
+      );
     });
   });
 }

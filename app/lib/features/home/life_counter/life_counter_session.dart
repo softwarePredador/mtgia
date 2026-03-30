@@ -21,6 +21,7 @@ class LifeCounterSession {
     required this.energy,
     required this.experience,
     required this.commanderCasts,
+    required this.partnerCommanders,
     required this.playerSpecialStates,
     required this.lastPlayerRolls,
     required this.lastHighRolls,
@@ -29,6 +30,13 @@ class LifeCounterSession {
     required this.monarchPlayer,
     required this.initiativePlayer,
     required this.firstPlayerIndex,
+    this.turnTrackerActive = false,
+    this.turnTrackerOngoingGame = false,
+    this.turnTrackerAutoHighRoll = false,
+    this.currentTurnPlayerIndex,
+    this.currentTurnNumber = 1,
+    this.turnTimerActive = false,
+    this.turnTimerSeconds = 0,
     required this.lastTableEvent,
   });
 
@@ -41,9 +49,10 @@ class LifeCounterSession {
       lifeCounterMinPlayers,
       lifeCounterMaxPlayers,
     );
-    final startingLife = normalizedPlayerCount == 2
-        ? startingLifeTwoPlayer
-        : startingLifeMultiPlayer;
+    final startingLife =
+        normalizedPlayerCount == 2
+            ? startingLifeTwoPlayer
+            : startingLifeMultiPlayer;
 
     return LifeCounterSession(
       playerCount: normalizedPlayerCount,
@@ -54,6 +63,7 @@ class LifeCounterSession {
       energy: List<int>.filled(normalizedPlayerCount, 0),
       experience: List<int>.filled(normalizedPlayerCount, 0),
       commanderCasts: List<int>.filled(normalizedPlayerCount, 0),
+      partnerCommanders: List<bool>.filled(normalizedPlayerCount, false),
       playerSpecialStates: List<LifeCounterPlayerSpecialState>.filled(
         normalizedPlayerCount,
         LifeCounterPlayerSpecialState.none,
@@ -68,6 +78,13 @@ class LifeCounterSession {
       monarchPlayer: null,
       initiativePlayer: null,
       firstPlayerIndex: null,
+      turnTrackerActive: false,
+      turnTrackerOngoingGame: false,
+      turnTrackerAutoHighRoll: false,
+      currentTurnPlayerIndex: null,
+      currentTurnNumber: 1,
+      turnTimerActive: false,
+      turnTimerSeconds: 0,
       lastTableEvent: null,
     );
   }
@@ -84,6 +101,7 @@ class LifeCounterSession {
   final List<int> energy;
   final List<int> experience;
   final List<int> commanderCasts;
+  final List<bool> partnerCommanders;
   final List<LifeCounterPlayerSpecialState> playerSpecialStates;
   final List<int?> lastPlayerRolls;
   final List<int?> lastHighRolls;
@@ -92,10 +110,93 @@ class LifeCounterSession {
   final int? monarchPlayer;
   final int? initiativePlayer;
   final int? firstPlayerIndex;
+  final bool turnTrackerActive;
+  final bool turnTrackerOngoingGame;
+  final bool turnTrackerAutoHighRoll;
+  final int? currentTurnPlayerIndex;
+  final int currentTurnNumber;
+  final bool turnTimerActive;
+  final int turnTimerSeconds;
   final String? lastTableEvent;
 
   int get startingLife =>
       playerCount == 2 ? startingLifeTwoPlayer : startingLifeMultiPlayer;
+
+  LifeCounterSession copyWith({
+    int? playerCount,
+    int? startingLifeTwoPlayer,
+    int? startingLifeMultiPlayer,
+    List<int>? lives,
+    List<int>? poison,
+    List<int>? energy,
+    List<int>? experience,
+    List<int>? commanderCasts,
+    List<bool>? partnerCommanders,
+    List<LifeCounterPlayerSpecialState>? playerSpecialStates,
+    List<int?>? lastPlayerRolls,
+    List<int?>? lastHighRolls,
+    List<List<int>>? commanderDamage,
+    int? stormCount,
+    int? monarchPlayer,
+    bool clearMonarchPlayer = false,
+    int? initiativePlayer,
+    bool clearInitiativePlayer = false,
+    int? firstPlayerIndex,
+    bool clearFirstPlayerIndex = false,
+    bool? turnTrackerActive,
+    bool? turnTrackerOngoingGame,
+    bool? turnTrackerAutoHighRoll,
+    int? currentTurnPlayerIndex,
+    bool clearCurrentTurnPlayerIndex = false,
+    int? currentTurnNumber,
+    bool? turnTimerActive,
+    int? turnTimerSeconds,
+    String? lastTableEvent,
+    bool clearLastTableEvent = false,
+  }) {
+    return LifeCounterSession(
+      playerCount: playerCount ?? this.playerCount,
+      startingLifeTwoPlayer:
+          startingLifeTwoPlayer ?? this.startingLifeTwoPlayer,
+      startingLifeMultiPlayer:
+          startingLifeMultiPlayer ?? this.startingLifeMultiPlayer,
+      lives: lives ?? this.lives,
+      poison: poison ?? this.poison,
+      energy: energy ?? this.energy,
+      experience: experience ?? this.experience,
+      commanderCasts: commanderCasts ?? this.commanderCasts,
+      partnerCommanders: partnerCommanders ?? this.partnerCommanders,
+      playerSpecialStates: playerSpecialStates ?? this.playerSpecialStates,
+      lastPlayerRolls: lastPlayerRolls ?? this.lastPlayerRolls,
+      lastHighRolls: lastHighRolls ?? this.lastHighRolls,
+      commanderDamage: commanderDamage ?? this.commanderDamage,
+      stormCount: stormCount ?? this.stormCount,
+      monarchPlayer:
+          clearMonarchPlayer ? null : monarchPlayer ?? this.monarchPlayer,
+      initiativePlayer:
+          clearInitiativePlayer
+              ? null
+              : initiativePlayer ?? this.initiativePlayer,
+      firstPlayerIndex:
+          clearFirstPlayerIndex
+              ? null
+              : firstPlayerIndex ?? this.firstPlayerIndex,
+      turnTrackerActive: turnTrackerActive ?? this.turnTrackerActive,
+      turnTrackerOngoingGame:
+          turnTrackerOngoingGame ?? this.turnTrackerOngoingGame,
+      turnTrackerAutoHighRoll:
+          turnTrackerAutoHighRoll ?? this.turnTrackerAutoHighRoll,
+      currentTurnPlayerIndex:
+          clearCurrentTurnPlayerIndex
+              ? null
+              : currentTurnPlayerIndex ?? this.currentTurnPlayerIndex,
+      currentTurnNumber: currentTurnNumber ?? this.currentTurnNumber,
+      turnTimerActive: turnTimerActive ?? this.turnTimerActive,
+      turnTimerSeconds: turnTimerSeconds ?? this.turnTimerSeconds,
+      lastTableEvent:
+          clearLastTableEvent ? null : lastTableEvent ?? this.lastTableEvent,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -108,6 +209,7 @@ class LifeCounterSession {
       'energy': energy,
       'experience': experience,
       'commander_casts': commanderCasts,
+      'partner_commanders': partnerCommanders,
       'player_special_states':
           playerSpecialStates.map(_encodePlayerSpecialState).toList(),
       'last_player_rolls': lastPlayerRolls,
@@ -117,6 +219,13 @@ class LifeCounterSession {
       'monarch_player': monarchPlayer,
       'initiative_player': initiativePlayer,
       'first_player_index': firstPlayerIndex,
+      'turn_tracker_active': turnTrackerActive,
+      'turn_tracker_ongoing_game': turnTrackerOngoingGame,
+      'turn_tracker_auto_high_roll': turnTrackerAutoHighRoll,
+      'current_turn_player_index': currentTurnPlayerIndex,
+      'current_turn_number': currentTurnNumber,
+      'turn_timer_active': turnTimerActive,
+      'turn_timer_seconds': turnTimerSeconds,
       'last_table_event': lastTableEvent,
     };
   }
@@ -169,7 +278,14 @@ class LifeCounterSession {
     final poison = _readIntList(payload['poison'], playerCount);
     final energy = _readIntList(payload['energy'], playerCount);
     final experience = _readIntList(payload['experience'], playerCount);
-    final commanderCasts = _readIntList(payload['commander_casts'], playerCount);
+    final commanderCasts = _readIntList(
+      payload['commander_casts'],
+      playerCount,
+    );
+    final partnerCommanders = _readBoolList(
+      payload['partner_commanders'],
+      playerCount,
+    );
     final playerSpecialStates = _readPlayerSpecialStateList(
       payload['player_special_states'],
       playerCount,
@@ -199,6 +315,33 @@ class LifeCounterSession {
       payload['first_player_index'],
       playerCount,
     );
+    final turnTrackerActive =
+        payload['turn_tracker_active'] is bool
+            ? payload['turn_tracker_active'] as bool
+            : false;
+    final turnTrackerOngoingGame =
+        payload['turn_tracker_ongoing_game'] is bool
+            ? payload['turn_tracker_ongoing_game'] as bool
+            : false;
+    final turnTrackerAutoHighRoll =
+        payload['turn_tracker_auto_high_roll'] is bool
+            ? payload['turn_tracker_auto_high_roll'] as bool
+            : false;
+    final currentTurnPlayerIndex = _readOptionalPlayerIndex(
+      payload['current_turn_player_index'],
+      playerCount,
+    );
+    final currentTurnNumber =
+        ((payload['current_turn_number'] as num?)?.toInt() ?? 1).clamp(1, 9999);
+    final turnTimerActive =
+        payload['turn_timer_active'] is bool
+            ? payload['turn_timer_active'] as bool
+            : false;
+    final turnTimerSeconds =
+        ((payload['turn_timer_seconds'] as num?)?.toInt() ?? 0).clamp(
+          0,
+          864000,
+        );
     final lastTableEvent = _sanitizeLastTableEvent(
       payload['last_table_event'] as String?,
     );
@@ -208,6 +351,7 @@ class LifeCounterSession {
         energy == null ||
         experience == null ||
         commanderCasts == null ||
+        partnerCommanders == null ||
         playerSpecialStates == null ||
         lastPlayerRolls == null ||
         lastHighRolls == null ||
@@ -224,6 +368,7 @@ class LifeCounterSession {
       energy: energy,
       experience: experience,
       commanderCasts: commanderCasts,
+      partnerCommanders: partnerCommanders,
       playerSpecialStates: playerSpecialStates,
       lastPlayerRolls: lastPlayerRolls,
       lastHighRolls: lastHighRolls,
@@ -232,13 +377,18 @@ class LifeCounterSession {
       monarchPlayer: monarchPlayer,
       initiativePlayer: initiativePlayer,
       firstPlayerIndex: firstPlayerIndex,
+      turnTrackerActive: turnTrackerActive,
+      turnTrackerOngoingGame: turnTrackerOngoingGame,
+      turnTrackerAutoHighRoll: turnTrackerAutoHighRoll,
+      currentTurnPlayerIndex: currentTurnPlayerIndex,
+      currentTurnNumber: currentTurnNumber,
+      turnTimerActive: turnTimerActive,
+      turnTimerSeconds: turnTimerSeconds,
       lastTableEvent: lastTableEvent,
     );
   }
 
-  static String _encodePlayerSpecialState(
-    LifeCounterPlayerSpecialState state,
-  ) {
+  static String _encodePlayerSpecialState(LifeCounterPlayerSpecialState state) {
     switch (state) {
       case LifeCounterPlayerSpecialState.none:
         return 'none';
@@ -249,9 +399,7 @@ class LifeCounterSession {
     }
   }
 
-  static LifeCounterPlayerSpecialState _decodePlayerSpecialState(
-    String value,
-  ) {
+  static LifeCounterPlayerSpecialState _decodePlayerSpecialState(String value) {
     switch (value) {
       case 'decked_out':
         return LifeCounterPlayerSpecialState.deckedOut;
@@ -285,6 +433,26 @@ class LifeCounterSession {
     }
 
     return value.map((item) => (item as num?)?.toInt()).toList();
+  }
+
+  static List<bool>? _readBoolList(dynamic value, int expectedLength) {
+    if (value == null) {
+      return List<bool>.filled(expectedLength, false);
+    }
+
+    if (value is! List || value.length != expectedLength) {
+      return null;
+    }
+
+    final parsed = <bool>[];
+    for (final item in value) {
+      if (item is! bool) {
+        return null;
+      }
+      parsed.add(item);
+    }
+
+    return parsed;
   }
 
   static List<List<int>>? _readMatrix(dynamic value, int expectedLength) {
