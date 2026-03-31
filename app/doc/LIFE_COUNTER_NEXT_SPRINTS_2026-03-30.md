@@ -139,6 +139,7 @@ Progresso fechado ate agora:
   - `player appearance`
   - `player counters`
   - `player state`
+  - `set life`
 - `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para:
   - `settings`
   - `history`
@@ -149,6 +150,7 @@ Progresso fechado ate agora:
 - shell nativa adicional assumida no runtime vivo:
   - `dice / high roll / coin / roll 1st`
 - `player state` agora funciona como hub para:
+  - `set life`
   - `player counters`
   - `commander damage`
   - `player appearance`
@@ -163,6 +165,7 @@ Progresso fechado ate agora:
   - `lastHighRolls`
   - `firstPlayerIndex` auxiliar
 - `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
+- o toque no total de vida do jogador agora pode abrir a shell nativa de `set life`
 - smokes reais adicionados:
   - `integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart`
   - `integration_test/life_counter_table_state_roundtrip_smoke_test.dart`

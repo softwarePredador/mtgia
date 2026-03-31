@@ -37,6 +37,67 @@ class _Host extends StatelessWidget {
 
 void main() {
   group('LifeCounterNativePlayerStateSheet', () {
+    testWidgets('opens the nested set life hub and applies the new total', (
+      tester,
+    ) async {
+      LifeCounterSession? result;
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: LifeCounterSession.initial(playerCount: 4),
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-3')),
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-7')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.lives[0], 37);
+      expect(result!.lastTableEvent, isNull);
+    });
+
     testWidgets('opens the nested player counter hub and returns to state', (
       tester,
     ) async {

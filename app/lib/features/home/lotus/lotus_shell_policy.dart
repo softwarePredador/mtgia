@@ -143,6 +143,28 @@ String get lotusShellCleanupScript {
     });
     return true;
   };
+  const openNativeSetLife = (node, source) => {
+    if (!(node instanceof Element)) {
+      return false;
+    }
+
+    const targetPlayerIndex = resolveTargetPlayerIndex(node);
+    if (targetPlayerIndex == null) {
+      return false;
+    }
+
+    postAnalytics('set_life_surface_pressed', 'life_counter.shell', {
+      selector: node.className || node.tagName,
+      source,
+      target_player_index: targetPlayerIndex,
+    });
+    postShellMessage({
+      type: 'open-native-set-life',
+      source,
+      targetPlayerIndex,
+    });
+    return true;
+  };
   const observePlayerStateSurface = (root = document) => {
     root.querySelectorAll('.player-card-inner.option-card').forEach((node) => {
       if (!(node instanceof Element)) {
@@ -261,6 +283,7 @@ String get lotusShellCleanupScript {
     const trackedClick = event.target.closest(
       '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter'
     );
+    const playerLifeClick = event.target.closest('.player-life-count');
     const playerStateClick = event.target.closest(
       '.player-card-inner.option-card, .player-card-inner .killed-overlay'
     );
@@ -431,6 +454,23 @@ String get lotusShellCleanupScript {
               : null,
           counterKey: playerCounterKey,
         });
+        return;
+      }
+    }
+
+    if (
+      playerLifeClick &&
+      document.body &&
+      document.body.classList.contains('set-life-by-tap-enabled')
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (
+        openNativeSetLife(
+          playerLifeClick,
+          'player_life_total_surface_pressed'
+        )
+      ) {
         return;
       }
     }

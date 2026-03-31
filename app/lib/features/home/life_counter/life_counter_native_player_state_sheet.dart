@@ -7,6 +7,7 @@ import 'life_counter_dice_engine.dart';
 import 'life_counter_native_commander_damage_sheet.dart';
 import 'life_counter_native_player_appearance_sheet.dart';
 import 'life_counter_native_player_counter_sheet.dart';
+import 'life_counter_native_set_life_sheet.dart';
 import 'life_counter_session.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
@@ -123,6 +124,22 @@ class _LifeCounterNativePlayerStateSheetState
 
   Future<void> _openManageAppearance() async {
     final updatedSession = await showLifeCounterNativePlayerAppearanceSheet(
+      context,
+      initialSession: _buildUpdatedSession(),
+      initialTargetPlayerIndex: _targetPlayerIndex,
+    );
+    if (!mounted || updatedSession == null) {
+      return;
+    }
+
+    setState(() {
+      _draftSession = updatedSession;
+      _syncFromTarget();
+    });
+  }
+
+  Future<void> _openSetLife() async {
+    final updatedSession = await showLifeCounterNativeSetLifeSheet(
       context,
       initialSession: _buildUpdatedSession(),
       initialTargetPlayerIndex: _targetPlayerIndex,
@@ -264,11 +281,19 @@ class _LifeCounterNativePlayerStateSheetState
                       _SectionCard(
                         title: 'Player Tools',
                         subtitle:
-                            'Open the ManaLoom-owned hubs for counters and commander damage without depending on Lotus-only chips.',
+                            'Open ManaLoom-owned player tools without depending on Lotus-only chips and gestures.',
                         child: Wrap(
                           spacing: 10,
                           runSpacing: 10,
                           children: [
+                            FilledButton.tonalIcon(
+                              key: const Key(
+                                'life-counter-native-player-state-set-life',
+                              ),
+                              onPressed: _openSetLife,
+                              icon: const Icon(Icons.favorite_rounded),
+                              label: const Text('Set Life'),
+                            ),
                             FilledButton.tonalIcon(
                               key: const Key(
                                 'life-counter-native-player-state-manage-counters',

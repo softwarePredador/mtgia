@@ -17,6 +17,7 @@ import 'life_counter/life_counter_native_history_sheet.dart';
 import 'life_counter/life_counter_native_player_appearance_sheet.dart';
 import 'life_counter/life_counter_native_player_counter_sheet.dart';
 import 'life_counter/life_counter_native_quick_actions_sheet.dart';
+import 'life_counter/life_counter_native_set_life_sheet.dart';
 import 'life_counter/life_counter_native_player_state_sheet.dart';
 import 'life_counter/life_counter_native_settings_sheet.dart';
 import 'life_counter/life_counter_native_turn_tracker_sheet.dart';
@@ -77,6 +78,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   bool _isNativePlayerAppearanceSheetOpen = false;
   bool _isNativePlayerCounterSheetOpen = false;
   bool _isNativePlayerStateSheetOpen = false;
+  bool _isNativeSetLifeSheetOpen = false;
 
   @override
   void initState() {
@@ -327,6 +329,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
               source:
                   (decoded['source'] as String?) ??
                   'player_state_surface_pressed',
+              targetPlayerIndex:
+                  (decoded['targetPlayerIndex'] as num?)?.toInt(),
+            ),
+          );
+          return;
+        }
+        if (decoded['type'] == 'open-native-set-life') {
+          unawaited(
+            _openNativeSetLifeSheet(
+              source:
+                  (decoded['source'] as String?) ??
+                  'player_life_total_surface_pressed',
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
             ),
@@ -1653,6 +1667,127 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'native_player_state_applied',
         category: 'life_counter.player_state',
         data: {'source': source},
+      ),
+    );
+
+    unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  Future<void> _openNativeSetLifeSheet({
+    required String source,
+    required int? targetPlayerIndex,
+  }) async {
+    if (!mounted || _isNativeSetLifeSheetOpen) {
+      return;
+    }
+
+    _isNativeSetLifeSheetOpen = true;
+    final session =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: 4);
+    if (!mounted) {
+      _isNativeSetLifeSheetOpen = false;
+      return;
+    }
+
+    final normalizedTargetIndex =
+        targetPlayerIndex == null ||
+                targetPlayerIndex < 0 ||
+                targetPlayerIndex >= session.playerCount
+            ? 0
+            : targetPlayerIndex;
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_set_life_opened',
+        category: 'life_counter.set_life',
+        data: {
+          'source': source,
+          'target_player_index': normalizedTargetIndex,
+          'current_life': session.lives[normalizedTargetIndex],
+        },
+      ),
+    );
+
+    final updatedSession = await showLifeCounterNativeSetLifeSheet(
+      context,
+      initialSession: session,
+      initialTargetPlayerIndex: normalizedTargetIndex,
+    );
+    _isNativeSetLifeSheetOpen = false;
+
+    if (!mounted || updatedSession == null) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_set_life_dismissed',
+          category: 'life_counter.set_life',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    if (updatedSession.toJsonString() == session.toJsonString()) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_set_life_dismissed',
+          category: 'life_counter.set_life',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    await _applyNativeSetLife(
+      updatedSession,
+      source: source,
+      targetPlayerIndex: normalizedTargetIndex,
+    );
+  }
+
+  Future<void> _applyNativeSetLife(
+    LifeCounterSession session, {
+    required String source,
+    required int targetPlayerIndex,
+  }) async {
+    await _sessionStore.save(session);
+
+    final settings = await _settingsStore.load();
+    final snapshot = await _snapshotStore.load();
+    if (snapshot != null) {
+      final mergedValues = <String, String>{
+        ...snapshot.values,
+        ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
+          session,
+        ),
+      };
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(mergedValues),
+        ),
+      );
+    } else {
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(
+            LotusLifeCounterSessionAdapter.buildSnapshotValues(
+              session,
+              settings: settings,
+            ),
+          ),
+        ),
+      );
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_set_life_applied',
+        category: 'life_counter.set_life',
+        data: {
+          'source': source,
+          'target_player_index': targetPlayerIndex,
+          'life': session.lives[targetPlayerIndex],
+        },
       ),
     );
 
