@@ -53,24 +53,6 @@ class _LifeCounterNativeCommanderDamageSheetState
 
   String _playerLabel(int index) => 'Player ${index + 1}';
 
-  int _totalDamageFromSource(int sourceIndex) {
-    return LifeCounterTabletopEngine.readCommanderDamageFromSource(
-      _draftSession,
-      targetPlayerIndex: _targetPlayerIndex,
-      sourcePlayerIndex: sourceIndex,
-    );
-  }
-
-  List<int> get _lethalSources => <int>[
-    for (
-      var source = 0;
-      source < widget.initialSession.playerCount;
-      source += 1
-    )
-      if (source != _targetPlayerIndex && _totalDamageFromSource(source) >= 21)
-        source,
-  ];
-
   void _updateCommanderDamage({
     required int sourceIndex,
     required bool secondCommander,
@@ -91,7 +73,17 @@ class _LifeCounterNativeCommanderDamageSheetState
 
   @override
   Widget build(BuildContext context) {
-    final lethalSources = _lethalSources;
+    final playerBoardSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      _draftSession,
+      playerIndex: _targetPlayerIndex,
+      playerLabelBuilder: _playerLabel,
+    );
+    final lethalSources = LifeCounterTabletopEngine.commanderDamageLethalSources(
+      _draftSession,
+      targetPlayerIndex: _targetPlayerIndex,
+    );
+    final lethalSummary = playerBoardSummary.commanderDamageLethalSummary;
+    final playerStatusSummary = playerBoardSummary.statusSummary;
 
     return SafeArea(
       child: Padding(
@@ -183,14 +175,45 @@ class _LifeCounterNativeCommanderDamageSheetState
                       if (lethalSources.isNotEmpty) ...[
                         _SectionCard(
                           title: 'Lethal Summary',
-                          subtitle:
-                              lethalSources.length == 1
-                                  ? '${_playerLabel(_targetPlayerIndex)} is lethal from ${_playerLabel(lethalSources.first)}.'
-                                  : '${_playerLabel(_targetPlayerIndex)} is lethal from ${lethalSources.map(_playerLabel).join(', ')}.',
+                          subtitle: lethalSummary ?? '',
                           child: const SizedBox.shrink(),
                         ),
                         const SizedBox(height: 18),
                       ],
+                      _SectionCard(
+                        title: 'Target Status',
+                        subtitle:
+                            'The ManaLoom tabletop engine evaluates the target status before you apply the change.',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              playerStatusSummary.label,
+                              key: const Key(
+                                'life-counter-native-commander-damage-status-label',
+                              ),
+                              style: const TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: AppTheme.fontLg,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              playerStatusSummary.description,
+                              key: const Key(
+                                'life-counter-native-commander-damage-status-description',
+                              ),
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: AppTheme.fontSm,
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
                       _SectionCard(
                         title: 'Damage By Source',
                         subtitle:
@@ -215,11 +238,13 @@ class _LifeCounterNativeCommanderDamageSheetState
                                         widget
                                             .initialSession
                                             .partnerCommanders[sourceIndex],
-                                    isLethal:
-                                        _draftSession
-                                            .resolvedCommanderDamageDetails[_targetPlayerIndex][sourceIndex]
-                                            .totalDamage >=
-                                        21,
+                                    isLethal: LifeCounterTabletopEngine
+                                        .isCommanderDamageSourceLethal(
+                                          _draftSession,
+                                          targetPlayerIndex:
+                                              _targetPlayerIndex,
+                                          sourcePlayerIndex: sourceIndex,
+                                        ),
                                     onCommanderOneIncrement:
                                         () => _updateCommanderDamage(
                                           sourceIndex: sourceIndex,

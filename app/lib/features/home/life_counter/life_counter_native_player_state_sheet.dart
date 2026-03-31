@@ -165,8 +165,53 @@ class _LifeCounterNativePlayerStateSheetState
     });
   }
 
+  void _markPlayerKnockedOut() {
+    setState(() {
+      _draftSession = LifeCounterTabletopEngine.markPlayerKnockedOut(
+        _buildUpdatedSession(),
+        playerIndex: _targetPlayerIndex,
+      );
+      _syncFromTarget();
+    });
+  }
+
+  void _markPlayerDeckedOut() {
+    setState(() {
+      _draftSession = LifeCounterTabletopEngine.markPlayerDeckedOut(
+        _buildUpdatedSession(),
+        playerIndex: _targetPlayerIndex,
+      );
+      _syncFromTarget();
+    });
+  }
+
+  void _markPlayerAnswerLeft() {
+    setState(() {
+      _draftSession = LifeCounterTabletopEngine.markPlayerAnswerLeft(
+        _buildUpdatedSession(),
+        playerIndex: _targetPlayerIndex,
+      );
+      _syncFromTarget();
+    });
+  }
+
+  void _revivePlayer() {
+    setState(() {
+      _draftSession = LifeCounterTabletopEngine.revivePlayer(
+        _buildUpdatedSession(),
+        playerIndex: _targetPlayerIndex,
+      );
+      _syncFromTarget();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final playerStatusSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      _draftSession,
+      playerIndex: _targetPlayerIndex,
+    ).statusSummary;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -248,6 +293,39 @@ class _LifeCounterNativePlayerStateSheetState
                               onSelected: (_) => _changeTarget(index),
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _SectionCard(
+                        title: 'Current Status',
+                        subtitle:
+                            'Use the canonical tabletop engine to understand why this player is active, lethal or out of the game.',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              playerStatusSummary.label,
+                              key: const Key(
+                                'life-counter-native-player-state-status-label',
+                              ),
+                              style: const TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: AppTheme.fontLg,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              playerStatusSummary.description,
+                              key: const Key(
+                                'life-counter-native-player-state-status-description',
+                              ),
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -365,6 +443,45 @@ class _LifeCounterNativePlayerStateSheetState
                                 color: AppTheme.textSecondary,
                                 height: 1.4,
                               ),
+                            ),
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: [
+                                FilledButton.tonalIcon(
+                                  key: const Key(
+                                    'life-counter-native-player-state-knockout',
+                                  ),
+                                  onPressed: _markPlayerKnockedOut,
+                                  icon: const Icon(Icons.heart_broken_rounded),
+                                  label: const Text('Knock Out'),
+                                ),
+                                FilledButton.tonalIcon(
+                                  key: const Key(
+                                    'life-counter-native-player-state-decked-out',
+                                  ),
+                                  onPressed: _markPlayerDeckedOut,
+                                  icon: const Icon(Icons.menu_book_rounded),
+                                  label: const Text('Decked Out'),
+                                ),
+                                FilledButton.tonalIcon(
+                                  key: const Key(
+                                    'life-counter-native-player-state-left-table',
+                                  ),
+                                  onPressed: _markPlayerAnswerLeft,
+                                  icon: const Icon(Icons.exit_to_app_rounded),
+                                  label: const Text('Left Table'),
+                                ),
+                                FilledButton.tonalIcon(
+                                  key: const Key(
+                                    'life-counter-native-player-state-revive',
+                                  ),
+                                  onPressed: _revivePlayer,
+                                  icon: const Icon(Icons.restart_alt_rounded),
+                                  label: const Text('Revive'),
+                                ),
+                              ],
                             ),
                           ],
                         ),

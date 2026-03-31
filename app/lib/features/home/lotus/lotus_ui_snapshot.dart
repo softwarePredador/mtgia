@@ -9,9 +9,15 @@ class LotusUiSnapshot {
   const LotusUiSnapshot({
     required this.capturedAtEpochMs,
     required this.bodyClassName,
+    required this.viewportWidth,
+    required this.viewportHeight,
+    required this.screenWidth,
+    required this.screenHeight,
     required this.setLifeByTapEnabled,
     required this.verticalTapAreasEnabled,
     required this.cleanLookEnabled,
+    required this.firstPlayerCardWidth,
+    required this.firstPlayerCardHeight,
     required this.regularCounterCount,
     required this.commanderDamageCounterCount,
     required this.gameTimerCount,
@@ -24,9 +30,15 @@ class LotusUiSnapshot {
 
   final int capturedAtEpochMs;
   final String bodyClassName;
+  final double viewportWidth;
+  final double viewportHeight;
+  final double screenWidth;
+  final double screenHeight;
   final bool setLifeByTapEnabled;
   final bool verticalTapAreasEnabled;
   final bool cleanLookEnabled;
+  final double firstPlayerCardWidth;
+  final double firstPlayerCardHeight;
   final int regularCounterCount;
   final int commanderDamageCounterCount;
   final int gameTimerCount;
@@ -40,9 +52,15 @@ class LotusUiSnapshot {
     return <String, dynamic>{
       'captured_at_epoch_ms': capturedAtEpochMs,
       'body_class_name': bodyClassName,
+      'viewport_width': viewportWidth,
+      'viewport_height': viewportHeight,
+      'screen_width': screenWidth,
+      'screen_height': screenHeight,
       'set_life_by_tap_enabled': setLifeByTapEnabled,
       'vertical_tap_areas_enabled': verticalTapAreasEnabled,
       'clean_look_enabled': cleanLookEnabled,
+      'first_player_card_width': firstPlayerCardWidth,
+      'first_player_card_height': firstPlayerCardHeight,
       'regular_counter_count': regularCounterCount,
       'commander_damage_counter_count': commanderDamageCounterCount,
       'game_timer_count': gameTimerCount,
@@ -76,9 +94,17 @@ class LotusUiSnapshot {
   static LotusUiSnapshot? tryFromJson(Map<String, dynamic> payload) {
     final capturedAtEpochMs = (payload['captured_at_epoch_ms'] as num?)?.toInt();
     final bodyClassName = payload['body_class_name'];
+    final viewportWidth = (payload['viewport_width'] as num?)?.toDouble();
+    final viewportHeight = (payload['viewport_height'] as num?)?.toDouble();
+    final screenWidth = (payload['screen_width'] as num?)?.toDouble();
+    final screenHeight = (payload['screen_height'] as num?)?.toDouble();
     final setLifeByTapEnabled = payload['set_life_by_tap_enabled'];
     final verticalTapAreasEnabled = payload['vertical_tap_areas_enabled'];
     final cleanLookEnabled = payload['clean_look_enabled'];
+    final firstPlayerCardWidth =
+        (payload['first_player_card_width'] as num?)?.toDouble();
+    final firstPlayerCardHeight =
+        (payload['first_player_card_height'] as num?)?.toDouble();
     final regularCounterCount =
         (payload['regular_counter_count'] as num?)?.toInt();
     final commanderDamageCounterCount =
@@ -94,9 +120,15 @@ class LotusUiSnapshot {
 
     if (capturedAtEpochMs == null ||
         bodyClassName is! String ||
+        viewportWidth == null ||
+        viewportHeight == null ||
+        screenWidth == null ||
+        screenHeight == null ||
         setLifeByTapEnabled is! bool ||
         verticalTapAreasEnabled is! bool ||
         cleanLookEnabled is! bool ||
+        firstPlayerCardWidth == null ||
+        firstPlayerCardHeight == null ||
         regularCounterCount == null ||
         commanderDamageCounterCount == null ||
         gameTimerCount == null ||
@@ -111,9 +143,15 @@ class LotusUiSnapshot {
     return LotusUiSnapshot(
       capturedAtEpochMs: capturedAtEpochMs,
       bodyClassName: bodyClassName,
+      viewportWidth: viewportWidth,
+      viewportHeight: viewportHeight,
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
       setLifeByTapEnabled: setLifeByTapEnabled,
       verticalTapAreasEnabled: verticalTapAreasEnabled,
       cleanLookEnabled: cleanLookEnabled,
+      firstPlayerCardWidth: firstPlayerCardWidth,
+      firstPlayerCardHeight: firstPlayerCardHeight,
       regularCounterCount: regularCounterCount,
       commanderDamageCounterCount: commanderDamageCounterCount,
       gameTimerCount: gameTimerCount,

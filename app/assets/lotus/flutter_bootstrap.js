@@ -67,11 +67,6 @@
     }
 
     try {
-      var currentValue = window.screen[key];
-      if (typeof currentValue === 'number' && currentValue > 0) {
-        return;
-      }
-
       Object.defineProperty(window.screen, key, {
         configurable: true,
         get: fallbackGetter,
@@ -97,17 +92,27 @@
     );
   }
 
+  function readEmbeddedWidth() {
+    return readViewportWidth() || ((window.screen && window.screen.width) || 0);
+  }
+
+  function readEmbeddedHeight() {
+    return (
+      readViewportHeight() || ((window.screen && window.screen.height) || 0)
+    );
+  }
+
   function readScreenWidth() {
-    return (window.screen && window.screen.width) || readViewportWidth();
+    return readEmbeddedWidth();
   }
 
   function readScreenHeight() {
-    return (window.screen && window.screen.height) || readViewportHeight();
+    return readEmbeddedHeight();
   }
 
   function applyEmbeddedViewportFrame() {
-    var width = readScreenWidth();
-    var height = readScreenHeight();
+    var width = readEmbeddedWidth();
+    var height = readEmbeddedHeight();
     if (!width || !height) {
       return;
     }

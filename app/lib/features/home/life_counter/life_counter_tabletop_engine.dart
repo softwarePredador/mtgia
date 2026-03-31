@@ -1,6 +1,48 @@
 import 'life_counter_session.dart';
 import 'life_counter_settings.dart';
 
+enum LifeCounterPlayerStatusKind {
+  active,
+  knockedOut,
+  poisonLethal,
+  commanderDamageLethal,
+  deckedOut,
+  leftTable,
+}
+
+class LifeCounterPlayerStatusSummary {
+  const LifeCounterPlayerStatusSummary({
+    required this.kind,
+    required this.label,
+    required this.description,
+  });
+
+  final LifeCounterPlayerStatusKind kind;
+  final String label;
+  final String description;
+
+  bool get isLethal =>
+      kind == LifeCounterPlayerStatusKind.knockedOut ||
+      kind == LifeCounterPlayerStatusKind.poisonLethal ||
+      kind == LifeCounterPlayerStatusKind.commanderDamageLethal;
+}
+
+class LifeCounterPlayerBoardSummary {
+  const LifeCounterPlayerBoardSummary({
+    required this.statusSummary,
+    required this.criticalCounterLabels,
+    this.commanderDamageLethalSummary,
+  });
+
+  final LifeCounterPlayerStatusSummary statusSummary;
+  final Map<String, String> criticalCounterLabels;
+  final String? commanderDamageLethalSummary;
+
+  String? criticalCounterLabel(String counterKey) {
+    return criticalCounterLabels[counterKey];
+  }
+}
+
 class LifeCounterTabletopEngine {
   LifeCounterTabletopEngine._();
 
@@ -70,6 +112,201 @@ class LifeCounterTabletopEngine {
     return session.commanderDamage[playerIndex].any((damage) => damage >= 21);
   }
 
+  static bool isCommanderDamageSourceLethal(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+    required int sourcePlayerIndex,
+  }) {
+    return readCommanderDamageFromSource(
+          session,
+          targetPlayerIndex: targetPlayerIndex,
+          sourcePlayerIndex: sourcePlayerIndex,
+        ) >=
+        21;
+  }
+
+  static List<int> commanderDamageLethalSources(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+  }) {
+    return <int>[
+      for (var sourcePlayerIndex = 0;
+          sourcePlayerIndex < session.playerCount;
+          sourcePlayerIndex += 1)
+        if (sourcePlayerIndex != targetPlayerIndex &&
+            isCommanderDamageSourceLethal(
+              session,
+              targetPlayerIndex: targetPlayerIndex,
+              sourcePlayerIndex: sourcePlayerIndex,
+            ))
+          sourcePlayerIndex,
+    ];
+  }
+
+  static String? commanderDamageLethalSummary(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+    String Function(int playerIndex)? playerLabelBuilder,
+  }) {
+    final lethalSources = commanderDamageLethalSources(
+      session,
+      targetPlayerIndex: targetPlayerIndex,
+    );
+    if (lethalSources.isEmpty) {
+      return null;
+    }
+
+    final labelBuilder =
+        playerLabelBuilder ?? ((playerIndex) => 'Player ${playerIndex + 1}');
+    final targetLabel = labelBuilder(targetPlayerIndex);
+    final sourceLabels = lethalSources.map(labelBuilder).join(', ');
+
+    if (lethalSources.length == 1) {
+      return '$targetLabel is lethal from $sourceLabels.';
+    }
+
+    return '$targetLabel is lethal from $sourceLabels.';
+  }
+
+  static bool isCounterCritical(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required String counterKey,
+  }) {
+    switch (counterKey) {
+      case 'poison':
+        return isPlayerPoisonLethal(session, playerIndex: playerIndex);
+      case 'tax-1':
+      case 'tax-2':
+        return readCounterValue(
+              session,
+              playerIndex: playerIndex,
+              counterKey: counterKey,
+            ) >=
+            10;
+      default:
+        return false;
+    }
+  }
+
+  static String? counterCriticalLabel(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required String counterKey,
+  }) {
+    if (!isCounterCritical(
+      session,
+      playerIndex: playerIndex,
+      counterKey: counterKey,
+    )) {
+      return null;
+    }
+
+    switch (counterKey) {
+      case 'poison':
+        return 'Poison lethal';
+      case 'tax-1':
+      case 'tax-2':
+        return 'Critical commander tax';
+      default:
+        return null;
+    }
+  }
+
+  static LifeCounterPlayerStatusSummary playerStatusSummary(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    final specialState = session.playerSpecialStates[playerIndex];
+    switch (specialState) {
+      case LifeCounterPlayerSpecialState.deckedOut:
+        return const LifeCounterPlayerStatusSummary(
+          kind: LifeCounterPlayerStatusKind.deckedOut,
+          label: 'Decked out',
+          description: 'This player lost by drawing from an empty library.',
+        );
+      case LifeCounterPlayerSpecialState.answerLeft:
+        return const LifeCounterPlayerStatusSummary(
+          kind: LifeCounterPlayerStatusKind.leftTable,
+          label: 'Left the table',
+          description: 'This player left or conceded outside of life loss.',
+        );
+      case LifeCounterPlayerSpecialState.none:
+        break;
+    }
+
+    if (isPlayerCommanderDamageLethal(session, playerIndex: playerIndex)) {
+      return const LifeCounterPlayerStatusSummary(
+        kind: LifeCounterPlayerStatusKind.commanderDamageLethal,
+        label: 'Commander damage lethal',
+        description: 'One commander source reached lethal damage for this player.',
+      );
+    }
+    if (isPlayerPoisonLethal(session, playerIndex: playerIndex)) {
+      return const LifeCounterPlayerStatusSummary(
+        kind: LifeCounterPlayerStatusKind.poisonLethal,
+        label: 'Poison lethal',
+        description: 'This player reached the poison lethal threshold.',
+      );
+    }
+    if (isPlayerLifeLethal(session, playerIndex: playerIndex)) {
+      return const LifeCounterPlayerStatusSummary(
+        kind: LifeCounterPlayerStatusKind.knockedOut,
+        label: 'Knocked out',
+        description: 'This player is at zero or less life.',
+      );
+    }
+    return const LifeCounterPlayerStatusSummary(
+      kind: LifeCounterPlayerStatusKind.active,
+      label: 'Active player',
+      description: 'This player is still active in the game.',
+    );
+  }
+
+  static LifeCounterPlayerBoardSummary playerBoardSummary(
+    LifeCounterSession session, {
+    required int playerIndex,
+    String Function(int playerIndex)? playerLabelBuilder,
+  }) {
+    final criticalCounterLabels = <String, String>{};
+    for (final counterKey in const <String>['poison', 'tax-1', 'tax-2']) {
+      final criticalLabel = counterCriticalLabel(
+        session,
+        playerIndex: playerIndex,
+        counterKey: counterKey,
+      );
+      if (criticalLabel != null) {
+        criticalCounterLabels[counterKey] = criticalLabel;
+      }
+    }
+
+    return LifeCounterPlayerBoardSummary(
+      statusSummary: playerStatusSummary(session, playerIndex: playerIndex),
+      commanderDamageLethalSummary: commanderDamageLethalSummary(
+        session,
+        targetPlayerIndex: playerIndex,
+        playerLabelBuilder: playerLabelBuilder,
+      ),
+      criticalCounterLabels: Map<String, String>.unmodifiable(
+        criticalCounterLabels,
+      ),
+    );
+  }
+
+  static String playerStatusLabel(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return playerStatusSummary(session, playerIndex: playerIndex).label;
+  }
+
+  static String playerStatusDescription(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return playerStatusSummary(session, playerIndex: playerIndex).description;
+  }
+
   static bool shouldAutoKnockOutPlayer(
     LifeCounterSession session, {
     required int playerIndex,
@@ -98,6 +335,27 @@ class LifeCounterTabletopEngine {
     }
 
     return markPlayerKnockedOut(session, playerIndex: playerIndex);
+  }
+
+  static LifeCounterSession applyAutoKnockOutAcrossPlayers(
+    LifeCounterSession session, {
+    required LifeCounterSettings settings,
+    bool preserveManualSpecialStates = true,
+  }) {
+    return List<int>.generate(session.playerCount, (index) => index)
+        .fold<LifeCounterSession>(session, (current, playerIndex) {
+          if (preserveManualSpecialStates &&
+              current.playerSpecialStates[playerIndex] !=
+                  LifeCounterPlayerSpecialState.none) {
+            return current;
+          }
+
+          return applyAutoKnockOutIfNeeded(
+            current,
+            playerIndex: playerIndex,
+            settings: settings,
+          );
+        });
   }
 
   static int readCommanderDamageFromSource(

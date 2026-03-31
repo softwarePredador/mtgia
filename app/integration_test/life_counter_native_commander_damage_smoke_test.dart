@@ -31,6 +31,9 @@ void main() {
   testWidgets(
     'opens the ManaLoom-owned commander damage shell on the live WebView path',
     (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().save(
@@ -92,6 +95,10 @@ void main() {
         250,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
       );

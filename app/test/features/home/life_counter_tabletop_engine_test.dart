@@ -151,6 +151,90 @@ void main() {
       expect(updated.commanderDamage[0][1], 7);
     });
 
+    test('collects lethal commander damage sources for a target player', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        commanderDamage: const [
+          [0, 21, 8, 23],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+      );
+
+      expect(
+        LifeCounterTabletopEngine.commanderDamageLethalSources(
+          session,
+          targetPlayerIndex: 0,
+        ),
+        <int>[1, 3],
+      );
+      expect(
+        LifeCounterTabletopEngine.isCommanderDamageSourceLethal(
+          session,
+          targetPlayerIndex: 0,
+          sourcePlayerIndex: 1,
+        ),
+        isTrue,
+      );
+      expect(
+        LifeCounterTabletopEngine.isCommanderDamageSourceLethal(
+          session,
+          targetPlayerIndex: 0,
+          sourcePlayerIndex: 2,
+        ),
+        isFalse,
+      );
+    });
+
+    test('builds commander damage lethal summary labels through the engine', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        commanderDamage: const [
+          [0, 21, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+      );
+
+      expect(
+        LifeCounterTabletopEngine.commanderDamageLethalSummary(
+          session,
+          targetPlayerIndex: 0,
+        ),
+        'Player 1 is lethal from Player 2.',
+      );
+      expect(
+        LifeCounterTabletopEngine.commanderDamageLethalSummary(
+          session,
+          targetPlayerIndex: 0,
+          playerLabelBuilder: (playerIndex) => 'Seat ${playerIndex + 1}',
+        ),
+        'Seat 1 is lethal from Seat 2.',
+      );
+    });
+
+    test('builds canonical player board summary through the engine', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        poison: const [10, 0, 0, 0],
+        commanderDamage: const [
+          [0, 21, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+      );
+
+      final summary = LifeCounterTabletopEngine.playerBoardSummary(
+        session,
+        playerIndex: 0,
+        playerLabelBuilder: (playerIndex) => 'Seat ${playerIndex + 1}',
+      );
+
+      expect(summary.statusSummary.label, 'Commander damage lethal');
+      expect(summary.criticalCounterLabel('poison'), 'Poison lethal');
+      expect(summary.commanderDamageLethalSummary, 'Seat 1 is lethal from Seat 2.');
+    });
+
     test('updates table state with clear flags', () {
       final session = LifeCounterSession.initial(
         playerCount: 4,
@@ -276,6 +360,31 @@ void main() {
       expect(updated.lastTableEvent, 'Jogador 1 foi nocauteado');
     });
 
+    test(
+      'applies auto knock out across players while preserving manual special states',
+      () {
+        final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+          lives: const [0, 40, 40, 40],
+          poison: const [0, 10, 0, 0],
+          playerSpecialStates: const [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.answerLeft,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+        );
+
+        final updated = LifeCounterTabletopEngine.applyAutoKnockOutAcrossPlayers(
+          session,
+          settings: LifeCounterSettings.defaults,
+        );
+
+        expect(updated.lives[0], 0);
+        expect(updated.playerSpecialStates[1], LifeCounterPlayerSpecialState.answerLeft);
+        expect(updated.lives[1], 40);
+      },
+    );
+
     test('keeps session untouched when auto kill is disabled', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 40, 40, 40],
@@ -289,6 +398,120 @@ void main() {
 
       expect(updated.lives[0], 0);
       expect(updated.lastTableEvent, isNull);
+    });
+
+    test('exposes critical counter labels for lethal poison and tax', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        poison: const [10, 0, 0, 0],
+        commanderCasts: const [0, 5, 0, 0],
+        commanderCastDetails: const [
+          LifeCounterCommanderCastDetail.zero,
+          LifeCounterCommanderCastDetail(
+            commanderOneCasts: 5,
+            commanderTwoCasts: 0,
+          ),
+          LifeCounterCommanderCastDetail.zero,
+          LifeCounterCommanderCastDetail.zero,
+        ],
+      );
+
+      expect(
+        LifeCounterTabletopEngine.counterCriticalLabel(
+          session,
+          playerIndex: 0,
+          counterKey: 'poison',
+        ),
+        'Poison lethal',
+      );
+      expect(
+        LifeCounterTabletopEngine.counterCriticalLabel(
+          session,
+          playerIndex: 1,
+          counterKey: 'tax-1',
+        ),
+        'Critical commander tax',
+      );
+    });
+
+    test('builds player status labels from canonical lethal and special state', () {
+      final lethalCommanderSession = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(
+        commanderDamage: const [
+          [0, 21, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+      );
+      final deckedOutSession = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(
+        playerSpecialStates: const [
+          LifeCounterPlayerSpecialState.deckedOut,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+        ],
+      );
+
+      expect(
+        LifeCounterTabletopEngine.playerStatusLabel(
+          lethalCommanderSession,
+          playerIndex: 0,
+        ),
+        'Commander damage lethal',
+      );
+      expect(
+        LifeCounterTabletopEngine.playerStatusDescription(
+          lethalCommanderSession,
+          playerIndex: 0,
+        ),
+        'One commander source reached lethal damage for this player.',
+      );
+      expect(
+        LifeCounterTabletopEngine.playerStatusLabel(
+          deckedOutSession,
+          playerIndex: 0,
+        ),
+        'Decked out',
+      );
+    });
+
+    test('builds player status summary as a single canonical structure', () {
+      final active = LifeCounterSession.initial(playerCount: 4);
+      final activeSummary = LifeCounterTabletopEngine.playerStatusSummary(
+        active,
+        playerIndex: 0,
+      );
+      expect(activeSummary.kind, LifeCounterPlayerStatusKind.active);
+      expect(activeSummary.label, 'Active player');
+      expect(activeSummary.description, 'This player is still active in the game.');
+      expect(activeSummary.isLethal, isFalse);
+
+      final poisonLethal = active.copyWith(poison: const [10, 0, 0, 0]);
+      final poisonSummary = LifeCounterTabletopEngine.playerStatusSummary(
+        poisonLethal,
+        playerIndex: 0,
+      );
+      expect(poisonSummary.kind, LifeCounterPlayerStatusKind.poisonLethal);
+      expect(poisonSummary.isLethal, isTrue);
+
+      final leftTable = active.copyWith(
+        playerSpecialStates: const [
+          LifeCounterPlayerSpecialState.answerLeft,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+        ],
+      );
+      final leftTableSummary = LifeCounterTabletopEngine.playerStatusSummary(
+        leftTable,
+        playerIndex: 0,
+      );
+      expect(leftTableSummary.kind, LifeCounterPlayerStatusKind.leftTable);
+      expect(leftTableSummary.label, 'Left the table');
+      expect(leftTableSummary.isLethal, isFalse);
     });
   });
 }

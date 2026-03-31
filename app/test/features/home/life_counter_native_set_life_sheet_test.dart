@@ -110,4 +110,62 @@ void main() {
     expect(result!.lives[1], 35);
     expect(result!.lastTableEvent, isNull);
   });
+
+  testWidgets('shows canonical preview status while editing life', (
+    tester,
+  ) async {
+    LifeCounterSession? result;
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: _SetLifeHost(onResult: (value) => result = value),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('life-counter-native-set-life-status-label')),
+      findsOneWidget,
+    );
+    expect(find.text('Active player'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(
+        const Key('life-counter-native-set-life-adjust-minus-10'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('life-counter-native-set-life-adjust-minus-10'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('life-counter-native-set-life-adjust-minus-10'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('life-counter-native-set-life-adjust-minus-10'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Knocked out'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const Key('life-counter-native-set-life-apply')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(result, isNotNull);
+    expect(result!.lives[1], 0);
+  });
 }

@@ -1671,21 +1671,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativeCommanderDamage(
     LifeCounterSession session, {
-    required String source,
-  }) async {
-    final settings = await _settingsStore.load();
-    final adjustedSession = List<int>.generate(
-      session.playerCount,
-      (index) => index,
-    ).fold<LifeCounterSession>(
-      session,
-      (current, playerIndex) => LifeCounterTabletopEngine
-          .applyAutoKnockOutIfNeeded(
-            current,
-            playerIndex: playerIndex,
-            settings: settings ?? LifeCounterSettings.defaults,
-          ),
-    );
+      required String source,
+    }) async {
+      final settings = await _settingsStore.load();
+      final adjustedSession = LifeCounterTabletopEngine
+          .applyAutoKnockOutAcrossPlayers(
+        session,
+        settings: settings ?? LifeCounterSettings.defaults,
+      );
     await _sessionStore.save(adjustedSession);
 
     final snapshot = await _snapshotStore.load();
@@ -2037,22 +2030,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativePlayerCounter(
     LifeCounterSession session, {
-    required String source,
-    required String counterKey,
-  }) async {
-    final settings = await _settingsStore.load();
-    final adjustedSession = List<int>.generate(
-      session.playerCount,
-      (index) => index,
-    ).fold<LifeCounterSession>(
-      session,
-      (current, playerIndex) => LifeCounterTabletopEngine
-          .applyAutoKnockOutIfNeeded(
-            current,
-            playerIndex: playerIndex,
-            settings: settings ?? LifeCounterSettings.defaults,
-          ),
-    );
+      required String source,
+      required String counterKey,
+    }) async {
+      final settings = await _settingsStore.load();
+      final adjustedSession = LifeCounterTabletopEngine
+          .applyAutoKnockOutAcrossPlayers(
+        session,
+        settings: settings ?? LifeCounterSettings.defaults,
+      );
     await _sessionStore.save(adjustedSession);
 
     final snapshot = await _snapshotStore.load();
@@ -2167,19 +2153,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativePlayerState(
     LifeCounterSession session, {
-    required String source,
-  }) async {
-    await _sessionStore.save(session);
-
-    final settings = await _settingsStore.load();
-    final snapshot = await _snapshotStore.load();
-    if (snapshot != null) {
-      final mergedValues = <String, String>{
-        ...snapshot.values,
-        ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
-          session,
-        ),
-      };
+      required String source,
+    }) async {
+      final settings = await _settingsStore.load();
+      final adjustedSession = LifeCounterTabletopEngine
+          .applyAutoKnockOutAcrossPlayers(
+        session,
+        settings: settings ?? LifeCounterSettings.defaults,
+      );
+      await _sessionStore.save(adjustedSession);
+      final snapshot = await _snapshotStore.load();
+      if (snapshot != null) {
+        final mergedValues = <String, String>{
+          ...snapshot.values,
+          ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
+            adjustedSession,
+          ),
+        };
       await _snapshotStore.save(
         LotusStorageSnapshot(
           values: Map<String, String>.unmodifiable(mergedValues),
@@ -2188,12 +2178,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     } else {
       await _snapshotStore.save(
         LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
-            LotusLifeCounterSessionAdapter.buildSnapshotValues(
-              session,
-              settings: settings,
+            values: Map<String, String>.unmodifiable(
+              LotusLifeCounterSessionAdapter.buildSnapshotValues(
+                adjustedSession,
+                settings: settings,
+              ),
             ),
-          ),
         ),
       );
     }
@@ -2283,16 +2273,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativeSetLife(
     LifeCounterSession session, {
-    required String source,
-    required int targetPlayerIndex,
-  }) async {
-    final settings = await _settingsStore.load();
-    final adjustedSession = LifeCounterTabletopEngine.applyAutoKnockOutIfNeeded(
-      session,
-      playerIndex: targetPlayerIndex,
-      settings: settings ?? LifeCounterSettings.defaults,
-    );
-    await _sessionStore.save(adjustedSession);
+      required String source,
+      required int targetPlayerIndex,
+    }) async {
+      final settings = await _settingsStore.load();
+      final adjustedSession = LifeCounterTabletopEngine
+          .applyAutoKnockOutAcrossPlayers(
+        session,
+        settings: settings ?? LifeCounterSettings.defaults,
+      );
+      await _sessionStore.save(adjustedSession);
 
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {

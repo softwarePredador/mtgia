@@ -151,6 +151,14 @@ class _LifeCounterNativePlayerCounterSheetState
     final playerLabel = 'Player ${_targetPlayerIndex + 1}';
     final isCustomCounter =
         !LifeCounterTabletopEngine.isKnownCounterKey(_selectedCounterKey);
+    final playerBoardSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      _draftSession,
+      playerIndex: _targetPlayerIndex,
+    );
+    final criticalLabel = playerBoardSummary.criticalCounterLabel(
+      _selectedCounterKey,
+    );
+    final playerStatusSummary = playerBoardSummary.statusSummary;
 
     return SafeArea(
       child: Padding(
@@ -225,6 +233,56 @@ class _LifeCounterNativePlayerCounterSheetState
                           ),
                         ),
                         const SizedBox(height: 18),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
+                            border: Border.all(color: AppTheme.outlineMuted),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Current player status',
+                                  style: TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: AppTheme.fontLg,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  playerStatusSummary.label,
+                                  key: const Key(
+                                    'life-counter-native-player-counter-status-label',
+                                  ),
+                                  style: const TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: AppTheme.fontLg,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  playerStatusSummary.description,
+                                  key: const Key(
+                                    'life-counter-native-player-counter-status-description',
+                                  ),
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: AppTheme.fontSm,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         const Text(
                           'Available counters',
                           style: TextStyle(
@@ -343,6 +401,35 @@ class _LifeCounterNativePlayerCounterSheetState
                                     ),
                                   ),
                                 ),
+                                if (criticalLabel != null)
+                                  Container(
+                                    key: const Key(
+                                      'life-counter-native-player-counter-critical-badge',
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.error.withValues(
+                                        alpha: 0.12,
+                                      ),
+                                      borderRadius: BorderRadius.circular(999),
+                                      border: Border.all(
+                                        color: AppTheme.error.withValues(
+                                          alpha: 0.35,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      criticalLabel,
+                                      style: const TextStyle(
+                                        color: AppTheme.error,
+                                        fontSize: AppTheme.fontXs,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
                                 IconButton(
                                   key: const Key(
                                     'life-counter-native-player-counter-minus',

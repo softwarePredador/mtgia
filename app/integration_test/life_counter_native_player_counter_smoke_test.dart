@@ -29,6 +29,9 @@ void main() {
   testWidgets(
     'opens the ManaLoom-owned player counter shell on the live WebView path',
     (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().save(
@@ -85,6 +88,10 @@ void main() {
 
       expect(find.text('Player Counter'), findsOneWidget);
 
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-counter-plus')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-counter-plus')),
       );

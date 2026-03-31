@@ -91,13 +91,23 @@ Estado vivo do contador hoje:
 - `Player State` agora funciona como hub ManaLoom para `counters`, `commander damage` e `player appearance`
 - `Player State` agora tambem oferece `Roll D20` por jogador sem depender do menu auxiliar do Lotus
 - `Player State` agora tambem oferece `Set Life` sem depender so do gesto original do Lotus
+- `Player State` agora tambem aplica transicoes canonicas de jogador como `Knock Out`, `Decked Out`, `Left Table` e `Revive` pela engine da mesa
 - `__manaloom_table_state` agora preserva tambem `lastPlayerRolls`, `lastHighRolls` e `firstPlayerIndex` auxiliar
 - `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `Table State`
 - a shell nativa de `Table State` agora controla `storm`, `monarch` e `initiative` sem mexer no layout central da mesa
 - `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa, reduzindo regra espalhada entre shells
 - `commander damage` agora tambem compartilha essa engine canonica inicial da mesa para leitura e escrita do split `commander1/commander2`
+- o resumo letal e a deteccao de fonte letal de `commander damage` agora tambem saem da UI e passam pela engine canonica da mesa
 - a shell nativa de `Set Life` agora tambem usa essa engine para ajustes rapidos de dano/cura sem depender do runtime implicito do Lotus
 - `autoKill` agora tambem entra no fluxo nativo de `set life`, `player counters` e `commander damage`, reduzindo mais a dependencia do comportamento implicito do bundle
+- a engine canonica da mesa agora tambem concentra sinais criticos de counters, como `poison lethal` e `critical commander tax`
+- a engine canonica da mesa agora tambem concentra o status atual do jogador, incluindo letalidade por vida/poison/commander damage e estados especiais como `decked out` e `left table`
+- o hub nativo de `player counters` agora tambem reflete esse status canonico do jogador, em vez de mostrar apenas o valor do counter selecionado
+- a shell nativa de `set life` agora tambem reflete o status canonico do jogador em tempo real enquanto o valor eh editado
+- a shell nativa de `commander damage` agora tambem reflete o status canonico do alvo em tempo real, antes do apply
+- o status canonico do jogador agora tambem vive em uma estrutura unica da `LifeCounterTabletopEngine`, em vez de cada shell montar `label` e `description` por conta propria
+- a engine canonica da mesa agora tambem expõe um `player board summary` unico, reunindo status, sinais criticos e resumo letal de commander damage para as shells nativas
+- `Player State` agora tambem respeita `autoKill` quando `Set Life`, `Player Counter` ou `Commander Damage` voltam pelo hub, sem sobrescrever estados especiais manuais
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Game Modes` como shell propria de status e navegacao

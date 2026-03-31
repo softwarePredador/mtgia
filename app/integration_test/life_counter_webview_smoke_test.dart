@@ -8,6 +8,7 @@ import 'package:manaloom/features/home/life_counter/life_counter_session_store.d
 import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
+import 'package:manaloom/features/home/lotus/lotus_ui_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
 Future<void> _pumpUntilSnapshotAvailable(
@@ -22,9 +23,22 @@ Future<void> _pumpUntilSnapshotAvailable(
   expect(snapshot, isNotNull);
 }
 
+Future<void> _pumpUntilUiSnapshotAvailable(
+  WidgetTester tester,
+  LotusUiSnapshotStore uiSnapshotStore,
+) async {
+  var snapshot = await uiSnapshotStore.load();
+  for (var attempt = 0; attempt < 20 && snapshot == null; attempt += 1) {
+    await tester.pump(const Duration(seconds: 1));
+    snapshot = await uiSnapshotStore.load();
+  }
+  expect(snapshot, isNotNull);
+}
+
 Future<void> _stabilizeHarness(
   WidgetTester tester,
   LotusStorageSnapshotStore snapshotStore,
+  LotusUiSnapshotStore uiSnapshotStore,
   LifeCounterGameTimerStateStore gameTimerStateStore,
   LifeCounterSessionStore sessionStore,
   LifeCounterSettingsStore settingsStore,
@@ -32,6 +46,7 @@ Future<void> _stabilizeHarness(
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump(const Duration(seconds: 2));
   await snapshotStore.clear();
+  await uiSnapshotStore.clear();
   await gameTimerStateStore.clear();
   await sessionStore.clear();
   await settingsStore.clear();
@@ -44,6 +59,8 @@ void main() {
   testWidgets('boots the embedded life counter without host error', (
     tester,
   ) async {
+    final uiSnapshotStore = LotusUiSnapshotStore();
+
     await tester.pumpWidget(
       const MaterialApp(
         home: LotusLifeCounterScreen(),
@@ -56,14 +73,26 @@ void main() {
     expect(find.text('Life counter unavailable'), findsNothing);
 
     await tester.pump(const Duration(seconds: 8));
+    await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
+
+    final uiSnapshot = await uiSnapshotStore.load();
 
     expect(find.text('Life counter unavailable'), findsNothing);
+    expect(uiSnapshot, isNotNull);
+    expect(uiSnapshot!.viewportWidth, greaterThan(300));
+    expect(uiSnapshot.viewportHeight, greaterThan(600));
+    expect(uiSnapshot.screenWidth, closeTo(uiSnapshot.viewportWidth, 1));
+    expect(uiSnapshot.screenHeight, closeTo(uiSnapshot.viewportHeight, 1));
+    expect(uiSnapshot.playerCardCount, 4);
+    expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
+    expect(uiSnapshot.firstPlayerCardHeight, greaterThan(300));
   });
 
   testWidgets('bootstraps Lotus from canonical state when raw snapshot is absent', (
     tester,
   ) async {
     final snapshotStore = LotusStorageSnapshotStore();
+    final uiSnapshotStore = LotusUiSnapshotStore();
     final gameTimerStateStore = LifeCounterGameTimerStateStore();
     final sessionStore = LifeCounterSessionStore();
     final settingsStore = LifeCounterSettingsStore();
@@ -71,6 +100,7 @@ void main() {
     await _stabilizeHarness(
       tester,
       snapshotStore,
+      uiSnapshotStore,
       gameTimerStateStore,
       sessionStore,
       settingsStore,
@@ -158,7 +188,9 @@ void main() {
     expect(find.text('Life counter unavailable'), findsNothing);
 
     await _pumpUntilSnapshotAvailable(tester, snapshotStore);
+    await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
     final restoredSnapshot = await snapshotStore.load();
+    final uiSnapshot = await uiSnapshotStore.load();
 
     expect(restoredSnapshot, isNotNull);
     expect(restoredSnapshot!.values['playerCount'], '4');
@@ -166,6 +198,10 @@ void main() {
     expect(restoredSnapshot.values['players'], isNotNull);
     expect(restoredSnapshot.values['gameSettings'], isNotNull);
     expect(restoredSnapshot.values['gameTimerState'], isNotNull);
+    expect(uiSnapshot, isNotNull);
+    expect(uiSnapshot!.viewportWidth, greaterThan(300));
+    expect(uiSnapshot.viewportHeight, greaterThan(600));
+    expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
 
     final rebuiltGameTimerState = await gameTimerStateStore.load();
     final rebuiltSession = await sessionStore.load();

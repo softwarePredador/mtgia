@@ -77,6 +77,8 @@ void main() {
       tester,
     ) async {
       LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         _Host(
@@ -95,6 +97,10 @@ void main() {
         250,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-player-state-set-life')),
       );
@@ -105,6 +111,10 @@ void main() {
         findsOneWidget,
       );
 
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-set-life-clear')),
       );
@@ -138,6 +148,8 @@ void main() {
       tester,
     ) async {
       LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         _Host(
@@ -158,6 +170,12 @@ void main() {
         250,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-manage-counters'),
+        ),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(
           const Key('life-counter-native-player-state-manage-counters'),
@@ -184,6 +202,8 @@ void main() {
       'opens the nested commander damage hub and returns to state',
       (tester) async {
         LifeCounterSession? result;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
         await tester.pumpWidget(
           _Host(
@@ -210,6 +230,14 @@ void main() {
           250,
           scrollable: find.byType(Scrollable).first,
         );
+        await tester.ensureVisible(
+          find.byKey(
+            const Key(
+              'life-counter-native-player-state-manage-commander-damage',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
         await tester.tap(
           find.byKey(
             const Key(
@@ -297,6 +325,65 @@ void main() {
         ),
       );
     });
+
+    testWidgets(
+      'shows canonical lethal status inside the commander damage shell',
+      (tester) async {
+        LifeCounterSession? result;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _CommanderDamageHost(
+            initialSession: LifeCounterSession.initial(
+              playerCount: 4,
+            ).copyWith(partnerCommanders: const [false, true, false, false]),
+            onResult: (value) => result = value,
+          ),
+        );
+
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(
+            const Key('life-counter-native-commander-damage-status-label'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Active player'), findsOneWidget);
+
+        for (var i = 0; i < 21; i += 1) {
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pump();
+        }
+        await tester.pumpAndSettle();
+
+        expect(find.text('Commander damage lethal'), findsOneWidget);
+        expect(
+          find.text('One commander source reached lethal damage for this player.'),
+          findsOneWidget,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-commander-damage-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(result, isNotNull);
+        expect(result!.commanderDamage[0][1], 21);
+      },
+    );
 
     testWidgets('opens the nested player appearance hub and returns to state', (
       tester,
@@ -396,6 +483,98 @@ void main() {
       expect(result, isNotNull);
       expect(result!.lastPlayerRolls[0], isNotNull);
       expect(result!.lastTableEvent, startsWith('Player 1 rolou D20: '));
+    });
+
+    testWidgets('marks and revives a player through canonical state actions', (
+      tester,
+    ) async {
+      LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: LifeCounterSession.initial(playerCount: 4),
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(
+          const Key('life-counter-native-player-state-status-label'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Active player'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-knockout'),
+        ),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-knockout'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-knockout')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.lives[0], 0);
+      expect(result!.lastTableEvent, 'Jogador 1 foi nocauteado');
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: result!,
+          onResult: (value) => result = value,
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-revive')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-revive')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-revive')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.lives[0], result!.startingLife);
+      expect(
+        result!.playerSpecialStates[0],
+        LifeCounterPlayerSpecialState.none,
+      );
+      expect(
+        result!.lastTableEvent,
+        'Jogador 1 voltou com ${result!.startingLife} de vida',
+      );
     });
   });
 }

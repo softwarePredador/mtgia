@@ -49,6 +49,8 @@ void main() {
       tester,
     ) async {
       LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         _Host(
@@ -64,6 +66,12 @@ void main() {
 
       expect(find.text('Player Counter'), findsOneWidget);
 
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-counter-custom-name'),
+        ),
+      );
+      await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(
           const Key('life-counter-native-player-counter-custom-name'),
@@ -105,6 +113,8 @@ void main() {
       tester,
     ) async {
       LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         _Host(
@@ -133,6 +143,12 @@ void main() {
         ),
         findsOneWidget,
       );
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-counter-chip-rad'),
+        ),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(
           const Key('life-counter-native-player-counter-chip-rad'),
@@ -169,6 +185,61 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.resolvedPlayerExtraCounters[0].containsKey('rad'), isFalse);
+    });
+
+    testWidgets('surfaces canonical player status and critical poison state', (
+      tester,
+    ) async {
+      LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        _Host(
+          initialSession: LifeCounterSession.initial(playerCount: 4),
+          initialTargetPlayerIndex: 0,
+          counterKey: 'poison',
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(
+          const Key('life-counter-native-player-counter-status-label'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Active player'), findsOneWidget);
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-counter-plus')),
+      );
+      await tester.pumpAndSettle();
+      for (var i = 0; i < 10; i += 1) {
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-counter-plus')),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      expect(
+        find.byKey(
+          const Key('life-counter-native-player-counter-critical-badge'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Poison lethal'), findsWidgets);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-counter-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.poison[0], 10);
     });
   });
 }

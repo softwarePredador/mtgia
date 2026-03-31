@@ -174,8 +174,18 @@ Progresso fechado ate agora:
   - `initiative`
 - `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa
 - `commander damage` agora tambem compartilha essa engine canonica inicial da mesa para leitura e escrita do split por comandante
+- o resumo letal e a deteccao de fonte letal de `commander damage` agora tambem passam pela engine canonica da mesa, em vez de ficarem espalhados na shell
 - `set life` agora tambem cobre ajustes rapidos de dano/cura pela mesma engine canonica, aproximando a saida do runtime implicito do Lotus
 - `autoKill` agora tambem passa pela engine canonica e ja e aplicado nos fluxos nativos de `set life`, `player counters` e `commander damage`
+- `player state` agora tambem aciona transicoes canonicas de jogador como `knock out`, `decked out`, `left table` e `revive`
+- a engine canonica agora tambem concentra sinais criticos de counters para feedback nativo de `poison` e `commander tax`
+- a engine canonica agora tambem concentra o status atual do jogador, incluindo letalidade por vida, poison e commander damage, alem de estados especiais
+- o hub nativo de `player counters` agora tambem reflete esse status canonico do jogador, reduzindo mais feedback implicito do Lotus
+- a shell nativa de `set life` agora tambem reflete esse status canonico do jogador em tempo real, antes do apply
+- a shell nativa de `commander damage` agora tambem reflete esse status canonico do alvo em tempo real, antes do apply
+- o status canonico do jogador agora tambem vive em uma estrutura unica da `LifeCounterTabletopEngine`, reduzindo mais duplicacao entre `set life`, `player counters`, `player state` e `commander damage`
+- a `LifeCounterTabletopEngine` agora tambem expõe um `player board summary` unico para as shells nativas, reunindo status, sinais criticos e resumo letal de commander damage
+- `Player State` agora tambem passa por `autoKill` quando hubs aninhados devolvem uma sessao letal, preservando estados especiais manuais
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
 - o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - os hints legados de `turn tracker` e `counters on card` agora sao suprimidos e marcados como concluidos pela shell policy

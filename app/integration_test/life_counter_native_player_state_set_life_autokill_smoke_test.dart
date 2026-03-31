@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
-Future<LifeCounterSession?> _pumpUntilLifeApplied(
+Future<LifeCounterSession?> _pumpUntilKnockoutApplied(
   WidgetTester tester,
   LifeCounterSessionStore store,
 ) async {
@@ -15,7 +16,9 @@ Future<LifeCounterSession?> _pumpUntilLifeApplied(
   for (
     var attempt = 0;
     attempt < 20 &&
-        (session == null || session.lives[1] != 45 || session.lastTableEvent != null);
+        (session == null ||
+            session.lives[1] != 0 ||
+            session.lastTableEvent != 'Jogador 2 foi nocauteado');
     attempt += 1
   ) {
     await tester.pump(const Duration(seconds: 1));
@@ -28,18 +31,20 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'opens set life from the ManaLoom player state hub on the live WebView path',
+    'auto-knocks out from the ManaLoom player state set life hub on the live WebView path',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(900, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
-      await LifeCounterSettingsStore().clear();
+      await LifeCounterSettingsStore().save(
+        LifeCounterSettings.defaults.copyWith(autoKill: true),
+      );
       await LifeCounterSessionStore().save(
         const LifeCounterSession(
           playerCount: 4,
           startingLifeTwoPlayer: 20,
           startingLifeMultiPlayer: 40,
-          lives: [40, 32, 25, 11],
+          lives: [40, 5, 25, 11],
           poison: [0, 0, 0, 0],
           energy: [0, 0, 0, 0],
           experience: [0, 0, 0, 0],
@@ -70,7 +75,7 @@ void main() {
           currentTurnNumber: 1,
           turnTimerActive: false,
           turnTimerSeconds: 0,
-          lastTableEvent: 'D20: 18',
+          lastTableEvent: null,
         ),
       );
 
@@ -105,21 +110,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
 
-      expect(
-        find.byKey(const Key('life-counter-native-set-life-apply')),
-        findsOneWidget,
-      );
-
       await tester.tap(
-        find.byKey(const Key('life-counter-native-set-life-clear')),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-set-life-digit-4')),
-      );
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-set-life-digit-5')),
+        find.byKey(const Key('life-counter-native-set-life-adjust-minus-10')),
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
@@ -138,13 +130,13 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 600));
 
-      final session = await _pumpUntilLifeApplied(
+      final session = await _pumpUntilKnockoutApplied(
         tester,
         LifeCounterSessionStore(),
       );
       expect(session, isNotNull);
-      expect(session!.lives[1], 45);
-      expect(session.lastTableEvent, isNull);
+      expect(session!.lives[1], 0);
+      expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
     },
   );
 }

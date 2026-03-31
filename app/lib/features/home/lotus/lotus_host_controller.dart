@@ -578,6 +578,10 @@ class LotusHostController implements LotusHost {
         (() => JSON.stringify({
           captured_at_epoch_ms: Date.now(),
           body_class_name: document.body ? document.body.className : '',
+          viewport_width: window.innerWidth || 0,
+          viewport_height: window.innerHeight || 0,
+          screen_width: window.screen ? window.screen.width || 0 : 0,
+          screen_height: window.screen ? window.screen.height || 0 : 0,
           set_life_by_tap_enabled: !!(
             document.body &&
             document.body.classList.contains('set-life-by-tap-enabled')
@@ -612,6 +616,16 @@ class LotusHostController implements LotusHost {
           clock_with_game_timer_count: document.querySelectorAll(
             '.current-time-clock.with-game-timer'
           ).length,
+          first_player_card_width: (() => {
+            const node = document.querySelector('.player-card');
+            if (!node) return 0;
+            return node.getBoundingClientRect().width || 0;
+          })(),
+          first_player_card_height: (() => {
+            const node = document.querySelector('.player-card');
+            if (!node) return 0;
+            return node.getBoundingClientRect().height || 0;
+          })(),
           player_card_count: document.querySelectorAll('.player-card').length
         }))()
       ''');

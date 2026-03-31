@@ -103,6 +103,15 @@ class _LifeCounterNativeSetLifeSheetState
   @override
   Widget build(BuildContext context) {
     final displayValue = _buffer.isEmpty ? '0' : _buffer;
+    final previewSession = LifeCounterTabletopEngine.setLifeTotal(
+      _draftSession,
+      playerIndex: _targetPlayerIndex,
+      life: int.tryParse(displayValue) ?? 0,
+    );
+    final playerStatusSummary = LifeCounterTabletopEngine.playerBoardSummary(
+      previewSession,
+      playerIndex: _targetPlayerIndex,
+    ).statusSummary;
 
     return SafeArea(
       child: Padding(
@@ -234,6 +243,56 @@ class _LifeCounterNativeSetLifeSheetState
                             onTap: () => _applyQuickDelta(10),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 18),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceElevated,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
+                          border: Border.all(color: AppTheme.outlineMuted),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Preview Status',
+                                style: TextStyle(
+                                  color: AppTheme.textPrimary,
+                                  fontSize: AppTheme.fontLg,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                playerStatusSummary.label,
+                                key: const Key(
+                                  'life-counter-native-set-life-status-label',
+                                ),
+                                style: const TextStyle(
+                                  color: AppTheme.textPrimary,
+                                  fontSize: AppTheme.fontLg,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                playerStatusSummary.description,
+                                key: const Key(
+                                  'life-counter-native-set-life-status-description',
+                                ),
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: AppTheme.fontSm,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       SizedBox(
