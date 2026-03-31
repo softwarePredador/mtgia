@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_dice_engine.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativeDiceSheet(
   BuildContext context, {
@@ -45,6 +46,8 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
       LifeCounterDiceEngine.deriveHighRollWinners(_draftSession.lastHighRolls);
 
   bool get _hasPendingTieBreak => _highRollWinners.length > 1;
+  bool get _hasAnyActivePlayers =>
+      LifeCounterTabletopEngine.hasAnyActivePlayers(_draftSession);
 
   @override
   void initState() {
@@ -132,7 +135,9 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                       _DiceSectionCard(
                         title: 'Quick Actions',
                         subtitle:
-                            _hasPendingTieBreak
+                            !_hasAnyActivePlayers
+                                ? 'No active players remain on the table. Dice actions that choose a player stay unavailable.'
+                                : _hasPendingTieBreak
                                 ? 'The previous high roll ended in a tie. Running high roll again rerolls only tied players.'
                                 : 'Run the same table tools without leaving the ManaLoom-owned shell.',
                         child: Wrap(
@@ -144,9 +149,11 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                                 'life-counter-native-dice-high-roll',
                               ),
                               onPressed:
-                                  () => _applyAction(
-                                    LifeCounterDiceEngine.runHighRoll,
-                                  ),
+                                  _hasAnyActivePlayers
+                                      ? () => _applyAction(
+                                        LifeCounterDiceEngine.runHighRoll,
+                                      )
+                                      : null,
                               icon: const Icon(Icons.emoji_events_rounded),
                               label: Text(
                                 _hasPendingTieBreak ? 'Tiebreak' : 'High Roll',
@@ -175,9 +182,11 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                                 'life-counter-native-dice-first-player',
                               ),
                               onPressed:
-                                  () => _applyAction(
-                                    LifeCounterDiceEngine.runFirstPlayerRoll,
-                                  ),
+                                  _hasAnyActivePlayers
+                                      ? () => _applyAction(
+                                        LifeCounterDiceEngine.runFirstPlayerRoll,
+                                      )
+                                      : null,
                               icon: const Icon(Icons.flag_rounded),
                               label: const Text('Roll 1st'),
                             ),

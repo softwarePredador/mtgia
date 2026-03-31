@@ -423,7 +423,10 @@ class _LifeCounterNativePlayerStateSheetState
                                       key: Key(
                                         'life-counter-native-player-state-${entry.name}',
                                       ),
-                                      label: Text(_specialStateLabel(entry)),
+                                      label: Text(
+                                        LifeCounterTabletopEngine
+                                            .playerSpecialStateLabel(entry),
+                                      ),
                                       selected: _specialState == entry,
                                       onSelected:
                                           (_) => setState(
@@ -435,7 +438,10 @@ class _LifeCounterNativePlayerStateSheetState
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              _specialStateDescription(_specialState),
+                              LifeCounterTabletopEngine
+                                  .playerSpecialStateDescription(
+                                    _specialState,
+                                  ),
                               key: const Key(
                                 'life-counter-native-player-state-description',
                               ),
@@ -534,28 +540,6 @@ class _LifeCounterNativePlayerStateSheetState
         ),
       ),
     );
-  }
-}
-
-String _specialStateLabel(LifeCounterPlayerSpecialState state) {
-  switch (state) {
-    case LifeCounterPlayerSpecialState.none:
-      return 'Active player';
-    case LifeCounterPlayerSpecialState.deckedOut:
-      return 'Decked out';
-    case LifeCounterPlayerSpecialState.answerLeft:
-      return 'Left the table';
-  }
-}
-
-String _specialStateDescription(LifeCounterPlayerSpecialState state) {
-  switch (state) {
-    case LifeCounterPlayerSpecialState.none:
-      return 'This player is still active in the game.';
-    case LifeCounterPlayerSpecialState.deckedOut:
-      return 'Track that the player lost by drawing from an empty library.';
-    case LifeCounterPlayerSpecialState.answerLeft:
-      return 'Track that the player left or conceded outside of life loss.';
   }
 }
 

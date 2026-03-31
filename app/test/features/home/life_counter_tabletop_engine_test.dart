@@ -252,6 +252,43 @@ void main() {
       expect(updated.initiativePlayer, 3);
     });
 
+    test('updateTableState refuses ownership for out players', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        lives: const [40, 0, 40, 0],
+      );
+
+      final updated = LifeCounterTabletopEngine.updateTableState(
+        session,
+        stormCount: 2,
+        monarchPlayer: 1,
+        initiativePlayer: 3,
+      );
+
+      expect(updated.stormCount, 2);
+      expect(updated.monarchPlayer, isNull);
+      expect(updated.initiativePlayer, isNull);
+    });
+
+    test('clears monarch and initiative ownership from out players', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        lives: const [40, 0, 40, 40],
+        playerSpecialStates: const [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.answerLeft,
+          LifeCounterPlayerSpecialState.none,
+        ],
+        monarchPlayer: 1,
+        initiativePlayer: 2,
+      );
+
+      final updated = LifeCounterTabletopEngine
+          .sanitizeTableOwnershipForActivePlayers(session);
+
+      expect(updated.monarchPlayer, isNull);
+      expect(updated.initiativePlayer, isNull);
+    });
+
     test('updates partner commander and special state for a player', () {
       final session = LifeCounterSession.initial(playerCount: 4);
 
@@ -385,6 +422,32 @@ void main() {
       },
     );
 
+    test('normalizes owned board session through one canonical engine path', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        lives: const [40, 0, 40, 40],
+        monarchPlayer: 1,
+        initiativePlayer: 2,
+        firstPlayerIndex: 1,
+        currentTurnPlayerIndex: 1,
+        currentTurnNumber: 3,
+        turnTrackerActive: true,
+        turnTrackerOngoingGame: true,
+      );
+
+      final updated = LifeCounterTabletopEngine.normalizeOwnedBoardSession(
+        session,
+        settings: LifeCounterSettings.defaults,
+      );
+
+      expect(updated.lives[1], 0);
+      expect(updated.monarchPlayer, isNull);
+      expect(updated.initiativePlayer, 2);
+      expect(updated.firstPlayerIndex, 2);
+      expect(updated.currentTurnPlayerIndex, 2);
+      expect(updated.turnTrackerActive, isTrue);
+      expect(updated.currentTurnNumber, 3);
+    });
+
     test('keeps session untouched when auto kill is disabled', () {
       final session = LifeCounterSession.initial(playerCount: 4).copyWith(
         lives: const [0, 40, 40, 40],
@@ -512,6 +575,40 @@ void main() {
       expect(leftTableSummary.kind, LifeCounterPlayerStatusKind.leftTable);
       expect(leftTableSummary.label, 'Left the table');
       expect(leftTableSummary.isLethal, isFalse);
+    });
+
+    test('exposes special state labels and descriptions through the engine', () {
+      expect(
+        LifeCounterTabletopEngine.playerSpecialStateLabel(
+          LifeCounterPlayerSpecialState.none,
+        ),
+        'Active player',
+      );
+      expect(
+        LifeCounterTabletopEngine.playerSpecialStateDescription(
+          LifeCounterPlayerSpecialState.deckedOut,
+        ),
+        'Track that the player lost by drawing from an empty library.',
+      );
+      expect(
+        LifeCounterTabletopEngine.playerSpecialStateLabel(
+          LifeCounterPlayerSpecialState.answerLeft,
+        ),
+        'Left the table',
+      );
+    });
+
+    test('reports when no active players remain on the table', () {
+      final session = LifeCounterSession.initial(playerCount: 4).copyWith(
+        lives: const [0, 0, 0, 0],
+      );
+
+      expect(LifeCounterTabletopEngine.hasAnyActivePlayers(session), isFalse);
+      expect(
+        LifeCounterTabletopEngine.firstActivePlayerIndexOrNull(session),
+        isNull,
+      );
+      expect(LifeCounterTabletopEngine.firstActivePlayerIndex(session), 0);
     });
   });
 }

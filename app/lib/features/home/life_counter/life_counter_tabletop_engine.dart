@@ -1,5 +1,6 @@
 import 'life_counter_session.dart';
 import 'life_counter_settings.dart';
+import 'life_counter_turn_tracker_engine.dart';
 
 enum LifeCounterPlayerStatusKind {
   active,
@@ -307,6 +308,55 @@ class LifeCounterTabletopEngine {
     return playerStatusSummary(session, playerIndex: playerIndex).description;
   }
 
+  static bool isPlayerActiveOnTable(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return playerStatusSummary(session, playerIndex: playerIndex).kind ==
+        LifeCounterPlayerStatusKind.active;
+  }
+
+  static bool hasAnyActivePlayers(LifeCounterSession session) {
+    return firstActivePlayerIndexOrNull(session) != null;
+  }
+
+  static int? firstActivePlayerIndexOrNull(LifeCounterSession session) {
+    for (var index = 0; index < session.playerCount; index += 1) {
+      if (isPlayerActiveOnTable(session, playerIndex: index)) {
+        return index;
+      }
+    }
+    return null;
+  }
+
+  static int firstActivePlayerIndex(LifeCounterSession session) {
+    return firstActivePlayerIndexOrNull(session) ?? 0;
+  }
+
+  static String playerSpecialStateLabel(LifeCounterPlayerSpecialState state) {
+    switch (state) {
+      case LifeCounterPlayerSpecialState.none:
+        return 'Active player';
+      case LifeCounterPlayerSpecialState.deckedOut:
+        return 'Decked out';
+      case LifeCounterPlayerSpecialState.answerLeft:
+        return 'Left the table';
+    }
+  }
+
+  static String playerSpecialStateDescription(
+    LifeCounterPlayerSpecialState state,
+  ) {
+    switch (state) {
+      case LifeCounterPlayerSpecialState.none:
+        return 'This player is still active in the game.';
+      case LifeCounterPlayerSpecialState.deckedOut:
+        return 'Track that the player lost by drawing from an empty library.';
+      case LifeCounterPlayerSpecialState.answerLeft:
+        return 'Track that the player left or conceded outside of life loss.';
+    }
+  }
+
   static bool shouldAutoKnockOutPlayer(
     LifeCounterSession session, {
     required int playerIndex,
@@ -356,6 +406,24 @@ class LifeCounterTabletopEngine {
             settings: settings,
           );
         });
+  }
+
+  static LifeCounterSession normalizeOwnedBoardSession(
+    LifeCounterSession session, {
+    required LifeCounterSettings settings,
+    bool preserveManualSpecialStates = true,
+  }) {
+    final autoAdjustedSession = applyAutoKnockOutAcrossPlayers(
+      session,
+      settings: settings,
+      preserveManualSpecialStates: preserveManualSpecialStates,
+    );
+    final sanitizedTableSession = sanitizeTableOwnershipForActivePlayers(
+      autoAdjustedSession,
+    );
+    return LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+      sanitizedTableSession,
+    );
   }
 
   static int readCommanderDamageFromSource(
@@ -430,11 +498,44 @@ class LifeCounterTabletopEngine {
     int? initiativePlayer,
     bool clearInitiativePlayer = false,
   }) {
+    final normalizedMonarchPlayer =
+        clearMonarchPlayer
+            ? null
+            : _sanitizeOwnershipPlayer(session, monarchPlayer);
+    final normalizedInitiativePlayer =
+        clearInitiativePlayer
+            ? null
+            : _sanitizeOwnershipPlayer(session, initiativePlayer);
+
     return session.copyWith(
       stormCount: stormCount.clamp(0, 999),
-      monarchPlayer: monarchPlayer,
+      monarchPlayer: normalizedMonarchPlayer,
+      clearMonarchPlayer: clearMonarchPlayer || normalizedMonarchPlayer == null,
+      initiativePlayer: normalizedInitiativePlayer,
+      clearInitiativePlayer:
+          clearInitiativePlayer || normalizedInitiativePlayer == null,
+    );
+  }
+
+  static LifeCounterSession sanitizeTableOwnershipForActivePlayers(
+    LifeCounterSession session,
+  ) {
+    final monarchPlayer = session.monarchPlayer;
+    final initiativePlayer = session.initiativePlayer;
+
+    final clearMonarchPlayer =
+        monarchPlayer != null &&
+        !isPlayerActiveOnTable(session, playerIndex: monarchPlayer);
+    final clearInitiativePlayer =
+        initiativePlayer != null &&
+        !isPlayerActiveOnTable(session, playerIndex: initiativePlayer);
+
+    if (!clearMonarchPlayer && !clearInitiativePlayer) {
+      return session;
+    }
+
+    return session.copyWith(
       clearMonarchPlayer: clearMonarchPlayer,
-      initiativePlayer: initiativePlayer,
       clearInitiativePlayer: clearInitiativePlayer,
     );
   }
@@ -640,5 +741,21 @@ class LifeCounterTabletopEngine {
         counterKey == 'xp' ||
         counterKey == 'tax-1' ||
         counterKey == 'tax-2';
+  }
+
+  static int? _sanitizeOwnershipPlayer(
+    LifeCounterSession session,
+    int? playerIndex,
+  ) {
+    if (playerIndex == null) {
+      return null;
+    }
+
+    final normalizedPlayerIndex = playerIndex.clamp(0, session.playerCount - 1);
+    if (!isPlayerActiveOnTable(session, playerIndex: normalizedPlayerIndex)) {
+      return null;
+    }
+
+    return normalizedPlayerIndex;
   }
 }

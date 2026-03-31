@@ -251,7 +251,17 @@ Done when:
 
 Pendencias reais apos a revalidacao:
 
-- revalidar em AVD limpo os smokes vivos mais novos que ainda sofrem com `INSTALL_FAILED_INSUFFICIENT_STORAGE`
+  - o host do contador vivo agora tambem consolida a aplicacao de sessoes nativas por um caminho unico de normalizacao e persistencia, reduzindo drift entre `set life`, `player counters`, `player state` e `commander damage`
+  - a `LifeCounterTabletopEngine` agora tambem concentra esse pipeline de normalizacao de board em um metodo unico, reduzindo dependencia da ordem de saneamento no host
+  - `turn tracker` e `table state` agora tambem usam a mesma nocao canonica de jogador ativo da `LifeCounterTabletopEngine`, em vez de checagens locais mais fracas
+  - a propria `LifeCounterTabletopEngine` agora tambem recusa `monarch` e `initiative` para jogadores fora da mesa, nao so a shell de `table state`
+  - `high roll` e `roll 1st` agora tambem respeitam apenas jogadores ativos, reduzindo mais um ponto de dependencia do comportamento implicito do Lotus
+  - a aplicacao de `dice` no host agora tambem passa pelo mesmo caminho central de normalizacao e persistencia usado pelas outras shells nativas
+  - a apresentacao de `special state` do jogador agora tambem sai da shell e passa a ser definida pela `LifeCounterTabletopEngine`
+- quando um jogador sai da mesa por estado letal, a engine canonica agora tambem saneia `monarch` e `initiative`, evitando ownership preso em jogador fora do jogo
+  - quando um jogador sai da mesa por estado letal, a camada canonica agora tambem realinha `currentTurnPlayerIndex` e `firstPlayerIndex`, evitando tracker preso em jogador fora do jogo
+  - quando nao sobra nenhum jogador ativo, o tracker canonico agora limpa os ponteiros em vez de manter referencia a jogador fora da mesa
+  - revalidar em AVD limpo os smokes vivos mais novos que ainda sofrem com `INSTALL_FAILED_INSUFFICIENT_STORAGE`
 - decidir se `edit cards` de `Planechase`, `Archenemy` e `Bounty` vao permanecer embutidos por decisao explicita ou se entram no backlog de migracao nativa
 - fechar a decisao final sobre o runtime central da mesa antes de falar em remocao do `WebView`
 

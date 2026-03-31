@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 class LifeCounterDiceEngine {
   LifeCounterDiceEngine._();
@@ -39,7 +40,15 @@ class LifeCounterDiceEngine {
     LifeCounterSession session, {
     Random? random,
   }) {
-    final chosen = (random ?? Random()).nextInt(session.playerCount);
+    final activePlayers = _activePlayerIndexes(session);
+    if (activePlayers.isEmpty) {
+      return session.copyWith(
+        clearFirstPlayerIndex: true,
+        lastTableEvent: 'Primeiro jogador indisponivel: nenhum jogador ativo',
+      );
+    }
+
+    final chosen = activePlayers[(random ?? Random()).nextInt(activePlayers.length)];
     return session.copyWith(
       firstPlayerIndex: chosen,
       lastTableEvent: 'Primeiro jogador: ${_playerLabel(chosen)}',
@@ -51,6 +60,13 @@ class LifeCounterDiceEngine {
     Random? random,
   }) {
     final participants = _resolveHighRollParticipants(session);
+    if (participants.isEmpty) {
+      return session.copyWith(
+        lastHighRolls: List<int?>.filled(session.playerCount, null),
+        lastTableEvent: 'High Roll indisponivel: nenhum jogador ativo',
+      );
+    }
+
     final nextRandom = random ?? Random();
     final nextHighRolls = List<int?>.filled(session.playerCount, null);
 
@@ -97,13 +113,27 @@ class LifeCounterDiceEngine {
   }
 
   static Set<int> _resolveHighRollParticipants(LifeCounterSession session) {
+    final activePlayers = _activePlayerIndexes(session).toSet();
     final persistedWinners = deriveHighRollWinners(session.lastHighRolls);
-    if (persistedWinners.length > 1) {
-      return persistedWinners;
+    final activePersistedWinners =
+        persistedWinners.where(activePlayers.contains).toSet();
+    if (activePersistedWinners.length > 1) {
+      return activePersistedWinners;
     }
 
-    return <int>{for (var index = 0; index < session.playerCount; index += 1) index};
+    return activePlayers;
   }
 
   static String _playerLabel(int playerIndex) => 'Player ${playerIndex + 1}';
+
+  static List<int> _activePlayerIndexes(LifeCounterSession session) {
+    return <int>[
+      for (var index = 0; index < session.playerCount; index += 1)
+        if (LifeCounterTabletopEngine.isPlayerActiveOnTable(
+          session,
+          playerIndex: index,
+        ))
+          index,
+    ];
+  }
 }

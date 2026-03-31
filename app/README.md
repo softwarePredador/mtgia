@@ -108,6 +108,16 @@ Estado vivo do contador hoje:
 - o status canonico do jogador agora tambem vive em uma estrutura unica da `LifeCounterTabletopEngine`, em vez de cada shell montar `label` e `description` por conta propria
 - a engine canonica da mesa agora tambem expõe um `player board summary` unico, reunindo status, sinais criticos e resumo letal de commander damage para as shells nativas
 - `Player State` agora tambem respeita `autoKill` quando `Set Life`, `Player Counter` ou `Commander Damage` voltam pelo hub, sem sobrescrever estados especiais manuais
+- o host do contador vivo agora tambem consolida a aplicacao de sessoes nativas por um caminho unico de normalizacao e persistencia, reduzindo drift entre `set life`, `player counters`, `player state` e `commander damage`
+- a `LifeCounterTabletopEngine` agora tambem concentra esse pipeline de normalizacao de board em um metodo unico, reduzindo dependencia da ordem de saneamento no host
+- `turn tracker` e `table state` agora tambem usam a mesma nocao canonica de jogador ativo da `LifeCounterTabletopEngine`, em vez de checagens locais mais fracas
+- a propria `LifeCounterTabletopEngine` agora tambem recusa `monarch` e `initiative` para jogadores fora da mesa, nao so a shell de `table state`
+- `high roll` e `roll 1st` agora tambem respeitam apenas jogadores ativos, reduzindo mais um ponto de dependencia do comportamento implicito do Lotus
+- a aplicacao de `dice` no host agora tambem passa pelo mesmo caminho central de normalizacao e persistencia usado pelas outras shells nativas
+- a apresentacao de `special state` do jogador agora tambem sai da `LifeCounterNativePlayerStateSheet` e passa a ser definida pela `LifeCounterTabletopEngine`
+- quando um jogador sai da mesa por estado letal, a engine canonica agora tambem saneia `monarch` e `initiative`, evitando ownership preso em jogador fora do jogo
+- quando um jogador sai da mesa por estado letal, a camada canonica agora tambem realinha `currentTurnPlayerIndex` e `firstPlayerIndex`, evitando tracker preso em jogador fora do jogo
+- quando nao sobra nenhum jogador ativo, o tracker canonico agora limpa os ponteiros em vez de manter referencia a jogador fora da mesa
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Game Modes` como shell propria de status e navegacao

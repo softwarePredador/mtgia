@@ -36,6 +36,13 @@ class _LifeCounterNativeTableStateSheetState
   late int? _monarchPlayer;
   late int? _initiativePlayer;
 
+  bool _isPlayerAvailable(int playerIndex) {
+    return LifeCounterTabletopEngine.isPlayerActiveOnTable(
+      widget.initialSession,
+      playerIndex: playerIndex,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +143,7 @@ class _LifeCounterNativeTableStateSheetState
                           keyPrefix: 'life-counter-native-table-state-monarch',
                           selectedPlayer: _monarchPlayer,
                           playerCount: widget.initialSession.playerCount,
+                          isPlayerAvailable: _isPlayerAvailable,
                           onPlayerSelected:
                               (playerIndex) =>
                                   setState(() => _monarchPlayer = playerIndex),
@@ -153,6 +161,7 @@ class _LifeCounterNativeTableStateSheetState
                               'life-counter-native-table-state-initiative',
                           selectedPlayer: _initiativePlayer,
                           playerCount: widget.initialSession.playerCount,
+                          isPlayerAvailable: _isPlayerAvailable,
                           onPlayerSelected:
                               (playerIndex) => setState(
                                 () => _initiativePlayer = playerIndex,
@@ -316,6 +325,7 @@ class _TokenAssignmentSection extends StatelessWidget {
     required this.keyPrefix,
     required this.selectedPlayer,
     required this.playerCount,
+    required this.isPlayerAvailable,
     required this.onPlayerSelected,
     required this.onCleared,
   });
@@ -323,6 +333,7 @@ class _TokenAssignmentSection extends StatelessWidget {
   final String keyPrefix;
   final int? selectedPlayer;
   final int playerCount;
+  final bool Function(int playerIndex) isPlayerAvailable;
   final ValueChanged<int> onPlayerSelected;
   final VoidCallback onCleared;
 
@@ -336,12 +347,19 @@ class _TokenAssignmentSection extends StatelessWidget {
           runSpacing: 8,
           children: List<Widget>.generate(
             playerCount,
-            (index) => ChoiceChip(
-              key: Key('$keyPrefix-player-$index'),
-              label: Text('Player ${index + 1}'),
-              selected: selectedPlayer == index,
-              onSelected: (_) => onPlayerSelected(index),
-            ),
+            (index) {
+              final isAvailable = isPlayerAvailable(index);
+              return ChoiceChip(
+                key: Key('$keyPrefix-player-$index'),
+                label: Text(
+                  isAvailable
+                      ? 'Player ${index + 1}'
+                      : 'Player ${index + 1} (out)',
+                ),
+                selected: selectedPlayer == index,
+                onSelected: isAvailable ? (_) => onPlayerSelected(index) : null,
+              );
+            },
           ),
         ),
         const SizedBox(height: 12),

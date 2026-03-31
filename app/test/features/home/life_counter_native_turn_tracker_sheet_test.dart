@@ -168,5 +168,125 @@ void main() {
       expect(result!.currentTurnNumber, 1);
       expect(result!.turnTimerSeconds, 0);
     });
+
+    testWidgets('sanitizes invalid tracked players when opening the sheet', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      LifeCounterSession? result;
+
+      final initialSession = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(
+        firstPlayerIndex: 1,
+        currentTurnPlayerIndex: 2,
+        currentTurnNumber: 3,
+        turnTrackerActive: true,
+        turnTrackerOngoingGame: true,
+        lives: const [40, 0, 0, 40],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      result = await showLifeCounterNativeTurnTrackerSheet(
+                        context,
+                        initialSession: initialSession,
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player 4'), findsWidgets);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.firstPlayerIndex, 3);
+      expect(result!.currentTurnPlayerIndex, 3);
+      expect(result!.currentTurnNumber, 3);
+    });
+
+    testWidgets('disables starting a tracked game when no active players remain', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      LifeCounterSession? result;
+
+      final initialSession = LifeCounterSession.initial(
+        playerCount: 4,
+      ).copyWith(
+        lives: const [0, 0, 0, 0],
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      result = await showLifeCounterNativeTurnTrackerSheet(
+                        context,
+                        initialSession: initialSession,
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No active players'), findsWidgets);
+
+      final startButton = tester.widget<FilledButton>(
+        find.byKey(const Key('life-counter-native-turn-tracker-start')),
+      );
+      expect(startButton.onPressed, isNull);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.firstPlayerIndex, isNull);
+      expect(result!.currentTurnPlayerIndex, isNull);
+      expect(result!.turnTrackerActive, isFalse);
+    });
   });
 }

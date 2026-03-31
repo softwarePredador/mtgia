@@ -1,4 +1,5 @@
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 class LifeCounterTurnTrackerEngine {
   LifeCounterTurnTrackerEngine._();
@@ -9,7 +10,20 @@ class LifeCounterTurnTrackerEngine {
     bool autoHighRoll = false,
     bool turnTimerActive = false,
   }) {
-    final normalizedStartingPlayer = _normalizePlayerIndex(
+    if (!LifeCounterTabletopEngine.hasAnyActivePlayers(session)) {
+      return session.copyWith(
+        clearFirstPlayerIndex: true,
+        clearCurrentTurnPlayerIndex: true,
+        currentTurnNumber: 1,
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+        turnTrackerAutoHighRoll: autoHighRoll,
+        turnTimerActive: false,
+        turnTimerSeconds: 0,
+      );
+    }
+
+    final normalizedStartingPlayer = _normalizeStartingPlayerIndex(
       session,
       startingPlayerIndex,
     );
@@ -91,7 +105,18 @@ class LifeCounterTurnTrackerEngine {
     LifeCounterSession session, {
     required int playerIndex,
   }) {
-    final normalizedIndex = _normalizePlayerIndex(session, playerIndex);
+    if (!LifeCounterTabletopEngine.hasAnyActivePlayers(session)) {
+      return session.copyWith(
+        clearFirstPlayerIndex: true,
+        clearCurrentTurnPlayerIndex: true,
+        currentTurnNumber: 1,
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+        turnTimerSeconds: 0,
+      );
+    }
+
+    final normalizedIndex = _normalizeStartingPlayerIndex(session, playerIndex);
     return session.copyWith(
       firstPlayerIndex: normalizedIndex,
       currentTurnPlayerIndex: normalizedIndex,
@@ -130,6 +155,47 @@ class LifeCounterTurnTrackerEngine {
     );
   }
 
+  static LifeCounterSession sanitizeTrackerPointersForActivePlayers(
+    LifeCounterSession session,
+  ) {
+    if (!session.turnTrackerActive) {
+      return session;
+    }
+
+    if (!LifeCounterTabletopEngine.hasAnyActivePlayers(session)) {
+      return session.copyWith(
+        clearCurrentTurnPlayerIndex: true,
+        clearFirstPlayerIndex: true,
+      );
+    }
+
+    final currentTurnPlayerIndex = session.currentTurnPlayerIndex;
+    final firstPlayerIndex = session.firstPlayerIndex;
+
+    final currentNeedsReset =
+        currentTurnPlayerIndex != null &&
+        !_isAlive(session, currentTurnPlayerIndex);
+    final firstNeedsReset =
+        firstPlayerIndex != null && !_isAlive(session, firstPlayerIndex);
+
+    if (!currentNeedsReset && !firstNeedsReset) {
+      return session;
+    }
+
+    final fallbackPlayerIndex = _findNextAlivePlayer(
+      session,
+      currentTurnPlayerIndex ?? firstPlayerIndex ?? 0,
+      includeCurrent: true,
+    );
+
+    return session.copyWith(
+      currentTurnPlayerIndex:
+          currentNeedsReset ? fallbackPlayerIndex : currentTurnPlayerIndex,
+      firstPlayerIndex:
+          firstNeedsReset ? fallbackPlayerIndex : firstPlayerIndex,
+    );
+  }
+
   static int _resolveActivePlayerIndex(LifeCounterSession session) {
     final current = session.currentTurnPlayerIndex;
     if (current != null) {
@@ -142,10 +208,26 @@ class LifeCounterTurnTrackerEngine {
   static int _resolveStartingPlayerIndex(LifeCounterSession session) {
     final starting = session.firstPlayerIndex;
     if (starting != null) {
-      return _normalizePlayerIndex(session, starting);
+      return _normalizeStartingPlayerIndex(session, starting);
     }
 
     return _findNextAlivePlayer(session, 0, includeCurrent: true);
+  }
+
+  static int _normalizeStartingPlayerIndex(
+    LifeCounterSession session,
+    int playerIndex,
+  ) {
+    final normalizedPlayerIndex = _normalizePlayerIndex(session, playerIndex);
+    if (_isAlive(session, normalizedPlayerIndex)) {
+      return normalizedPlayerIndex;
+    }
+
+    return _findNextAlivePlayer(
+      session,
+      normalizedPlayerIndex,
+      includeCurrent: true,
+    );
   }
 
   static int _findNextAlivePlayer(
@@ -183,8 +265,10 @@ class LifeCounterTurnTrackerEngine {
   }
 
   static bool _isAlive(LifeCounterSession session, int playerIndex) {
-    return session.playerSpecialStates[playerIndex] ==
-        LifeCounterPlayerSpecialState.none;
+    return LifeCounterTabletopEngine.isPlayerActiveOnTable(
+      session,
+      playerIndex: playerIndex,
+    );
   }
 
   static int _normalizePlayerIndex(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 import 'life_counter_turn_tracker_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativeTurnTrackerSheet(
@@ -38,17 +39,32 @@ class _LifeCounterNativeTurnTrackerSheetState
   @override
   void initState() {
     super.initState();
-    _draftSession = widget.initialSession;
+    _draftSession =
+        LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+          widget.initialSession,
+        );
     _startingPlayerIndex =
-        widget.initialSession.firstPlayerIndex ?? _firstAlivePlayerIndex();
-    _autoHighRoll = widget.initialSession.turnTrackerAutoHighRoll;
-    _turnTimerActive = widget.initialSession.turnTimerActive;
+        _draftSession.firstPlayerIndex ??
+        LifeCounterTabletopEngine.firstActivePlayerIndex(_draftSession);
+    _autoHighRoll = _draftSession.turnTrackerAutoHighRoll;
+    _turnTimerActive = _draftSession.turnTimerActive;
   }
 
   bool get _isTrackerActive => _draftSession.turnTrackerActive;
+  bool get _hasAnyActivePlayers =>
+      LifeCounterTabletopEngine.hasAnyActivePlayers(_draftSession);
 
   @override
   Widget build(BuildContext context) {
+    final currentPlayerLabel =
+        _draftSession.currentTurnPlayerIndex != null
+            ? _playerLabel(_draftSession.currentTurnPlayerIndex!)
+            : 'No active players';
+    final startingPlayerLabel =
+        _hasAnyActivePlayers
+            ? _playerLabel(_startingPlayerIndex)
+            : 'No active players';
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -115,11 +131,8 @@ class _LifeCounterNativeTurnTrackerSheetState
                       _SummaryCard(
                         isTrackerActive: _isTrackerActive,
                         currentTurn: _draftSession.currentTurnNumber,
-                        currentPlayerLabel: _playerLabel(
-                          _draftSession.currentTurnPlayerIndex ??
-                              _startingPlayerIndex,
-                        ),
-                        startingPlayerLabel: _playerLabel(_startingPlayerIndex),
+                        currentPlayerLabel: currentPlayerLabel,
+                        startingPlayerLabel: startingPlayerLabel,
                         turnTimerActive: _turnTimerActive,
                         turnTimerSeconds: _draftSession.turnTimerSeconds,
                       ),
@@ -134,7 +147,11 @@ class _LifeCounterNativeTurnTrackerSheetState
                           children: List<
                             Widget
                           >.generate(_draftSession.playerCount, (index) {
-                            final isAlive = _isAlive(index);
+                            final isAlive = LifeCounterTabletopEngine
+                                .isPlayerActiveOnTable(
+                                  _draftSession,
+                                  playerIndex: index,
+                                );
                             return ChoiceChip(
                               key: Key(
                                 'life-counter-native-turn-tracker-player-$index',
@@ -239,18 +256,22 @@ class _LifeCounterNativeTurnTrackerSheetState
                                 key: const Key(
                                   'life-counter-native-turn-tracker-start',
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    _draftSession =
-                                        LifeCounterTurnTrackerEngine.startGame(
-                                          _draftSession,
-                                          startingPlayerIndex:
-                                              _startingPlayerIndex,
-                                          autoHighRoll: _autoHighRoll,
-                                          turnTimerActive: _turnTimerActive,
-                                        );
-                                  });
-                                },
+                                onPressed:
+                                    _hasAnyActivePlayers
+                                        ? () {
+                                          setState(() {
+                                            _draftSession =
+                                                LifeCounterTurnTrackerEngine.startGame(
+                                                  _draftSession,
+                                                  startingPlayerIndex:
+                                                      _startingPlayerIndex,
+                                                  autoHighRoll: _autoHighRoll,
+                                                  turnTimerActive:
+                                                      _turnTimerActive,
+                                                );
+                                          });
+                                        }
+                                        : null,
                                 icon: const Icon(Icons.play_arrow_rounded),
                                 label: const Text('Start Game'),
                               ),
@@ -363,20 +384,6 @@ class _LifeCounterNativeTurnTrackerSheetState
         ),
       ),
     );
-  }
-
-  int _firstAlivePlayerIndex() {
-    for (var index = 0; index < widget.initialSession.playerCount; index += 1) {
-      if (_isAlive(index)) {
-        return index;
-      }
-    }
-    return 0;
-  }
-
-  bool _isAlive(int index) {
-    return widget.initialSession.playerSpecialStates[index] ==
-        LifeCounterPlayerSpecialState.none;
   }
 
   String _playerLabel(int index) => 'Player ${index + 1}';
