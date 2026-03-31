@@ -9,6 +9,7 @@ enum LifeCounterQuickAction {
   turnTracker,
   gameTimer,
   dice,
+  gameModes,
   tableState,
   dayNight,
 }
@@ -128,6 +129,12 @@ class _LifeCounterNativeQuickActionsSheet extends StatelessWidget {
                       action: LifeCounterQuickAction.dice,
                       label: 'Dice',
                       icon: Icons.casino_rounded,
+                    ),
+                    _QuickActionButton(
+                      keyName: 'game-modes',
+                      action: LifeCounterQuickAction.gameModes,
+                      label: 'Game Modes',
+                      icon: Icons.auto_awesome_mosaic_outlined,
                     ),
                     _QuickActionButton(
                       keyName: 'table-state',

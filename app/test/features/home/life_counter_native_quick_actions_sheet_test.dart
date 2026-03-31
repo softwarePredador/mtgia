@@ -49,4 +49,24 @@ void main() {
 
     expect(result, LifeCounterQuickAction.dayNight);
   });
+
+  testWidgets('returns game modes from the quick actions sheet', (tester) async {
+    LifeCounterQuickAction? result;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: _QuickActionsHost(onResult: (value) => result = value),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const Key('life-counter-native-quick-actions-game-modes')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(result, LifeCounterQuickAction.gameModes);
+  });
 }

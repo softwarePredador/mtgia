@@ -414,6 +414,44 @@ void main() {
       expect(state!.isNight, isTrue);
     });
 
+    testWidgets('opens native game modes from quick actions', (tester) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-quick-actions-game-modes')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Game Modes'), findsOneWidget);
+      expect(find.text('Planechase'), findsOneWidget);
+      expect(find.text('Archenemy'), findsOneWidget);
+      expect(find.text('Bounty'), findsOneWidget);
+    });
+
     testWidgets('opens native history from shell shortcut', (tester) async {
       late _FakeLotusHost host;
 

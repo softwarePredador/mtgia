@@ -47,6 +47,7 @@ Estado vivo do contador hoje:
 - shell nativa atual de dice/high roll: `app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart`
 - shell nativa atual de table state: `app/lib/features/home/life_counter/life_counter_native_table_state_sheet.dart`
 - shell nativa atual de day/night: `app/lib/features/home/life_counter/life_counter_native_day_night_sheet.dart`
+- shell nativa atual de game modes: `app/lib/features/home/life_counter/life_counter_native_game_modes_sheet.dart`
 - shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
@@ -88,7 +89,9 @@ Estado vivo do contador hoje:
 - a shell nativa de `Table State` agora controla `storm`, `monarch` e `initiative` sem mexer no layout central da mesa
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Day / Night`
+- o hub rapido ManaLoom agora tambem oferece `Game Modes` como shell propria de status e navegacao
 - o estado de `day/night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
+- os hints legados de `turn tracker` e `counters on card` agora sao marcados como concluídos e suprimidos pela shell policy
 - `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
 - `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para `settings`, `history`, `card search`, `turn tracker`, `game timer`, `dice`, `table state` e `day/night`
 - o toque no total de vida do jogador pode abrir a shell nativa de `Set Life`

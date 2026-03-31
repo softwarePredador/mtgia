@@ -23,6 +23,8 @@ const List<String> lotusSuppressedShellSelectors = <String>[
   '.feedback-btn',
   '.patreon-btn-wrapper',
   '.patreon-btn',
+  '.turn-tracker-hint-overlay',
+  '.show-counters-hint-overlay',
 ];
 
 bool lotusShouldPreventNavigation(NavigationRequest request) {
@@ -56,6 +58,8 @@ String get lotusShellCleanupScript {
 (() => {
   const BLOCKED_HOSTS = new Set($blockedHosts);
   const SUPPRESSED_SELECTORS = $suppressedSelectors;
+  const TURN_TRACKER_HINT_KEY = 'turnTrackerHintOverlay_v1';
+  const COUNTERS_HINT_KEY = 'countersOnPlayerCardHintOverlay_v1';
   const STYLE_ID = 'manaloom-lotus-shell-policy';
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
   const TELEMETRY_ATTR = 'data-manaloom-telemetry-seen';
@@ -281,7 +285,7 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter, .monarch-btn, .initiative-btn, .day-night-switcher'
+      '.menu-button, .dice-btn, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter, .monarch-btn, .initiative-btn, .day-night-switcher'
     );
     const playerLifeClick = event.target.closest('.player-life-count');
     const playerStateClick = event.target.closest(
@@ -571,6 +575,11 @@ String get lotusShellCleanupScript {
   };
 
   const applyPolicy = () => {
+    try {
+      localStorage.setItem(TURN_TRACKER_HINT_KEY, 'true');
+      localStorage.setItem(COUNTERS_HINT_KEY, 'true');
+    } catch (_) {}
+
     ensureStyle();
     suppressShell(document);
     protectBlockedLinks(document);

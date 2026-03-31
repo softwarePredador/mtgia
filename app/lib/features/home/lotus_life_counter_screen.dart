@@ -15,6 +15,7 @@ import 'life_counter/life_counter_native_card_search_sheet.dart';
 import 'life_counter/life_counter_native_commander_damage_sheet.dart';
 import 'life_counter/life_counter_native_day_night_sheet.dart';
 import 'life_counter/life_counter_native_dice_sheet.dart';
+import 'life_counter/life_counter_native_game_modes_sheet.dart';
 import 'life_counter/life_counter_native_game_timer_sheet.dart';
 import 'life_counter/life_counter_native_history_sheet.dart';
 import 'life_counter/life_counter_native_player_appearance_sheet.dart';
@@ -79,6 +80,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   bool _isNativeTurnTrackerSheetOpen = false;
   bool _isNativeGameTimerSheetOpen = false;
   bool _isNativeDiceSheetOpen = false;
+  bool _isNativeGameModesSheetOpen = false;
   bool _isNativeQuickActionsSheetOpen = false;
   bool _isNativeCommanderDamageSheetOpen = false;
   bool _isNativePlayerAppearanceSheetOpen = false;
@@ -565,11 +567,43 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         await _openNativeGameTimerSheet(source: 'quick_actions_game_timer');
       case LifeCounterQuickAction.dice:
         await _openNativeDiceSheet(source: 'quick_actions_dice');
+      case LifeCounterQuickAction.gameModes:
+        await _openNativeGameModesSheet(source: 'quick_actions_game_modes');
       case LifeCounterQuickAction.tableState:
         await _openNativeTableStateSheet(source: 'quick_actions_table_state');
       case LifeCounterQuickAction.dayNight:
         await _openNativeDayNightSheet(source: 'quick_actions_day_night');
     }
+  }
+
+  Future<void> _openNativeGameModesSheet({required String source}) async {
+    if (!mounted || _isNativeGameModesSheetOpen) {
+      return;
+    }
+
+    _isNativeGameModesSheetOpen = true;
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_game_modes_opened',
+        category: 'life_counter.game_modes',
+        data: {'source': source},
+      ),
+    );
+
+    await showLifeCounterNativeGameModesSheet(context);
+    _isNativeGameModesSheetOpen = false;
+
+    if (!mounted) {
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_game_modes_dismissed',
+        category: 'life_counter.game_modes',
+        data: {'source': source},
+      ),
+    );
   }
 
   Future<void> _openNativeDayNightSheet({required String source}) async {

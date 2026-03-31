@@ -150,8 +150,14 @@ Progresso fechado ate agora:
   - `turn tracker`
   - `game timer`
   - `dice`
+  - `game modes`
   - `table state`
   - `day / night`
+- o hub rapido agora tambem abre uma shell nativa de `game modes` para:
+  - `Planechase`
+  - `Archenemy`
+  - `Bounty`
+- essa shell marca o inicio seguro do `Sprint 5`, mas o gameplay desses modos ainda permanece Lotus-owned
 - shell nativa adicional assumida no runtime vivo:
   - `dice / high roll / coin / roll 1st`
 - `player state` agora funciona como hub para:
@@ -167,6 +173,7 @@ Progresso fechado ate agora:
   - `initiative`
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
 - o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
+- os hints legados de `turn tracker` e `counters on card` agora sao suprimidos e marcados como concluidos pela shell policy
 - takeover do `option-card` do Lotus abre a shell nativa de estado do jogador
 - `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
 - takeover do `color-card` e da entrada de background do Lotus abre a shell nativa de aparencia do jogador
@@ -210,6 +217,11 @@ Escopo:
 - Archenemy
 - Bounty
 - revisar overlay/hints remanescentes ainda Lotus-only
+
+Progresso inicial:
+
+- shell nativa de `game modes` ja existe no hub rapido ManaLoom
+- `Planechase`, `Archenemy` e `Bounty` agora ja tem um ponto de posse/navegacao nosso, sem desligar o runtime do bundle
 
 Done when:
 
