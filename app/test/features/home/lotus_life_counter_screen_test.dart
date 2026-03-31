@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_player_appearance_profile_store.dart';
@@ -31,6 +32,7 @@ class _FakeLotusHost implements LotusHost {
 
   int loadBundleCallCount = 0;
   bool isDisposed = false;
+  final List<String> executedScripts = <String>[];
 
   @override
   Widget buildView(BuildContext context) {
@@ -47,6 +49,11 @@ class _FakeLotusHost implements LotusHost {
   Future<void> loadBundle() async {
     loadBundleCallCount += 1;
     await onLoadBundle?.call(this);
+  }
+
+  @override
+  Future<void> runJavaScript(String script) async {
+    executedScripts.add(script);
   }
 
   void completeSuccessfulLoad() {
@@ -248,6 +255,163 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Life Counter Settings'), findsOneWidget);
+    });
+
+    testWidgets('opens native day night from shell shortcut', (tester) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-day-night","source":"day_night_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Day / Night'), findsOneWidget);
+
+      await tester.tap(find.text('Night'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-day-night-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final state = await LifeCounterDayNightStateStore().load();
+      expect(state, isNotNull);
+      expect(state!.isNight, isTrue);
+      expect(
+        host.executedScripts.any(
+          (script) =>
+              script.contains('__manaloom_day_night_mode') &&
+              script.contains("'night'"),
+        ),
+        isTrue,
+      );
+    });
+
+    testWidgets('opens native table state from quick actions', (tester) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        LifeCounterSession.initial(playerCount: 4),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-quick-actions-table-state'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Table State'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-table-state-monarch-player-0'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-table-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.monarchPlayer, 0);
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('opens native day night from quick actions', (tester) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-quick-actions-day-night')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Day / Night'), findsOneWidget);
+
+      await tester.tap(find.text('Night'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-day-night-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final state = await LifeCounterDayNightStateStore().load();
+      expect(state, isNotNull);
+      expect(state!.isNight, isTrue);
     });
 
     testWidgets('opens native history from shell shortcut', (tester) async {
@@ -1089,6 +1253,87 @@ void main() {
       expect(session, isNotNull);
       expect(session!.lives[1], 40);
       expect(session.lastTableEvent, isNull);
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('opens native table state from shell shortcut', (tester) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        LifeCounterSession.initial(playerCount: 4),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-table-state","source":"monarch_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Table State'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-table-state-monarch-player-2'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(
+          const Key('life-counter-native-table-state-initiative-player-1'),
+        ),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-table-state-initiative-player-1'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-table-state-storm-plus')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-table-state-storm-plus')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-table-state-storm-plus')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-table-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.monarchPlayer, 2);
+      expect(session.initiativePlayer, 1);
+      expect(session.stormCount, 1);
       expect(host.loadBundleCallCount, 2);
     });
 

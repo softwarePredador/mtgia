@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/observability/app_observability.dart';
+import 'life_counter/life_counter_day_night_state.dart';
+import 'life_counter/life_counter_day_night_state_store.dart';
 import 'life_counter/life_counter_game_timer_state.dart';
 import 'life_counter/life_counter_game_timer_state_store.dart';
 import 'life_counter/life_counter_history.dart';
 import 'life_counter/life_counter_history_transfer.dart';
 import 'life_counter/life_counter_native_card_search_sheet.dart';
 import 'life_counter/life_counter_native_commander_damage_sheet.dart';
+import 'life_counter/life_counter_native_day_night_sheet.dart';
 import 'life_counter/life_counter_native_dice_sheet.dart';
 import 'life_counter/life_counter_native_game_timer_sheet.dart';
 import 'life_counter/life_counter_native_history_sheet.dart';
@@ -20,6 +23,7 @@ import 'life_counter/life_counter_native_quick_actions_sheet.dart';
 import 'life_counter/life_counter_native_set_life_sheet.dart';
 import 'life_counter/life_counter_native_player_state_sheet.dart';
 import 'life_counter/life_counter_native_settings_sheet.dart';
+import 'life_counter/life_counter_native_table_state_sheet.dart';
 import 'life_counter/life_counter_native_turn_tracker_sheet.dart';
 import 'life_counter/life_counter_player_appearance_profile_store.dart';
 import 'life_counter/life_counter_player_appearance_transfer.dart';
@@ -59,6 +63,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   late final LotusHost _hostController;
   final LifeCounterGameTimerStateStore _gameTimerStateStore =
       LifeCounterGameTimerStateStore();
+  final LifeCounterDayNightStateStore _dayNightStateStore =
+      LifeCounterDayNightStateStore();
   final LifeCounterPlayerAppearanceProfileStore _appearanceProfileStore =
       LifeCounterPlayerAppearanceProfileStore();
   final LifeCounterSettingsStore _settingsStore = LifeCounterSettingsStore();
@@ -79,6 +85,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   bool _isNativePlayerCounterSheetOpen = false;
   bool _isNativePlayerStateSheetOpen = false;
   bool _isNativeSetLifeSheetOpen = false;
+  bool _isNativeTableStateSheetOpen = false;
+  bool _isNativeDayNightSheetOpen = false;
 
   @override
   void initState() {
@@ -106,7 +114,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
       _syncLoadingOverlay();
       _syncErrorOverlay();
-      unawaited(_hostController.loadBundle());
+      unawaited(_loadBundleAndSyncOwnedShellState());
     });
   }
 
@@ -195,7 +203,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             message: _hostController.errorMessage.value ?? '',
             onRetry: () {
               _removeErrorOverlay();
-              unawaited(_hostController.loadBundle());
+              unawaited(_loadBundleAndSyncOwnedShellState());
             },
           ),
     );
@@ -347,6 +355,22 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           );
           return;
         }
+        if (decoded['type'] == 'open-native-table-state') {
+          unawaited(
+            _openNativeTableStateSheet(
+              source: (decoded['source'] as String?) ?? 'table_state_surface',
+            ),
+          );
+          return;
+        }
+        if (decoded['type'] == 'open-native-day-night') {
+          unawaited(
+            _openNativeDayNightSheet(
+              source: (decoded['source'] as String?) ?? 'day_night_surface',
+            ),
+          );
+          return;
+        }
       }
     } catch (_) {}
 
@@ -397,7 +421,41 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _reloadLotusBundleFromOwnedSnapshot() async {
     _hostController.suppressStaleBeforeUnloadSnapshot();
+    await _loadBundleAndSyncOwnedShellState(
+      suppressStaleBeforeUnloadSnapshot: false,
+    );
+  }
+
+  Future<void> _loadBundleAndSyncOwnedShellState({
+    bool suppressStaleBeforeUnloadSnapshot = false,
+  }) async {
+    if (suppressStaleBeforeUnloadSnapshot) {
+      _hostController.suppressStaleBeforeUnloadSnapshot();
+    }
     await _hostController.loadBundle();
+    await _applyOwnedDayNightPreference();
+  }
+
+  Future<void> _applyOwnedDayNightPreference() async {
+    final state = await _dayNightStateStore.load();
+    if (state == null) {
+      return;
+    }
+
+    final script = '''
+(() => {
+  try {
+    localStorage.setItem('__manaloom_day_night_mode', '${state.mode}');
+    const switcher = document.querySelector('.day-night-switcher');
+    if (switcher) {
+      switcher.classList.toggle('night', ${state.isNight ? 'true' : 'false'});
+    }
+  } catch (_) {}
+})();
+''';
+    try {
+      await _hostController.runJavaScript(script);
+    } catch (_) {}
   }
 
   Future<void> _openNativeSettingsSheet({required String source}) async {
@@ -507,7 +565,90 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         await _openNativeGameTimerSheet(source: 'quick_actions_game_timer');
       case LifeCounterQuickAction.dice:
         await _openNativeDiceSheet(source: 'quick_actions_dice');
+      case LifeCounterQuickAction.tableState:
+        await _openNativeTableStateSheet(source: 'quick_actions_table_state');
+      case LifeCounterQuickAction.dayNight:
+        await _openNativeDayNightSheet(source: 'quick_actions_day_night');
     }
+  }
+
+  Future<void> _openNativeDayNightSheet({required String source}) async {
+    if (!mounted || _isNativeDayNightSheetOpen) {
+      return;
+    }
+
+    _isNativeDayNightSheetOpen = true;
+    final initialState =
+        await _dayNightStateStore.load() ??
+        const LifeCounterDayNightState(isNight: false);
+    if (!mounted) {
+      _isNativeDayNightSheetOpen = false;
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_day_night_opened',
+        category: 'life_counter.day_night',
+        data: {'source': source, 'is_night': initialState.isNight},
+      ),
+    );
+
+    final updatedState = await showLifeCounterNativeDayNightSheet(
+      context,
+      initialState: initialState,
+    );
+    _isNativeDayNightSheetOpen = false;
+
+    if (!mounted || updatedState == null) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_day_night_dismissed',
+          category: 'life_counter.day_night',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    if (updatedState.isNight == initialState.isNight) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_day_night_dismissed',
+          category: 'life_counter.day_night',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    await _applyNativeDayNightState(updatedState, source: source);
+  }
+
+  Future<void> _applyNativeDayNightState(
+    LifeCounterDayNightState state, {
+    required String source,
+  }) async {
+    await _dayNightStateStore.save(state);
+
+    final snapshot = await _snapshotStore.load();
+    final mergedValues = <String, String>{
+      ...?snapshot?.values,
+      '__manaloom_day_night_mode': state.mode,
+    };
+    await _snapshotStore.save(
+      LotusStorageSnapshot(values: Map<String, String>.unmodifiable(mergedValues)),
+    );
+
+    await _applyOwnedDayNightPreference();
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_day_night_applied',
+        category: 'life_counter.day_night',
+        data: {'source': source, 'is_night': state.isNight},
+      ),
+    );
   }
 
   Future<void> _applyNativeSettings(
@@ -1787,6 +1928,113 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'target_player_index': targetPlayerIndex,
           'life': session.lives[targetPlayerIndex],
+        },
+      ),
+    );
+
+    unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  Future<void> _openNativeTableStateSheet({required String source}) async {
+    if (!mounted || _isNativeTableStateSheetOpen) {
+      return;
+    }
+
+    _isNativeTableStateSheetOpen = true;
+    final session =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: 4);
+    if (!mounted) {
+      _isNativeTableStateSheetOpen = false;
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_table_state_opened',
+        category: 'life_counter.table_state',
+        data: {
+          'source': source,
+          'storm_count': session.stormCount,
+          'monarch_player': session.monarchPlayer,
+          'initiative_player': session.initiativePlayer,
+        },
+      ),
+    );
+
+    final updatedSession = await showLifeCounterNativeTableStateSheet(
+      context,
+      initialSession: session,
+    );
+    _isNativeTableStateSheetOpen = false;
+
+    if (!mounted || updatedSession == null) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_table_state_dismissed',
+          category: 'life_counter.table_state',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    if (updatedSession.toJsonString() == session.toJsonString()) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_table_state_dismissed',
+          category: 'life_counter.table_state',
+          data: {'source': source, 'changed': false},
+        ),
+      );
+      return;
+    }
+
+    await _applyNativeTableState(updatedSession, source: source);
+  }
+
+  Future<void> _applyNativeTableState(
+    LifeCounterSession session, {
+    required String source,
+  }) async {
+    await _sessionStore.save(session);
+
+    final settings = await _settingsStore.load();
+    final snapshot = await _snapshotStore.load();
+    if (snapshot != null) {
+      final mergedValues = <String, String>{
+        ...snapshot.values,
+        ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
+          session,
+        ),
+      };
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(mergedValues),
+        ),
+      );
+    } else {
+      await _snapshotStore.save(
+        LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(
+            LotusLifeCounterSessionAdapter.buildSnapshotValues(
+              session,
+              settings: settings,
+            ),
+          ),
+        ),
+      );
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_table_state_applied',
+        category: 'life_counter.table_state',
+        data: {
+          'source': source,
+          'storm_count': session.stormCount,
+          'monarch_player': session.monarchPlayer,
+          'initiative_player': session.initiativePlayer,
         },
       ),
     );

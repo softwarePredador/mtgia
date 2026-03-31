@@ -43,10 +43,10 @@ void main() {
     expect(find.text('Quick Actions'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(const Key('life-counter-native-quick-actions-dice')),
+      find.byKey(const Key('life-counter-native-quick-actions-day-night')),
     );
     await tester.pumpAndSettle();
 
-    expect(result, LifeCounterQuickAction.dice);
+    expect(result, LifeCounterQuickAction.dayNight);
   });
 }

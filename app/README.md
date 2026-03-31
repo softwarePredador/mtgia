@@ -45,6 +45,8 @@ Estado vivo do contador hoje:
 - shell nativa atual do turn tracker: `app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart`
 - shell nativa atual de timer/clock: `app/lib/features/home/life_counter/life_counter_native_game_timer_sheet.dart`
 - shell nativa atual de dice/high roll: `app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart`
+- shell nativa atual de table state: `app/lib/features/home/life_counter/life_counter_native_table_state_sheet.dart`
+- shell nativa atual de day/night: `app/lib/features/home/life_counter/life_counter_native_day_night_sheet.dart`
 - shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
@@ -82,9 +84,15 @@ Estado vivo do contador hoje:
 - `Player State` agora tambem oferece `Roll D20` por jogador sem depender do menu auxiliar do Lotus
 - `Player State` agora tambem oferece `Set Life` sem depender so do gesto original do Lotus
 - `__manaloom_table_state` agora preserva tambem `lastPlayerRolls`, `lastHighRolls` e `firstPlayerIndex` auxiliar
+- `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `Table State`
+- a shell nativa de `Table State` agora controla `storm`, `monarch` e `initiative` sem mexer no layout central da mesa
+- o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
+- o hub rapido ManaLoom agora tambem oferece `Day / Night`
+- o estado de `day/night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
-- `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para `settings`, `history`, `card search`, `turn tracker`, `game timer` e `dice`
+- `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para `settings`, `history`, `card search`, `turn tracker`, `game timer`, `dice`, `table state` e `day/night`
 - o toque no total de vida do jogador pode abrir a shell nativa de `Set Life`
+- smoke novo preparado para o caminho vivo `Player State -> Set Life`: `integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart`
 
 ## Comandos
 

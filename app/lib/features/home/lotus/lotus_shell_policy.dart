@@ -281,7 +281,7 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter'
+      '.menu-button, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter, .monarch-btn, .initiative-btn, .day-night-switcher'
     );
     const playerLifeClick = event.target.closest('.player-life-count');
     const playerStateClick = event.target.closest(
@@ -317,6 +317,12 @@ String get lotusShellCleanupScript {
         trackedClick.matches('.current-time-clock.with-game-timer')
       ) {
         name = 'game_timer_surface_pressed';
+      } else if (trackedClick.matches('.monarch-btn')) {
+        name = 'monarch_surface_pressed';
+      } else if (trackedClick.matches('.initiative-btn')) {
+        name = 'initiative_surface_pressed';
+      } else if (trackedClick.matches('.day-night-switcher')) {
+        name = 'day_night_surface_pressed';
       } else if (trackedClick.matches('.commander-damage-counter')) {
         name = 'commander_damage_surface_pressed';
       } else if (
@@ -409,6 +415,33 @@ String get lotusShellCleanupScript {
             (trackedClick.matches('.current-time-clock:not(.with-game-timer)')
               ? 'clock_surface_pressed'
               : 'game_timer_surface_pressed'),
+        });
+        return;
+      }
+
+      if (
+        trackedClick.matches('.monarch-btn') ||
+        trackedClick.matches('.initiative-btn')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-table-state',
+          source:
+            name ||
+            (trackedClick.matches('.monarch-btn')
+              ? 'monarch_surface_pressed'
+              : 'initiative_surface_pressed'),
+        });
+        return;
+      }
+
+      if (trackedClick.matches('.day-night-switcher')) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-day-night',
+          source: name || 'day_night_surface_pressed',
         });
         return;
       }
@@ -547,6 +580,14 @@ String get lotusShellCleanupScript {
     observeUiSurface('.settings-overlay', 'settings_overlay_opened');
     observeUiSurface('.life-history-overlay', 'history_overlay_opened');
     observeUiSurface('.search-overlay', 'card_search_overlay_opened');
+    const dayNightMode = localStorage.getItem('__manaloom_day_night_mode');
+    const switcher = document.querySelector('.day-night-switcher');
+    if (
+      switcher &&
+      (dayNightMode === 'day' || dayNightMode === 'night')
+    ) {
+      switcher.classList.toggle('night', dayNightMode === 'night');
+    }
   };
 
   const observeUiSurface = (selector, eventName) => {

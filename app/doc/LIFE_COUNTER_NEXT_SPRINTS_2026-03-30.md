@@ -13,6 +13,7 @@ Estado atual do contador:
   - card search
   - turn tracker shell
   - game timer shell
+  - day/night shell
   - player appearance shell
 - validacao automatizada atual cobre:
   - bootstrap/reopen do contador vivo
@@ -140,6 +141,8 @@ Progresso fechado ate agora:
   - `player counters`
   - `player state`
   - `set life`
+- shell nativa adicional assumida no runtime vivo:
+  - `table state`
 - `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para:
   - `settings`
   - `history`
@@ -147,6 +150,8 @@ Progresso fechado ate agora:
   - `turn tracker`
   - `game timer`
   - `dice`
+  - `table state`
+  - `day / night`
 - shell nativa adicional assumida no runtime vivo:
   - `dice / high roll / coin / roll 1st`
 - `player state` agora funciona como hub para:
@@ -155,6 +160,13 @@ Progresso fechado ate agora:
   - `commander damage`
   - `player appearance`
   - `player D20`
+- `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `table state`
+- a shell nativa de `table state` agora controla:
+  - `storm`
+  - `monarch`
+  - `initiative`
+- o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
+- o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - takeover do `option-card` do Lotus abre a shell nativa de estado do jogador
 - `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
 - takeover do `color-card` e da entrada de background do Lotus abre a shell nativa de aparencia do jogador
@@ -177,11 +189,14 @@ Progresso fechado ate agora:
   - `integration_test/life_counter_native_player_counter_smoke_test.dart`
   - `integration_test/life_counter_native_player_state_smoke_test.dart`
   - `integration_test/life_counter_native_player_state_d20_hub_smoke_test.dart`
+  - `integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart`
 
 Done when:
 
 - existe plano de fatiamento do runtime de jogador com ordem de migracao
 - nao restam campos “soltos” sem dono entre sessao canonica e snapshot vivo
+
+- overlays auxiliares mais leves da mesa tambem ja tem dono claro em superficies ManaLoom
 
 ## Sprint 5 - Game Modes And Endgame
 

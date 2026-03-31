@@ -16,5 +16,6 @@ abstract class LotusHost {
   Widget buildView(BuildContext context);
   void suppressStaleBeforeUnloadSnapshot();
   Future<void> loadBundle();
+  Future<void> runJavaScript(String script);
   void dispose();
 }
