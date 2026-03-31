@@ -173,6 +173,9 @@ Progresso fechado ate agora:
   - `monarch`
   - `initiative`
 - `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa
+- `commander damage` agora tambem compartilha essa engine canonica inicial da mesa para leitura e escrita do split por comandante
+- `set life` agora tambem cobre ajustes rapidos de dano/cura pela mesma engine canonica, aproximando a saida do runtime implicito do Lotus
+- `autoKill` agora tambem passa pela engine canonica e ja e aplicado nos fluxos nativos de `set life`, `player counters` e `commander damage`
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
 - o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - os hints legados de `turn tracker` e `counters on card` agora sao suprimidos e marcados como concluidos pela shell policy

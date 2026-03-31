@@ -39,16 +39,18 @@ class _LifeCounterNativeSetLifeSheet extends StatefulWidget {
 class _LifeCounterNativeSetLifeSheetState
     extends State<_LifeCounterNativeSetLifeSheet> {
   late final int _targetPlayerIndex;
+  late LifeCounterSession _draftSession;
   late String _buffer;
 
   @override
   void initState() {
     super.initState();
+    _draftSession = widget.initialSession;
     _targetPlayerIndex = widget.initialTargetPlayerIndex.clamp(
       0,
       widget.initialSession.playerCount - 1,
     );
-    _buffer = widget.initialSession.lives[_targetPlayerIndex].toString();
+    _buffer = _draftSession.lives[_targetPlayerIndex].toString();
   }
 
   void _appendDigit(String digit) {
@@ -80,11 +82,22 @@ class _LifeCounterNativeSetLifeSheetState
   void _apply() {
     Navigator.of(context).pop(
       LifeCounterTabletopEngine.setLifeTotal(
-        widget.initialSession,
+        _draftSession,
         playerIndex: _targetPlayerIndex,
         life: int.tryParse(_buffer) ?? 0,
       ),
     );
+  }
+
+  void _applyQuickDelta(int delta) {
+    setState(() {
+      _draftSession = LifeCounterTabletopEngine.adjustLifeTotal(
+        _draftSession,
+        playerIndex: _targetPlayerIndex,
+        delta: delta,
+      );
+      _buffer = _draftSession.lives[_targetPlayerIndex].toString();
+    });
   }
 
   @override
@@ -186,6 +199,42 @@ class _LifeCounterNativeSetLifeSheetState
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          _SetLifeQuickAdjustButton(
+                            buttonKey: const Key(
+                              'life-counter-native-set-life-adjust-minus-10',
+                            ),
+                            label: '-10',
+                            onTap: () => _applyQuickDelta(-10),
+                          ),
+                          _SetLifeQuickAdjustButton(
+                            buttonKey: const Key(
+                              'life-counter-native-set-life-adjust-minus-5',
+                            ),
+                            label: '-5',
+                            onTap: () => _applyQuickDelta(-5),
+                          ),
+                          _SetLifeQuickAdjustButton(
+                            buttonKey: const Key(
+                              'life-counter-native-set-life-adjust-plus-5',
+                            ),
+                            label: '+5',
+                            onTap: () => _applyQuickDelta(5),
+                          ),
+                          _SetLifeQuickAdjustButton(
+                            buttonKey: const Key(
+                              'life-counter-native-set-life-adjust-plus-10',
+                            ),
+                            label: '+10',
+                            onTap: () => _applyQuickDelta(10),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: 250,
@@ -264,6 +313,39 @@ class _LifeCounterNativeSetLifeSheetState
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SetLifeQuickAdjustButton extends StatelessWidget {
+  const _SetLifeQuickAdjustButton({
+    required this.buttonKey,
+    required this.label,
+    required this.onTap,
+  });
+
+  final Key buttonKey;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      key: buttonKey,
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor:
+            label.startsWith('-')
+                ? const Color(0xFFFF7A9C)
+                : AppTheme.textPrimary,
+        side: BorderSide(
+          color:
+              label.startsWith('-')
+                  ? const Color(0x66FF2C77)
+                  : AppTheme.outlineMuted,
+        ),
+      ),
+      child: Text(label),
     );
   }
 }

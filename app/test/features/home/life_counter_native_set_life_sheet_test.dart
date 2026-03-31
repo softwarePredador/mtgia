@@ -31,6 +31,8 @@ class _SetLifeHost extends StatelessWidget {
 void main() {
   testWidgets('sets life for the targeted player', (tester) async {
     LifeCounterSession? result;
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -47,6 +49,10 @@ void main() {
       findsOneWidget,
     );
 
+    await tester.ensureVisible(
+      find.byKey(const Key('life-counter-native-set-life-clear')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(
       find.byKey(const Key('life-counter-native-set-life-clear')),
     );
@@ -66,6 +72,42 @@ void main() {
 
     expect(result, isNotNull);
     expect(result!.lives[1], 40);
+    expect(result!.lastTableEvent, isNull);
+  });
+
+  testWidgets('applies quick life adjustments through the native shell', (
+    tester,
+  ) async {
+    LifeCounterSession? result;
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: _SetLifeHost(onResult: (value) => result = value),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(
+        const Key('life-counter-native-set-life-adjust-minus-10'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const Key('life-counter-native-set-life-adjust-plus-5')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const Key('life-counter-native-set-life-apply')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(result, isNotNull);
+    expect(result!.lives[1], 35);
     expect(result!.lastTableEvent, isNull);
   });
 }

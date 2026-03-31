@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_native_commander_damage_sheet.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_native_player_state_sheet.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 
@@ -19,6 +20,41 @@ class _Host extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   final result = await showLifeCounterNativePlayerStateSheet(
+                    context,
+                    initialSession: initialSession,
+                    initialTargetPlayerIndex: 0,
+                  );
+                  onResult(result);
+                },
+                child: const Text('Open'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _CommanderDamageHost extends StatelessWidget {
+  const _CommanderDamageHost({
+    required this.initialSession,
+    required this.onResult,
+  });
+
+  final LifeCounterSession initialSession;
+  final ValueChanged<LifeCounterSession?> onResult;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Builder(
+          builder: (context) {
+            return Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  final result = await showLifeCounterNativeCommanderDamageSheet(
                     context,
                     initialSession: initialSession,
                     initialTargetPlayerIndex: 0,
@@ -203,6 +239,64 @@ void main() {
         expect(result, isNotNull);
       },
     );
+
+    testWidgets('applies split commander damage through the native shell', (
+      tester,
+    ) async {
+      LifeCounterSession? result;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        _CommanderDamageHost(
+          initialSession: LifeCounterSession.initial(
+            playerCount: 4,
+          ).copyWith(partnerCommanders: const [false, true, false, false]),
+          onResult: (value) => result = value,
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-commander-damage-plus-1-c1'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-commander-damage-plus-1-c1'),
+        ),
+      );
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-commander-damage-plus-1-c1'),
+        ),
+      );
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-commander-damage-plus-1-c2'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-commander-damage-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.commanderDamage[0][1], 3);
+      expect(
+        result!.resolvedCommanderDamageDetails[0][1],
+        const LifeCounterCommanderDamageDetail(
+          commanderOneDamage: 2,
+          commanderTwoDamage: 1,
+        ),
+      );
+    });
 
     testWidgets('opens the nested player appearance hub and returns to state', (
       tester,

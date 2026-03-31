@@ -2219,6 +2219,101 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
+    testWidgets('auto-knocks out a player from native set life when enabled', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 5, 25, 11],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: null,
+          turnTrackerActive: false,
+          turnTrackerOngoingGame: false,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: null,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: null,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-set-life","source":"player_life_total_surface_pressed","targetPlayerIndex":1}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-set-life-adjust-minus-10'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-set-life-adjust-minus-10'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lives[1], 0);
+      expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
+      expect(host.loadBundleCallCount, 2);
+    });
+
     testWidgets('exports native player appearance to clipboard', (
       tester,
     ) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativeCommanderDamageSheet(
   BuildContext context, {
@@ -38,7 +39,7 @@ class _LifeCounterNativeCommanderDamageSheet extends StatefulWidget {
 class _LifeCounterNativeCommanderDamageSheetState
     extends State<_LifeCounterNativeCommanderDamageSheet> {
   late int _targetPlayerIndex;
-  late List<List<LifeCounterCommanderDamageDetail>> _draftDetails;
+  late LifeCounterSession _draftSession;
 
   @override
   void initState() {
@@ -47,15 +48,17 @@ class _LifeCounterNativeCommanderDamageSheetState
       0,
       widget.initialSession.playerCount - 1,
     );
-    _draftDetails = widget.initialSession.resolvedCommanderDamageDetails
-        .map((row) => row.map((entry) => entry).toList(growable: false))
-        .toList(growable: false);
+    _draftSession = widget.initialSession;
   }
 
   String _playerLabel(int index) => 'Player ${index + 1}';
 
   int _totalDamageFromSource(int sourceIndex) {
-    return _draftDetails[_targetPlayerIndex][sourceIndex].totalDamage;
+    return LifeCounterTabletopEngine.readCommanderDamageFromSource(
+      _draftSession,
+      targetPlayerIndex: _targetPlayerIndex,
+      sourcePlayerIndex: sourceIndex,
+    );
   }
 
   List<int> get _lethalSources => <int>[
@@ -74,35 +77,17 @@ class _LifeCounterNativeCommanderDamageSheetState
     required int delta,
   }) {
     setState(() {
-      final current = _draftDetails[_targetPlayerIndex][sourceIndex];
-      _draftDetails[_targetPlayerIndex][sourceIndex] =
-          LifeCounterCommanderDamageDetail(
-            commanderOneDamage:
-                secondCommander
-                    ? current.commanderOneDamage
-                    : (current.commanderOneDamage + delta).clamp(0, 99),
-            commanderTwoDamage:
-                secondCommander
-                    ? (current.commanderTwoDamage + delta).clamp(0, 99)
-                    : current.commanderTwoDamage,
-          );
+      _draftSession = LifeCounterTabletopEngine.adjustCommanderDamageFromSource(
+        _draftSession,
+        targetPlayerIndex: _targetPlayerIndex,
+        sourcePlayerIndex: sourceIndex,
+        secondCommander: secondCommander,
+        delta: delta,
+      );
     });
   }
 
-  LifeCounterSession _buildUpdatedSession() {
-    final totals = List<List<int>>.generate(
-      widget.initialSession.playerCount,
-      (target) => List<int>.generate(
-        widget.initialSession.playerCount,
-        (source) => _draftDetails[target][source].totalDamage,
-      ),
-    );
-
-    return widget.initialSession.copyWith(
-      commanderDamage: totals,
-      commanderDamageDetails: _draftDetails,
-    );
-  }
+  LifeCounterSession _buildUpdatedSession() => _draftSession;
 
   @override
   Widget build(BuildContext context) {
@@ -224,13 +209,15 @@ class _LifeCounterNativeCommanderDamageSheetState
                                     sourceIndex: sourceIndex,
                                     sourceLabel: _playerLabel(sourceIndex),
                                     detail:
-                                        _draftDetails[_targetPlayerIndex][sourceIndex],
+                                        _draftSession
+                                            .resolvedCommanderDamageDetails[_targetPlayerIndex][sourceIndex],
                                     hasPartnerCommander:
                                         widget
                                             .initialSession
                                             .partnerCommanders[sourceIndex],
                                     isLethal:
-                                        _draftDetails[_targetPlayerIndex][sourceIndex]
+                                        _draftSession
+                                            .resolvedCommanderDamageDetails[_targetPlayerIndex][sourceIndex]
                                             .totalDamage >=
                                         21,
                                     onCommanderOneIncrement:

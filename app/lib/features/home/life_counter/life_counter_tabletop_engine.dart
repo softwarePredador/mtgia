@@ -1,4 +1,5 @@
 import 'life_counter_session.dart';
+import 'life_counter_settings.dart';
 
 class LifeCounterTabletopEngine {
   LifeCounterTabletopEngine._();
@@ -11,6 +12,19 @@ class LifeCounterTabletopEngine {
     final lives = List<int>.from(session.lives);
     lives[playerIndex] = life.clamp(0, 999);
     return session.copyWith(lives: lives, clearLastTableEvent: true);
+  }
+
+  static LifeCounterSession adjustLifeTotal(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required int delta,
+  }) {
+    final currentLife = session.lives[playerIndex];
+    return setLifeTotal(
+      session,
+      playerIndex: playerIndex,
+      life: currentLife + delta,
+    );
   }
 
   static LifeCounterSession setPartnerCommander(
@@ -33,6 +47,121 @@ class LifeCounterTabletopEngine {
     );
     specialStates[playerIndex] = state;
     return session.copyWith(playerSpecialStates: specialStates);
+  }
+
+  static bool isPlayerLifeLethal(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return session.lives[playerIndex] <= 0;
+  }
+
+  static bool isPlayerPoisonLethal(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return session.poison[playerIndex] >= 10;
+  }
+
+  static bool isPlayerCommanderDamageLethal(
+    LifeCounterSession session, {
+    required int playerIndex,
+  }) {
+    return session.commanderDamage[playerIndex].any((damage) => damage >= 21);
+  }
+
+  static bool shouldAutoKnockOutPlayer(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required LifeCounterSettings settings,
+  }) {
+    if (!settings.autoKill) {
+      return false;
+    }
+
+    return isPlayerLifeLethal(session, playerIndex: playerIndex) ||
+        isPlayerPoisonLethal(session, playerIndex: playerIndex) ||
+        isPlayerCommanderDamageLethal(session, playerIndex: playerIndex);
+  }
+
+  static LifeCounterSession applyAutoKnockOutIfNeeded(
+    LifeCounterSession session, {
+    required int playerIndex,
+    required LifeCounterSettings settings,
+  }) {
+    if (!shouldAutoKnockOutPlayer(
+      session,
+      playerIndex: playerIndex,
+      settings: settings,
+    )) {
+      return session;
+    }
+
+    return markPlayerKnockedOut(session, playerIndex: playerIndex);
+  }
+
+  static int readCommanderDamageFromSource(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+    required int sourcePlayerIndex,
+  }) {
+    return session
+        .resolvedCommanderDamageDetails[targetPlayerIndex][sourcePlayerIndex]
+        .totalDamage;
+  }
+
+  static LifeCounterSession writeCommanderDamageFromSource(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+    required int sourcePlayerIndex,
+    required int commanderOneDamage,
+    required int commanderTwoDamage,
+  }) {
+    final commanderDamage = session.commanderDamage
+        .map((row) => List<int>.from(row))
+        .toList(growable: false);
+    final commanderDamageDetails = session.resolvedCommanderDamageDetails
+        .map((row) => List<LifeCounterCommanderDamageDetail>.from(row))
+        .toList(growable: false);
+
+    final normalizedDetail = LifeCounterCommanderDamageDetail(
+      commanderOneDamage: commanderOneDamage.clamp(0, 999),
+      commanderTwoDamage: commanderTwoDamage.clamp(0, 999),
+    );
+
+    commanderDamageDetails[targetPlayerIndex][sourcePlayerIndex] =
+        normalizedDetail;
+    commanderDamage[targetPlayerIndex][sourcePlayerIndex] =
+        normalizedDetail.totalDamage;
+
+    return session.copyWith(
+      commanderDamage: commanderDamage,
+      commanderDamageDetails: commanderDamageDetails,
+    );
+  }
+
+  static LifeCounterSession adjustCommanderDamageFromSource(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+    required int sourcePlayerIndex,
+    required bool secondCommander,
+    required int delta,
+  }) {
+    final current = session
+        .resolvedCommanderDamageDetails[targetPlayerIndex][sourcePlayerIndex];
+    return writeCommanderDamageFromSource(
+      session,
+      targetPlayerIndex: targetPlayerIndex,
+      sourcePlayerIndex: sourcePlayerIndex,
+      commanderOneDamage:
+          secondCommander
+              ? current.commanderOneDamage
+              : current.commanderOneDamage + delta,
+      commanderTwoDamage:
+          secondCommander
+              ? current.commanderTwoDamage + delta
+              : current.commanderTwoDamage,
+    );
   }
 
   static LifeCounterSession updateTableState(

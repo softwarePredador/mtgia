@@ -95,6 +95,9 @@ Estado vivo do contador hoje:
 - `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `Table State`
 - a shell nativa de `Table State` agora controla `storm`, `monarch` e `initiative` sem mexer no layout central da mesa
 - `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa, reduzindo regra espalhada entre shells
+- `commander damage` agora tambem compartilha essa engine canonica inicial da mesa para leitura e escrita do split `commander1/commander2`
+- a shell nativa de `Set Life` agora tambem usa essa engine para ajustes rapidos de dano/cura sem depender do runtime implicito do Lotus
+- `autoKill` agora tambem entra no fluxo nativo de `set life`, `player counters` e `commander damage`, reduzindo mais a dependencia do comportamento implicito do bundle
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Day / Night`
 - o hub rapido ManaLoom agora tambem oferece `Game Modes` como shell propria de status e navegacao

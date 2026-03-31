@@ -32,6 +32,7 @@ import 'life_counter/life_counter_settings.dart';
 import 'life_counter/life_counter_settings_store.dart';
 import 'life_counter/life_counter_session.dart';
 import 'life_counter/life_counter_session_store.dart';
+import 'life_counter/life_counter_tabletop_engine.dart';
 import 'life_counter_route.dart';
 import 'lotus/lotus_life_counter_settings_adapter.dart';
 import 'lotus/lotus_life_counter_session_adapter.dart';
@@ -1672,15 +1673,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
-    await _sessionStore.save(session);
-
     final settings = await _settingsStore.load();
+    final adjustedSession = List<int>.generate(
+      session.playerCount,
+      (index) => index,
+    ).fold<LifeCounterSession>(
+      session,
+      (current, playerIndex) => LifeCounterTabletopEngine
+          .applyAutoKnockOutIfNeeded(
+            current,
+            playerIndex: playerIndex,
+            settings: settings ?? LifeCounterSettings.defaults,
+          ),
+    );
+    await _sessionStore.save(adjustedSession);
+
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {
       final mergedValues = <String, String>{
         ...snapshot.values,
         ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
-          session,
+          adjustedSession,
         ),
       };
       await _snapshotStore.save(
@@ -1689,25 +1702,28 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         ),
       );
     } else {
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
-            LotusLifeCounterSessionAdapter.buildSnapshotValues(
-              session,
-              settings: settings,
+        await _snapshotStore.save(
+          LotusStorageSnapshot(
+            values: Map<String, String>.unmodifiable(
+              LotusLifeCounterSessionAdapter.buildSnapshotValues(
+                adjustedSession,
+                settings: settings,
+              ),
             ),
           ),
-        ),
-      );
+        );
     }
 
     unawaited(
-      AppObservability.instance.recordEvent(
-        'native_commander_damage_applied',
-        category: 'life_counter.commander_damage',
-        data: {'source': source, 'player_count': session.playerCount},
-      ),
-    );
+        AppObservability.instance.recordEvent(
+          'native_commander_damage_applied',
+          category: 'life_counter.commander_damage',
+          data: {
+            'source': source,
+            'player_count': adjustedSession.playerCount,
+          },
+        ),
+      );
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
@@ -2024,15 +2040,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
     required String counterKey,
   }) async {
-    await _sessionStore.save(session);
-
     final settings = await _settingsStore.load();
+    final adjustedSession = List<int>.generate(
+      session.playerCount,
+      (index) => index,
+    ).fold<LifeCounterSession>(
+      session,
+      (current, playerIndex) => LifeCounterTabletopEngine
+          .applyAutoKnockOutIfNeeded(
+            current,
+            playerIndex: playerIndex,
+            settings: settings ?? LifeCounterSettings.defaults,
+          ),
+    );
+    await _sessionStore.save(adjustedSession);
+
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {
       final mergedValues = <String, String>{
         ...snapshot.values,
         ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
-          session,
+          adjustedSession,
         ),
       };
       await _snapshotStore.save(
@@ -2041,16 +2069,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         ),
       );
     } else {
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
-            LotusLifeCounterSessionAdapter.buildSnapshotValues(
-              session,
-              settings: settings,
+        await _snapshotStore.save(
+          LotusStorageSnapshot(
+            values: Map<String, String>.unmodifiable(
+              LotusLifeCounterSessionAdapter.buildSnapshotValues(
+                adjustedSession,
+                settings: settings,
+              ),
             ),
           ),
-        ),
-      );
+        );
     }
 
     unawaited(
@@ -2258,15 +2286,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
     required int targetPlayerIndex,
   }) async {
-    await _sessionStore.save(session);
-
     final settings = await _settingsStore.load();
+    final adjustedSession = LifeCounterTabletopEngine.applyAutoKnockOutIfNeeded(
+      session,
+      playerIndex: targetPlayerIndex,
+      settings: settings ?? LifeCounterSettings.defaults,
+    );
+    await _sessionStore.save(adjustedSession);
+
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {
       final mergedValues = <String, String>{
         ...snapshot.values,
         ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
-          session,
+          adjustedSession,
         ),
       };
       await _snapshotStore.save(
@@ -2275,29 +2308,29 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         ),
       );
     } else {
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
-            LotusLifeCounterSessionAdapter.buildSnapshotValues(
-              session,
-              settings: settings,
+        await _snapshotStore.save(
+          LotusStorageSnapshot(
+            values: Map<String, String>.unmodifiable(
+              LotusLifeCounterSessionAdapter.buildSnapshotValues(
+                adjustedSession,
+                settings: settings,
+              ),
             ),
           ),
-        ),
-      );
+        );
     }
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_set_life_applied',
         category: 'life_counter.set_life',
-        data: {
-          'source': source,
-          'target_player_index': targetPlayerIndex,
-          'life': session.lives[targetPlayerIndex],
-        },
-      ),
-    );
+          data: {
+            'source': source,
+            'target_player_index': targetPlayerIndex,
+            'life': adjustedSession.lives[targetPlayerIndex],
+          },
+        ),
+      );
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
