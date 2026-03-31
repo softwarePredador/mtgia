@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativeTableStateSheet(
   BuildContext context, {
@@ -51,7 +52,8 @@ class _LifeCounterNativeTableStateSheetState
 
   void _apply() {
     Navigator.of(context).pop(
-      widget.initialSession.copyWith(
+      LifeCounterTabletopEngine.updateTableState(
+        widget.initialSession,
         stormCount: _stormCount,
         monarchPlayer: _monarchPlayer,
         clearMonarchPlayer: _monarchPlayer == null,

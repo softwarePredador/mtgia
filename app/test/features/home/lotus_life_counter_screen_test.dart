@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,10 +21,15 @@ import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeLotusHost implements LotusHost {
-  _FakeLotusHost({required this.onShellMessageRequested, this.onLoadBundle});
+  _FakeLotusHost({
+    required this.onShellMessageRequested,
+    this.onLoadBundle,
+    this.onRunJavaScriptReturningResult,
+  });
 
   final LotusShellMessageCallback onShellMessageRequested;
   final Future<void> Function(_FakeLotusHost host)? onLoadBundle;
+  final Object? Function(String script)? onRunJavaScriptReturningResult;
 
   @override
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
@@ -54,6 +61,41 @@ class _FakeLotusHost implements LotusHost {
   @override
   Future<void> runJavaScript(String script) async {
     executedScripts.add(script);
+  }
+
+  @override
+  Future<Object?> runJavaScriptReturningResult(String script) async {
+    if (onRunJavaScriptReturningResult != null) {
+      return onRunJavaScriptReturningResult!(script);
+    }
+
+    if (script.contains('.planechase-overlay')) {
+      return jsonEncode(<String, Object>{
+        'planechaseAvailable': true,
+        'planechaseActive': true,
+        'planechaseCardPoolActive': false,
+        'archenemyAvailable': true,
+        'archenemyActive': false,
+        'archenemyCardPoolActive': false,
+        'bountyAvailable': true,
+        'bountyActive': false,
+        'bountyCardPoolActive': false,
+        'maxActiveModes': 2,
+      });
+    }
+
+    return jsonEncode(<String, Object>{
+      'planechaseAvailable': true,
+      'planechaseActive': false,
+      'planechaseCardPoolActive': false,
+      'archenemyAvailable': true,
+      'archenemyActive': false,
+      'archenemyCardPoolActive': false,
+      'bountyAvailable': true,
+      'bountyActive': false,
+      'bountyCardPoolActive': false,
+      'maxActiveModes': 2,
+    });
   }
 
   void completeSuccessfulLoad() {
@@ -184,11 +226,11 @@ void main() {
                 required onAppReviewRequested,
                 required onShellMessageRequested,
               }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
             ),
           ),
         );
@@ -232,6 +274,15 @@ void main() {
             }) {
               host = _FakeLotusHost(
                 onShellMessageRequested: onShellMessageRequested,
+                onRunJavaScriptReturningResult:
+                    (script) => jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    }),
               )..completeSuccessfulLoad();
               return host;
             },
@@ -269,6 +320,15 @@ void main() {
             }) {
               host = _FakeLotusHost(
                 onShellMessageRequested: onShellMessageRequested,
+                onRunJavaScriptReturningResult:
+                    (script) => jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    }),
               )..completeSuccessfulLoad();
               return host;
             },
@@ -325,6 +385,15 @@ void main() {
             }) {
               host = _FakeLotusHost(
                 onShellMessageRequested: onShellMessageRequested,
+                onRunJavaScriptReturningResult:
+                    (script) => jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    }),
               )..completeSuccessfulLoad();
               return host;
             },
@@ -379,6 +448,15 @@ void main() {
             }) {
               host = _FakeLotusHost(
                 onShellMessageRequested: onShellMessageRequested,
+                onRunJavaScriptReturningResult:
+                    (script) => jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    }),
               )..completeSuccessfulLoad();
               return host;
             },
@@ -450,7 +528,406 @@ void main() {
       expect(find.text('Planechase'), findsOneWidget);
       expect(find.text('Archenemy'), findsOneWidget);
       expect(find.text('Bounty'), findsOneWidget);
+      expect(find.text('Active Now'), findsOneWidget);
+      expect(find.text('Return To Embedded Mode'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        host.executedScripts.any(
+          (script) =>
+              script.contains("document.querySelector('.planechase-btn')") &&
+              script.contains('button.click()'),
+        ),
+        isTrue,
+      );
     });
+
+    testWidgets('opens native game modes from a direct planechase shortcut', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-game-modes","source":"planechase_mode_pressed","preferredMode":"planechase"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Game Modes'), findsOneWidget);
+      expect(find.text('Selected Surface'), findsOneWidget);
+      expect(find.text('Continue With Planechase'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        host.executedScripts.any(
+          (script) =>
+              script.contains("document.querySelector('.planechase-btn')") &&
+              script.contains('button.click()'),
+        ),
+        isTrue,
+      );
+    });
+
+    testWidgets(
+      'opens native game modes from an active planechase overlay settings shortcut',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"planechase_overlay_settings_pressed","preferredMode":"planechase"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Game Modes'), findsOneWidget);
+        expect(find.text('Continue With Planechase'), findsOneWidget);
+        expect(find.text('Active Now'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'hands off planechase card pool editing through the owned game modes shell',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"planechase_cards_pressed","preferredMode":"planechase","intent":"edit-cards"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Continue To Embedded Card Pool'), findsOneWidget);
+
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+          warnIfMissed: false,
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains("document.querySelector('.planechase-btn')") &&
+                script.contains("document.querySelector('.edit-planechase-cards')") &&
+                script.contains('window.setTimeout'),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets(
+      'offers explicit close action for an active embedded planechase card pool editor',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                  onRunJavaScriptReturningResult:
+                      (script) => jsonEncode(<String, bool>{
+                        'planechaseAvailable': true,
+                        'planechaseActive': false,
+                        'planechaseCardPoolActive': true,
+                        'archenemyAvailable': true,
+                        'archenemyActive': false,
+                        'archenemyCardPoolActive': false,
+                        'bountyAvailable': true,
+                        'bountyActive': false,
+                        'bountyCardPoolActive': false,
+                      }),
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"planechase_cards_pressed","preferredMode":"planechase","intent":"edit-cards"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Card Pool Open'), findsOneWidget);
+        expect(find.text('Return To Embedded Card Pool'), findsOneWidget);
+
+        await tester.ensureVisible(
+          find.byKey(
+            const Key(
+              'life-counter-native-game-modes-planechase-close-card-pool',
+            ),
+          ),
+        );
+        await tester.tap(
+          find.byKey(
+            const Key(
+              'life-counter-native-game-modes-planechase-close-card-pool',
+            ),
+          ),
+          warnIfMissed: false,
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          host.executedScripts.any(
+            (script) => script.contains(
+              "document.querySelector('.close-edit-planechase-cards-overlay')",
+            ),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets(
+      'offers explicit edit card pool action from quick actions game modes shell',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"quick_actions_game_modes"}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(
+            const Key('life-counter-native-game-modes-planechase-edit-cards'),
+          ),
+        );
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-game-modes-planechase-edit-cards'),
+          ),
+          warnIfMissed: false,
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains("document.querySelector('.planechase-btn')") &&
+                script.contains("document.querySelector('.edit-planechase-cards')") &&
+                script.contains('window.setTimeout'),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets('routes unavailable direct game modes to native settings', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+                onRunJavaScriptReturningResult:
+                    (script) => jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    }),
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-game-modes","source":"archenemy_mode_pressed","preferredMode":"archenemy"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Open Settings'), findsOneWidget);
+
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-game-modes-archenemy-settings'),
+        ),
+      );
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-game-modes-archenemy-settings'),
+        ),
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Life Counter Settings'), findsOneWidget);
+    });
+
+    testWidgets(
+      'blocks opening a third game mode when the active limit is reached',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                  onRunJavaScriptReturningResult:
+                      (script) => jsonEncode(<String, Object>{
+                        'planechaseAvailable': true,
+                        'planechaseActive': true,
+                        'planechaseCardPoolActive': false,
+                        'archenemyAvailable': true,
+                        'archenemyActive': true,
+                        'archenemyCardPoolActive': false,
+                        'bountyAvailable': true,
+                        'bountyActive': false,
+                        'bountyCardPoolActive': false,
+                        'maxActiveModes': 2,
+                      }),
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"bounty_mode_pressed","preferredMode":"bounty"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('life-counter-native-game-modes-limit-warning')),
+          findsOneWidget,
+        );
+        expect(find.text('Close One Active Mode First'), findsOneWidget);
+
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-game-modes-bounty-open')),
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-modes-bounty-open')),
+          warnIfMissed: false,
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          host.executedScripts.any(
+            (script) => script.contains("document.querySelector('.bounty-btn')"),
+          ),
+          isFalse,
+        );
+      },
+    );
 
     testWidgets('opens native history from shell shortcut', (tester) async {
       late _FakeLotusHost host;

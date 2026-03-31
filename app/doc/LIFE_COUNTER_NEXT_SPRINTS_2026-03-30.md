@@ -158,6 +158,7 @@ Progresso fechado ate agora:
   - `Archenemy`
   - `Bounty`
 - essa shell marca o inicio seguro do `Sprint 5`, mas o gameplay desses modos ainda permanece Lotus-owned
+- os botoes de `settings` dentro dos overlays ativos de `Planechase`, `Archenemy` e `Bounty` agora tambem retornam primeiro para a shell ManaLoom
 - shell nativa adicional assumida no runtime vivo:
   - `dice / high roll / coin / roll 1st`
 - `player state` agora funciona como hub para:
@@ -171,6 +172,7 @@ Progresso fechado ate agora:
   - `storm`
   - `monarch`
   - `initiative`
+- `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa
 - o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
 - o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - os hints legados de `turn tracker` e `counters on card` agora sao suprimidos e marcados como concluidos pela shell policy
@@ -222,12 +224,23 @@ Progresso inicial:
 
 - shell nativa de `game modes` ja existe no hub rapido ManaLoom
 - `Planechase`, `Archenemy` e `Bounty` agora ja tem um ponto de posse/navegacao nosso, sem desligar o runtime do bundle
+- os botoes diretos de `Planechase`, `Archenemy` e `Bounty` agora tambem passam pela shell ManaLoom, com destaque para o modo selecionado e sinal de overlay embutido ja ativo
+- a shell de `game modes` agora tambem owns a ajuda contextual nativa de `Planechase`, `Archenemy` e `Bounty`, reduzindo dependencia dos info overlays do Lotus
+- as entradas de `edit cards` desses modos agora tambem passam primeiro pela shell ManaLoom antes do handoff para o editor embutido correspondente
+- a shell de `game modes` agora tambem reconhece quando o editor embutido de card pool ja esta ativo e oferece retorno/fechamento explicito dessa superficie
+- a shell de `game modes` agora tambem assume o limite de 2 modos ativos do Lotus e bloqueia a abertura de um terceiro modo antes do warning legado
 
 Done when:
 
 - os modos extras tem dono claro:
   - continuam no Lotus por decisao explicita
   - ou entram no backlog de migracao nativa com contrato definido
+
+Pendencias reais apos a revalidacao:
+
+- revalidar em AVD limpo os smokes vivos mais novos que ainda sofrem com `INSTALL_FAILED_INSUFFICIENT_STORAGE`
+- decidir se `edit cards` de `Planechase`, `Archenemy` e `Bounty` vao permanecer embutidos por decisao explicita ou se entram no backlog de migracao nativa
+- fechar a decisao final sobre o runtime central da mesa antes de falar em remocao do `WebView`
 
 ## Exit Criteria Before Replacing The Tabletop
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativeSetLifeSheet(
   BuildContext context, {
@@ -77,12 +78,11 @@ class _LifeCounterNativeSetLifeSheetState
   }
 
   void _apply() {
-    final nextLives = List<int>.from(widget.initialSession.lives);
-    nextLives[_targetPlayerIndex] = (int.tryParse(_buffer) ?? 0).clamp(0, 999);
     Navigator.of(context).pop(
-      widget.initialSession.copyWith(
-        lives: nextLives,
-        clearLastTableEvent: true,
+      LifeCounterTabletopEngine.setLifeTotal(
+        widget.initialSession,
+        playerIndex: _targetPlayerIndex,
+        life: int.tryParse(_buffer) ?? 0,
       ),
     );
   }

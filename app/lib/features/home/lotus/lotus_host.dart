@@ -17,5 +17,6 @@ abstract class LotusHost {
   void suppressStaleBeforeUnloadSnapshot();
   Future<void> loadBundle();
   Future<void> runJavaScript(String script);
+  Future<Object?> runJavaScriptReturningResult(String script);
   void dispose();
 }

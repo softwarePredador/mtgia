@@ -9,6 +9,7 @@ import 'life_counter_native_player_appearance_sheet.dart';
 import 'life_counter_native_player_counter_sheet.dart';
 import 'life_counter_native_set_life_sheet.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
   BuildContext context, {
@@ -75,18 +76,17 @@ class _LifeCounterNativePlayerStateSheetState
   }
 
   LifeCounterSession _buildUpdatedSession() {
-    final partnerCommanders = List<bool>.from(_draftSession.partnerCommanders);
-    final playerSpecialStates = List<LifeCounterPlayerSpecialState>.from(
-      _draftSession.playerSpecialStates,
+    var updatedSession = LifeCounterTabletopEngine.setPartnerCommander(
+      _draftSession,
+      playerIndex: _targetPlayerIndex,
+      enabled: _partnerCommander,
     );
-
-    partnerCommanders[_targetPlayerIndex] = _partnerCommander;
-    playerSpecialStates[_targetPlayerIndex] = _specialState;
-
-    return _draftSession.copyWith(
-      partnerCommanders: partnerCommanders,
-      playerSpecialStates: playerSpecialStates,
+    updatedSession = LifeCounterTabletopEngine.setPlayerSpecialState(
+      updatedSession,
+      playerIndex: _targetPlayerIndex,
+      state: _specialState,
     );
+    return updatedSession;
   }
 
   Future<void> _openManageCounters() async {

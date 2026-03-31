@@ -285,7 +285,7 @@ String get lotusShellCleanupScript {
     }
 
     const trackedClick = event.target.closest(
-      '.menu-button, .dice-btn, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter, .monarch-btn, .initiative-btn, .day-night-switcher'
+      '.menu-button, .dice-btn, .planechase-btn, .archenemy-btn, .bounty-btn, .life-history-btn, .card-search-btn, .settings, .overlay-settings-btn, .edit-planechase-cards, .edit-archenemy-cards, .edit-bounty-cards, .turn-time-tracker, .game-timer:not(.current-time-clock), .current-time-clock, .commander-damage-counter, .counters-on-card .counter, .monarch-btn, .initiative-btn, .day-night-switcher'
     );
     const playerLifeClick = event.target.closest('.player-life-count');
     const playerStateClick = event.target.closest(
@@ -297,19 +297,51 @@ String get lotusShellCleanupScript {
     if (trackedClick) {
       let name = null;
       const playerCounterKey = resolvePlayerCounterKey(trackedClick);
+      const modeOverlayContext = trackedClick.matches('.overlay-settings-btn')
+        ? trackedClick.closest(
+            '.planechase-overlay, .archenemy-overlay, .bounty-overlay'
+          )
+        : null;
       if (trackedClick.matches('.menu-button')) {
         name = 'menu_button_pressed';
       } else if (trackedClick.matches('.dice-btn')) {
         name = 'dice_shortcut_pressed';
+      } else if (trackedClick.matches('.planechase-btn')) {
+        name = 'planechase_mode_pressed';
+      } else if (trackedClick.matches('.archenemy-btn')) {
+        name = 'archenemy_mode_pressed';
+      } else if (trackedClick.matches('.bounty-btn')) {
+        name = 'bounty_mode_pressed';
       } else if (trackedClick.matches('.life-history-btn')) {
         name = 'history_shortcut_pressed';
       } else if (trackedClick.matches('.card-search-btn')) {
         name = 'card_search_shortcut_pressed';
       } else if (
         trackedClick.matches('.settings') ||
-        trackedClick.matches('.overlay-settings-btn')
+        (trackedClick.matches('.overlay-settings-btn') && !modeOverlayContext)
       ) {
         name = 'settings_shortcut_pressed';
+      } else if (
+        trackedClick.matches('.overlay-settings-btn') &&
+        modeOverlayContext?.matches('.planechase-overlay')
+      ) {
+        name = 'planechase_overlay_settings_pressed';
+      } else if (
+        trackedClick.matches('.overlay-settings-btn') &&
+        modeOverlayContext?.matches('.archenemy-overlay')
+      ) {
+        name = 'archenemy_overlay_settings_pressed';
+      } else if (
+        trackedClick.matches('.overlay-settings-btn') &&
+        modeOverlayContext?.matches('.bounty-overlay')
+      ) {
+        name = 'bounty_overlay_settings_pressed';
+      } else if (trackedClick.matches('.edit-planechase-cards')) {
+        name = 'planechase_cards_pressed';
+      } else if (trackedClick.matches('.edit-archenemy-cards')) {
+        name = 'archenemy_cards_pressed';
+      } else if (trackedClick.matches('.edit-bounty-cards')) {
+        name = 'bounty_cards_pressed';
       } else if (trackedClick.matches('.turn-time-tracker')) {
         name = 'turn_tracker_surface_pressed';
       } else if (
@@ -363,6 +395,31 @@ String get lotusShellCleanupScript {
         return;
       }
 
+      if (
+        trackedClick.matches('.planechase-btn') ||
+        trackedClick.matches('.archenemy-btn') ||
+        trackedClick.matches('.bounty-btn')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-game-modes',
+          source:
+            name ||
+            (trackedClick.matches('.planechase-btn')
+              ? 'planechase_mode_pressed'
+              : trackedClick.matches('.archenemy-btn')
+              ? 'archenemy_mode_pressed'
+              : 'bounty_mode_pressed'),
+          preferredMode: trackedClick.matches('.planechase-btn')
+              ? 'planechase'
+              : trackedClick.matches('.archenemy-btn')
+              ? 'archenemy'
+              : 'bounty',
+        });
+        return;
+      }
+
       if (trackedClick.matches('.life-history-btn')) {
         event.preventDefault();
         event.stopPropagation();
@@ -379,6 +436,61 @@ String get lotusShellCleanupScript {
         postShellMessage({
           type: 'open-native-card-search',
           source: name || 'card_search_shortcut_pressed',
+        });
+        return;
+      }
+
+      if (
+        trackedClick.matches('.edit-planechase-cards') ||
+        trackedClick.matches('.edit-archenemy-cards') ||
+        trackedClick.matches('.edit-bounty-cards')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-game-modes',
+          source:
+            name ||
+            (trackedClick.matches('.edit-planechase-cards')
+              ? 'planechase_cards_pressed'
+              : trackedClick.matches('.edit-archenemy-cards')
+              ? 'archenemy_cards_pressed'
+              : 'bounty_cards_pressed'),
+          preferredMode: trackedClick.matches('.edit-planechase-cards')
+              ? 'planechase'
+              : trackedClick.matches('.edit-archenemy-cards')
+              ? 'archenemy'
+              : 'bounty',
+          intent: 'edit-cards',
+        });
+        return;
+      }
+
+      if (
+        trackedClick.matches('.overlay-settings-btn') &&
+        modeOverlayContext &&
+        (
+          modeOverlayContext.matches('.planechase-overlay') ||
+          modeOverlayContext.matches('.archenemy-overlay') ||
+          modeOverlayContext.matches('.bounty-overlay')
+        )
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        postShellMessage({
+          type: 'open-native-game-modes',
+          source:
+            name ||
+            (modeOverlayContext.matches('.planechase-overlay')
+              ? 'planechase_overlay_settings_pressed'
+              : modeOverlayContext.matches('.archenemy-overlay')
+              ? 'archenemy_overlay_settings_pressed'
+              : 'bounty_overlay_settings_pressed'),
+          preferredMode: modeOverlayContext.matches('.planechase-overlay')
+              ? 'planechase'
+              : modeOverlayContext.matches('.archenemy-overlay')
+              ? 'archenemy'
+              : 'bounty',
         });
         return;
       }
@@ -589,6 +701,23 @@ String get lotusShellCleanupScript {
     observeUiSurface('.settings-overlay', 'settings_overlay_opened');
     observeUiSurface('.life-history-overlay', 'history_overlay_opened');
     observeUiSurface('.search-overlay', 'card_search_overlay_opened');
+    observeUiSurface('.planechase-overlay', 'planechase_overlay_opened');
+    observeUiSurface('.archenemy-overlay', 'archenemy_overlay_opened');
+    observeUiSurface('.bounty-overlay', 'bounty_overlay_opened');
+    observeUiSurface(
+      '.edit-planechase-cards-overlay',
+      'planechase_card_pool_overlay_opened'
+    );
+    observeUiSurface(
+      '.edit-archenemy-cards-overlay',
+      'archenemy_card_pool_overlay_opened'
+    );
+    observeUiSurface(
+      '.edit-bounty-cards-overlay',
+      'bounty_card_pool_overlay_opened'
+    );
+    observeUiSurface('.game-mode-info-overlay', 'game_mode_info_overlay_opened');
+    observeUiSurface('.max-game-modes-warning', 'max_game_modes_warning_opened');
     const dayNightMode = localStorage.getItem('__manaloom_day_night_mode');
     const switcher = document.querySelector('.day-night-switcher');
     if (

@@ -280,6 +280,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           );
           return;
         }
+        if (decoded['type'] == 'open-native-game-modes') {
+          unawaited(
+            _openNativeGameModesSheet(
+              source: (decoded['source'] as String?) ?? 'game_modes_shortcut',
+              preferredAction: _decodePreferredGameModeAction(
+                decoded['preferredMode'] as String?,
+              ),
+              preferredIntent: _decodePreferredGameModeIntent(
+                decoded['intent'] as String?,
+              ),
+            ),
+          );
+          return;
+        }
         if (decoded['type'] == 'open-native-dice') {
           unawaited(
             _openNativeDiceSheet(
@@ -576,34 +590,353 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
   }
 
-  Future<void> _openNativeGameModesSheet({required String source}) async {
+  Future<void> _openNativeGameModesSheet({
+    required String source,
+    LifeCounterGameModesAction? preferredAction,
+    LifeCounterGameModesEntryIntent preferredIntent =
+        LifeCounterGameModesEntryIntent.openMode,
+  }) async {
     if (!mounted || _isNativeGameModesSheetOpen) {
       return;
     }
 
     _isNativeGameModesSheetOpen = true;
+    final availability = await _readNativeGameModesAvailability();
+    if (!mounted) {
+      _isNativeGameModesSheetOpen = false;
+      return;
+    }
+
     unawaited(
       AppObservability.instance.recordEvent(
         'native_game_modes_opened',
         category: 'life_counter.game_modes',
-        data: {'source': source},
+        data: {
+          'source': source,
+          'preferred_intent': preferredIntent.name,
+          'planechase_available': availability.planechaseAvailable,
+          'planechase_active': availability.planechaseActive,
+          'planechase_card_pool_active': availability.planechaseCardPoolActive,
+          'archenemy_available': availability.archenemyAvailable,
+          'archenemy_active': availability.archenemyActive,
+          'archenemy_card_pool_active': availability.archenemyCardPoolActive,
+          'bounty_available': availability.bountyAvailable,
+          'bounty_active': availability.bountyActive,
+          'bounty_card_pool_active': availability.bountyCardPoolActive,
+          'active_mode_count': availability.activeModeCount,
+          'max_active_modes': availability.maxActiveModes,
+        },
       ),
     );
 
-    await showLifeCounterNativeGameModesSheet(context);
+    final action = await showLifeCounterNativeGameModesSheet(
+      context,
+      availability: availability,
+      preferredAction: preferredAction,
+      preferredIntent: preferredIntent,
+    );
     _isNativeGameModesSheetOpen = false;
 
     if (!mounted) {
       return;
     }
 
+    if (action != null) {
+      switch (action) {
+        case LifeCounterGameModesAction.openPlanechase:
+          await _triggerEmbeddedGameMode(
+            selector: '.planechase-btn',
+            modeName: 'planechase',
+            source: source,
+            followUpSelector:
+                preferredIntent == LifeCounterGameModesEntryIntent.editCards
+                    ? '.edit-planechase-cards'
+                    : null,
+          );
+        case LifeCounterGameModesAction.openArchenemy:
+          await _triggerEmbeddedGameMode(
+            selector: '.archenemy-btn',
+            modeName: 'archenemy',
+            source: source,
+            followUpSelector:
+                preferredIntent == LifeCounterGameModesEntryIntent.editCards
+                    ? '.edit-archenemy-cards'
+                    : null,
+          );
+        case LifeCounterGameModesAction.openBounty:
+          await _triggerEmbeddedGameMode(
+            selector: '.bounty-btn',
+            modeName: 'bounty',
+            source: source,
+            followUpSelector:
+                preferredIntent == LifeCounterGameModesEntryIntent.editCards
+                    ? '.edit-bounty-cards'
+                    : null,
+          );
+        case LifeCounterGameModesAction.editPlanechaseCards:
+          await _triggerEmbeddedGameMode(
+            selector: '.planechase-btn',
+            modeName: 'planechase',
+            source: source,
+            followUpSelector: '.edit-planechase-cards',
+          );
+        case LifeCounterGameModesAction.closePlanechaseCardPool:
+          await _closeEmbeddedGameModeCardPool(
+            selector: '.close-edit-planechase-cards-overlay',
+            modeName: 'planechase',
+            source: source,
+          );
+        case LifeCounterGameModesAction.editArchenemyCards:
+          await _triggerEmbeddedGameMode(
+            selector: '.archenemy-btn',
+            modeName: 'archenemy',
+            source: source,
+            followUpSelector: '.edit-archenemy-cards',
+          );
+        case LifeCounterGameModesAction.closeArchenemyCardPool:
+          await _closeEmbeddedGameModeCardPool(
+            selector: '.close-edit-archenemy-cards-overlay',
+            modeName: 'archenemy',
+            source: source,
+          );
+        case LifeCounterGameModesAction.editBountyCards:
+          await _triggerEmbeddedGameMode(
+            selector: '.bounty-btn',
+            modeName: 'bounty',
+            source: source,
+            followUpSelector: '.edit-bounty-cards',
+          );
+        case LifeCounterGameModesAction.closeBountyCardPool:
+          await _closeEmbeddedGameModeCardPool(
+            selector: '.close-edit-bounty-cards-overlay',
+            modeName: 'bounty',
+            source: source,
+          );
+        case LifeCounterGameModesAction.closePlanechase:
+          await _closeEmbeddedGameModeOverlay(
+            selector: '.close-planechase-overlay-btn',
+            modeName: 'planechase',
+            source: source,
+          );
+        case LifeCounterGameModesAction.closeArchenemy:
+          await _closeEmbeddedGameModeOverlay(
+            selector: '.close-archenemy-overlay-btn',
+            modeName: 'archenemy',
+            source: source,
+          );
+        case LifeCounterGameModesAction.closeBounty:
+          await _closeEmbeddedGameModeOverlay(
+            selector: '.close-bounty-overlay-btn',
+            modeName: 'bounty',
+            source: source,
+          );
+        case LifeCounterGameModesAction.openSettings:
+          await _openNativeSettingsSheet(source: 'game_modes_settings');
+      }
+    }
+
     unawaited(
       AppObservability.instance.recordEvent(
         'native_game_modes_dismissed',
         category: 'life_counter.game_modes',
-        data: {'source': source},
+        data: {
+          'source': source,
+          'preferred_intent': preferredIntent.name,
+          'selected_action': action?.name,
+        },
       ),
     );
+  }
+
+  Future<LifeCounterGameModesAvailability>
+  _readNativeGameModesAvailability() async {
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+        (() => JSON.stringify({
+          planechaseAvailable: !!document.querySelector('.planechase-btn'),
+          planechaseActive: !!document.querySelector('.planechase-overlay'),
+          planechaseCardPoolActive: !!document.querySelector('.edit-planechase-cards-overlay'),
+          archenemyAvailable: !!document.querySelector('.archenemy-btn'),
+          archenemyActive: !!document.querySelector('.archenemy-overlay'),
+          archenemyCardPoolActive: !!document.querySelector('.edit-archenemy-cards-overlay'),
+          bountyAvailable: !!document.querySelector('.bounty-btn'),
+          bountyActive: !!document.querySelector('.bounty-overlay'),
+          bountyCardPoolActive: !!document.querySelector('.edit-bounty-cards-overlay'),
+          maxActiveModes: 2
+        }))()
+      ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      if (decoded is Map<String, dynamic>) {
+        final planechaseActive = decoded['planechaseActive'] == true;
+        final archenemyActive = decoded['archenemyActive'] == true;
+        final bountyActive = decoded['bountyActive'] == true;
+        final activeModeCount =
+            (planechaseActive ? 1 : 0) +
+            (archenemyActive ? 1 : 0) +
+            (bountyActive ? 1 : 0);
+        return LifeCounterGameModesAvailability(
+          planechaseAvailable: decoded['planechaseAvailable'] == true,
+          planechaseActive: planechaseActive,
+          planechaseCardPoolActive:
+              decoded['planechaseCardPoolActive'] == true,
+          archenemyAvailable: decoded['archenemyAvailable'] == true,
+          archenemyActive: archenemyActive,
+          archenemyCardPoolActive:
+              decoded['archenemyCardPoolActive'] == true,
+          bountyAvailable: decoded['bountyAvailable'] == true,
+          bountyActive: bountyActive,
+          bountyCardPoolActive: decoded['bountyCardPoolActive'] == true,
+          activeModeCount: activeModeCount,
+          maxActiveModes: (decoded['maxActiveModes'] as num?)?.toInt() ?? 2,
+        );
+      }
+    } catch (_) {}
+
+    return const LifeCounterGameModesAvailability(
+      planechaseAvailable: false,
+      archenemyAvailable: false,
+      bountyAvailable: false,
+    );
+  }
+
+  Future<void> _triggerEmbeddedGameMode({
+    required String selector,
+    required String modeName,
+    required String source,
+    String? followUpSelector,
+  }) async {
+    await _hostController.runJavaScript('''
+      (() => {
+        const button = document.querySelector('$selector');
+        if (button instanceof HTMLElement) {
+          button.click();
+        }
+        ${followUpSelector == null ? '' : '''
+        window.setTimeout(() => {
+          const followUpButton = document.querySelector('$followUpSelector');
+          if (followUpButton instanceof HTMLElement) {
+            followUpButton.click();
+          }
+        }, 120);
+        '''}
+      })();
+    ''');
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'embedded_game_mode_requested',
+        category: 'life_counter.game_modes',
+        data: {
+          'source': source,
+          'mode': modeName,
+          'follow_up_selector': followUpSelector,
+        },
+      ),
+    );
+  }
+
+  Future<void> _closeEmbeddedGameModeOverlay({
+    required String selector,
+    required String modeName,
+    required String source,
+  }) async {
+    await _hostController.runJavaScript('''
+      (() => {
+        const button = document.querySelector('$selector');
+        if (button instanceof HTMLElement) {
+          button.click();
+        }
+      })();
+    ''');
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'embedded_game_mode_overlay_closed',
+        category: 'life_counter.game_modes',
+        data: {
+          'source': source,
+          'mode': modeName,
+          'selector': selector,
+        },
+      ),
+    );
+  }
+
+  Future<void> _closeEmbeddedGameModeCardPool({
+    required String selector,
+    required String modeName,
+    required String source,
+  }) async {
+    await _hostController.runJavaScript('''
+      (() => {
+        const button = document.querySelector('$selector');
+        if (button instanceof HTMLElement) {
+          button.click();
+        }
+      })();
+    ''');
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'embedded_game_mode_card_pool_closed',
+        category: 'life_counter.game_modes',
+        data: {
+          'source': source,
+          'mode': modeName,
+          'selector': selector,
+        },
+      ),
+    );
+  }
+
+  LifeCounterGameModesAction? _decodePreferredGameModeAction(String? rawMode) {
+    switch (rawMode) {
+      case 'planechase':
+        return LifeCounterGameModesAction.openPlanechase;
+      case 'archenemy':
+        return LifeCounterGameModesAction.openArchenemy;
+      case 'bounty':
+        return LifeCounterGameModesAction.openBounty;
+      default:
+        return null;
+    }
+  }
+
+  LifeCounterGameModesEntryIntent _decodePreferredGameModeIntent(
+    String? rawIntent,
+  ) {
+    switch (rawIntent) {
+      case 'edit-cards':
+        return LifeCounterGameModesEntryIntent.editCards;
+      default:
+        return LifeCounterGameModesEntryIntent.openMode;
+    }
+  }
+
+  Object? _decodeJavaScriptResult(Object? rawResult) {
+    Object? value = rawResult;
+
+    for (var attempt = 0; attempt < 3; attempt += 1) {
+      if (value is Map<String, dynamic>) {
+        return value;
+      }
+
+      if (value is Map) {
+        return value.cast<String, dynamic>();
+      }
+
+      if (value is! String || value.isEmpty) {
+        return value;
+      }
+
+      try {
+        value = jsonDecode(value);
+      } catch (_) {
+        return value;
+      }
+    }
+
+    return value;
   }
 
   Future<void> _openNativeDayNightSheet({required String source}) async {

@@ -137,6 +137,11 @@ class LotusHostController implements LotusHost {
   }
 
   @override
+  Future<Object?> runJavaScriptReturningResult(String script) {
+    return webViewController.runJavaScriptReturningResult(script);
+  }
+
+  @override
   void dispose() {
     _isDisposed = true;
     _loadingOverlayFallbackTimer?.cancel();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'life_counter_session.dart';
+import 'life_counter_tabletop_engine.dart';
 
 Future<LifeCounterSession?> showLifeCounterNativePlayerCounterSheet(
   BuildContext context, {
@@ -70,7 +71,11 @@ class _LifeCounterNativePlayerCounterSheetState
   }
 
   int get _currentValue =>
-      _readCounterValue(_draftSession, _targetPlayerIndex, _selectedCounterKey);
+      LifeCounterTabletopEngine.readCounterValue(
+        _draftSession,
+        playerIndex: _targetPlayerIndex,
+        counterKey: _selectedCounterKey,
+      );
 
   int get _step => _isTaxCounter(_selectedCounterKey) ? 2 : 1;
 
@@ -83,7 +88,7 @@ class _LifeCounterNativePlayerCounterSheetState
   void _changeValue(int delta) {
     setState(() {
       final nextValue = (_currentValue + delta).clamp(0, 999);
-      _draftSession = _writeCounterValue(
+      _draftSession = LifeCounterTabletopEngine.writeCounterValue(
         _draftSession,
         playerIndex: _targetPlayerIndex,
         counterKey: _selectedCounterKey,
@@ -112,7 +117,7 @@ class _LifeCounterNativePlayerCounterSheetState
 
     setState(() {
       _customCounterError = null;
-      _draftSession = _ensureExtraCounterExists(
+      _draftSession = LifeCounterTabletopEngine.ensureExtraCounterExists(
         _draftSession,
         playerIndex: _targetPlayerIndex,
         counterKey: normalizedKey,
@@ -123,12 +128,12 @@ class _LifeCounterNativePlayerCounterSheetState
   }
 
   void _removeSelectedCustomCounter() {
-    if (_isKnownCounterKey(_selectedCounterKey)) {
+    if (LifeCounterTabletopEngine.isKnownCounterKey(_selectedCounterKey)) {
       return;
     }
 
     setState(() {
-      _draftSession = _removeExtraCounter(
+      _draftSession = LifeCounterTabletopEngine.removeExtraCounter(
         _draftSession,
         playerIndex: _targetPlayerIndex,
         counterKey: _selectedCounterKey,
@@ -144,7 +149,8 @@ class _LifeCounterNativePlayerCounterSheetState
   Widget build(BuildContext context) {
     final counterLabel = _counterLabel(_selectedCounterKey);
     final playerLabel = 'Player ${_targetPlayerIndex + 1}';
-    final isCustomCounter = !_isKnownCounterKey(_selectedCounterKey);
+    final isCustomCounter =
+        !LifeCounterTabletopEngine.isKnownCounterKey(_selectedCounterKey);
 
     return SafeArea(
       child: Padding(
@@ -503,14 +509,6 @@ List<String> _buildAvailableCounterKeys(
   return keys;
 }
 
-bool _isKnownCounterKey(String counterKey) {
-  return counterKey == 'poison' ||
-      counterKey == 'energy' ||
-      counterKey == 'xp' ||
-      counterKey == 'tax-1' ||
-      counterKey == 'tax-2';
-}
-
 String? _normalizeCustomCounterKey(String raw) {
   final parts = raw
       .trim()
@@ -523,121 +521,6 @@ String? _normalizeCustomCounterKey(String raw) {
     return null;
   }
   return parts.join('-');
-}
-
-LifeCounterSession _ensureExtraCounterExists(
-  LifeCounterSession session, {
-  required int playerIndex,
-  required String counterKey,
-}) {
-  if (_isKnownCounterKey(counterKey)) {
-    return session;
-  }
-
-  final extraCounters = session.resolvedPlayerExtraCounters
-      .map((entry) => <String, int>{...entry})
-      .toList(growable: false);
-  extraCounters[playerIndex].putIfAbsent(counterKey, () => 0);
-  return session.copyWith(playerExtraCounters: extraCounters);
-}
-
-LifeCounterSession _removeExtraCounter(
-  LifeCounterSession session, {
-  required int playerIndex,
-  required String counterKey,
-}) {
-  if (_isKnownCounterKey(counterKey)) {
-    return session;
-  }
-
-  final extraCounters = session.resolvedPlayerExtraCounters
-      .map((entry) => <String, int>{...entry})
-      .toList(growable: false);
-  extraCounters[playerIndex].remove(counterKey);
-  return session.copyWith(playerExtraCounters: extraCounters);
-}
-
-int _readCounterValue(
-  LifeCounterSession session,
-  int playerIndex,
-  String counterKey,
-) {
-  switch (counterKey) {
-    case 'poison':
-      return session.poison[playerIndex];
-    case 'energy':
-      return session.energy[playerIndex];
-    case 'xp':
-      return session.experience[playerIndex];
-    case 'tax-1':
-      return session
-              .resolvedCommanderCastDetails[playerIndex]
-              .commanderOneCasts *
-          2;
-    case 'tax-2':
-      return session
-              .resolvedCommanderCastDetails[playerIndex]
-              .commanderTwoCasts *
-          2;
-    default:
-      return session.resolvedPlayerExtraCounters[playerIndex][counterKey] ?? 0;
-  }
-}
-
-LifeCounterSession _writeCounterValue(
-  LifeCounterSession session, {
-  required int playerIndex,
-  required String counterKey,
-  required int value,
-}) {
-  switch (counterKey) {
-    case 'poison':
-      final poison = List<int>.from(session.poison);
-      poison[playerIndex] = value;
-      return session.copyWith(poison: poison);
-    case 'energy':
-      final energy = List<int>.from(session.energy);
-      energy[playerIndex] = value;
-      return session.copyWith(energy: energy);
-    case 'xp':
-      final experience = List<int>.from(session.experience);
-      experience[playerIndex] = value;
-      return session.copyWith(experience: experience);
-    case 'tax-1':
-    case 'tax-2':
-      final details = List<LifeCounterCommanderCastDetail>.from(
-        session.resolvedCommanderCastDetails,
-      );
-      final current = details[playerIndex];
-      final casts = (value ~/ 2).clamp(0, 999);
-      details[playerIndex] =
-          counterKey == 'tax-1'
-              ? LifeCounterCommanderCastDetail(
-                commanderOneCasts: casts,
-                commanderTwoCasts: current.commanderTwoCasts,
-              )
-              : LifeCounterCommanderCastDetail(
-                commanderOneCasts: current.commanderOneCasts,
-                commanderTwoCasts: casts,
-              );
-      final commanderCasts = details
-          .map((entry) => entry.totalCasts)
-          .toList(growable: false);
-      return session.copyWith(
-        commanderCasts: commanderCasts,
-        commanderCastDetails: details,
-      );
-    default:
-      final extraCounters = session.resolvedPlayerExtraCounters
-          .map((entry) => <String, int>{...entry})
-          .toList(growable: false);
-      if (value <= 0) {
-        extraCounters[playerIndex].remove(counterKey);
-      } else {
-        extraCounters[playerIndex][counterKey] = value;
-      }
-      return session.copyWith(playerExtraCounters: extraCounters);
-  }
 }
 
 bool _isTaxCounter(String counterKey) =>
