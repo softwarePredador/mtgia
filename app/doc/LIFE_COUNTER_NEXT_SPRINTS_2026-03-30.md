@@ -5,16 +5,26 @@
 Estado atual do contador:
 
 - baseline visual e de gameplay da mesa continua Lotus-faithful
+- diretriz atual: o `WebView` do Lotus e a camada visual oficial da mesa; ManaLoom continua dona de backend, persistencia, normalizacao e customizacao futura por cima do proprio Lotus
+- sem pedido explicito, mudanca visual nova deve preservar o Lotus 1:1
 - host Flutter e shell policy ja sao ManaLoom-owned
 - sessao canonica, settings canonicas e fronteiras de persistencia ja sao nossas
-- shells nativas ja assumidas:
+- fluxo visual ja devolvido ao Lotus para:
   - settings
   - history
   - card search
-  - turn tracker shell
-  - game timer shell
-  - day/night shell
-  - player appearance shell
+- fluxo visual tambem devolvido ao Lotus para:
+  - player state
+  - set life
+  - player counters
+  - commander damage
+  - player appearance
+- pacote prioritario de reversao visual ja aplicado para:
+  - dice
+  - turn tracker
+  - game timer / clock
+  - table state
+  - day / night
 - validacao automatizada atual cobre:
   - bootstrap/reopen do contador vivo
   - reboot dedicado do snapshot persistido do contador vivo
@@ -143,21 +153,9 @@ Progresso fechado ate agora:
   - `set life`
 - shell nativa adicional assumida no runtime vivo:
   - `table state`
-- `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para:
-  - `settings`
-  - `history`
-  - `card search`
-  - `turn tracker`
-  - `game timer`
-  - `dice`
-  - `game modes`
-  - `table state`
-  - `day / night`
-- o hub rapido agora tambem abre uma shell nativa de `game modes` para:
-  - `Planechase`
-  - `Archenemy`
-  - `Bounty`
-- essa shell marca o inicio seguro do `Sprint 5`, mas o gameplay desses modos ainda permanece Lotus-owned
+- o `menu-button` voltou ao overlay radial original do Lotus
+- `settings`, `history` e `card search` tambem voltaram ao visual original do Lotus
+- a shell nativa de `game modes` continua existindo em codigo, mas o objetivo agora e preservar o overlay visual do Lotus como fluxo principal
 - os botoes de `settings` dentro dos overlays ativos de `Planechase`, `Archenemy` e `Bounty` agora tambem retornam primeiro para a shell ManaLoom
 - shell nativa adicional assumida no runtime vivo:
   - `dice / high roll / coin / roll 1st`
@@ -167,7 +165,6 @@ Progresso fechado ate agora:
   - `commander damage`
   - `player appearance`
   - `player D20`
-- `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `table state`
 - a shell nativa de `table state` agora controla:
   - `storm`
   - `monarch`
@@ -186,19 +183,14 @@ Progresso fechado ate agora:
 - o status canonico do jogador agora tambem vive em uma estrutura unica da `LifeCounterTabletopEngine`, reduzindo mais duplicacao entre `set life`, `player counters`, `player state` e `commander damage`
 - a `LifeCounterTabletopEngine` agora tambem expõe um `player board summary` unico para as shells nativas, reunindo status, sinais criticos e resumo letal de commander damage
 - `Player State` agora tambem passa por `autoKill` quando hubs aninhados devolvem uma sessao letal, preservando estados especiais manuais
-- o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `day / night`
 - o estado de `day / night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - os hints legados de `turn tracker` e `counters on card` agora sao suprimidos e marcados como concluidos pela shell policy
-- takeover do `option-card` do Lotus abre a shell nativa de estado do jogador
-- `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
-- takeover do `color-card` e da entrada de background do Lotus abre a shell nativa de aparencia do jogador
 - `player appearance` agora tambem tem transporte proprio de import/export via clipboard
 - perfis salvos de aparencia agora ficam em store propria ManaLoom
 - `__manaloom_table_state` agora preserva tambem:
   - `lastPlayerRolls`
   - `lastHighRolls`
   - `firstPlayerIndex` auxiliar
-- `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
 - o toque no total de vida do jogador agora pode abrir a shell nativa de `set life`
 - smokes reais adicionados:
   - `integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart`
@@ -235,13 +227,10 @@ Escopo:
 
 Progresso inicial:
 
-- shell nativa de `game modes` ja existe no hub rapido ManaLoom
-- `Planechase`, `Archenemy` e `Bounty` agora ja tem um ponto de posse/navegacao nosso, sem desligar o runtime do bundle
-- os botoes diretos de `Planechase`, `Archenemy` e `Bounty` agora tambem passam pela shell ManaLoom, com destaque para o modo selecionado e sinal de overlay embutido ja ativo
-- a shell de `game modes` agora tambem owns a ajuda contextual nativa de `Planechase`, `Archenemy` e `Bounty`, reduzindo dependencia dos info overlays do Lotus
-- as entradas de `edit cards` desses modos agora tambem passam primeiro pela shell ManaLoom antes do handoff para o editor embutido correspondente
-- a shell de `game modes` agora tambem reconhece quando o editor embutido de card pool ja esta ativo e oferece retorno/fechamento explicito dessa superficie
-- a shell de `game modes` agora tambem assume o limite de 2 modos ativos do Lotus e bloqueia a abertura de um terceiro modo antes do warning legado
+- shell nativa de `game modes` ainda existe em codigo como suporte de backend/handoff
+- `Planechase`, `Archenemy` e `Bounty` agora seguem o Lotus como fluxo visual principal
+- a shell nativa de `game modes` fica preservada como apoio tecnico de backend, observabilidade e fluxos internos
+- diretriz atual desta frente: preservar o overlay visual do Lotus como fluxo principal e usar ManaLoom como camada invisivel de estado, observabilidade e handoff tecnico
 
 Done when:
 
@@ -257,6 +246,8 @@ Pendencias reais apos a revalidacao:
   - a propria `LifeCounterTabletopEngine` agora tambem recusa `monarch` e `initiative` para jogadores fora da mesa, nao so a shell de `table state`
   - `high roll` e `roll 1st` agora tambem respeitam apenas jogadores ativos, reduzindo mais um ponto de dependencia do comportamento implicito do Lotus
   - a aplicacao de `dice` no host agora tambem passa pelo mesmo caminho central de normalizacao e persistencia usado pelas outras shells nativas
+  - o snapshot vivo agora tambem atualiza `turnTracker` pelo mesmo funil canonico de persistencia, evitando drift entre sessao ajustada e bundle recarregado
+  - o adapter do snapshot agora tambem serializa `turnTracker` usando a mesma nocao canonica de jogador ativo da engine da mesa
   - a apresentacao de `special state` do jogador agora tambem sai da shell e passa a ser definida pela `LifeCounterTabletopEngine`
 - quando um jogador sai da mesa por estado letal, a engine canonica agora tambem saneia `monarch` e `initiative`, evitando ownership preso em jogador fora do jogo
   - quando um jogador sai da mesa por estado letal, a camada canonica agora tambem realinha `currentTurnPlayerIndex` e `firstPlayerIndex`, evitando tracker preso em jogador fora do jogo

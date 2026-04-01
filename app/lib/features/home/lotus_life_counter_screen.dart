@@ -1333,37 +1333,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
-    await _sessionStore.save(session);
-
-    final settings = await _settingsStore.load();
-    final snapshot = await _snapshotStore.load();
-    if (snapshot != null) {
-      final mergedValues = <String, String>{
-        ...snapshot.values,
-        ...LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
-          session,
-          layoutType: LotusLifeCounterSessionAdapter.tryReadLayoutType(
-            snapshot,
-          ),
-        ),
-      };
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(mergedValues),
-        ),
-      );
-    } else {
-      await _snapshotStore.save(
-        LotusStorageSnapshot(
-          values: Map<String, String>.unmodifiable(
-            LotusLifeCounterSessionAdapter.buildSnapshotValues(
-              session,
-              settings: settings,
-            ),
-          ),
-        ),
-      );
-    }
+    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
+    await _persistOwnedSessionSnapshot(adjustedSession);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1371,11 +1342,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.turn_tracker',
         data: {
           'source': source,
-          'is_active': session.turnTrackerActive,
-          'current_turn': session.currentTurnNumber,
-          'current_player_index': session.currentTurnPlayerIndex,
-          'starting_player_index': session.firstPlayerIndex,
-          'turn_timer_active': session.turnTimerActive,
+          'is_active': adjustedSession.turnTrackerActive,
+          'current_turn': adjustedSession.currentTurnNumber,
+          'current_player_index': adjustedSession.currentTurnPlayerIndex,
+          'starting_player_index': adjustedSession.firstPlayerIndex,
+          'turn_timer_active': adjustedSession.turnTimerActive,
         },
       ),
     );
@@ -1671,6 +1642,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         ...snapshot.values,
         ...LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(
           session,
+        ),
+        ...LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
+          session,
+          layoutType: LotusLifeCounterSessionAdapter.tryReadLayoutType(
+            snapshot,
+          ),
         ),
       };
       await _snapshotStore.save(
@@ -2261,7 +2238,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
-    await _persistOwnedSessionSnapshot(session);
+    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
+    await _persistOwnedSessionSnapshot(adjustedSession);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2269,9 +2247,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.table_state',
         data: {
           'source': source,
-          'storm_count': session.stormCount,
-          'monarch_player': session.monarchPlayer,
-          'initiative_player': session.initiativePlayer,
+          'storm_count': adjustedSession.stormCount,
+          'monarch_player': adjustedSession.monarchPlayer,
+          'initiative_player': adjustedSession.initiativePlayer,
         },
       ),
     );

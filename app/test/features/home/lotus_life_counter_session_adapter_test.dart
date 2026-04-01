@@ -445,7 +445,55 @@ void main() {
           jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
 
       expect(turnTracker['startingPlayerIndex'], 3);
-      expect(turnTracker['currentPlayerIndex'], 0);
+      expect(turnTracker['currentPlayerIndex'], 2);
+    });
+
+    test('skips lethal players when serializing turn tracker payloads', () {
+      final values = LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [0, 40, 40, 40],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: 0,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: 0,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: null,
+        ),
+      );
+
+      final turnTracker =
+          jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
+
+      expect(turnTracker['startingPlayerIndex'], 2);
+      expect(turnTracker['currentPlayerIndex'], 3);
     });
 
     test('falls back to answer-left when Lotus only exposes alive false', () {

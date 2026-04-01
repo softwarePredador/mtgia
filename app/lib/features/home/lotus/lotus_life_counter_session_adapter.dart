@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../life_counter/life_counter_settings.dart';
 import '../life_counter/life_counter_session.dart';
+import '../life_counter/life_counter_tabletop_engine.dart';
 import 'lotus_life_counter_settings_adapter.dart';
 import 'lotus_storage_snapshot.dart';
 
@@ -895,8 +896,10 @@ class LotusLifeCounterSessionAdapter {
   }
 
   static bool _isPlayerAlive(LifeCounterSession session, int index) {
-    return session.playerSpecialStates[index] ==
-        LifeCounterPlayerSpecialState.none;
+    return LifeCounterTabletopEngine.isPlayerActiveOnTable(
+      session,
+      playerIndex: index,
+    );
   }
 
   static Map<String, Object?> _buildTurnTrackerPayload(

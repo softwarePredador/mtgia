@@ -36,25 +36,28 @@ Documento complementar importante para a frente do contador:
 
 Estado vivo do contador hoje:
 
+- diretriz atual: o `WebView` do Lotus e a camada visual oficial da mesa; ManaLoom fica com backend, persistencia, normalizacao e customizacao futura por cima do proprio Lotus
+- mudanca visual sem pedido explicito deve preservar o Lotus 1:1
 - runtime source-of-truth: `app/assets/lotus/`
 - implementacao oficial: `app/lib/features/home/lotus_life_counter_screen.dart`
 - rota viva: `app/lib/features/home/life_counter_route.dart`
 - contrato proprio de sessao/persistencia: `app/lib/features/home/life_counter/`
 - engine canonica inicial da mesa: `app/lib/features/home/life_counter/life_counter_tabletop_engine.dart`
 - catalogo proprio de settings por secao/campo: `app/lib/features/home/life_counter/life_counter_settings_catalog.dart`
-- shells nativas atuais do contador: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_history_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart`
-- shell nativa atual do turn tracker: `app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart`
-- shell nativa atual de timer/clock: `app/lib/features/home/life_counter/life_counter_native_game_timer_sheet.dart`
-- shell nativa atual de dice/high roll: `app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart`
-- shell nativa atual de table state: `app/lib/features/home/life_counter/life_counter_native_table_state_sheet.dart`
-- shell nativa atual de day/night: `app/lib/features/home/life_counter/life_counter_native_day_night_sheet.dart`
+- surfaces nativas ainda existentes em codigo: `app/lib/features/home/life_counter/life_counter_native_settings_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_history_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_card_search_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_turn_tracker_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_game_timer_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_dice_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_table_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_day_night_sheet.dart`
+- fluxo visual principal ja devolvido ao Lotus para:
+  - `settings`
+  - `history`
+  - `card search`
+- pacote prioritario de reversao visual ja aplicado para:
+  - `dice`
+  - `turn tracker`
+  - `game timer / clock`
+  - `table state`
+  - `day / night`
 - shell nativa atual de game modes: `app/lib/features/home/life_counter/life_counter_native_game_modes_sheet.dart`
-- entradas diretas de `Planechase`, `Archenemy` e `Bounty` agora tambem passam pela shell ManaLoom antes de voltar ao runtime embutido
-- a shell de `game modes` agora tambem owns a ajuda contextual nativa de `Planechase`, `Archenemy` e `Bounty`
-- os botoes de `settings` dentro dos overlays ativos de `Planechase`, `Archenemy` e `Bounty` agora tambem voltam para a shell ManaLoom
-- as entradas de `edit cards` de `Planechase`, `Archenemy` e `Bounty` agora tambem passam pela shell ManaLoom antes do handoff para o editor embutido correspondente
-- a shell de `game modes` agora tambem reconhece quando o editor embutido de card pool ja esta aberto e oferece retorno/fechamento explicito dessa superficie
-- a shell de `game modes` agora tambem assume o limite de 2 modos ativos do Lotus e bloqueia a abertura de um terceiro modo antes do warning legado
+- `Planechase`, `Archenemy` e `Bounty` agora seguem Lotus como fluxo visual principal
+- a shell nativa de `game modes` continua existindo em codigo apenas como apoio de backend, observabilidade e fluxos internos
 - shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
@@ -77,10 +80,12 @@ Estado vivo do contador hoje:
   - `integration_test/life_counter_native_commander_damage_smoke_test.dart`
   - `integration_test/life_counter_native_player_counter_smoke_test.dart`
   - `integration_test/life_counter_native_player_state_smoke_test.dart`
-- takeover atual do runtime de jogador:
-  - `option-card` do Lotus abre a shell nativa de estado do jogador
-  - `killed-overlay` funciona como atalho real para a shell nativa de estado do jogador
-  - `color-card` e a entrada de background do Lotus abrem a shell nativa de aparencia do jogador
+- o fluxo visual principal do runtime de jogador agora tambem deve permanecer Lotus-first:
+  - `player state`
+  - `set life`
+  - `player counters`
+  - `commander damage`
+  - `player appearance`
 - transporte proprio atual de aparencia do jogador:
   - `app/lib/features/home/life_counter/life_counter_player_appearance_transfer.dart`
   - export/import de perfil de aparencia via clipboard pela shell nativa
@@ -93,7 +98,6 @@ Estado vivo do contador hoje:
 - `Player State` agora tambem oferece `Set Life` sem depender so do gesto original do Lotus
 - `Player State` agora tambem aplica transicoes canonicas de jogador como `Knock Out`, `Decked Out`, `Left Table` e `Revive` pela engine da mesa
 - `__manaloom_table_state` agora preserva tambem `lastPlayerRolls`, `lastHighRolls` e `firstPlayerIndex` auxiliar
-- `monarch-btn` e `initiative-btn` do Lotus agora podem abrir a shell nativa de `Table State`
 - a shell nativa de `Table State` agora controla `storm`, `monarch` e `initiative` sem mexer no layout central da mesa
 - `set life`, `player counters`, `player state` e `table state` agora compartilham uma engine canonica inicial da mesa, reduzindo regra espalhada entre shells
 - `commander damage` agora tambem compartilha essa engine canonica inicial da mesa para leitura e escrita do split `commander1/commander2`
@@ -114,17 +118,18 @@ Estado vivo do contador hoje:
 - a propria `LifeCounterTabletopEngine` agora tambem recusa `monarch` e `initiative` para jogadores fora da mesa, nao so a shell de `table state`
 - `high roll` e `roll 1st` agora tambem respeitam apenas jogadores ativos, reduzindo mais um ponto de dependencia do comportamento implicito do Lotus
 - a aplicacao de `dice` no host agora tambem passa pelo mesmo caminho central de normalizacao e persistencia usado pelas outras shells nativas
+- o snapshot vivo agora tambem atualiza `turnTracker` pelo mesmo funil canonico de persistencia, evitando drift entre sessao ajustada e bundle recarregado
+- o adapter do snapshot agora tambem serializa `turnTracker` usando a mesma nocao canonica de jogador ativo da engine da mesa
 - a apresentacao de `special state` do jogador agora tambem sai da `LifeCounterNativePlayerStateSheet` e passa a ser definida pela `LifeCounterTabletopEngine`
 - quando um jogador sai da mesa por estado letal, a engine canonica agora tambem saneia `monarch` e `initiative`, evitando ownership preso em jogador fora do jogo
 - quando um jogador sai da mesa por estado letal, a camada canonica agora tambem realinha `currentTurnPlayerIndex` e `firstPlayerIndex`, evitando tracker preso em jogador fora do jogo
 - quando nao sobra nenhum jogador ativo, o tracker canonico agora limpa os ponteiros em vez de manter referencia a jogador fora da mesa
-- o `day-night-switcher` do Lotus agora pode abrir a shell nativa de `Day / Night`
-- o hub rapido ManaLoom agora tambem oferece `Day / Night`
-- o hub rapido ManaLoom agora tambem oferece `Game Modes` como shell propria de status e navegacao
+- o `menu-button` voltou ao overlay radial original do Lotus
+- `settings`, `history` e `card search` tambem voltaram ao visual original do Lotus
+- `dice`, `turn tracker`, `game timer / clock`, `table state` e `day / night` tambem voltaram ao fluxo visual original do Lotus
+- `player state`, `set life`, `player counters`, `commander damage` e `player appearance` tambem voltaram ao fluxo visual original do Lotus
 - o estado de `day/night` agora fica em store propria e eh reaplicado no bundle via `__manaloom_day_night_mode`
 - os hints legados de `turn tracker` e `counters on card` agora sao marcados como concluídos e suprimidos pela shell policy
-- `dice-btn` do Lotus agora abre a shell nativa de `dice/high roll/coin/roll 1st`
-- `menu-button` do Lotus agora pode abrir um hub rapido ManaLoom para `settings`, `history`, `card search`, `turn tracker`, `game timer`, `dice`, `table state` e `day/night`
 - o toque no total de vida do jogador pode abrir a shell nativa de `Set Life`
 - smoke novo preparado para o caminho vivo `Player State -> Set Life`: `integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart`
 
