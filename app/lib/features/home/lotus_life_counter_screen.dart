@@ -2911,15 +2911,57 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
-    final syncBlockers = _rollCanonicalSyncBlockers(
+    final rollSyncBlockers = _rollCanonicalSyncBlockers(
       previousSession,
       adjustedSession,
     );
-    final canonicalSyncEligible = syncBlockers.isEmpty;
-    const livePatchEligible = false;
+    final canonicalSyncEligible = rollSyncBlockers.isEmpty;
+    final setLifeTargetPlayerIndex = canonicalSyncEligible
+        ? null
+        : _singleChangedLifePlayerIndex(previousSession, adjustedSession);
+    String? setLifeFailureReason;
+    List<String> setLifeSyncBlockers = const <String>[];
+    var livePatchEligible = false;
+    var appliedLive = false;
+
+    if (setLifeTargetPlayerIndex != null) {
+      final settings = await _loadOwnedLifeCounterSettings();
+      setLifeSyncBlockers = _setLifeLivePatchBlockers(
+        previousSession,
+        adjustedSession,
+        targetPlayerIndex: setLifeTargetPlayerIndex,
+        settings: settings,
+      );
+      livePatchEligible = setLifeSyncBlockers.isEmpty;
+      if (livePatchEligible) {
+        final delta =
+            adjustedSession.lives[setLifeTargetPlayerIndex] -
+            previousSession.lives[setLifeTargetPlayerIndex];
+        setLifeFailureReason = await _applyOwnedSetLifeRuntimeFailureReason(
+          targetPlayerIndex: setLifeTargetPlayerIndex,
+          delta: delta,
+        );
+        appliedLive = setLifeFailureReason == null;
+      }
+    }
+
     final applyStrategy =
-        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
-    final reloadRequired = !canonicalSyncEligible;
+        canonicalSyncEligible
+            ? 'canonical_store_sync'
+            : (appliedLive ? 'live_runtime' : 'reload_fallback');
+    final reloadRequired = !canonicalSyncEligible && !appliedLive;
+    final syncBlockers =
+        canonicalSyncEligible
+            ? const <String>[]
+            : (appliedLive
+                ? const <String>[]
+                : (setLifeTargetPlayerIndex != null
+                    ? (setLifeSyncBlockers.isNotEmpty
+                        ? setLifeSyncBlockers
+                        : <String>[
+                            setLifeFailureReason ?? 'player_state_live_rejected',
+                          ])
+                    : rollSyncBlockers));
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2943,6 +2985,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  int? _singleChangedLifePlayerIndex(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    int? targetPlayerIndex;
+    for (var index = 0; index < next.playerCount; index += 1) {
+      if (previous.lives[index] == next.lives[index]) {
+        continue;
+      }
+      if (targetPlayerIndex != null) {
+        return null;
+      }
+      targetPlayerIndex = index;
+    }
+    return targetPlayerIndex;
   }
 
   Future<void> _openNativeSetLifeSheet({

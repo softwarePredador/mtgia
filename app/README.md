@@ -72,6 +72,7 @@ Estado vivo do contador hoje:
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, alinhando sua trilha de apply/fallback ao mesmo contrato observavel
 - `dice` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a shell so altera resultado canonico de rolagem; com `turn tracker` ativo, isso continua limitado aos casos em que `first player` e a estrutura do tracker permanecem intactos
 - `player state` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a sheet so altera dados canonicos de rolagem, reaproveitando o mesmo criterio conservador de `dice`
+- `player state` agora tambem tem um recorte sem `reload` por `live_runtime` quando o efeito final do hub fica limitado a um `set life` curto em um unico jogador, reaproveitando os controles reais do Lotus
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
 - o atalho direto de `set life` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mudanca fica limitada a um delta curto de vida no jogador alvo e o runtime real do Lotus confirma os controles da mesa

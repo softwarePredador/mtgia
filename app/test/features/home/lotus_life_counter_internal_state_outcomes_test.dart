@@ -275,7 +275,7 @@ void main() {
         expect(session, isNotNull);
         expect(session!.lives[1], 0);
         expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
-        expect(host.loadBundleCallCount, 2);
+        expect(host.loadBundleCallCount, 1);
       },
     );
 
