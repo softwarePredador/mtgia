@@ -221,7 +221,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_day_night_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: ownership_bridge',
+                ),
           ),
           isTrue,
         );
@@ -376,6 +379,9 @@ void main() {
                 message.contains('message=native_game_modes_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
                 message.contains(
+                  'fallback_classification: excluded_core_support',
+                ) &&
+                message.contains(
                   'core_scope: excluded_from_canonical_core',
                 ),
           ),
@@ -386,6 +392,9 @@ void main() {
             (message) =>
                 message.contains('message=native_game_modes_dismissed') &&
                 message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: excluded_core_support',
+                ) &&
                 message.contains(
                   'core_scope: excluded_from_canonical_core',
                 ) &&

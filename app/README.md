@@ -95,6 +95,7 @@ Estado vivo do contador hoje:
 - a deteccao de `history_domain_present` agora tambem parte do proprio dominio `LifeCounterHistoryState`, evitando drift entre host, shell e snapshot matrix
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que essas superfices utilitarias continuam suporte nativo ao fluxo Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que o runtime de jogador continua suporte nativo ao fluxo Lotus-first
+- os fluxos `open-native-*` agora tambem expõem `fallback_classification`, separando `ownership_bridge`, `support_utility` e `excluded_core_support` sem depender de leitura implícita por tipo de sheet
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local

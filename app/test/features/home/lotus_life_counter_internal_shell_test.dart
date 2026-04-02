@@ -166,7 +166,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_settings_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: ownership_bridge',
+                ),
           ),
           isTrue,
         );
@@ -249,6 +252,9 @@ void main() {
             (message) =>
                 message.contains('message=native_history_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: support_utility',
+                ) &&
                 message.contains('history_domain_present: true'),
           ),
           isTrue,
@@ -470,7 +476,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_card_search_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: support_utility',
+                ),
           ),
           isTrue,
         );

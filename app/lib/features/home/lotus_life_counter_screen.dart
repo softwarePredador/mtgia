@@ -59,6 +59,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   static const int _maxLiveTurnTrackerBackwardSteps = 3;
   static const int _turnTrackerLongPressDurationMs = 1100;
   static const int _turnTrackerLongPressCycleMs = 1150;
+  static const String _ownershipBridgeFallbackClassification =
+      'ownership_bridge';
+  static const String _supportUtilityFallbackClassification =
+      'support_utility';
+  static const String _excludedCoreSupportFallbackClassification =
+      'excluded_core_support';
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
   };
@@ -531,6 +537,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeSettingsSheetOpen = true;
     final initialSettings =
         await _settingsStore.load() ?? LifeCounterSettings.defaults;
@@ -542,7 +549,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_settings_opened',
         category: 'life_counter.settings',
-        data: {'source': source, 'surface_strategy': surfaceStrategy},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
+        },
       ),
     );
 
@@ -561,6 +572,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -576,6 +588,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -598,6 +611,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     _isNativeGameModesSheetOpen = true;
     const surfaceStrategy = 'native_fallback';
     const coreScope = 'excluded_from_canonical_core';
+    const fallbackClassification = _excludedCoreSupportFallbackClassification;
     final availability = await _readNativeGameModesAvailability();
     if (!mounted) {
       _isNativeGameModesSheetOpen = false;
@@ -611,6 +625,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'core_scope': coreScope,
           'preferred_intent': preferredIntent.name,
           'planechase_available': availability.planechaseAvailable,
@@ -745,6 +760,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           data: {
             'source': source,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'core_scope': coreScope,
             'preferred_intent': preferredIntent.name,
             'selected_action': action.name,
@@ -760,6 +776,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'core_scope': coreScope,
           'preferred_intent': preferredIntent.name,
           'selected_action': action?.name,
@@ -1080,6 +1097,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeDayNightSheetOpen = true;
     final initialState =
         await _dayNightStateStore.load() ??
@@ -1097,6 +1115,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'is_night': initialState.isNight,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
         },
       ),
     );
@@ -1116,6 +1135,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1131,6 +1151,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1233,6 +1254,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _supportUtilityFallbackClassification;
     _isNativeHistorySheetOpen = true;
     final historyState = await _historyStore.load();
     final session = await _sessionStore.load();
@@ -1257,6 +1279,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'history_domain_present': historyDomainPresent,
           'current_game_events': history.currentGameEventCount,
           'archived_games': history.archivedGameCount,
@@ -1273,9 +1296,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             history,
             source: source,
             historyDomainPresent: historyDomainPresent,
+            fallbackClassification: fallbackClassification,
           ),
       onImportSubmitted:
-          (rawPayload) => _importNativeHistory(rawPayload, source: source),
+          (rawPayload) => _importNativeHistory(
+            rawPayload,
+            source: source,
+            fallbackClassification: fallbackClassification,
+          ),
     );
     _isNativeHistorySheetOpen = false;
 
@@ -1292,6 +1320,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'had_content': history.hasContent,
           'history_domain_present': historyDomainPresent,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
         },
       ),
     );
@@ -1301,6 +1330,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterHistorySnapshot history, {
     required String source,
     required bool historyDomainPresent,
+    required String fallbackClassification,
   }) async {
     const surfaceStrategy = 'native_fallback';
     const transferStrategy = 'clipboard_export';
@@ -1313,6 +1343,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'transfer_strategy': transferStrategy,
           'history_domain_present': historyDomainPresent,
           'current_game_events': history.currentGameEventCount,
@@ -1325,6 +1356,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   Future<bool> _importNativeHistory(
     String rawPayload, {
     required String source,
+    required String fallbackClassification,
   }) async {
     const surfaceStrategy = 'native_fallback';
     const transferStrategy = 'clipboard_import';
@@ -1337,6 +1369,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           data: {
             'source': source,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'transfer_strategy': transferStrategy,
             'reason': 'invalid_payload',
           },
@@ -1414,6 +1447,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'transfer_strategy': transferStrategy,
           'apply_strategy': 'canonical_store_sync',
           'reload_required': false,
@@ -1433,12 +1467,17 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _supportUtilityFallbackClassification;
     _isNativeCardSearchSheetOpen = true;
     unawaited(
       AppObservability.instance.recordEvent(
         'native_card_search_opened',
         category: 'life_counter.search',
-        data: {'source': source, 'surface_strategy': surfaceStrategy},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
+        },
       ),
     );
 
@@ -1453,7 +1492,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_card_search_dismissed',
         category: 'life_counter.search',
-        data: {'source': source, 'surface_strategy': surfaceStrategy},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
+        },
       ),
     );
   }
@@ -1464,6 +1507,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeTurnTrackerSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -1480,6 +1524,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'is_active': session.turnTrackerActive,
           'current_turn': session.currentTurnNumber,
         },
@@ -1501,6 +1546,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1516,6 +1562,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1773,6 +1820,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeGameTimerSheetOpen = true;
     final initialState =
         await _gameTimerStateStore.load() ??
@@ -1793,6 +1841,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'is_active': initialState.isActive,
           'is_paused': initialState.isPaused,
         },
@@ -1814,6 +1863,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1829,6 +1879,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -1982,6 +2033,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeDiceSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -1998,6 +2050,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'player_count': session.playerCount,
           'has_pending_high_roll_tie':
               session.lastHighRolls.whereType<int>().isNotEmpty &&
@@ -2022,6 +2075,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -2037,6 +2091,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -2141,6 +2196,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeCommanderDamageSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2164,6 +2220,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'target_player_index': normalizedTargetIndex,
           'player_count': session.playerCount,
         },
@@ -2186,6 +2243,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -2201,6 +2259,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -2376,6 +2435,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativePlayerAppearanceSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2408,6 +2468,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'target_player_index': normalizedTargetIndex,
         },
       ),
@@ -2459,6 +2520,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'surface_reset_required': shouldResetLotusSurface,
             'surface_reset_strategy': surfaceResetStrategy,
           },
@@ -2479,6 +2541,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'surface_reset_required': shouldResetLotusSurface,
             'surface_reset_strategy': surfaceResetStrategy,
           },
@@ -2528,6 +2591,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     const transferStrategy = 'clipboard_export';
     final appearance = session.resolvedPlayerAppearances[targetPlayerIndex];
     final transfer = LifeCounterPlayerAppearanceTransfer.fromAppearance(
@@ -2541,6 +2605,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'transfer_strategy': transferStrategy,
           'target_player_index': targetPlayerIndex,
           'has_nickname': appearance.nickname.isNotEmpty,
@@ -2559,6 +2624,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     const transferStrategy = 'clipboard_import';
     final transfer = LifeCounterPlayerAppearanceTransfer.tryParse(rawPayload);
     if (transfer == null) {
@@ -2569,6 +2635,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           data: {
             'source': source,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'transfer_strategy': transferStrategy,
             'target_player_index': targetPlayerIndex,
             'reason': 'invalid_payload',
@@ -2593,6 +2660,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'transfer_strategy': transferStrategy,
           'target_player_index': targetPlayerIndex,
           'has_nickname': transfer.appearance.nickname.isNotEmpty,
@@ -2612,6 +2680,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     const persistenceStrategy = 'owned_profile_store';
     final profiles = await _appearanceProfileStore.saveProfile(
       name: name,
@@ -2624,6 +2693,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'persistence_strategy': persistenceStrategy,
           'profile_name': name.trim(),
           'profile_count': profiles.length,
@@ -2643,6 +2713,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     const persistenceStrategy = 'owned_profile_store';
     final profiles = await _appearanceProfileStore.deleteProfile(profileId);
     unawaited(
@@ -2652,6 +2723,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'persistence_strategy': persistenceStrategy,
           'profile_id': profileId,
           'profile_count': profiles.length,
@@ -2667,6 +2739,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) {
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     const persistenceStrategy = 'owned_profile_store';
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2675,6 +2748,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'persistence_strategy': persistenceStrategy,
           'target_player_index': targetPlayerIndex,
           'profile_id': profile.id,
@@ -2701,6 +2775,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativePlayerCounterSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2724,6 +2799,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'target_player_index': normalizedTargetIndex,
           'counter_key': counterKey,
         },
@@ -2861,6 +2937,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativePlayerStateSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2884,6 +2961,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'target_player_index': normalizedTargetIndex,
         },
       ),
@@ -2910,6 +2988,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'surface_reset_required': shouldResetLotusSurface,
             'surface_reset_strategy': surfaceResetStrategy,
           },
@@ -2930,6 +3009,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
             'surface_reset_required': shouldResetLotusSurface,
             'surface_reset_strategy': surfaceResetStrategy,
           },
@@ -3256,6 +3336,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeSetLifeSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -3279,6 +3360,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'target_player_index': normalizedTargetIndex,
           'current_life': session.lives[normalizedTargetIndex],
         },
@@ -3301,6 +3383,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -3316,6 +3399,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -3533,6 +3617,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     const surfaceStrategy = 'native_fallback';
+    const fallbackClassification = _ownershipBridgeFallbackClassification;
     _isNativeTableStateSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -3549,6 +3634,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'fallback_classification': fallbackClassification,
           'storm_count': session.stormCount,
           'monarch_player': session.monarchPlayer,
           'initiative_player': session.initiativePlayer,
@@ -3571,6 +3657,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );
@@ -3586,6 +3673,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'fallback_classification': fallbackClassification,
           },
         ),
       );

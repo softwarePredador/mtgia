@@ -215,7 +215,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_player_state_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'fallback_classification: ownership_bridge',
+                ),
           ),
           isTrue,
         );
