@@ -1312,8 +1312,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
     if (previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame ||
         previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll ||
-        previous.turnTimerActive != next.turnTimerActive ||
-        previous.firstPlayerIndex != next.firstPlayerIndex) {
+        previous.turnTimerActive != next.turnTimerActive) {
       return false;
     }
 
@@ -1373,6 +1372,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession right,
   ) {
     return left.currentTurnPlayerIndex == right.currentTurnPlayerIndex &&
+        left.firstPlayerIndex == right.firstPlayerIndex &&
         left.currentTurnNumber == right.currentTurnNumber &&
         left.turnTimerSeconds == right.turnTimerSeconds &&
         left.turnTrackerActive == right.turnTrackerActive &&

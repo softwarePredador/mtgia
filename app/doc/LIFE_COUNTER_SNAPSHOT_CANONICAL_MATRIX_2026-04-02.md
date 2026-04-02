@@ -142,7 +142,7 @@ Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`
-- `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente ou fazer rewind curto limitado mantendo a mesma configuracao estrutural
+- `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural
 
 ### 3. Runtime Lotus-first visual paths
 

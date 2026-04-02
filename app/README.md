@@ -156,7 +156,7 @@ Estado vivo do contador hoje:
 - suite de fallback interno para `day night` e `game modes`: `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`
 - `game timer` agora ja evita `reload` no caso seguro `active -> active`, usando patch incremental do runtime Lotus
-- `turn tracker` agora tambem evita `reload` nos casos seguros de avancar turnos para frente ou fazer rewind curto limitado com tracker ja ativo, dirigindo o proprio runtime do Lotus
+- `turn tracker` agora tambem evita `reload` nos casos seguros de avancar turnos para frente, fazer rewind curto limitado e mudar o starting player por rewind curto em `Turn 1`, com tracker ja ativo, dirigindo o proprio runtime do Lotus
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`
