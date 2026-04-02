@@ -34,6 +34,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
+      await LifeCounterSessionStore().clear();
       await LifeCounterSessionStore().save(
         const LifeCounterSession(
           playerCount: 4,
@@ -138,6 +139,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
+      await LifeCounterSessionStore().clear();
       await LifeCounterSessionStore().save(
         const LifeCounterSession(
           playerCount: 4,
@@ -193,16 +195,16 @@ void main() {
       expect(find.text('Player State'), findsOneWidget);
 
       await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-player-state-deckedOut')),
+        find.byKey(const Key('life-counter-native-player-state-decked-out')),
         250,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-player-state-deckedOut')),
+        find.byKey(const Key('life-counter-native-player-state-decked-out')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(const Key('life-counter-native-player-state-deckedOut')),
+        find.byKey(const Key('life-counter-native-player-state-decked-out')),
       );
       await tester.pumpAndSettle();
 

@@ -127,3 +127,9 @@ Antes de podar qualquer sheet:
 - cada `native sheet` tem papel claro
 - a equipe sabe o que e principal, o que e fallback e o que pode entrar em fila de poda
 - futuras remocoes deixam de ser intuitivas e passam a seguir criterio documentado
+
+## Estado apos a validacao final
+
+- nao existe poda obrigatoria pendente para considerar o life counter fechado nesta arquitetura
+- as sheets restantes continuam de forma intencional como `fallback interno` ou `backend support`
+- qualquer remocao adicional passa a ser melhoria futura, nao requisito para encerramento do contador Lotus-first

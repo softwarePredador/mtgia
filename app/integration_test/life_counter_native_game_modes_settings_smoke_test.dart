@@ -24,6 +24,16 @@ Future<void> _bootLiveLotus(WidgetTester tester) async {
   await tester.pump(const Duration(seconds: 8));
 }
 
+Future<void> _pumpUntilVisible(
+  WidgetTester tester,
+  Finder finder, {
+  int attempts = 30,
+}) async {
+  for (var attempt = 0; attempt < attempts && finder.evaluate().isEmpty; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 200));
+  }
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -56,6 +66,7 @@ void main() {
       await state.debugHandleShellMessage(
         '{"type":"open-native-game-modes","source":"archenemy_mode_pressed","preferredMode":"archenemy"}',
       );
+      await _pumpUntilVisible(tester, find.text('Game Modes'));
       await tester.pumpAndSettle();
 
       expect(find.text('Game Modes'), findsOneWidget);
@@ -77,6 +88,7 @@ void main() {
         ),
         warnIfMissed: false,
       );
+      await _pumpUntilVisible(tester, find.text('Life Counter Settings'));
       await tester.pumpAndSettle();
 
       expect(find.text('Life Counter Settings'), findsOneWidget);

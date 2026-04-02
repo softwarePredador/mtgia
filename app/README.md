@@ -35,6 +35,7 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_NEXT_SPRINTS_2026-03-30.md`
 - `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+- `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 
 Estado vivo do contador hoje:
 
@@ -64,6 +65,11 @@ Estado vivo do contador hoje:
 - a shell nativa de `game modes` continua existindo em codigo apenas como apoio de backend, observabilidade e fluxos internos
 - decisao final de `Game Modes`: `Planechase`, `Archenemy` e `Bounty` entram no produto final como fluxos Lotus-first visuais, com ManaLoom sustentando handoff tecnico, observabilidade e persistencia quando necessario
 - `edit cards` e card pools permanecem embutidos no runtime Lotus como parte suportada do produto final, sem migracao visual para Flutter nesta fase
+- validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
+- definicao operacional de encerramento atual:
+  - visual oficial: Lotus no `WebView`
+  - backend oficial: ManaLoom
+  - nenhuma remocao ativa do `WebView`
 - shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`

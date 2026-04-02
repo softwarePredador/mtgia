@@ -2,6 +2,8 @@
 
 ## Objective
 
+Status deste plano: implementado.
+
 Travamos a diretriz do contador assim:
 
 - o `WebView` do Lotus e a camada visual oficial da mesa
@@ -309,6 +311,16 @@ Fechar a decisao explicita de `Game Modes`.
 - `edit cards` e card pools documentados como embutidos no Lotus por decisao explicita
 - `integration_test/life_counter_native_game_modes_settings_smoke_test.dart`
 
+### Task F - Closed
+
+Executar a validacao final de produto do life counter Lotus-first.
+
+#### Closed with
+
+- bateria local completa do contador em `test/features/home`
+- smokes Android de baseline visual, reopen/reload, runtime de jogador, `Game Modes` e player counts
+- registro final em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
+
 ## Validation Checklist Per Task
 
 Ao fechar qualquer task desta frente:
@@ -330,8 +342,10 @@ Regra operacional vigente:
 
 ## Current Recommendation
 
-O proximo passo mais certo agora e:
+O plano Lotus-first desta frente fica concluido.
 
-1. continuar fortalecendo o backend invisivel sem mexer no visual
-2. revisar os fallbacks internos restantes para novas podas controladas
-3. fechar a validacao final de produto do life counter
+Trabalho futuro, se houver novo briefing:
+
+1. fortalecer ainda mais o backend invisivel em pontos especificos sem mexer no visual
+2. podar fallback interno adicional somente quando houver ganho claro e cobertura equivalente
+3. customizar o proprio Lotus no `WebView` quando houver pedido visual explicito

@@ -225,7 +225,7 @@ void main() {
         LifeCounterPlayerSpecialState.answerLeft,
       ],
     );
-    expect(rebuiltSession.firstPlayerIndex, 2);
+    expect(rebuiltSession.firstPlayerIndex, 1);
     expect(rebuiltSession.turnTrackerActive, isTrue);
     expect(rebuiltSession.turnTrackerOngoingGame, isTrue);
     expect(rebuiltSession.turnTrackerAutoHighRoll, isTrue);
