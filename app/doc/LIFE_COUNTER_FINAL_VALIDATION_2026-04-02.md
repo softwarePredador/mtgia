@@ -61,6 +61,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_webview_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_reopen_snapshot_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_lotus_visual_overlays_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_lotus_settings_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_lotus_card_search_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_roundtrip_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
