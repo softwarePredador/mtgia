@@ -73,6 +73,7 @@ Estado vivo do contador hoje:
 - `dice` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a shell so altera resultado canonico de rolagem; com `turn tracker` ativo, isso continua limitado aos casos em que `first player` e a estrutura do tracker permanecem intactos
 - `player state` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a sheet so altera dados canonicos de rolagem, reaproveitando o mesmo criterio conservador de `dice`
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
+- `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
 - `settings` continua `reload-only` por seguranca do bundle Lotus, e agora tambem anota isso explicitamente na observabilidade de apply com `live_patch_eligible: false` e `apply_strategy: reload_fallback`
 - `history` e `card search` continuam Lotus-first visuais, e as sheets internas agora anotam explicitamente `surface_strategy: native_fallback`; `history export` tambem anota `transfer_strategy: clipboard_export`
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que a troca real acontece no estado canonico sem rebootar o bundle
@@ -183,6 +184,7 @@ Estado vivo do contador hoje:
 - `dice` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que so muda resultado canonico; com `turn tracker` ativo, isso continua restrito aos casos em que `first player` e a estrutura do tracker nao mudam
 - `player state` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que a sheet so muda dados canonicos de rolagem
 - `commander damage` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que o settings atual ja garante ausencia de reflexo visual na mesa
+- `player counter` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que o settings atual ja garante ausencia de reflexo visual na mesa e `poison` nao pode acionar `autoKill`
 - `settings` agora tambem anota `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que esse dominio continua dependente de rehydrate completo
 - `history` e `card search` agora tambem anotam `surface_strategy: native_fallback` nos eventos da sheet interna, deixando explicito no log que esses atalhos sao suporte nativo e nao takeover visual principal
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito no log que esse fluxo faz sync canonico sem apply live no Lotus

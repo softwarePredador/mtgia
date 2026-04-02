@@ -2677,10 +2677,21 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
     required String counterKey,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    final settings = await _loadOwnedLifeCounterSettings();
+    final canonicalSyncEligible = _canApplyCanonicalPlayerCounterWithoutReload(
+      previousSession,
+      adjustedSession,
+      settings: settings,
+    );
     const livePatchEligible = false;
-    const applyStrategy = 'reload_fallback';
+    final applyStrategy =
+        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalSyncEligible;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2691,11 +2702,43 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'counter_key': counterKey,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
         },
       ),
     );
 
+    if (!reloadRequired) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _canApplyCanonicalPlayerCounterWithoutReload(
+    LifeCounterSession previous,
+    LifeCounterSession next, {
+    required LifeCounterSettings settings,
+  }) {
+    if (settings.showCountersOnPlayerCard) {
+      return false;
+    }
+
+    final poisonChanged = previous.poison.join(',') != next.poison.join(',');
+    if (poisonChanged && settings.autoKill) {
+      return false;
+    }
+
+    final expected = previous.copyWith(
+      poison: next.poison,
+      energy: next.energy,
+      experience: next.experience,
+      commanderCasts: next.commanderCasts,
+      commanderCastDetails: next.resolvedCommanderCastDetails,
+      playerExtraCounters: next.resolvedPlayerExtraCounters,
+      lastTableEvent: next.lastTableEvent,
+      clearLastTableEvent: next.lastTableEvent == null,
+    );
+    return expected.toJsonString() == next.toJsonString();
   }
 
   Future<void> _openNativePlayerStateSheet({
