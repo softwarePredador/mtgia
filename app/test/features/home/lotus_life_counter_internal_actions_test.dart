@@ -277,7 +277,8 @@ void main() {
                   'message=native_fallback_surface_requested',
                 ) &&
                 message.contains('message_type: open-native-day-night') &&
-                message.contains('source: day_night_surface'),
+                message.contains('source: day_night_surface') &&
+                message.contains('used_default_source: true'),
           ),
           isTrue,
         );
@@ -416,6 +417,7 @@ void main() {
                 ) &&
                 message.contains('message_type: open-native-game-modes') &&
                 message.contains('domain_key: game_modes') &&
+                message.contains('used_default_source: false') &&
                 message.contains(
                   'fallback_classification: excluded_core_support',
                 ) &&

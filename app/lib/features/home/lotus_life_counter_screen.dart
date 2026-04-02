@@ -45,6 +45,30 @@ import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
 
+class _NativeFallbackDescriptor {
+  const _NativeFallbackDescriptor({
+    required this.classification,
+    required this.defaultSource,
+    required this.domainKey,
+    required this.reviewStatus,
+  });
+
+  final String classification;
+  final String defaultSource;
+  final String domainKey;
+  final String reviewStatus;
+}
+
+class _ResolvedNativeFallbackSource {
+  const _ResolvedNativeFallbackSource({
+    required this.source,
+    required this.usedDefaultSource,
+  });
+
+  final String source;
+  final bool usedDefaultSource;
+}
+
 class LotusLifeCounterScreen extends StatefulWidget {
   const LotusLifeCounterScreen({super.key, this.hostFactory});
 
@@ -65,58 +89,92 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       'support_utility';
   static const String _excludedCoreSupportFallbackClassification =
       'excluded_core_support';
-  static const Map<String, String> _nativeFallbackClassificationByType =
-      <String, String>{
-        'open-native-settings': _ownershipBridgeFallbackClassification,
-        'open-native-history': _supportUtilityFallbackClassification,
-        'open-native-card-search': _supportUtilityFallbackClassification,
-        'open-native-turn-tracker': _ownershipBridgeFallbackClassification,
-        'open-native-game-timer': _ownershipBridgeFallbackClassification,
-        'open-native-game-modes': _excludedCoreSupportFallbackClassification,
-        'open-native-dice': _ownershipBridgeFallbackClassification,
-        'open-native-commander-damage':
-            _ownershipBridgeFallbackClassification,
-        'open-native-player-appearance':
-            _ownershipBridgeFallbackClassification,
-        'open-native-player-counter': _ownershipBridgeFallbackClassification,
-        'open-native-player-state': _ownershipBridgeFallbackClassification,
-        'open-native-set-life': _ownershipBridgeFallbackClassification,
-        'open-native-table-state': _ownershipBridgeFallbackClassification,
-        'open-native-day-night': _ownershipBridgeFallbackClassification,
-      };
-  static const Map<String, String> _nativeFallbackDefaultSourceByType =
-      <String, String>{
-        'open-native-settings': 'shell_shortcut',
-        'open-native-history': 'shell_shortcut',
-        'open-native-card-search': 'shell_shortcut',
-        'open-native-turn-tracker': 'turn_tracker_surface_pressed',
-        'open-native-game-timer': 'game_timer_surface_pressed',
-        'open-native-game-modes': 'game_modes_shortcut',
-        'open-native-dice': 'dice_shortcut_pressed',
-        'open-native-commander-damage': 'commander_damage_surface_pressed',
-        'open-native-player-appearance': 'player_background_surface_pressed',
-        'open-native-player-counter': 'player_counter_surface_pressed',
-        'open-native-player-state': 'player_state_surface_pressed',
-        'open-native-set-life': 'player_life_total_surface_pressed',
-        'open-native-table-state': 'table_state_surface',
-        'open-native-day-night': 'day_night_surface',
-      };
-  static const Map<String, String> _nativeFallbackDomainKeyByType =
-      <String, String>{
-        'open-native-settings': 'settings',
-        'open-native-history': 'history',
-        'open-native-card-search': 'card_search',
-        'open-native-turn-tracker': 'turn_tracker',
-        'open-native-game-timer': 'game_timer',
-        'open-native-game-modes': 'game_modes',
-        'open-native-dice': 'dice',
-        'open-native-commander-damage': 'commander_damage',
-        'open-native-player-appearance': 'player_appearance',
-        'open-native-player-counter': 'player_counter',
-        'open-native-player-state': 'player_state',
-        'open-native-set-life': 'set_life',
-        'open-native-table-state': 'table_state',
-        'open-native-day-night': 'day_night',
+  static const Map<String, _NativeFallbackDescriptor> _nativeFallbackDescriptors =
+      <String, _NativeFallbackDescriptor>{
+        'open-native-settings': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'settings',
+          defaultSource: 'shell_shortcut',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-history': _NativeFallbackDescriptor(
+          classification: _supportUtilityFallbackClassification,
+          domainKey: 'history',
+          defaultSource: 'shell_shortcut',
+          reviewStatus: 'support_utility',
+        ),
+        'open-native-card-search': _NativeFallbackDescriptor(
+          classification: _supportUtilityFallbackClassification,
+          domainKey: 'card_search',
+          defaultSource: 'shell_shortcut',
+          reviewStatus: 'support_utility',
+        ),
+        'open-native-turn-tracker': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'turn_tracker',
+          defaultSource: 'turn_tracker_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-game-timer': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'game_timer',
+          defaultSource: 'game_timer_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-game-modes': _NativeFallbackDescriptor(
+          classification: _excludedCoreSupportFallbackClassification,
+          domainKey: 'game_modes',
+          defaultSource: 'game_modes_shortcut',
+          reviewStatus: 'excluded_from_core',
+        ),
+        'open-native-dice': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'dice',
+          defaultSource: 'dice_shortcut_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-commander-damage': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'commander_damage',
+          defaultSource: 'commander_damage_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-player-appearance': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'player_appearance',
+          defaultSource: 'player_background_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-player-counter': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'player_counter',
+          defaultSource: 'player_counter_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-player-state': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'player_state',
+          defaultSource: 'player_state_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-set-life': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'set_life',
+          defaultSource: 'player_life_total_surface_pressed',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-table-state': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'table_state',
+          defaultSource: 'table_state_surface',
+          reviewStatus: 'ownership_in_progress',
+        ),
+        'open-native-day-night': _NativeFallbackDescriptor(
+          classification: _ownershipBridgeFallbackClassification,
+          domainKey: 'day_night',
+          defaultSource: 'day_night_surface',
+          reviewStatus: 'ownership_in_progress',
+        ),
       };
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
@@ -573,28 +631,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   void _recordNativeFallbackSurfaceRequested(Map<String, dynamic> decoded) {
     final type = decoded['type'] as String?;
-    final fallbackClassification =
-        type == null ? null : _nativeFallbackClassificationByType[type];
-    final domainKey = type == null ? null : _nativeFallbackDomainKeyByType[type];
-    if (type == null || fallbackClassification == null || domainKey == null) {
+    final descriptor = type == null ? null : _nativeFallbackDescriptors[type];
+    if (type == null || descriptor == null) {
       return;
     }
 
-    final source = _nativeFallbackSourceForMessage(decoded);
-    final reviewStatus =
-        switch (fallbackClassification) {
-          _ownershipBridgeFallbackClassification => 'ownership_in_progress',
-          _supportUtilityFallbackClassification => 'support_utility',
-          _excludedCoreSupportFallbackClassification => 'excluded_from_core',
-          _ => 'unclassified',
-        };
+    final resolvedSource = _nativeFallbackResolvedSourceForMessage(decoded);
     final data = <String, Object?>{
       'message_type': type,
-      'domain_key': domainKey,
-      'source': source,
+      'domain_key': descriptor.domainKey,
+      'source': resolvedSource.source,
+      'used_default_source': resolvedSource.usedDefaultSource,
       'surface_strategy': 'native_fallback',
-      'fallback_classification': fallbackClassification,
-      'review_status': reviewStatus,
+      'fallback_classification': descriptor.classification,
+      'review_status': descriptor.reviewStatus,
     };
 
     final targetPlayerIndex = (decoded['targetPlayerIndex'] as num?)?.toInt();
@@ -631,13 +681,26 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }
 
   String _nativeFallbackSourceForMessage(Map<String, dynamic> decoded) {
+    return _nativeFallbackResolvedSourceForMessage(decoded).source;
+  }
+
+  _ResolvedNativeFallbackSource _nativeFallbackResolvedSourceForMessage(
+    Map<String, dynamic> decoded,
+  ) {
     final rawSource = (decoded['source'] as String?)?.trim();
     if (rawSource != null && rawSource.isNotEmpty) {
-      return rawSource;
+      return _ResolvedNativeFallbackSource(
+        source: rawSource,
+        usedDefaultSource: false,
+      );
     }
 
     final type = decoded['type'] as String?;
-    return _nativeFallbackDefaultSourceByType[type] ?? 'shell_shortcut';
+    final descriptor = _nativeFallbackDescriptors[type];
+    return _ResolvedNativeFallbackSource(
+      source: descriptor?.defaultSource ?? 'shell_shortcut',
+      usedDefaultSource: true,
+    );
   }
 
   Future<void> _openNativeSettingsSheet({required String source}) async {

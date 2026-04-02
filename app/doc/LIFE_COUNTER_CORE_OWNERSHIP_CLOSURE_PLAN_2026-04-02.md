@@ -247,6 +247,7 @@ Leitura operacional atual:
 - a propria entrada da shell agora tambem registra `native_fallback_surface_requested` para cada `open-native-*`, fechando a auditoria do fallback na borda do host em vez de depender apenas dos eventos emitidos apos a abertura da sheet
 - esse evento de borda agora tambem expõe `domain_key` e `review_status`, transformando a classificacao dos fallbacks internos em regra viva da shell e reduzindo drift na revisao operacional
 - os defaults de `source` para cada `open-native-*` agora tambem saem do mesmo inventario da shell, evitando drift entre a auditoria de borda e a abertura real da sheet
+- esse mesmo inventario agora tambem expõe `used_default_source`, deixando explicito quando o host caiu no fallback interno de `source` em vez de receber um contexto real vindo do Lotus
 - em `game modes`, os eventos de open, dismiss e falha de entrega agora tambem expõem `surface_strategy: native_fallback`, alinhando essa shell Lotus-first ao mesmo contrato observavel das outras superfices internas
 - em `player appearance`, os eventos auxiliares de export/import agora tambem deixam explicito quando o fluxo passou por clipboard, em vez de parecer mutacao direta do runtime
 - em `player appearance`, os eventos auxiliares de save/delete de perfil agora tambem deixam explicito quando o fluxo passou por persistencia propria do ManaLoom, em vez de parecer mutacao direta do runtime Lotus

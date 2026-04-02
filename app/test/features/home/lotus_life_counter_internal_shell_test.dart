@@ -311,7 +311,8 @@ void main() {
                   'message=native_fallback_surface_requested',
                 ) &&
                 message.contains('message_type: open-native-history') &&
-                message.contains('source: shell_shortcut'),
+                message.contains('source: shell_shortcut') &&
+                message.contains('used_default_source: true'),
           ),
           isTrue,
         );
