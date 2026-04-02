@@ -335,6 +335,13 @@ void main() {
             version: lifeCounterHistoryTransferVersion,
             exportedAt: DateTime.utc(2026, 4, 2, 12),
             currentGameName: 'Imported Game',
+            currentGameMeta: const {
+              'id': 'import-42',
+              'name': 'Imported Game',
+              'startDate': 1711802000000,
+              'gameMode': 'commander',
+            },
+            gameCounter: 42,
             lastTableEvent: 'Player 4 ganhou o monarchy',
             currentGameEntries: const [
               LifeCounterHistoryTransferEntry(
@@ -392,6 +399,8 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(historyState, isNotNull);
           expect(historyState!.currentGameName, 'Imported Game');
+          expect(historyState.currentGameMeta?['id'], 'import-42');
+          expect(historyState.gameCounter, 42);
           expect(
             historyState.currentGameEntries.single.message,
             'Player 1 perdeu 2 de vida',

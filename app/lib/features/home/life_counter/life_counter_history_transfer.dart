@@ -50,12 +50,16 @@ class LifeCounterHistoryTransfer {
     required this.currentGameEntries,
     required this.archiveEntries,
     this.currentGameName,
+    this.currentGameMeta,
+    this.gameCounter,
     this.lastTableEvent,
   });
 
   final int version;
   final DateTime exportedAt;
   final String? currentGameName;
+  final Map<String, Object?>? currentGameMeta;
+  final int? gameCounter;
   final String? lastTableEvent;
   final List<LifeCounterHistoryTransferEntry> currentGameEntries;
   final List<LifeCounterHistoryTransferEntry> archiveEntries;
@@ -67,6 +71,8 @@ class LifeCounterHistoryTransfer {
       version: lifeCounterHistoryTransferVersion,
       exportedAt: DateTime.now().toUtc(),
       currentGameName: snapshot.currentGameName,
+      currentGameMeta: snapshot.currentGameMeta,
+      gameCounter: snapshot.gameCounter,
       lastTableEvent: snapshot.lastTableEvent,
       currentGameEntries: snapshot.currentGameEntries
           .map(
@@ -92,6 +98,8 @@ class LifeCounterHistoryTransfer {
       'version': version,
       'exported_at': exportedAt.toIso8601String(),
       'current_game_name': currentGameName,
+      'current_game_meta': currentGameMeta,
+      'game_counter': gameCounter,
       'last_table_event': lastTableEvent,
       'current_game_entries':
           currentGameEntries.map((e) => e.toJson()).toList(),
@@ -140,6 +148,8 @@ class LifeCounterHistoryTransfer {
       version: version,
       exportedAt: exportedAt,
       currentGameName: _readOptionalString(raw['current_game_name']),
+      currentGameMeta: _readCurrentGameMeta(raw['current_game_meta']),
+      gameCounter: _readOptionalGameCounter(raw['game_counter']),
       lastTableEvent: _readOptionalString(raw['last_table_event']),
       currentGameEntries: currentGameEntries,
       archiveEntries: archiveEntries,
@@ -172,5 +182,34 @@ class LifeCounterHistoryTransfer {
     }
     final trimmed = raw.trim();
     return trimmed.isEmpty ? null : trimmed;
+  }
+
+  static Map<String, Object?>? _readCurrentGameMeta(Object? raw) {
+    if (raw is! Map) {
+      return null;
+    }
+
+    try {
+      final encoded = jsonEncode(
+        raw.map((key, value) => MapEntry(key.toString(), value)),
+      );
+      return LifeCounterHistoryState.decodeCurrentGameMeta(encoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static int? _readOptionalGameCounter(Object? raw) {
+    if (raw == null) {
+      return null;
+    }
+    if (raw is int) {
+      return raw < 1 ? 1 : raw;
+    }
+    if (raw is num) {
+      final value = raw.toInt();
+      return value < 1 ? 1 : value;
+    }
+    return null;
   }
 }

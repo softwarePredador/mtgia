@@ -1354,6 +1354,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         ...LifeCounterHistoryState.decodeCurrentGameMeta(
           snapshot?.values['currentGameMeta'],
         ),
+        ...?transfer.currentGameMeta,
         if ((transfer.currentGameName ?? '').trim().isNotEmpty)
           'name': transfer.currentGameName!.trim(),
       },
@@ -1376,9 +1377,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           )
           .toList(growable: false),
       archivedGameCount: transfer.archiveEntries.isEmpty ? 0 : 1,
-      gameCounter: LifeCounterHistoryState.decodeGameCounter(
-        snapshot?.values['gameCounter'],
-      ),
+      gameCounter:
+          transfer.gameCounter ??
+          LifeCounterHistoryState.decodeGameCounter(snapshot?.values['gameCounter']),
       lastTableEvent: transfer.lastTableEvent,
     );
     await _historyStore.save(importedHistory);
