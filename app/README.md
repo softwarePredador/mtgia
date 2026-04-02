@@ -76,6 +76,7 @@ Estado vivo do contador hoje:
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que a troca real acontece no estado canonico sem rebootar o bundle
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que essas superfices utilitarias continuam suporte nativo ao fluxo Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que o runtime de jogador continua suporte nativo ao fluxo Lotus-first
+- `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`
@@ -177,6 +178,7 @@ Estado vivo do contador hoje:
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito no log que esse fluxo faz sync canonico sem apply live no Lotus
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem anotam `surface_strategy: native_fallback` nos eventos de open/dismiss da sheet interna, padronizando a leitura de suporte tecnico Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `surface_strategy: native_fallback` nos eventos de open/dismiss da sheet interna, padronizando a leitura de suporte tecnico Lotus-first no runtime de jogador
+- `player appearance export/import` agora tambem anotam `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos auxiliares de clipboard dos eventos de apply do runtime de jogador
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`

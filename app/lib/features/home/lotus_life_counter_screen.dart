@@ -2228,8 +2228,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       initialSession: session,
       initialTargetPlayerIndex: normalizedTargetIndex,
       initialProfiles: profiles,
-      onExportPressed: _exportNativePlayerAppearance,
-      onImportSubmitted: _importNativePlayerAppearance,
+      onExportPressed:
+          (session, targetPlayerIndex) => _exportNativePlayerAppearance(
+            session,
+            targetPlayerIndex,
+            source: source,
+          ),
+      onImportSubmitted:
+          (rawPayload, session, targetPlayerIndex) =>
+              _importNativePlayerAppearance(
+                rawPayload,
+                session,
+                targetPlayerIndex,
+                source: source,
+              ),
       onSaveProfilePressed: _saveNativePlayerAppearanceProfile,
       onDeleteProfilePressed: _deleteNativePlayerAppearanceProfile,
     );
@@ -2299,8 +2311,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _exportNativePlayerAppearance(
     LifeCounterSession session,
-    int targetPlayerIndex,
-  ) async {
+    int targetPlayerIndex, {
+    required String source,
+  }) async {
+    const surfaceStrategy = 'native_fallback';
+    const transferStrategy = 'clipboard_export';
     final appearance = session.resolvedPlayerAppearances[targetPlayerIndex];
     final transfer = LifeCounterPlayerAppearanceTransfer.fromAppearance(
       appearance,
@@ -2311,6 +2326,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'native_player_appearance_exported',
         category: 'life_counter.player_appearance',
         data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'transfer_strategy': transferStrategy,
           'target_player_index': targetPlayerIndex,
           'has_nickname': appearance.nickname.isNotEmpty,
           'has_background_image': appearance.backgroundImage != null,
@@ -2324,8 +2342,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   Future<LifeCounterSession?> _importNativePlayerAppearance(
     String rawPayload,
     LifeCounterSession session,
-    int targetPlayerIndex,
-  ) async {
+    int targetPlayerIndex, {
+    required String source,
+  }) async {
+    const surfaceStrategy = 'native_fallback';
+    const transferStrategy = 'clipboard_import';
     final transfer = LifeCounterPlayerAppearanceTransfer.tryParse(rawPayload);
     if (transfer == null) {
       unawaited(
@@ -2333,6 +2354,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'native_player_appearance_import_failed',
           category: 'life_counter.player_appearance',
           data: {
+            'source': source,
+            'surface_strategy': surfaceStrategy,
+            'transfer_strategy': transferStrategy,
             'target_player_index': targetPlayerIndex,
             'reason': 'invalid_payload',
           },
@@ -2354,6 +2378,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'native_player_appearance_imported',
         category: 'life_counter.player_appearance',
         data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'transfer_strategy': transferStrategy,
           'target_player_index': targetPlayerIndex,
           'has_nickname': transfer.appearance.nickname.isNotEmpty,
           'has_background_image': transfer.appearance.backgroundImage != null,

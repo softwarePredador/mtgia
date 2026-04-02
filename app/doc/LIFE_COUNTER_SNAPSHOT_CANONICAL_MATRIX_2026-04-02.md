@@ -36,6 +36,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `history import` agora tambem expõe `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, separando a sincronizacao canonica de `history` dos eventos que sao apenas sheet fallback
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna assume o fluxo, padronizando a leitura das superfices utilitarias Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna assume o fluxo, padronizando a leitura do runtime de jogador Lotus-first
+- `player appearance export/import` agora tambem expõem `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos de clipboard dos eventos de apply do runtime de jogador
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 
 ## Reading rule
@@ -167,6 +168,7 @@ Complemento desta rodada:
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`
 - nas utility sheets, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, sem implicar takeover visual do Lotus
 - nas sheets de runtime de jogador, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, sem implicar takeover visual do Lotus
+- em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a transporte por clipboard
 - `history` e `card search` continuam como suporte interno Lotus-first, e agora isso tambem fica explicito na observabilidade das sheets nativas
 
 ### 3. Runtime Lotus-first visual paths
