@@ -55,6 +55,9 @@ class LotusLifeCounterScreen extends StatefulWidget {
 }
 
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
+  static const int _maxLiveTurnTrackerBackwardSteps = 3;
+  static const int _turnTrackerLongPressDurationMs = 1100;
+  static const int _turnTrackerLongPressCycleMs = 1150;
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
   };
@@ -1318,8 +1321,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
+    final backwardSteps = _countBackwardTurnTrackerSteps(previous, next);
     return _countForwardTurnTrackerSteps(previous, next) != null ||
-        _countBackwardTurnTrackerSteps(previous, next) == 1;
+        (backwardSteps != null &&
+            backwardSteps > 0 &&
+            backwardSteps <= _maxLiveTurnTrackerBackwardSteps);
   }
 
   int? _countForwardTurnTrackerSteps(
@@ -1406,7 +1412,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     final backwardSteps = _countBackwardTurnTrackerSteps(previous, next);
-    if (backwardSteps != 1) {
+    if (backwardSteps == null ||
+        backwardSteps <= 0 ||
+        backwardSteps > _maxLiveTurnTrackerBackwardSteps) {
       return false;
     }
 
@@ -1430,14 +1438,22 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       view: window,
       button: 0,
     });
-    tracker.dispatchEvent(downEvent);
-    window.setTimeout(() => {
-      tracker.dispatchEvent(upEvent);
-    }, 1100);
+
+    for (let index = 0; index < $backwardSteps; index += 1) {
+      const baseDelay = index * $_turnTrackerLongPressCycleMs;
+      window.setTimeout(() => {
+        tracker.dispatchEvent(downEvent);
+      }, baseDelay);
+      window.setTimeout(() => {
+        tracker.dispatchEvent(upEvent);
+      }, baseDelay + $_turnTrackerLongPressDurationMs);
+    }
   } catch (_) {}
 })();
 ''');
-      await Future<void>.delayed(const Duration(milliseconds: 1150));
+      await Future<void>.delayed(
+        Duration(milliseconds: backwardSteps * _turnTrackerLongPressCycleMs),
+      );
       return true;
     } catch (_) {
       return false;

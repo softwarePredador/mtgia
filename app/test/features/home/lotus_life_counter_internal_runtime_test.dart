@@ -390,6 +390,121 @@ void main() {
     );
 
     testWidgets(
+      'rewinds two active turn tracker steps without reloading the Lotus bundle',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 40, 40, 40],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: 0,
+            turnTrackerActive: true,
+            turnTrackerOngoingGame: true,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: 2,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
+          ),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'layoutType': '"portrait-portrait-portrait-portrait"',
+              'turnTracker':
+                  '{"isActive":true,"ongoingGame":true,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":2,"startingPlayerIndex":0,"currentTurn":1}',
+            },
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-turn-tracker-previous')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-previous')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-previous')),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+        );
+        await tester.pump(const Duration(milliseconds: 2400));
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.currentTurnPlayerIndex, 0);
+        expect(session.currentTurnNumber, 1);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains("MouseEvent('mousedown'") &&
+                script.contains("index < 2"),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    testWidgets(
       'sanitizes stale table ownership when native turn tracker is applied',
       (tester) async {
         late _FakeLotusHost host;

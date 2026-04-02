@@ -142,7 +142,7 @@ Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`
-- `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente ou voltar um unico passo mantendo a mesma configuracao estrutural
+- `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente ou fazer rewind curto limitado mantendo a mesma configuracao estrutural
 
 ### 3. Runtime Lotus-first visual paths
 
@@ -169,5 +169,5 @@ Esta matrix fica considerada suficiente para a `Wave 1` quando:
 Com esta matriz pronta, a proxima task mais correta e:
 
 1. continuar o mapeamento conservador de dominios com `safe live patch`
-2. ampliar o `turn tracker` apenas se houver mais caminhos seguros pelo proprio runtime Lotus, sem patch cego de memoria interna
+2. ampliar o `turn tracker` apenas se houver mais caminhos seguros pelo proprio runtime Lotus, sem patch cego de memoria interna nem esperas longas demais
 3. manter `currentGameMeta/gameCounter` sincronizados com qualquer evolucao futura do contrato de `history`
