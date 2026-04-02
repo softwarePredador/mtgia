@@ -49,6 +49,24 @@ O que ainda continua Lotus-owned:
 - commander damage runtime
 - Planechase, Archenemy e Bounty
 
+## Next Actions
+
+Ordem de execucao a partir do estado atual:
+
+1. fechar o baseline visual Lotus-first
+2. alinhar os testes com a diretriz real do produto
+3. fortalecer o backend invisivel por tras do `WebView`
+4. revisar sheets nativas e fluxos internos que nao sao mais visuais
+5. fechar a decisao explicita de `Game Modes`
+
+Documento operacional principal desta fase:
+
+- `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
+
+Proximo passo imediato:
+
+- fechar um smoke Android confiavel de `card search` no fluxo visual do Lotus
+
 ## Sprint 1 - Closed
 
 Objetivo fechado:

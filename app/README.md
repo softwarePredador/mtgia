@@ -33,6 +33,7 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_LOTUS_GAMEPLAY_COPY_AUDIT_2026-03-29.md`
 - `app/doc/LIFE_COUNTER_SPRINT_2026-03-30.md`
 - `app/doc/LIFE_COUNTER_NEXT_SPRINTS_2026-03-30.md`
+- `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 
 Estado vivo do contador hoje:
 
@@ -132,6 +133,7 @@ Estado vivo do contador hoje:
 - os hints legados de `turn tracker` e `counters on card` agora sao marcados como concluídos e suprimidos pela shell policy
 - o toque no total de vida do jogador pode abrir a shell nativa de `Set Life`
 - smoke novo preparado para o caminho vivo `Player State -> Set Life`: `integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart`
+- plano operacional atual da frente Lotus-first: `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 
 ## Comandos
 
