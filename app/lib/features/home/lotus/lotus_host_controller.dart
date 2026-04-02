@@ -28,6 +28,31 @@ import 'lotus_storage_snapshot_store.dart';
 import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
 
+const Set<String> _lotusSessionBootstrapKeys = <String>{
+  'playerCount',
+  'startingLife2P',
+  'startingLifeMP',
+  'layoutType',
+  'players',
+  'turnTracker',
+  '__manaloom_player_special_states',
+  '__manaloom_player_appearances',
+  '__manaloom_table_state',
+};
+
+const Set<String> _lotusHistoryBootstrapKeys = <String>{
+  'gameHistory',
+  'allGamesHistory',
+  'currentGameMeta',
+  'gameCounter',
+};
+
+const Set<String> _lotusSettingsBootstrapKeys = <String>{'gameSettings'};
+const Set<String> _lotusGameTimerBootstrapKeys = <String>{'gameTimerState'};
+const Set<String> _lotusDayNightBootstrapKeys = <String>{
+  '__manaloom_day_night_mode',
+};
+
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
   required LifeCounterDayNightStateStore dayNightStateStore,
   required LifeCounterGameTimerStateStore gameTimerStateStore,
@@ -67,6 +92,56 @@ Future<Map<String, String>> buildLotusFallbackBootstrapValues({
     values.addAll(history.buildLotusSnapshotValues());
   }
   return values;
+}
+
+Map<String, String> mergeLotusBootstrapValues({
+  Map<String, String>? snapshotValues,
+  required Map<String, String> fallbackValues,
+}) {
+  final mergedValues = <String, String>{...?snapshotValues};
+
+  _pruneStaleBootstrapDomain(
+    mergedValues,
+    fallbackValues: fallbackValues,
+    domainKeys: _lotusSessionBootstrapKeys,
+  );
+  _pruneStaleBootstrapDomain(
+    mergedValues,
+    fallbackValues: fallbackValues,
+    domainKeys: _lotusHistoryBootstrapKeys,
+  );
+  _pruneStaleBootstrapDomain(
+    mergedValues,
+    fallbackValues: fallbackValues,
+    domainKeys: _lotusSettingsBootstrapKeys,
+  );
+  _pruneStaleBootstrapDomain(
+    mergedValues,
+    fallbackValues: fallbackValues,
+    domainKeys: _lotusGameTimerBootstrapKeys,
+  );
+  _pruneStaleBootstrapDomain(
+    mergedValues,
+    fallbackValues: fallbackValues,
+    domainKeys: _lotusDayNightBootstrapKeys,
+  );
+
+  mergedValues.addAll(fallbackValues);
+  return mergedValues;
+}
+
+void _pruneStaleBootstrapDomain(
+  Map<String, String> mergedValues, {
+  required Map<String, String> fallbackValues,
+  required Set<String> domainKeys,
+}) {
+  if (domainKeys.any(fallbackValues.containsKey)) {
+    return;
+  }
+
+  for (final key in domainKeys) {
+    mergedValues.remove(key);
+  }
 }
 
 LifeCounterDayNightState? buildLotusDayNightStateFromSnapshot(
@@ -487,10 +562,10 @@ class LotusHostController implements LotusHost {
   Future<void> _sendStorageBootstrapSnapshot() async {
     final snapshot = await _storageSnapshotStore.load();
     final fallbackValues = await _buildFallbackBootstrapValues();
-    final mergedValues = <String, String>{
-      ...?snapshot?.values,
-      ...fallbackValues,
-    };
+    final mergedValues = mergeLotusBootstrapValues(
+      snapshotValues: snapshot?.values,
+      fallbackValues: fallbackValues,
+    );
     final payload = <String, Object?>{
       'type': 'bootstrap_snapshot',
       'hasSnapshot': mergedValues.isNotEmpty,

@@ -204,6 +204,7 @@ Complemento desta rodada:
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a persistencia propria de perfis ManaLoom-owned
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a carregar um preset salvo no draft da sheet, sem apply real na mesa
 - o caminho `canonical -> bootstrap Lotus` agora tambem fica provado sem snapshot persistido, incluindo `day/night`, reduzindo a dependencia implicita de `localStorage` preexistente como requisito de reabertura
+- o merge de bootstrap do host agora tambem poda chaves stale de dominios canonicos ausentes antes de reaplicar o payload no Lotus, evitando que `session/settings/timer/day-night/history` antigos ressuscitem a partir de um snapshot salvo quando o fallback canonico daquele dominio ja foi limpo
 - `history` e `card search` continuam como suporte interno Lotus-first, e agora isso tambem fica explicito na observabilidade das sheets nativas
 
 ### 3. Runtime Lotus-first visual paths

@@ -239,6 +239,7 @@ Leitura operacional atual:
 - em `player appearance`, a selecao de perfil salvo agora tambem fica observavel como uso de preset ManaLoom-owned no draft da sheet, sem parecer apply real da mesa
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
 - o caminho `storage_bootstrap_restored_from_canonical` agora tem prova unitaria do payload de fallback gerado a partir das stores canonicas, incluindo `day/night`, sem depender de `localStorage` Lotus previamente salvo
+- o merge de `storage_bootstrap` agora tambem poda chaves stale de `session`, `settings`, `game timer`, `day/night` e `history` quando o fallback canonico daquele dominio nao existe mais, evitando que um snapshot Lotus antigo ressuscite estado limpo no reopen
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe
 
