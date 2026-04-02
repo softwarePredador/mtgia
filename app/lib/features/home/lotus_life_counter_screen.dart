@@ -2916,6 +2916,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       adjustedSession,
     );
     final canonicalSyncEligible = rollSyncBlockers.isEmpty;
+    final settings = await _loadOwnedLifeCounterSettings();
     final setLifeTargetPlayerIndex = canonicalSyncEligible
         ? null
         : _singleChangedLifePlayerIndex(previousSession, adjustedSession);
@@ -2925,7 +2926,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     var appliedLive = false;
 
     if (setLifeTargetPlayerIndex != null) {
-      final settings = await _loadOwnedLifeCounterSettings();
       setLifeSyncBlockers = _setLifeLivePatchBlockers(
         previousSession,
         adjustedSession,
@@ -2945,23 +2945,62 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       }
     }
 
+    final commanderDamageSyncBlockers = canonicalSyncEligible || appliedLive
+        ? const <String>[]
+        : _commanderDamageCanonicalSyncBlockers(
+            previousSession,
+            adjustedSession,
+            settings: settings,
+          );
+    final commanderDamageCanonicalSyncEligible =
+        commanderDamageSyncBlockers.isEmpty &&
+        _hasCommanderDamageDelta(previousSession, adjustedSession);
+
+    final playerCounterSyncBlockers =
+        canonicalSyncEligible || appliedLive || commanderDamageCanonicalSyncEligible
+            ? const <String>[]
+            : _playerCounterCanonicalSyncBlockers(
+                previousSession,
+                adjustedSession,
+                settings: settings,
+              );
+    final playerCounterCanonicalSyncEligible =
+        playerCounterSyncBlockers.isEmpty &&
+        _hasPlayerCounterDelta(previousSession, adjustedSession);
+
     final applyStrategy =
         canonicalSyncEligible
             ? 'canonical_store_sync'
-            : (appliedLive ? 'live_runtime' : 'reload_fallback');
-    final reloadRequired = !canonicalSyncEligible && !appliedLive;
+            : (appliedLive
+                ? 'live_runtime'
+                : (commanderDamageCanonicalSyncEligible ||
+                        playerCounterCanonicalSyncEligible
+                    ? 'canonical_store_sync'
+                    : 'reload_fallback'));
+    final reloadRequired =
+        !canonicalSyncEligible &&
+        !appliedLive &&
+        !commanderDamageCanonicalSyncEligible &&
+        !playerCounterCanonicalSyncEligible;
     final syncBlockers =
         canonicalSyncEligible
             ? const <String>[]
             : (appliedLive
                 ? const <String>[]
+                : (commanderDamageCanonicalSyncEligible ||
+                        playerCounterCanonicalSyncEligible
+                    ? const <String>[]
                 : (setLifeTargetPlayerIndex != null
                     ? (setLifeSyncBlockers.isNotEmpty
                         ? setLifeSyncBlockers
                         : <String>[
                             setLifeFailureReason ?? 'player_state_live_rejected',
                           ])
-                    : rollSyncBlockers));
+                    : (_hasCommanderDamageDelta(previousSession, adjustedSession)
+                        ? commanderDamageSyncBlockers
+                        : (_hasPlayerCounterDelta(previousSession, adjustedSession)
+                            ? playerCounterSyncBlockers
+                            : rollSyncBlockers)))));
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2985,6 +3024,52 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _hasCommanderDamageDelta(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    for (var targetPlayerIndex = 0;
+        targetPlayerIndex < next.playerCount;
+        targetPlayerIndex += 1) {
+      for (var sourcePlayerIndex = 0;
+          sourcePlayerIndex < next.playerCount;
+          sourcePlayerIndex += 1) {
+        if (previous.commanderDamage[targetPlayerIndex][sourcePlayerIndex] !=
+            next.commanderDamage[targetPlayerIndex][sourcePlayerIndex]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _hasPlayerCounterDelta(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    if (previous.poison.join(',') != next.poison.join(',')) {
+      return true;
+    }
+    if (previous.energy.join(',') != next.energy.join(',')) {
+      return true;
+    }
+    if (previous.experience.join(',') != next.experience.join(',')) {
+      return true;
+    }
+    if (previous.commanderCasts.join(',') != next.commanderCasts.join(',')) {
+      return true;
+    }
+
+    for (var index = 0; index < next.playerCount; index += 1) {
+      final previousCounters = previous.resolvedPlayerExtraCounters[index];
+      final nextCounters = next.resolvedPlayerExtraCounters[index];
+      if (jsonEncode(previousCounters) != jsonEncode(nextCounters)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   int? _singleChangedLifePlayerIndex(
