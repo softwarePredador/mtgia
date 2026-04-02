@@ -51,7 +51,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente, rewind curto limitado e mudanca curta de starting player em `Turn 1`, sem mudanca estrutural fora desse gesto, e so evita `reload` quando o alvo `.turn-time-tracker` esta presente e responde no DOM real do Lotus
 - `table state` agora tambem aceita sync incremental no recorte seguro de `monarch/initiative`, incluindo aplicar e limpar ownership visual, mas so evita `reload` quando a mutacao nao mexe em `storm` e os `.player-card` do DOM real do Lotus estao presentes
 - `day/night` continua live sem takeover visual, mas agora so considera sucesso quando o `.day-night-switcher` responde; se falhar, cai em `reload` de fallback
-- handoffs embutidos de `Game Modes` agora confirmam que o seletor primario ou de fechamento existe no DOM do Lotus antes de registrar sucesso; seletor ausente passa a gerar falha observavel em vez de sucesso silencioso
+- handoffs embutidos de `Game Modes` agora confirmam que o seletor primario, o seletor de `edit cards` e os seletores de fechamento existem no DOM do Lotus antes de registrar sucesso; seletor ausente passa a gerar falha observavel em vez de sucesso silencioso
 
 ## Ja ManaLoom-owned
 
@@ -209,7 +209,7 @@ Hoje:
 - `Planechase`, `Archenemy` e `Bounty` seguem Lotus-first visualmente
 - a shell nativa de `game modes` existe como apoio tecnico
 - o proprio texto da sheet ainda assume que o runtime real fica embutido no Lotus
-- os handoffs embutidos agora validam a presenca do seletor alvo antes de considerar que a acao foi entregue ao runtime do Lotus
+- os handoffs embutidos agora validam a presenca do seletor alvo antes de considerar que a acao foi entregue ao runtime do Lotus, inclusive no segundo passo de `edit cards`
 
 Isso cria uma fronteira em aberto:
 
@@ -397,7 +397,7 @@ Implementado nesta rodada:
 - `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente, voltar poucos passos ou mudar o starting player por rewind curto em `Turn 1`, mas agora so considera sucesso quando o DOM `.turn-time-tracker` existe e confirma a aplicacao
 - `table state` usa sync incremental quando a mutacao e apenas ownership visual de `monarch/initiative`, reaplicando ou limpando classes e moedas no DOM do Lotus e sincronizando a `menu-button` sem rebootar o bundle
 - `day/night` atualiza `__manaloom_day_night_mode` e o `.day-night-switcher` com confirmacao explicita de sucesso; se o switcher nao responder, o host faz fallback via `reload`
-- `game modes` embutidos agora so registram sucesso quando o seletor primario ou de fechamento existe no DOM real do Lotus; caso contrario, o host registra falha observavel em vez de assumir handoff silencioso
+- `game modes` embutidos agora so registram sucesso quando o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem no DOM real do Lotus; o segundo passo de card pool saiu do modelo `setTimeout` fire-and-forget e passa a ser confirmado em chamada separada
 - `settings` continuam em reload por decisao explicita de seguranca, porque o Lotus mantem esse dominio em memoria e nao reage apenas ao patch de storage
 
 ### Wave 5 - Tornar o host o escritor primario

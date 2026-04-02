@@ -773,11 +773,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
   }
 
-  Future<bool> _triggerEmbeddedGameMode({
+  Future<bool> _runEmbeddedGameModeButtonAction({
     required String selector,
     required String modeName,
     required String source,
-    String? followUpSelector,
+    required String failureEventName,
+    Map<String, Object?> extraData = const <String, Object?>{},
   }) async {
     try {
       final rawResult = await _hostController.runJavaScriptReturningResult('''
@@ -789,21 +790,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           }
 
           button.click();
-          ${followUpSelector == null ? '''
           return JSON.stringify({ ok: true, selector: '$selector' });
-          ''' : '''
-          window.setTimeout(() => {
-            const followUpButton = document.querySelector('$followUpSelector');
-            if (followUpButton instanceof HTMLElement) {
-              followUpButton.click();
-            }
-          }, 120);
-          return JSON.stringify({
-            ok: true,
-            selector: '$selector',
-            followUpSelector: '$followUpSelector',
-          });
-          '''}
         } catch (_) {}
         return JSON.stringify({ ok: false, reason: 'trigger_failed' });
       })();
@@ -813,13 +800,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       if (!success) {
         unawaited(
           AppObservability.instance.recordEvent(
-            'embedded_game_mode_request_failed',
+            failureEventName,
             category: 'life_counter.game_modes',
             data: {
               'source': source,
               'mode': modeName,
               'selector': selector,
-              'follow_up_selector': followUpSelector,
+              ...extraData,
             },
           ),
         );
@@ -828,17 +815,50 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     } catch (_) {
       unawaited(
         AppObservability.instance.recordEvent(
-          'embedded_game_mode_request_failed',
+          failureEventName,
           category: 'life_counter.game_modes',
           data: {
             'source': source,
             'mode': modeName,
             'selector': selector,
-            'follow_up_selector': followUpSelector,
+            ...extraData,
           },
         ),
       );
       return false;
+    }
+    return true;
+  }
+
+  Future<bool> _triggerEmbeddedGameMode({
+    required String selector,
+    required String modeName,
+    required String source,
+    String? followUpSelector,
+  }) async {
+    final primaryDelivered = await _runEmbeddedGameModeButtonAction(
+      selector: selector,
+      modeName: modeName,
+      source: source,
+      failureEventName: 'embedded_game_mode_request_failed',
+      extraData: {'follow_up_selector': followUpSelector},
+    );
+    if (!primaryDelivered) {
+      return false;
+    }
+
+    if (followUpSelector != null) {
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      final followUpDelivered = await _runEmbeddedGameModeButtonAction(
+        selector: followUpSelector,
+        modeName: modeName,
+        source: source,
+        failureEventName: 'embedded_game_mode_follow_up_failed',
+        extraData: {'primary_selector': selector},
+      );
+      if (!followUpDelivered) {
+        return false;
+      }
     }
 
     unawaited(

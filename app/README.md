@@ -66,7 +66,7 @@ Estado vivo do contador hoje:
 - `Planechase`, `Archenemy` e `Bounty` agora seguem Lotus como fluxo visual principal
 - a shell nativa de `game modes` continua existindo em codigo apenas como apoio de backend, observabilidade e fluxos internos
 - decisao final de `Game Modes`: `Planechase`, `Archenemy` e `Bounty` entram no produto final como fluxos Lotus-first visuais, com ManaLoom sustentando handoff tecnico, observabilidade e persistencia quando necessario
-- os handoffs embutidos de `game modes` agora so contam como entregues quando o seletor alvo existe no DOM real do Lotus; seletor ausente vira falha observavel
+- os handoffs embutidos de `game modes` agora so contam como entregues quando o seletor alvo existe no DOM real do Lotus, inclusive no segundo passo de `edit cards`; seletor ausente vira falha observavel
 - `edit cards` e card pools permanecem embutidos no runtime Lotus como parte suportada do produto final, sem migracao visual para Flutter nesta fase
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
@@ -160,7 +160,7 @@ Estado vivo do contador hoje:
 - `turn tracker` agora tambem evita `reload` nos casos seguros de avancar turnos para frente, fazer rewind curto limitado e mudar o starting player por rewind curto em `Turn 1`, com tracker ja ativo, dirigindo o proprio runtime do Lotus, mas so quando o alvo `.turn-time-tracker` esta presente no DOM real
 - `table state` agora tambem evita `reload` no recorte seguro de `monarch/initiative`, reaplicando ou limpando moedas, ownership visual e estado da `menu-button` direto no DOM do Lotus; `storm` continua em fallback
 - `day/night` continua live no Lotus, mas agora so fecha sem fallback quando o `.day-night-switcher` confirma a troca; se nao confirmar, o host recarrega o bundle
-- `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura ou fechamento existe no DOM real do Lotus; se nao existir, o host registra falha observavel
+- `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool saiu do `setTimeout` fire-and-forget e passou a ser confirmado em chamada separada
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`

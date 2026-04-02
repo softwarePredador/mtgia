@@ -391,8 +391,17 @@ void main() {
           host.executedScripts.any(
             (script) =>
                 script.contains("document.querySelector('.planechase-btn')") &&
-                script.contains("document.querySelector('.edit-planechase-cards')") &&
-                script.contains('window.setTimeout'),
+                script.contains('button.click()'),
+          ),
+          isTrue,
+        );
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains(
+                  "document.querySelector('.edit-planechase-cards')",
+                ) &&
+                script.contains('button.click()'),
           ),
           isTrue,
         );
@@ -517,8 +526,17 @@ void main() {
           host.executedScripts.any(
             (script) =>
                 script.contains("document.querySelector('.planechase-btn')") &&
-                script.contains("document.querySelector('.edit-planechase-cards')") &&
-                script.contains('window.setTimeout'),
+                script.contains('button.click()'),
+          ),
+          isTrue,
+        );
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains(
+                  "document.querySelector('.edit-planechase-cards')",
+                ) &&
+                script.contains('button.click()'),
           ),
           isTrue,
         );
