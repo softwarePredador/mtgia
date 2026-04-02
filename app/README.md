@@ -73,6 +73,7 @@ Estado vivo do contador hoje:
 - `dice` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a shell so altera resultado canonico de rolagem; com `turn tracker` ativo, isso continua limitado aos casos em que `first player` e a estrutura do tracker permanecem intactos
 - `player state` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a sheet so altera dados canonicos de rolagem, reaproveitando o mesmo criterio conservador de `dice`
 - `player state` agora tambem herda `canonical_store_sync` sem `reload` quando o efeito final do hub fica limitado a `player counter` oculto ou `commander damage` oculto, reaproveitando os mesmos gates de settings desses dominios
+- `player state` agora tambem herda `canonical_store_sync` sem `reload` quando o efeito final do hub fica limitado a `partner commander` oculto, desde que counters continuem fora do player card e a mutacao nao escape desse contrato
 - `player state` agora tambem tem um recorte sem `reload` por `live_runtime` quando o efeito final do hub fica limitado a um `set life` curto em um unico jogador, reaproveitando os controles reais do Lotus
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
@@ -191,6 +192,7 @@ Estado vivo do contador hoje:
 - a suite de `player values` agora tambem prova explicitamente os limites desses recortes, garantindo `reload_fallback` quando `commander damage` volta a afetar vida ou quando `player counter` volta a ficar visivel na mesa
 - `commander damage` e `player counter` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um recorte oculto caiu em `reload_fallback`
 - `dice` e `player state` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um recorte baseado em rolagem caiu em `reload_fallback`
+- no recorte oculto de `partner commander`, `player state` agora tambem anota `sync_blockers`, deixando explicito quando o fallback veio de counters ainda visiveis na mesa ou de mutacao misturada fora desse contrato
 - `turn tracker` e `game timer` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um apply caiu em `reload_fallback` mesmo dentro da familia de live sync
 - `day/night` e `table state` agora tambem anotam `sync_blockers` com o `reason` real devolvido pelo runtime do Lotus, deixando explicito quando o fallback veio de falha concreta de DOM/runtime e nao de bloqueio arquitetural previo
 - `settings` e `player appearance` continuam anotando `sync_blockers` puramente arquiteturais; em `set life`, os blockers agora tambem deixam explicito quando o fallback veio de delta acima do limite live, jogador previamente inativo, vida letal sem `autoKill` ou mudanca fora do contrato do jogador alvo

@@ -2968,27 +2968,45 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         playerCounterSyncBlockers.isEmpty &&
         _hasPlayerCounterDelta(previousSession, adjustedSession);
 
+    final partnerCommanderSyncBlockers =
+        canonicalSyncEligible ||
+                appliedLive ||
+                commanderDamageCanonicalSyncEligible ||
+                playerCounterCanonicalSyncEligible
+            ? const <String>[]
+            : _partnerCommanderCanonicalSyncBlockers(
+                previousSession,
+                adjustedSession,
+                settings: settings,
+              );
+    final partnerCommanderCanonicalSyncEligible =
+        partnerCommanderSyncBlockers.isEmpty &&
+        _hasPartnerCommanderDelta(previousSession, adjustedSession);
+
     final applyStrategy =
         canonicalSyncEligible
             ? 'canonical_store_sync'
             : (appliedLive
                 ? 'live_runtime'
                 : (commanderDamageCanonicalSyncEligible ||
-                        playerCounterCanonicalSyncEligible
+                        playerCounterCanonicalSyncEligible ||
+                        partnerCommanderCanonicalSyncEligible
                     ? 'canonical_store_sync'
                     : 'reload_fallback'));
     final reloadRequired =
         !canonicalSyncEligible &&
         !appliedLive &&
         !commanderDamageCanonicalSyncEligible &&
-        !playerCounterCanonicalSyncEligible;
+        !playerCounterCanonicalSyncEligible &&
+        !partnerCommanderCanonicalSyncEligible;
     final syncBlockers =
         canonicalSyncEligible
             ? const <String>[]
             : (appliedLive
                 ? const <String>[]
                 : (commanderDamageCanonicalSyncEligible ||
-                        playerCounterCanonicalSyncEligible
+                        playerCounterCanonicalSyncEligible ||
+                        partnerCommanderCanonicalSyncEligible
                     ? const <String>[]
                 : (setLifeTargetPlayerIndex != null
                     ? (setLifeSyncBlockers.isNotEmpty
@@ -3000,7 +3018,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                         ? commanderDamageSyncBlockers
                         : (_hasPlayerCounterDelta(previousSession, adjustedSession)
                             ? playerCounterSyncBlockers
-                            : rollSyncBlockers)))));
+                            : (_hasPartnerCommanderDelta(
+                                    previousSession,
+                                    adjustedSession,
+                                  )
+                                ? partnerCommanderSyncBlockers
+                                : rollSyncBlockers))))));
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3070,6 +3093,33 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       }
     }
     return false;
+  }
+
+  bool _hasPartnerCommanderDelta(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    return previous.partnerCommanders.join(',') !=
+        next.partnerCommanders.join(',');
+  }
+
+  List<String> _partnerCommanderCanonicalSyncBlockers(
+    LifeCounterSession previous,
+    LifeCounterSession next, {
+    required LifeCounterSettings settings,
+  }) {
+    final blockers = <String>[];
+    if (settings.showCountersOnPlayerCard) {
+      blockers.add('show_counters_on_player_card_enabled');
+    }
+
+    final expected = previous.copyWith(
+      partnerCommanders: next.partnerCommanders,
+    );
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_hidden_partner_commander');
+    }
+    return blockers;
   }
 
   int? _singleChangedLifePlayerIndex(
