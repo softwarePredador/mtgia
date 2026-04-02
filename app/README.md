@@ -136,6 +136,7 @@ Estado vivo do contador hoje:
 - plano operacional atual da frente Lotus-first: `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 - smoke Android Lotus-first de `menu + history`: `integration_test/life_counter_lotus_visual_overlays_smoke_test.dart`
 - smoke Android Lotus-first de `card search`: `integration_test/life_counter_lotus_card_search_visual_smoke_test.dart`
+- suite de fallback interno do host/shell: `test/features/home/lotus_life_counter_internal_shell_test.dart`
 
 ## Comandos
 

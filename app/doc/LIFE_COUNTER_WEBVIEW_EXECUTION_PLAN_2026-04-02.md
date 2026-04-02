@@ -223,6 +223,12 @@ Refatorar a suite de testes para separar:
 #### Done when
 
 - `lotus_life_counter_screen_test.dart` fica menos misturado com fluxo visual principal
+- atalhos internos de `open-native-*` ficam em uma suite propria de fallback interno
+
+#### Progress
+
+- primeira extracao concluida em `test/features/home/lotus_life_counter_internal_shell_test.dart`
+- `lotus_life_counter_screen_test.dart` agora fica nomeado como cobertura de `host and backend behavior`
 
 ### Task C
 
