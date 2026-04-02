@@ -78,6 +78,7 @@ Estado vivo do contador hoje:
 - engine propria do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_engine.dart`
 - contrato proprio de import/export de history: `app/lib/features/home/life_counter/life_counter_history_transfer.dart`
 - store canonica de `history`: `app/lib/features/home/life_counter/life_counter_history_store.dart`
+- `currentGameMeta` e `gameCounter` agora tambem ficam no contrato canonico de `history`, nao so no payload legado do Lotus
 - snapshot proprio do `localStorage` do Lotus: `app/lib/features/home/lotus/lotus_storage_snapshot*.dart`
 - adapter do snapshot vivo para sessao canonica: `app/lib/features/home/lotus/lotus_life_counter_session_adapter.dart`
 - adapter do `gameSettings` vivo para configuracao canonica: `app/lib/features/home/lotus/lotus_life_counter_settings_adapter.dart`

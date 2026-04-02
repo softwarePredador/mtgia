@@ -44,6 +44,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 
 - `Wave 1` concluida: a matriz do snapshot foi formalizada
 - `Wave 2` concluida: `history` agora tem contrato canonico e store propria
+- `currentGameMeta` e `gameCounter` agora tambem vivem dentro do contrato canonico de `history`
 - `Wave 4` iniciada: existe ponte de patch incremental para o runtime Lotus
 - `settings` permanecem em `reload` por seguranca, porque o bundle Lotus mantem esse dominio em memoria propria
 - `game timer` ja aceita sync incremental no caso seguro `active -> active`
@@ -183,19 +184,19 @@ Hoje:
 - existe `LifeCounterHistoryState` como contrato tipado
 - existe `LifeCounterHistoryStore` como persistencia propria
 - o host espelha `history` canonico quando recebe `persist_snapshot`
-- o bootstrap canonicamente gerado ja reidrata `gameHistory`, `allGamesHistory` e `currentGameMeta`
+- o bootstrap canonicamente gerado ja reidrata `gameHistory`, `allGamesHistory`, `currentGameMeta` e `gameCounter`
 - o import/export nativo grava primeiro no store canonico
 
 Mas ainda falta:
 
 - reduzir ainda mais a leitura de compatibilidade do snapshot legado
-- decidir a fronteira final de `currentGameMeta` e `gameCounter`
 - provar round-trip completo com snapshot Lotus parcial, stale ou ausente
 
 Leitura:
 
 - `history` deixou de ser apenas compatibilidade forte
 - o runtime Lotus ainda recebe payload legado por compatibilidade visual
+- `currentGameMeta/gameCounter` deixaram de ser detalhe implícito do bootstrap e passam a ter owner canonico junto de `history`
 
 ### 4. `Game Modes` ainda nao estao em contrato canonico proprio
 
@@ -329,6 +330,7 @@ Implementado nesta rodada:
 - leitura preferencial do historico canonico no host e na tela viva
 - persistencia canonica do historico ao receber snapshot do Lotus
 - serializacao de volta para o formato legado apenas como compatibilidade do renderer
+- `currentGameMeta` e `gameCounter` agora tambem sao persistidos no store canonico de `history`
 
 ### Wave 3 - Fechar a fronteira de `Game Modes`
 

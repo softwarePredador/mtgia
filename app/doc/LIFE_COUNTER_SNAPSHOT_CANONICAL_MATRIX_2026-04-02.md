@@ -21,7 +21,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 
 - a matrix desta fase ja foi usada para abrir ownership canonico de `history`
 - `LifeCounterHistoryState` e `LifeCounterHistoryStore` passam a ser o owner real do dominio
-- `gameHistory`, `allGamesHistory` e `currentGameMeta` continuam existindo como payload de compatibilidade para o renderer Lotus
+- `gameHistory`, `allGamesHistory`, `currentGameMeta` e `gameCounter` continuam existindo como payload de compatibilidade para o renderer Lotus
 - o bootstrap agora tambem aceita patch incremental via `receivePatch`, mas isso ainda vale so para dominios com runtime seguro
 
 ## Reading rule
@@ -53,8 +53,8 @@ Quando uma chave estiver marcada como:
 | `__manaloom_day_night_mode` | preferencia day/night | host ManaLoom | `LifeCounterDayNightState` | `canonical source` | Hoje ja vive em store propria e e reaplicado ao bundle. |
 | `gameHistory` | historico da partida atual | host ManaLoom e renderer Lotus | `LifeCounterHistoryState` | `derived for Lotus` | O valor vivo agora sai do contrato canonico e e serializado para o formato legado so por compatibilidade visual. |
 | `allGamesHistory` | historico arquivado | host ManaLoom e renderer Lotus | `LifeCounterHistoryState` | `derived for Lotus` | O historico arquivado agora e reconstruido do store canonico antes de voltar ao Lotus. |
-| `currentGameMeta` | metadata da partida atual | host ManaLoom e bootstrap adapter | `LifeCounterHistoryState` com compatibilidade Lotus | `legacy compatibility` | Ainda existe como payload legado do renderer. A fronteira final do dominio segue em aberto. |
-| `gameCounter` | contador de partidas | bootstrap adapter | nenhum contrato canonico proprio | `legacy compatibility` | Hoje e serializado como valor fixo no bootstrap canonicamente gerado. |
+| `currentGameMeta` | metadata da partida atual | host ManaLoom e bootstrap adapter | `LifeCounterHistoryState` | `derived for Lotus` | Agora fica persistido no contrato canonico de `history` e volta ao Lotus so como payload de compatibilidade visual. |
+| `gameCounter` | contador de partidas | host ManaLoom e bootstrap adapter | `LifeCounterHistoryState` | `derived for Lotus` | Agora fica persistido no contrato canonico de `history` em vez de depender de valor implicito do bootstrap. |
 | `turnTrackerHintOverlay_v1` | hint de onboarding do Lotus | shell policy | nenhum | `legacy compatibility` | Nao e parte do core do jogo; so controla supressao de hint. |
 | `countersOnPlayerCardHintOverlay_v1` | hint de onboarding do Lotus | shell policy | nenhum | `legacy compatibility` | Nao e parte do core do jogo; so controla supressao de hint. |
 
@@ -102,13 +102,12 @@ Leitura:
 Dominios que ainda bloqueiam a frase `core 100% nosso` sem ressalva:
 
 - `currentGameMeta`
-- `gameCounter`
 - `layoutType`
 
 Leitura:
 
 - `history` ja saiu desta lista como owner canonico
-- `currentGameMeta/gameCounter` ainda precisam de fronteira final ou contrato mais explicito
+- `currentGameMeta/gameCounter` agora ja vivem no contrato canonico de `history`
 - `layoutType` ainda depende da semantica do bundle Lotus
 
 ## Current write paths
@@ -167,6 +166,6 @@ Esta matrix fica considerada suficiente para a `Wave 1` quando:
 
 Com esta matriz pronta, a proxima task mais correta e:
 
-1. decidir se `currentGameMeta` e `gameCounter` ficam dentro do contrato canonico de `history`
-2. continuar o mapeamento conservador de dominios com `safe live patch`
-3. so depois ampliar a troca de `reload bundle` por sincronizacao incremental
+1. continuar o mapeamento conservador de dominios com `safe live patch`
+2. so depois ampliar a troca de `reload bundle` por sincronizacao incremental
+3. manter `currentGameMeta/gameCounter` sincronizados com qualquer evolucao futura do contrato de `history`

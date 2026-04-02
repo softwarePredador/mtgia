@@ -7,6 +7,11 @@ void main() {
     test('round-trips from history snapshot to json payload', () {
       final snapshot = LifeCounterHistorySnapshot(
         currentGameName: 'Game #9',
+        currentGameMeta: const {
+          'id': 'game-9',
+          'name': 'Game #9',
+          'startDate': 1711800000000,
+        },
         currentGameEntries: const [
           LifeCounterHistoryEntry(
             message: 'Player 1 gained 2 life',
@@ -20,6 +25,7 @@ void main() {
           ),
         ],
         archivedGameCount: 1,
+        gameCounter: 9,
         lastTableEvent: 'Player 1 gained 2 life',
       );
 

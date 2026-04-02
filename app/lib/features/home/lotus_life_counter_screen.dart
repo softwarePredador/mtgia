@@ -1102,8 +1102,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
+    final snapshot = await _snapshotStore.load();
     final importedHistory = LifeCounterHistoryState(
       currentGameName: transfer.currentGameName,
+      currentGameMeta: <String, Object?>{
+        ...LifeCounterHistoryState.decodeCurrentGameMeta(
+          snapshot?.values['currentGameMeta'],
+        ),
+        if ((transfer.currentGameName ?? '').trim().isNotEmpty)
+          'name': transfer.currentGameName!.trim(),
+      },
       currentGameEntries: transfer.currentGameEntries
           .map(
             (entry) => LifeCounterHistoryEntry(
@@ -1123,18 +1131,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           )
           .toList(growable: false),
       archivedGameCount: transfer.archiveEntries.isEmpty ? 0 : 1,
+      gameCounter: LifeCounterHistoryState.decodeGameCounter(
+        snapshot?.values['gameCounter'],
+      ),
       lastTableEvent: transfer.lastTableEvent,
     );
     await _historyStore.save(importedHistory);
 
-    final snapshot = await _snapshotStore.load();
     final mergedValues = <String, String>{
       ...?snapshot?.values,
-      ...importedHistory.buildLotusSnapshotValues(
-        currentGameMetaSeed: LifeCounterHistoryState.decodeCurrentGameMeta(
-          snapshot?.values['currentGameMeta'],
-        ),
-      ),
+      ...importedHistory.buildLotusSnapshotValues(),
     };
 
     await _snapshotStore.save(
@@ -1684,6 +1690,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           currentGameEntries: const [],
           archiveEntries: const [],
           archivedGameCount: 0,
+          gameCounter: 1,
           lastTableEvent: nextLastTableEvent,
         ),
       );

@@ -59,20 +59,26 @@ class LifeCounterHistoryState {
     required this.archiveEntries,
     required this.archivedGameCount,
     this.currentGameName,
+    this.currentGameMeta,
+    this.gameCounter = 1,
     this.lastTableEvent,
   });
 
   const LifeCounterHistoryState.empty()
     : currentGameName = null,
+      currentGameMeta = null,
       currentGameEntries = const [],
       archiveEntries = const [],
       archivedGameCount = 0,
+      gameCounter = 1,
       lastTableEvent = null;
 
   final String? currentGameName;
+  final Map<String, Object?>? currentGameMeta;
   final List<LifeCounterHistoryEntry> currentGameEntries;
   final List<LifeCounterHistoryEntry> archiveEntries;
   final int archivedGameCount;
+  final int gameCounter;
   final String? lastTableEvent;
 
   bool get hasContent =>
@@ -84,7 +90,7 @@ class LifeCounterHistoryState {
     LifeCounterSession? session,
     LotusStorageSnapshot? snapshot,
   }) {
-    final currentGameMeta = LifeCounterHistorySnapshot._decodeSnapshotJson(
+    final currentGameMeta = decodeCurrentGameMeta(
       snapshot?.values[_currentGameMetaKey],
     );
     final archivePayload = LifeCounterHistorySnapshot._decodeSnapshotJson(
@@ -92,12 +98,10 @@ class LifeCounterHistoryState {
     );
 
     return LifeCounterHistoryState(
-      currentGameName: switch (currentGameMeta) {
-        Map<dynamic, dynamic> meta => LifeCounterHistorySnapshot._readString(
-          meta['name'],
-        ),
-        _ => null,
-      },
+      currentGameName: LifeCounterHistorySnapshot._readString(
+        currentGameMeta['name'],
+      ),
+      currentGameMeta: currentGameMeta,
       currentGameEntries: LifeCounterHistorySnapshot._extractEntries(
         LifeCounterHistorySnapshot._decodeSnapshotJson(
           snapshot?.values[_gameHistoryKey],
@@ -110,6 +114,7 @@ class LifeCounterHistoryState {
       archivedGameCount: LifeCounterHistorySnapshot._countArchivedGames(
         archivePayload,
       ),
+      gameCounter: decodeGameCounter(snapshot?.values[_gameCounterKey]),
       lastTableEvent: LifeCounterHistorySnapshot._normalizeLastTableEvent(
         session?.lastTableEvent,
       ),
@@ -126,12 +131,16 @@ class LifeCounterHistoryState {
     }
 
     return LifeCounterHistoryState(
-      currentGameName: LifeCounterHistorySnapshot._readString(
-        raw['current_game_name'],
-      ),
+      currentGameName:
+          LifeCounterHistorySnapshot._readString(raw['current_game_name']) ??
+          LifeCounterHistorySnapshot._readString(
+            _readPersistedMeta(raw['current_game_meta'])?['name'],
+          ),
+      currentGameMeta: _readPersistedMeta(raw['current_game_meta']),
       currentGameEntries: currentGameEntries,
       archiveEntries: archiveEntries,
       archivedGameCount: _readArchivedGameCount(raw['archived_game_count']),
+      gameCounter: _readGameCounter(raw['game_counter']),
       lastTableEvent: LifeCounterHistorySnapshot._readString(
         raw['last_table_event'],
       ),
@@ -146,9 +155,11 @@ class LifeCounterHistoryState {
 
   LifeCounterHistoryState copyWith({
     Object? currentGameName = _unset,
+    Object? currentGameMeta = _unset,
     List<LifeCounterHistoryEntry>? currentGameEntries,
     List<LifeCounterHistoryEntry>? archiveEntries,
     int? archivedGameCount,
+    int? gameCounter,
     Object? lastTableEvent = _unset,
   }) {
     return LifeCounterHistoryState(
@@ -156,6 +167,18 @@ class LifeCounterHistoryState {
           identical(currentGameName, _unset)
               ? this.currentGameName
               : LifeCounterHistorySnapshot._readString(currentGameName),
+      currentGameMeta:
+          identical(currentGameMeta, _unset)
+              ? this.currentGameMeta
+              : _normalizeCurrentGameMeta(
+                currentGameMeta,
+                fallbackName:
+                    identical(currentGameName, _unset)
+                        ? this.currentGameName
+                        : LifeCounterHistorySnapshot._readString(
+                          currentGameName,
+                        ),
+              ),
       currentGameEntries:
           currentGameEntries == null
               ? this.currentGameEntries
@@ -170,6 +193,12 @@ class LifeCounterHistoryState {
               : archivedGameCount < 0
               ? 0
               : archivedGameCount,
+      gameCounter:
+          gameCounter == null
+              ? this.gameCounter
+              : gameCounter < 1
+              ? 1
+              : gameCounter,
       lastTableEvent:
           identical(lastTableEvent, _unset)
               ? this.lastTableEvent
@@ -180,10 +209,12 @@ class LifeCounterHistoryState {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'current_game_name': currentGameName,
+      'current_game_meta': currentGameMeta,
       'current_game_entries':
           currentGameEntries.map((e) => e.toJson()).toList(),
       'archive_entries': archiveEntries.map((e) => e.toJson()).toList(),
       'archived_game_count': archivedGameCount,
+      'game_counter': gameCounter,
       'last_table_event': lastTableEvent,
     };
   }
@@ -193,35 +224,22 @@ class LifeCounterHistoryState {
   Map<String, String> buildLotusSnapshotValues({
     Map<String, Object?>? currentGameMetaSeed,
   }) {
-    final currentGameMeta = <String, Object?>{
+    final resolvedCurrentGameMeta = _normalizeCurrentGameMeta(<String, Object?>{
       ...?currentGameMetaSeed,
-      'id':
-          LifeCounterHistorySnapshot._readString(currentGameMetaSeed?['id']) ??
-          'canonical-history-bootstrap',
-      'name':
-          currentGameName ??
-          LifeCounterHistorySnapshot._readString(
-            currentGameMetaSeed?['name'],
-          ) ??
-          'Imported History',
-      'startDate':
-          currentGameMetaSeed?['startDate'] ??
-          DateTime.now().millisecondsSinceEpoch,
-    };
+      ...?currentGameMeta,
+    }, fallbackName: currentGameName);
 
     final archiveGames = _buildArchiveGames();
 
     return <String, String>{
-      _currentGameMetaKey: jsonEncode(currentGameMeta),
+      _currentGameMetaKey: jsonEncode(resolvedCurrentGameMeta),
       _gameHistoryKey: jsonEncode(
         currentGameEntries
             .map(LifeCounterHistorySnapshot._encodeEntryForLotus)
             .toList(growable: false),
       ),
       _allGamesHistoryKey: jsonEncode(archiveGames),
-      _gameCounterKey: jsonEncode(
-        archivedGameCount <= 0 ? 1 : archivedGameCount + 1,
-      ),
+      _gameCounterKey: jsonEncode(gameCounter < 1 ? 1 : gameCounter),
     };
   }
 
@@ -251,30 +269,28 @@ class LifeCounterHistoryState {
 
   static Map<String, Object?> decodeCurrentGameMeta(String? raw) {
     if (raw == null || raw.isEmpty) {
-      return <String, Object?>{
-        'id': 'canonical-history-bootstrap',
-        'name': 'Imported History',
-        'startDate': DateTime.now().millisecondsSinceEpoch,
-      };
+      return _defaultCurrentGameMeta();
     }
 
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is Map<String, dynamic>) {
-        return <String, Object?>{...decoded};
-      }
-      if (decoded is Map) {
-        return decoded.map<String, Object?>(
-          (key, value) => MapEntry(key.toString(), value),
-        );
-      }
+      return _normalizeCurrentGameMeta(decoded);
     } catch (_) {}
 
-    return <String, Object?>{
-      'id': 'canonical-history-bootstrap',
-      'name': 'Imported History',
-      'startDate': DateTime.now().millisecondsSinceEpoch,
-    };
+    return _defaultCurrentGameMeta();
+  }
+
+  static int decodeGameCounter(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return 1;
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      return _readGameCounter(decoded);
+    } catch (_) {
+      return 1;
+    }
   }
 
   static List<LifeCounterHistoryEntry>? _readPersistedEntries(Object? raw) {
@@ -306,22 +322,78 @@ class LifeCounterHistoryState {
     }
     return 0;
   }
+
+  static int _readGameCounter(Object? raw) {
+    if (raw is int) {
+      return raw < 1 ? 1 : raw;
+    }
+    if (raw is num) {
+      return raw < 1 ? 1 : raw.toInt();
+    }
+    return 1;
+  }
+
+  static Map<String, Object?>? _readPersistedMeta(Object? raw) {
+    if (raw == null) {
+      return null;
+    }
+
+    final normalized = _normalizeCurrentGameMeta(raw);
+    return normalized.isEmpty ? null : normalized;
+  }
+
+  static Map<String, Object?> _normalizeCurrentGameMeta(
+    Object? raw, {
+    String? fallbackName,
+  }) {
+    final values = <String, Object?>{};
+    if (raw is Map<String, dynamic>) {
+      values.addAll(raw);
+    } else if (raw is Map) {
+      values.addAll(
+        raw.map<String, Object?>(
+          (key, value) => MapEntry(key.toString(), value),
+        ),
+      );
+    }
+
+    values['id'] =
+        LifeCounterHistorySnapshot._readString(values['id']) ??
+        'canonical-history-bootstrap';
+    values['name'] =
+        fallbackName ??
+        LifeCounterHistorySnapshot._readString(values['name']) ??
+        'Imported History';
+    values['startDate'] =
+        values['startDate'] is num
+            ? (values['startDate'] as num).toInt()
+            : DateTime.now().millisecondsSinceEpoch;
+    return Map<String, Object?>.unmodifiable(values);
+  }
+
+  static Map<String, Object?> _defaultCurrentGameMeta() {
+    return _normalizeCurrentGameMeta(const <String, Object?>{});
+  }
 }
 
 @immutable
 class LifeCounterHistorySnapshot {
   const LifeCounterHistorySnapshot({
     required this.currentGameName,
+    required this.currentGameMeta,
     required this.currentGameEntries,
     required this.archiveEntries,
     required this.archivedGameCount,
+    required this.gameCounter,
     required this.lastTableEvent,
   });
 
   final String? currentGameName;
+  final Map<String, Object?>? currentGameMeta;
   final List<LifeCounterHistoryEntry> currentGameEntries;
   final List<LifeCounterHistoryEntry> archiveEntries;
   final int archivedGameCount;
+  final int gameCounter;
   final String? lastTableEvent;
 
   int get currentGameEventCount => currentGameEntries.length;
@@ -351,6 +423,7 @@ class LifeCounterHistorySnapshot {
         canonicalState.lastTableEvent != null) {
       return LifeCounterHistorySnapshot(
         currentGameName: canonicalState.currentGameName,
+        currentGameMeta: canonicalState.currentGameMeta,
         currentGameEntries: [
           LifeCounterHistoryEntry(
             message: canonicalState.lastTableEvent!,
@@ -359,15 +432,18 @@ class LifeCounterHistorySnapshot {
         ],
         archiveEntries: canonicalState.archiveEntries,
         archivedGameCount: canonicalState.archivedGameCount,
+        gameCounter: canonicalState.gameCounter,
         lastTableEvent: canonicalState.lastTableEvent,
       );
     }
 
     return LifeCounterHistorySnapshot(
       currentGameName: canonicalState.currentGameName,
+      currentGameMeta: canonicalState.currentGameMeta,
       currentGameEntries: canonicalState.currentGameEntries,
       archiveEntries: canonicalState.archiveEntries,
       archivedGameCount: canonicalState.archivedGameCount,
+      gameCounter: canonicalState.gameCounter,
       lastTableEvent: canonicalState.lastTableEvent,
     );
   }

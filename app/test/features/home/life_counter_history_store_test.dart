@@ -13,6 +13,12 @@ void main() {
       final store = LifeCounterHistoryStore();
       const history = LifeCounterHistoryState(
         currentGameName: 'Game #4',
+        currentGameMeta: {
+          'id': 'game-4',
+          'name': 'Game #4',
+          'startDate': 1711800000000,
+          'gameMode': 'commander',
+        },
         currentGameEntries: [
           LifeCounterHistoryEntry(
             message: 'Player 1 gained 4 life',
@@ -26,6 +32,7 @@ void main() {
           ),
         ],
         archivedGameCount: 2,
+        gameCounter: 5,
         lastTableEvent: 'Player 1 gained 4 life',
       );
 
@@ -34,12 +41,15 @@ void main() {
 
       expect(loaded, isNotNull);
       expect(loaded!.currentGameName, 'Game #4');
+      expect(loaded.currentGameMeta?['id'], 'game-4');
+      expect(loaded.currentGameMeta?['gameMode'], 'commander');
       expect(
         loaded.currentGameEntries.single.message,
         'Player 1 gained 4 life',
       );
       expect(loaded.archiveEntries.single.message, 'Player 2 was eliminated');
       expect(loaded.archivedGameCount, 2);
+      expect(loaded.gameCounter, 5);
       expect(loaded.lastTableEvent, 'Player 1 gained 4 life');
     });
 
