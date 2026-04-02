@@ -64,6 +64,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_lotus_settings_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_lotus_card_search_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_day_night_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_settings_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_roundtrip_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_commander_cast_roundtrip_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -86,6 +87,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `life_counter_native_player_state_smoke_test.dart` foi endurecido para limpar o store explicitamente e acionar `Decked Out` pelo botao dedicado da sheet, evitando heranca de estado entre cenarios.
 - os smokes de `Game Modes` passaram a esperar o modal explicitamente antes das assercoes, reduzindo sensibilidade ao tempo de animacao do overlay.
 - `day / night` tambem ficou coberto no caminho vivo de reopen: a preferencia canonica ManaLoom volta a prevalecer mesmo quando o snapshot Lotus e propositalmente regravado com valor stale antes da reabertura.
+- `settings` tambem ficou coberto no mesmo padrao de reopen: `gameSettings` canonico volta a prevalecer no bootstrap mesmo quando o snapshot Lotus salvo traz flags stale.
 - o smoke de `6 players` precisou de reinicio do daemon `adb` durante a rodada; o rerun passou sem mudanca de produto.
 
 ## Final done definition
