@@ -64,5 +64,33 @@ void main() {
 
       expect(loaded, isNull);
     });
+
+    test('round-trips metadata-only canonical history state', () async {
+      final store = LifeCounterHistoryStore();
+      const history = LifeCounterHistoryState(
+        currentGameName: 'Game #12',
+        currentGameMeta: {
+          'id': 'game-12',
+          'name': 'Game #12',
+          'startDate': 1711802000000,
+          'gameMode': 'commander',
+        },
+        currentGameEntries: [],
+        archiveEntries: [],
+        archivedGameCount: 0,
+        gameCounter: 12,
+      );
+
+      await store.save(history);
+      final loaded = await store.load();
+
+      expect(loaded, isNotNull);
+      expect(loaded!.currentGameName, 'Game #12');
+      expect(loaded.currentGameMeta?['id'], 'game-12');
+      expect(loaded.currentGameEntries, isEmpty);
+      expect(loaded.archiveEntries, isEmpty);
+      expect(loaded.gameCounter, 12);
+      expect(loaded.hasContent, isFalse);
+    });
   });
 }

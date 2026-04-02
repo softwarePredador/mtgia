@@ -326,6 +326,57 @@ void main() {
     );
 
     test(
+      'builds metadata-only history bootstrap values when canonical history has no entries',
+      () async {
+        await historyStore.save(
+          const LifeCounterHistoryState(
+            currentGameName: 'Game #12',
+            currentGameMeta: {
+              'id': 'game-12',
+              'name': 'Game #12',
+              'startDate': 1711802000000,
+              'gameMode': 'commander',
+            },
+            currentGameEntries: [],
+            archiveEntries: [],
+            archivedGameCount: 0,
+            gameCounter: 12,
+          ),
+        );
+
+        final values = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+
+        expect(values['players'], isNull);
+        expect(values['gameSettings'], isNull);
+        expect(values['gameTimerState'], isNull);
+        expect(values['currentGameMeta'], isNotNull);
+        expect(values['gameCounter'], isNotNull);
+        expect(values['gameHistory'], isNotNull);
+        expect(values['allGamesHistory'], isNotNull);
+
+        final snapshot = LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(values),
+        );
+        final restoredHistory = LifeCounterHistoryState.fromSources(
+          snapshot: snapshot,
+        );
+
+        expect(restoredHistory.currentGameName, 'Game #12');
+        expect(restoredHistory.currentGameMeta?['id'], 'game-12');
+        expect(restoredHistory.currentGameEntries, isEmpty);
+        expect(restoredHistory.archiveEntries, isEmpty);
+        expect(restoredHistory.gameCounter, 12);
+        expect(restoredHistory.hasContent, isFalse);
+      },
+    );
+
+    test(
       'builds day night bootstrap values when only canonical day night exists',
       () async {
         await dayNightStateStore.save(
