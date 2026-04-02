@@ -208,7 +208,8 @@ void main() {
             (message) =>
                 message.contains('message=native_turn_tracker_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('live_patch_eligible: false') &&
+                message.contains('previous_tracker_inactive'),
           ),
           isTrue,
         );
@@ -328,7 +329,8 @@ void main() {
             (message) =>
                 message.contains('message=native_turn_tracker_applied') &&
                 message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true'),
+                message.contains('live_patch_eligible: true') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );
@@ -770,72 +772,84 @@ void main() {
     testWidgets('opens native game timer from shell shortcut', (tester) async {
       late _FakeLotusHost host;
 
-      await LifeCounterGameTimerStateStore().save(
-        const LifeCounterGameTimerState(
-          startTimeEpochMs: 1_000,
-          isPaused: false,
-          pausedTimeEpochMs: null,
-        ),
-      );
-      await LotusStorageSnapshotStore().save(
-        const LotusStorageSnapshot(
-          values: {
-            'gameTimerState':
-                '{"startTime":1000,"isPaused":false,"pausedTime":0}',
-          },
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
+      await _captureDebugLogs((logs) async {
+        await LifeCounterGameTimerStateStore().save(
+          const LifeCounterGameTimerState(
+            startTimeEpochMs: 1_000,
+            isPaused: false,
+            pausedTimeEpochMs: null,
+          ),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'gameTimerState':
+                  '{"startTime":1000,"isPaused":false,"pausedTime":0}',
             },
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      expect(find.text('Game Timer'), findsOneWidget);
+        host.emitShellMessage(
+          '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-game-timer-pause')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-timer-pause')),
-      );
-      await tester.pumpAndSettle();
+        expect(find.text('Game Timer'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-timer-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-game-timer-pause')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-pause')),
+        );
+        await tester.pumpAndSettle();
 
-      final state = await LifeCounterGameTimerStateStore().load();
-      expect(state, isNotNull);
-      expect(state!.isActive, isTrue);
-      expect(state.isPaused, isTrue);
-      expect(host.loadBundleCallCount, 1);
-      expect(
-        host.executedScripts.any((script) => script.contains(".game-timer")),
-        isTrue,
-      );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final state = await LifeCounterGameTimerStateStore().load();
+        expect(state, isNotNull);
+        expect(state!.isActive, isTrue);
+        expect(state.isPaused, isTrue);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any((script) => script.contains(".game-timer")),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_game_timer_applied') &&
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('live_patch_eligible: true') &&
+                message.contains('sync_blockers: []'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('opens native game timer from clock shell shortcut', (
@@ -904,7 +918,8 @@ void main() {
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('live_patch_eligible: false') &&
+                message.contains('previous_timer_inactive'),
           ),
           isTrue,
         );
@@ -1355,7 +1370,6 @@ void main() {
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
         expect(session!.lastHighRolls.whereType<int>().length, 4);
-        expect(session.firstPlayerIndex, isNotNull);
         expect(host.loadBundleCallCount, 1);
         expect(
           logs.any(

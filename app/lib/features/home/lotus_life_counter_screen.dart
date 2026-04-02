@@ -1492,10 +1492,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
-    final livePatchEligible = _canApplyLiveTurnTrackerPatch(
+    final syncBlockers = _turnTrackerLivePatchBlockers(
       previousSession,
       adjustedSession,
     );
+    final livePatchEligible = syncBlockers.isEmpty;
     final appliedLive =
         livePatchEligible &&
         await _applyOwnedTurnTrackerRuntimeState(
@@ -1517,6 +1518,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'turn_timer_active': adjustedSession.turnTimerActive,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -1528,29 +1530,54 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyLiveTurnTrackerPatch(
+  List<String> _turnTrackerLivePatchBlockers(
     LifeCounterSession previous,
     LifeCounterSession next,
   ) {
-    if (!previous.turnTrackerActive || !next.turnTrackerActive) {
-      return false;
+    final blockers = <String>[];
+    if (!previous.turnTrackerActive) {
+      blockers.add('previous_tracker_inactive');
+    }
+    if (!next.turnTrackerActive) {
+      blockers.add('next_tracker_inactive');
+    }
+    if (previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame) {
+      blockers.add('ongoing_game_changed');
+    }
+    if (previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll) {
+      blockers.add('auto_high_roll_changed');
+    }
+    if (previous.turnTimerActive != next.turnTimerActive) {
+      blockers.add('turn_timer_active_changed');
+    }
+    if ((next.currentTurnPlayerIndex ?? -1) < 0) {
+      blockers.add('current_player_missing');
+    }
+    if (next.turnTimerSeconds != 0) {
+      blockers.add('turn_timer_seconds_nonzero');
+    }
+    if (blockers.isNotEmpty) {
+      return blockers;
     }
 
-    if (previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame ||
-        previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll ||
-        previous.turnTimerActive != next.turnTimerActive) {
-      return false;
-    }
-
-    if ((next.currentTurnPlayerIndex ?? -1) < 0 || next.turnTimerSeconds != 0) {
-      return false;
+    final forwardSteps = _countForwardTurnTrackerSteps(previous, next);
+    if (forwardSteps != null) {
+      return blockers;
     }
 
     final backwardSteps = _countBackwardTurnTrackerSteps(previous, next);
-    return _countForwardTurnTrackerSteps(previous, next) != null ||
-        (backwardSteps != null &&
-            backwardSteps > 0 &&
-            backwardSteps <= _maxLiveTurnTrackerBackwardSteps);
+    if (backwardSteps == null) {
+      blockers.add('turn_position_change_unsupported');
+      return blockers;
+    }
+    if (backwardSteps <= 0) {
+      blockers.add('turn_position_change_unsupported');
+      return blockers;
+    }
+    if (backwardSteps > _maxLiveTurnTrackerBackwardSteps) {
+      blockers.add('backward_steps_exceed_live_limit');
+    }
+    return blockers;
   }
 
   int? _countForwardTurnTrackerSteps(
@@ -1805,7 +1832,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       );
     }
 
-    final livePatchEligible = _canApplyLiveGameTimerPatch(previousState, state);
+    final syncBlockers = _gameTimerLivePatchBlockers(previousState, state);
+    final livePatchEligible = syncBlockers.isEmpty;
     final appliedLive =
         livePatchEligible && await _applyOwnedGameTimerRuntimeState(state);
     final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
@@ -1821,6 +1849,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'has_paused_time': state.pausedTimeEpochMs != null,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -1832,11 +1861,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyLiveGameTimerPatch(
+  List<String> _gameTimerLivePatchBlockers(
     LifeCounterGameTimerState previous,
     LifeCounterGameTimerState next,
   ) {
-    return previous.isActive && next.isActive;
+    final blockers = <String>[];
+    if (!previous.isActive) {
+      blockers.add('previous_timer_inactive');
+    }
+    if (!next.isActive) {
+      blockers.add('next_timer_inactive');
+    }
+    return blockers;
   }
 
   Future<bool> _applyOwnedGameTimerRuntimeState(

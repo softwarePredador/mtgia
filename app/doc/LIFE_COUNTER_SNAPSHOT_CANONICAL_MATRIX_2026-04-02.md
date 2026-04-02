@@ -180,6 +180,7 @@ Complemento desta rodada:
 - a suite de `player values` agora tambem prova os limites desses recortes, garantindo fallback para `reload` assim que `commander damage` volta a afetar vida ou assim que `player counter` volta a ficar visivel no player card
 - `commander damage` e `player counter` agora tambem expõem `sync_blockers`, deixando explicito no log qual condicao bloqueou `canonical_store_sync` nos recortes ocultos
 - `dice` e `player state` agora tambem expõem `sync_blockers`, deixando explicito no log qual condicao bloqueou `canonical_store_sync` nos recortes baseados em rolagem
+- `turn tracker` e `game timer` agora tambem expõem `sync_blockers`, deixando explicito no log qual condicao bloqueou `live_runtime` nos recortes seguros de runtime (`tracker/timer` inativo, mudanca estrutural do tracker ou posicao fora dos caminhos suportados)
 - `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
 - `history` e `card search` seguem sem apply de runtime nessa shell interna; a observabilidade agora deixa explicito quando o fluxo foi apenas `native_fallback`
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`
