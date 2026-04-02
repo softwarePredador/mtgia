@@ -30,6 +30,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - os handoffs embutidos de `Game Modes` agora tambem confirmam que o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem antes de reportar sucesso; seletor ausente deixa de parecer entrega bem-sucedida, e o dismiss da shell passa a carregar o status real de entrega
 - `turn tracker`, `game timer` e `table state` agora tambem expõem na observabilidade se o apply fechou em `live_runtime` ou `reload_fallback`, evitando leitura ambigua dos recortes sem `reload`
 - `day/night` agora tambem expõe `live_patch_eligible` e `apply_strategy`, alinhando sua leitura operacional aos outros recortes com apply live
+- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem expõem `live_patch_eligible: false` e `apply_strategy: reload_fallback`, fechando a leitura observavel dos dominios de runtime de jogador que ainda nao tem caminho live seguro
 
 ## Reading rule
 
@@ -154,6 +155,7 @@ Complemento desta rodada:
 - `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool agora e confirmado em chamada separada, sem `setTimeout` fire-and-forget, e a telemetria de dismiss passa a indicar `action_delivered`
 - `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, separando visualmente no log quando o estado foi aplicado live e quando caiu em `reload`
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, deixando explicito quando a troca foi aplicada live e quando o host precisou recarregar o bundle
+- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso tambem fica explicito na observabilidade de apply, sem ambiguidade com os dominios que ja tem recortes live
 
 ### 3. Runtime Lotus-first visual paths
 

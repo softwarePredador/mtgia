@@ -1161,49 +1161,61 @@ void main() {
 
     testWidgets('opens native dice from shell shortcut', (tester) async {
       late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
 
-      await LifeCounterSessionStore().save(
-        LifeCounterSession.initial(playerCount: 4),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-dice","source":"dice_shortcut_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-dice","source":"dice_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Dice Tools'), findsOneWidget);
+        expect(find.text('Dice Tools'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-dice-high-roll')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-dice-high-roll')),
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-dice-apply')),
+        );
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.lastHighRolls.whereType<int>().length, 4);
-      expect(host.loadBundleCallCount, 2);
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.lastHighRolls.whereType<int>().length, 4);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_dice_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
   });
 }

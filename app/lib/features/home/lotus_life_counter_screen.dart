@@ -1891,6 +1891,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1902,6 +1904,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'has_last_event': adjustedSession.lastTableEvent != null,
           'has_high_rolls':
               adjustedSession.lastHighRolls.whereType<int>().isNotEmpty,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );
@@ -2068,12 +2072,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_commander_damage_applied',
         category: 'life_counter.commander_damage',
-        data: {'source': source, 'player_count': adjustedSession.playerCount},
+        data: {
+          'source': source,
+          'player_count': adjustedSession.playerCount,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
+        },
       ),
     );
 
@@ -2167,12 +2178,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     await _persistOwnedSessionSnapshot(session);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_player_appearance_applied',
         category: 'life_counter.player_appearance',
-        data: {'source': source},
+        data: {
+          'source': source,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
+        },
       ),
     );
 
@@ -2369,12 +2386,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_player_counter_applied',
         category: 'life_counter.player_counter',
-        data: {'source': source, 'counter_key': counterKey},
+        data: {
+          'source': source,
+          'counter_key': counterKey,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
+        },
       ),
     );
 
@@ -2460,12 +2484,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_player_state_applied',
         category: 'life_counter.player_state',
-        data: {'source': source},
+        data: {
+          'source': source,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
+        },
       ),
     );
 
@@ -2551,6 +2581,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2560,6 +2592,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'target_player_index': targetPlayerIndex,
           'life': adjustedSession.lives[targetPlayerIndex],
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );

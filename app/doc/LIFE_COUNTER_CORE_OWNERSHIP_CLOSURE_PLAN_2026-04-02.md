@@ -54,6 +54,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - handoffs embutidos de `Game Modes` agora confirmam que o seletor primario, o seletor de `edit cards` e os seletores de fechamento existem no DOM do Lotus antes de registrar sucesso; seletor ausente passa a gerar falha observavel em vez de sucesso silencioso, e o dismiss da shell agora diferencia acao escolhida de acao realmente entregue
 - `turn tracker`, `game timer` e `table state` agora tambem registram na observabilidade se a aplicacao fechou por `live_runtime` ou `reload_fallback`, junto do sinal de elegibilidade do patch live
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, fechando o mesmo contrato observavel dos dominios com live apply/fallback
+- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem registram explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando claro que esses dominios ainda sao `reload-only`
 
 ## Ja ManaLoom-owned
 
@@ -182,6 +183,10 @@ Estado final desejado:
 
 - atualizar o runtime Lotus sem reload completo sempre que o fluxo permitir
 - deixar reload apenas como fallback
+
+Leitura operacional atual:
+
+- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso aparece de forma explicita na telemetria de apply, sem parecer live sync parcial
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe
 

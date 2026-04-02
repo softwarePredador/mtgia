@@ -73,6 +73,23 @@ class _FakeLotusHost implements LotusHost {
   }
 }
 
+Future<void> _captureDebugLogs(
+  Future<void> Function(List<String> logs) action,
+) async {
+  final logs = <String>[];
+  final originalDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) {
+      logs.add(message);
+    }
+  };
+  try {
+    await action(logs);
+  } finally {
+    debugPrint = originalDebugPrint;
+  }
+}
+
 void main() {
   group('LotusLifeCounterScreen internal player values fallback', () {
     setUp(() {
@@ -83,198 +100,223 @@ void main() {
       tester,
     ) async {
       late _FakeLotusHost host;
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await _captureDebugLogs((logs) async {
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await LifeCounterSessionStore().save(
-        const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [40, 32, 25, 11],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, true, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
-          firstPlayerIndex: null,
-          turnTrackerActive: false,
-          turnTrackerOngoingGame: false,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: null,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 32, 25, 11],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, true, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      expect(find.text('Commander Damage'), findsOneWidget);
+        host.emitShellMessage(
+          '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
-      );
-      await tester.pumpAndSettle();
+        expect(find.text('Commander Damage'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-commander-damage-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(
+            const Key('life-counter-native-commander-damage-plus-1-c1'),
+          ),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-commander-damage-plus-1-c1'),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.commanderDamage[0][1], 1);
-      expect(
-        session.resolvedCommanderDamageDetails[0][1],
-        const LifeCounterCommanderDamageDetail(
-          commanderOneDamage: 1,
-          commanderTwoDamage: 0,
-        ),
-      );
-      expect(host.loadBundleCallCount, 2);
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-commander-damage-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.commanderDamage[0][1], 1);
+        expect(
+          session.resolvedCommanderDamageDetails[0][1],
+          const LifeCounterCommanderDamageDetail(
+            commanderOneDamage: 1,
+            commanderTwoDamage: 0,
+          ),
+        );
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_commander_damage_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('opens native player counter from shell shortcut', (
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      await LifeCounterSessionStore().save(
-        const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [40, 32, 25, 11],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, false, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
-          firstPlayerIndex: null,
-          turnTrackerActive: false,
-          turnTrackerOngoingGame: false,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: null,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+      await _captureDebugLogs((logs) async {
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 32, 25, 11],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-player-counter","source":"player_counter_surface_pressed","targetPlayerIndex":0,"counterKey":"poison"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      expect(find.text('Player Counter'), findsOneWidget);
-      expect(find.text('Player 1 · Poison'), findsOneWidget);
+        host.emitShellMessage(
+          '{"type":"open-native-player-counter","source":"player_counter_surface_pressed","targetPlayerIndex":0,"counterKey":"poison"}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-player-counter-plus')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-player-counter-plus')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-counter-plus')),
-      );
-      await tester.pumpAndSettle();
+        expect(find.text('Player Counter'), findsOneWidget);
+        expect(find.text('Player 1 · Poison'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-counter-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-player-counter-plus')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-player-counter-plus')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-counter-plus')),
+        );
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.poison[0], 1);
-      expect(host.loadBundleCallCount, 2);
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-counter-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.poison[0], 1);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_player_counter_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
   });
 }
