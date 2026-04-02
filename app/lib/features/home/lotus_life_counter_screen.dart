@@ -1427,6 +1427,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
+    final livePatchEligible = _canApplyLiveTurnTrackerPatch(
+      previousSession,
+      adjustedSession,
+    );
+    final appliedLive =
+        livePatchEligible &&
+        await _applyOwnedTurnTrackerRuntimeState(
+          previousSession,
+          adjustedSession,
+        );
+    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+
     unawaited(
       AppObservability.instance.recordEvent(
         'native_turn_tracker_applied',
@@ -1438,15 +1450,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'current_player_index': adjustedSession.currentTurnPlayerIndex,
           'starting_player_index': adjustedSession.firstPlayerIndex,
           'turn_timer_active': adjustedSession.turnTimerActive,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );
 
-    if (_canApplyLiveTurnTrackerPatch(previousSession, adjustedSession) &&
-        await _applyOwnedTurnTrackerRuntimeState(
-          previousSession,
-          adjustedSession,
-        )) {
+    if (appliedLive) {
       return;
     }
 
@@ -1720,6 +1730,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       );
     }
 
+    final livePatchEligible = _canApplyLiveGameTimerPatch(previousState, state);
+    final appliedLive =
+        livePatchEligible && await _applyOwnedGameTimerRuntimeState(state);
+    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+
     unawaited(
       AppObservability.instance.recordEvent(
         'native_game_timer_applied',
@@ -1729,12 +1744,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'is_active': state.isActive,
           'is_paused': state.isPaused,
           'has_paused_time': state.pausedTimeEpochMs != null,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );
 
-    if (_canApplyLiveGameTimerPatch(previousState, state) &&
-        await _applyOwnedGameTimerRuntimeState(state)) {
+    if (appliedLive) {
       return;
     }
 
@@ -2612,6 +2628,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
+    final livePatchEligible = _canApplyLiveTableStatePatch(
+      previousSession,
+      adjustedSession,
+    );
+    final appliedLive =
+        livePatchEligible &&
+        await _applyOwnedTableStateRuntimeState(adjustedSession);
+    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+
     unawaited(
       AppObservability.instance.recordEvent(
         'native_table_state_applied',
@@ -2621,12 +2646,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'storm_count': adjustedSession.stormCount,
           'monarch_player': adjustedSession.monarchPlayer,
           'initiative_player': adjustedSession.initiativePlayer,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );
 
-    if (_canApplyLiveTableStatePatch(previousSession, adjustedSession) &&
-        await _applyOwnedTableStateRuntimeState(adjustedSession)) {
+    if (appliedLive) {
       return;
     }
 

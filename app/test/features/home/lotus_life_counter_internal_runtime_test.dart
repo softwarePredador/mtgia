@@ -109,6 +109,23 @@ class _FakeLotusHost implements LotusHost {
   }
 }
 
+Future<void> _captureDebugLogs(
+  Future<void> Function(List<String> logs) action,
+) async {
+  final logs = <String>[];
+  final originalDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) {
+      logs.add(message);
+    }
+  };
+  try {
+    await action(logs);
+  } finally {
+    debugPrint = originalDebugPrint;
+  }
+}
+
 void main() {
   group('LotusLifeCounterScreen internal runtime fallback', () {
     setUp(() {
@@ -120,63 +137,74 @@ void main() {
     ) async {
       late _FakeLotusHost host;
 
-      await LifeCounterSessionStore().save(
-        LifeCounterSession.initial(playerCount: 4),
-      );
-      await LotusStorageSnapshotStore().save(
-        const LotusStorageSnapshot(
-          values: {
-            'layoutType': '"portrait-portrait-portrait-portrait"',
-            'turnTracker':
-                '{"isActive":false,"ongoingGame":false,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":0,"startingPlayerIndex":null,"currentTurn":1}',
-          },
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
+      await _captureDebugLogs((logs) async {
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'layoutType': '"portrait-portrait-portrait-portrait"',
+              'turnTracker':
+                  '{"isActive":false,"ongoingGame":false,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":0,"startingPlayerIndex":null,"currentTurn":1}',
             },
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      expect(find.text('Turn Tracker'), findsOneWidget);
+        host.emitShellMessage(
+          '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.text('Start Game'),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
+        expect(find.text('Turn Tracker'), findsOneWidget);
 
-      await tester.tap(find.text('Start Game'));
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text('Start Game'),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-turn-tracker-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Start Game'));
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.turnTrackerActive, isTrue);
-      expect(host.loadBundleCallCount, 2);
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.turnTrackerActive, isTrue);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_turn_tracker_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('advances active turn tracker without reloading the Lotus bundle', (
@@ -184,8 +212,9 @@ void main() {
     ) async {
       late _FakeLotusHost host;
 
-      await LifeCounterSessionStore().save(
-        const LifeCounterSession(
+      await _captureDebugLogs((logs) async {
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
           playerCount: 4,
           startingLifeTwoPlayer: 20,
           startingLifeMultiPlayer: 40,
@@ -221,71 +250,81 @@ void main() {
           turnTimerActive: false,
           turnTimerSeconds: 0,
           lastTableEvent: null,
-        ),
-      );
-      await LotusStorageSnapshotStore().save(
-        const LotusStorageSnapshot(
-          values: {
-            'layoutType': '"portrait-portrait-portrait-portrait"',
-            'turnTracker':
-                '{"isActive":true,"ongoingGame":true,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":0,"startingPlayerIndex":0,"currentTurn":1}',
-          },
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
+          ),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'layoutType': '"portrait-portrait-portrait-portrait"',
+              'turnTracker':
+                  '{"isActive":true,"ongoingGame":true,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":0,"startingPlayerIndex":0,"currentTurn":1}',
             },
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-turn-tracker-next')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
+        host.emitShellMessage(
+          '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-turn-tracker-next')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-turn-tracker-next')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-turn-tracker-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-next')),
+        );
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.currentTurnPlayerIndex, 1);
-      expect(session.currentTurnNumber, 1);
-      expect(host.loadBundleCallCount, 1);
-      expect(
-        host.executedScripts.any(
-          (script) =>
-              script.contains('.turn-time-tracker') &&
-              script.contains('tracker.click()'),
-        ),
-        isTrue,
-      );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.currentTurnPlayerIndex, 1);
+        expect(session.currentTurnNumber, 1);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains('.turn-time-tracker') &&
+                script.contains('tracker.click()'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_turn_tracker_applied') &&
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('live_patch_eligible: true'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets(
@@ -796,53 +835,64 @@ void main() {
     ) async {
       late _FakeLotusHost host;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-game-timer","source":"clock_surface_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-game-timer","source":"clock_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Game Timer'), findsOneWidget);
-      expect(find.text('Idle'), findsOneWidget);
+        expect(find.text('Game Timer'), findsOneWidget);
+        expect(find.text('Idle'), findsOneWidget);
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-game-timer-start')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-timer-start')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-game-timer-start')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-start')),
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-timer-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-apply')),
+        );
+        await tester.pumpAndSettle();
 
-      final state = await LifeCounterGameTimerStateStore().load();
-      expect(state, isNotNull);
-      expect(state!.isActive, isTrue);
-      expect(state.isPaused, isFalse);
-      expect(host.loadBundleCallCount, 2);
+        final state = await LifeCounterGameTimerStateStore().load();
+        expect(state, isNotNull);
+        expect(state!.isActive, isTrue);
+        expect(state.isPaused, isFalse);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_game_timer_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets(
@@ -850,9 +900,10 @@ void main() {
       (tester) async {
         late _FakeLotusHost host;
 
-        await LifeCounterSessionStore().save(
-          const LifeCounterSession(
-            playerCount: 4,
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+          playerCount: 4,
             startingLifeTwoPlayer: 20,
             startingLifeMultiPlayer: 40,
             lives: [40, 40, 40, 40],
@@ -888,82 +939,92 @@ void main() {
             turnTimerSeconds: 0,
             lastTableEvent: null,
           ),
-        );
-        await LotusStorageSnapshotStore().save(
-          const LotusStorageSnapshot(
-            values: {
-              '__manaloom_table_state':
-                  '{"stormCount":0,"monarchPlayer":null,"initiativePlayer":null,"lastPlayerRolls":[null,null,null,null],"lastHighRolls":[null,null,null,null],"firstPlayerIndex":0}',
-            },
-          ),
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
+          );
+          await LotusStorageSnapshotStore().save(
+            const LotusStorageSnapshot(
+              values: {
+                '__manaloom_table_state':
+                    '{"stormCount":0,"monarchPlayer":null,"initiativePlayer":null,"lastPlayerRolls":[null,null,null,null],"lastHighRolls":[null,null,null,null],"firstPlayerIndex":0}',
               },
             ),
-          ),
-        );
+          );
 
-        await tester.pump();
-        await tester.pump();
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
 
-        host.emitShellMessage(
-          '{"type":"open-native-table-state","source":"monarch_surface_pressed"}',
-        );
-        await tester.pumpAndSettle();
+          await tester.pump();
+          await tester.pump();
 
-        expect(find.text('Table State'), findsOneWidget);
+          host.emitShellMessage(
+            '{"type":"open-native-table-state","source":"monarch_surface_pressed"}',
+          );
+          await tester.pumpAndSettle();
 
-        await tester.tap(
-          find.byKey(
-            const Key('life-counter-native-table-state-monarch-player-2'),
-          ),
-        );
-        await tester.pumpAndSettle();
+          expect(find.text('Table State'), findsOneWidget);
 
-        await tester.scrollUntilVisible(
-          find.byKey(
-            const Key('life-counter-native-table-state-initiative-player-1'),
-          ),
-          250,
-          scrollable: find.byType(Scrollable).first,
-        );
-        await tester.tap(
-          find.byKey(
-            const Key('life-counter-native-table-state-initiative-player-1'),
-          ),
-        );
-        await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-table-state-monarch-player-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
 
-        await tester.tap(
-          find.byKey(const Key('life-counter-native-table-state-apply')),
-        );
-        await tester.pumpAndSettle();
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-table-state-initiative-player-1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-table-state-initiative-player-1'),
+            ),
+          );
+          await tester.pumpAndSettle();
 
-        final session = await LifeCounterSessionStore().load();
-        expect(session, isNotNull);
-        expect(session!.monarchPlayer, 2);
-        expect(session.initiativePlayer, 1);
-        expect(session.stormCount, 0);
-        expect(host.loadBundleCallCount, 1);
-        expect(
-          host.executedScripts.any(
-            (script) =>
-                script.contains("syncCoin('monarch'") &&
-                script.contains("syncCoin('initiative'"),
-          ),
-          isTrue,
-        );
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-table-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.monarchPlayer, 2);
+          expect(session.initiativePlayer, 1);
+          expect(session.stormCount, 0);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains("syncCoin('monarch'") &&
+                  script.contains("syncCoin('initiative'"),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_table_state_applied') &&
+                  message.contains('apply_strategy: live_runtime') &&
+                  message.contains('live_patch_eligible: true'),
+            ),
+            isTrue,
+          );
+        });
       },
     );
 

@@ -68,6 +68,7 @@ Estado vivo do contador hoje:
 - decisao final de `Game Modes`: `Planechase`, `Archenemy` e `Bounty` entram no produto final como fluxos Lotus-first visuais, com ManaLoom sustentando handoff tecnico, observabilidade e persistencia quando necessario
 - os handoffs embutidos de `game modes` agora so contam como entregues quando o seletor alvo existe no DOM real do Lotus, inclusive no segundo passo de `edit cards`; seletor ausente vira falha observavel, e o dismiss da shell passa a carregar `action_delivered`
 - `edit cards` e card pools permanecem embutidos no runtime Lotus como parte suportada do produto final, sem migracao visual para Flutter nesta fase
+- `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, deixando explicito na observabilidade quando o apply fechou por runtime live ou por `reload`
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`
@@ -161,6 +162,7 @@ Estado vivo do contador hoje:
 - `table state` agora tambem evita `reload` no recorte seguro de `monarch/initiative`, reaplicando ou limpando moedas, ownership visual e estado da `menu-button` direto no DOM do Lotus; `storm` continua em fallback
 - `day/night` continua live no Lotus, mas agora so fecha sem fallback quando o `.day-night-switcher` confirma a troca; se nao confirmar, o host recarrega o bundle
 - `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool saiu do `setTimeout` fire-and-forget e passou a ser confirmado em chamada separada, com `native_game_modes_action_failed` e `action_delivered` evitando telemetria ambigua
+- `turn tracker`, `game timer` e `table state` agora tambem anotam `apply_strategy` (`live_runtime` vs `reload_fallback`) e `live_patch_eligible` nos eventos de apply
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`
