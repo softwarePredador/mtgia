@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_player_appearance_profile_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
@@ -21,6 +24,28 @@ Future<void> _pumpUntilUiSnapshotAvailable(
   expect(snapshot, isNotNull);
 }
 
+Future<void> _stabilizeHarness(
+  WidgetTester tester, {
+  required LotusStorageSnapshotStore snapshotStore,
+  required LotusUiSnapshotStore uiSnapshotStore,
+  required LifeCounterGameTimerStateStore gameTimerStateStore,
+  required LifeCounterSessionStore sessionStore,
+  required LifeCounterSettingsStore settingsStore,
+}) async {
+  await tester.binding.setSurfaceSize(const Size(900, 1200));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(seconds: 2));
+  await snapshotStore.clear();
+  await uiSnapshotStore.clear();
+  await gameTimerStateStore.clear();
+  await sessionStore.clear();
+  await settingsStore.clear();
+  await LifeCounterDayNightStateStore().clear();
+  await LifeCounterPlayerAppearanceProfileStore().clear();
+  await tester.pump(const Duration(milliseconds: 200));
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -31,6 +56,7 @@ void main() {
     final sessionStore = LifeCounterSessionStore();
     final settingsStore = LifeCounterSettingsStore();
     final uiSnapshotStore = LotusUiSnapshotStore();
+    final gameTimerStateStore = LifeCounterGameTimerStateStore();
 
     const session = LifeCounterSession(
       playerCount: 4,
@@ -123,10 +149,19 @@ void main() {
       await sessionStore.clear();
       await settingsStore.clear();
       await uiSnapshotStore.clear();
+      await gameTimerStateStore.clear();
       await sessionStore.save(session);
       await settingsStore.save(settings);
     }
 
+    await _stabilizeHarness(
+      tester,
+      snapshotStore: snapshotStore,
+      uiSnapshotStore: uiSnapshotStore,
+      gameTimerStateStore: gameTimerStateStore,
+      sessionStore: sessionStore,
+      settingsStore: settingsStore,
+    );
     await prepareStores(enabledSettings);
 
     await tester.pumpWidget(
@@ -152,8 +187,16 @@ void main() {
     expect(enabledUiSnapshot.clockWithGameTimerCount, 1);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 2));
 
+    await _stabilizeHarness(
+      tester,
+      snapshotStore: snapshotStore,
+      uiSnapshotStore: uiSnapshotStore,
+      gameTimerStateStore: gameTimerStateStore,
+      sessionStore: sessionStore,
+      settingsStore: settingsStore,
+    );
     await prepareStores(disabledSettings);
 
     await tester.pumpWidget(
