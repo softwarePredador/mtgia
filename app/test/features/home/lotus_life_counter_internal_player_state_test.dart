@@ -213,7 +213,10 @@ void main() {
             (message) =>
                 message.contains('message=native_player_state_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('live_patch_eligible: false') &&
+                message.contains(
+                  'sync_blockers: [session_change_outside_canonical_roll]',
+                ),
           ),
           isTrue,
         );
@@ -287,7 +290,8 @@ void main() {
             (message) =>
                 message.contains('message=native_player_state_applied') &&
                 message.contains('apply_strategy: canonical_store_sync') &&
-                message.contains('reload_required: false'),
+                message.contains('reload_required: false') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );

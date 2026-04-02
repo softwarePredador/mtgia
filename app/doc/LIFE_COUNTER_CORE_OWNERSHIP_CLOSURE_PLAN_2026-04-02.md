@@ -208,6 +208,7 @@ Leitura operacional atual:
 - `player counter` agora tambem pode fechar por `canonical_store_sync` sem rebootar o bundle no subcaso em que o settings ja garante ausencia de reflexo visual na mesa, mantendo `reload` quando os counters ainda aparecem no player card ou quando `poison` pode abrir `autoKill`
 - as suites de `player values` agora tambem provam explicitamente essas fronteiras, garantindo que `commander damage` e `player counter` continuam em `reload_fallback` assim que o settings volta a permitir reflexo visual ou efeito colateral real na mesa
 - `commander damage` e `player counter` agora tambem expõem `sync_blockers` na observabilidade de apply, deixando explicito por que um recorte oculto caiu em `reload_fallback`
+- `dice` e `player state` agora tambem expõem `sync_blockers` nos applies baseados em rolagem, deixando explicito quando o fallback veio de mudanca estrutural do tracker, troca indevida de `first player` ou mutacao fora do contrato canonico de roll
 - `settings` continua em `reload` por seguranca do bundle Lotus, e agora isso tambem aparece de forma explicita na telemetria de apply
 - `history` e `card search` seguem Lotus-first visualmente; quando a shell interna entra em cena, a observabilidade agora marca isso explicitamente como `native_fallback`
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`

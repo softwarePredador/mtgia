@@ -1972,10 +1972,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
-    final canonicalSyncEligible = _canApplyCanonicalDiceSessionWithoutReload(
+    final syncBlockers = _rollCanonicalSyncBlockers(
       previousSession,
       adjustedSession,
     );
+    final canonicalSyncEligible = syncBlockers.isEmpty;
     const livePatchEligible = false;
     final applyStrategy =
         canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
@@ -1994,6 +1995,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -2005,10 +2007,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyCanonicalRollSessionWithoutReload(
+  List<String> _rollCanonicalSyncBlockers(
     LifeCounterSession previous,
     LifeCounterSession next,
   ) {
+    final blockers = <String>[];
     final trackerIsActive =
         previous.turnTrackerActive || next.turnTrackerActive;
     if (previous.turnTrackerActive != next.turnTrackerActive ||
@@ -2018,10 +2021,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         previous.currentTurnNumber != next.currentTurnNumber ||
         previous.turnTimerActive != next.turnTimerActive ||
         previous.turnTimerSeconds != next.turnTimerSeconds) {
-      return false;
+      blockers.add('tracker_structure_changed');
     }
     if (trackerIsActive && previous.firstPlayerIndex != next.firstPlayerIndex) {
-      return false;
+      blockers.add('tracker_active_first_player_change');
     }
 
     final expected =
@@ -2040,13 +2043,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
               lastTableEvent: next.lastTableEvent,
               clearLastTableEvent: next.lastTableEvent == null,
             );
-    return expected.toJsonString() == next.toJsonString();
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_canonical_roll');
+    }
+    return blockers;
   }
-
-  bool _canApplyCanonicalDiceSessionWithoutReload(
-    LifeCounterSession previous,
-    LifeCounterSession next,
-  ) => _canApplyCanonicalRollSessionWithoutReload(previous, next);
 
   Future<void> _openNativeCommanderDamageSheet({
     required String source,
@@ -2853,10 +2854,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
-    final canonicalSyncEligible = _canApplyCanonicalRollSessionWithoutReload(
+    final syncBlockers = _rollCanonicalSyncBlockers(
       previousSession,
       adjustedSession,
     );
+    final canonicalSyncEligible = syncBlockers.isEmpty;
     const livePatchEligible = false;
     final applyStrategy =
         canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
@@ -2874,6 +2876,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'has_last_event': adjustedSession.lastTableEvent != null,
           'has_player_rolls':
               adjustedSession.lastPlayerRolls.whereType<int>().isNotEmpty,
+          'sync_blockers': syncBlockers,
         },
       ),
     );

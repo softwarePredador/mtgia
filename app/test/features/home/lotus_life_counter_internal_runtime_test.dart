@@ -1270,16 +1270,12 @@ void main() {
           expect(find.text('Table State'), findsOneWidget);
 
           await tester.scrollUntilVisible(
-            find.byKey(
-              const Key('life-counter-native-table-state-storm-plus'),
-            ),
+            find.byKey(const Key('life-counter-native-table-state-storm-plus')),
             250,
             scrollable: find.byType(Scrollable).first,
           );
           final stormPlusButton = tester.widget<FilledButton>(
-            find.byKey(
-              const Key('life-counter-native-table-state-storm-plus'),
-            ),
+            find.byKey(const Key('life-counter-native-table-state-storm-plus')),
           );
           stormPlusButton.onPressed!.call();
           await tester.pumpAndSettle();
@@ -1375,7 +1371,8 @@ void main() {
                 message.contains('message=native_dice_applied') &&
                 message.contains('apply_strategy: canonical_store_sync') &&
                 message.contains('live_patch_eligible: false') &&
-                message.contains('reload_required: false'),
+                message.contains('reload_required: false') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );
@@ -1475,7 +1472,8 @@ void main() {
               (message) =>
                   message.contains('message=native_dice_applied') &&
                   message.contains('apply_strategy: canonical_store_sync') &&
-                  message.contains('reload_required: false'),
+                  message.contains('reload_required: false') &&
+                  message.contains('sync_blockers: []'),
             ),
             isTrue,
           );
