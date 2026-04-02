@@ -408,13 +408,19 @@ Implementado nesta rodada:
 
 Status:
 
-- pendente
+- concluida
 
 Entregaveis:
 
 - decisao formal:
   - fora do core desta fase
   - ou contrato canonicamente nosso
+
+Decisao formal registrada:
+
+- `Game Modes` ficam fora da definicao de `core 100% nosso` nesta fase
+- `Planechase`, `Archenemy` e `Bounty` permanecem fluxos Lotus-first visuais
+- ManaLoom fica responsavel por handoff tecnico, observabilidade e suporte nativo interno quando necessario
 
 Se ficar fora:
 
@@ -424,6 +430,10 @@ Se ficar fora:
 Se entrar:
 
 - criar contrato proprio de disponibilidade, estado ativo e card pool handoff
+
+Fechamento executado:
+
+- `game modes` agora tambem expõem `core_scope: excluded_from_canonical_core` em open, dismiss e falha de entrega, deixando essa fronteira explicita no contrato observavel da tela viva
 
 Objetivo:
 
@@ -491,9 +501,9 @@ Done when:
 
 Checklist curto de execucao:
 
-- [ ] documentar a matriz completa do snapshot
-- [ ] criar contrato canonico proprio para `history`
-- [ ] decidir escopo final de `Game Modes`
+- [x] documentar a matriz completa do snapshot
+- [x] criar contrato canonico proprio para `history`
+- [x] decidir escopo final de `Game Modes`
 - [ ] reduzir `reload bundle` como caminho padrao
 - [ ] criar mecanismo de patch incremental do runtime Lotus
 - [ ] provar reopen com estado canonico mesmo sem snapshot Lotus confiavel

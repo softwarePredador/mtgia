@@ -374,7 +374,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_game_modes_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'core_scope: excluded_from_canonical_core',
+                ),
           ),
           isTrue,
         );
@@ -383,6 +386,9 @@ void main() {
             (message) =>
                 message.contains('message=native_game_modes_dismissed') &&
                 message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'core_scope: excluded_from_canonical_core',
+                ) &&
                 message.contains('action_delivered: true'),
           ),
           isTrue,
@@ -696,7 +702,10 @@ void main() {
             logs.any(
               (message) =>
                   message.contains('message=native_game_modes_action_failed') &&
-                  message.contains('surface_strategy: native_fallback'),
+                  message.contains('surface_strategy: native_fallback') &&
+                  message.contains(
+                    'core_scope: excluded_from_canonical_core',
+                  ),
             ),
             isTrue,
           );
@@ -705,6 +714,9 @@ void main() {
               (message) =>
                   message.contains('message=native_game_modes_dismissed') &&
                   message.contains('surface_strategy: native_fallback') &&
+                  message.contains(
+                    'core_scope: excluded_from_canonical_core',
+                  ) &&
                   message.contains('action_delivered: false'),
             ),
             isTrue,

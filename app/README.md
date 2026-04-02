@@ -67,6 +67,7 @@ Estado vivo do contador hoje:
 - a shell nativa de `game modes` continua existindo em codigo apenas como apoio de backend, observabilidade e fluxos internos
 - decisao final de `Game Modes`: `Planechase`, `Archenemy` e `Bounty` entram no produto final como fluxos Lotus-first visuais, com ManaLoom sustentando handoff tecnico, observabilidade e persistencia quando necessario
 - os handoffs embutidos de `game modes` agora so contam como entregues quando o seletor alvo existe no DOM real do Lotus, inclusive no segundo passo de `edit cards`; seletor ausente vira falha observavel, e o dismiss da shell passa a carregar `action_delivered`
+- `game modes` agora tambem expõe `core_scope: excluded_from_canonical_core` em open, dismiss e falha de entrega, deixando explicito no proprio runtime observavel que esse dominio fica fora do fechamento do core canonico desta fase
 - a shell de `game modes` agora tambem expõe `surface_strategy: native_fallback` em open, dismiss e falha de entrega, alinhando essa superficie Lotus-first ao mesmo contrato observavel das outras sheets internas
 - `edit cards` e card pools permanecem embutidos no runtime Lotus como parte suportada do produto final, sem migracao visual para Flutter nesta fase
 - `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, deixando explicito na observabilidade quando o apply fechou por runtime live ou por `reload`

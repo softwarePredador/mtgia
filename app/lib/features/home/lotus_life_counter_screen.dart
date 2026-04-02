@@ -597,6 +597,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
     _isNativeGameModesSheetOpen = true;
     const surfaceStrategy = 'native_fallback';
+    const coreScope = 'excluded_from_canonical_core';
     final availability = await _readNativeGameModesAvailability();
     if (!mounted) {
       _isNativeGameModesSheetOpen = false;
@@ -610,6 +611,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'core_scope': coreScope,
           'preferred_intent': preferredIntent.name,
           'planechase_available': availability.planechaseAvailable,
           'planechase_active': availability.planechaseActive,
@@ -743,6 +745,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           data: {
             'source': source,
             'surface_strategy': surfaceStrategy,
+            'core_scope': coreScope,
             'preferred_intent': preferredIntent.name,
             'selected_action': action.name,
           },
@@ -757,6 +760,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'core_scope': coreScope,
           'preferred_intent': preferredIntent.name,
           'selected_action': action?.name,
           'action_delivered': actionDelivered,
