@@ -6,11 +6,15 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
+import '../life_counter/life_counter_day_night_state.dart';
 import '../life_counter/life_counter_day_night_state_store.dart';
+import '../life_counter/life_counter_game_timer_state.dart';
 import '../life_counter/life_counter_game_timer_state_store.dart';
 import '../life_counter/life_counter_history.dart';
 import '../life_counter/life_counter_history_store.dart';
+import '../life_counter/life_counter_settings.dart';
 import '../life_counter/life_counter_settings_store.dart';
+import '../life_counter/life_counter_session.dart';
 import '../life_counter/life_counter_session_store.dart';
 import 'lotus_host.dart';
 import 'lotus_life_counter_game_timer_adapter.dart';
@@ -65,6 +69,89 @@ Future<Map<String, String>> buildLotusFallbackBootstrapValues({
   return values;
 }
 
+LifeCounterDayNightState? buildLotusDayNightStateFromSnapshot(
+  LotusStorageSnapshot snapshot,
+) {
+  final rawMode = snapshot.values['__manaloom_day_night_mode'];
+  if (rawMode == 'night') {
+    return const LifeCounterDayNightState(isNight: true);
+  }
+  if (rawMode == 'day') {
+    return const LifeCounterDayNightState(isNight: false);
+  }
+  return null;
+}
+
+class LotusCanonicalMirrorResult {
+  const LotusCanonicalMirrorResult({
+    required this.dayNightState,
+    required this.gameTimerState,
+    required this.history,
+    required this.session,
+    required this.settings,
+  });
+
+  final LifeCounterDayNightState? dayNightState;
+  final LifeCounterGameTimerState? gameTimerState;
+  final LifeCounterHistoryState history;
+  final LifeCounterSession? session;
+  final LifeCounterSettings? settings;
+}
+
+Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
+  required LifeCounterDayNightStateStore dayNightStateStore,
+  required LifeCounterGameTimerStateStore gameTimerStateStore,
+  required LifeCounterHistoryStore historyStore,
+  required LifeCounterSessionStore sessionStore,
+  required LifeCounterSettingsStore settingsStore,
+  required LotusStorageSnapshot snapshot,
+}) async {
+  final derivedDayNight = buildLotusDayNightStateFromSnapshot(snapshot);
+  final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+    snapshot,
+  );
+  final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
+    snapshot,
+  );
+  final derivedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
+    snapshot,
+  );
+  final derivedHistory = LifeCounterHistoryState.fromSources(
+    session: derivedSession,
+    snapshot: snapshot,
+  );
+
+  if (derivedDayNight != null) {
+    await dayNightStateStore.save(derivedDayNight);
+  } else {
+    await dayNightStateStore.clear();
+  }
+  if (derivedSession != null) {
+    await sessionStore.save(derivedSession);
+  }
+  if (derivedSettings != null) {
+    await settingsStore.save(derivedSettings);
+  }
+  if (derivedGameTimer != null) {
+    await gameTimerStateStore.save(derivedGameTimer);
+  } else {
+    await gameTimerStateStore.clear();
+  }
+  if (derivedHistory.hasContent) {
+    await historyStore.save(derivedHistory);
+  } else {
+    await historyStore.clear();
+  }
+
+  return LotusCanonicalMirrorResult(
+    dayNightState: derivedDayNight,
+    gameTimerState: derivedGameTimer,
+    history: derivedHistory,
+    session: derivedSession,
+    settings: derivedSettings,
+  );
+}
+
 class LotusHostController implements LotusHost {
   static const String _bundleLoadErrorMessage =
       'ManaLoom could not open the embedded life counter. '
@@ -108,6 +195,7 @@ class LotusHostController implements LotusHost {
   bool _didRecordCanonicalSessionMirrorThisLoad = false;
   bool _didRecordCanonicalSettingsMirrorThisLoad = false;
   bool _didRecordCanonicalGameTimerMirrorThisLoad = false;
+  bool _didRecordCanonicalDayNightMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
   DateTime? _ignoreBeforeUnloadSnapshotUntil;
 
@@ -133,6 +221,7 @@ class LotusHostController implements LotusHost {
     _didRecordCanonicalSessionMirrorThisLoad = false;
     _didRecordCanonicalSettingsMirrorThisLoad = false;
     _didRecordCanonicalGameTimerMirrorThisLoad = false;
+    _didRecordCanonicalDayNightMirrorThisLoad = false;
     unawaited(
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
@@ -242,39 +331,24 @@ class LotusHostController implements LotusHost {
     }
 
     await _storageSnapshotStore.save(snapshot);
-    final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
-      snapshot,
-    );
-    final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
-      snapshot,
-    );
-    final derivedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
-      snapshot,
-    );
-    final derivedHistory = LifeCounterHistoryState.fromSources(
-      session: derivedSession,
+    final mirror = await persistCanonicalMirrorFromLotusSnapshot(
+      dayNightStateStore: _dayNightStateStore,
+      gameTimerStateStore: _gameTimerStateStore,
+      historyStore: _historyStore,
+      sessionStore: _sessionStore,
+      settingsStore: _settingsStore,
       snapshot: snapshot,
     );
-    if (derivedSession != null) {
-      await _sessionStore.save(derivedSession);
-    }
-    if (derivedSettings != null) {
-      await _settingsStore.save(derivedSettings);
-    }
-    if (derivedGameTimer != null) {
-      await _gameTimerStateStore.save(derivedGameTimer);
-    } else {
-      await _gameTimerStateStore.clear();
-    }
-    if (derivedHistory.hasContent) {
-      await _historyStore.save(derivedHistory);
-    } else {
-      await _historyStore.clear();
-    }
+    final derivedDayNight = mirror.dayNightState;
+    final derivedGameTimer = mirror.gameTimerState;
+    final derivedSession = mirror.session;
+    final derivedSettings = mirror.settings;
 
     if (_didRecordStoragePersistThisLoad) {
       if ((derivedSettings == null ||
               _didRecordCanonicalSettingsMirrorThisLoad) &&
+          (derivedDayNight == null ||
+              _didRecordCanonicalDayNightMirrorThisLoad) &&
           (derivedGameTimer == null ||
               _didRecordCanonicalGameTimerMirrorThisLoad)) {
         return;
@@ -316,6 +390,17 @@ class LotusHostController implements LotusHost {
             'show_counters_on_player_card':
                 derivedSettings.showCountersOnPlayerCard,
           },
+        ),
+      );
+    }
+
+    if (derivedDayNight != null && !_didRecordCanonicalDayNightMirrorThisLoad) {
+      _didRecordCanonicalDayNightMirrorThisLoad = true;
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'canonical_day_night_mirrored_from_lotus',
+          category: 'life_counter.day_night',
+          data: {'mode': derivedDayNight.mode},
         ),
       );
     }

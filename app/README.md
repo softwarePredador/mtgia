@@ -80,6 +80,7 @@ Estado vivo do contador hoje:
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local
 - o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, `session`, `settings`, `timer`, `history`, `history-only` e `day/night-only`
+- o host agora tambem espelha `day/night` do `persist_snapshot` Lotus para a store canonica, e limpa estado stale quando `__manaloom_day_night_mode` some do snapshot
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`

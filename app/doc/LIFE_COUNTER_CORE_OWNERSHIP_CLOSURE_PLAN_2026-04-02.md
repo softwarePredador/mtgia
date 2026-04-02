@@ -64,6 +64,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `player appearance profile save/delete` agora tambem registram `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, separando persistencia de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `player appearance profile select` agora tambem registra `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo para o draft local
 - o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, os caminhos `session/settings/timer/history`, `history-only` e `day/night-only`
+- o host agora tambem espelha `day/night` do `persist_snapshot` Lotus para a store canonica, e limpa estado stale quando a chave `__manaloom_day_night_mode` deixa de existir no snapshot
 - `history` e `card search` agora identificam explicitamente na observabilidade que a sheet nativa acionada por atalho interno eh `native_fallback`; `history export` tambem marca o transporte como `clipboard_export`
 
 ## Ja ManaLoom-owned
