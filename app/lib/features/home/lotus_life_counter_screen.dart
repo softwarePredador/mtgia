@@ -436,6 +436,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await Future<void>.delayed(Duration.zero);
   }
 
+  Future<void> debugRunJavaScript(String script) {
+    return _hostController.runJavaScript(script);
+  }
+
+  Future<Object?> debugRunJavaScriptReturningResult(String script) {
+    return _hostController.runJavaScriptReturningResult(script);
+  }
+
   Future<void> _reloadLotusBundleFromOwnedSnapshot() async {
     _hostController.suppressStaleBeforeUnloadSnapshot();
     await _loadBundleAndSyncOwnedShellState(
