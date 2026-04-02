@@ -70,6 +70,7 @@ Proximo passo imediato:
 - segunda extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - terceira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_runtime_test.dart`
 - quarta extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
+- quinta extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 
 ## Sprint 1 - Closed
 
