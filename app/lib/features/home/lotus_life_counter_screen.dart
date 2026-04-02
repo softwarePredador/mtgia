@@ -2520,11 +2520,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     const syncCoin = (type, targetIndex) => {
       const className = type + '-coin';
       const existingCoin = document.querySelector('.' + className);
+      const menuButton = document.querySelector('.menu-button');
+      const menuButtonClassName = 'active-' + type;
       playerCards.forEach((card) => {
         if (card instanceof HTMLElement) {
           card.classList.remove(type);
         }
       });
+      if (menuButton instanceof HTMLElement) {
+        menuButton.classList.remove(menuButtonClassName);
+      }
 
       if (targetIndex == null) {
         if (existingCoin instanceof HTMLElement) {
@@ -2539,6 +2544,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       }
 
       targetCard.classList.add(type);
+      if (menuButton instanceof HTMLElement) {
+        menuButton.classList.add(menuButtonClassName);
+      }
 
       let coin = existingCoin;
       if (!(coin instanceof HTMLElement)) {
