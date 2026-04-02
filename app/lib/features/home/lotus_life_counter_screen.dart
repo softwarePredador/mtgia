@@ -457,26 +457,31 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _applyOwnedDayNightPreference();
   }
 
-  Future<void> _applyOwnedDayNightPreference() async {
+  Future<bool> _applyOwnedDayNightPreference() async {
     final state = await _dayNightStateStore.load();
     if (state == null) {
-      return;
+      return true;
     }
 
-    final script = '''
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
     localStorage.setItem('__manaloom_day_night_mode', '${state.mode}');
     const switcher = document.querySelector('.day-night-switcher');
-    if (switcher) {
-      switcher.classList.toggle('night', ${state.isNight ? 'true' : 'false'});
+    if (!(switcher instanceof HTMLElement)) {
+      return JSON.stringify({ ok: false, reason: 'switcher_missing' });
     }
+    switcher.classList.toggle('night', ${state.isNight ? 'true' : 'false'});
+    return JSON.stringify({ ok: true, isNight: ${state.isNight ? 'true' : 'false'} });
   } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'day_night_patch_failed' });
 })();
-''';
-    try {
-      await _hostController.runJavaScript(script);
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      return decoded is Map<String, dynamic> && decoded['ok'] == true;
     } catch (_) {}
+    return false;
   }
 
   Future<bool> _applyLiveLotusStoragePatch(Map<String, String?> values) async {
@@ -970,7 +975,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
-    await _applyOwnedDayNightPreference();
+    final applied = await _applyOwnedDayNightPreference();
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -979,6 +984,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {'source': source, 'is_night': state.isNight},
       ),
     );
+
+    if (!applied) {
+      unawaited(_reloadLotusBundleFromOwnedSnapshot());
+    }
   }
 
   Future<void> _applyNativeSettings(

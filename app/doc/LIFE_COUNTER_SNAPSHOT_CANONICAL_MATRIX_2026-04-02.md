@@ -26,6 +26,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o `turn tracker` agora tambem tem recortes de sync incremental pelo proprio runtime do Lotus, sem depender de patch cego de storage
 - os caminhos de runtime sem `reload` agora tambem confirmam presenca real do alvo no DOM do Lotus antes de reportar sucesso ao host
 - `table state` agora tambem tem um recorte sem `reload` para `monarch/initiative`, incluindo clear de ownership visual; `storm` continua fora desse caminho
+- `day/night` agora tambem confirma o `.day-night-switcher` antes de assumir sucesso no sync live; se o alvo nao responder, o host volta para fallback
 
 ## Reading rule
 
@@ -146,6 +147,7 @@ Complemento desta rodada:
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`, desde que o alvo `.game-timer` exista e responda
 - `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural e com o alvo `.turn-time-tracker` presente
 - `table state` ja tem um caso seguro de sync incremental sem `reload`, desde que a mutacao seja apenas trocar ou limpar `monarch/initiative`, com `.player-card` presentes e `menu-button` sincronizada; mudanca de `storm` ainda cai em fallback
+- `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca
 
 ### 3. Runtime Lotus-first visual paths
 

@@ -49,8 +49,19 @@ class _FakeLotusHost implements LotusHost {
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
+    if (script.contains('.day-night-switcher')) {
+      executedScripts.add(script);
+    }
+
     if (onRunJavaScriptReturningResult != null) {
       return onRunJavaScriptReturningResult!(script);
+    }
+
+    if (script.contains('.day-night-switcher')) {
+      return jsonEncode(<String, Object>{
+        'ok': true,
+        'isNight': script.contains("toggle('night', true)"),
+      });
     }
 
     if (script.contains('.planechase-overlay')) {
@@ -146,11 +157,78 @@ void main() {
         host.executedScripts.any(
           (script) =>
               script.contains('__manaloom_day_night_mode') &&
-              script.contains("'night'"),
+              script.contains('.day-night-switcher'),
         ),
         isTrue,
       );
+      expect(host.loadBundleCallCount, 1);
     });
+
+    testWidgets(
+      'reloads the Lotus bundle when day night live sync cannot confirm the switcher',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                  onRunJavaScriptReturningResult: (script) {
+                    if (script.contains('.day-night-switcher')) {
+                      return jsonEncode(<String, Object>{
+                        'ok': false,
+                        'reason': 'switcher_missing',
+                      });
+                    }
+
+                    return jsonEncode(<String, Object>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'archenemyAvailable': false,
+                      'archenemyActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                    });
+                  },
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-day-night","source":"day_night_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Night'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-day-night-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains('__manaloom_day_night_mode') &&
+                script.contains('.day-night-switcher'),
+          ),
+          isTrue,
+        );
+      },
+    );
 
     testWidgets('opens native game modes from a direct planechase shortcut', (
       tester,

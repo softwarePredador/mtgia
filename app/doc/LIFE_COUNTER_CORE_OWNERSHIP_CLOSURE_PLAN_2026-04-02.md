@@ -50,6 +50,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `game timer` ja aceita sync incremental no caso seguro `active -> active`, mas so evita `reload` quando o alvo `.game-timer` esta presente e responde no DOM real do Lotus
 - `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente, rewind curto limitado e mudanca curta de starting player em `Turn 1`, sem mudanca estrutural fora desse gesto, e so evita `reload` quando o alvo `.turn-time-tracker` esta presente e responde no DOM real do Lotus
 - `table state` agora tambem aceita sync incremental no recorte seguro de `monarch/initiative`, incluindo aplicar e limpar ownership visual, mas so evita `reload` quando a mutacao nao mexe em `storm` e os `.player-card` do DOM real do Lotus estao presentes
+- `day/night` continua live sem takeover visual, mas agora so considera sucesso quando o `.day-night-switcher` responde; se falhar, cai em `reload` de fallback
 
 ## Ja ManaLoom-owned
 
@@ -393,6 +394,7 @@ Implementado nesta rodada:
 - `game timer` usa sync incremental no caso seguro `active -> active`, mas agora so considera sucesso quando o DOM `.game-timer` existe e confirma a aplicacao
 - `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente, voltar poucos passos ou mudar o starting player por rewind curto em `Turn 1`, mas agora so considera sucesso quando o DOM `.turn-time-tracker` existe e confirma a aplicacao
 - `table state` usa sync incremental quando a mutacao e apenas ownership visual de `monarch/initiative`, reaplicando ou limpando classes e moedas no DOM do Lotus e sincronizando a `menu-button` sem rebootar o bundle
+- `day/night` atualiza `__manaloom_day_night_mode` e o `.day-night-switcher` com confirmacao explicita de sucesso; se o switcher nao responder, o host faz fallback via `reload`
 - `settings` continuam em reload por decisao explicita de seguranca, porque o Lotus mantem esse dominio em memoria e nao reage apenas ao patch de storage
 
 ### Wave 5 - Tornar o host o escritor primario
