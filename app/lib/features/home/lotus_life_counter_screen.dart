@@ -1267,6 +1267,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     const surfaceStrategy = 'native_fallback';
+    const transferStrategy = 'clipboard_import';
     final transfer = LifeCounterHistoryTransfer.tryParse(rawPayload);
     if (transfer == null) {
       unawaited(
@@ -1276,6 +1277,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           data: {
             'source': source,
             'surface_strategy': surfaceStrategy,
+            'transfer_strategy': transferStrategy,
             'reason': 'invalid_payload',
           },
         ),
@@ -1349,6 +1351,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'transfer_strategy': transferStrategy,
+          'apply_strategy': 'canonical_store_sync',
+          'reload_required': false,
           'current_game_events': transfer.currentGameEntries.length,
           'archived_events': transfer.archiveEntries.length,
         },

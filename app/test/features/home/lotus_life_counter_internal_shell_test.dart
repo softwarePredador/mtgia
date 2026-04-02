@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history_transfer.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
@@ -305,6 +307,102 @@ void main() {
         );
       });
     });
+
+    testWidgets(
+      'imports native history into canonical stores from fallback shell',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
+
+          final transfer = LifeCounterHistoryTransfer(
+            version: lifeCounterHistoryTransferVersion,
+            exportedAt: DateTime.utc(2026, 4, 2, 12),
+            currentGameName: 'Imported Game',
+            lastTableEvent: 'Player 4 ganhou o monarchy',
+            currentGameEntries: const [
+              LifeCounterHistoryTransferEntry(
+                message: 'Player 1 perdeu 2 de vida',
+              ),
+            ],
+            archiveEntries: const [
+              LifeCounterHistoryTransferEntry(
+                message: 'Player 3 foi eliminado',
+              ),
+            ],
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-history","source":"history_shortcut_pressed"}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-history-import')),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.enterText(
+            find.byKey(const Key('life-counter-native-history-import-input')),
+            transfer.toJsonString(),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-history-import-confirm')),
+          );
+          await tester.pumpAndSettle();
+
+          final historyState = await LifeCounterHistoryStore().load();
+          final session = await LifeCounterSessionStore().load();
+          expect(historyState, isNotNull);
+          expect(historyState!.currentGameName, 'Imported Game');
+          expect(
+            historyState.currentGameEntries.single.message,
+            'Player 1 perdeu 2 de vida',
+          );
+          expect(
+            historyState.archiveEntries.single.message,
+            'Player 3 foi eliminado',
+          );
+          expect(session, isNotNull);
+          expect(session!.lastTableEvent, 'Player 4 ganhou o monarchy');
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_history_imported') &&
+                  message.contains('surface_strategy: native_fallback') &&
+                  message.contains('transfer_strategy: clipboard_import') &&
+                  message.contains('apply_strategy: canonical_store_sync') &&
+                  message.contains('reload_required: false'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
 
     testWidgets('opens native card search from a shell fallback shortcut', (
       tester,
