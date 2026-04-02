@@ -444,7 +444,7 @@ void main() {
       final turnTracker =
           jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
 
-      expect(turnTracker['startingPlayerIndex'], 3);
+      expect(turnTracker['startingPlayerIndex'], 2);
       expect(turnTracker['currentPlayerIndex'], 2);
     });
 
@@ -492,9 +492,65 @@ void main() {
       final turnTracker =
           jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
 
-      expect(turnTracker['startingPlayerIndex'], 2);
+      expect(turnTracker['startingPlayerIndex'], 3);
       expect(turnTracker['currentPlayerIndex'], 3);
     });
+
+    test(
+      'clears turn tracker pointers when serializing a session with no active players',
+      () {
+        final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [0, 0, 0, 0],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: 2,
+            turnTrackerActive: true,
+            turnTrackerOngoingGame: true,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: 3,
+            currentTurnNumber: 9,
+            turnTimerActive: true,
+            turnTimerSeconds: 14,
+            lastTableEvent: null,
+          ),
+        );
+
+        final turnTracker =
+            jsonDecode(values['turnTracker']!) as Map<String, dynamic>;
+        final tableState =
+            jsonDecode(values['__manaloom_table_state']!)
+                as Map<String, dynamic>;
+
+        expect(turnTracker['isActive'], isTrue);
+        expect(turnTracker['startingPlayerIndex'], isNull);
+        expect(turnTracker['currentPlayerIndex'], isNull);
+        expect(tableState['firstPlayerIndex'], isNull);
+      },
+    );
 
     test('falls back to answer-left when Lotus only exposes alive false', () {
       final snapshot = LotusStorageSnapshot(

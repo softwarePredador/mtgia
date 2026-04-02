@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../life_counter/life_counter_settings.dart';
 import '../life_counter/life_counter_session.dart';
 import '../life_counter/life_counter_tabletop_engine.dart';
+import '../life_counter/life_counter_turn_tracker_engine.dart';
 import 'lotus_life_counter_settings_adapter.dart';
 import 'lotus_storage_snapshot.dart';
 
@@ -305,38 +306,51 @@ class LotusLifeCounterSessionAdapter {
     LifeCounterSession session, {
     LifeCounterSettings? settings,
   }) {
+    final trackerSanitizedSession =
+        LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+          session,
+        );
     final layoutType =
-        _layoutTypeByPlayerCount[session.playerCount] ??
+        _layoutTypeByPlayerCount[trackerSanitizedSession.playerCount] ??
         _layoutTypeByPlayerCount[4]!;
     final turnTrackerDirection = _resolveTurnTrackerDirection(
-      session.playerCount,
+      trackerSanitizedSession.playerCount,
       layoutType,
     );
-    final startingPlayerIndex = session.firstPlayerIndex;
-    final currentTurnPlayerIndex = _normalizeCanonicalTurnTrackerPlayerIndex(
-      session,
-      session.currentTurnPlayerIndex ?? startingPlayerIndex ?? 0,
-    );
+    final startingPlayerIndex = trackerSanitizedSession.firstPlayerIndex;
+    final currentTurnPlayerIndex =
+        trackerSanitizedSession.currentTurnPlayerIndex == null &&
+                startingPlayerIndex == null
+            ? null
+            : _normalizeCanonicalTurnTrackerPlayerIndex(
+              trackerSanitizedSession,
+              trackerSanitizedSession.currentTurnPlayerIndex ??
+                  startingPlayerIndex ??
+                  0,
+            );
     final playerNames = List<String>.generate(
-      session.playerCount,
+      trackerSanitizedSession.playerCount,
       (index) => 'Player ${index + 1}',
     );
     final players = <Map<String, Object?>>[];
-    final resolvedCommanderCastDetails = session.resolvedCommanderCastDetails;
+    final resolvedCommanderCastDetails =
+        trackerSanitizedSession.resolvedCommanderCastDetails;
     final resolvedCommanderDamageDetails =
-        session.resolvedCommanderDamageDetails;
-    final resolvedPlayerExtraCounters = session.resolvedPlayerExtraCounters;
-    final resolvedPlayerAppearances = session.resolvedPlayerAppearances;
-    for (var index = 0; index < session.playerCount; index += 1) {
+        trackerSanitizedSession.resolvedCommanderDamageDetails;
+    final resolvedPlayerExtraCounters =
+        trackerSanitizedSession.resolvedPlayerExtraCounters;
+    final resolvedPlayerAppearances =
+        trackerSanitizedSession.resolvedPlayerAppearances;
+    for (var index = 0; index < trackerSanitizedSession.playerCount; index += 1) {
       final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
-      if (session.poison[index] > 0) {
-        counters['poison'] = session.poison[index];
+      if (trackerSanitizedSession.poison[index] > 0) {
+        counters['poison'] = trackerSanitizedSession.poison[index];
       }
-      if (session.energy[index] > 0) {
-        counters['energy'] = session.energy[index];
+      if (trackerSanitizedSession.energy[index] > 0) {
+        counters['energy'] = trackerSanitizedSession.energy[index];
       }
-      if (session.experience[index] > 0) {
-        counters['xp'] = session.experience[index];
+      if (trackerSanitizedSession.experience[index] > 0) {
+        counters['xp'] = trackerSanitizedSession.experience[index];
       }
       final castDetail = resolvedCommanderCastDetails[index];
       if (castDetail.commanderOneCasts > 0) {
@@ -347,12 +361,14 @@ class LotusLifeCounterSessionAdapter {
       }
       if (counters['tax-1'] == null &&
           counters['tax-2'] == null &&
-          session.commanderCasts[index] > 0) {
-        counters['tax-1'] = session.commanderCasts[index] * 2;
+          trackerSanitizedSession.commanderCasts[index] > 0) {
+        counters['tax-1'] = trackerSanitizedSession.commanderCasts[index] * 2;
       }
 
       final commanderDamage = <Map<String, Object?>>[];
-      for (var source = 0; source < session.playerCount; source += 1) {
+      for (var source = 0;
+          source < trackerSanitizedSession.playerCount;
+          source += 1) {
         final damageDetail = resolvedCommanderDamageDetails[index][source];
         final totalDamage = damageDetail.totalDamage;
         if (totalDamage <= 0) {
@@ -378,21 +394,21 @@ class LotusLifeCounterSessionAdapter {
       players.add({
         'name': playerNames[index],
         'nickname': appearance.nickname,
-        'life': session.lives[index],
+        'life': trackerSanitizedSession.lives[index],
         'background': appearance.background,
         'backgroundImage': appearance.backgroundImage ?? false,
         'backgroundImagePartner': appearance.backgroundImagePartner ?? false,
         'alive':
-            session.playerSpecialStates[index] ==
+            trackerSanitizedSession.playerSpecialStates[index] ==
             LifeCounterPlayerSpecialState.none,
-        'partnerCommander': session.partnerCommanders[index],
+        'partnerCommander': trackerSanitizedSession.partnerCommanders[index],
         'commanderDamage': commanderDamage,
         'counters': counters,
       });
     }
 
     final turnTracker = _buildTurnTrackerPayload(
-      session,
+      trackerSanitizedSession,
       turnTrackerDirection: turnTrackerDirection,
       currentTurnPlayerIndex: currentTurnPlayerIndex,
       startingPlayerIndex: startingPlayerIndex,
@@ -402,18 +418,23 @@ class LotusLifeCounterSessionAdapter {
       'id': 'canonical-bootstrap',
       'name': 'Game #1',
       'startDate': DateTime.now().millisecondsSinceEpoch,
-      'startingLife': session.startingLife,
-      'playerCount': session.playerCount,
+      'startingLife': trackerSanitizedSession.startingLife,
+      'playerCount': trackerSanitizedSession.playerCount,
       'gameMode':
-          session.playerCount > 2 && session.startingLife >= 40
+          trackerSanitizedSession.playerCount > 2 &&
+                  trackerSanitizedSession.startingLife >= 40
               ? 'commander'
               : 'standard',
     };
 
     return <String, String>{
-      _playerCountKey: jsonEncode(session.playerCount),
-      _startingLifeTwoPlayerKey: jsonEncode(session.startingLifeTwoPlayer),
-      _startingLifeMultiPlayerKey: jsonEncode(session.startingLifeMultiPlayer),
+      _playerCountKey: jsonEncode(trackerSanitizedSession.playerCount),
+      _startingLifeTwoPlayerKey: jsonEncode(
+        trackerSanitizedSession.startingLifeTwoPlayer,
+      ),
+      _startingLifeMultiPlayerKey: jsonEncode(
+        trackerSanitizedSession.startingLifeMultiPlayer,
+      ),
       _layoutTypeKey: jsonEncode(layoutType),
       _playersKey: jsonEncode(players),
       _gameHistoryKey: jsonEncode(const <Object?>[]),
@@ -422,23 +443,23 @@ class LotusLifeCounterSessionAdapter {
       _gameCounterKey: jsonEncode(1),
       _currentGameMetaKey: jsonEncode(currentGameMeta),
       _manaloomPlayerSpecialStatesKey: jsonEncode(
-        session.playerSpecialStates
+        trackerSanitizedSession.playerSpecialStates
             .map(_encodePlayerSpecialState)
             .toList(growable: false),
       ),
       _manaloomPlayerAppearancesKey: jsonEncode(
-        session.resolvedPlayerAppearances
+        trackerSanitizedSession.resolvedPlayerAppearances
             .map((entry) => entry.toJson())
             .toList(growable: false),
       ),
       _manaloomTableStateKey: jsonEncode(
         _encodeTableState(
-          stormCount: session.stormCount,
-          monarchPlayer: session.monarchPlayer,
-          initiativePlayer: session.initiativePlayer,
-          lastPlayerRolls: session.lastPlayerRolls,
-          lastHighRolls: session.lastHighRolls,
-          firstPlayerIndex: session.firstPlayerIndex,
+          stormCount: trackerSanitizedSession.stormCount,
+          monarchPlayer: trackerSanitizedSession.monarchPlayer,
+          initiativePlayer: trackerSanitizedSession.initiativePlayer,
+          lastPlayerRolls: trackerSanitizedSession.lastPlayerRolls,
+          lastHighRolls: trackerSanitizedSession.lastHighRolls,
+          firstPlayerIndex: trackerSanitizedSession.firstPlayerIndex,
         ),
       ),
       if (settings != null)
@@ -454,24 +475,34 @@ class LotusLifeCounterSessionAdapter {
     LifeCounterSession session, {
     String? layoutType,
   }) {
+    final trackerSanitizedSession =
+        LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+          session,
+        );
     final resolvedLayoutType =
         layoutType ??
-        _layoutTypeByPlayerCount[session.playerCount] ??
+        _layoutTypeByPlayerCount[trackerSanitizedSession.playerCount] ??
         _layoutTypeByPlayerCount[4]!;
     final turnTrackerDirection = _resolveTurnTrackerDirection(
-      session.playerCount,
+      trackerSanitizedSession.playerCount,
       resolvedLayoutType,
     );
-    final startingPlayerIndex = session.firstPlayerIndex;
-    final currentTurnPlayerIndex = _normalizeCanonicalTurnTrackerPlayerIndex(
-      session,
-      session.currentTurnPlayerIndex ?? startingPlayerIndex ?? 0,
-    );
+    final startingPlayerIndex = trackerSanitizedSession.firstPlayerIndex;
+    final currentTurnPlayerIndex =
+        trackerSanitizedSession.currentTurnPlayerIndex == null &&
+                startingPlayerIndex == null
+            ? null
+            : _normalizeCanonicalTurnTrackerPlayerIndex(
+              trackerSanitizedSession,
+              trackerSanitizedSession.currentTurnPlayerIndex ??
+                  startingPlayerIndex ??
+                  0,
+            );
 
     return <String, String>{
       _turnTrackerKey: jsonEncode(
         _buildTurnTrackerPayload(
-          session,
+          trackerSanitizedSession,
           turnTrackerDirection: turnTrackerDirection,
           currentTurnPlayerIndex: currentTurnPlayerIndex,
           startingPlayerIndex: startingPlayerIndex,
