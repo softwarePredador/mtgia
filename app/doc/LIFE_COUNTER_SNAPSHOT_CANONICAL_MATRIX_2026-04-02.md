@@ -31,6 +31,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `turn tracker`, `game timer` e `table state` agora tambem expõem na observabilidade se o apply fechou em `live_runtime` ou `reload_fallback`, evitando leitura ambigua dos recortes sem `reload`
 - `day/night` agora tambem expõe `live_patch_eligible` e `apply_strategy`, alinhando sua leitura operacional aos outros recortes com apply live
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem expõem `live_patch_eligible: false` e `apply_strategy: reload_fallback`, fechando a leitura observavel dos dominios de runtime de jogador que ainda nao tem caminho live seguro
+- `settings` agora tambem expõe `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando visivel no log que esse dominio continua fora do live sync por seguranca
 
 ## Reading rule
 
@@ -156,6 +157,7 @@ Complemento desta rodada:
 - `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, separando visualmente no log quando o estado foi aplicado live e quando caiu em `reload`
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, deixando explicito quando a troca foi aplicada live e quando o host precisou recarregar o bundle
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso tambem fica explicito na observabilidade de apply, sem ambiguidade com os dominios que ja tem recortes live
+- `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
 
 ### 3. Runtime Lotus-first visual paths
 

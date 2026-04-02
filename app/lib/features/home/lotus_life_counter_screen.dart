@@ -1144,6 +1144,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) async {
     await _settingsStore.save(settings);
+    const livePatchEligible = false;
+    const applyStrategy = 'reload_fallback';
 
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {
@@ -1167,6 +1169,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'game_timer': settings.gameTimer,
           'show_counters_on_player_card': settings.showCountersOnPlayerCard,
           'clean_look': settings.cleanLook,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
         },
       ),
     );

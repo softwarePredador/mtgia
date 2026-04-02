@@ -76,6 +76,23 @@ class _FakeLotusHost implements LotusHost {
   }
 }
 
+Future<void> _captureDebugLogs(
+  Future<void> Function(List<String> logs) action,
+) async {
+  final logs = <String>[];
+  final originalDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) {
+      logs.add(message);
+    }
+  };
+  try {
+    await action(logs);
+  } finally {
+    debugPrint = originalDebugPrint;
+  }
+}
+
 void main() {
   group('LotusLifeCounterScreen internal shell fallback', () {
     String? clipboardText;
@@ -104,45 +121,55 @@ void main() {
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-settings","source":"settings_shortcut_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-settings","source":"settings_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Life Counter Settings'), findsOneWidget);
+        expect(find.text('Life Counter Settings'), findsOneWidget);
 
-      await tester.tap(find.text('Auto-kill'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Auto-kill'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-settings-save')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-settings-save')),
+        );
+        await tester.pumpAndSettle();
 
-      final settings = await LifeCounterSettingsStore().load();
-      expect(settings, isNotNull);
-      expect(settings!.autoKill, isFalse);
-      expect(host.loadBundleCallCount, 2);
+        final settings = await LifeCounterSettingsStore().load();
+        expect(settings, isNotNull);
+        expect(settings!.autoKill, isFalse);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_settings_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('opens native history from a shell fallback shortcut', (

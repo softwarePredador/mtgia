@@ -55,6 +55,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `turn tracker`, `game timer` e `table state` agora tambem registram na observabilidade se a aplicacao fechou por `live_runtime` ou `reload_fallback`, junto do sinal de elegibilidade do patch live
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, fechando o mesmo contrato observavel dos dominios com live apply/fallback
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem registram explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando claro que esses dominios ainda sao `reload-only`
+- `settings` agora tambem registra explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, alinhando a telemetria com a decisao arquitetural de manter esse dominio fora do live sync
 
 ## Ja ManaLoom-owned
 
@@ -187,6 +188,7 @@ Estado final desejado:
 Leitura operacional atual:
 
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso aparece de forma explicita na telemetria de apply, sem parecer live sync parcial
+- `settings` continua em `reload` por seguranca do bundle Lotus, e agora isso tambem aparece de forma explicita na telemetria de apply
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe
 
