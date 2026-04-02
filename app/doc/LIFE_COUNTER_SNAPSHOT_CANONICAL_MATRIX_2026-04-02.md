@@ -177,6 +177,7 @@ Complemento desta rodada:
 - `player state` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a sheet so altera `last rolls`, `first player` quando permitido e `last event`, reaproveitando o mesmo filtro conservador de `dice`
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a shell so altera dano canonico oculto para a mesa pelo settings atual, sem mudanca de vida, sem auto-kill e sem counters visiveis no player card
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a shell so altera counters canonicos ocultos para a mesa pelo settings atual, sem risco de `poison` abrir `autoKill`
+- a suite de `player values` agora tambem prova os limites desses recortes, garantindo fallback para `reload` assim que `commander damage` volta a afetar vida ou assim que `player counter` volta a ficar visivel no player card
 - `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
 - `history` e `card search` seguem sem apply de runtime nessa shell interna; a observabilidade agora deixa explicito quando o fluxo foi apenas `native_fallback`
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`

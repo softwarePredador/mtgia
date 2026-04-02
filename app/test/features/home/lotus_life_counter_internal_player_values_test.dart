@@ -338,6 +338,121 @@ void main() {
       },
     );
 
+    testWidgets(
+      'keeps commander damage on reload fallback when life loss on commander damage stays enabled',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await tester.binding.setSurfaceSize(const Size(900, 1200));
+          addTearDown(() => tester.binding.setSurfaceSize(null));
+
+          await LifeCounterSettingsStore().save(
+            LifeCounterSettings.defaults.copyWith(
+              autoKill: false,
+              lifeLossOnCommanderDamage: true,
+              showCountersOnPlayerCard: false,
+              showCommanderDamageCounters: false,
+            ),
+          );
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 32, 25, 11],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, true, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: null,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-commander-damage","source":"commander_damage_surface_pressed","targetPlayerIndex":0}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-commander-damage-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.commanderDamage[0][1], 1);
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_commander_damage_applied') &&
+                  message.contains('apply_strategy: reload_fallback'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
     testWidgets('opens native player counter from shell shortcut', (
       tester,
     ) async {
@@ -557,6 +672,116 @@ void main() {
                   message.contains('message=native_player_counter_applied') &&
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
+    testWidgets(
+      'keeps player counter on reload fallback when counters stay visible on player card',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSettingsStore().save(
+            LifeCounterSettings.defaults.copyWith(
+              autoKill: false,
+              showCountersOnPlayerCard: true,
+            ),
+          );
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 32, 25, 11],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: null,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-counter","source":"player_counter_surface_pressed","targetPlayerIndex":0,"counterKey":"poison"}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(const Key('life-counter-native-player-counter-plus')),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(const Key('life-counter-native-player-counter-plus')),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-counter-plus')),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-counter-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.poison[0], 1);
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_counter_applied') &&
+                  message.contains('apply_strategy: reload_fallback'),
             ),
             isTrue,
           );
