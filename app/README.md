@@ -40,6 +40,8 @@ Estado vivo do contador hoje:
 
 - diretriz atual: o `WebView` do Lotus e a camada visual oficial da mesa; ManaLoom fica com backend, persistencia, normalizacao e customizacao futura por cima do proprio Lotus
 - mudanca visual sem pedido explicito deve preservar o Lotus 1:1
+- decisao arquitetural fechada: o `WebView` nao sera removido como meta ativa enquanto a prioridade for manter ou superar a qualidade visual do Lotus
+- customizacao futura deve priorizar edicao do proprio Lotus no `WebView` (`css`, `js`, assets e injecao controlada pelo host), nao reimplementacao do board em Flutter puro
 - runtime source-of-truth: `app/assets/lotus/`
 - implementacao oficial: `app/lib/features/home/lotus_life_counter_screen.dart`
 - rota viva: `app/lib/features/home/life_counter_route.dart`

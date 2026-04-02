@@ -7,6 +7,8 @@ Estado atual do contador:
 - baseline visual e de gameplay da mesa continua Lotus-faithful
 - diretriz atual: o `WebView` do Lotus e a camada visual oficial da mesa; ManaLoom continua dona de backend, persistencia, normalizacao e customizacao futura por cima do proprio Lotus
 - sem pedido explicito, mudanca visual nova deve preservar o Lotus 1:1
+- decisao fechada: o `WebView` nao entra em roadmap de remocao enquanto a prioridade for manter ou superar o padrao visual atual do Lotus
+- customizacao visual futura deve priorizar alteracoes no proprio `WebView`, nao reimplementacao do board em Flutter puro
 - host Flutter e shell policy ja sao ManaLoom-owned
 - sessao canonica, settings canonicas e fronteiras de persistencia ja sao nossas
 - fluxo visual ja devolvido ao Lotus para:
@@ -48,6 +50,11 @@ O que ainda continua Lotus-owned:
 - overlays internos de gameplay
 - commander damage runtime
 - Planechase, Archenemy e Bounty
+
+Observacao de fronteira:
+
+- esses pontos continuam Lotus-owned por decisao de fidelidade visual, nao como debito obrigatorio de migracao
+- o trabalho ativo nesta fase e fortalecer o backend invisivel por tras do `WebView`
 
 ## Next Actions
 

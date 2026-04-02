@@ -7,12 +7,15 @@ Travamos a diretriz do contador assim:
 - o `WebView` do Lotus e a camada visual oficial da mesa
 - ManaLoom fica com backend, persistencia, snapshot bridge, normalizacao e regras de mesa
 - sem pedido explicito, nenhuma task nova deve mudar o visual do Lotus
+- remocao do `WebView` sai do roadmap ativo; so pode voltar como tema se houver novo briefing explicito de produto
+- customizacao visual futura deve acontecer no proprio Lotus (`css`, `js`, assets e injecao controlada do host), nao por reimplementacao da mesa em Flutter
 
 Em termos praticos:
 
 - o usuario deve enxergar Lotus
 - o estado critico deve ser nosso
 - o host Flutter deve agir como uma camada invisivel
+- quando quisermos melhorar o visual, o caminho preferencial e editar o `WebView` em si
 
 ## Immediate Goal
 
@@ -49,6 +52,22 @@ O que significa fechar esse baseline:
 - redesenhar menu, overlay ou affordance que ja exista no Lotus
 - planejar remocao do `WebView` como meta imediata
 - tratar Flutter como substituto visual da mesa
+- abrir frente de reimplementacao visual 1:1 em Flutter puro
+
+### Closed architectural decision
+
+- o `WebView` permanece como renderer visual oficial do life counter
+- nao existe meta ativa de substituir a mesa do Lotus por Flutter puro
+- se houver melhoria visual futura, ela deve priorizar:
+  - ajuste direto nos assets do Lotus
+  - injecao controlada via host
+  - extensao visual incremental sobre o proprio `WebView`
+- Flutter continua como camada de:
+  - app shell
+  - backend
+  - persistencia
+  - normalizacao
+  - integracao
 
 ### Allowed exceptions
 
