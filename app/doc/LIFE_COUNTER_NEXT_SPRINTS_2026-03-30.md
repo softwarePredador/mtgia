@@ -67,6 +67,7 @@ Proximo passo imediato:
 
 - alinhar a suite de testes com a diretriz Lotus-first, separando visual Lotus de fallback interno
 - primeira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_shell_test.dart`
+- segunda extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_actions_test.dart`
 
 ## Sprint 1 - Closed
 
