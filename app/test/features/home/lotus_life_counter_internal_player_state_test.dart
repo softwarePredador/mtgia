@@ -539,9 +539,9 @@ void main() {
             ),
           );
           await LifeCounterSessionStore().save(
-            LifeCounterSession.initial(playerCount: 4).copyWith(
-              lives: const [40, 32, 25, 11],
-            ),
+            LifeCounterSession.initial(
+              playerCount: 4,
+            ).copyWith(lives: const [40, 32, 25, 11]),
           );
 
           await tester.pumpWidget(
@@ -586,7 +586,8 @@ void main() {
                   message.contains('message=native_player_state_applied') &&
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
-                  message.contains('surface_reset_required: true'),
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: bundle_reload'),
             ),
             isTrue,
           );
@@ -662,6 +663,7 @@ void main() {
                 message.contains('message=native_player_state_applied') &&
                 message.contains('apply_strategy: canonical_store_sync') &&
                 message.contains('reload_required: false') &&
+                message.contains('surface_reset_strategy: none') &&
                 message.contains('sync_blockers: []'),
           ),
           isTrue,

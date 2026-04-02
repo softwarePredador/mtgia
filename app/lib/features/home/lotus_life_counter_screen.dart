@@ -1153,9 +1153,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final failureReason = await _applyOwnedDayNightPreferenceFailureReason();
     final applied = failureReason == null;
     final applyStrategy = applied ? 'live_runtime' : 'reload_fallback';
-    final syncBlockers = applied
-        ? const <String>[]
-        : <String>[failureReason];
+    final syncBlockers = applied ? const <String>[] : <String>[failureReason];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2918,9 +2916,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
     final canonicalSyncEligible = rollSyncBlockers.isEmpty;
     final settings = await _loadOwnedLifeCounterSettings();
-    final setLifeTargetPlayerIndex = canonicalSyncEligible
-        ? null
-        : _singleChangedLifePlayerIndex(previousSession, adjustedSession);
+    final setLifeTargetPlayerIndex =
+        canonicalSyncEligible
+            ? null
+            : _singleChangedLifePlayerIndex(previousSession, adjustedSession);
     String? setLifeFailureReason;
     List<String> setLifeSyncBlockers = const <String>[];
     var livePatchEligible = false;
@@ -2946,25 +2945,28 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       }
     }
 
-    final commanderDamageSyncBlockers = canonicalSyncEligible || appliedLive
-        ? const <String>[]
-        : _commanderDamageCanonicalSyncBlockers(
-            previousSession,
-            adjustedSession,
-            settings: settings,
-          );
+    final commanderDamageSyncBlockers =
+        canonicalSyncEligible || appliedLive
+            ? const <String>[]
+            : _commanderDamageCanonicalSyncBlockers(
+              previousSession,
+              adjustedSession,
+              settings: settings,
+            );
     final commanderDamageCanonicalSyncEligible =
         commanderDamageSyncBlockers.isEmpty &&
         _hasCommanderDamageDelta(previousSession, adjustedSession);
 
     final playerCounterSyncBlockers =
-        canonicalSyncEligible || appliedLive || commanderDamageCanonicalSyncEligible
+        canonicalSyncEligible ||
+                appliedLive ||
+                commanderDamageCanonicalSyncEligible
             ? const <String>[]
             : _playerCounterCanonicalSyncBlockers(
-                previousSession,
-                adjustedSession,
-                settings: settings,
-              );
+              previousSession,
+              adjustedSession,
+              settings: settings,
+            );
     final playerCounterCanonicalSyncEligible =
         playerCounterSyncBlockers.isEmpty &&
         _hasPlayerCounterDelta(previousSession, adjustedSession);
@@ -2976,10 +2978,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                 playerCounterCanonicalSyncEligible
             ? const <String>[]
             : _partnerCommanderCanonicalSyncBlockers(
-                previousSession,
-                adjustedSession,
-                settings: settings,
-              );
+              previousSession,
+              adjustedSession,
+              settings: settings,
+            );
     final partnerCommanderCanonicalSyncEligible =
         partnerCommanderSyncBlockers.isEmpty &&
         _hasPartnerCommanderDelta(previousSession, adjustedSession);
@@ -3000,6 +3002,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         !commanderDamageCanonicalSyncEligible &&
         !playerCounterCanonicalSyncEligible &&
         !partnerCommanderCanonicalSyncEligible;
+    final surfaceResetStrategy =
+        shouldResetLotusSurface ? 'bundle_reload' : 'none';
     final syncBlockers =
         canonicalSyncEligible
             ? const <String>[]
@@ -3009,22 +3013,29 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                         playerCounterCanonicalSyncEligible ||
                         partnerCommanderCanonicalSyncEligible
                     ? const <String>[]
-                : (setLifeTargetPlayerIndex != null
-                    ? (setLifeSyncBlockers.isNotEmpty
-                        ? setLifeSyncBlockers
-                        : <String>[
-                            setLifeFailureReason ?? 'player_state_live_rejected',
-                          ])
-                    : (_hasCommanderDamageDelta(previousSession, adjustedSession)
-                        ? commanderDamageSyncBlockers
-                        : (_hasPlayerCounterDelta(previousSession, adjustedSession)
-                            ? playerCounterSyncBlockers
-                            : (_hasPartnerCommanderDelta(
-                                    previousSession,
-                                    adjustedSession,
-                                  )
-                                ? partnerCommanderSyncBlockers
-                                : rollSyncBlockers))))));
+                    : (setLifeTargetPlayerIndex != null
+                        ? (setLifeSyncBlockers.isNotEmpty
+                            ? setLifeSyncBlockers
+                            : <String>[
+                              setLifeFailureReason ??
+                                  'player_state_live_rejected',
+                            ])
+                        : (_hasCommanderDamageDelta(
+                              previousSession,
+                              adjustedSession,
+                            )
+                            ? commanderDamageSyncBlockers
+                            : (_hasPlayerCounterDelta(
+                                  previousSession,
+                                  adjustedSession,
+                                )
+                                ? playerCounterSyncBlockers
+                                : (_hasPartnerCommanderDelta(
+                                      previousSession,
+                                      adjustedSession,
+                                    )
+                                    ? partnerCommanderSyncBlockers
+                                    : rollSyncBlockers))))));
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3036,6 +3047,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
           'surface_reset_required': shouldResetLotusSurface,
+          'surface_reset_strategy': surfaceResetStrategy,
           'has_last_event': adjustedSession.lastTableEvent != null,
           'has_player_rolls':
               adjustedSession.lastPlayerRolls.whereType<int>().isNotEmpty,
@@ -3058,12 +3070,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession previous,
     LifeCounterSession next,
   ) {
-    for (var targetPlayerIndex = 0;
-        targetPlayerIndex < next.playerCount;
-        targetPlayerIndex += 1) {
-      for (var sourcePlayerIndex = 0;
-          sourcePlayerIndex < next.playerCount;
-          sourcePlayerIndex += 1) {
+    for (
+      var targetPlayerIndex = 0;
+      targetPlayerIndex < next.playerCount;
+      targetPlayerIndex += 1
+    ) {
+      for (
+        var sourcePlayerIndex = 0;
+        sourcePlayerIndex < next.playerCount;
+        sourcePlayerIndex += 1
+      ) {
         if (previous.commanderDamage[targetPlayerIndex][sourcePlayerIndex] !=
             next.commanderDamage[targetPlayerIndex][sourcePlayerIndex]) {
           return true;
@@ -3122,7 +3138,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       next,
     );
     if (targetPlayerIndex != null) {
-      final previousAppearance = previous.resolvedPlayerAppearances[targetPlayerIndex];
+      final previousAppearance =
+          previous.resolvedPlayerAppearances[targetPlayerIndex];
       final nextAppearance = next.resolvedPlayerAppearances[targetPlayerIndex];
       if (previousAppearance.backgroundImagePartner != null ||
           nextAppearance.backgroundImagePartner != null) {
@@ -3541,26 +3558,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
     final livePatchEligible = _canApplyLiveTableStatePatch();
     String? failureReason;
-    final appliedLive = livePatchEligible
-        ? (() async {
-            failureReason = await _applyOwnedTableStateRuntimeFailureReason(
-              adjustedSession,
-            );
-            return failureReason == null;
-          })()
-        : Future<bool>.value(false);
+    final appliedLive =
+        livePatchEligible
+            ? (() async {
+              failureReason = await _applyOwnedTableStateRuntimeFailureReason(
+                adjustedSession,
+              );
+              return failureReason == null;
+            })()
+            : Future<bool>.value(false);
     final appliedLiveResolved = await appliedLive;
-    final applyStrategy = appliedLiveResolved
-        ? 'live_runtime'
-        : 'reload_fallback';
-    final syncBlockers = appliedLiveResolved
-        ? const <String>[]
-        : <String>[
-            if (!livePatchEligible)
-              'live_patch_ineligible'
-            else
-              failureReason ?? 'live_runtime_rejected',
-          ];
+    final applyStrategy =
+        appliedLiveResolved ? 'live_runtime' : 'reload_fallback';
+    final syncBlockers =
+        appliedLiveResolved
+            ? const <String>[]
+            : <String>[
+              if (!livePatchEligible)
+                'live_patch_ineligible'
+              else
+                failureReason ?? 'live_runtime_rejected',
+            ];
 
     unawaited(
       AppObservability.instance.recordEvent(
