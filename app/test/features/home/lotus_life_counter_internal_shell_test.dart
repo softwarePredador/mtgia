@@ -254,9 +254,11 @@ void main() {
                   'message=native_fallback_surface_requested',
                 ) &&
                 message.contains('message_type: open-native-history') &&
+                message.contains('domain_key: history') &&
                 message.contains(
                   'fallback_classification: support_utility',
-                ),
+                ) &&
+                message.contains('review_status: support_utility'),
           ),
           isTrue,
         );

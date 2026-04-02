@@ -218,9 +218,11 @@ void main() {
                   'message=native_fallback_surface_requested',
                 ) &&
                 message.contains('message_type: open-native-player-state') &&
+                message.contains('domain_key: player_state') &&
                 message.contains(
                   'fallback_classification: ownership_bridge',
                 ) &&
+                message.contains('review_status: ownership_in_progress') &&
                 message.contains('target_player_index: 1'),
           ),
           isTrue,

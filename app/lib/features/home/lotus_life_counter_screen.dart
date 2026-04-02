@@ -84,6 +84,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'open-native-table-state': _ownershipBridgeFallbackClassification,
         'open-native-day-night': _ownershipBridgeFallbackClassification,
       };
+  static const Map<String, String> _nativeFallbackDomainKeyByType =
+      <String, String>{
+        'open-native-settings': 'settings',
+        'open-native-history': 'history',
+        'open-native-card-search': 'card_search',
+        'open-native-turn-tracker': 'turn_tracker',
+        'open-native-game-timer': 'game_timer',
+        'open-native-game-modes': 'game_modes',
+        'open-native-dice': 'dice',
+        'open-native-commander-damage': 'commander_damage',
+        'open-native-player-appearance': 'player_appearance',
+        'open-native-player-counter': 'player_counter',
+        'open-native-player-state': 'player_state',
+        'open-native-set-life': 'set_life',
+        'open-native-table-state': 'table_state',
+        'open-native-day-night': 'day_night',
+      };
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
   };
@@ -555,16 +572,26 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final type = decoded['type'] as String?;
     final fallbackClassification =
         type == null ? null : _nativeFallbackClassificationByType[type];
-    if (type == null || fallbackClassification == null) {
+    final domainKey = type == null ? null : _nativeFallbackDomainKeyByType[type];
+    if (type == null || fallbackClassification == null || domainKey == null) {
       return;
     }
 
     final source = (decoded['source'] as String?) ?? 'shell_shortcut';
+    final reviewStatus =
+        switch (fallbackClassification) {
+          _ownershipBridgeFallbackClassification => 'ownership_in_progress',
+          _supportUtilityFallbackClassification => 'support_utility',
+          _excludedCoreSupportFallbackClassification => 'excluded_from_core',
+          _ => 'unclassified',
+        };
     final data = <String, Object?>{
       'message_type': type,
+      'domain_key': domainKey,
       'source': source,
       'surface_strategy': 'native_fallback',
       'fallback_classification': fallbackClassification,
+      'review_status': reviewStatus,
     };
 
     final targetPlayerIndex = (decoded['targetPlayerIndex'] as num?)?.toInt();

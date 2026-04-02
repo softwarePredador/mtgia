@@ -365,9 +365,11 @@ void main() {
                   'message=native_fallback_surface_requested',
                 ) &&
                 message.contains('message_type: open-native-game-modes') &&
+                message.contains('domain_key: game_modes') &&
                 message.contains(
                   'fallback_classification: excluded_core_support',
                 ) &&
+                message.contains('review_status: excluded_from_core') &&
                 message.contains(
                   'core_scope: excluded_from_canonical_core',
                 ),

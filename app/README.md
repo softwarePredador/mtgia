@@ -97,6 +97,7 @@ Estado vivo do contador hoje:
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que o runtime de jogador continua suporte nativo ao fluxo Lotus-first
 - os fluxos `open-native-*` agora tambem expõem `fallback_classification`, separando `ownership_bridge`, `support_utility` e `excluded_core_support` sem depender de leitura implícita por tipo de sheet
 - a propria entrada da shell agora tambem registra `native_fallback_surface_requested` para cada `open-native-*`, com tipo, source e classificacao, fechando a auditoria do fallback antes mesmo da sheet abrir
+- esse evento de borda agora tambem expõe `domain_key` e `review_status`, transformando a revisao dos fallbacks internos numa regra viva da shell em vez de uma leitura espalhada pelo codigo
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local
