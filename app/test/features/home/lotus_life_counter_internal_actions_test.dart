@@ -78,6 +78,13 @@ class _FakeLotusHost implements LotusHost {
       });
     }
 
+    if (onRunJavaScriptReturningResult != null) {
+      final overriddenResult = onRunJavaScriptReturningResult!(script);
+      if (overriddenResult != null) {
+        return overriddenResult;
+      }
+    }
+
     if (!isGameModesAvailabilityQuery &&
         (script.contains('.planechase-btn') ||
             script.contains('.archenemy-btn') ||
@@ -92,10 +99,6 @@ class _FakeLotusHost implements LotusHost {
             script.contains('.close-edit-archenemy-cards-overlay') ||
             script.contains('.close-edit-bounty-cards-overlay'))) {
       return jsonEncode(<String, Object>{'ok': true});
-    }
-
-    if (onRunJavaScriptReturningResult != null) {
-      return onRunJavaScriptReturningResult!(script);
     }
 
     if (script.contains('.planechase-overlay')) {
@@ -218,6 +221,10 @@ void main() {
                         'ok': false,
                         'reason': 'switcher_missing',
                       });
+                    }
+
+                    if (!script.contains('planechaseAvailable:')) {
+                      return null;
                     }
 
                     return jsonEncode(<String, Object>{
@@ -422,18 +429,23 @@ void main() {
               }) {
                 host = _FakeLotusHost(
                   onShellMessageRequested: onShellMessageRequested,
-                  onRunJavaScriptReturningResult:
-                      (script) => jsonEncode(<String, bool>{
-                        'planechaseAvailable': true,
-                        'planechaseActive': false,
-                        'planechaseCardPoolActive': true,
-                        'archenemyAvailable': true,
-                        'archenemyActive': false,
-                        'archenemyCardPoolActive': false,
-                        'bountyAvailable': true,
-                        'bountyActive': false,
-                        'bountyCardPoolActive': false,
-                      }),
+                  onRunJavaScriptReturningResult: (script) {
+                    if (!script.contains('planechaseAvailable:')) {
+                      return null;
+                    }
+
+                    return jsonEncode(<String, bool>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': false,
+                      'planechaseCardPoolActive': true,
+                      'archenemyAvailable': true,
+                      'archenemyActive': false,
+                      'archenemyCardPoolActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                      'bountyCardPoolActive': false,
+                    });
+                  },
                 )..completeSuccessfulLoad();
                 return host;
               },
@@ -543,6 +555,90 @@ void main() {
       },
     );
 
+    testWidgets(
+      'records failed game mode delivery when the edit cards follow up selector is missing',
+      (tester) async {
+        late _FakeLotusHost host;
+        final logs = <String>[];
+        final originalDebugPrint = debugPrint;
+        debugPrint = (String? message, {int? wrapWidth}) {
+          if (message != null) {
+            logs.add(message);
+          }
+        };
+        try {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                    onRunJavaScriptReturningResult: (script) {
+                      if (script.contains(
+                        "document.querySelector('.edit-planechase-cards')",
+                      )) {
+                        return jsonEncode(<String, Object>{
+                          'ok': false,
+                          'reason': 'button_missing',
+                        });
+                      }
+                      return null;
+                    },
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-game-modes","source":"planechase_cards_pressed","preferredMode":"planechase","intent":"edit-cards"}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-game-modes-planechase-open'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(
+            logs.any(
+              (message) => message.contains(
+                'message=embedded_game_mode_follow_up_failed',
+              ),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) => message.contains(
+                'message=native_game_modes_action_failed',
+              ),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_game_modes_dismissed') &&
+                  message.contains('action_delivered: false'),
+            ),
+            isTrue,
+          );
+        } finally {
+          debugPrint = originalDebugPrint;
+        }
+      },
+    );
+
     testWidgets('routes unavailable direct game modes to native settings', (
       tester,
     ) async {
@@ -557,15 +653,20 @@ void main() {
             }) {
               host = _FakeLotusHost(
                 onShellMessageRequested: onShellMessageRequested,
-                onRunJavaScriptReturningResult:
-                    (script) => jsonEncode(<String, bool>{
-                      'planechaseAvailable': true,
-                      'planechaseActive': false,
-                      'archenemyAvailable': false,
-                      'archenemyActive': false,
-                      'bountyAvailable': true,
-                      'bountyActive': false,
-                    }),
+                onRunJavaScriptReturningResult: (script) {
+                  if (!script.contains('planechaseAvailable:')) {
+                    return null;
+                  }
+
+                  return jsonEncode(<String, bool>{
+                    'planechaseAvailable': true,
+                    'planechaseActive': false,
+                    'archenemyAvailable': false,
+                    'archenemyActive': false,
+                    'bountyAvailable': true,
+                    'bountyActive': false,
+                  });
+                },
               )..completeSuccessfulLoad();
               return host;
             },
@@ -613,19 +714,24 @@ void main() {
               }) {
                 host = _FakeLotusHost(
                   onShellMessageRequested: onShellMessageRequested,
-                  onRunJavaScriptReturningResult:
-                      (script) => jsonEncode(<String, Object>{
-                        'planechaseAvailable': true,
-                        'planechaseActive': true,
-                        'planechaseCardPoolActive': false,
-                        'archenemyAvailable': true,
-                        'archenemyActive': true,
-                        'archenemyCardPoolActive': false,
-                        'bountyAvailable': true,
-                        'bountyActive': false,
-                        'bountyCardPoolActive': false,
-                        'maxActiveModes': 2,
-                      }),
+                  onRunJavaScriptReturningResult: (script) {
+                    if (!script.contains('planechaseAvailable:')) {
+                      return null;
+                    }
+
+                    return jsonEncode(<String, Object>{
+                      'planechaseAvailable': true,
+                      'planechaseActive': true,
+                      'planechaseCardPoolActive': false,
+                      'archenemyAvailable': true,
+                      'archenemyActive': true,
+                      'archenemyCardPoolActive': false,
+                      'bountyAvailable': true,
+                      'bountyActive': false,
+                      'bountyCardPoolActive': false,
+                      'maxActiveModes': 2,
+                    });
+                  },
                 )..completeSuccessfulLoad();
                 return host;
               },

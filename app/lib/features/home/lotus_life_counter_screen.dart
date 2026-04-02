@@ -617,10 +617,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    bool? actionDelivered;
+
     if (action != null) {
       switch (action) {
         case LifeCounterGameModesAction.openPlanechase:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.planechase-btn',
             modeName: 'planechase',
             source: source,
@@ -630,7 +632,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                     : null,
           );
         case LifeCounterGameModesAction.openArchenemy:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.archenemy-btn',
             modeName: 'archenemy',
             source: source,
@@ -640,7 +642,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                     : null,
           );
         case LifeCounterGameModesAction.openBounty:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.bounty-btn',
             modeName: 'bounty',
             source: source,
@@ -650,65 +652,80 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                     : null,
           );
         case LifeCounterGameModesAction.editPlanechaseCards:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.planechase-btn',
             modeName: 'planechase',
             source: source,
             followUpSelector: '.edit-planechase-cards',
           );
         case LifeCounterGameModesAction.closePlanechaseCardPool:
-          await _closeEmbeddedGameModeCardPool(
+          actionDelivered = await _closeEmbeddedGameModeCardPool(
             selector: '.close-edit-planechase-cards-overlay',
             modeName: 'planechase',
             source: source,
           );
         case LifeCounterGameModesAction.editArchenemyCards:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.archenemy-btn',
             modeName: 'archenemy',
             source: source,
             followUpSelector: '.edit-archenemy-cards',
           );
         case LifeCounterGameModesAction.closeArchenemyCardPool:
-          await _closeEmbeddedGameModeCardPool(
+          actionDelivered = await _closeEmbeddedGameModeCardPool(
             selector: '.close-edit-archenemy-cards-overlay',
             modeName: 'archenemy',
             source: source,
           );
         case LifeCounterGameModesAction.editBountyCards:
-          await _triggerEmbeddedGameMode(
+          actionDelivered = await _triggerEmbeddedGameMode(
             selector: '.bounty-btn',
             modeName: 'bounty',
             source: source,
             followUpSelector: '.edit-bounty-cards',
           );
         case LifeCounterGameModesAction.closeBountyCardPool:
-          await _closeEmbeddedGameModeCardPool(
+          actionDelivered = await _closeEmbeddedGameModeCardPool(
             selector: '.close-edit-bounty-cards-overlay',
             modeName: 'bounty',
             source: source,
           );
         case LifeCounterGameModesAction.closePlanechase:
-          await _closeEmbeddedGameModeOverlay(
+          actionDelivered = await _closeEmbeddedGameModeOverlay(
             selector: '.close-planechase-overlay-btn',
             modeName: 'planechase',
             source: source,
           );
         case LifeCounterGameModesAction.closeArchenemy:
-          await _closeEmbeddedGameModeOverlay(
+          actionDelivered = await _closeEmbeddedGameModeOverlay(
             selector: '.close-archenemy-overlay-btn',
             modeName: 'archenemy',
             source: source,
           );
         case LifeCounterGameModesAction.closeBounty:
-          await _closeEmbeddedGameModeOverlay(
+          actionDelivered = await _closeEmbeddedGameModeOverlay(
             selector: '.close-bounty-overlay-btn',
             modeName: 'bounty',
             source: source,
           );
         case LifeCounterGameModesAction.openSettings:
           await _openNativeSettingsSheet(source: 'game_modes_settings');
+          actionDelivered = true;
       }
+    }
+
+    if (action != null && actionDelivered == false) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'native_game_modes_action_failed',
+          category: 'life_counter.game_modes',
+          data: {
+            'source': source,
+            'preferred_intent': preferredIntent.name,
+            'selected_action': action.name,
+          },
+        ),
+      );
     }
 
     unawaited(
@@ -719,6 +736,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'preferred_intent': preferredIntent.name,
           'selected_action': action?.name,
+          'action_delivered': actionDelivered,
         },
       ),
     );

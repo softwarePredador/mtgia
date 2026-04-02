@@ -27,7 +27,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - os caminhos de runtime sem `reload` agora tambem confirmam presenca real do alvo no DOM do Lotus antes de reportar sucesso ao host
 - `table state` agora tambem tem um recorte sem `reload` para `monarch/initiative`, incluindo clear de ownership visual; `storm` continua fora desse caminho
 - `day/night` agora tambem confirma o `.day-night-switcher` antes de assumir sucesso no sync live; se o alvo nao responder, o host volta para fallback
-- os handoffs embutidos de `Game Modes` agora tambem confirmam que o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem antes de reportar sucesso; seletor ausente deixa de parecer entrega bem-sucedida
+- os handoffs embutidos de `Game Modes` agora tambem confirmam que o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem antes de reportar sucesso; seletor ausente deixa de parecer entrega bem-sucedida, e o dismiss da shell passa a carregar o status real de entrega
 
 ## Reading rule
 
@@ -149,7 +149,7 @@ Complemento desta rodada:
 - `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural e com o alvo `.turn-time-tracker` presente
 - `table state` ja tem um caso seguro de sync incremental sem `reload`, desde que a mutacao seja apenas trocar ou limpar `monarch/initiative`, com `.player-card` presentes e `menu-button` sincronizada; mudanca de `storm` ainda cai em fallback
 - `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca
-- `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool agora e confirmado em chamada separada, sem `setTimeout` fire-and-forget
+- `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool agora e confirmado em chamada separada, sem `setTimeout` fire-and-forget, e a telemetria de dismiss passa a indicar `action_delivered`
 
 ### 3. Runtime Lotus-first visual paths
 
