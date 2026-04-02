@@ -61,6 +61,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem registram `surface_strategy: native_fallback` na abertura e no dismiss das sheets internas, alinhando a telemetria dessas superfices utilitarias ao papel Lotus-first atual
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem registram `surface_strategy: native_fallback` na abertura e no dismiss das sheets internas, fechando o mesmo contrato observavel para o runtime de jogador
 - `player appearance export/import` agora tambem registram `surface_strategy: native_fallback` e `transfer_strategy` (`clipboard_export` / `clipboard_import`), deixando explicito quando o fluxo auxiliar usa transporte por clipboard
+- `player appearance profile save/delete` agora tambem registram `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, separando persistencia de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `history` e `card search` agora identificam explicitamente na observabilidade que a sheet nativa acionada por atalho interno eh `native_fallback`; `history export` tambem marca o transporte como `clipboard_export`
 
 ## Ja ManaLoom-owned
@@ -200,6 +201,7 @@ Leitura operacional atual:
 - nas utility sheets (`settings`, `day/night`, `turn tracker`, `game timer`, `dice`, `table state`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
 - nas sheets de runtime de jogador (`commander damage`, `player appearance`, `player counter`, `player state`, `set life`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
 - em `player appearance`, os eventos auxiliares de export/import agora tambem deixam explicito quando o fluxo passou por clipboard, em vez de parecer mutacao direta do runtime
+- em `player appearance`, os eventos auxiliares de save/delete de perfil agora tambem deixam explicito quando o fluxo passou por persistencia propria do ManaLoom, em vez de parecer mutacao direta do runtime Lotus
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe

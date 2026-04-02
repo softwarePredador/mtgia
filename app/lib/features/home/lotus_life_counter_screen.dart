@@ -2242,8 +2242,17 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                 targetPlayerIndex,
                 source: source,
               ),
-      onSaveProfilePressed: _saveNativePlayerAppearanceProfile,
-      onDeleteProfilePressed: _deleteNativePlayerAppearanceProfile,
+      onSaveProfilePressed:
+          (name, appearance) => _saveNativePlayerAppearanceProfile(
+            name,
+            appearance,
+            source: source,
+          ),
+      onDeleteProfilePressed:
+          (profileId) => _deleteNativePlayerAppearanceProfile(
+            profileId,
+            source: source,
+          ),
     );
     _isNativePlayerAppearanceSheetOpen = false;
 
@@ -2396,7 +2405,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   _saveNativePlayerAppearanceProfile(
     String name,
     LifeCounterPlayerAppearance appearance,
+    {
+    required String source,
+  }
   ) async {
+    const surfaceStrategy = 'native_fallback';
+    const persistenceStrategy = 'owned_profile_store';
     final profiles = await _appearanceProfileStore.saveProfile(
       name: name,
       appearance: appearance,
@@ -2406,7 +2420,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'native_player_appearance_profile_saved',
         category: 'life_counter.player_appearance',
         data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'persistence_strategy': persistenceStrategy,
           'profile_name': name.trim(),
+          'profile_count': profiles.length,
           'has_nickname': appearance.nickname.isNotEmpty,
           'has_background_image': appearance.backgroundImage != null,
           'has_partner_background_image':
@@ -2418,13 +2436,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }
 
   Future<List<LifeCounterPlayerAppearanceProfile>>
-  _deleteNativePlayerAppearanceProfile(String profileId) async {
+  _deleteNativePlayerAppearanceProfile(
+    String profileId, {
+    required String source,
+  }) async {
+    const surfaceStrategy = 'native_fallback';
+    const persistenceStrategy = 'owned_profile_store';
     final profiles = await _appearanceProfileStore.deleteProfile(profileId);
     unawaited(
       AppObservability.instance.recordEvent(
         'native_player_appearance_profile_deleted',
         category: 'life_counter.player_appearance',
-        data: {'profile_id': profileId},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'persistence_strategy': persistenceStrategy,
+          'profile_id': profileId,
+          'profile_count': profiles.length,
+        },
       ),
     );
     return profiles;
