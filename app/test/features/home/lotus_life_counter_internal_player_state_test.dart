@@ -409,7 +409,13 @@ void main() {
         expect(session, isNotNull);
         expect(session!.lives[1], 40);
         expect(session.lastTableEvent, isNull);
-        expect(host.loadBundleCallCount, 2);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any(
+            (script) => script.contains('.increase-button.life'),
+          ),
+          isTrue,
+        );
         expect(
           logs.any(
             (message) =>
@@ -422,10 +428,122 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_set_life_applied') &&
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('reload_required: false') &&
+                message.contains('sync_blockers: []'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
+    testWidgets('keeps native set life on fallback above the live delta limit', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 32, 25, 11],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: 'D20: 18',
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-set-life","source":"player_life_total_surface_pressed","targetPlayerIndex":1}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-set-life-clear')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-set-life-clear')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-set-life-digit-4')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-set-life-digit-5')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-set-life-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.lives[1], 45);
+        expect(session.lastTableEvent, isNull);
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_set_life_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false') &&
                 message.contains('reload_required: true') &&
-                message.contains('sync_blockers: [life_delta_exceeds_live_limit]'),
+                message.contains(
+                  'sync_blockers: [life_delta_exceeds_live_limit]',
+                ),
           ),
           isTrue,
         );

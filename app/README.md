@@ -76,7 +76,7 @@ Estado vivo do contador hoje:
 - `player state` agora tambem tem um recorte sem `reload` por `live_runtime` quando o efeito final do hub fica limitado a um `set life` curto em um unico jogador, reaproveitando os controles reais do Lotus
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
-- o atalho direto de `set life` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mudanca fica limitada a um delta curto de vida no jogador alvo e o runtime real do Lotus confirma os controles da mesa
+- o atalho direto de `set life` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mudanca fica limitada a um delta medio de vida no jogador alvo e o runtime real do Lotus confirma os controles da mesa
 - `settings` continua `reload-only` por seguranca do bundle Lotus, e agora tambem anota isso explicitamente na observabilidade de apply com `live_patch_eligible: false` e `apply_strategy: reload_fallback`
 - `history` e `card search` continuam Lotus-first visuais, e as sheets internas agora anotam explicitamente `surface_strategy: native_fallback`; `history export` tambem anota `transfer_strategy: clipboard_export`
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que a troca real acontece no estado canonico sem rebootar o bundle

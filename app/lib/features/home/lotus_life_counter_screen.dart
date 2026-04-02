@@ -55,7 +55,7 @@ class LotusLifeCounterScreen extends StatefulWidget {
 }
 
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
-  static const int _maxLiveSetLifeDelta = 5;
+  static const int _maxLiveSetLifeDelta = 10;
   static const int _maxLiveTurnTrackerBackwardSteps = 3;
   static const int _turnTrackerLongPressDurationMs = 1100;
   static const int _turnTrackerLongPressCycleMs = 1150;
