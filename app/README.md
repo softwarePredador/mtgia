@@ -141,6 +141,7 @@ Estado vivo do contador hoje:
 - suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
+- suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`
 
 ## Comandos
 

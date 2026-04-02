@@ -1,0 +1,520 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
+import 'package:manaloom/features/home/lotus/lotus_host.dart';
+import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
+import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeLotusHost implements LotusHost {
+  _FakeLotusHost({required this.onShellMessageRequested});
+
+  final LotusShellMessageCallback onShellMessageRequested;
+
+  @override
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
+
+  @override
+  final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
+
+  int loadBundleCallCount = 0;
+
+  @override
+  Widget buildView(BuildContext context) {
+    return const ColoredBox(
+      key: Key('fake-lotus-host-view'),
+      color: Colors.black,
+    );
+  }
+
+  @override
+  void suppressStaleBeforeUnloadSnapshot() {}
+
+  @override
+  Future<void> loadBundle() async {
+    loadBundleCallCount += 1;
+  }
+
+  @override
+  Future<void> runJavaScript(String script) async {}
+
+  @override
+  Future<Object?> runJavaScriptReturningResult(String script) async {
+    return jsonEncode(<String, Object>{
+      'planechaseAvailable': true,
+      'planechaseActive': false,
+      'planechaseCardPoolActive': false,
+      'archenemyAvailable': true,
+      'archenemyActive': false,
+      'archenemyCardPoolActive': false,
+      'bountyAvailable': true,
+      'bountyActive': false,
+      'bountyCardPoolActive': false,
+      'maxActiveModes': 2,
+    });
+  }
+
+  void completeSuccessfulLoad() {
+    errorMessage.value = null;
+    isLoading.value = false;
+  }
+
+  void emitShellMessage(String message) {
+    onShellMessageRequested(message);
+  }
+
+  @override
+  void dispose() {
+    isLoading.dispose();
+    errorMessage.dispose();
+  }
+}
+
+void main() {
+  group('LotusLifeCounterScreen internal player state fallback', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    testWidgets('opens native player state from shell shortcut', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 32, 25, 11],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: null,
+          turnTrackerActive: false,
+          turnTrackerOngoingGame: false,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: null,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: null,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":1}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.tap(find.text('Partner commander'));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-answerLeft')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-answerLeft')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-answerLeft')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.partnerCommanders[1], isTrue);
+      expect(
+        session.playerSpecialStates[1],
+        LifeCounterPlayerSpecialState.answerLeft,
+      );
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('rolls player d20 from the player state hub', (tester) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        LifeCounterSession.initial(playerCount: 4),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":0}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lastPlayerRolls[0], isNotNull);
+      expect(session.lastTableEvent, startsWith('Player 1 rolou D20: '));
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('opens native set life from shell shortcut', (tester) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 32, 25, 11],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: null,
+          turnTrackerActive: false,
+          turnTrackerOngoingGame: false,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: null,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: 'D20: 18',
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-set-life","source":"player_life_total_surface_pressed","targetPlayerIndex":1}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+        findsOneWidget,
+      );
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-4')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-0')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lives[1], 40);
+      expect(session.lastTableEvent, isNull);
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets('opens native set life from the player state hub', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await LifeCounterSessionStore().save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 32, 25, 11],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: null,
+          turnTrackerActive: false,
+          turnTrackerOngoingGame: false,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: null,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: 'D20: 18',
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":1}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-set-life')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+        findsOneWidget,
+      );
+
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-clear')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-4')),
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-digit-5')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-set-life-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Player State'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-player-state-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.lives[1], 45);
+      expect(session.lastTableEvent, isNull);
+      expect(host.loadBundleCallCount, 2);
+    });
+
+    testWidgets(
+      'resets the Lotus player surface when native player state is dismissed from option-card takeover',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":2}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Player State'), findsOneWidget);
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Player State'), findsNothing);
+        expect(host.loadBundleCallCount, 2);
+      },
+    );
+  });
+}
