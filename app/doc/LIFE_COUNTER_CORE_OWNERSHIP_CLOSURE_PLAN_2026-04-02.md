@@ -238,6 +238,7 @@ Leitura operacional atual:
 - `history` e `card search` seguem Lotus-first visualmente; quando a shell interna entra em cena, a observabilidade agora marca isso explicitamente como `native_fallback`
 - a shell de `history` agora tambem expõe `history_domain_present`, separando corretamente um dominio `meta-only` da mera ausencia de eventos no log operacional
 - `history transfer` agora tambem carrega `currentGameMeta` e `gameCounter`, fechando o round-trip de `meta-only history` tambem fora da store local e do bootstrap do host
+- `history transfer` agora tambem carrega `archivedGameCount`, evitando reduzir historico importado a um unico jogo arquivado quando o canônico original tinha mais de um
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`
 - nas utility sheets (`settings`, `day/night`, `turn tracker`, `game timer`, `dice`, `table state`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
 - nas sheets de runtime de jogador (`commander damage`, `player appearance`, `player counter`, `player state`, `set life`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal

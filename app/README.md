@@ -91,6 +91,7 @@ Estado vivo do contador hoje:
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que a troca real acontece no estado canonico sem rebootar o bundle
 - a telemetria da shell de `history` agora tambem expõe `history_domain_present`, evitando colapsar `currentGameMeta/gameCounter` em simples ausencia de eventos quando o dominio continua presente
 - `history transfer` agora tambem carrega `currentGameMeta` e `gameCounter`, evitando perder `meta-only history` ao exportar/importar por clipboard
+- `history transfer` agora tambem carrega `archivedGameCount`, evitando achatar historico importado para `0/1` jogos arquivados no round-trip por clipboard
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que essas superfices utilitarias continuam suporte nativo ao fluxo Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `surface_strategy: native_fallback` na abertura da sheet interna, deixando explicito que o runtime de jogador continua suporte nativo ao fluxo Lotus-first
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard

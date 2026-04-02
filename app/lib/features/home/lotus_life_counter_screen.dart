@@ -1376,7 +1376,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             ),
           )
           .toList(growable: false),
-      archivedGameCount: transfer.archiveEntries.isEmpty ? 0 : 1,
+      archivedGameCount:
+          transfer.archivedGameCount ??
+          (transfer.archiveEntries.isEmpty ? 0 : 1),
       gameCounter:
           transfer.gameCounter ??
           LifeCounterHistoryState.decodeGameCounter(snapshot?.values['gameCounter']),
@@ -1418,6 +1420,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'apply_strategy': 'canonical_store_sync',
           'reload_required': false,
           'history_domain_present': true,
+          'archived_games': importedHistory.archivedGameCount,
           'current_game_events': transfer.currentGameEntries.length,
           'archived_events': transfer.archiveEntries.length,
         },

@@ -35,7 +35,8 @@ void main() {
       );
 
       expect(parsed, isNotNull);
-      expect(parsed!.currentGameName, 'Game #9');
+      expect(parsed!.archivedGameCount, 1);
+      expect(parsed.currentGameName, 'Game #9');
       expect(parsed.currentGameMeta?['id'], 'game-9');
       expect(parsed.gameCounter, 9);
       expect(parsed.lastTableEvent, 'Player 1 gained 2 life');
@@ -69,11 +70,42 @@ void main() {
 
       expect(parsed, isNotNull);
       expect(parsed!.currentGameName, 'Game #12');
+      expect(parsed.archivedGameCount, 0);
       expect(parsed.currentGameMeta?['id'], 'game-12');
       expect(parsed.gameCounter, 12);
       expect(parsed.currentGameEntries, isEmpty);
       expect(parsed.archiveEntries, isEmpty);
       expect(parsed.lastTableEvent, isNull);
+    });
+
+    test('round-trips archived game count greater than one', () {
+      final snapshot = LifeCounterHistorySnapshot(
+        currentGameName: 'Imported History',
+        currentGameMeta: const {
+          'id': 'import-2',
+          'name': 'Imported History',
+          'startDate': 1711803000000,
+        },
+        currentGameEntries: const [],
+        archiveEntries: const [
+          LifeCounterHistoryEntry(
+            message: 'Player 2 lost the game',
+            source: LifeCounterHistoryEntrySource.archive,
+          ),
+        ],
+        archivedGameCount: 3,
+        gameCounter: 5,
+        lastTableEvent: null,
+      );
+
+      final transfer = LifeCounterHistoryTransfer.fromSnapshot(snapshot);
+      final parsed = LifeCounterHistoryTransfer.tryParse(
+        transfer.toJsonString(),
+      );
+
+      expect(parsed, isNotNull);
+      expect(parsed!.archivedGameCount, 3);
+      expect(parsed.archiveEntries.single.message, 'Player 2 lost the game');
     });
 
     test('rejects invalid payloads', () {

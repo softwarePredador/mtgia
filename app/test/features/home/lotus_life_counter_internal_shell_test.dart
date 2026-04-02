@@ -334,6 +334,7 @@ void main() {
           final transfer = LifeCounterHistoryTransfer(
             version: lifeCounterHistoryTransferVersion,
             exportedAt: DateTime.utc(2026, 4, 2, 12),
+            archivedGameCount: 3,
             currentGameName: 'Imported Game',
             currentGameMeta: const {
               'id': 'import-42',
@@ -400,6 +401,7 @@ void main() {
           expect(historyState, isNotNull);
           expect(historyState!.currentGameName, 'Imported Game');
           expect(historyState.currentGameMeta?['id'], 'import-42');
+          expect(historyState.archivedGameCount, 3);
           expect(historyState.gameCounter, 42);
           expect(
             historyState.currentGameEntries.single.message,
@@ -420,7 +422,8 @@ void main() {
                   message.contains('transfer_strategy: clipboard_import') &&
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
-                  message.contains('history_domain_present: true'),
+                  message.contains('history_domain_present: true') &&
+                  message.contains('archived_games: 3'),
             ),
             isTrue,
           );

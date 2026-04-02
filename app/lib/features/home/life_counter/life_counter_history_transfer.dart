@@ -49,6 +49,7 @@ class LifeCounterHistoryTransfer {
     required this.exportedAt,
     required this.currentGameEntries,
     required this.archiveEntries,
+    this.archivedGameCount,
     this.currentGameName,
     this.currentGameMeta,
     this.gameCounter,
@@ -57,6 +58,7 @@ class LifeCounterHistoryTransfer {
 
   final int version;
   final DateTime exportedAt;
+  final int? archivedGameCount;
   final String? currentGameName;
   final Map<String, Object?>? currentGameMeta;
   final int? gameCounter;
@@ -70,6 +72,7 @@ class LifeCounterHistoryTransfer {
     return LifeCounterHistoryTransfer(
       version: lifeCounterHistoryTransferVersion,
       exportedAt: DateTime.now().toUtc(),
+      archivedGameCount: snapshot.archivedGameCount,
       currentGameName: snapshot.currentGameName,
       currentGameMeta: snapshot.currentGameMeta,
       gameCounter: snapshot.gameCounter,
@@ -97,6 +100,7 @@ class LifeCounterHistoryTransfer {
     return <String, dynamic>{
       'version': version,
       'exported_at': exportedAt.toIso8601String(),
+      'archived_game_count': archivedGameCount,
       'current_game_name': currentGameName,
       'current_game_meta': currentGameMeta,
       'game_counter': gameCounter,
@@ -147,6 +151,9 @@ class LifeCounterHistoryTransfer {
     return LifeCounterHistoryTransfer(
       version: version,
       exportedAt: exportedAt,
+      archivedGameCount: _readOptionalArchivedGameCount(
+        raw['archived_game_count'],
+      ),
       currentGameName: _readOptionalString(raw['current_game_name']),
       currentGameMeta: _readCurrentGameMeta(raw['current_game_meta']),
       gameCounter: _readOptionalGameCounter(raw['game_counter']),
@@ -209,6 +216,20 @@ class LifeCounterHistoryTransfer {
     if (raw is num) {
       final value = raw.toInt();
       return value < 1 ? 1 : value;
+    }
+    return null;
+  }
+
+  static int? _readOptionalArchivedGameCount(Object? raw) {
+    if (raw == null) {
+      return null;
+    }
+    if (raw is int) {
+      return raw < 0 ? 0 : raw;
+    }
+    if (raw is num) {
+      final value = raw.toInt();
+      return value < 0 ? 0 : value;
     }
     return null;
   }
