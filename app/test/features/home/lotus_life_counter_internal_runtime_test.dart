@@ -169,6 +169,115 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
+    testWidgets('advances active turn tracker without reloading the Lotus bundle', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await LifeCounterSessionStore().save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 40, 40, 40],
+          poison: [0, 0, 0, 0],
+          energy: [0, 0, 0, 0],
+          experience: [0, 0, 0, 0],
+          commanderCasts: [0, 0, 0, 0],
+          partnerCommanders: [false, false, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: 0,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: 0,
+          currentTurnNumber: 1,
+          turnTimerActive: false,
+          turnTimerSeconds: 0,
+          lastTableEvent: null,
+        ),
+      );
+      await LotusStorageSnapshotStore().save(
+        const LotusStorageSnapshot(
+          values: {
+            'layoutType': '"portrait-portrait-portrait-portrait"',
+            'turnTracker':
+                '{"isActive":true,"ongoingGame":true,"autoHighroll":false,"turnTimer":{"isActive":false,"duration":0,"countDown":[]},"currentPlayerIndex":0,"startingPlayerIndex":0,"currentTurn":1}',
+          },
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LotusLifeCounterScreen(
+            hostFactory: ({
+              required onAppReviewRequested,
+              required onShellMessageRequested,
+            }) {
+              host = _FakeLotusHost(
+                onShellMessageRequested: onShellMessageRequested,
+              )..completeSuccessfulLoad();
+              return host;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      host.emitShellMessage(
+        '{"type":"open-native-turn-tracker","source":"turn_tracker_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-turn-tracker-next')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-turn-tracker-next')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-turn-tracker-apply')),
+      );
+      await tester.pumpAndSettle();
+
+      final session = await LifeCounterSessionStore().load();
+      expect(session, isNotNull);
+      expect(session!.currentTurnPlayerIndex, 1);
+      expect(session.currentTurnNumber, 1);
+      expect(host.loadBundleCallCount, 1);
+      expect(
+        host.executedScripts.any(
+          (script) =>
+              script.contains('.turn-time-tracker') &&
+              script.contains('tracker.click()'),
+        ),
+        isTrue,
+      );
+    });
+
     testWidgets(
       'sanitizes stale table ownership when native turn tracker is applied',
       (tester) async {

@@ -23,6 +23,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `LifeCounterHistoryState` e `LifeCounterHistoryStore` passam a ser o owner real do dominio
 - `gameHistory`, `allGamesHistory`, `currentGameMeta` e `gameCounter` continuam existindo como payload de compatibilidade para o renderer Lotus
 - o bootstrap agora tambem aceita patch incremental via `receivePatch`, mas isso ainda vale so para dominios com runtime seguro
+- o `turn tracker` agora tambem tem um recorte de sync incremental pelo proprio runtime do Lotus, sem depender de patch cego de storage
 
 ## Reading rule
 
@@ -141,6 +142,7 @@ Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`
+- `turn tracker` ja tem um caso seguro de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente mantendo a mesma configuracao estrutural
 
 ### 3. Runtime Lotus-first visual paths
 
@@ -167,5 +169,5 @@ Esta matrix fica considerada suficiente para a `Wave 1` quando:
 Com esta matriz pronta, a proxima task mais correta e:
 
 1. continuar o mapeamento conservador de dominios com `safe live patch`
-2. so depois ampliar a troca de `reload bundle` por sincronizacao incremental
+2. ampliar o `turn tracker` apenas se houver mais caminhos seguros pelo proprio runtime Lotus, sem patch cego de memoria interna
 3. manter `currentGameMeta/gameCounter` sincronizados com qualquer evolucao futura do contrato de `history`

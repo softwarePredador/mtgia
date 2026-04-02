@@ -33,6 +33,7 @@ import 'life_counter/life_counter_settings_store.dart';
 import 'life_counter/life_counter_session.dart';
 import 'life_counter/life_counter_session_store.dart';
 import 'life_counter/life_counter_tabletop_engine.dart';
+import 'life_counter/life_counter_turn_tracker_engine.dart';
 import 'life_counter_route.dart';
 import 'lotus/lotus_life_counter_settings_adapter.dart';
 import 'lotus/lotus_life_counter_session_adapter.dart';
@@ -1266,6 +1267,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
@@ -1284,7 +1288,103 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
+    if (_canApplyLiveTurnTrackerPatch(previousSession, adjustedSession) &&
+        await _applyOwnedTurnTrackerRuntimeState(
+          previousSession,
+          adjustedSession,
+        )) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _canApplyLiveTurnTrackerPatch(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    if (!previous.turnTrackerActive || !next.turnTrackerActive) {
+      return false;
+    }
+
+    if (previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame ||
+        previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll ||
+        previous.turnTimerActive != next.turnTimerActive ||
+        previous.firstPlayerIndex != next.firstPlayerIndex) {
+      return false;
+    }
+
+    if ((next.currentTurnPlayerIndex ?? -1) < 0 || next.turnTimerSeconds != 0) {
+      return false;
+    }
+
+    return _countForwardTurnTrackerSteps(previous, next) != null;
+  }
+
+  int? _countForwardTurnTrackerSteps(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    if (_matchesTurnTrackerPosition(previous, next)) {
+      return 0;
+    }
+
+    var cursor = previous;
+    final maxSteps = next.playerCount * 32;
+    for (var steps = 1; steps <= maxSteps; steps += 1) {
+      cursor = LifeCounterTurnTrackerEngine.nextTurn(cursor);
+      if (_matchesTurnTrackerPosition(cursor, next)) {
+        return steps;
+      }
+    }
+
+    return null;
+  }
+
+  bool _matchesTurnTrackerPosition(
+    LifeCounterSession left,
+    LifeCounterSession right,
+  ) {
+    return left.currentTurnPlayerIndex == right.currentTurnPlayerIndex &&
+        left.currentTurnNumber == right.currentTurnNumber &&
+        left.turnTimerSeconds == right.turnTimerSeconds &&
+        left.turnTrackerActive == right.turnTrackerActive &&
+        left.turnTrackerOngoingGame == right.turnTrackerOngoingGame &&
+        left.turnTimerActive == right.turnTimerActive;
+  }
+
+  Future<bool> _applyOwnedTurnTrackerRuntimeState(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) async {
+    final steps = _countForwardTurnTrackerSteps(previous, next);
+    if (steps == null) {
+      return false;
+    }
+
+    if (steps == 0) {
+      return true;
+    }
+
+    try {
+      await _hostController.runJavaScript('''
+(() => {
+  try {
+    const tracker = document.querySelector('.turn-time-tracker');
+    if (!(tracker instanceof HTMLElement)) {
+      return;
+    }
+
+    for (let index = 0; index < $steps; index += 1) {
+      tracker.click();
+    }
+  } catch (_) {}
+})();
+''');
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> _openNativeGameTimerSheet({required String source}) async {

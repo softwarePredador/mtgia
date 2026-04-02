@@ -48,6 +48,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `Wave 4` iniciada: existe ponte de patch incremental para o runtime Lotus
 - `settings` permanecem em `reload` por seguranca, porque o bundle Lotus mantem esse dominio em memoria propria
 - `game timer` ja aceita sync incremental no caso seguro `active -> active`
+- `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente e sem mudanca estrutural
 
 ## Ja ManaLoom-owned
 
@@ -389,6 +390,7 @@ Implementado nesta rodada:
 - `flutter_bootstrap.js` agora expoe `receivePatch` para aplicar mutacoes pontuais no `localStorage`
 - o host consegue tentar patch incremental antes do reload completo
 - `game timer` usa sync incremental no caso seguro `active -> active`
+- `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente
 - `settings` continuam em reload por decisao explicita de seguranca, porque o Lotus mantem esse dominio em memoria e nao reage apenas ao patch de storage
 
 ### Wave 5 - Tornar o host o escritor primario
@@ -454,5 +456,6 @@ Depois desta rodada, a leitura mais correta e:
 - `history` ja tem owner canonico ManaLoom
 - o renderer Lotus ainda recebe `history/meta/counter` em formato legado por compatibilidade
 - `receivePatch` existe e ja reduz reload em parte do `game timer`
+- o `turn tracker` ja tem um caso seguro de sync pelo proprio runtime do Lotus, disparando `click` no tracker em vez de rebootar o bundle
 - `settings` nao devem migrar para patch cego enquanto o runtime do Lotus continuar mantendo esse estado em memoria interna
 - o proximo alvo tecnico com melhor relacao ganho/risco continua sendo mapear de forma conservadora quais dominios aceitam patch incremental real
