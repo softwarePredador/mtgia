@@ -2366,6 +2366,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             : targetPlayerIndex;
     final shouldResetLotusSurface = _playerAppearanceSurfaceResetSources
         .contains(source);
+    final surfaceResetStrategy =
+        shouldResetLotusSurface ? 'bundle_reload' : 'none';
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2425,6 +2427,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'surface_reset_required': shouldResetLotusSurface,
+            'surface_reset_strategy': surfaceResetStrategy,
           },
         ),
       );
@@ -2443,6 +2447,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             'source': source,
             'changed': false,
             'surface_strategy': surfaceStrategy,
+            'surface_reset_required': shouldResetLotusSurface,
+            'surface_reset_strategy': surfaceResetStrategy,
           },
         ),
       );

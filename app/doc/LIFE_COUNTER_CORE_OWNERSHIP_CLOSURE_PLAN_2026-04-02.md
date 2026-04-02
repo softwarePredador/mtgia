@@ -237,6 +237,7 @@ Leitura operacional atual:
 - em `player appearance`, os eventos auxiliares de export/import agora tambem deixam explicito quando o fluxo passou por clipboard, em vez de parecer mutacao direta do runtime
 - em `player appearance`, os eventos auxiliares de save/delete de perfil agora tambem deixam explicito quando o fluxo passou por persistencia propria do ManaLoom, em vez de parecer mutacao direta do runtime Lotus
 - em `player appearance`, a selecao de perfil salvo agora tambem fica observavel como uso de preset ManaLoom-owned no draft da sheet, sem parecer apply real da mesa
+- quando `player appearance` nasce de takeover da superficie de background do Lotus, o evento de dismiss agora tambem expõe `surface_reset_required` e `surface_reset_strategy`, deixando explicito quando o host reabre o bundle apenas para limpar a superficie takeover
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
 - o caminho `storage_bootstrap_restored_from_canonical` agora tem prova unitaria do payload de fallback gerado a partir das stores canonicas, incluindo `day/night`, sem depender de `localStorage` Lotus previamente salvo
 - o merge de `storage_bootstrap` agora tambem poda chaves stale de `session`, `settings`, `game timer`, `day/night` e `history` quando o fallback canonico daquele dominio nao existe mais, evitando que um snapshot Lotus antigo ressuscite estado limpo no reopen

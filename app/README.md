@@ -90,6 +90,7 @@ Estado vivo do contador hoje:
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local
+- quando `player appearance` nasce de takeover da superficie de background do Lotus e a sheet e fechada sem apply, a observabilidade agora tambem expõe `surface_reset_required` e `surface_reset_strategy`, deixando explicito o reset do bundle usado so para limpar a superficie takeover
 - o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, `session`, `settings`, `timer`, `history`, `history-only` e `day/night-only`
 - o host agora tambem espelha `day/night` do `persist_snapshot` Lotus para a store canonica, e limpa estado stale quando `__manaloom_day_night_mode` some do snapshot
 - o mirror canonico do host agora tambem limpa `session` e `settings` stale quando o snapshot Lotus deixa de trazer `players` ou `gameSettings`, evitando reopen com estado antigo reidratado do nosso lado

@@ -691,9 +691,7 @@ void main() {
                   'message=native_player_appearance_profile_saved',
                 ) &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'persistence_strategy: owned_profile_store',
-                ) &&
+                message.contains('persistence_strategy: owned_profile_store') &&
                 message.contains('source: player_background_surface_pressed') &&
                 message.contains('profile_count: 1'),
           ),
@@ -781,9 +779,7 @@ void main() {
                   'message=native_player_appearance_profile_deleted',
                 ) &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'persistence_strategy: owned_profile_store',
-                ) &&
+                message.contains('persistence_strategy: owned_profile_store') &&
                 message.contains('source: player_background_surface_pressed') &&
                 message.contains('profile_id: $profileId') &&
                 message.contains('profile_count: 0'),
@@ -866,9 +862,7 @@ void main() {
                   'message=native_player_appearance_profile_selected',
                 ) &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'persistence_strategy: owned_profile_store',
-                ) &&
+                message.contains('persistence_strategy: owned_profile_store') &&
                 message.contains('source: player_background_surface_pressed') &&
                 message.contains('target_player_index: 2') &&
                 message.contains('profile_id: $profileId') &&
@@ -883,48 +877,68 @@ void main() {
       'resets the Lotus appearance surface when native player appearance is dismissed from color-card takeover',
       (tester) async {
         late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
 
-        await LifeCounterSessionStore().save(
-          LifeCounterSession.initial(playerCount: 4),
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
             ),
-          ),
-        );
+          );
 
-        await tester.pump();
-        await tester.pump();
+          await tester.pump();
+          await tester.pump();
 
-        host.emitShellMessage(
-          '{"type":"open-native-player-appearance","source":"player_background_color_card_presented","targetPlayerIndex":2}',
-        );
-        await tester.pumpAndSettle();
+          host.emitShellMessage(
+            '{"type":"open-native-player-appearance","source":"player_background_color_card_presented","targetPlayerIndex":2}',
+          );
+          await tester.pumpAndSettle();
 
-        expect(
-          find.byKey(const Key('life-counter-native-player-appearance-apply')),
-          findsOneWidget,
-        );
+          expect(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+            findsOneWidget,
+          );
 
-        await tester.tap(find.text('Cancel'));
-        await tester.pumpAndSettle();
+          await tester.tap(find.text('Cancel'));
+          await tester.pumpAndSettle();
 
-        expect(
-          find.byKey(const Key('life-counter-native-player-appearance-apply')),
-          findsNothing,
-        );
-        expect(host.loadBundleCallCount, 2);
+          expect(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+            findsNothing,
+          );
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains(
+                    'message=native_player_appearance_dismissed',
+                  ) &&
+                  message.contains(
+                    'source: player_background_color_card_presented',
+                  ) &&
+                  message.contains('changed: false') &&
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: bundle_reload'),
+            ),
+            isTrue,
+          );
+        });
       },
     );
   });
