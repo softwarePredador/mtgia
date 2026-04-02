@@ -297,8 +297,8 @@ class LotusHostController implements LotusHost {
     final snapshot = await _storageSnapshotStore.load();
     final fallbackValues = await _buildFallbackBootstrapValues();
     final mergedValues = <String, String>{
-      ...fallbackValues,
       ...?snapshot?.values,
+      ...fallbackValues,
     };
     final payload = <String, Object?>{
       'type': 'bootstrap_snapshot',
@@ -327,7 +327,7 @@ class LotusHostController implements LotusHost {
           category: 'life_counter.storage',
           data: {
             'entry_count': mergedValues.length,
-            'used_fallback': snapshot == null && fallbackValues.isNotEmpty,
+            'used_fallback': fallbackValues.isNotEmpty,
           },
         ),
       );

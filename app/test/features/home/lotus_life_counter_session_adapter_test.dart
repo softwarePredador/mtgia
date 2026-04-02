@@ -160,7 +160,7 @@ void main() {
           commanderTwoDamage: 2,
         ),
       );
-      expect(session.firstPlayerIndex, 2);
+      expect(session.firstPlayerIndex, 1);
       expect(session.turnTrackerActive, isTrue);
       expect(session.turnTrackerOngoingGame, isTrue);
       expect(session.turnTrackerAutoHighRoll, isTrue);
@@ -497,7 +497,7 @@ void main() {
     });
 
     test(
-      'clears turn tracker pointers when serializing a session with no active players',
+      'keeps Lotus-safe tracker indices while preserving null canonical pointers when no players are active',
       () {
         final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
           const LifeCounterSession(
@@ -544,11 +544,17 @@ void main() {
         final tableState =
             jsonDecode(values['__manaloom_table_state']!)
                 as Map<String, dynamic>;
+        final rebuiltSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+          LotusStorageSnapshot(values: values),
+        );
 
         expect(turnTracker['isActive'], isTrue);
-        expect(turnTracker['startingPlayerIndex'], isNull);
-        expect(turnTracker['currentPlayerIndex'], isNull);
+        expect(turnTracker['startingPlayerIndex'], 2);
+        expect(turnTracker['currentPlayerIndex'], 2);
         expect(tableState['firstPlayerIndex'], isNull);
+        expect(rebuiltSession, isNotNull);
+        expect(rebuiltSession!.firstPlayerIndex, isNull);
+        expect(rebuiltSession.currentTurnPlayerIndex, isNull);
       },
     );
 

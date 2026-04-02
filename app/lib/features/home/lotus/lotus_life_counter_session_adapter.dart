@@ -269,7 +269,7 @@ class LotusLifeCounterSessionAdapter {
             ? (_parseNum(rawTurnTimer['duration']) ?? 0).clamp(0, 864000)
             : 0;
 
-    return LifeCounterSession(
+    final session = LifeCounterSession(
       playerCount: playerCount,
       startingLifeTwoPlayer: startingLifeTwoPlayer,
       startingLifeMultiPlayer: startingLifeMultiPlayer,
@@ -300,6 +300,9 @@ class LotusLifeCounterSessionAdapter {
       turnTimerSeconds: turnTimerSeconds,
       lastTableEvent: null,
     );
+    return LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
+      session,
+    );
   }
 
   static Map<String, String> buildSnapshotValues(
@@ -317,17 +320,14 @@ class LotusLifeCounterSessionAdapter {
       trackerSanitizedSession.playerCount,
       layoutType,
     );
-    final startingPlayerIndex = trackerSanitizedSession.firstPlayerIndex;
-    final currentTurnPlayerIndex =
-        trackerSanitizedSession.currentTurnPlayerIndex == null &&
-                startingPlayerIndex == null
-            ? null
-            : _normalizeCanonicalTurnTrackerPlayerIndex(
-              trackerSanitizedSession,
-              trackerSanitizedSession.currentTurnPlayerIndex ??
-                  startingPlayerIndex ??
-                  0,
-            );
+    final currentTurnPlayerIndex = _normalizeCanonicalTurnTrackerPlayerIndex(
+      trackerSanitizedSession,
+      trackerSanitizedSession.currentTurnPlayerIndex ??
+          trackerSanitizedSession.firstPlayerIndex ??
+          0,
+    );
+    final startingPlayerIndex =
+        trackerSanitizedSession.firstPlayerIndex ?? currentTurnPlayerIndex;
     final playerNames = List<String>.generate(
       trackerSanitizedSession.playerCount,
       (index) => 'Player ${index + 1}',
@@ -487,17 +487,14 @@ class LotusLifeCounterSessionAdapter {
       trackerSanitizedSession.playerCount,
       resolvedLayoutType,
     );
-    final startingPlayerIndex = trackerSanitizedSession.firstPlayerIndex;
-    final currentTurnPlayerIndex =
-        trackerSanitizedSession.currentTurnPlayerIndex == null &&
-                startingPlayerIndex == null
-            ? null
-            : _normalizeCanonicalTurnTrackerPlayerIndex(
-              trackerSanitizedSession,
-              trackerSanitizedSession.currentTurnPlayerIndex ??
-                  startingPlayerIndex ??
-                  0,
-            );
+    final currentTurnPlayerIndex = _normalizeCanonicalTurnTrackerPlayerIndex(
+      trackerSanitizedSession,
+      trackerSanitizedSession.currentTurnPlayerIndex ??
+          trackerSanitizedSession.firstPlayerIndex ??
+          0,
+    );
+    final startingPlayerIndex =
+        trackerSanitizedSession.firstPlayerIndex ?? currentTurnPlayerIndex;
 
     return <String, String>{
       _turnTrackerKey: jsonEncode(
