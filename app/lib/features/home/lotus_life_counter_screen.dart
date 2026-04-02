@@ -2005,11 +2005,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyCanonicalDiceSessionWithoutReload(
+  bool _canApplyCanonicalRollSessionWithoutReload(
     LifeCounterSession previous,
     LifeCounterSession next,
   ) {
-    final trackerIsActive = previous.turnTrackerActive || next.turnTrackerActive;
+    final trackerIsActive =
+        previous.turnTrackerActive || next.turnTrackerActive;
     if (previous.turnTrackerActive != next.turnTrackerActive ||
         previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame ||
         previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll ||
@@ -2041,6 +2042,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             );
     return expected.toJsonString() == next.toJsonString();
   }
+
+  bool _canApplyCanonicalDiceSessionWithoutReload(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) => _canApplyCanonicalRollSessionWithoutReload(previous, next);
 
   Future<void> _openNativeCommanderDamageSheet({
     required String source,
@@ -2300,17 +2306,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             source: source,
           ),
       onDeleteProfilePressed:
-          (profileId) => _deleteNativePlayerAppearanceProfile(
-            profileId,
+          (profileId) =>
+              _deleteNativePlayerAppearanceProfile(profileId, source: source),
+      onApplyProfilePressed:
+          (profile, targetPlayerIndex) => _selectNativePlayerAppearanceProfile(
+            profile,
+            targetPlayerIndex,
             source: source,
           ),
-      onApplyProfilePressed:
-          (profile, targetPlayerIndex) =>
-              _selectNativePlayerAppearanceProfile(
-                profile,
-                targetPlayerIndex,
-                source: source,
-              ),
     );
     _isNativePlayerAppearanceSheetOpen = false;
 
@@ -2462,11 +2465,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   Future<List<LifeCounterPlayerAppearanceProfile>>
   _saveNativePlayerAppearanceProfile(
     String name,
-    LifeCounterPlayerAppearance appearance,
-    {
+    LifeCounterPlayerAppearance appearance, {
     required String source,
-  }
-  ) async {
+  }) async {
     const surfaceStrategy = 'native_fallback';
     const persistenceStrategy = 'owned_profile_store';
     final profiles = await _appearanceProfileStore.saveProfile(
@@ -2749,10 +2750,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    final canonicalSyncEligible = _canApplyCanonicalRollSessionWithoutReload(
+      previousSession,
+      adjustedSession,
+    );
     const livePatchEligible = false;
-    const applyStrategy = 'reload_fallback';
+    final applyStrategy =
+        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalSyncEligible;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2762,9 +2772,17 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
+          'has_last_event': adjustedSession.lastTableEvent != null,
+          'has_player_rolls':
+              adjustedSession.lastPlayerRolls.whereType<int>().isNotEmpty,
         },
       ),
     );
+
+    if (!reloadRequired) {
+      return;
+    }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }

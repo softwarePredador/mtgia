@@ -222,65 +222,76 @@ void main() {
 
     testWidgets('rolls player d20 from the player state hub', (tester) async {
       late _FakeLotusHost host;
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await _captureDebugLogs((logs) async {
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await LifeCounterSessionStore().save(
-        LifeCounterSession.initial(playerCount: 4),
-      );
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":0}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":0}',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
-        250,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-state-roll-d20')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-state-roll-d20')),
+        );
+        await tester.pumpAndSettle();
 
-      await tester.ensureVisible(
-        find.byKey(const Key('life-counter-native-player-state-apply')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-player-state-apply')),
-      );
-      await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byKey(const Key('life-counter-native-player-state-apply')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-state-apply')),
+        );
+        await tester.pumpAndSettle();
 
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.lastPlayerRolls[0], isNotNull);
-      expect(session.lastTableEvent, startsWith('Player 1 rolou D20: '));
-      expect(host.loadBundleCallCount, 2);
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.lastPlayerRolls[0], isNotNull);
+        expect(session.lastTableEvent, startsWith('Player 1 rolou D20: '));
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_player_state_applied') &&
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('reload_required: false'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('opens native set life from shell shortcut', (tester) async {
