@@ -34,6 +34,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `settings` agora tambem expõe `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando visivel no log que esse dominio continua fora do live sync por seguranca
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a shell interna assume o fluxo, separando esses eventos dos dominios que realmente aplicam estado no runtime
 - `history import` agora tambem expõe `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, separando a sincronizacao canonica de `history` dos eventos que sao apenas sheet fallback
+- `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna assume o fluxo, padronizando a leitura das superfices utilitarias Lotus-first
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 
 ## Reading rule
@@ -163,6 +164,7 @@ Complemento desta rodada:
 - `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
 - `history` e `card search` seguem sem apply de runtime nessa shell interna; a observabilidade agora deixa explicito quando o fluxo foi apenas `native_fallback`
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`
+- nas utility sheets, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, sem implicar takeover visual do Lotus
 - `history` e `card search` continuam como suporte interno Lotus-first, e agora isso tambem fica explicito na observabilidade das sheets nativas
 
 ### 3. Runtime Lotus-first visual paths

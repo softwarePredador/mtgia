@@ -220,6 +220,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_day_night_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_day_night_applied') &&
                 message.contains('apply_strategy: live_runtime') &&
                 message.contains('live_patch_eligible: true'),
@@ -425,10 +433,14 @@ void main() {
         expect(find.text('Continue To Embedded Card Pool'), findsOneWidget);
 
         await tester.ensureVisible(
-          find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+          find.byKey(
+            const Key('life-counter-native-game-modes-planechase-open'),
+          ),
         );
         await tester.tap(
-          find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
+          find.byKey(
+            const Key('life-counter-native-game-modes-planechase-open'),
+          ),
           warnIfMissed: false,
         );
         await tester.pumpAndSettle();
@@ -658,9 +670,8 @@ void main() {
           );
           expect(
             logs.any(
-              (message) => message.contains(
-                'message=native_game_modes_action_failed',
-              ),
+              (message) =>
+                  message.contains('message=native_game_modes_action_failed'),
             ),
             isTrue,
           );
@@ -803,7 +814,8 @@ void main() {
 
         expect(
           host.executedScripts.any(
-            (script) => script.contains("document.querySelector('.bounty-btn')"),
+            (script) =>
+                script.contains("document.querySelector('.bounty-btn')"),
           ),
           isFalse,
         );

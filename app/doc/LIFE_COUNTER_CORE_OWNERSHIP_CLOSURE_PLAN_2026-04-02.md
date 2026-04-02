@@ -58,6 +58,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `settings` agora tambem registra explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, alinhando a telemetria com a decisao arquitetural de manter esse dominio fora do live sync
 - `history` e `card search` agora registram `surface_strategy: native_fallback` nos eventos da shell interna, deixando explicito que esses fluxos sao apoio tecnico e nao apply de runtime do Lotus
 - `history import` agora tambem registra `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que o dominio muda primeiro no contrato canonico sem rebootar o bundle
+- `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem registram `surface_strategy: native_fallback` na abertura e no dismiss das sheets internas, alinhando a telemetria dessas superfices utilitarias ao papel Lotus-first atual
 - `history` e `card search` agora identificam explicitamente na observabilidade que a sheet nativa acionada por atalho interno eh `native_fallback`; `history export` tambem marca o transporte como `clipboard_export`
 
 ## Ja ManaLoom-owned
@@ -194,6 +195,7 @@ Leitura operacional atual:
 - `settings` continua em `reload` por seguranca do bundle Lotus, e agora isso tambem aparece de forma explicita na telemetria de apply
 - `history` e `card search` seguem Lotus-first visualmente; quando a shell interna entra em cena, a observabilidade agora marca isso explicitamente como `native_fallback`
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`
+- nas utility sheets (`settings`, `day/night`, `turn tracker`, `game timer`, `dice`, `table state`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe

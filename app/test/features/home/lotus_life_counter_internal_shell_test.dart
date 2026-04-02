@@ -165,6 +165,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_settings_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_settings_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),

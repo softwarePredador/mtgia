@@ -198,6 +198,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_turn_tracker_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_turn_tracker_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),
@@ -215,41 +223,41 @@ void main() {
       await _captureDebugLogs((logs) async {
         await LifeCounterSessionStore().save(
           const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [40, 40, 40, 40],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, false, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [null, null, null, null],
-          lastHighRolls: [null, null, null, null],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 0,
-          monarchPlayer: null,
-          initiativePlayer: null,
-          firstPlayerIndex: 0,
-          turnTrackerActive: true,
-          turnTrackerOngoingGame: true,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: 0,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 40, 40, 40],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: 0,
+            turnTrackerActive: true,
+            turnTrackerOngoingGame: true,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: 0,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
           ),
         );
         await LotusStorageSnapshotStore().save(
@@ -886,6 +894,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_game_timer_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_game_timer_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),
@@ -903,42 +919,42 @@ void main() {
         await _captureDebugLogs((logs) async {
           await LifeCounterSessionStore().save(
             const LifeCounterSession(
-          playerCount: 4,
-            startingLifeTwoPlayer: 20,
-            startingLifeMultiPlayer: 40,
-            lives: [40, 40, 40, 40],
-            poison: [0, 0, 0, 0],
-            energy: [0, 0, 0, 0],
-            experience: [0, 0, 0, 0],
-            commanderCasts: [0, 0, 0, 0],
-            partnerCommanders: [false, false, false, false],
-            playerSpecialStates: [
-              LifeCounterPlayerSpecialState.none,
-              LifeCounterPlayerSpecialState.none,
-              LifeCounterPlayerSpecialState.none,
-              LifeCounterPlayerSpecialState.none,
-            ],
-            lastPlayerRolls: [null, null, null, null],
-            lastHighRolls: [null, null, null, null],
-            commanderDamage: [
-              [0, 0, 0, 0],
-              [0, 0, 0, 0],
-              [0, 0, 0, 0],
-              [0, 0, 0, 0],
-            ],
-            stormCount: 0,
-            monarchPlayer: null,
-            initiativePlayer: null,
-            firstPlayerIndex: 0,
-            turnTrackerActive: false,
-            turnTrackerOngoingGame: false,
-            turnTrackerAutoHighRoll: false,
-            currentTurnPlayerIndex: null,
-            currentTurnNumber: 1,
-            turnTimerActive: false,
-            turnTimerSeconds: 0,
-            lastTableEvent: null,
-          ),
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 40, 40, 40],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: 0,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
           );
           await LotusStorageSnapshotStore().save(
             const LotusStorageSnapshot(
@@ -1007,6 +1023,14 @@ void main() {
           expect(session.initiativePlayer, 1);
           expect(session.stormCount, 0);
           expect(host.loadBundleCallCount, 1);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_table_state_opened') &&
+                  message.contains('surface_strategy: native_fallback'),
+            ),
+            isTrue,
+          );
           expect(
             host.executedScripts.any(
               (script) =>
@@ -1108,7 +1132,9 @@ void main() {
         expect(find.text('Table State'), findsOneWidget);
 
         await tester.tap(
-          find.byKey(const Key('life-counter-native-table-state-monarch-clear')),
+          find.byKey(
+            const Key('life-counter-native-table-state-monarch-clear'),
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -1151,8 +1177,12 @@ void main() {
         expect(
           host.executedScripts.any(
             (script) =>
-                script.contains("const menuButton = document.querySelector('.menu-button');") &&
-                script.contains("const menuButtonClassName = 'active-' + type;"),
+                script.contains(
+                  "const menuButton = document.querySelector('.menu-button');",
+                ) &&
+                script.contains(
+                  "const menuButtonClassName = 'active-' + type;",
+                ),
           ),
           isTrue,
         );
@@ -1206,6 +1236,14 @@ void main() {
         expect(session, isNotNull);
         expect(session!.lastHighRolls.whereType<int>().length, 4);
         expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_dice_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
         expect(
           logs.any(
             (message) =>
