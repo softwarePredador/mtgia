@@ -251,6 +251,7 @@ Leitura operacional atual:
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
 - o caminho `storage_bootstrap_restored_from_canonical` agora tem prova unitaria do payload de fallback gerado a partir das stores canonicas, incluindo `day/night`, sem depender de `localStorage` Lotus previamente salvo
 - o merge de `storage_bootstrap` agora tambem poda chaves stale de `session`, `settings`, `game timer`, `day/night` e `history` quando o fallback canonico daquele dominio nao existe mais, evitando que um snapshot Lotus antigo ressuscite estado limpo no reopen
+- o host agora tambem tem prova unitaria de reopen com snapshot Lotus salvo parcial e stale, garantindo que o merge do bootstrap preserva flags auxiliares fora do core, mas reidrata os dominios canonicos a partir das stores ManaLoom
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe
 
@@ -265,7 +266,7 @@ Hoje:
 Mas ainda falta:
 
 - reduzir ainda mais a leitura de compatibilidade do snapshot legado
-- provar round-trip completo com snapshot Lotus parcial, stale ou ausente
+- ampliar a prova de round-trip completo ate cobrir mais cenarios de snapshot Lotus parcial, stale ou ausente alem do merge de bootstrap ja validado
 
 Leitura:
 

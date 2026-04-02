@@ -57,6 +57,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o mirror canonico do host agora tambem preserva `history` meta-only (`currentGameMeta` / `gameCounter`) quando o snapshot Lotus traz o dominio sem entradas, evitando limpar cedo demais uma parte que ja e canonica
 - o round-trip de `history` meta-only agora tambem tem cobertura direta na store canonica e no fallback `history-only`, provando que `currentGameMeta/gameCounter` seguem reidrataveis mesmo sem `gameHistory`
 - o fallback canônico agora tambem cobre explicitamente `session + history` meta-only, provando que o payload de `history` canonico continua prevalecendo sobre o bootstrap default da sessao
+- o fallback canônico agora tambem tem prova direta de reopen com snapshot Lotus salvo parcial e stale, garantindo que o merge do bootstrap preserva chaves auxiliares fora do core enquanto sobrescreve `session`, `settings`, `game timer`, `day/night` e `history` com o estado ManaLoom
 - `game modes` agora tambem expõem `core_scope: excluded_from_canonical_core` em open, dismiss e falha de entrega, deixando explicito que esse dominio continua fora da matriz de ownership canonico desta fase
 - a shell de `history` agora tambem expõe `history_domain_present`, deixando explicito quando `currentGameMeta/gameCounter` existem mesmo sem `gameHistory` ou `allGamesHistory` com entradas
 - `history transfer` agora tambem carrega `currentGameMeta` e `gameCounter`, garantindo que esse envelope canônico não se perca no clipboard mesmo quando o dominio está `meta-only`

@@ -107,6 +107,7 @@ Estado vivo do contador hoje:
 - o fallback canônico do host agora tambem tem prova direta para `session + history` meta-only, garantindo que uma mesa canônica ativa não sobrescreve `currentGameMeta/gameCounter` com os defaults do bootstrap
 - a deduplicacao de observabilidade do `persist_snapshot` no host agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - o merge de bootstrap do host agora tambem poda chaves stale de `session`, `settings`, `game timer`, `day/night` e `history` quando o fallback canonico daquele dominio nao existe mais, evitando que um snapshot Lotus salvo ressuscite estado antigo no reopen
+- o host agora tambem tem prova direta de reopen com snapshot Lotus salvo parcial e stale, garantindo que o merge do bootstrap preserva flags auxiliares fora do core, mas reidrata `session`, `settings`, `game timer`, `day/night` e `history` a partir do estado canonico
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`

@@ -474,6 +474,184 @@ void main() {
     );
 
     test(
+      'reopens from stale partial Lotus snapshot using canonical fallback values',
+      () async {
+        await dayNightStateStore.save(
+          const LifeCounterDayNightState(isNight: true),
+        );
+        await sessionStore.save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [38, 29, 17, 11],
+            poison: [0, 1, 0, 3],
+            energy: [2, 0, 4, 1],
+            experience: [0, 0, 1, 0],
+            commanderCasts: [1, 0, 2, 0],
+            partnerCommanders: [false, false, true, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.answerLeft,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [14, null, null, null],
+            lastHighRolls: [19, null, null, null],
+            commanderDamage: [
+              [0, 0, 5, 0],
+              [0, 0, 0, 7],
+              [3, 0, 0, 0],
+              [0, 2, 0, 0],
+            ],
+            stormCount: 4,
+            monarchPlayer: 3,
+            initiativePlayer: 1,
+            firstPlayerIndex: 2,
+            turnTrackerActive: true,
+            turnTrackerOngoingGame: true,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: 1,
+            currentTurnNumber: 5,
+            turnTimerActive: true,
+            turnTimerSeconds: 33,
+            lastTableEvent: 'Player 2 lost 6 life',
+          ),
+        );
+        await settingsStore.save(
+          const LifeCounterSettings(
+            autoKill: true,
+            lifeLossOnCommanderDamage: true,
+            showCountersOnPlayerCard: true,
+            showRegularCounters: false,
+            showCommanderDamageCounters: false,
+            clickableCommanderDamageCounters: false,
+            keepZeroCountersOnPlayerCard: false,
+            saltyDefeatMessages: true,
+            cycleSaltyDefeatMessages: true,
+            gameTimer: true,
+            gameTimerMainScreen: true,
+            showClockOnMainScreen: true,
+            randomPlayerColors: true,
+            preserveBackgroundImagesOnShuffle: true,
+            setLifeByTappingNumber: false,
+            verticalTapAreas: true,
+            cleanLook: false,
+            criticalDamageWarning: true,
+            customLongTapEnabled: true,
+            customLongTapValue: 12,
+            whitelabelIcon: null,
+          ),
+        );
+        await gameTimerStateStore.save(
+          const LifeCounterGameTimerState(
+            startTimeEpochMs: 1711803000000,
+            isPaused: true,
+            pausedTimeEpochMs: 1711803010000,
+          ),
+        );
+        await historyStore.save(
+          const LifeCounterHistoryState(
+            currentGameName: 'Canonical Game',
+            currentGameMeta: {
+              'id': 'canonical-game',
+              'name': 'Canonical Game',
+              'startDate': 1711803000000,
+              'gameMode': 'commander',
+            },
+            currentGameEntries: [
+              LifeCounterHistoryEntry(
+                message: 'Player 2 lost 6 life',
+                source: LifeCounterHistoryEntrySource.currentGame,
+              ),
+            ],
+            archiveEntries: [
+              LifeCounterHistoryEntry(
+                message: 'Player 4 was eliminated',
+                source: LifeCounterHistoryEntrySource.archive,
+              ),
+            ],
+            archivedGameCount: 2,
+            gameCounter: 14,
+            lastTableEvent: 'Player 2 lost 6 life',
+          ),
+        );
+
+        final fallbackValues = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+        final mergedValues = mergeLotusBootstrapValues(
+          snapshotValues: const {
+            'players': '[{"id":"stale-player"}]',
+            'playerCount': '2',
+            'gameSettings': '{"autoKO":false,"showRegularCounters":true}',
+            'gameTimerState': '{"startTime":999,"isPaused":false}',
+            '__manaloom_day_night_mode': 'day',
+            'gameHistory': '["stale-event"]',
+            'allGamesHistory': '["stale-archive"]',
+            'currentGameMeta': '{"id":"stale-game","name":"Stale Game"}',
+            'gameCounter': '2',
+            'turnTrackerHintOverlay_v1': 'true',
+          },
+          fallbackValues: fallbackValues,
+        );
+
+        expect(mergedValues['turnTrackerHintOverlay_v1'], 'true');
+
+        final snapshot = LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(mergedValues),
+        );
+        final restoredSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+          snapshot,
+        );
+        final restoredSettings =
+            LotusLifeCounterSettingsAdapter.tryBuildSettings(snapshot);
+        final restoredGameTimer =
+            LotusLifeCounterGameTimerAdapter.tryBuildState(snapshot);
+        final restoredDayNight = buildLotusDayNightStateFromSnapshot(snapshot);
+        final restoredHistory = LifeCounterHistoryState.fromSources(
+          session: restoredSession,
+          snapshot: snapshot,
+        );
+
+        expect(restoredSession, isNotNull);
+        expect(restoredSession!.lives, const [38, 29, 17, 11]);
+        expect(restoredSession.firstPlayerIndex, 2);
+        expect(restoredSession.currentTurnNumber, 5);
+
+        expect(restoredSettings, isNotNull);
+        expect(restoredSettings!.autoKill, isTrue);
+        expect(restoredSettings.showRegularCounters, isFalse);
+        expect(restoredSettings.gameTimer, isTrue);
+
+        expect(restoredGameTimer, isNotNull);
+        expect(restoredGameTimer!.startTimeEpochMs, 1711803000000);
+        expect(restoredGameTimer.isPaused, isTrue);
+        expect(restoredGameTimer.pausedTimeEpochMs, 1711803010000);
+
+        expect(restoredDayNight, isNotNull);
+        expect(restoredDayNight!.isNight, isTrue);
+
+        expect(restoredHistory.currentGameMeta?['id'], 'canonical-game');
+        expect(restoredHistory.gameCounter, 14);
+        expect(
+          restoredHistory.currentGameEntries.single.message,
+          'Player 2 lost 6 life',
+        );
+        expect(
+          restoredHistory.archiveEntries.any(
+            (entry) => entry.message == 'Player 4 was eliminated',
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test(
       'builds day night bootstrap values when only canonical day night exists',
       () async {
         await dayNightStateStore.save(
