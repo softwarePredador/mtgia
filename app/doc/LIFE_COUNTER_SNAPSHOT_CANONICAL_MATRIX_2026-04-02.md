@@ -25,7 +25,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o bootstrap agora tambem aceita patch incremental via `receivePatch`, mas isso ainda vale so para dominios com runtime seguro
 - o `turn tracker` agora tambem tem recortes de sync incremental pelo proprio runtime do Lotus, sem depender de patch cego de storage
 - os caminhos de runtime sem `reload` agora tambem confirmam presenca real do alvo no DOM do Lotus antes de reportar sucesso ao host
-- `table state` agora tambem tem um recorte sem `reload` para `monarch/initiative`, incluindo clear de ownership visual; `storm` continua fora desse caminho
+- `table state` agora tambem tem um recorte sem `reload` para `storm`, `monarch` e `initiative`; `storm` fecha so por patch no payload canonico, e `monarch/initiative` continuam com sync visual no DOM do Lotus
 - `day/night` agora tambem confirma o `.day-night-switcher` antes de assumir sucesso no sync live; se o alvo nao responder, o host volta para fallback
 - os handoffs embutidos de `Game Modes` agora tambem confirmam que o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem antes de reportar sucesso; seletor ausente deixa de parecer entrega bem-sucedida, e o dismiss da shell passa a carregar o status real de entrega
 - `turn tracker`, `game timer` e `table state` agora tambem expõem na observabilidade se o apply fechou em `live_runtime` ou `reload_fallback`, evitando leitura ambigua dos recortes sem `reload`
@@ -160,7 +160,7 @@ Complemento desta rodada:
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`, desde que o alvo `.game-timer` exista e responda
 - `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural e com o alvo `.turn-time-tracker` presente
-- `table state` ja tem um caso seguro de sync incremental sem `reload`, desde que a mutacao seja apenas trocar ou limpar `monarch/initiative`, com `.player-card` presentes e `menu-button` sincronizada; mudanca de `storm` ainda cai em fallback
+- `table state` ja tem um caso seguro de sync incremental sem `reload` para `storm`, `monarch` e `initiative`; `storm` fecha por patch no payload canonico, e `monarch/initiative` continuam exigindo `.player-card` presentes e `menu-button` sincronizada para o ajuste visual no DOM do Lotus
 - `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca
 - `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool agora e confirmado em chamada separada, sem `setTimeout` fire-and-forget, e a telemetria de dismiss passa a indicar `action_delivered`
 - `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, separando visualmente no log quando o estado foi aplicado live e quando caiu em `reload`

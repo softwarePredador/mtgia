@@ -1189,6 +1189,130 @@ void main() {
       },
     );
 
+    testWidgets(
+      'applies storm-only table state changes without reloading the Lotus bundle',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 40, 40, 40],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: 0,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+          await LotusStorageSnapshotStore().save(
+            const LotusStorageSnapshot(
+              values: {
+                '__manaloom_table_state':
+                    '{"stormCount":0,"monarchPlayer":null,"initiativePlayer":null,"lastPlayerRolls":[null,null,null,null],"lastHighRolls":[null,null,null,null],"firstPlayerIndex":0}',
+              },
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-table-state","source":"storm_surface_pressed"}',
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Table State'), findsOneWidget);
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-table-state-storm-plus'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          final stormPlusButton = tester.widget<FilledButton>(
+            find.byKey(
+              const Key('life-counter-native-table-state-storm-plus'),
+            ),
+          );
+          stormPlusButton.onPressed!.call();
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-table-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          final snapshot = await LotusStorageSnapshotStore().load();
+          expect(session, isNotNull);
+          expect(session!.stormCount, 1);
+          expect(session.monarchPlayer, isNull);
+          expect(session.initiativePlayer, isNull);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            snapshot?.values['__manaloom_table_state'],
+            contains('"stormCount":1'),
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_table_state_applied') &&
+                  message.contains('apply_strategy: live_runtime') &&
+                  message.contains('live_patch_eligible: true'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
     testWidgets('opens native dice from shell shortcut', (tester) async {
       late _FakeLotusHost host;
       await _captureDebugLogs((logs) async {

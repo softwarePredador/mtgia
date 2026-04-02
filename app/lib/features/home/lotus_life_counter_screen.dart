@@ -2899,16 +2899,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
-    final previousSession =
-        await _sessionStore.load() ??
-        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
-    final livePatchEligible = _canApplyLiveTableStatePatch(
-      previousSession,
-      adjustedSession,
-    );
+    final livePatchEligible = _canApplyLiveTableStatePatch();
     final appliedLive =
         livePatchEligible &&
         await _applyOwnedTableStateRuntimeState(adjustedSession);
@@ -2936,12 +2930,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyLiveTableStatePatch(
-    LifeCounterSession previous,
-    LifeCounterSession next,
-  ) {
-    return previous.stormCount == next.stormCount;
-  }
+  bool _canApplyLiveTableStatePatch() => true;
 
   Future<bool> _applyOwnedTableStateRuntimeState(
     LifeCounterSession session,
