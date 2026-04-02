@@ -1381,5 +1381,106 @@ void main() {
         );
       });
     });
+
+    testWidgets(
+      'keeps dice canonical store sync without reload when tracker stays active and first player is unchanged',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 40, 40, 40],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: 1,
+              turnTrackerActive: true,
+              turnTrackerOngoingGame: true,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: 1,
+              currentTurnNumber: 3,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-dice","source":"dice_shortcut_pressed"}',
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Dice Tools'), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-dice-d20')),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-dice-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.turnTrackerActive, isTrue);
+          expect(session.firstPlayerIndex, 1);
+          expect(session.lastTableEvent, contains('D20:'));
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_dice_applied') &&
+                  message.contains('apply_strategy: canonical_store_sync') &&
+                  message.contains('reload_required: false'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
   });
 }

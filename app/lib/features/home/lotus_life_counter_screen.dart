@@ -2009,18 +2009,36 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession previous,
     LifeCounterSession next,
   ) {
-    if (previous.turnTrackerActive || next.turnTrackerActive) {
+    final trackerIsActive = previous.turnTrackerActive || next.turnTrackerActive;
+    if (previous.turnTrackerActive != next.turnTrackerActive ||
+        previous.turnTrackerOngoingGame != next.turnTrackerOngoingGame ||
+        previous.turnTrackerAutoHighRoll != next.turnTrackerAutoHighRoll ||
+        previous.currentTurnPlayerIndex != next.currentTurnPlayerIndex ||
+        previous.currentTurnNumber != next.currentTurnNumber ||
+        previous.turnTimerActive != next.turnTimerActive ||
+        previous.turnTimerSeconds != next.turnTimerSeconds) {
+      return false;
+    }
+    if (trackerIsActive && previous.firstPlayerIndex != next.firstPlayerIndex) {
       return false;
     }
 
-    final expected = previous.copyWith(
-      lastPlayerRolls: next.lastPlayerRolls,
-      lastHighRolls: next.lastHighRolls,
-      firstPlayerIndex: next.firstPlayerIndex,
-      clearFirstPlayerIndex: next.firstPlayerIndex == null,
-      lastTableEvent: next.lastTableEvent,
-      clearLastTableEvent: next.lastTableEvent == null,
-    );
+    final expected =
+        trackerIsActive
+            ? previous.copyWith(
+              lastPlayerRolls: next.lastPlayerRolls,
+              lastHighRolls: next.lastHighRolls,
+              lastTableEvent: next.lastTableEvent,
+              clearLastTableEvent: next.lastTableEvent == null,
+            )
+            : previous.copyWith(
+              lastPlayerRolls: next.lastPlayerRolls,
+              lastHighRolls: next.lastHighRolls,
+              firstPlayerIndex: next.firstPlayerIndex,
+              clearFirstPlayerIndex: next.firstPlayerIndex == null,
+              lastTableEvent: next.lastTableEvent,
+              clearLastTableEvent: next.lastTableEvent == null,
+            );
     return expected.toJsonString() == next.toJsonString();
   }
 
