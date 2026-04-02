@@ -33,6 +33,22 @@ void main() {
       await _bootLiveLotus(tester);
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+      await state.debugRunJavaScript('''
+        (() => {
+          const ensureNode = (selector, className) => {
+            if (document.querySelector(selector)) {
+              return;
+            }
+            const node = document.createElement('button');
+            node.className = className;
+            document.body.appendChild(node);
+          };
+          ensureNode('.planechase-btn', 'planechase-btn');
+          ensureNode('.archenemy-btn', 'archenemy-btn');
+          ensureNode('.bounty-btn', 'bounty-btn');
+        })();
+      ''');
+      await tester.pump(const Duration(milliseconds: 300));
       await state.debugHandleShellMessage(
         '{"type":"open-native-game-modes","source":"quick_actions_game_modes"}',
       );
@@ -42,6 +58,7 @@ void main() {
       expect(find.text('Planechase'), findsOneWidget);
       expect(find.text('Archenemy'), findsOneWidget);
       expect(find.text('Bounty'), findsOneWidget);
+      expect(find.text('Available'), findsNWidgets(3));
     },
   );
 }

@@ -83,6 +83,10 @@ Proximo passo imediato:
 - suite dedicada de normalizacao canonica do host agora vive em `test/features/home/lotus_life_counter_host_normalization_test.dart`
 - revisao formal das native sheets agora vive em `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
 - primeira poda controlada concluida: `life_counter_native_quick_actions_sheet.dart`
+- decisao de `Game Modes` agora fechada:
+  - `Planechase`, `Archenemy` e `Bounty` permanecem Lotus-first visualmente
+  - `edit cards` e card pools permanecem embutidos no Lotus como parte suportada do produto final
+  - `life_counter_native_game_modes_sheet.dart` fica como backend support interno
 
 ## Sprint 1 - Closed
 
@@ -260,18 +264,21 @@ Escopo:
 - Bounty
 - revisar overlay/hints remanescentes ainda Lotus-only
 
-Progresso inicial:
+Progresso fechado:
 
 - shell nativa de `game modes` ainda existe em codigo como suporte de backend/handoff
 - `Planechase`, `Archenemy` e `Bounty` agora seguem o Lotus como fluxo visual principal
 - a shell nativa de `game modes` fica preservada como apoio tecnico de backend, observabilidade e fluxos internos
 - diretriz atual desta frente: preservar o overlay visual do Lotus como fluxo principal e usar ManaLoom como camada invisivel de estado, observabilidade e handoff tecnico
+- `edit cards` e card pools permanecem embutidos no runtime Lotus por decisao explicita de produto
+- smoke adicional de suporte interno para `Game Modes -> Settings` no caminho vivo:
+  - `integration_test/life_counter_native_game_modes_settings_smoke_test.dart`
 
 Done when:
 
 - os modos extras tem dono claro:
   - continuam no Lotus por decisao explicita
-  - ou entram no backlog de migracao nativa com contrato definido
+  - com ManaLoom por tras em observabilidade, handoff tecnico e estado
 
 Pendencias reais apos a revalidacao:
 
@@ -288,7 +295,6 @@ Pendencias reais apos a revalidacao:
   - quando um jogador sai da mesa por estado letal, a camada canonica agora tambem realinha `currentTurnPlayerIndex` e `firstPlayerIndex`, evitando tracker preso em jogador fora do jogo
   - quando nao sobra nenhum jogador ativo, o tracker canonico agora limpa os ponteiros em vez de manter referencia a jogador fora da mesa
   - revalidar em AVD limpo os smokes vivos mais novos que ainda sofrem com `INSTALL_FAILED_INSUFFICIENT_STORAGE`
-- decidir se `edit cards` de `Planechase`, `Archenemy` e `Bounty` vao permanecer embutidos por decisao explicita ou se entram no backlog de migracao nativa
 - fechar a decisao final sobre o runtime central da mesa antes de falar em remocao do `WebView`
 
 ## Exit Criteria Before Replacing The Tabletop

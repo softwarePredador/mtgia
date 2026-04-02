@@ -102,7 +102,7 @@ Ela define o papel de cada sheet para orientar manutencao, testes e poda futura.
 - `life_counter_native_game_modes_sheet.dart`
   - status: `backend support`
   - visual principal atual: Lotus
-  - observacao: manter como apoio tecnico de backend, handoff e observabilidade enquanto `Planechase`, `Archenemy` e `Bounty` seguirem Lotus-first
+  - observacao: manter como apoio tecnico de backend, handoff e observabilidade por decisao final de produto; `Planechase`, `Archenemy` e `Bounty` seguem Lotus-first visualmente e `edit cards`/card pools permanecem embutidos no Lotus
 
 ## Decisao operacional atual
 
@@ -112,7 +112,7 @@ Ordem recomendada:
 
 1. manter todas as sheets classificadas como `fallback interno` enquanto o host ainda aceitar `open-native-*`
 2. registrar `life_counter_native_quick_actions_sheet.dart` como primeira poda concluida
-3. revisar `life_counter_native_game_modes_sheet.dart` so depois da decisao formal sobre `Planechase`, `Archenemy` e `Bounty`
+3. revisar `life_counter_native_game_modes_sheet.dart` apenas se a estrategia de `Game Modes` mudar no futuro; com a decisao atual, ela permanece como `backend support`
 
 ## Proximo passo recomendado
 

@@ -62,6 +62,8 @@ Estado vivo do contador hoje:
 - shell nativa atual de game modes: `app/lib/features/home/life_counter/life_counter_native_game_modes_sheet.dart`
 - `Planechase`, `Archenemy` e `Bounty` agora seguem Lotus como fluxo visual principal
 - a shell nativa de `game modes` continua existindo em codigo apenas como apoio de backend, observabilidade e fluxos internos
+- decisao final de `Game Modes`: `Planechase`, `Archenemy` e `Bounty` entram no produto final como fluxos Lotus-first visuais, com ManaLoom sustentando handoff tecnico, observabilidade e persistencia quando necessario
+- `edit cards` e card pools permanecem embutidos no runtime Lotus como parte suportada do produto final, sem migracao visual para Flutter nesta fase
 - shells nativas atuais de runtime de jogador: `app/lib/features/home/life_counter/life_counter_native_commander_damage_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_appearance_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_counter_sheet.dart`, `app/lib/features/home/life_counter/life_counter_native_player_state_sheet.dart` e `app/lib/features/home/life_counter/life_counter_native_set_life_sheet.dart`
 - reboot do tracker e reabertura do snapshot persistido ja validados em `integration_test/life_counter_reopen_snapshot_smoke_test.dart`
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
@@ -139,6 +141,7 @@ Estado vivo do contador hoje:
 - plano operacional atual da frente Lotus-first: `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 - smoke Android Lotus-first de `menu + history`: `integration_test/life_counter_lotus_visual_overlays_smoke_test.dart`
 - smoke Android Lotus-first de `card search`: `integration_test/life_counter_lotus_card_search_visual_smoke_test.dart`
+- smoke Android de suporte interno para `Game Modes -> Settings`: `integration_test/life_counter_native_game_modes_settings_smoke_test.dart`
 - suite de fallback interno do host/shell: `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - suite de fallback interno para `day night` e `game modes`: `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`

@@ -216,16 +216,17 @@ Fechar de forma explicita o destino de:
 2. permanecem Lotus-first visualmente, com ManaLoom por tras
 3. entram em backlog de migracao nativa
 
-#### Current recommendation
+#### Closed decision
 
-- manter Lotus-first visualmente
-- manter ManaLoom como observabilidade, handoff tecnico e estado
-- evitar migracao visual enquanto a mesa principal continuar Lotus
+- `Planechase`, `Archenemy` e `Bounty` permanecem Lotus-first visualmente
+- ManaLoom continua como observabilidade, handoff tecnico e estado
+- `edit cards` e card pools permanecem embutidos no Lotus como parte suportada do produto final
+- nao existe migracao visual ativa desses modos para Flutter
 
 #### Acceptance
 
-- documentacao com decisao explicita
-- sem ambiguidade sobre `edit cards` e card pools
+- documentacao explicita fechada
+- sem ambiguidade sobre `edit cards`, card pools e papel da `life_counter_native_game_modes_sheet.dart`
 
 ## Next Concrete Tasks
 
@@ -275,7 +276,7 @@ Poda controlada de `life_counter_native_quick_actions_sheet.dart`.
 - limpeza da cobertura de fallback que ainda dependia desse caminho
 - classificacao da poda refletida em `doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
 
-### Task D
+### Task D - Closed
 
 Atualizar docs principais para refletir a diretriz definitiva.
 
@@ -291,6 +292,22 @@ Atualizar docs principais para refletir a diretriz definitiva.
   - o que pode mexer
   - o que nao pode mexer
   - a ordem correta das proximas tasks
+
+#### Closed with
+
+- `README.md`
+- `doc/LIFE_COUNTER_NEXT_SPRINTS_2026-03-30.md`
+- este plano
+
+### Task E - Closed
+
+Fechar a decisao explicita de `Game Modes`.
+
+#### Closed with
+
+- `Planechase`, `Archenemy` e `Bounty` documentados como Lotus-first visuais no produto final
+- `edit cards` e card pools documentados como embutidos no Lotus por decisao explicita
+- `integration_test/life_counter_native_game_modes_settings_smoke_test.dart`
 
 ## Validation Checklist Per Task
 
@@ -317,4 +334,4 @@ O proximo passo mais certo agora e:
 
 1. continuar fortalecendo o backend invisivel sem mexer no visual
 2. revisar os fallbacks internos restantes para novas podas controladas
-3. fechar a decisao explicita de `Game Modes`
+3. fechar a validacao final de produto do life counter

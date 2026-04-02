@@ -28,48 +28,58 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'shows explicit close action when the embedded Planechase card pool editor is already active',
+    'opens settings from the internal game modes support shell when a preferred mode is unavailable',
     (tester) async {
       await _bootLiveLotus(tester);
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
       await state.debugRunJavaScript('''
         (() => {
-          const ensureNode = (selector, tagName, className) => {
+          const ensureNode = (selector, className) => {
             if (document.querySelector(selector)) {
               return;
             }
-            const node = document.createElement(tagName);
+            const node = document.createElement('button');
             node.className = className;
             document.body.appendChild(node);
           };
-          ensureNode('.planechase-btn', 'button', 'planechase-btn');
-          ensureNode(
-            '.edit-planechase-cards-overlay',
-            'div',
-            'edit-planechase-cards-overlay'
-          );
-          ensureNode(
-            '.close-edit-planechase-cards-overlay',
-            'button',
-            'close-edit-planechase-cards-overlay'
-          );
+          ensureNode('.planechase-btn', 'planechase-btn');
+          ensureNode('.bounty-btn', 'bounty-btn');
+          const archenemyButton = document.querySelector('.archenemy-btn');
+          if (archenemyButton instanceof HTMLElement) {
+            archenemyButton.remove();
+          }
         })();
       ''');
       await tester.pump(const Duration(milliseconds: 300));
 
       await state.debugHandleShellMessage(
-        '{"type":"open-native-game-modes","source":"planechase_cards_pressed","preferredMode":"planechase","intent":"edit-cards"}',
+        '{"type":"open-native-game-modes","source":"archenemy_mode_pressed","preferredMode":"archenemy"}',
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Card Pool Open'), findsOneWidget);
+      expect(find.text('Game Modes'), findsOneWidget);
       expect(
         find.byKey(
-          const Key('life-counter-native-game-modes-planechase-close-card-pool'),
+          const Key('life-counter-native-game-modes-archenemy-settings'),
         ),
         findsOneWidget,
       );
+
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-game-modes-archenemy-settings'),
+        ),
+      );
+      await tester.tap(
+        find.byKey(
+          const Key('life-counter-native-game-modes-archenemy-settings'),
+        ),
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Life Counter Settings'), findsOneWidget);
     },
   );
 }
