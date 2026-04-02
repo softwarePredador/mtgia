@@ -412,7 +412,10 @@ void main() {
             (message) =>
                 message.contains('message=native_set_life_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('live_patch_eligible: false') &&
+                message.contains(
+                  'sync_blockers: [life_total_rendered_on_lotus_surface]',
+                ),
           ),
           isTrue,
         );

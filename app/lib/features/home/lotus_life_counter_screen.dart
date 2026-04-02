@@ -1182,6 +1182,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _settingsStore.save(settings);
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
+    const syncBlockers = <String>['lotus_settings_runtime_in_memory'];
 
     final snapshot = await _snapshotStore.load();
     if (snapshot != null) {
@@ -1207,6 +1208,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'clean_look': settings.cleanLook,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -2463,6 +2465,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _persistOwnedSessionSnapshot(session);
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
+    const syncBlockers = <String>[
+      'player_appearance_visual_surface_requires_reload',
+    ];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2472,6 +2477,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -3029,6 +3035,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _persistOwnedSessionSnapshot(adjustedSession);
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
+    const syncBlockers = <String>['life_total_rendered_on_lotus_surface'];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3040,6 +3047,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'life': adjustedSession.lives[targetPlayerIndex],
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );

@@ -175,7 +175,10 @@ void main() {
             (message) =>
                 message.contains('message=native_settings_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('live_patch_eligible: false') &&
+                message.contains(
+                  'sync_blockers: [lotus_settings_runtime_in_memory]',
+                ),
           ),
           isTrue,
         );

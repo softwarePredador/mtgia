@@ -190,6 +190,7 @@ Estado vivo do contador hoje:
 - `dice` e `player state` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um recorte baseado em rolagem caiu em `reload_fallback`
 - `turn tracker` e `game timer` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um apply caiu em `reload_fallback` mesmo dentro da familia de live sync
 - `day/night` e `table state` agora tambem anotam `sync_blockers` com o `reason` real devolvido pelo runtime do Lotus, deixando explicito quando o fallback veio de falha concreta de DOM/runtime e nao de bloqueio arquitetural previo
+- `settings`, `player appearance` e `set life` agora tambem anotam `sync_blockers`, deixando explicito no log quando o fallback e puramente arquitetural: runtime de settings em memoria propria do Lotus, aparencia ainda acoplada a superficie visual do board e vida renderizada diretamente na mesa
 - `settings` agora tambem anota `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que esse dominio continua dependente de rehydrate completo
 - `history` e `card search` agora tambem anotam `surface_strategy: native_fallback` nos eventos da sheet interna, deixando explicito no log que esses atalhos sao suporte nativo e nao takeover visual principal
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito no log que esse fluxo faz sync canonico sem apply live no Lotus
