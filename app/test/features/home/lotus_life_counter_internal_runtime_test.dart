@@ -50,7 +50,13 @@ class _FakeLotusHost implements LotusHost {
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
+    executedScripts.add(script);
+
     if (script.contains('receivePatch')) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
+    if (script.contains('.turn-time-tracker') || script.contains('.game-timer')) {
       return jsonEncode(<String, Object>{'ok': true});
     }
 

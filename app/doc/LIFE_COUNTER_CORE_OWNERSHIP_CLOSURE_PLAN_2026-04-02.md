@@ -47,8 +47,8 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `currentGameMeta` e `gameCounter` agora tambem vivem dentro do contrato canonico de `history`
 - `Wave 4` iniciada: existe ponte de patch incremental para o runtime Lotus
 - `settings` permanecem em `reload` por seguranca, porque o bundle Lotus mantem esse dominio em memoria propria
-- `game timer` ja aceita sync incremental no caso seguro `active -> active`
-- `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente, rewind curto limitado e mudanca curta de starting player em `Turn 1`, sem mudanca estrutural fora desse gesto
+- `game timer` ja aceita sync incremental no caso seguro `active -> active`, mas so evita `reload` quando o alvo `.game-timer` esta presente e responde no DOM real do Lotus
+- `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente, rewind curto limitado e mudanca curta de starting player em `Turn 1`, sem mudanca estrutural fora desse gesto, e so evita `reload` quando o alvo `.turn-time-tracker` esta presente e responde no DOM real do Lotus
 
 ## Ja ManaLoom-owned
 
@@ -389,8 +389,8 @@ Implementado nesta rodada:
 
 - `flutter_bootstrap.js` agora expoe `receivePatch` para aplicar mutacoes pontuais no `localStorage`
 - o host consegue tentar patch incremental antes do reload completo
-- `game timer` usa sync incremental no caso seguro `active -> active`
-- `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente, voltar poucos passos ou mudar o starting player por rewind curto em `Turn 1`
+- `game timer` usa sync incremental no caso seguro `active -> active`, mas agora so considera sucesso quando o DOM `.game-timer` existe e confirma a aplicacao
+- `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente, voltar poucos passos ou mudar o starting player por rewind curto em `Turn 1`, mas agora so considera sucesso quando o DOM `.turn-time-tracker` existe e confirma a aplicacao
 - `settings` continuam em reload por decisao explicita de seguranca, porque o Lotus mantem esse dominio em memoria e nao reage apenas ao patch de storage
 
 ### Wave 5 - Tornar o host o escritor primario

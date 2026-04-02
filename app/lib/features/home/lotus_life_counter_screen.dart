@@ -1391,21 +1391,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       }
 
       try {
-        await _hostController.runJavaScript('''
+        final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
     const tracker = document.querySelector('.turn-time-tracker');
     if (!(tracker instanceof HTMLElement)) {
-      return;
+      return JSON.stringify({ ok: false, reason: 'tracker_missing' });
     }
 
     for (let index = 0; index < $steps; index += 1) {
       tracker.click();
     }
+    return JSON.stringify({ ok: true, action: 'forward', steps: $steps });
   } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'forward_failed' });
 })();
 ''');
-        return true;
+        final decoded = _decodeJavaScriptResult(rawResult);
+        return decoded is Map<String, dynamic> && decoded['ok'] == true;
       } catch (_) {
         return false;
       }
@@ -1419,12 +1422,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     try {
-      await _hostController.runJavaScript('''
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
     const tracker = document.querySelector('.turn-time-tracker');
     if (!(tracker instanceof HTMLElement)) {
-      return;
+      return JSON.stringify({ ok: false, reason: 'tracker_missing' });
     }
     const downEvent = new MouseEvent('mousedown', {
       bubbles: true,
@@ -1448,9 +1451,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         tracker.dispatchEvent(upEvent);
       }, baseDelay + $_turnTrackerLongPressDurationMs);
     }
+    return JSON.stringify({ ok: true, action: 'backward', steps: $backwardSteps });
   } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'backward_failed' });
 })();
 ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      if (decoded is! Map<String, dynamic> || decoded['ok'] != true) {
+        return false;
+      }
       await Future<void>.delayed(
         Duration(milliseconds: backwardSteps * _turnTrackerLongPressCycleMs),
       );
@@ -1602,18 +1611,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     try {
-      await _hostController.runJavaScript('''
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
     const timer = document.querySelector('.game-timer');
     if (!(timer instanceof HTMLElement)) {
-      return;
+      return JSON.stringify({ ok: false, reason: 'timer_missing' });
     }
 
     const startTime = ${state.startTimeEpochMs ?? 'null'};
     const pausedTime = ${state.pausedTimeEpochMs ?? 0};
     if (startTime == null) {
-      return;
+      return JSON.stringify({ ok: false, reason: 'start_time_missing' });
     }
 
     const elapsedSeconds = Math.max(
@@ -1630,14 +1639,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ':' +
       String(seconds).padStart(2, '0');
     timer.classList.toggle('paused', ${state.isPaused ? 'true' : 'false'});
+    return JSON.stringify({ ok: true });
   } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'timer_patch_failed' });
 })();
 ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      return decoded is Map<String, dynamic> && decoded['ok'] == true;
     } catch (_) {
       return false;
     }
-
-    return true;
   }
 
   Future<void> _openNativeDiceSheet({required String source}) async {
