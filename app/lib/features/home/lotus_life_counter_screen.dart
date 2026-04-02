@@ -1318,7 +1318,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
-    return _countForwardTurnTrackerSteps(previous, next) != null;
+    return _countForwardTurnTrackerSteps(previous, next) != null ||
+        _countBackwardTurnTrackerSteps(previous, next) == 1;
   }
 
   int? _countForwardTurnTrackerSteps(
@@ -1333,6 +1334,26 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final maxSteps = next.playerCount * 32;
     for (var steps = 1; steps <= maxSteps; steps += 1) {
       cursor = LifeCounterTurnTrackerEngine.nextTurn(cursor);
+      if (_matchesTurnTrackerPosition(cursor, next)) {
+        return steps;
+      }
+    }
+
+    return null;
+  }
+
+  int? _countBackwardTurnTrackerSteps(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    if (_matchesTurnTrackerPosition(previous, next)) {
+      return 0;
+    }
+
+    var cursor = previous;
+    final maxSteps = next.playerCount * 32;
+    for (var steps = 1; steps <= maxSteps; steps += 1) {
+      cursor = LifeCounterTurnTrackerEngine.previousTurn(cursor);
       if (_matchesTurnTrackerPosition(cursor, next)) {
         return steps;
       }
@@ -1358,16 +1379,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession next,
   ) async {
     final steps = _countForwardTurnTrackerSteps(previous, next);
-    if (steps == null) {
-      return false;
-    }
+    if (steps != null) {
+      if (steps == 0) {
+        return true;
+      }
 
-    if (steps == 0) {
-      return true;
-    }
-
-    try {
-      await _hostController.runJavaScript('''
+      try {
+        await _hostController.runJavaScript('''
 (() => {
   try {
     const tracker = document.querySelector('.turn-time-tracker');
@@ -1381,6 +1399,45 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   } catch (_) {}
 })();
 ''');
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    final backwardSteps = _countBackwardTurnTrackerSteps(previous, next);
+    if (backwardSteps != 1) {
+      return false;
+    }
+
+    try {
+      await _hostController.runJavaScript('''
+(() => {
+  try {
+    const tracker = document.querySelector('.turn-time-tracker');
+    if (!(tracker instanceof HTMLElement)) {
+      return;
+    }
+    const downEvent = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0,
+    });
+    const upEvent = new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0,
+    });
+    tracker.dispatchEvent(downEvent);
+    window.setTimeout(() => {
+      tracker.dispatchEvent(upEvent);
+    }, 1100);
+  } catch (_) {}
+})();
+''');
+      await Future<void>.delayed(const Duration(milliseconds: 1150));
       return true;
     } catch (_) {
       return false;

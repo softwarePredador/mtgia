@@ -23,7 +23,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `LifeCounterHistoryState` e `LifeCounterHistoryStore` passam a ser o owner real do dominio
 - `gameHistory`, `allGamesHistory`, `currentGameMeta` e `gameCounter` continuam existindo como payload de compatibilidade para o renderer Lotus
 - o bootstrap agora tambem aceita patch incremental via `receivePatch`, mas isso ainda vale so para dominios com runtime seguro
-- o `turn tracker` agora tambem tem um recorte de sync incremental pelo proprio runtime do Lotus, sem depender de patch cego de storage
+- o `turn tracker` agora tambem tem recortes de sync incremental pelo proprio runtime do Lotus, sem depender de patch cego de storage
 
 ## Reading rule
 
@@ -142,7 +142,7 @@ Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
 - `game timer` ja tem um caso seguro de patch incremental sem `reload`
-- `turn tracker` ja tem um caso seguro de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente mantendo a mesma configuracao estrutural
+- `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente ou voltar um unico passo mantendo a mesma configuracao estrutural
 
 ### 3. Runtime Lotus-first visual paths
 
