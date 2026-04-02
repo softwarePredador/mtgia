@@ -71,7 +71,7 @@ Essas excecoes nao devem virar fluxo principal.
 
 #### What still needs work
 
-- fechar validacao automatizada confiavel de `card search` no Android real
+- manter a validacao automatizada de `card search` no Android real junto do baseline Lotus-first
 - revisar se existe qualquer takeover visual restante em `lotus_shell_policy.dart`
 - revisar testes de host que ainda assumem `open-native-*` como caminho principal
 
@@ -202,15 +202,15 @@ Fechar de forma explicita o destino de:
 
 ## Next Concrete Tasks
 
-### Task A
+### Task A - Closed
 
-Fechar smoke confiavel de `card search` no Android real.
+Smoke confiavel de `card search` no Android real.
 
-#### Done when
+#### Closed with
 
-- o teste abre `card search` do Lotus
-- confirma que nao caiu na overlay Flutter nativa
-- passa no emulator atual
+- `integration_test/life_counter_lotus_card_search_visual_smoke_test.dart`
+- abertura do `Card Search` original do Lotus
+- confirmacao explicita de que nao caiu na overlay Flutter nativa
 
 ### Task B
 

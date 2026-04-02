@@ -206,7 +206,7 @@ String get lotusShellCleanupScript {
     observeUiSurface('.menu-button-overlay', 'menu_overlay_opened');
     observeUiSurface('.settings-overlay', 'settings_overlay_opened');
     observeUiSurface('.life-history-overlay', 'history_overlay_opened');
-    observeUiSurface('.search-overlay', 'card_search_overlay_opened');
+    observeUiSurface('.card-search-overlay', 'card_search_overlay_opened');
     observeUiSurface('.planechase-overlay', 'planechase_overlay_opened');
     observeUiSurface('.archenemy-overlay', 'archenemy_overlay_opened');
     observeUiSurface('.bounty-overlay', 'bounty_overlay_opened');

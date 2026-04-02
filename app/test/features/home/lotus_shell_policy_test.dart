@@ -181,6 +181,10 @@ void main() {
     test('still observes Lotus game mode overlays for telemetry', () {
       expect(
         lotusShellCleanupScript,
+        contains("observeUiSurface('.card-search-overlay', 'card_search_overlay_opened');"),
+      );
+      expect(
+        lotusShellCleanupScript,
         contains("observeUiSurface('.planechase-overlay', 'planechase_overlay_opened');"),
       );
       expect(

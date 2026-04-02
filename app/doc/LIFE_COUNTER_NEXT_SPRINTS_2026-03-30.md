@@ -65,7 +65,7 @@ Documento operacional principal desta fase:
 
 Proximo passo imediato:
 
-- fechar um smoke Android confiavel de `card search` no fluxo visual do Lotus
+- alinhar a suite de testes com a diretriz Lotus-first, separando visual Lotus de fallback interno
 
 ## Sprint 1 - Closed
 

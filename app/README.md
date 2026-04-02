@@ -134,6 +134,8 @@ Estado vivo do contador hoje:
 - o toque no total de vida do jogador pode abrir a shell nativa de `Set Life`
 - smoke novo preparado para o caminho vivo `Player State -> Set Life`: `integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart`
 - plano operacional atual da frente Lotus-first: `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
+- smoke Android Lotus-first de `menu + history`: `integration_test/life_counter_lotus_visual_overlays_smoke_test.dart`
+- smoke Android Lotus-first de `card search`: `integration_test/life_counter_lotus_card_search_visual_smoke_test.dart`
 
 ## Comandos
 
