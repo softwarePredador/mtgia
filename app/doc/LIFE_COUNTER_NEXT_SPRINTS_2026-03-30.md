@@ -65,7 +65,7 @@ Documento operacional principal desta fase:
 
 Proximo passo imediato:
 
-- revisar/classificar as native sheets restantes e preparar a primeira poda controlada
+- fortalecer o backend invisivel por tras do `WebView`
 - primeira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - segunda extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - terceira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_runtime_test.dart`
@@ -75,6 +75,7 @@ Proximo passo imediato:
 - setima extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_state_outcomes_test.dart`
 - suite dedicada de normalizacao canonica do host agora vive em `test/features/home/lotus_life_counter_host_normalization_test.dart`
 - revisao formal das native sheets agora vive em `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+- primeira poda controlada concluida: `life_counter_native_quick_actions_sheet.dart`
 
 ## Sprint 1 - Closed
 

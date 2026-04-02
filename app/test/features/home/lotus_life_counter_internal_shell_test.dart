@@ -145,45 +145,6 @@ void main() {
       expect(host.loadBundleCallCount, 2);
     });
 
-    testWidgets('opens native quick actions from a shell fallback shortcut', (
-      tester,
-    ) async {
-      late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
-          ),
-        ),
-      );
-
-      await tester.pump();
-      await tester.pump();
-
-      host.emitShellMessage(
-        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Quick Actions'), findsOneWidget);
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-quick-actions-settings')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Life Counter Settings'), findsOneWidget);
-    });
-
     testWidgets('opens native history from a shell fallback shortcut', (
       tester,
     ) async {

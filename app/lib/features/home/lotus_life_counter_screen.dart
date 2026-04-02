@@ -20,7 +20,6 @@ import 'life_counter/life_counter_native_game_timer_sheet.dart';
 import 'life_counter/life_counter_native_history_sheet.dart';
 import 'life_counter/life_counter_native_player_appearance_sheet.dart';
 import 'life_counter/life_counter_native_player_counter_sheet.dart';
-import 'life_counter/life_counter_native_quick_actions_sheet.dart';
 import 'life_counter/life_counter_native_set_life_sheet.dart';
 import 'life_counter/life_counter_native_player_state_sheet.dart';
 import 'life_counter/life_counter_native_settings_sheet.dart';
@@ -82,7 +81,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   bool _isNativeGameTimerSheetOpen = false;
   bool _isNativeDiceSheetOpen = false;
   bool _isNativeGameModesSheetOpen = false;
-  bool _isNativeQuickActionsSheetOpen = false;
   bool _isNativeCommanderDamageSheetOpen = false;
   bool _isNativePlayerAppearanceSheetOpen = false;
   bool _isNativePlayerCounterSheetOpen = false;
@@ -299,14 +297,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           unawaited(
             _openNativeDiceSheet(
               source: (decoded['source'] as String?) ?? 'dice_shortcut_pressed',
-            ),
-          );
-          return;
-        }
-        if (decoded['type'] == 'open-native-quick-actions') {
-          unawaited(
-            _openNativeQuickActionsSheet(
-              source: (decoded['source'] as String?) ?? 'menu_button_pressed',
             ),
           );
           return;
@@ -532,71 +522,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     await _applyNativeSettings(updatedSettings, source: source);
-  }
-
-  Future<void> _openNativeQuickActionsSheet({required String source}) async {
-    if (!mounted || _isNativeQuickActionsSheetOpen) {
-      return;
-    }
-
-    _isNativeQuickActionsSheetOpen = true;
-    unawaited(
-      AppObservability.instance.recordEvent(
-        'native_quick_actions_opened',
-        category: 'life_counter.quick_actions',
-        data: {'source': source},
-      ),
-    );
-
-    final selectedAction = await showLifeCounterNativeQuickActionsSheet(
-      context,
-    );
-    _isNativeQuickActionsSheetOpen = false;
-
-    if (!mounted || selectedAction == null) {
-      unawaited(
-        AppObservability.instance.recordEvent(
-          'native_quick_actions_dismissed',
-          category: 'life_counter.quick_actions',
-          data: {'source': source, 'selected': false},
-        ),
-      );
-      return;
-    }
-
-    unawaited(
-      AppObservability.instance.recordEvent(
-        'native_quick_actions_selected',
-        category: 'life_counter.quick_actions',
-        data: {
-          'source': source,
-          'action': selectedAction.name,
-        },
-      ),
-    );
-
-    switch (selectedAction) {
-      case LifeCounterQuickAction.settings:
-        await _openNativeSettingsSheet(source: 'quick_actions_settings');
-      case LifeCounterQuickAction.history:
-        await _openNativeHistorySheet(source: 'quick_actions_history');
-      case LifeCounterQuickAction.cardSearch:
-        await _openNativeCardSearchSheet(source: 'quick_actions_card_search');
-      case LifeCounterQuickAction.turnTracker:
-        await _openNativeTurnTrackerSheet(
-          source: 'quick_actions_turn_tracker',
-        );
-      case LifeCounterQuickAction.gameTimer:
-        await _openNativeGameTimerSheet(source: 'quick_actions_game_timer');
-      case LifeCounterQuickAction.dice:
-        await _openNativeDiceSheet(source: 'quick_actions_dice');
-      case LifeCounterQuickAction.gameModes:
-        await _openNativeGameModesSheet(source: 'quick_actions_game_modes');
-      case LifeCounterQuickAction.tableState:
-        await _openNativeTableStateSheet(source: 'quick_actions_table_state');
-      case LifeCounterQuickAction.dayNight:
-        await _openNativeDayNightSheet(source: 'quick_actions_day_night');
-    }
   }
 
   Future<void> _openNativeGameModesSheet({

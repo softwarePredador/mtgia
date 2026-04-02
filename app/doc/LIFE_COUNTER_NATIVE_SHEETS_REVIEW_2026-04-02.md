@@ -17,6 +17,7 @@ Ela define o papel de cada sheet para orientar manutencao, testes e poda futura.
 - `fallback interno`: suporte tecnico ainda exercitavel por host/tests/debug, mas nao e o fluxo visual principal
 - `backend support`: existe para handoff tecnico, observabilidade ou apoio do backend, mesmo sem ser fluxo visual principal
 - `candidata a poda`: pode entrar em fila de remocao quando o fallback equivalente deixar de ser necessario
+- `podada`: removida do runtime e da cobertura interna por nao ter mais papel no fluxo atual
 
 ## Classificacao atual
 
@@ -38,9 +39,9 @@ Ela define o papel de cada sheet para orientar manutencao, testes e poda futura.
   - observacao: manter enquanto o host ainda suportar `open-native-card-search`
 
 - `life_counter_native_quick_actions_sheet.dart`
-  - status: `candidata a poda`
+  - status: `podada`
   - visual principal atual: menu radial do Lotus
-  - observacao: o `menu-button` ja voltou ao Lotus; esta sheet hoje sobrevive principalmente para fallback e cobertura historica
+  - observacao: removida do runtime e da suite de fallback em 2026-04-02; o menu radial do Lotus segue como fluxo visual oficial
 
 ### Runtime auxiliar da mesa
 
@@ -110,7 +111,7 @@ Nenhuma dessas sheets deve ser removida imediatamente.
 Ordem recomendada:
 
 1. manter todas as sheets classificadas como `fallback interno` enquanto o host ainda aceitar `open-native-*`
-2. tratar `life_counter_native_quick_actions_sheet.dart` como primeira `candidata a poda`
+2. registrar `life_counter_native_quick_actions_sheet.dart` como primeira poda concluida
 3. revisar `life_counter_native_game_modes_sheet.dart` so depois da decisao formal sobre `Planechase`, `Archenemy` e `Bounty`
 
 ## Proximo passo recomendado

@@ -179,7 +179,7 @@ Primeiro classificar cada uma como:
 - classificacao atual:
   - `fallback interno`: quase todas as native sheets ainda acionaveis por `open-native-*`
   - `backend support`: `life_counter_native_game_modes_sheet.dart`
-  - `candidata a poda`: `life_counter_native_quick_actions_sheet.dart`
+  - `podada`: `life_counter_native_quick_actions_sheet.dart`
 
 ### Step 5 - Decide the boundary of Game Modes
 
@@ -220,7 +220,7 @@ Smoke confiavel de `card search` no Android real.
 - abertura do `Card Search` original do Lotus
 - confirmacao explicita de que nao caiu na overlay Flutter nativa
 
-### Task B
+### Task B - Closed
 
 Refatorar a suite de testes para separar:
 
@@ -245,7 +245,18 @@ Refatorar a suite de testes para separar:
 - suite dedicada de normalizacao canonica do host concluida em `test/features/home/lotus_life_counter_host_normalization_test.dart`
 - `lotus_life_counter_screen_test.dart` agora fica nomeado como cobertura de `host and backend behavior`
 
-### Task C
+### Task C - Closed
+
+Poda controlada de `life_counter_native_quick_actions_sheet.dart`.
+
+#### Closed with
+
+- remocao da sheet `life_counter_native_quick_actions_sheet.dart`
+- remocao do handler `open-native-quick-actions` do host
+- limpeza da cobertura de fallback que ainda dependia desse caminho
+- classificacao da poda refletida em `doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+
+### Task D
 
 Atualizar docs principais para refletir a diretriz definitiva.
 
@@ -285,6 +296,6 @@ Regra operacional vigente:
 
 O proximo passo mais certo agora e:
 
-1. revisar se `life_counter_native_quick_actions_sheet.dart` ja pode entrar em poda controlada
-2. continuar fortalecendo o backend invisivel sem mexer no visual
+1. continuar fortalecendo o backend invisivel sem mexer no visual
+2. revisar os fallbacks internos restantes para novas podas controladas
 3. fechar a decisao explicita de `Game Modes`

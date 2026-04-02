@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
-import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
-import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_host.dart';
 import 'package:manaloom/features/home/lotus/lotus_js_bridges.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
@@ -149,167 +147,6 @@ void main() {
           (script) =>
               script.contains('__manaloom_day_night_mode') &&
               script.contains("'night'"),
-        ),
-        isTrue,
-      );
-    });
-
-    testWidgets('opens native table state from quick actions', (tester) async {
-      late _FakeLotusHost host;
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
-      await LifeCounterSessionStore().save(
-        LifeCounterSession.initial(playerCount: 4),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
-          ),
-        ),
-      );
-
-      await tester.pump();
-      await tester.pump();
-
-      host.emitShellMessage(
-        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-quick-actions-table-state'),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Table State'), findsOneWidget);
-
-      await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-table-state-monarch-player-0'),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-table-state-apply')),
-      );
-      await tester.pumpAndSettle();
-
-      final session = await LifeCounterSessionStore().load();
-      expect(session, isNotNull);
-      expect(session!.monarchPlayer, 0);
-      expect(host.loadBundleCallCount, 2);
-    });
-
-    testWidgets('opens native day night from quick actions', (tester) async {
-      late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
-          ),
-        ),
-      );
-
-      await tester.pump();
-      await tester.pump();
-
-      host.emitShellMessage(
-        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-quick-actions-day-night')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Day / Night'), findsOneWidget);
-
-      await tester.tap(find.text('Night'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-day-night-apply')),
-      );
-      await tester.pumpAndSettle();
-
-      final state = await LifeCounterDayNightStateStore().load();
-      expect(state, isNotNull);
-      expect(state!.isNight, isTrue);
-    });
-
-    testWidgets('opens native game modes from quick actions', (tester) async {
-      late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
-          ),
-        ),
-      );
-
-      await tester.pump();
-      await tester.pump();
-
-      host.emitShellMessage(
-        '{"type":"open-native-quick-actions","source":"menu_button_pressed"}',
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-quick-actions-game-modes')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Game Modes'), findsOneWidget);
-      expect(find.text('Planechase'), findsOneWidget);
-      expect(find.text('Archenemy'), findsOneWidget);
-      expect(find.text('Bounty'), findsOneWidget);
-      expect(find.text('Active Now'), findsOneWidget);
-      expect(find.text('Return To Embedded Mode'), findsOneWidget);
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(
-        host.executedScripts.any(
-          (script) =>
-              script.contains("document.querySelector('.planechase-btn')") &&
-              script.contains('button.click()'),
         ),
         isTrue,
       );
@@ -523,7 +360,7 @@ void main() {
     );
 
     testWidgets(
-      'offers explicit edit card pool action from quick actions game modes shell',
+      'offers explicit edit card pool action from the internal game modes shell',
       (tester) async {
         late _FakeLotusHost host;
 
@@ -547,7 +384,7 @@ void main() {
         await tester.pump();
 
         host.emitShellMessage(
-          '{"type":"open-native-game-modes","source":"quick_actions_game_modes"}',
+          '{"type":"open-native-game-modes","source":"internal_game_modes_fallback"}',
         );
         await tester.pumpAndSettle();
 
