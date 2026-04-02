@@ -28,6 +28,11 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerAppearanceSheet(
   onSaveProfilePressed,
   Future<List<LifeCounterPlayerAppearanceProfile>> Function(String profileId)?
   onDeleteProfilePressed,
+  void Function(
+    LifeCounterPlayerAppearanceProfile profile,
+    int targetPlayerIndex,
+  )?
+  onApplyProfilePressed,
 }) {
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
@@ -42,6 +47,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerAppearanceSheet(
         onImportSubmitted: onImportSubmitted,
         onSaveProfilePressed: onSaveProfilePressed,
         onDeleteProfilePressed: onDeleteProfilePressed,
+        onApplyProfilePressed: onApplyProfilePressed,
       );
     },
   );
@@ -56,6 +62,7 @@ class _LifeCounterNativePlayerAppearanceSheet extends StatefulWidget {
     this.onImportSubmitted,
     this.onSaveProfilePressed,
     this.onDeleteProfilePressed,
+    this.onApplyProfilePressed,
   });
 
   final LifeCounterSession initialSession;
@@ -79,6 +86,11 @@ class _LifeCounterNativePlayerAppearanceSheet extends StatefulWidget {
   onSaveProfilePressed;
   final Future<List<LifeCounterPlayerAppearanceProfile>> Function(String profileId)?
   onDeleteProfilePressed;
+  final void Function(
+    LifeCounterPlayerAppearanceProfile profile,
+    int targetPlayerIndex,
+  )?
+  onApplyProfilePressed;
 
   @override
   State<_LifeCounterNativePlayerAppearanceSheet> createState() =>
@@ -296,6 +308,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
   }
 
   void _applyProfile(LifeCounterPlayerAppearanceProfile profile) {
+    widget.onApplyProfilePressed?.call(profile, _targetPlayerIndex);
     setState(() {
       _appearance = profile.appearance;
       _nicknameController.text = _appearance.nickname;

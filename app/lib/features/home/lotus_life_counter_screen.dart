@@ -2253,6 +2253,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             profileId,
             source: source,
           ),
+      onApplyProfilePressed:
+          (profile, targetPlayerIndex) =>
+              _selectNativePlayerAppearanceProfile(
+                profile,
+                targetPlayerIndex,
+                source: source,
+              ),
     );
     _isNativePlayerAppearanceSheetOpen = false;
 
@@ -2457,6 +2464,33 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
     return profiles;
+  }
+
+  void _selectNativePlayerAppearanceProfile(
+    LifeCounterPlayerAppearanceProfile profile,
+    int targetPlayerIndex, {
+    required String source,
+  }) {
+    const surfaceStrategy = 'native_fallback';
+    const persistenceStrategy = 'owned_profile_store';
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_player_appearance_profile_selected',
+        category: 'life_counter.player_appearance',
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'persistence_strategy': persistenceStrategy,
+          'target_player_index': targetPlayerIndex,
+          'profile_id': profile.id,
+          'profile_name': profile.name,
+          'has_nickname': profile.appearance.nickname.isNotEmpty,
+          'has_background_image': profile.appearance.backgroundImage != null,
+          'has_partner_background_image':
+              profile.appearance.backgroundImagePartner != null,
+        },
+      ),
+    );
   }
 
   Future<void> _openNativePlayerCounterSheet({

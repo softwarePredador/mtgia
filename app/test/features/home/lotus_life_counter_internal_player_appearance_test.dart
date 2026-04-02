@@ -790,6 +790,92 @@ void main() {
       });
     });
 
+    testWidgets('selects native player appearance profiles into draft', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await LifeCounterSessionStore().save(
+          LifeCounterSession.initial(playerCount: 4),
+        );
+
+        final store = LifeCounterPlayerAppearanceProfileStore();
+        final seededProfiles = await store.saveProfile(
+          name: 'Partner Pod',
+          appearance: const LifeCounterPlayerAppearance(
+            background: '#CF7AEF',
+            nickname: 'Partner Pilot',
+          ),
+        );
+        final profileId = seededProfiles.single.id;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-appearance","source":"player_background_surface_pressed","targetPlayerIndex":2}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.byKey(
+            Key(
+              'life-counter-native-player-appearance-apply-profile-$profileId',
+            ),
+          ),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(
+            Key(
+              'life-counter-native-player-appearance-apply-profile-$profileId',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_player_appearance_profile_selected',
+                ) &&
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains(
+                  'persistence_strategy: owned_profile_store',
+                ) &&
+                message.contains('source: player_background_surface_pressed') &&
+                message.contains('target_player_index: 2') &&
+                message.contains('profile_id: $profileId') &&
+                message.contains('profile_name: Partner Pod'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets(
       'resets the Lotus appearance surface when native player appearance is dismissed from color-card takeover',
       (tester) async {
