@@ -56,6 +56,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o mirror canonico do host agora tambem limpa `LifeCounterSessionStore` e `LifeCounterSettingsStore` quando o snapshot Lotus nao traz mais `players` ou `gameSettings`, evitando reopen com estado stale reidratado do nosso lado
 - o mirror canonico do host agora tambem preserva `history` meta-only (`currentGameMeta` / `gameCounter`) quando o snapshot Lotus traz o dominio sem entradas, evitando limpar cedo demais uma parte que ja e canonica
 - o round-trip de `history` meta-only agora tambem tem cobertura direta na store canonica e no fallback `history-only`, provando que `currentGameMeta/gameCounter` seguem reidrataveis mesmo sem `gameHistory`
+- o fallback canônico agora tambem cobre explicitamente `session + history` meta-only, provando que o payload de `history` canonico continua prevalecendo sobre o bootstrap default da sessao
 - a deduplicacao de observabilidade do `persist_snapshot` agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 

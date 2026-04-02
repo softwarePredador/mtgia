@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
@@ -372,6 +374,101 @@ void main() {
         expect(restoredHistory.currentGameEntries, isEmpty);
         expect(restoredHistory.archiveEntries, isEmpty);
         expect(restoredHistory.gameCounter, 12);
+        expect(restoredHistory.hasContent, isFalse);
+      },
+    );
+
+    test(
+      'builds session bootstrap values with metadata-only canonical history',
+      () async {
+        await sessionStore.save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 40, 40, 40],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: true,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
+          ),
+        );
+        await historyStore.save(
+          const LifeCounterHistoryState(
+            currentGameName: 'Game #12',
+            currentGameMeta: {
+              'id': 'game-12',
+              'name': 'Game #12',
+              'startDate': 1711802000000,
+              'gameMode': 'commander',
+            },
+            currentGameEntries: [],
+            archiveEntries: [],
+            archivedGameCount: 0,
+            gameCounter: 12,
+          ),
+        );
+
+        final values = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+
+        expect(values['players'], isNotNull);
+        expect(values['currentGameMeta'], isNotNull);
+        expect(values['gameCounter'], isNotNull);
+
+        final currentGameMeta = jsonDecode(values['currentGameMeta']!);
+        expect(currentGameMeta['id'], 'game-12');
+        expect(currentGameMeta['name'], 'Game #12');
+        expect(jsonDecode(values['gameCounter']!), 12);
+        expect(jsonDecode(values['gameHistory']!), isEmpty);
+        expect(jsonDecode(values['allGamesHistory']!), isEmpty);
+
+        final snapshot = LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(values),
+        );
+        final restoredSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+          snapshot,
+        );
+        final restoredHistory = LifeCounterHistoryState.fromSources(
+          session: restoredSession,
+          snapshot: snapshot,
+        );
+
+        expect(restoredSession, isNotNull);
+        expect(restoredHistory.currentGameMeta?['id'], 'game-12');
+        expect(restoredHistory.gameCounter, 12);
+        expect(restoredHistory.currentGameEntries, isEmpty);
+        expect(restoredHistory.archiveEntries, isEmpty);
         expect(restoredHistory.hasContent, isFalse);
       },
     );
