@@ -1999,6 +1999,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativeCommanderDamageSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2021,6 +2022,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.commander_damage',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
           'target_player_index': normalizedTargetIndex,
           'player_count': session.playerCount,
         },
@@ -2039,7 +2041,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_commander_damage_dismissed',
           category: 'life_counter.commander_damage',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;
@@ -2050,7 +2056,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_commander_damage_dismissed',
           category: 'life_counter.commander_damage',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;
@@ -2177,6 +2187,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativePlayerAppearanceSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2204,7 +2215,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_player_appearance_opened',
         category: 'life_counter.player_appearance',
-        data: {'source': source, 'target_player_index': normalizedTargetIndex},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'target_player_index': normalizedTargetIndex,
+        },
       ),
     );
 
@@ -2225,7 +2240,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_appearance_dismissed',
           category: 'life_counter.player_appearance',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       if (shouldResetLotusSurface) {
@@ -2239,7 +2258,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_appearance_dismissed',
           category: 'life_counter.player_appearance',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       if (shouldResetLotusSurface) {
@@ -2392,6 +2415,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativePlayerCounterSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2414,6 +2438,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.player_counter',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
           'target_player_index': normalizedTargetIndex,
           'counter_key': counterKey,
         },
@@ -2433,7 +2458,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_counter_dismissed',
           category: 'life_counter.player_counter',
-          data: {'source': source, 'counter_key': counterKey, 'changed': false},
+          data: {
+            'source': source,
+            'counter_key': counterKey,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;
@@ -2444,7 +2474,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_counter_dismissed',
           category: 'life_counter.player_counter',
-          data: {'source': source, 'counter_key': counterKey, 'changed': false},
+          data: {
+            'source': source,
+            'counter_key': counterKey,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;
@@ -2491,6 +2526,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativePlayerStateSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2511,7 +2547,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_player_state_opened',
         category: 'life_counter.player_state',
-        data: {'source': source, 'target_player_index': normalizedTargetIndex},
+        data: {
+          'source': source,
+          'surface_strategy': surfaceStrategy,
+          'target_player_index': normalizedTargetIndex,
+        },
       ),
     );
 
@@ -2530,7 +2570,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_state_dismissed',
           category: 'life_counter.player_state',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       if (shouldResetLotusSurface) {
@@ -2544,7 +2588,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_player_state_dismissed',
           category: 'life_counter.player_state',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       if (shouldResetLotusSurface) {
@@ -2588,6 +2636,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativeSetLifeSheetOpen = true;
     final session =
         await _sessionStore.load() ??
@@ -2610,6 +2659,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.set_life',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
           'target_player_index': normalizedTargetIndex,
           'current_life': session.lives[normalizedTargetIndex],
         },
@@ -2628,7 +2678,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_set_life_dismissed',
           category: 'life_counter.set_life',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;
@@ -2639,7 +2693,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         AppObservability.instance.recordEvent(
           'native_set_life_dismissed',
           category: 'life_counter.set_life',
-          data: {'source': source, 'changed': false},
+          data: {
+            'source': source,
+            'changed': false,
+            'surface_strategy': surfaceStrategy,
+          },
         ),
       );
       return;

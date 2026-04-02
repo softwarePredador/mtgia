@@ -203,6 +203,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_commander_damage_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_commander_damage_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),
@@ -307,6 +315,14 @@ void main() {
         expect(session, isNotNull);
         expect(session!.poison[0], 1);
         expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_player_counter_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
         expect(
           logs.any(
             (message) =>

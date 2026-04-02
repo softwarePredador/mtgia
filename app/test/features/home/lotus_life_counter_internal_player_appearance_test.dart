@@ -231,6 +231,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_player_appearance_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_player_appearance_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),
@@ -301,9 +309,7 @@ void main() {
       );
 
       await tester.enterText(
-        find.byKey(
-          const Key('life-counter-native-player-appearance-nickname'),
-        ),
+        find.byKey(const Key('life-counter-native-player-appearance-nickname')),
         'State Hub Pilot',
       );
       await tester.pumpAndSettle();
@@ -687,9 +693,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.byKey(
-            const Key('life-counter-native-player-appearance-apply'),
-          ),
+          find.byKey(const Key('life-counter-native-player-appearance-apply')),
           findsOneWidget,
         );
 
@@ -697,9 +701,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.byKey(
-            const Key('life-counter-native-player-appearance-apply'),
-          ),
+          find.byKey(const Key('life-counter-native-player-appearance-apply')),
           findsNothing,
         );
         expect(host.loadBundleCallCount, 2);

@@ -203,6 +203,14 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains('message=native_player_state_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_player_state_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false'),
@@ -376,6 +384,14 @@ void main() {
         expect(session!.lives[1], 40);
         expect(session.lastTableEvent, isNull);
         expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_set_life_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
         expect(
           logs.any(
             (message) =>
