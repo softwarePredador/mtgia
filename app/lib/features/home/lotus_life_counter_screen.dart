@@ -3110,6 +3110,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     if (_regularCountersVisibleOnPlayerCard(settings)) {
       blockers.add('show_counters_on_player_card_enabled');
     }
+    final targetPlayerIndex = _singleChangedPartnerCommanderPlayerIndex(
+      previous,
+      next,
+    );
+    if (targetPlayerIndex != null) {
+      final previousAppearance = previous.resolvedPlayerAppearances[targetPlayerIndex];
+      final nextAppearance = next.resolvedPlayerAppearances[targetPlayerIndex];
+      if (previousAppearance.backgroundImagePartner != null ||
+          nextAppearance.backgroundImagePartner != null) {
+        blockers.add('partner_background_image_present');
+      }
+    }
 
     final expected = previous.copyWith(
       partnerCommanders: next.partnerCommanders,
@@ -3118,6 +3130,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       blockers.add('session_change_outside_hidden_partner_commander');
     }
     return blockers;
+  }
+
+  int? _singleChangedPartnerCommanderPlayerIndex(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    int? targetPlayerIndex;
+    for (var index = 0; index < next.playerCount; index += 1) {
+      if (previous.partnerCommanders[index] == next.partnerCommanders[index]) {
+        continue;
+      }
+      if (targetPlayerIndex != null) {
+        return null;
+      }
+      targetPlayerIndex = index;
+    }
+    return targetPlayerIndex;
   }
 
   bool _regularCountersVisibleOnPlayerCard(LifeCounterSettings settings) {
