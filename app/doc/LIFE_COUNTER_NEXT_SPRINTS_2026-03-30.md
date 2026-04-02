@@ -65,7 +65,7 @@ Documento operacional principal desta fase:
 
 Proximo passo imediato:
 
-- alinhar a suite de testes com a diretriz Lotus-first, separando visual Lotus de fallback interno
+- revisar/classificar as native sheets restantes e preparar a primeira poda controlada
 - primeira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - segunda extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - terceira extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_runtime_test.dart`
@@ -74,6 +74,7 @@ Proximo passo imediato:
 - sexta extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_player_state_test.dart`
 - setima extracao dessa separacao agora vive em `test/features/home/lotus_life_counter_internal_state_outcomes_test.dart`
 - suite dedicada de normalizacao canonica do host agora vive em `test/features/home/lotus_life_counter_host_normalization_test.dart`
+- revisao formal das native sheets agora vive em `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
 
 ## Sprint 1 - Closed
 

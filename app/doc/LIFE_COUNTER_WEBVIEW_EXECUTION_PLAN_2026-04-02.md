@@ -173,6 +173,14 @@ Primeiro classificar cada uma como:
 
 - cada sheet listada acima tem dono e status claro
 
+#### Current status
+
+- revisao formal concluida em `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+- classificacao atual:
+  - `fallback interno`: quase todas as native sheets ainda acionaveis por `open-native-*`
+  - `backend support`: `life_counter_native_game_modes_sheet.dart`
+  - `candidata a poda`: `life_counter_native_quick_actions_sheet.dart`
+
 ### Step 5 - Decide the boundary of Game Modes
 
 #### Objective
@@ -275,8 +283,8 @@ Regra operacional vigente:
 
 ## Current Recommendation
 
-O proximo passo mais certo e:
+O proximo passo mais certo agora e:
 
-1. fechar o smoke de `card search` Lotus-first
-2. separar os testes de visual principal e fallback interno
-3. continuar fortalecendo o backend invisivel sem mexer no visual
+1. revisar se `life_counter_native_quick_actions_sheet.dart` ja pode entrar em poda controlada
+2. continuar fortalecendo o backend invisivel sem mexer no visual
+3. fechar a decisao explicita de `Game Modes`
