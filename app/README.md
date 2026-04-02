@@ -138,6 +138,7 @@ Estado vivo do contador hoje:
 - smoke Android Lotus-first de `card search`: `integration_test/life_counter_lotus_card_search_visual_smoke_test.dart`
 - suite de fallback interno do host/shell: `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - suite de fallback interno para `quick actions`, `day night` e `game modes`: `test/features/home/lotus_life_counter_internal_actions_test.dart`
+- suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`
 
 ## Comandos
 
