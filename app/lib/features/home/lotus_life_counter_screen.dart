@@ -773,28 +773,73 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
   }
 
-  Future<void> _triggerEmbeddedGameMode({
+  Future<bool> _triggerEmbeddedGameMode({
     required String selector,
     required String modeName,
     required String source,
     String? followUpSelector,
   }) async {
-    await _hostController.runJavaScript('''
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
       (() => {
-        const button = document.querySelector('$selector');
-        if (button instanceof HTMLElement) {
-          button.click();
-        }
-        ${followUpSelector == null ? '' : '''
-        window.setTimeout(() => {
-          const followUpButton = document.querySelector('$followUpSelector');
-          if (followUpButton instanceof HTMLElement) {
-            followUpButton.click();
+        try {
+          const button = document.querySelector('$selector');
+          if (!(button instanceof HTMLElement)) {
+            return JSON.stringify({ ok: false, reason: 'button_missing' });
           }
-        }, 120);
-        '''}
+
+          button.click();
+          ${followUpSelector == null ? '''
+          return JSON.stringify({ ok: true, selector: '$selector' });
+          ''' : '''
+          window.setTimeout(() => {
+            const followUpButton = document.querySelector('$followUpSelector');
+            if (followUpButton instanceof HTMLElement) {
+              followUpButton.click();
+            }
+          }, 120);
+          return JSON.stringify({
+            ok: true,
+            selector: '$selector',
+            followUpSelector: '$followUpSelector',
+          });
+          '''}
+        } catch (_) {}
+        return JSON.stringify({ ok: false, reason: 'trigger_failed' });
       })();
     ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      final success = decoded is Map<String, dynamic> && decoded['ok'] == true;
+      if (!success) {
+        unawaited(
+          AppObservability.instance.recordEvent(
+            'embedded_game_mode_request_failed',
+            category: 'life_counter.game_modes',
+            data: {
+              'source': source,
+              'mode': modeName,
+              'selector': selector,
+              'follow_up_selector': followUpSelector,
+            },
+          ),
+        );
+        return false;
+      }
+    } catch (_) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'embedded_game_mode_request_failed',
+          category: 'life_counter.game_modes',
+          data: {
+            'source': source,
+            'mode': modeName,
+            'selector': selector,
+            'follow_up_selector': followUpSelector,
+          },
+        ),
+      );
+      return false;
+    }
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -807,21 +852,50 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         },
       ),
     );
+    return true;
   }
 
-  Future<void> _closeEmbeddedGameModeOverlay({
+  Future<bool> _closeEmbeddedGameModeOverlay({
     required String selector,
     required String modeName,
     required String source,
   }) async {
-    await _hostController.runJavaScript('''
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
       (() => {
-        const button = document.querySelector('$selector');
-        if (button instanceof HTMLElement) {
+        try {
+          const button = document.querySelector('$selector');
+          if (!(button instanceof HTMLElement)) {
+            return JSON.stringify({ ok: false, reason: 'button_missing' });
+          }
           button.click();
-        }
+          return JSON.stringify({ ok: true, selector: '$selector' });
+        } catch (_) {}
+        return JSON.stringify({ ok: false, reason: 'close_failed' });
       })();
     ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      final success = decoded is Map<String, dynamic> && decoded['ok'] == true;
+      if (!success) {
+        unawaited(
+          AppObservability.instance.recordEvent(
+            'embedded_game_mode_overlay_close_failed',
+            category: 'life_counter.game_modes',
+            data: {'source': source, 'mode': modeName, 'selector': selector},
+          ),
+        );
+        return false;
+      }
+    } catch (_) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'embedded_game_mode_overlay_close_failed',
+          category: 'life_counter.game_modes',
+          data: {'source': source, 'mode': modeName, 'selector': selector},
+        ),
+      );
+      return false;
+    }
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -830,21 +904,50 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {'source': source, 'mode': modeName, 'selector': selector},
       ),
     );
+    return true;
   }
 
-  Future<void> _closeEmbeddedGameModeCardPool({
+  Future<bool> _closeEmbeddedGameModeCardPool({
     required String selector,
     required String modeName,
     required String source,
   }) async {
-    await _hostController.runJavaScript('''
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
       (() => {
-        const button = document.querySelector('$selector');
-        if (button instanceof HTMLElement) {
+        try {
+          const button = document.querySelector('$selector');
+          if (!(button instanceof HTMLElement)) {
+            return JSON.stringify({ ok: false, reason: 'button_missing' });
+          }
           button.click();
-        }
+          return JSON.stringify({ ok: true, selector: '$selector' });
+        } catch (_) {}
+        return JSON.stringify({ ok: false, reason: 'close_failed' });
       })();
     ''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      final success = decoded is Map<String, dynamic> && decoded['ok'] == true;
+      if (!success) {
+        unawaited(
+          AppObservability.instance.recordEvent(
+            'embedded_game_mode_card_pool_close_failed',
+            category: 'life_counter.game_modes',
+            data: {'source': source, 'mode': modeName, 'selector': selector},
+          ),
+        );
+        return false;
+      }
+    } catch (_) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'embedded_game_mode_card_pool_close_failed',
+          category: 'life_counter.game_modes',
+          data: {'source': source, 'mode': modeName, 'selector': selector},
+        ),
+      );
+      return false;
+    }
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -853,6 +956,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {'source': source, 'mode': modeName, 'selector': selector},
       ),
     );
+    return true;
   }
 
   LifeCounterGameModesAction? _decodePreferredGameModeAction(String? rawMode) {

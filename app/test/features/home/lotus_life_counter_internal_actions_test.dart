@@ -49,12 +49,26 @@ class _FakeLotusHost implements LotusHost {
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
-    if (script.contains('.day-night-switcher')) {
-      executedScripts.add(script);
-    }
+    final isGameModesAvailabilityQuery =
+        script.contains('planechaseAvailable:') &&
+        script.contains('archenemyAvailable:') &&
+        script.contains('bountyAvailable:');
 
-    if (onRunJavaScriptReturningResult != null) {
-      return onRunJavaScriptReturningResult!(script);
+    if (script.contains('.day-night-switcher') ||
+        (!isGameModesAvailabilityQuery &&
+            (script.contains('.planechase-btn') ||
+                script.contains('.archenemy-btn') ||
+                script.contains('.bounty-btn') ||
+                script.contains('.edit-planechase-cards') ||
+                script.contains('.edit-archenemy-cards') ||
+                script.contains('.edit-bounty-cards') ||
+                script.contains('.close-planechase-overlay-btn') ||
+                script.contains('.close-archenemy-overlay-btn') ||
+                script.contains('.close-bounty-overlay-btn') ||
+                script.contains('.close-edit-planechase-cards-overlay') ||
+                script.contains('.close-edit-archenemy-cards-overlay') ||
+                script.contains('.close-edit-bounty-cards-overlay')))) {
+      executedScripts.add(script);
     }
 
     if (script.contains('.day-night-switcher')) {
@@ -62,6 +76,26 @@ class _FakeLotusHost implements LotusHost {
         'ok': true,
         'isNight': script.contains("toggle('night', true)"),
       });
+    }
+
+    if (!isGameModesAvailabilityQuery &&
+        (script.contains('.planechase-btn') ||
+            script.contains('.archenemy-btn') ||
+            script.contains('.bounty-btn') ||
+            script.contains('.edit-planechase-cards') ||
+            script.contains('.edit-archenemy-cards') ||
+            script.contains('.edit-bounty-cards') ||
+            script.contains('.close-planechase-overlay-btn') ||
+            script.contains('.close-archenemy-overlay-btn') ||
+            script.contains('.close-bounty-overlay-btn') ||
+            script.contains('.close-edit-planechase-cards-overlay') ||
+            script.contains('.close-edit-archenemy-cards-overlay') ||
+            script.contains('.close-edit-bounty-cards-overlay'))) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
+    if (onRunJavaScriptReturningResult != null) {
+      return onRunJavaScriptReturningResult!(script);
     }
 
     if (script.contains('.planechase-overlay')) {
@@ -218,7 +252,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(host.loadBundleCallCount, 2);
+        expect(host.loadBundleCallCount, 1);
         expect(
           host.executedScripts.any(
             (script) =>
