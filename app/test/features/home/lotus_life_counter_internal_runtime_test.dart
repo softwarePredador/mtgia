@@ -50,6 +50,10 @@ class _FakeLotusHost implements LotusHost {
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
+    if (script.contains('receivePatch')) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
     if (script.contains('.planechase-overlay')) {
       return jsonEncode(<String, Object>{
         'planechaseAvailable': true,
@@ -323,7 +327,11 @@ void main() {
       expect(state, isNotNull);
       expect(state!.isActive, isTrue);
       expect(state.isPaused, isTrue);
-      expect(host.loadBundleCallCount, 2);
+      expect(host.loadBundleCallCount, 1);
+      expect(
+        host.executedScripts.any((script) => script.contains(".game-timer")),
+        isTrue,
+      );
     });
 
     testWidgets('opens native game timer from clock shell shortcut', (
@@ -418,9 +426,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-dice-apply')),
-      );
+      await tester.tap(find.byKey(const Key('life-counter-native-dice-apply')));
       await tester.pumpAndSettle();
 
       final session = await LifeCounterSessionStore().load();

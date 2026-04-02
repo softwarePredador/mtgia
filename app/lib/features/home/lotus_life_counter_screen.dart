@@ -10,6 +10,7 @@ import 'life_counter/life_counter_day_night_state_store.dart';
 import 'life_counter/life_counter_game_timer_state.dart';
 import 'life_counter/life_counter_game_timer_state_store.dart';
 import 'life_counter/life_counter_history.dart';
+import 'life_counter/life_counter_history_store.dart';
 import 'life_counter/life_counter_history_transfer.dart';
 import 'life_counter/life_counter_native_card_search_sheet.dart';
 import 'life_counter/life_counter_native_commander_damage_sheet.dart';
@@ -64,6 +65,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   late final LotusHost _hostController;
   final LifeCounterGameTimerStateStore _gameTimerStateStore =
       LifeCounterGameTimerStateStore();
+  final LifeCounterHistoryStore _historyStore = LifeCounterHistoryStore();
   final LifeCounterDayNightStateStore _dayNightStateStore =
       LifeCounterDayNightStateStore();
   final LifeCounterPlayerAppearanceProfileStore _appearanceProfileStore =
@@ -473,6 +475,37 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     } catch (_) {}
   }
 
+  Future<bool> _applyLiveLotusStoragePatch(Map<String, String?> values) async {
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const bridge = window.__ManaloomLotusStorageBridge;
+    if (!bridge || typeof bridge.receivePatch !== 'function') {
+      return JSON.stringify({ ok: false, reason: 'bridge_missing' });
+    }
+
+    const result = bridge.receivePatch(${jsonEncode(<String, Object?>{'values': values})});
+    if (result && typeof result === 'object') {
+      return JSON.stringify(result);
+    }
+
+    return JSON.stringify({ ok: true });
+  } catch (error) {
+    return JSON.stringify({
+      ok: false,
+      reason: error && error.message ? String(error.message) : 'patch_failed',
+    });
+  }
+})()
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      return decoded is Map<String, dynamic> && decoded['ok'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _openNativeSettingsSheet({required String source}) async {
     if (!mounted || _isNativeSettingsSheetOpen) {
       return;
@@ -711,12 +744,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         return LifeCounterGameModesAvailability(
           planechaseAvailable: decoded['planechaseAvailable'] == true,
           planechaseActive: planechaseActive,
-          planechaseCardPoolActive:
-              decoded['planechaseCardPoolActive'] == true,
+          planechaseCardPoolActive: decoded['planechaseCardPoolActive'] == true,
           archenemyAvailable: decoded['archenemyAvailable'] == true,
           archenemyActive: archenemyActive,
-          archenemyCardPoolActive:
-              decoded['archenemyCardPoolActive'] == true,
+          archenemyCardPoolActive: decoded['archenemyCardPoolActive'] == true,
           bountyAvailable: decoded['bountyAvailable'] == true,
           bountyActive: bountyActive,
           bountyCardPoolActive: decoded['bountyCardPoolActive'] == true,
@@ -787,11 +818,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'embedded_game_mode_overlay_closed',
         category: 'life_counter.game_modes',
-        data: {
-          'source': source,
-          'mode': modeName,
-          'selector': selector,
-        },
+        data: {'source': source, 'mode': modeName, 'selector': selector},
       ),
     );
   }
@@ -814,11 +841,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'embedded_game_mode_card_pool_closed',
         category: 'life_counter.game_modes',
-        data: {
-          'source': source,
-          'mode': modeName,
-          'selector': selector,
-        },
+        data: {'source': source, 'mode': modeName, 'selector': selector},
       ),
     );
   }
@@ -938,7 +961,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       '__manaloom_day_night_mode': state.mode,
     };
     await _snapshotStore.save(
-      LotusStorageSnapshot(values: Map<String, String>.unmodifiable(mergedValues)),
+      LotusStorageSnapshot(
+        values: Map<String, String>.unmodifiable(mergedValues),
+      ),
     );
 
     await _applyOwnedDayNightPreference();
@@ -993,6 +1018,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     _isNativeHistorySheetOpen = true;
+    final historyState = await _historyStore.load();
     final session = await _sessionStore.load();
     final snapshot = await _snapshotStore.load();
     if (!mounted) {
@@ -1001,6 +1027,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     final history = LifeCounterHistorySnapshot.fromSources(
+      historyState: historyState,
       session: session,
       snapshot: snapshot,
     );
@@ -1075,45 +1102,40 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
-    final snapshot = await _snapshotStore.load();
-    final mergedValues = <String, String>{...?snapshot?.values};
-
-    final currentGameMeta = _decodeSnapshotValueMap(
-      mergedValues['currentGameMeta'],
-    );
-    if (transfer.currentGameName != null) {
-      currentGameMeta['name'] = transfer.currentGameName;
-    }
-    mergedValues['currentGameMeta'] = jsonEncode(currentGameMeta);
-    mergedValues['gameHistory'] = jsonEncode(
-      transfer.currentGameEntries
+    final importedHistory = LifeCounterHistoryState(
+      currentGameName: transfer.currentGameName,
+      currentGameEntries: transfer.currentGameEntries
           .map(
-            (entry) => {
-              'message': entry.message,
-              if (entry.occurredAt != null)
-                'timestamp': entry.occurredAt!.millisecondsSinceEpoch,
-            },
+            (entry) => LifeCounterHistoryEntry(
+              message: entry.message,
+              occurredAt: entry.occurredAt,
+              source: LifeCounterHistoryEntrySource.currentGame,
+            ),
           )
           .toList(growable: false),
+      archiveEntries: transfer.archiveEntries
+          .map(
+            (entry) => LifeCounterHistoryEntry(
+              message: entry.message,
+              occurredAt: entry.occurredAt,
+              source: LifeCounterHistoryEntrySource.archive,
+            ),
+          )
+          .toList(growable: false),
+      archivedGameCount: transfer.archiveEntries.isEmpty ? 0 : 1,
+      lastTableEvent: transfer.lastTableEvent,
     );
-    mergedValues['allGamesHistory'] = jsonEncode(
-      transfer.archiveEntries.isEmpty
-          ? const <Object?>[]
-          : [
-            {
-              'name': transfer.currentGameName ?? 'Imported History',
-              'history': transfer.archiveEntries
-                  .map(
-                    (entry) => {
-                      'message': entry.message,
-                      if (entry.occurredAt != null)
-                        'timestamp': entry.occurredAt!.millisecondsSinceEpoch,
-                    },
-                  )
-                  .toList(growable: false),
-            },
-          ],
-    );
+    await _historyStore.save(importedHistory);
+
+    final snapshot = await _snapshotStore.load();
+    final mergedValues = <String, String>{
+      ...?snapshot?.values,
+      ...importedHistory.buildLotusSnapshotValues(
+        currentGameMetaSeed: LifeCounterHistoryState.decodeCurrentGameMeta(
+          snapshot?.values['currentGameMeta'],
+        ),
+      ),
+    };
 
     await _snapshotStore.save(
       LotusStorageSnapshot(
@@ -1145,34 +1167,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
     return true;
-  }
-
-  Map<String, Object?> _decodeSnapshotValueMap(String? raw) {
-    if (raw == null || raw.isEmpty) {
-      return <String, Object?>{
-        'id': 'manaloom-imported-history',
-        'name': 'Imported History',
-        'startDate': DateTime.now().millisecondsSinceEpoch,
-      };
-    }
-
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is Map<String, dynamic>) {
-        return <String, Object?>{...decoded};
-      }
-      if (decoded is Map) {
-        return decoded.map<String, Object?>(
-          (key, value) => MapEntry(key.toString(), value),
-        );
-      }
-    } catch (_) {}
-
-    return <String, Object?>{
-      'id': 'manaloom-imported-history',
-      'name': 'Imported History',
-      'startDate': DateTime.now().millisecondsSinceEpoch,
-    };
   }
 
   Future<void> _openNativeCardSearchSheet({required String source}) async {
@@ -1352,6 +1346,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterGameTimerState state, {
     required String source,
   }) async {
+    final previousState =
+        await _gameTimerStateStore.load() ??
+        const LifeCounterGameTimerState(
+          startTimeEpochMs: null,
+          isPaused: false,
+          pausedTimeEpochMs: null,
+        );
     if (state.isActive) {
       await _gameTimerStateStore.save(state);
     } else {
@@ -1393,7 +1394,71 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
+    if (_canApplyLiveGameTimerPatch(previousState, state) &&
+        await _applyOwnedGameTimerRuntimeState(state)) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _canApplyLiveGameTimerPatch(
+    LifeCounterGameTimerState previous,
+    LifeCounterGameTimerState next,
+  ) {
+    return previous.isActive && next.isActive;
+  }
+
+  Future<bool> _applyOwnedGameTimerRuntimeState(
+    LifeCounterGameTimerState state,
+  ) async {
+    final patched = await _applyLiveLotusStoragePatch(<String, String?>{
+      LotusLifeCounterGameTimerAdapter.gameTimerStateKey:
+          LotusLifeCounterGameTimerAdapter.buildSnapshotValues(
+            state,
+          )[LotusLifeCounterGameTimerAdapter.gameTimerStateKey],
+    });
+    if (!patched) {
+      return false;
+    }
+
+    try {
+      await _hostController.runJavaScript('''
+(() => {
+  try {
+    const timer = document.querySelector('.game-timer');
+    if (!(timer instanceof HTMLElement)) {
+      return;
+    }
+
+    const startTime = ${state.startTimeEpochMs ?? 'null'};
+    const pausedTime = ${state.pausedTimeEpochMs ?? 0};
+    if (startTime == null) {
+      return;
+    }
+
+    const elapsedSeconds = Math.max(
+      0,
+      Math.floor((${state.isPaused ? 'pausedTime' : 'Date.now()'} - startTime) / 1000)
+    );
+    const hours = Math.floor(elapsedSeconds / 3600);
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+    const seconds = elapsedSeconds % 60;
+    const prefix = hours > 0 ? String(hours).padStart(2, '0') + ':' : '';
+    timer.textContent =
+      prefix +
+      String(minutes).padStart(2, '0') +
+      ':' +
+      String(seconds).padStart(2, '0');
+    timer.classList.toggle('paused', ${state.isPaused ? 'true' : 'false'});
+  } catch (_) {}
+})();
+''');
+    } catch (_) {
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> _openNativeDiceSheet({required String source}) async {
@@ -1458,24 +1523,24 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativeDiceSession(
     LifeCounterSession session, {
-      required String source,
-    }) async {
-      final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
-      await _persistOwnedSessionSnapshot(adjustedSession);
+    required String source,
+  }) async {
+    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
+    await _persistOwnedSessionSnapshot(adjustedSession);
 
-      unawaited(
-        AppObservability.instance.recordEvent(
-          'native_dice_applied',
-          category: 'life_counter.dice',
-          data: {
-            'source': source,
-            'first_player_index': adjustedSession.firstPlayerIndex,
-            'has_last_event': adjustedSession.lastTableEvent != null,
-            'has_high_rolls':
-                adjustedSession.lastHighRolls.whereType<int>().isNotEmpty,
-          },
-        ),
-      );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_dice_applied',
+        category: 'life_counter.dice',
+        data: {
+          'source': source,
+          'first_player_index': adjustedSession.firstPlayerIndex,
+          'has_last_event': adjustedSession.lastTableEvent != null,
+          'has_high_rolls':
+              adjustedSession.lastHighRolls.whereType<int>().isNotEmpty,
+        },
+      ),
+    );
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
@@ -1567,8 +1632,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     bool playerRuntimeOnly = true,
   }) async {
     await _sessionStore.save(session);
+    await _syncOwnedHistoryLastTableEvent(session.lastTableEvent);
 
     final settings = await _loadOwnedLifeCounterSettings();
+    final history = await _historyStore.load();
     final snapshot = await _snapshotStore.load();
     if (snapshot != null && playerRuntimeOnly) {
       final mergedValues = <String, String>{
@@ -1591,35 +1658,59 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    final values = LotusLifeCounterSessionAdapter.buildSnapshotValues(
+      session,
+      settings: settings,
+      history: history,
+    );
     await _snapshotStore.save(
-      LotusStorageSnapshot(
-        values: Map<String, String>.unmodifiable(
-          LotusLifeCounterSessionAdapter.buildSnapshotValues(
-            session,
-            settings: settings,
-          ),
+      LotusStorageSnapshot(values: Map<String, String>.unmodifiable(values)),
+    );
+  }
+
+  Future<void> _syncOwnedHistoryLastTableEvent(String? lastTableEvent) async {
+    final normalizedEvent = lastTableEvent?.trim();
+    final nextLastTableEvent =
+        normalizedEvent == null || normalizedEvent.isEmpty
+            ? null
+            : normalizedEvent;
+    final history = await _historyStore.load();
+    if (history == null) {
+      if (nextLastTableEvent == null) {
+        return;
+      }
+      await _historyStore.save(
+        LifeCounterHistoryState(
+          currentGameEntries: const [],
+          archiveEntries: const [],
+          archivedGameCount: 0,
+          lastTableEvent: nextLastTableEvent,
         ),
-      ),
+      );
+      return;
+    }
+    if (history.lastTableEvent == nextLastTableEvent) {
+      return;
+    }
+    await _historyStore.save(
+      history.copyWith(lastTableEvent: nextLastTableEvent),
     );
   }
 
   Future<void> _applyNativeCommanderDamage(
     LifeCounterSession session, {
-      required String source,
-    }) async {
+    required String source,
+  }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
     unawaited(
-        AppObservability.instance.recordEvent(
-          'native_commander_damage_applied',
-          category: 'life_counter.commander_damage',
-          data: {
-            'source': source,
-            'player_count': adjustedSession.playerCount,
-          },
-        ),
-      );
+      AppObservability.instance.recordEvent(
+        'native_commander_damage_applied',
+        category: 'life_counter.commander_damage',
+        data: {'source': source, 'player_count': adjustedSession.playerCount},
+      ),
+    );
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
@@ -1652,8 +1743,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
                 targetPlayerIndex >= session.playerCount
             ? 0
             : targetPlayerIndex;
-    final shouldResetLotusSurface =
-        _playerAppearanceSurfaceResetSources.contains(source);
+    final shouldResetLotusSurface = _playerAppearanceSurfaceResetSources
+        .contains(source);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1771,7 +1862,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       session.resolvedPlayerAppearances,
     );
     playerAppearances[targetPlayerIndex] = transfer.appearance;
-    final updatedSession = session.copyWith(playerAppearances: playerAppearances);
+    final updatedSession = session.copyWith(
+      playerAppearances: playerAppearances,
+    );
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1906,9 +1999,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativePlayerCounter(
     LifeCounterSession session, {
-      required String source,
-      required String counterKey,
-    }) async {
+    required String source,
+    required String counterKey,
+  }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
@@ -1998,8 +2091,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativePlayerState(
     LifeCounterSession session, {
-      required String source,
-    }) async {
+    required String source,
+  }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
@@ -2088,9 +2181,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   Future<void> _applyNativeSetLife(
     LifeCounterSession session, {
-      required String source,
-      required int targetPlayerIndex,
-    }) async {
+    required String source,
+    required int targetPlayerIndex,
+  }) async {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
@@ -2098,13 +2191,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_set_life_applied',
         category: 'life_counter.set_life',
-          data: {
-            'source': source,
-            'target_player_index': targetPlayerIndex,
-            'life': adjustedSession.lives[targetPlayerIndex],
-          },
-        ),
-      );
+        data: {
+          'source': source,
+          'target_player_index': targetPlayerIndex,
+          'life': adjustedSession.lives[targetPlayerIndex],
+        },
+      ),
+    );
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }

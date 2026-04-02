@@ -33,6 +33,8 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_LOTUS_GAMEPLAY_COPY_AUDIT_2026-03-29.md`
 - `app/doc/LIFE_COUNTER_SPRINT_2026-03-30.md`
 - `app/doc/LIFE_COUNTER_NEXT_SPRINTS_2026-03-30.md`
+- `app/doc/LIFE_COUNTER_CORE_OWNERSHIP_CLOSURE_PLAN_2026-04-02.md`
+- `app/doc/LIFE_COUNTER_SNAPSHOT_CANONICAL_MATRIX_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
@@ -75,6 +77,7 @@ Estado vivo do contador hoje:
 - contrato canonico inicial do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_state*.dart`
 - engine propria do game timer: `app/lib/features/home/life_counter/life_counter_game_timer_engine.dart`
 - contrato proprio de import/export de history: `app/lib/features/home/life_counter/life_counter_history_transfer.dart`
+- store canonica de `history`: `app/lib/features/home/life_counter/life_counter_history_store.dart`
 - snapshot proprio do `localStorage` do Lotus: `app/lib/features/home/lotus/lotus_storage_snapshot*.dart`
 - adapter do snapshot vivo para sessao canonica: `app/lib/features/home/lotus/lotus_life_counter_session_adapter.dart`
 - adapter do `gameSettings` vivo para configuracao canonica: `app/lib/features/home/lotus/lotus_life_counter_settings_adapter.dart`
@@ -151,6 +154,7 @@ Estado vivo do contador hoje:
 - suite de fallback interno do host/shell: `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - suite de fallback interno para `day night` e `game modes`: `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`
+- `game timer` agora ja evita `reload` no caso seguro `active -> active`, usando patch incremental do runtime Lotus
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`

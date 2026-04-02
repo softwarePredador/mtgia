@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../life_counter/life_counter_history.dart';
 import '../life_counter/life_counter_settings.dart';
 import '../life_counter/life_counter_session.dart';
 import '../life_counter/life_counter_tabletop_engine.dart';
@@ -160,8 +161,8 @@ class LotusLifeCounterSessionAdapter {
       final lotusAppearance = LifeCounterPlayerAppearance(
         background:
             _readPlayerBackground(playerIndex, player) ??
-            lifeCounterDefaultPlayerBackgrounds[
-                playerIndex % lifeCounterDefaultPlayerBackgrounds.length],
+            lifeCounterDefaultPlayerBackgrounds[playerIndex %
+                lifeCounterDefaultPlayerBackgrounds.length],
         nickname: ((player['nickname'] as String?) ?? '').trim(),
         backgroundImage: _readPlayerImage(player['backgroundImage']),
         backgroundImagePartner: _readPlayerImage(
@@ -308,6 +309,7 @@ class LotusLifeCounterSessionAdapter {
   static Map<String, String> buildSnapshotValues(
     LifeCounterSession session, {
     LifeCounterSettings? settings,
+    LifeCounterHistoryState? history,
   }) {
     final trackerSanitizedSession =
         LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(
@@ -341,7 +343,11 @@ class LotusLifeCounterSessionAdapter {
         trackerSanitizedSession.resolvedPlayerExtraCounters;
     final resolvedPlayerAppearances =
         trackerSanitizedSession.resolvedPlayerAppearances;
-    for (var index = 0; index < trackerSanitizedSession.playerCount; index += 1) {
+    for (
+      var index = 0;
+      index < trackerSanitizedSession.playerCount;
+      index += 1
+    ) {
       final counters = <String, int>{...resolvedPlayerExtraCounters[index]};
       if (trackerSanitizedSession.poison[index] > 0) {
         counters['poison'] = trackerSanitizedSession.poison[index];
@@ -366,9 +372,11 @@ class LotusLifeCounterSessionAdapter {
       }
 
       final commanderDamage = <Map<String, Object?>>[];
-      for (var source = 0;
-          source < trackerSanitizedSession.playerCount;
-          source += 1) {
+      for (
+        var source = 0;
+        source < trackerSanitizedSession.playerCount;
+        source += 1
+      ) {
         final damageDetail = resolvedCommanderDamageDetails[index][source];
         final totalDamage = damageDetail.totalDamage;
         if (totalDamage <= 0) {
@@ -427,7 +435,7 @@ class LotusLifeCounterSessionAdapter {
               : 'standard',
     };
 
-    return <String, String>{
+    final values = <String, String>{
       _playerCountKey: jsonEncode(trackerSanitizedSession.playerCount),
       _startingLifeTwoPlayerKey: jsonEncode(
         trackerSanitizedSession.startingLifeTwoPlayer,
@@ -465,6 +473,14 @@ class LotusLifeCounterSessionAdapter {
       if (settings != null)
         ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
     };
+
+    if (history != null) {
+      values.addAll(
+        history.buildLotusSnapshotValues(currentGameMetaSeed: currentGameMeta),
+      );
+    }
+
+    return values;
   }
 
   static String? tryReadLayoutType(LotusStorageSnapshot snapshot) {
@@ -654,8 +670,8 @@ class LotusLifeCounterSessionAdapter {
       return background;
     }
 
-    return lifeCounterDefaultPlayerBackgrounds[
-        playerIndex % lifeCounterDefaultPlayerBackgrounds.length];
+    return lifeCounterDefaultPlayerBackgrounds[playerIndex %
+        lifeCounterDefaultPlayerBackgrounds.length];
   }
 
   static String? _readPlayerImage(dynamic value) {
@@ -835,7 +851,10 @@ class LotusLifeCounterSessionAdapter {
         payload['lastPlayerRolls'],
         playerCount,
       ),
-      lastHighRolls: _readNullableIntList(payload['lastHighRolls'], playerCount),
+      lastHighRolls: _readNullableIntList(
+        payload['lastHighRolls'],
+        playerCount,
+      ),
       firstPlayerIndex: _readOptionalPlayerIndex(
         payload['firstPlayerIndex'],
         playerCount,

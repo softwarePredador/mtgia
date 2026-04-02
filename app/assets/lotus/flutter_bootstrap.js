@@ -277,6 +277,34 @@
     }
   }
 
+  function applyStoragePatchSnapshot(payload) {
+    if (!payload || !payload.values || !window.localStorage) {
+      return { ok: false, reason: 'missing_values' };
+    }
+
+    isApplyingStorageBootstrap = true;
+    try {
+      Object.keys(payload.values).forEach(function (key) {
+        var value = payload.values[key];
+        if (value === null || typeof value === 'undefined') {
+          window.localStorage.removeItem(String(key));
+          return;
+        }
+
+        window.localStorage.setItem(String(key), String(value));
+      });
+
+      return { ok: true, patchedKeys: Object.keys(payload.values).length };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: error && error.message ? String(error.message) : 'patch_failed',
+      };
+    } finally {
+      isApplyingStorageBootstrap = false;
+    }
+  }
+
   function requestStorageBootstrapSnapshot() {
     return new Promise(function (resolve) {
       resolveStorageBootstrap = resolve;
@@ -333,6 +361,18 @@
 
         applyStorageBootstrapSnapshot(decoded);
         resolveStorageBootstrapHandshake();
+      },
+      receivePatch: function (payload) {
+        var decoded = payload;
+        try {
+          if (typeof payload === 'string') {
+            decoded = JSON.parse(payload);
+          }
+        } catch (error) {
+          decoded = null;
+        }
+
+        return applyStoragePatchSnapshot(decoded);
       },
     };
 

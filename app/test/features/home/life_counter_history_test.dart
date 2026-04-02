@@ -64,5 +64,53 @@ void main() {
       );
       expect(history.currentGameEntries.single.message, 'Player 1 rolled a 19');
     });
+
+    test(
+      'prefers canonical history state over legacy Lotus snapshot payloads',
+      () {
+        final session = LifeCounterSession.tryFromJson({
+          ...LifeCounterSession.initial(playerCount: 4).toJson(),
+          'last_table_event': 'Player 4 became the monarch',
+        });
+
+        final history = LifeCounterHistorySnapshot.fromSources(
+          historyState: const LifeCounterHistoryState(
+            currentGameName: 'Game #99',
+            currentGameEntries: [
+              LifeCounterHistoryEntry(
+                message: 'Player 1 cast their commander',
+                source: LifeCounterHistoryEntrySource.currentGame,
+              ),
+            ],
+            archiveEntries: [
+              LifeCounterHistoryEntry(
+                message: 'Player 2 lost the game',
+                source: LifeCounterHistoryEntrySource.archive,
+              ),
+            ],
+            archivedGameCount: 3,
+            lastTableEvent: 'Player 1 cast their commander',
+          ),
+          session: session,
+          snapshot: const LotusStorageSnapshot(
+            values: {
+              'currentGameMeta': '{"name":"Legacy Game"}',
+              'gameHistory': '[{"message":"Legacy entry"}]',
+              'allGamesHistory':
+                  '[{"name":"Legacy Game","history":[{"message":"Legacy archive"}]}]',
+            },
+          ),
+        );
+
+        expect(history.currentGameName, 'Game #99');
+        expect(
+          history.currentGameEntries.single.message,
+          'Player 1 cast their commander',
+        );
+        expect(history.archiveEntries.single.message, 'Player 2 lost the game');
+        expect(history.archivedGameCount, 3);
+        expect(history.lastTableEvent, 'Player 4 became the monarch');
+      },
+    );
   });
 }

@@ -7,6 +7,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
 import '../life_counter/life_counter_game_timer_state_store.dart';
+import '../life_counter/life_counter_history.dart';
+import '../life_counter/life_counter_history_store.dart';
 import '../life_counter/life_counter_settings_store.dart';
 import '../life_counter/life_counter_session_store.dart';
 import 'lotus_host.dart';
@@ -33,14 +35,13 @@ class LotusHostController implements LotusHost {
        isLoading = ValueNotifier<bool>(true),
        errorMessage = ValueNotifier<String?>(null),
        _gameTimerStateStore = LifeCounterGameTimerStateStore(),
+       _historyStore = LifeCounterHistoryStore(),
        _settingsStore = LifeCounterSettingsStore(),
        _sessionStore = LifeCounterSessionStore(),
        _storageSnapshotStore = LotusStorageSnapshotStore(),
        _uiSnapshotStore = LotusUiSnapshotStore(),
        _onShellMessageRequested = onShellMessageRequested {
-    _configure(
-      onAppReviewRequested: onAppReviewRequested,
-    );
+    _configure(onAppReviewRequested: onAppReviewRequested);
   }
 
   final WebViewController webViewController;
@@ -49,6 +50,7 @@ class LotusHostController implements LotusHost {
   @override
   final ValueNotifier<String?> errorMessage;
   final LifeCounterGameTimerStateStore _gameTimerStateStore;
+  final LifeCounterHistoryStore _historyStore;
   final LifeCounterSettingsStore _settingsStore;
   final LifeCounterSessionStore _sessionStore;
   final LotusStorageSnapshotStore _storageSnapshotStore;
@@ -91,10 +93,7 @@ class LotusHostController implements LotusHost {
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
         category: 'life_counter.host',
-        data: {
-          'entry': bundleEntry,
-          'is_retry': isRetry,
-        },
+        data: {'entry': bundleEntry, 'is_retry': isRetry},
       ),
     );
 
@@ -109,23 +108,15 @@ class LotusHostController implements LotusHost {
           'bundle_load_failed',
           category: 'life_counter.host',
           level: SentryLevel.error,
-          data: {
-            'error': error.toString(),
-          },
+          data: {'error': error.toString()},
         ),
       );
       unawaited(
         AppObservability.instance.captureException(
           error,
           stackTrace: stackTrace,
-          tags: const {
-            'source': 'life_counter_host',
-            'stage': 'bundle_load',
-          },
-          extras: {
-            'entry': bundleEntry,
-            'is_retry': isRetry,
-          },
+          tags: const {'source': 'life_counter_host', 'stage': 'bundle_load'},
+          extras: {'entry': bundleEntry, 'is_retry': isRetry},
         ),
       );
     }
@@ -149,9 +140,7 @@ class LotusHostController implements LotusHost {
     errorMessage.dispose();
   }
 
-  void _configure({
-    required LotusAppReviewCallback onAppReviewRequested,
-  }) {
+  void _configure({required LotusAppReviewCallback onAppReviewRequested}) {
     LotusJavaScriptBridges.register(
       webViewController,
       onAppReviewRequested: onAppReviewRequested,
@@ -209,11 +198,19 @@ class LotusHostController implements LotusHost {
     }
 
     await _storageSnapshotStore.save(snapshot);
-    final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(snapshot);
-    final derivedSettings =
-        LotusLifeCounterSettingsAdapter.tryBuildSettings(snapshot);
-    final derivedGameTimer =
-        LotusLifeCounterGameTimerAdapter.tryBuildState(snapshot);
+    final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+      snapshot,
+    );
+    final derivedSettings = LotusLifeCounterSettingsAdapter.tryBuildSettings(
+      snapshot,
+    );
+    final derivedGameTimer = LotusLifeCounterGameTimerAdapter.tryBuildState(
+      snapshot,
+    );
+    final derivedHistory = LifeCounterHistoryState.fromSources(
+      session: derivedSession,
+      snapshot: snapshot,
+    );
     if (derivedSession != null) {
       await _sessionStore.save(derivedSession);
     }
@@ -225,10 +222,17 @@ class LotusHostController implements LotusHost {
     } else {
       await _gameTimerStateStore.clear();
     }
+    if (derivedHistory.hasContent) {
+      await _historyStore.save(derivedHistory);
+    } else {
+      await _historyStore.clear();
+    }
 
     if (_didRecordStoragePersistThisLoad) {
-      if ((derivedSettings == null || _didRecordCanonicalSettingsMirrorThisLoad) &&
-          (derivedGameTimer == null || _didRecordCanonicalGameTimerMirrorThisLoad)) {
+      if ((derivedSettings == null ||
+              _didRecordCanonicalSettingsMirrorThisLoad) &&
+          (derivedGameTimer == null ||
+              _didRecordCanonicalGameTimerMirrorThisLoad)) {
         return;
       }
     } else {
@@ -237,10 +241,7 @@ class LotusHostController implements LotusHost {
         AppObservability.instance.recordEvent(
           'storage_snapshot_persisted',
           category: 'life_counter.storage',
-          data: {
-            'entry_count': snapshot.entryCount,
-            'reason': reason,
-          },
+          data: {'entry_count': snapshot.entryCount, 'reason': reason},
         ),
       );
     }
@@ -275,7 +276,8 @@ class LotusHostController implements LotusHost {
       );
     }
 
-    if (derivedGameTimer != null && !_didRecordCanonicalGameTimerMirrorThisLoad) {
+    if (derivedGameTimer != null &&
+        !_didRecordCanonicalGameTimerMirrorThisLoad) {
       _didRecordCanonicalGameTimerMirrorThisLoad = true;
       unawaited(
         AppObservability.instance.recordEvent(
@@ -307,23 +309,21 @@ class LotusHostController implements LotusHost {
     };
 
     try {
-      await webViewController.runJavaScript(
-        '''
+      await webViewController.runJavaScript('''
         if (
           window.__ManaloomLotusStorageBridge &&
           typeof window.__ManaloomLotusStorageBridge.receiveBootstrap === 'function'
         ) {
           window.__ManaloomLotusStorageBridge.receiveBootstrap(${jsonEncode(payload)});
         }
-        ''',
-      );
+        ''');
       unawaited(
         AppObservability.instance.recordEvent(
           mergedValues.isEmpty
               ? 'storage_bootstrap_missing'
               : (snapshot == null
-                    ? 'storage_bootstrap_restored_from_canonical'
-                    : 'storage_bootstrap_restored'),
+                  ? 'storage_bootstrap_restored_from_canonical'
+                  : 'storage_bootstrap_restored'),
           category: 'life_counter.storage',
           data: {
             'entry_count': mergedValues.length,
@@ -338,22 +338,31 @@ class LotusHostController implements LotusHost {
 
   Future<Map<String, String>> _buildFallbackBootstrapValues() async {
     final gameTimerState = await _gameTimerStateStore.load();
+    final history = await _historyStore.load();
     final session = await _sessionStore.load();
     final settings = await _settingsStore.load();
     final values = <String, String>{};
     if (gameTimerState != null) {
-      values.addAll(LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState));
+      values.addAll(
+        LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState),
+      );
     }
     if (settings != null) {
-      values.addAll(LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings));
+      values.addAll(
+        LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
+      );
     }
     if (session != null) {
       values.addAll(
         LotusLifeCounterSessionAdapter.buildSnapshotValues(
           session,
+          history: history,
           settings: settings,
         ),
       );
+    }
+    if (session == null && history != null) {
+      values.addAll(history.buildLotusSnapshotValues());
     }
     return values;
   }
@@ -429,9 +438,7 @@ class LotusHostController implements LotusHost {
       AppObservability.instance.recordEvent(
         'blocked_top_level_navigation',
         category: 'life_counter.shell',
-        data: {
-          'url': request.url,
-        },
+        data: {'url': request.url},
       ),
     );
     _notifyBlockedNavigation(request.url);
@@ -574,7 +581,8 @@ class LotusHostController implements LotusHost {
         return;
       }
 
-      final rawSnapshot = await webViewController.runJavaScriptReturningResult('''
+      final rawSnapshot = await webViewController.runJavaScriptReturningResult(
+        '''
         (() => JSON.stringify({
           captured_at_epoch_ms: Date.now(),
           body_class_name: document.body ? document.body.className : '',
@@ -628,7 +636,8 @@ class LotusHostController implements LotusHost {
           })(),
           player_card_count: document.querySelectorAll('.player-card').length
         }))()
-      ''');
+      ''',
+      );
 
       final decoded = _decodeJavaScriptJsonResult(rawSnapshot);
       if (decoded is! Map<String, dynamic>) {
@@ -725,9 +734,7 @@ class LotusHostController implements LotusHost {
         AppObservability.instance.recordEvent(
           entry.value.name,
           category: entry.value.category,
-          data: {
-            'console_message': normalizedMessage,
-          },
+          data: {'console_message': normalizedMessage},
         ),
       );
       return;
@@ -774,10 +781,7 @@ class LotusHostController implements LotusHost {
         AppObservability.instance.recordEvent(
           'blocked_external_link',
           category: 'life_counter.shell',
-          data: {
-            'type': type,
-            'href': href,
-          },
+          data: {'type': type, 'href': href},
         ),
       );
     }
