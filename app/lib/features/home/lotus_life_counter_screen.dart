@@ -458,9 +458,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }
 
   Future<bool> _applyOwnedDayNightPreference() async {
+    return (await _applyOwnedDayNightPreferenceFailureReason()) == null;
+  }
+
+  Future<String?> _applyOwnedDayNightPreferenceFailureReason() async {
     final state = await _dayNightStateStore.load();
     if (state == null) {
-      return true;
+      return null;
     }
 
     try {
@@ -479,9 +483,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 })();
 ''');
       final decoded = _decodeJavaScriptResult(rawResult);
-      return decoded is Map<String, dynamic> && decoded['ok'] == true;
+      if (decoded is Map<String, dynamic> && decoded['ok'] == true) {
+        return null;
+      }
+      if (decoded is Map<String, dynamic> && decoded['reason'] is String) {
+        return decoded['reason'] as String;
+      }
     } catch (_) {}
-    return false;
+    return 'day_night_patch_failed';
   }
 
   Future<bool> _applyLiveLotusStoragePatch(Map<String, String?> values) async {
@@ -1140,8 +1149,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
 
     const livePatchEligible = true;
-    final applied = await _applyOwnedDayNightPreference();
+    final failureReason = await _applyOwnedDayNightPreferenceFailureReason();
+    final applied = failureReason == null;
     final applyStrategy = applied ? 'live_runtime' : 'reload_fallback';
+    final syncBlockers = applied
+        ? const <String>[]
+        : <String>[failureReason];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1152,6 +1165,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'is_night': state.isNight,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -3109,10 +3123,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _persistOwnedSessionSnapshot(adjustedSession);
 
     final livePatchEligible = _canApplyLiveTableStatePatch();
-    final appliedLive =
-        livePatchEligible &&
-        await _applyOwnedTableStateRuntimeState(adjustedSession);
-    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+    String? failureReason;
+    final appliedLive = livePatchEligible
+        ? (() async {
+            failureReason = await _applyOwnedTableStateRuntimeFailureReason(
+              adjustedSession,
+            );
+            return failureReason == null;
+          })()
+        : Future<bool>.value(false);
+    final appliedLiveResolved = await appliedLive;
+    final applyStrategy = appliedLiveResolved
+        ? 'live_runtime'
+        : 'reload_fallback';
+    final syncBlockers = appliedLiveResolved
+        ? const <String>[]
+        : <String>[
+            if (!livePatchEligible)
+              'live_patch_ineligible'
+            else
+              failureReason ?? 'live_runtime_rejected',
+          ];
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3125,11 +3156,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'initiative_player': adjustedSession.initiativePlayer,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
 
-    if (appliedLive) {
+    if (appliedLiveResolved) {
       return;
     }
 
@@ -3138,14 +3170,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   bool _canApplyLiveTableStatePatch() => true;
 
-  Future<bool> _applyOwnedTableStateRuntimeState(
+  Future<String?> _applyOwnedTableStateRuntimeFailureReason(
     LifeCounterSession session,
   ) async {
     final patched = await _applyLiveLotusStoragePatch(
       LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(session),
     );
     if (!patched) {
-      return false;
+      return 'storage_patch_failed';
     }
 
     final monarchPlayer = session.monarchPlayer;
@@ -3223,17 +3255,29 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     };
 
     const monarchOk = syncCoin('monarch', ${monarchPlayer ?? 'null'});
+    if (!monarchOk) {
+      return JSON.stringify({ ok: false, reason: 'monarch_coin_sync_failed' });
+    }
     const initiativeOk = syncCoin('initiative', ${initiativePlayer ?? 'null'});
-    return JSON.stringify({ ok: monarchOk && initiativeOk });
+    if (!initiativeOk) {
+      return JSON.stringify({ ok: false, reason: 'initiative_coin_sync_failed' });
+    }
+    return JSON.stringify({ ok: true });
   } catch (_) {}
   return JSON.stringify({ ok: false, reason: 'table_state_patch_failed' });
 })();
 ''');
       final decoded = _decodeJavaScriptResult(rawResult);
-      return decoded is Map<String, dynamic> && decoded['ok'] == true;
+      if (decoded is Map<String, dynamic> && decoded['ok'] == true) {
+        return null;
+      }
+      if (decoded is Map<String, dynamic> && decoded['reason'] is String) {
+        return decoded['reason'] as String;
+      }
     } catch (_) {
-      return false;
+      return 'table_state_patch_failed';
     }
+    return 'table_state_patch_failed';
   }
 
   @override

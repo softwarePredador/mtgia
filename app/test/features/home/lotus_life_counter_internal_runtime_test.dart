@@ -14,9 +14,13 @@ import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeLotusHost implements LotusHost {
-  _FakeLotusHost({required this.onShellMessageRequested});
+  _FakeLotusHost({
+    required this.onShellMessageRequested,
+    this.onRunJavaScriptReturningResult,
+  });
 
   final LotusShellMessageCallback onShellMessageRequested;
+  final Object? Function(String script)? onRunJavaScriptReturningResult;
 
   @override
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
@@ -51,6 +55,13 @@ class _FakeLotusHost implements LotusHost {
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
     executedScripts.add(script);
+
+    if (onRunJavaScriptReturningResult != null) {
+      final overriddenResult = onRunJavaScriptReturningResult!(script);
+      if (overriddenResult != null) {
+        return overriddenResult;
+      }
+    }
 
     if (script.contains('receivePatch')) {
       return jsonEncode(<String, Object>{'ok': true});
@@ -1059,7 +1070,8 @@ void main() {
               (message) =>
                   message.contains('message=native_table_state_applied') &&
                   message.contains('apply_strategy: live_runtime') &&
-                  message.contains('live_patch_eligible: true'),
+                  message.contains('live_patch_eligible: true') &&
+                  message.contains('sync_blockers: []'),
             ),
             isTrue,
           );
@@ -1316,7 +1328,124 @@ void main() {
               (message) =>
                   message.contains('message=native_table_state_applied') &&
                   message.contains('apply_strategy: live_runtime') &&
-                  message.contains('live_patch_eligible: true'),
+                  message.contains('live_patch_eligible: true') &&
+                  message.contains('sync_blockers: []'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
+    testWidgets(
+      'reloads the Lotus bundle when table state live sync cannot confirm player cards',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 40, 40, 40],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: 0,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+          await LotusStorageSnapshotStore().save(
+            const LotusStorageSnapshot(
+              values: {
+                '__manaloom_table_state':
+                    '{"stormCount":0,"monarchPlayer":null,"initiativePlayer":null,"lastPlayerRolls":[null,null,null,null],"lastHighRolls":[null,null,null,null],"firstPlayerIndex":0}',
+              },
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                    onRunJavaScriptReturningResult: (script) {
+                      if (script.contains('.player-card')) {
+                        return jsonEncode(<String, Object>{
+                          'ok': false,
+                          'reason': 'player_cards_missing',
+                        });
+                      }
+                      return null;
+                    },
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-table-state","source":"monarch_surface_pressed"}',
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Table State'), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-table-state-monarch-player-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-table-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_table_state_applied') &&
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains('live_patch_eligible: true') &&
+                  message.contains('sync_blockers: [player_cards_missing]'),
             ),
             isTrue,
           );

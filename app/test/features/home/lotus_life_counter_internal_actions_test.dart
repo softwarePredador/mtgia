@@ -230,7 +230,8 @@ void main() {
             (message) =>
                 message.contains('message=native_day_night_applied') &&
                 message.contains('apply_strategy: live_runtime') &&
-                message.contains('live_patch_eligible: true'),
+                message.contains('live_patch_eligible: true') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );
@@ -305,15 +306,16 @@ void main() {
             ),
             isTrue,
           );
-          expect(
-            logs.any(
-              (message) =>
-                  message.contains('message=native_day_night_applied') &&
-                  message.contains('apply_strategy: reload_fallback') &&
-                  message.contains('live_patch_eligible: true'),
-            ),
-            isTrue,
-          );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_day_night_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: true') &&
+                message.contains('sync_blockers: [switcher_missing]'),
+          ),
+          isTrue,
+        );
         });
       },
     );
