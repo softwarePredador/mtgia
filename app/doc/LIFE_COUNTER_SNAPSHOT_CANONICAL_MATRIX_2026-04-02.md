@@ -53,6 +53,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - esse evento de borda agora tambem expõe `domain_key` e `review_status`, transformando o inventario das superfices fallback numa regra viva da shell
 - os defaults de `source` para cada `open-native-*` agora tambem saem do mesmo inventario da shell, evitando drift entre a auditoria da borda e a abertura real da superficie nativa
 - esse mesmo inventario agora tambem expõe `used_default_source`, separando mensagens que vieram com contexto explicito do Lotus das que dependeram do fallback interno do host
+- a borda da shell agora tambem expõe `native_fallback_surface_rejected`, separando falha de entrega por `open-native-*` desconhecido ou payload invalido de simples ausencia de abertura da superficie
 - `player appearance export/import` agora tambem expõem `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos de clipboard dos eventos de apply do runtime de jogador
 - `player appearance profile save/delete` agora tambem expõem `persistence_strategy: owned_profile_store`, separando a store propria de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `player appearance profile select` agora tambem expõe `persistence_strategy: owned_profile_store`, separando o uso de preset salvo no draft da sheet dos eventos de apply do runtime de jogador

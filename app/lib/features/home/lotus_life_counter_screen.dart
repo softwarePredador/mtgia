@@ -359,6 +359,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     try {
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
+        final type = decoded['type'] as String?;
+        if (type != null && type.startsWith('open-native-')) {
+          final descriptor = _nativeFallbackDescriptors[type];
+          if (descriptor == null) {
+            _recordNativeFallbackSurfaceRejected(
+              decoded,
+              reason: 'unknown_surface_type',
+            );
+            return;
+          }
+        }
+
         _recordNativeFallbackSurfaceRequested(decoded);
         if (decoded['type'] == 'open-native-settings') {
           unawaited(
@@ -443,12 +455,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           return;
         }
         if (decoded['type'] == 'open-native-player-counter') {
+          final counterKey = (decoded['counterKey'] as String?)?.trim();
+          if (counterKey == null || counterKey.isEmpty) {
+            _recordNativeFallbackSurfaceRejected(
+              decoded,
+              reason: 'missing_counter_key',
+            );
+            return;
+          }
           unawaited(
             _openNativePlayerCounterSheet(
               source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
-              counterKey: (decoded['counterKey'] as String?)?.trim(),
+              counterKey: counterKey,
             ),
           );
           return;
@@ -674,6 +694,49 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(
       AppObservability.instance.recordEvent(
         'native_fallback_surface_requested',
+        category: 'life_counter.shell',
+        data: data,
+      ),
+    );
+  }
+
+  void _recordNativeFallbackSurfaceRejected(
+    Map<String, dynamic> decoded, {
+    required String reason,
+  }) {
+    final type = decoded['type'] as String?;
+    final descriptor = type == null ? null : _nativeFallbackDescriptors[type];
+    final resolvedSource = _nativeFallbackResolvedSourceForMessage(decoded);
+    final data = <String, Object?>{
+      'message_type': type ?? 'unknown',
+      'source': resolvedSource.source,
+      'used_default_source': resolvedSource.usedDefaultSource,
+      'surface_strategy': 'native_fallback',
+      'reason': reason,
+    };
+
+    if (descriptor != null) {
+      data['domain_key'] = descriptor.domainKey;
+      data['fallback_classification'] = descriptor.classification;
+      data['review_status'] = descriptor.reviewStatus;
+      if (type == 'open-native-game-modes') {
+        data['core_scope'] = 'excluded_from_canonical_core';
+      }
+    }
+
+    final targetPlayerIndex = (decoded['targetPlayerIndex'] as num?)?.toInt();
+    if (targetPlayerIndex != null) {
+      data['target_player_index'] = targetPlayerIndex;
+    }
+
+    final counterKey = (decoded['counterKey'] as String?)?.trim();
+    if (counterKey != null && counterKey.isNotEmpty) {
+      data['counter_key'] = counterKey;
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_fallback_surface_rejected',
         category: 'life_counter.shell',
         data: data,
       ),

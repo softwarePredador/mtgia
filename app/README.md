@@ -100,6 +100,7 @@ Estado vivo do contador hoje:
 - esse evento de borda agora tambem expõe `domain_key` e `review_status`, transformando a revisao dos fallbacks internos numa regra viva da shell em vez de uma leitura espalhada pelo codigo
 - os defaults de `source` para cada `open-native-*` agora tambem saem do mesmo inventario da shell, evitando drift entre a auditoria de borda e a abertura real da sheet
 - esse mesmo inventario agora tambem deixa explicito quando a shell usou `used_default_source`, separando chamadas que vieram com `source` real do Lotus das que dependeram do fallback interno do host
+- a borda da shell agora tambem expõe `native_fallback_surface_rejected`, evitando que `open-native-*` desconhecido ou payload invalido morra em silencio
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local

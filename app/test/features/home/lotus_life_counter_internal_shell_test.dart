@@ -327,6 +327,94 @@ void main() {
       });
     });
 
+    testWidgets('rejects unsupported native fallback requests explicitly', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-quick-actions","source":"shell_shortcut"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_rejected',
+                ) &&
+                message.contains('message_type: open-native-quick-actions') &&
+                message.contains('reason: unknown_surface_type'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
+    testWidgets('rejects player counter requests without counter key', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-counter","targetPlayerIndex":2}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_rejected',
+                ) &&
+                message.contains('message_type: open-native-player-counter') &&
+                message.contains('domain_key: player_counter') &&
+                message.contains('target_player_index: 2') &&
+                message.contains('reason: missing_counter_key'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets('exports native history from a shell fallback shortcut', (
       tester,
     ) async {
