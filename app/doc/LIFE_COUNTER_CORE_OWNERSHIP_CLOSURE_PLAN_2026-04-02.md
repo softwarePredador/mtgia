@@ -230,6 +230,7 @@ Leitura operacional atual:
 - `turn tracker` e `game timer` agora tambem expõem `sync_blockers` nos applies com live path, deixando explicito quando o fallback veio de `tracker/timer` ainda inativo, mudanca estrutural do tracker ou mudanca de posicao fora dos recortes live suportados
 - `day/night` e `table state` agora tambem expõem `sync_blockers` com o `reason` real vindo do runtime do Lotus, deixando explicito quando o fallback veio de falha de confirmacao do DOM em vez de ficar escondido sob um `reload_fallback` generico
 - `settings` e `player appearance` continuam exponto `sync_blockers` puramente arquiteturais; em `set life`, os blockers agora tambem distinguem quando o fallback veio de delta acima do limite live, jogador previamente inativo, vida letal sem `autoKill` ou mudanca fora do contrato de vida alvo
+- os applies de `settings`, `day/night`, `turn tracker`, `game timer`, `player appearance` e `table state` agora tambem expõem `reload_required`, alinhando toda a trilha observavel de apply ao mesmo contrato ja usado pelos demais dominios
 - `settings` continua em `reload` por seguranca do bundle Lotus, e agora isso tambem aparece de forma explicita na telemetria de apply
 - `history` e `card search` seguem Lotus-first visualmente; quando a shell interna entra em cena, a observabilidade agora marca isso explicitamente como `native_fallback`
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`

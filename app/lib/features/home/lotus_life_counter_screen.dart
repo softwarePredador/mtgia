@@ -1153,6 +1153,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final failureReason = await _applyOwnedDayNightPreferenceFailureReason();
     final applied = failureReason == null;
     final applyStrategy = applied ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !applied;
     final syncBlockers = applied ? const <String>[] : <String>[failureReason];
 
     unawaited(
@@ -1164,12 +1165,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'is_night': state.isNight,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
     );
 
-    if (!applied) {
+    if (reloadRequired) {
       unawaited(_reloadLotusBundleFromOwnedSnapshot());
     }
   }
@@ -1181,6 +1183,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _settingsStore.save(settings);
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
+    const reloadRequired = true;
     const syncBlockers = <String>['lotus_settings_runtime_in_memory'];
 
     final snapshot = await _snapshotStore.load();
@@ -1207,6 +1210,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'clean_look': settings.cleanLook,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
@@ -1519,6 +1523,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           adjustedSession,
         );
     final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !appliedLive;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1533,12 +1538,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'turn_timer_active': adjustedSession.turnTimerActive,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
     );
 
-    if (appliedLive) {
+    if (!reloadRequired) {
       return;
     }
 
@@ -1852,6 +1858,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final appliedLive =
         livePatchEligible && await _applyOwnedGameTimerRuntimeState(state);
     final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !appliedLive;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1864,12 +1871,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'has_paused_time': state.pausedTimeEpochMs != null,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
     );
 
-    if (appliedLive) {
+    if (!reloadRequired) {
       return;
     }
 
@@ -2468,6 +2476,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await _persistOwnedSessionSnapshot(session);
     const livePatchEligible = false;
     const applyStrategy = 'reload_fallback';
+    const reloadRequired = true;
     const syncBlockers = <String>[
       'player_appearance_visual_surface_requires_reload',
     ];
@@ -2480,6 +2489,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
@@ -3582,6 +3592,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final appliedLiveResolved = await appliedLive;
     final applyStrategy =
         appliedLiveResolved ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !appliedLiveResolved;
     final syncBlockers =
         appliedLiveResolved
             ? const <String>[]
@@ -3603,12 +3614,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'initiative_player': adjustedSession.initiativePlayer,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
           'sync_blockers': syncBlockers,
         },
       ),
     );
 
-    if (appliedLiveResolved) {
+    if (!reloadRequired) {
       return;
     }
 

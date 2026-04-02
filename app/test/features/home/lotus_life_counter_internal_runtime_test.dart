@@ -220,6 +220,7 @@ void main() {
                 message.contains('message=native_turn_tracker_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false') &&
+                message.contains('reload_required: true') &&
                 message.contains('previous_tracker_inactive'),
           ),
           isTrue,
@@ -341,6 +342,7 @@ void main() {
                 message.contains('message=native_turn_tracker_applied') &&
                 message.contains('apply_strategy: live_runtime') &&
                 message.contains('live_patch_eligible: true') &&
+                message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
           isTrue,
@@ -856,6 +858,7 @@ void main() {
                 message.contains('message=native_game_timer_applied') &&
                 message.contains('apply_strategy: live_runtime') &&
                 message.contains('live_patch_eligible: true') &&
+                message.contains('reload_required: false') &&
                 message.contains('sync_blockers: []'),
           ),
           isTrue,
@@ -930,6 +933,7 @@ void main() {
                 message.contains('message=native_game_timer_applied') &&
                 message.contains('apply_strategy: reload_fallback') &&
                 message.contains('live_patch_eligible: false') &&
+                message.contains('reload_required: true') &&
                 message.contains('previous_timer_inactive'),
           ),
           isTrue,
@@ -1071,6 +1075,7 @@ void main() {
                   message.contains('message=native_table_state_applied') &&
                   message.contains('apply_strategy: live_runtime') &&
                   message.contains('live_patch_eligible: true') &&
+                  message.contains('reload_required: false') &&
                   message.contains('sync_blockers: []'),
             ),
             isTrue,
@@ -1445,6 +1450,7 @@ void main() {
                   message.contains('message=native_table_state_applied') &&
                   message.contains('apply_strategy: reload_fallback') &&
                   message.contains('live_patch_eligible: true') &&
+                  message.contains('reload_required: true') &&
                   message.contains('sync_blockers: [player_cards_missing]'),
             ),
             isTrue,

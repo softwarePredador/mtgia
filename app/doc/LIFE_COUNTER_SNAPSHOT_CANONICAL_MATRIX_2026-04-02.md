@@ -196,6 +196,7 @@ Complemento desta rodada:
 - `turn tracker` e `game timer` agora tambem expõem `sync_blockers`, deixando explicito no log qual condicao bloqueou `live_runtime` nos recortes seguros de runtime (`tracker/timer` inativo, mudanca estrutural do tracker ou posicao fora dos caminhos suportados)
 - `day/night` e `table state` agora tambem expõem `sync_blockers`, deixando explicito no log qual `reason` do runtime Lotus bloqueou o apply live (`switcher_missing`, `player_cards_missing` e equivalentes), em vez de esconder isso sob fallback generico
 - `settings` e `player appearance` continuam expondo `sync_blockers` arquiteturais conhecidos; em `set life`, os blockers agora tambem distinguem delta acima do limite live, jogador previamente inativo, vida letal sem `autoKill` e mudanca fora do contrato do jogador alvo
+- os applies de `settings`, `day/night`, `turn tracker`, `game timer`, `player appearance` e `table state` agora tambem expõem `reload_required`, padronizando a leitura de fallback e sync bem-sucedido no mesmo contrato observavel dos outros dominios
 - `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
 - `history` e `card search` seguem sem apply de runtime nessa shell interna; a observabilidade agora deixa explicito quando o fluxo foi apenas `native_fallback`
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`
