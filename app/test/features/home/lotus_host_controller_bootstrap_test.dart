@@ -474,6 +474,193 @@ void main() {
     );
 
     test(
+      'round-trips canonical stores through Lotus mirror and fallback bootstrap',
+      () async {
+        final sourceSession = const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [36, 27, 19, 8],
+          poison: [0, 0, 2, 5],
+          energy: [1, 3, 0, 0],
+          experience: [0, 1, 0, 2],
+          commanderCasts: [2, 0, 1, 0],
+          partnerCommanders: [false, true, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.answerLeft,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+          ],
+          lastPlayerRolls: [11, null, null, null],
+          lastHighRolls: [17, null, null, null],
+          commanderDamage: [
+            [0, 0, 4, 0],
+            [0, 0, 0, 8],
+            [2, 0, 0, 0],
+            [0, 5, 0, 0],
+          ],
+          stormCount: 2,
+          monarchPlayer: 1,
+          initiativePlayer: 3,
+          firstPlayerIndex: 0,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: false,
+          currentTurnPlayerIndex: 2,
+          currentTurnNumber: 7,
+          turnTimerActive: true,
+          turnTimerSeconds: 51,
+          lastTableEvent: 'Player 4 lost 11 life',
+        );
+        final sourceSettings = const LifeCounterSettings(
+          autoKill: true,
+          lifeLossOnCommanderDamage: true,
+          showCountersOnPlayerCard: true,
+          showRegularCounters: false,
+          showCommanderDamageCounters: false,
+          clickableCommanderDamageCounters: false,
+          keepZeroCountersOnPlayerCard: false,
+          saltyDefeatMessages: true,
+          cycleSaltyDefeatMessages: true,
+          gameTimer: true,
+          gameTimerMainScreen: true,
+          showClockOnMainScreen: true,
+          randomPlayerColors: true,
+          preserveBackgroundImagesOnShuffle: false,
+          setLifeByTappingNumber: false,
+          verticalTapAreas: true,
+          cleanLook: false,
+          criticalDamageWarning: true,
+          customLongTapEnabled: true,
+          customLongTapValue: 9,
+          whitelabelIcon: null,
+        );
+        final sourceGameTimer = const LifeCounterGameTimerState(
+          startTimeEpochMs: 1711804000000,
+          isPaused: true,
+          pausedTimeEpochMs: 1711804015000,
+        );
+        final sourceHistory = const LifeCounterHistoryState(
+          currentGameName: 'Round Trip Game',
+          currentGameMeta: {
+            'id': 'round-trip-game',
+            'name': 'Round Trip Game',
+            'startDate': 1711804000000,
+            'gameMode': 'commander',
+          },
+          currentGameEntries: [
+            LifeCounterHistoryEntry(
+              message: 'Player 4 lost 11 life',
+              source: LifeCounterHistoryEntrySource.currentGame,
+            ),
+          ],
+          archiveEntries: [
+            LifeCounterHistoryEntry(
+              message: 'Player 2 was eliminated',
+              source: LifeCounterHistoryEntrySource.archive,
+            ),
+          ],
+          archivedGameCount: 4,
+          gameCounter: 15,
+          lastTableEvent: 'Player 4 lost 11 life',
+        );
+
+        final sourceSnapshot = LotusStorageSnapshot(
+          values: <String, String>{
+            ...LotusLifeCounterSessionAdapter.buildSnapshotValues(
+              sourceSession,
+              history: sourceHistory,
+              settings: sourceSettings,
+            ),
+            ...LotusLifeCounterSettingsAdapter.buildSnapshotValues(
+              sourceSettings,
+            ),
+            ...LotusLifeCounterGameTimerAdapter.buildSnapshotValues(
+              sourceGameTimer,
+            ),
+            '__manaloom_day_night_mode': 'night',
+          },
+        );
+
+        final mirror = await persistCanonicalMirrorFromLotusSnapshot(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+          snapshot: sourceSnapshot,
+        );
+
+        expect(mirror.session, isNotNull);
+        expect(mirror.settings, isNotNull);
+        expect(mirror.gameTimerState, isNotNull);
+        expect(mirror.dayNightState, isNotNull);
+        expect(mirror.history.currentGameMeta?['id'], 'round-trip-game');
+
+        final fallbackValues = await buildLotusFallbackBootstrapValues(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+        );
+        final restoredSnapshot = LotusStorageSnapshot(
+          values: Map<String, String>.unmodifiable(fallbackValues),
+        );
+
+        final restoredSession = LotusLifeCounterSessionAdapter.tryBuildSession(
+          restoredSnapshot,
+        );
+        final restoredSettings =
+            LotusLifeCounterSettingsAdapter.tryBuildSettings(restoredSnapshot);
+        final restoredGameTimer =
+            LotusLifeCounterGameTimerAdapter.tryBuildState(restoredSnapshot);
+        final restoredDayNight = buildLotusDayNightStateFromSnapshot(
+          restoredSnapshot,
+        );
+        final restoredHistory = LifeCounterHistoryState.fromSources(
+          session: restoredSession,
+          snapshot: restoredSnapshot,
+        );
+
+        expect(restoredSession, isNotNull);
+        expect(restoredSession!.lives, sourceSession.lives);
+        expect(restoredSession.currentTurnPlayerIndex, 2);
+        expect(restoredSession.currentTurnNumber, 7);
+        expect(restoredSession.lastTableEvent, isNull);
+
+        expect(restoredSettings, isNotNull);
+        expect(restoredSettings!.gameTimer, isTrue);
+        expect(restoredSettings.showRegularCounters, isFalse);
+        expect(restoredSettings.customLongTapValue, 9);
+
+        expect(restoredGameTimer, isNotNull);
+        expect(restoredGameTimer!.startTimeEpochMs, 1711804000000);
+        expect(restoredGameTimer.isPaused, isTrue);
+        expect(restoredGameTimer.pausedTimeEpochMs, 1711804015000);
+
+        expect(restoredDayNight, isNotNull);
+        expect(restoredDayNight!.isNight, isTrue);
+
+        expect(restoredHistory.currentGameMeta?['id'], 'round-trip-game');
+        expect(restoredHistory.gameCounter, 15);
+        expect(
+          restoredHistory.currentGameEntries.any(
+            (entry) => entry.message == 'Player 4 lost 11 life',
+          ),
+          isTrue,
+        );
+        expect(
+          restoredHistory.archiveEntries.any(
+            (entry) => entry.message == 'Player 2 was eliminated',
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test(
       'reopens from stale partial Lotus snapshot using canonical fallback values',
       () async {
         await dayNightStateStore.save(
