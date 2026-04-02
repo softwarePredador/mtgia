@@ -2221,12 +2221,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
     final settings = await _loadOwnedLifeCounterSettings();
-    final canonicalSyncEligible =
-        _canApplyCanonicalCommanderDamageWithoutReload(
-          previousSession,
-          adjustedSession,
-          settings: settings,
-        );
+    final syncBlockers = _commanderDamageCanonicalSyncBlockers(
+      previousSession,
+      adjustedSession,
+      settings: settings,
+    );
+    final canonicalSyncEligible = syncBlockers.isEmpty;
     const livePatchEligible = false;
     final applyStrategy =
         canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
@@ -2242,6 +2242,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -2253,16 +2254,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyCanonicalCommanderDamageWithoutReload(
+  List<String> _commanderDamageCanonicalSyncBlockers(
     LifeCounterSession previous,
     LifeCounterSession next, {
     required LifeCounterSettings settings,
   }) {
-    if (settings.autoKill ||
-        settings.lifeLossOnCommanderDamage ||
-        settings.showCountersOnPlayerCard ||
-        settings.showCommanderDamageCounters) {
-      return false;
+    final blockers = <String>[];
+    if (settings.autoKill) {
+      blockers.add('auto_kill_enabled');
+    }
+    if (settings.lifeLossOnCommanderDamage) {
+      blockers.add('life_loss_on_commander_damage_enabled');
+    }
+    if (settings.showCountersOnPlayerCard) {
+      blockers.add('show_counters_on_player_card_enabled');
+    }
+    if (settings.showCommanderDamageCounters) {
+      blockers.add('show_commander_damage_counters_enabled');
     }
 
     final expected = previous.copyWith(
@@ -2271,7 +2279,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       lastTableEvent: next.lastTableEvent,
       clearLastTableEvent: next.lastTableEvent == null,
     );
-    return expected.toJsonString() == next.toJsonString();
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_hidden_commander_damage');
+    }
+    return blockers;
   }
 
   Future<void> _openNativePlayerAppearanceSheet({
@@ -2683,11 +2694,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
     final settings = await _loadOwnedLifeCounterSettings();
-    final canonicalSyncEligible = _canApplyCanonicalPlayerCounterWithoutReload(
+    final syncBlockers = _playerCounterCanonicalSyncBlockers(
       previousSession,
       adjustedSession,
       settings: settings,
     );
+    final canonicalSyncEligible = syncBlockers.isEmpty;
     const livePatchEligible = false;
     final applyStrategy =
         canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
@@ -2703,6 +2715,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
+          'sync_blockers': syncBlockers,
         },
       ),
     );
@@ -2714,18 +2727,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
   }
 
-  bool _canApplyCanonicalPlayerCounterWithoutReload(
+  List<String> _playerCounterCanonicalSyncBlockers(
     LifeCounterSession previous,
     LifeCounterSession next, {
     required LifeCounterSettings settings,
   }) {
+    final blockers = <String>[];
     if (settings.showCountersOnPlayerCard) {
-      return false;
+      blockers.add('show_counters_on_player_card_enabled');
     }
 
     final poisonChanged = previous.poison.join(',') != next.poison.join(',');
     if (poisonChanged && settings.autoKill) {
-      return false;
+      blockers.add('poison_auto_kill_enabled');
     }
 
     final expected = previous.copyWith(
@@ -2738,7 +2752,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       lastTableEvent: next.lastTableEvent,
       clearLastTableEvent: next.lastTableEvent == null,
     );
-    return expected.toJsonString() == next.toJsonString();
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_hidden_player_counter');
+    }
+    return blockers;
   }
 
   Future<void> _openNativePlayerStateSheet({

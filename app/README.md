@@ -186,6 +186,7 @@ Estado vivo do contador hoje:
 - `commander damage` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que o settings atual ja garante ausencia de reflexo visual na mesa
 - `player counter` agora tambem anota `apply_strategy: canonical_store_sync`, `reload_required: false` e `live_patch_eligible: false` no recorte em que o settings atual ja garante ausencia de reflexo visual na mesa e `poison` nao pode acionar `autoKill`
 - a suite de `player values` agora tambem prova explicitamente os limites desses recortes, garantindo `reload_fallback` quando `commander damage` volta a afetar vida ou quando `player counter` volta a ficar visivel na mesa
+- `commander damage` e `player counter` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um recorte oculto caiu em `reload_fallback`
 - `settings` agora tambem anota `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que esse dominio continua dependente de rehydrate completo
 - `history` e `card search` agora tambem anotam `surface_strategy: native_fallback` nos eventos da sheet interna, deixando explicito no log que esses atalhos sao suporte nativo e nao takeover visual principal
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito no log que esse fluxo faz sync canonico sem apply live no Lotus

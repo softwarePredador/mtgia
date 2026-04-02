@@ -445,7 +445,10 @@ void main() {
             logs.any(
               (message) =>
                   message.contains('message=native_commander_damage_applied') &&
-                  message.contains('apply_strategy: reload_fallback'),
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains(
+                    'sync_blockers: [life_loss_on_commander_damage_enabled]',
+                  ),
             ),
             isTrue,
           );
@@ -781,7 +784,10 @@ void main() {
             logs.any(
               (message) =>
                   message.contains('message=native_player_counter_applied') &&
-                  message.contains('apply_strategy: reload_fallback'),
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains(
+                    'sync_blockers: [show_counters_on_player_card_enabled]',
+                  ),
             ),
             isTrue,
           );
