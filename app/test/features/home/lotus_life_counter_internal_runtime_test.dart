@@ -56,7 +56,11 @@ class _FakeLotusHost implements LotusHost {
       return jsonEncode(<String, Object>{'ok': true});
     }
 
-    if (script.contains('.turn-time-tracker') || script.contains('.game-timer')) {
+    if (script.contains('.turn-time-tracker') ||
+        script.contains('.game-timer') ||
+        script.contains("syncCoin('monarch'") ||
+        script.contains("syncCoin('initiative'") ||
+        script.contains(".player-card")) {
       return jsonEncode(<String, Object>{'ok': true});
     }
 
@@ -840,6 +844,128 @@ void main() {
       expect(state.isPaused, isFalse);
       expect(host.loadBundleCallCount, 2);
     });
+
+    testWidgets(
+      'applies monarch and initiative table state without reloading the Lotus bundle',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 40, 40, 40],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            partnerCommanders: [false, false, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: 0,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
+          ),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              '__manaloom_table_state':
+                  '{"stormCount":0,"monarchPlayer":null,"initiativePlayer":null,"lastPlayerRolls":[null,null,null,null],"lastHighRolls":[null,null,null,null],"firstPlayerIndex":0}',
+            },
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-table-state","source":"monarch_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Table State'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-table-state-monarch-player-2'),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.byKey(
+            const Key('life-counter-native-table-state-initiative-player-1'),
+          ),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-table-state-initiative-player-1'),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-table-state-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.monarchPlayer, 2);
+        expect(session.initiativePlayer, 1);
+        expect(session.stormCount, 0);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains("syncCoin('monarch'") &&
+                script.contains("syncCoin('initiative'"),
+          ),
+          isTrue,
+        );
+      },
+    );
 
     testWidgets('opens native dice from shell shortcut', (tester) async {
       late _FakeLotusHost host;

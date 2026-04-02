@@ -2455,6 +2455,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
 
@@ -2471,7 +2474,109 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
+    if (_canApplyLiveTableStatePatch(previousSession, adjustedSession) &&
+        await _applyOwnedTableStateRuntimeState(adjustedSession)) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _canApplyLiveTableStatePatch(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    return previous.stormCount == next.stormCount;
+  }
+
+  Future<bool> _applyOwnedTableStateRuntimeState(
+    LifeCounterSession session,
+  ) async {
+    final patched = await _applyLiveLotusStoragePatch(
+      LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(session),
+    );
+    if (!patched) {
+      return false;
+    }
+
+    final monarchPlayer = session.monarchPlayer;
+    final initiativePlayer = session.initiativePlayer;
+
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const playerCards = Array.from(document.querySelectorAll('.player-card'));
+    if (playerCards.length < ${session.playerCount}) {
+      return JSON.stringify({ ok: false, reason: 'player_cards_missing' });
+    }
+
+    document.querySelectorAll('.coin-info, .remove-indicator').forEach((node) => {
+      if (node instanceof HTMLElement) {
+        node.remove();
+      }
+    });
+
+    const syncCoin = (type, targetIndex) => {
+      const className = type + '-coin';
+      const existingCoin = document.querySelector('.' + className);
+      playerCards.forEach((card) => {
+        if (card instanceof HTMLElement) {
+          card.classList.remove(type);
+        }
+      });
+
+      if (targetIndex == null) {
+        if (existingCoin instanceof HTMLElement) {
+          existingCoin.remove();
+        }
+        return true;
+      }
+
+      const targetCard = playerCards[targetIndex];
+      if (!(targetCard instanceof HTMLElement)) {
+        return false;
+      }
+
+      targetCard.classList.add(type);
+
+      let coin = existingCoin;
+      if (!(coin instanceof HTMLElement)) {
+        coin = document.createElement('div');
+        coin.className = className;
+        coin.style.setProperty('--rotation', '0deg');
+        document.body.appendChild(coin);
+      }
+
+      coin.classList.remove('hide');
+      coin.classList.remove('active');
+      const rect = targetCard.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        return false;
+      }
+
+      const coinRect = coin.getBoundingClientRect();
+      const coinWidth = coinRect.width > 0 ? coinRect.width : 66;
+      const coinHeight = coinRect.height > 0 ? coinRect.height : 66;
+      coin.style.left =
+        String(rect.left + rect.width / 2 - coinWidth / 2) + 'px';
+      coin.style.top =
+        String(rect.top + rect.height / 2 - coinHeight / 2) + 'px';
+      return true;
+    };
+
+    const monarchOk = syncCoin('monarch', ${monarchPlayer ?? 'null'});
+    const initiativeOk = syncCoin('initiative', ${initiativePlayer ?? 'null'});
+    return JSON.stringify({ ok: monarchOk && initiativeOk });
+  } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'table_state_patch_failed' });
+})();
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      return decoded is Map<String, dynamic> && decoded['ok'] == true;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
