@@ -6,6 +6,24 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 
 void main() {
   group('LifeCounterHistorySnapshot', () {
+    test('detects history domain presence from Lotus snapshot keys', () {
+      expect(
+        LifeCounterHistoryState.hasSnapshotDomain(
+          const LotusStorageSnapshot(
+            values: {'currentGameMeta': '{"name":"Game #7"}'},
+          ),
+        ),
+        isTrue,
+      );
+      expect(
+        LifeCounterHistoryState.hasSnapshotDomain(
+          const LotusStorageSnapshot(values: {}),
+        ),
+        isFalse,
+      );
+      expect(LifeCounterHistoryState.hasSnapshotDomain(null), isFalse);
+    });
+
     test('builds current and archived entries from Lotus storage snapshot', () {
       final session = LifeCounterSession.tryFromJson({
         ...LifeCounterSession.initial(playerCount: 4).toJson(),

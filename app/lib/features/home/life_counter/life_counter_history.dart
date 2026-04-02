@@ -152,6 +152,21 @@ class LifeCounterHistoryState {
   static const String _allGamesHistoryKey = 'allGamesHistory';
   static const String _currentGameMetaKey = 'currentGameMeta';
   static const String _gameCounterKey = 'gameCounter';
+  static const Set<String> snapshotDomainKeys = <String>{
+    _gameHistoryKey,
+    _allGamesHistoryKey,
+    _currentGameMetaKey,
+    _gameCounterKey,
+  };
+
+  static bool hasSnapshotDomain(LotusStorageSnapshot? snapshot) {
+    final values = snapshot?.values;
+    if (values == null) {
+      return false;
+    }
+
+    return snapshotDomainKeys.any(values.containsKey);
+  }
 
   LifeCounterHistoryState copyWith({
     Object? currentGameName = _unset,

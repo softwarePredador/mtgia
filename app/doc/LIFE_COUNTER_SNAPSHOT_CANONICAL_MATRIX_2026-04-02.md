@@ -61,6 +61,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - a shell de `history` agora tambem expõe `history_domain_present`, deixando explicito quando `currentGameMeta/gameCounter` existem mesmo sem `gameHistory` ou `allGamesHistory` com entradas
 - `history transfer` agora tambem carrega `currentGameMeta` e `gameCounter`, garantindo que esse envelope canônico não se perca no clipboard mesmo quando o dominio está `meta-only`
 - `history transfer` agora tambem carrega `archivedGameCount`, preservando a cardinalidade do arquivo canonico no round-trip por clipboard
+- a deteccao de `history_domain_present` agora tambem parte do proprio dominio `LifeCounterHistoryState`, reduzindo risco de drift entre mirror, bootstrap e shell
 - a deduplicacao de observabilidade do `persist_snapshot` agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 

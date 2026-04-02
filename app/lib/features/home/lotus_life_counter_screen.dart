@@ -1247,10 +1247,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       session: session,
       snapshot: snapshot,
     );
-    final historyDomainPresent = _hasHistoryDomain(
-      historyState: historyState,
-      snapshot: snapshot,
-    );
+    final historyDomainPresent =
+        historyState != null || LifeCounterHistoryState.hasSnapshotDomain(snapshot);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1427,25 +1425,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
     return true;
-  }
-
-  bool _hasHistoryDomain({
-    required LifeCounterHistoryState? historyState,
-    required LotusStorageSnapshot? snapshot,
-  }) {
-    if (historyState != null) {
-      return true;
-    }
-
-    final values = snapshot?.values;
-    if (values == null) {
-      return false;
-    }
-
-    return values.containsKey('gameHistory') ||
-        values.containsKey('allGamesHistory') ||
-        values.containsKey('currentGameMeta') ||
-        values.containsKey('gameCounter');
   }
 
   Future<void> _openNativeCardSearchSheet({required String source}) async {

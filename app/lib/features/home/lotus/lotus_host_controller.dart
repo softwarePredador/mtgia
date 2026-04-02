@@ -40,13 +40,6 @@ const Set<String> _lotusSessionBootstrapKeys = <String>{
   '__manaloom_table_state',
 };
 
-const Set<String> _lotusHistoryBootstrapKeys = <String>{
-  'gameHistory',
-  'allGamesHistory',
-  'currentGameMeta',
-  'gameCounter',
-};
-
 const Set<String> _lotusSettingsBootstrapKeys = <String>{'gameSettings'};
 const Set<String> _lotusGameTimerBootstrapKeys = <String>{'gameTimerState'};
 const Set<String> _lotusDayNightBootstrapKeys = <String>{
@@ -108,7 +101,7 @@ Map<String, String> mergeLotusBootstrapValues({
   _pruneStaleBootstrapDomain(
     mergedValues,
     fallbackValues: fallbackValues,
-    domainKeys: _lotusHistoryBootstrapKeys,
+    domainKeys: LifeCounterHistoryState.snapshotDomainKeys,
   );
   _pruneStaleBootstrapDomain(
     mergedValues,
@@ -175,10 +168,6 @@ class LotusCanonicalMirrorResult {
   final LifeCounterSettings? settings;
 }
 
-bool hasLotusHistoryDomain(LotusStorageSnapshot snapshot) {
-  return _lotusHistoryBootstrapKeys.any(snapshot.values.containsKey);
-}
-
 Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   required LifeCounterDayNightStateStore dayNightStateStore,
   required LifeCounterGameTimerStateStore gameTimerStateStore,
@@ -187,7 +176,9 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   required LifeCounterSettingsStore settingsStore,
   required LotusStorageSnapshot snapshot,
 }) async {
-  final historyDomainPresent = hasLotusHistoryDomain(snapshot);
+  final historyDomainPresent = LifeCounterHistoryState.hasSnapshotDomain(
+    snapshot,
+  );
   final derivedDayNight = buildLotusDayNightStateFromSnapshot(snapshot);
   final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
     snapshot,
