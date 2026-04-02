@@ -53,6 +53,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `day/night` continua live sem takeover visual, mas agora so considera sucesso quando o `.day-night-switcher` responde; se falhar, cai em `reload` de fallback
 - handoffs embutidos de `Game Modes` agora confirmam que o seletor primario, o seletor de `edit cards` e os seletores de fechamento existem no DOM do Lotus antes de registrar sucesso; seletor ausente passa a gerar falha observavel em vez de sucesso silencioso, e o dismiss da shell agora diferencia acao escolhida de acao realmente entregue
 - `turn tracker`, `game timer` e `table state` agora tambem registram na observabilidade se a aplicacao fechou por `live_runtime` ou `reload_fallback`, junto do sinal de elegibilidade do patch live
+- `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, fechando o mesmo contrato observavel dos dominios com live apply/fallback
 
 ## Ja ManaLoom-owned
 
@@ -401,6 +402,7 @@ Implementado nesta rodada:
 - `game modes` embutidos agora so registram sucesso quando o seletor primario, o follow-up de `edit cards` e os seletores de fechamento existem no DOM real do Lotus; o segundo passo de card pool saiu do modelo `setTimeout` fire-and-forget e passa a ser confirmado em chamada separada
 - a observabilidade da shell agora registra `native_game_modes_action_failed` e marca `action_delivered` no evento de dismiss, evitando telemetria ambigua quando a acao foi escolhida mas nao chegou ao Lotus
 - `turn tracker`, `game timer` e `table state` agora marcam `live_patch_eligible` e `apply_strategy` nos eventos de apply, o que separa claramente sucesso via runtime do Lotus e fallback por `reload`
+- `day/night` agora tambem marca `live_patch_eligible` e `apply_strategy` no evento de apply, deixando o fallback para `reload` visivel na mesma trilha operacional
 - `settings` continuam em reload por decisao explicita de seguranca, porque o Lotus mantem esse dominio em memoria e nao reage apenas ao patch de storage
 
 ### Wave 5 - Tornar o host o escritor primario

@@ -71,18 +71,18 @@ class _FakeLotusHost implements LotusHost {
       executedScripts.add(script);
     }
 
-    if (script.contains('.day-night-switcher')) {
-      return jsonEncode(<String, Object>{
-        'ok': true,
-        'isNight': script.contains("toggle('night', true)"),
-      });
-    }
-
     if (onRunJavaScriptReturningResult != null) {
       final overriddenResult = onRunJavaScriptReturningResult!(script);
       if (overriddenResult != null) {
         return overriddenResult;
       }
+    }
+
+    if (script.contains('.day-night-switcher')) {
+      return jsonEncode(<String, Object>{
+        'ok': true,
+        'isNight': script.contains("toggle('night', true)"),
+      });
     }
 
     if (!isGameModesAvailabilityQuery &&
@@ -142,6 +142,23 @@ class _FakeLotusHost implements LotusHost {
   }
 }
 
+Future<void> _captureDebugLogs(
+  Future<void> Function(List<String> logs) action,
+) async {
+  final logs = <String>[];
+  final originalDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) {
+      logs.add(message);
+    }
+  };
+  try {
+    await action(logs);
+  } finally {
+    debugPrint = originalDebugPrint;
+  }
+}
+
 void main() {
   group('LotusLifeCounterScreen internal actions fallback', () {
     setUp(() {
@@ -153,59 +170,7 @@ void main() {
     ) async {
       late _FakeLotusHost host;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
-          ),
-        ),
-      );
-
-      await tester.pump();
-      await tester.pump();
-
-      host.emitShellMessage(
-        '{"type":"open-native-day-night","source":"day_night_surface_pressed"}',
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Day / Night'), findsOneWidget);
-
-      await tester.tap(find.text('Night'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-day-night-apply')),
-      );
-      await tester.pumpAndSettle();
-
-      final state = await LifeCounterDayNightStateStore().load();
-      expect(state, isNotNull);
-      expect(state!.isNight, isTrue);
-      expect(
-        host.executedScripts.any(
-          (script) =>
-              script.contains('__manaloom_day_night_mode') &&
-              script.contains('.day-night-switcher'),
-        ),
-        isTrue,
-      );
-      expect(host.loadBundleCallCount, 1);
-    });
-
-    testWidgets(
-      'reloads the Lotus bundle when day night live sync cannot confirm the switcher',
-      (tester) async {
-        late _FakeLotusHost host;
-
+      await _captureDebugLogs((logs) async {
         await tester.pumpWidget(
           MaterialApp(
             home: LotusLifeCounterScreen(
@@ -215,27 +180,6 @@ void main() {
               }) {
                 host = _FakeLotusHost(
                   onShellMessageRequested: onShellMessageRequested,
-                  onRunJavaScriptReturningResult: (script) {
-                    if (script.contains('.day-night-switcher')) {
-                      return jsonEncode(<String, Object>{
-                        'ok': false,
-                        'reason': 'switcher_missing',
-                      });
-                    }
-
-                    if (!script.contains('planechaseAvailable:')) {
-                      return null;
-                    }
-
-                    return jsonEncode(<String, Object>{
-                      'planechaseAvailable': true,
-                      'planechaseActive': false,
-                      'archenemyAvailable': false,
-                      'archenemyActive': false,
-                      'bountyAvailable': true,
-                      'bountyActive': false,
-                    });
-                  },
                 )..completeSuccessfulLoad();
                 return host;
               },
@@ -251,6 +195,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        expect(find.text('Day / Night'), findsOneWidget);
+
         await tester.tap(find.text('Night'));
         await tester.pumpAndSettle();
 
@@ -259,7 +205,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(host.loadBundleCallCount, 1);
+        final state = await LifeCounterDayNightStateStore().load();
+        expect(state, isNotNull);
+        expect(state!.isNight, isTrue);
         expect(
           host.executedScripts.any(
             (script) =>
@@ -268,6 +216,97 @@ void main() {
           ),
           isTrue,
         );
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_day_night_applied') &&
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('live_patch_eligible: true'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
+    testWidgets(
+      'reloads the Lotus bundle when day night live sync cannot confirm the switcher',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await _captureDebugLogs((logs) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                    onRunJavaScriptReturningResult: (script) {
+                      if (script.contains('.day-night-switcher')) {
+                        return jsonEncode(<String, Object>{
+                          'ok': false,
+                          'reason': 'switcher_missing',
+                        });
+                      }
+
+                      if (!script.contains('planechaseAvailable:')) {
+                        return null;
+                      }
+
+                      return jsonEncode(<String, Object>{
+                        'planechaseAvailable': true,
+                        'planechaseActive': false,
+                        'archenemyAvailable': false,
+                        'archenemyActive': false,
+                        'bountyAvailable': true,
+                        'bountyActive': false,
+                      });
+                    },
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-day-night","source":"day_night_surface_pressed"}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(find.text('Night'));
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-day-night-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('__manaloom_day_night_mode') &&
+                  script.contains('.day-night-switcher'),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_day_night_applied') &&
+                  message.contains('apply_strategy: reload_fallback') &&
+                  message.contains('live_patch_eligible: true'),
+            ),
+            isTrue,
+          );
+        });
       },
     );
 

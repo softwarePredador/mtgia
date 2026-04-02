@@ -1117,13 +1117,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
+    const livePatchEligible = true;
     final applied = await _applyOwnedDayNightPreference();
+    final applyStrategy = applied ? 'live_runtime' : 'reload_fallback';
 
     unawaited(
       AppObservability.instance.recordEvent(
         'native_day_night_applied',
         category: 'life_counter.day_night',
-        data: {'source': source, 'is_night': state.isNight},
+        data: {
+          'source': source,
+          'is_night': state.isNight,
+          'live_patch_eligible': livePatchEligible,
+          'apply_strategy': applyStrategy,
+        },
       ),
     );
 
