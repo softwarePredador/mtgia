@@ -89,6 +89,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       'support_utility';
   static const String _excludedCoreSupportFallbackClassification =
       'excluded_core_support';
+  static const Set<String> _nativeFallbackPlayerTargetTypes = <String>{
+    'open-native-commander-damage',
+    'open-native-player-appearance',
+    'open-native-player-counter',
+    'open-native-player-state',
+    'open-native-set-life',
+  };
   static const Map<String, _NativeFallbackDescriptor> _nativeFallbackDescriptors =
       <String, _NativeFallbackDescriptor>{
         'open-native-settings': _NativeFallbackDescriptor(
@@ -366,6 +373,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             _recordNativeFallbackSurfaceRejected(
               decoded,
               reason: 'unknown_surface_type',
+            );
+            return;
+          }
+          if (_nativeFallbackPlayerTargetTypes.contains(type) &&
+              (decoded['targetPlayerIndex'] as num?)?.toInt() == null) {
+            _recordNativeFallbackSurfaceRejected(
+              decoded,
+              reason: 'missing_target_player_index',
             );
             return;
           }

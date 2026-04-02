@@ -415,6 +415,51 @@ void main() {
       });
     });
 
+    testWidgets('rejects player fallback requests without target player index', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-state","source":"player_option_card_presented"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_rejected',
+                ) &&
+                message.contains('message_type: open-native-player-state') &&
+                message.contains('domain_key: player_state') &&
+                message.contains('source: player_option_card_presented') &&
+                message.contains('reason: missing_target_player_index'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets('exports native history from a shell fallback shortcut', (
       tester,
     ) async {
