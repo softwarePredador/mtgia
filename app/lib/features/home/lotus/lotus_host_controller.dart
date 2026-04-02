@@ -128,9 +128,13 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   }
   if (derivedSession != null) {
     await sessionStore.save(derivedSession);
+  } else {
+    await sessionStore.clear();
   }
   if (derivedSettings != null) {
     await settingsStore.save(derivedSettings);
+  } else {
+    await settingsStore.clear();
   }
   if (derivedGameTimer != null) {
     await gameTimerStateStore.save(derivedGameTimer);

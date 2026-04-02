@@ -41,6 +41,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `player appearance profile select` agora tambem expõe `persistence_strategy: owned_profile_store`, separando o uso de preset salvo no draft da sheet dos eventos de apply do runtime de jogador
 - o fallback bootstrap do host agora tambem tem cobertura unitaria direta para `day/night`, `session/settings/timer/history`, `history-only` e `day/night-only`, provando que o payload Lotus pode ser reconstruido a partir das stores canonicas sem snapshot persistido
 - o host agora tambem espelha `__manaloom_day_night_mode` do `persist_snapshot` para a `LifeCounterDayNightStateStore`, e limpa store stale quando a chave some do snapshot Lotus
+- o mirror canonico do host agora tambem limpa `LifeCounterSessionStore` e `LifeCounterSettingsStore` quando o snapshot Lotus nao traz mais `players` ou `gameSettings`, evitando reopen com estado stale reidratado do nosso lado
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 
 ## Reading rule
@@ -164,6 +165,7 @@ Complemento desta rodada:
 - `table state` ja tem um caso seguro de sync incremental sem `reload` para `storm`, `monarch` e `initiative`; `storm` fecha por patch no payload canonico, e `monarch/initiative` continuam exigindo `.player-card` presentes e `menu-button` sincronizada para o ajuste visual no DOM do Lotus
 - `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca
 - `day/night` agora tambem e reespelhado do `persist_snapshot` Lotus para a store canonica, o que mantem o fallback `canonical -> bootstrap` coerente mesmo depois de interacoes visuais que partem do bundle
+- `session` e `settings` agora tambem sao limpas do lado canonico quando o snapshot Lotus nao traz mais `players` ou `gameSettings`, evitando que o fallback `canonical -> bootstrap` ressuscite estado stale apos reset ou snapshot parcial
 - `game modes` embutidos agora tambem so registram sucesso quando o seletor de abertura, o follow-up de `edit cards` ou o seletor de fechamento existe no DOM real do Lotus; o passo de card pool agora e confirmado em chamada separada, sem `setTimeout` fire-and-forget, e a telemetria de dismiss passa a indicar `action_delivered`
 - `turn tracker`, `game timer` e `table state` agora tambem registram `live_patch_eligible` e `apply_strategy`, separando visualmente no log quando o estado foi aplicado live e quando caiu em `reload`
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, deixando explicito quando a troca foi aplicada live e quando o host precisou recarregar o bundle

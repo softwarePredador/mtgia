@@ -3,7 +3,9 @@ import 'package:manaloom/features/home/life_counter/life_counter_day_night_state
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_host_controller.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
@@ -60,6 +62,36 @@ void main() {
       final storedState = await dayNightStateStore.load();
       expect(result.dayNightState, isNull);
       expect(storedState, isNull);
+    });
+
+    test('clears stale canonical session and settings when Lotus snapshot omits them', () async {
+      await sessionStore.save(
+        LifeCounterSession.initial(playerCount: 4).copyWith(
+          lives: const [30, 30, 30, 30],
+        ),
+      );
+      await settingsStore.save(
+        LifeCounterSettings.defaults.copyWith(
+          autoKill: true,
+          gameTimer: true,
+        ),
+      );
+
+      final result = await persistCanonicalMirrorFromLotusSnapshot(
+        dayNightStateStore: dayNightStateStore,
+        gameTimerStateStore: gameTimerStateStore,
+        historyStore: historyStore,
+        sessionStore: sessionStore,
+        settingsStore: settingsStore,
+        snapshot: const LotusStorageSnapshot(values: {}),
+      );
+
+      final storedSession = await sessionStore.load();
+      final storedSettings = await settingsStore.load();
+      expect(result.session, isNull);
+      expect(result.settings, isNull);
+      expect(storedSession, isNull);
+      expect(storedSettings, isNull);
     });
   });
 }
