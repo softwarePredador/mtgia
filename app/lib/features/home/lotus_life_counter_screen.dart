@@ -55,6 +55,7 @@ class LotusLifeCounterScreen extends StatefulWidget {
 }
 
 class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
+  static const int _maxLiveSetLifeDelta = 5;
   static const int _maxLiveTurnTrackerBackwardSteps = 3;
   static const int _turnTrackerLongPressDurationMs = 1100;
   static const int _turnTrackerLongPressCycleMs = 1150;
@@ -3031,11 +3032,38 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
     required int targetPlayerIndex,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
-    const livePatchEligible = false;
-    const applyStrategy = 'reload_fallback';
-    const syncBlockers = <String>['life_total_rendered_on_lotus_surface'];
+    final settings = await _loadOwnedLifeCounterSettings();
+    final delta =
+        adjustedSession.lives[targetPlayerIndex] -
+        previousSession.lives[targetPlayerIndex];
+    final syncBlockers = _setLifeLivePatchBlockers(
+      previousSession,
+      adjustedSession,
+      targetPlayerIndex: targetPlayerIndex,
+      settings: settings,
+    );
+    final livePatchEligible = syncBlockers.isEmpty;
+    final failureReason =
+        livePatchEligible
+            ? await _applyOwnedSetLifeRuntimeFailureReason(
+              targetPlayerIndex: targetPlayerIndex,
+              delta: delta,
+            )
+            : null;
+    final appliedLive = livePatchEligible && failureReason == null;
+    final applyStrategy = appliedLive ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !appliedLive;
+    final effectiveSyncBlockers =
+        appliedLive
+            ? const <String>[]
+            : (syncBlockers.isNotEmpty
+                ? syncBlockers
+                : <String>[failureReason ?? 'life_runtime_rejected']);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3047,12 +3075,154 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'life': adjustedSession.lives[targetPlayerIndex],
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
-          'sync_blockers': syncBlockers,
+          'reload_required': reloadRequired,
+          'sync_blockers': effectiveSyncBlockers,
         },
       ),
     );
 
+    if (!reloadRequired) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  List<String> _setLifeLivePatchBlockers(
+    LifeCounterSession previous,
+    LifeCounterSession next, {
+    required int targetPlayerIndex,
+    required LifeCounterSettings settings,
+  }) {
+    final blockers = <String>[];
+    if (targetPlayerIndex < 0 || targetPlayerIndex >= next.playerCount) {
+      blockers.add('target_player_missing');
+      return blockers;
+    }
+
+    if (!LifeCounterTabletopEngine.isPlayerActiveOnTable(
+      previous,
+      playerIndex: targetPlayerIndex,
+    )) {
+      blockers.add('previous_target_inactive');
+    }
+
+    final delta =
+        next.lives[targetPlayerIndex] - previous.lives[targetPlayerIndex];
+    if (delta == 0) {
+      blockers.add('life_delta_zero');
+    }
+    if (delta.abs() > _maxLiveSetLifeDelta) {
+      blockers.add('life_delta_exceeds_live_limit');
+    }
+    if (next.lives[targetPlayerIndex] <= 0 && !settings.autoKill) {
+      blockers.add('life_lethal_without_auto_kill');
+    }
+
+    final expectedLives = List<int>.from(previous.lives);
+    expectedLives[targetPlayerIndex] = next.lives[targetPlayerIndex];
+    final expected = previous.copyWith(
+      lives: expectedLives,
+      lastTableEvent: next.lastTableEvent,
+      clearLastTableEvent: next.lastTableEvent == null,
+    );
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_target_life');
+    }
+    return blockers;
+  }
+
+  Future<String?> _applyOwnedSetLifeRuntimeFailureReason({
+    required int targetPlayerIndex,
+    required int delta,
+  }) async {
+    if (delta == 0) {
+      return 'life_delta_zero';
+    }
+
+    final selector =
+        delta > 0 ? '.increase-button.life' : '.decrease-button.life';
+    final steps = delta.abs();
+
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const playerCards = Array.from(document.querySelectorAll('.player-card'));
+    const targetCard = playerCards[$targetPlayerIndex];
+    if (!(targetCard instanceof HTMLElement)) {
+      return JSON.stringify({ ok: false, reason: 'player_card_missing' });
+    }
+
+    const button = targetCard.querySelector('$selector');
+    if (!(button instanceof HTMLElement)) {
+      return JSON.stringify({ ok: false, reason: 'life_button_missing' });
+    }
+
+    const dispatchTap = () => {
+      const downEvent =
+        typeof PointerEvent === 'function'
+          ? new PointerEvent('pointerdown', {
+              bubbles: true,
+              cancelable: true,
+              pointerId: 1,
+              pointerType: 'touch',
+              isPrimary: true,
+              button: 0,
+              buttons: 1,
+            })
+          : new MouseEvent('mousedown', {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+              button: 0,
+            });
+      const upEvent =
+        typeof PointerEvent === 'function'
+          ? new PointerEvent('pointerup', {
+              bubbles: true,
+              cancelable: true,
+              pointerId: 1,
+              pointerType: 'touch',
+              isPrimary: true,
+              button: 0,
+              buttons: 0,
+            })
+          : new MouseEvent('mouseup', {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+              button: 0,
+            });
+      button.dispatchEvent(downEvent);
+      button.dispatchEvent(upEvent);
+      button.click();
+    };
+
+    for (let index = 0; index < $steps; index += 1) {
+      dispatchTap();
+    }
+
+    return JSON.stringify({
+      ok: true,
+      steps: $steps,
+      selector: '$selector',
+    });
+  } catch (_) {}
+  return JSON.stringify({ ok: false, reason: 'life_runtime_apply_failed' });
+})();
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      if (decoded is Map<String, dynamic> && decoded['ok'] == true) {
+        return null;
+      }
+      if (decoded is Map<String, dynamic>) {
+        return decoded['reason'] as String? ?? 'life_runtime_rejected';
+      }
+    } catch (_) {
+      return 'life_runtime_apply_failed';
+    }
+    return 'life_runtime_rejected';
   }
 
   Future<void> _openNativeTableStateSheet({required String source}) async {

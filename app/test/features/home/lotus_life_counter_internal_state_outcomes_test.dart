@@ -45,6 +45,12 @@ class _FakeLotusHost implements LotusHost {
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
+    if (script.contains('.increase-button.life') ||
+        script.contains('.decrease-button.life') ||
+        script.contains('.player-card')) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
     return jsonEncode(<String, Object>{
       'planechaseAvailable': true,
       'planechaseActive': false,
@@ -365,7 +371,7 @@ void main() {
       expect(session, isNotNull);
       expect(session!.lives[1], 0);
       expect(session.lastTableEvent, 'Jogador 2 foi nocauteado');
-      expect(host.loadBundleCallCount, 2);
+      expect(host.loadBundleCallCount, 1);
     });
   });
 }

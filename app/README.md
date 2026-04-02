@@ -74,6 +74,7 @@ Estado vivo do contador hoje:
 - `player state` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando a sheet so altera dados canonicos de rolagem, reaproveitando o mesmo criterio conservador de `dice`
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
+- o atalho direto de `set life` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mudanca fica limitada a um delta curto de vida no jogador alvo e o runtime real do Lotus confirma os controles da mesa
 - `settings` continua `reload-only` por seguranca do bundle Lotus, e agora tambem anota isso explicitamente na observabilidade de apply com `live_patch_eligible: false` e `apply_strategy: reload_fallback`
 - `history` e `card search` continuam Lotus-first visuais, e as sheets internas agora anotam explicitamente `surface_strategy: native_fallback`; `history export` tambem anota `transfer_strategy: clipboard_export`
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que a troca real acontece no estado canonico sem rebootar o bundle
@@ -190,7 +191,7 @@ Estado vivo do contador hoje:
 - `dice` e `player state` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um recorte baseado em rolagem caiu em `reload_fallback`
 - `turn tracker` e `game timer` agora tambem anotam `sync_blockers`, deixando explicito na observabilidade por que um apply caiu em `reload_fallback` mesmo dentro da familia de live sync
 - `day/night` e `table state` agora tambem anotam `sync_blockers` com o `reason` real devolvido pelo runtime do Lotus, deixando explicito quando o fallback veio de falha concreta de DOM/runtime e nao de bloqueio arquitetural previo
-- `settings`, `player appearance` e `set life` agora tambem anotam `sync_blockers`, deixando explicito no log quando o fallback e puramente arquitetural: runtime de settings em memoria propria do Lotus, aparencia ainda acoplada a superficie visual do board e vida renderizada diretamente na mesa
+- `settings` e `player appearance` continuam anotando `sync_blockers` puramente arquiteturais; em `set life`, os blockers agora tambem deixam explicito quando o fallback veio de delta acima do limite live, jogador previamente inativo, vida letal sem `autoKill` ou mudanca fora do contrato do jogador alvo
 - `settings` agora tambem anota `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que esse dominio continua dependente de rehydrate completo
 - `history` e `card search` agora tambem anotam `surface_strategy: native_fallback` nos eventos da sheet interna, deixando explicito no log que esses atalhos sao suporte nativo e nao takeover visual principal
 - `history import` agora tambem anota `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito no log que esse fluxo faz sync canonico sem apply live no Lotus
