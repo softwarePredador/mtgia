@@ -2320,10 +2320,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     if (settings.lifeLossOnCommanderDamage) {
       blockers.add('life_loss_on_commander_damage_enabled');
     }
-    if (settings.showCountersOnPlayerCard) {
+    if (_commanderDamageCountersVisibleOnPlayerCard(settings)) {
       blockers.add('show_counters_on_player_card_enabled');
-    }
-    if (settings.showCommanderDamageCounters) {
       blockers.add('show_commander_damage_counters_enabled');
     }
 
@@ -2791,7 +2789,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required LifeCounterSettings settings,
   }) {
     final blockers = <String>[];
-    if (settings.showCountersOnPlayerCard) {
+    if (_regularCountersVisibleOnPlayerCard(settings)) {
       blockers.add('show_counters_on_player_card_enabled');
     }
 
@@ -3109,7 +3107,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required LifeCounterSettings settings,
   }) {
     final blockers = <String>[];
-    if (settings.showCountersOnPlayerCard) {
+    if (_regularCountersVisibleOnPlayerCard(settings)) {
       blockers.add('show_counters_on_player_card_enabled');
     }
 
@@ -3120,6 +3118,17 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       blockers.add('session_change_outside_hidden_partner_commander');
     }
     return blockers;
+  }
+
+  bool _regularCountersVisibleOnPlayerCard(LifeCounterSettings settings) {
+    return settings.showCountersOnPlayerCard && settings.showRegularCounters;
+  }
+
+  bool _commanderDamageCountersVisibleOnPlayerCard(
+    LifeCounterSettings settings,
+  ) {
+    return settings.showCountersOnPlayerCard &&
+        settings.showCommanderDamageCounters;
   }
 
   int? _singleChangedLifePlayerIndex(
