@@ -1247,6 +1247,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       session: session,
       snapshot: snapshot,
     );
+    final historyDomainPresent = _hasHistoryDomain(
+      historyState: historyState,
+      snapshot: snapshot,
+    );
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1255,6 +1259,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'surface_strategy': surfaceStrategy,
+          'history_domain_present': historyDomainPresent,
           'current_game_events': history.currentGameEventCount,
           'archived_games': history.archivedGameCount,
           'archived_events': history.archivedEventCount,
@@ -1265,7 +1270,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     await showLifeCounterNativeHistorySheet(
       context,
       history: history,
-      onExportPressed: () => _exportNativeHistory(history, source: source),
+      onExportPressed:
+          () => _exportNativeHistory(
+            history,
+            source: source,
+            historyDomainPresent: historyDomainPresent,
+          ),
       onImportSubmitted:
           (rawPayload) => _importNativeHistory(rawPayload, source: source),
     );
@@ -1282,6 +1292,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: {
           'source': source,
           'had_content': history.hasContent,
+          'history_domain_present': historyDomainPresent,
           'surface_strategy': surfaceStrategy,
         },
       ),
@@ -1291,6 +1302,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   Future<void> _exportNativeHistory(
     LifeCounterHistorySnapshot history, {
     required String source,
+    required bool historyDomainPresent,
   }) async {
     const surfaceStrategy = 'native_fallback';
     const transferStrategy = 'clipboard_export';
@@ -1304,6 +1316,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'source': source,
           'surface_strategy': surfaceStrategy,
           'transfer_strategy': transferStrategy,
+          'history_domain_present': historyDomainPresent,
           'current_game_events': history.currentGameEventCount,
           'archived_events': history.archivedEventCount,
         },
@@ -1403,12 +1416,32 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'transfer_strategy': transferStrategy,
           'apply_strategy': 'canonical_store_sync',
           'reload_required': false,
+          'history_domain_present': true,
           'current_game_events': transfer.currentGameEntries.length,
           'archived_events': transfer.archiveEntries.length,
         },
       ),
     );
     return true;
+  }
+
+  bool _hasHistoryDomain({
+    required LifeCounterHistoryState? historyState,
+    required LotusStorageSnapshot? snapshot,
+  }) {
+    if (historyState != null) {
+      return true;
+    }
+
+    final values = snapshot?.values;
+    if (values == null) {
+      return false;
+    }
+
+    return values.containsKey('gameHistory') ||
+        values.containsKey('allGamesHistory') ||
+        values.containsKey('currentGameMeta') ||
+        values.containsKey('gameCounter');
   }
 
   Future<void> _openNativeCardSearchSheet({required String source}) async {

@@ -58,6 +58,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o round-trip de `history` meta-only agora tambem tem cobertura direta na store canonica e no fallback `history-only`, provando que `currentGameMeta/gameCounter` seguem reidrataveis mesmo sem `gameHistory`
 - o fallback canônico agora tambem cobre explicitamente `session + history` meta-only, provando que o payload de `history` canonico continua prevalecendo sobre o bootstrap default da sessao
 - `game modes` agora tambem expõem `core_scope: excluded_from_canonical_core` em open, dismiss e falha de entrega, deixando explicito que esse dominio continua fora da matriz de ownership canonico desta fase
+- a shell de `history` agora tambem expõe `history_domain_present`, deixando explicito quando `currentGameMeta/gameCounter` existem mesmo sem `gameHistory` ou `allGamesHistory` com entradas
 - a deduplicacao de observabilidade do `persist_snapshot` agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 

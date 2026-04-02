@@ -248,7 +248,8 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_history_opened') &&
-                message.contains('surface_strategy: native_fallback'),
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains('history_domain_present: true'),
           ),
           isTrue,
         );
@@ -313,7 +314,8 @@ void main() {
             (message) =>
                 message.contains('message=native_history_exported') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains('transfer_strategy: clipboard_export'),
+                message.contains('transfer_strategy: clipboard_export') &&
+                message.contains('history_domain_present: true'),
           ),
           isTrue,
         );
@@ -408,7 +410,8 @@ void main() {
                   message.contains('surface_strategy: native_fallback') &&
                   message.contains('transfer_strategy: clipboard_import') &&
                   message.contains('apply_strategy: canonical_store_sync') &&
-                  message.contains('reload_required: false'),
+                  message.contains('reload_required: false') &&
+                  message.contains('history_domain_present: true'),
             ),
             isTrue,
           );
