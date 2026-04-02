@@ -202,6 +202,7 @@ Complemento desta rodada:
 - `history import` continua sem apply de runtime no Lotus, mas agora o log deixa explicito quando houve sync canonico real no ManaLoom sem `reload`
 - nas utility sheets, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, sem implicar takeover visual do Lotus
 - nas sheets de runtime de jogador, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, sem implicar takeover visual do Lotus
+- em `game modes`, a observabilidade agora tambem deixa explicito quando a interacao ficou restrita ao suporte nativo interno, com `surface_strategy: native_fallback` em open, dismiss e falha de entrega
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a transporte por clipboard
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a persistencia propria de perfis ManaLoom-owned
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a carregar um preset salvo no draft da sheet, sem apply real na mesa

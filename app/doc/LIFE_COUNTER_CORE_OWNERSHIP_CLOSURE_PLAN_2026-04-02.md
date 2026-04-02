@@ -236,6 +236,7 @@ Leitura operacional atual:
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`
 - nas utility sheets (`settings`, `day/night`, `turn tracker`, `game timer`, `dice`, `table state`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
 - nas sheets de runtime de jogador (`commander damage`, `player appearance`, `player counter`, `player state`, `set life`), a observabilidade agora tambem deixa explicito quando a interacao passou por suporte interno nativo, sem confundir a abertura da sheet com takeover visual principal
+- em `game modes`, os eventos de open, dismiss e falha de entrega agora tambem expõem `surface_strategy: native_fallback`, alinhando essa shell Lotus-first ao mesmo contrato observavel das outras superfices internas
 - em `player appearance`, os eventos auxiliares de export/import agora tambem deixam explicito quando o fluxo passou por clipboard, em vez de parecer mutacao direta do runtime
 - em `player appearance`, os eventos auxiliares de save/delete de perfil agora tambem deixam explicito quando o fluxo passou por persistencia propria do ManaLoom, em vez de parecer mutacao direta do runtime Lotus
 - em `player appearance`, a selecao de perfil salvo agora tambem fica observavel como uso de preset ManaLoom-owned no draft da sheet, sem parecer apply real da mesa

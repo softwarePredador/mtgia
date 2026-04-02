@@ -326,48 +326,68 @@ void main() {
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-game-modes","source":"planechase_mode_pressed","preferredMode":"planechase"}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-game-modes","source":"planechase_mode_pressed","preferredMode":"planechase"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Game Modes'), findsOneWidget);
-      expect(find.text('Selected Surface'), findsOneWidget);
-      expect(find.text('Continue With Planechase'), findsOneWidget);
+        expect(find.text('Game Modes'), findsOneWidget);
+        expect(find.text('Selected Surface'), findsOneWidget);
+        expect(find.text('Continue With Planechase'), findsOneWidget);
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-game-modes-planechase-open')),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(
+            const Key('life-counter-native-game-modes-planechase-open'),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(
-        host.executedScripts.any(
-          (script) =>
-              script.contains("document.querySelector('.planechase-btn')") &&
-              script.contains('button.click()'),
-        ),
-        isTrue,
-      );
+        expect(
+          host.executedScripts.any(
+            (script) =>
+                script.contains("document.querySelector('.planechase-btn')") &&
+                script.contains('button.click()'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_game_modes_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_game_modes_dismissed') &&
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains('action_delivered: true'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets(
@@ -675,7 +695,8 @@ void main() {
           expect(
             logs.any(
               (message) =>
-                  message.contains('message=native_game_modes_action_failed'),
+                  message.contains('message=native_game_modes_action_failed') &&
+                  message.contains('surface_strategy: native_fallback'),
             ),
             isTrue,
           );
@@ -683,6 +704,7 @@ void main() {
             logs.any(
               (message) =>
                   message.contains('message=native_game_modes_dismissed') &&
+                  message.contains('surface_strategy: native_fallback') &&
                   message.contains('action_delivered: false'),
             ),
             isTrue,
