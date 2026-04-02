@@ -97,6 +97,7 @@ Estado vivo do contador hoje:
 - o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, `session`, `settings`, `timer`, `history`, `history-only` e `day/night-only`
 - o host agora tambem espelha `day/night` do `persist_snapshot` Lotus para a store canonica, e limpa estado stale quando `__manaloom_day_night_mode` some do snapshot
 - o mirror canonico do host agora tambem limpa `session` e `settings` stale quando o snapshot Lotus deixa de trazer `players` ou `gameSettings`, evitando reopen com estado antigo reidratado do nosso lado
+- o mirror canonico do host agora tambem preserva `history` meta-only (`currentGameMeta` / `gameCounter`) quando o snapshot Lotus traz o dominio sem entradas, evitando perder esse estado canonico logo no primeiro espelhamento
 - a deduplicacao de observabilidade do `persist_snapshot` no host agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - o merge de bootstrap do host agora tambem poda chaves stale de `session`, `settings`, `game timer`, `day/night` e `history` quando o fallback canonico daquele dominio nao existe mais, evitando que um snapshot Lotus salvo ressuscite estado antigo no reopen
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`

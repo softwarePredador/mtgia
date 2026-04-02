@@ -54,6 +54,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - o fallback bootstrap do host agora tambem tem cobertura unitaria direta para `day/night`, `session/settings/timer/history`, `history-only` e `day/night-only`, provando que o payload Lotus pode ser reconstruido a partir das stores canonicas sem snapshot persistido
 - o host agora tambem espelha `__manaloom_day_night_mode` do `persist_snapshot` para a `LifeCounterDayNightStateStore`, e limpa store stale quando a chave some do snapshot Lotus
 - o mirror canonico do host agora tambem limpa `LifeCounterSessionStore` e `LifeCounterSettingsStore` quando o snapshot Lotus nao traz mais `players` ou `gameSettings`, evitando reopen com estado stale reidratado do nosso lado
+- o mirror canonico do host agora tambem preserva `history` meta-only (`currentGameMeta` / `gameCounter`) quando o snapshot Lotus traz o dominio sem entradas, evitando limpar cedo demais uma parte que ja e canonica
 - a deduplicacao de observabilidade do `persist_snapshot` agora tambem considera `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro mirror canonico desses dominios na mesma carga do Lotus
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 

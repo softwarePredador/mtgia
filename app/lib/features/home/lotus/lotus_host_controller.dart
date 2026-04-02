@@ -162,6 +162,7 @@ class LotusCanonicalMirrorResult {
     required this.dayNightState,
     required this.gameTimerState,
     required this.history,
+    required this.historyDomainPresent,
     required this.session,
     required this.settings,
   });
@@ -169,8 +170,13 @@ class LotusCanonicalMirrorResult {
   final LifeCounterDayNightState? dayNightState;
   final LifeCounterGameTimerState? gameTimerState;
   final LifeCounterHistoryState history;
+  final bool historyDomainPresent;
   final LifeCounterSession? session;
   final LifeCounterSettings? settings;
+}
+
+bool hasLotusHistoryDomain(LotusStorageSnapshot snapshot) {
+  return _lotusHistoryBootstrapKeys.any(snapshot.values.containsKey);
 }
 
 Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
@@ -181,6 +187,7 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   required LifeCounterSettingsStore settingsStore,
   required LotusStorageSnapshot snapshot,
 }) async {
+  final historyDomainPresent = hasLotusHistoryDomain(snapshot);
   final derivedDayNight = buildLotusDayNightStateFromSnapshot(snapshot);
   final derivedSession = LotusLifeCounterSessionAdapter.tryBuildSession(
     snapshot,
@@ -216,7 +223,7 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   } else {
     await gameTimerStateStore.clear();
   }
-  if (derivedHistory.hasContent) {
+  if (historyDomainPresent || derivedHistory.hasContent) {
     await historyStore.save(derivedHistory);
   } else {
     await historyStore.clear();
@@ -226,6 +233,7 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
     dayNightState: derivedDayNight,
     gameTimerState: derivedGameTimer,
     history: derivedHistory,
+    historyDomainPresent: historyDomainPresent,
     session: derivedSession,
     settings: derivedSettings,
   );
@@ -238,6 +246,7 @@ bool shouldSkipLotusStoragePersistObservability({
   required bool didRecordCanonicalGameTimerMirrorThisLoad,
   required bool didRecordCanonicalDayNightMirrorThisLoad,
   required bool didRecordCanonicalHistoryMirrorThisLoad,
+  required bool historyDomainPresent,
   required LifeCounterSession? derivedSession,
   required LifeCounterSettings? derivedSettings,
   required LifeCounterGameTimerState? derivedGameTimer,
@@ -252,7 +261,8 @@ bool shouldSkipLotusStoragePersistObservability({
       (derivedSettings == null || didRecordCanonicalSettingsMirrorThisLoad) &&
       (derivedDayNight == null || didRecordCanonicalDayNightMirrorThisLoad) &&
       (derivedGameTimer == null || didRecordCanonicalGameTimerMirrorThisLoad) &&
-      (!derivedHistory.hasContent || didRecordCanonicalHistoryMirrorThisLoad);
+      (!(historyDomainPresent || derivedHistory.hasContent) ||
+          didRecordCanonicalHistoryMirrorThisLoad);
 }
 
 class LotusHostController implements LotusHost {
@@ -447,6 +457,7 @@ class LotusHostController implements LotusHost {
     final derivedDayNight = mirror.dayNightState;
     final derivedGameTimer = mirror.gameTimerState;
     final derivedHistory = mirror.history;
+    final historyDomainPresent = mirror.historyDomainPresent;
     final derivedSession = mirror.session;
     final derivedSettings = mirror.settings;
 
@@ -462,6 +473,7 @@ class LotusHostController implements LotusHost {
           _didRecordCanonicalDayNightMirrorThisLoad,
       didRecordCanonicalHistoryMirrorThisLoad:
           _didRecordCanonicalHistoryMirrorThisLoad,
+      historyDomainPresent: historyDomainPresent,
       derivedSession: derivedSession,
       derivedSettings: derivedSettings,
       derivedGameTimer: derivedGameTimer,
@@ -539,7 +551,7 @@ class LotusHostController implements LotusHost {
       );
     }
 
-    if (derivedHistory.hasContent &&
+    if ((historyDomainPresent || derivedHistory.hasContent) &&
         !_didRecordCanonicalHistoryMirrorThisLoad) {
       _didRecordCanonicalHistoryMirrorThisLoad = true;
       unawaited(
@@ -547,6 +559,7 @@ class LotusHostController implements LotusHost {
           'canonical_history_mirrored_from_lotus',
           category: 'life_counter.history',
           data: {
+            'history_domain_present': historyDomainPresent,
             'current_game_entries': derivedHistory.currentGameEntries.length,
             'archive_entries': derivedHistory.archiveEntries.length,
             'game_counter': derivedHistory.gameCounter,

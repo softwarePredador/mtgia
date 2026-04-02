@@ -22,6 +22,7 @@ void main() {
         didRecordCanonicalGameTimerMirrorThisLoad: true,
         didRecordCanonicalDayNightMirrorThisLoad: true,
         didRecordCanonicalHistoryMirrorThisLoad: true,
+        historyDomainPresent: false,
         derivedSession: LifeCounterSession.initial(playerCount: 4),
         derivedSettings: null,
         derivedGameTimer: null,
@@ -44,6 +45,7 @@ void main() {
         didRecordCanonicalGameTimerMirrorThisLoad: true,
         didRecordCanonicalDayNightMirrorThisLoad: true,
         didRecordCanonicalHistoryMirrorThisLoad: false,
+        historyDomainPresent: true,
         derivedSession: null,
         derivedSettings: null,
         derivedGameTimer: null,
@@ -72,6 +74,7 @@ void main() {
         didRecordCanonicalGameTimerMirrorThisLoad: true,
         didRecordCanonicalDayNightMirrorThisLoad: true,
         didRecordCanonicalHistoryMirrorThisLoad: true,
+        historyDomainPresent: false,
         derivedSession: LifeCounterSession.initial(playerCount: 4),
         derivedSettings: null,
         derivedGameTimer: null,
@@ -90,6 +93,30 @@ void main() {
       );
 
       expect(shouldSkip, isTrue);
+    });
+
+    test('keeps history mirror observable for metadata-only history domain', () {
+      final shouldSkip = shouldSkipLotusStoragePersistObservability(
+        didRecordStoragePersistThisLoad: true,
+        didRecordCanonicalSessionMirrorThisLoad: true,
+        didRecordCanonicalSettingsMirrorThisLoad: true,
+        didRecordCanonicalGameTimerMirrorThisLoad: true,
+        didRecordCanonicalDayNightMirrorThisLoad: true,
+        didRecordCanonicalHistoryMirrorThisLoad: false,
+        historyDomainPresent: true,
+        derivedSession: null,
+        derivedSettings: null,
+        derivedGameTimer: null,
+        derivedDayNight: null,
+        derivedHistory: const LifeCounterHistoryState(
+          currentGameEntries: [],
+          archiveEntries: [],
+          archivedGameCount: 0,
+          gameCounter: 4,
+        ),
+      );
+
+      expect(shouldSkip, isFalse);
     });
   });
 
@@ -182,5 +209,31 @@ void main() {
         expect(storedSettings, isNull);
       },
     );
+
+    test('persists metadata-only canonical history from Lotus snapshot', () async {
+      final result = await persistCanonicalMirrorFromLotusSnapshot(
+        dayNightStateStore: dayNightStateStore,
+        gameTimerStateStore: gameTimerStateStore,
+        historyStore: historyStore,
+        sessionStore: sessionStore,
+        settingsStore: settingsStore,
+        snapshot: const LotusStorageSnapshot(
+          values: {
+            'currentGameMeta': '{"id":"game-12","name":"Game #12"}',
+            'gameCounter': '12',
+          },
+        ),
+      );
+
+      final storedHistory = await historyStore.load();
+      expect(result.historyDomainPresent, isTrue);
+      expect(result.history.currentGameMeta?['id'], 'game-12');
+      expect(result.history.gameCounter, 12);
+      expect(result.history.hasContent, isFalse);
+      expect(storedHistory, isNotNull);
+      expect(storedHistory!.currentGameMeta?['id'], 'game-12');
+      expect(storedHistory.gameCounter, 12);
+      expect(storedHistory.hasContent, isFalse);
+    });
   });
 }
