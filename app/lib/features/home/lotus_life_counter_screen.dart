@@ -1967,10 +1967,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
     final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
     await _persistOwnedSessionSnapshot(adjustedSession);
+    final canonicalSyncEligible = _canApplyCanonicalDiceSessionWithoutReload(
+      previousSession,
+      adjustedSession,
+    );
     const livePatchEligible = false;
-    const applyStrategy = 'reload_fallback';
+    final applyStrategy =
+        canonicalSyncEligible ? 'canonical_store_sync' : 'reload_fallback';
+    final reloadRequired = !canonicalSyncEligible;
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1984,11 +1993,35 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
               adjustedSession.lastHighRolls.whereType<int>().isNotEmpty,
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
+          'reload_required': reloadRequired,
         },
       ),
     );
 
+    if (!reloadRequired) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  bool _canApplyCanonicalDiceSessionWithoutReload(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    if (previous.turnTrackerActive || next.turnTrackerActive) {
+      return false;
+    }
+
+    final expected = previous.copyWith(
+      lastPlayerRolls: next.lastPlayerRolls,
+      lastHighRolls: next.lastHighRolls,
+      firstPlayerIndex: next.firstPlayerIndex,
+      clearFirstPlayerIndex: next.firstPlayerIndex == null,
+      lastTableEvent: next.lastTableEvent,
+      clearLastTableEvent: next.lastTableEvent == null,
+    );
+    return expected.toJsonString() == next.toJsonString();
   }
 
   Future<void> _openNativeCommanderDamageSheet({

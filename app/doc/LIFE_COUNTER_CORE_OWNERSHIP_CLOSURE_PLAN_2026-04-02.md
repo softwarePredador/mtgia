@@ -54,7 +54,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - handoffs embutidos de `Game Modes` agora confirmam que o seletor primario, o seletor de `edit cards` e os seletores de fechamento existem no DOM do Lotus antes de registrar sucesso; seletor ausente passa a gerar falha observavel em vez de sucesso silencioso, e o dismiss da shell agora diferencia acao escolhida de acao realmente entregue
 - `turn tracker`, `game timer` e `table state` agora tambem registram na observabilidade se a aplicacao fechou por `live_runtime` ou `reload_fallback`, junto do sinal de elegibilidade do patch live
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, fechando o mesmo contrato observavel dos dominios com live apply/fallback
-- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem registram explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando claro que esses dominios ainda sao `reload-only`
+- `dice` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o `turn tracker` esta inativo e a mutacao fica restrita ao resultado canonico de rolagem; `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam `reload-only`
 - `settings` agora tambem registra explicitamente `live_patch_eligible: false` e `apply_strategy: reload_fallback`, alinhando a telemetria com a decisao arquitetural de manter esse dominio fora do live sync
 - `history` e `card search` agora registram `surface_strategy: native_fallback` nos eventos da shell interna, deixando explicito que esses fluxos sao apoio tecnico e nao apply de runtime do Lotus
 - `history import` agora tambem registra `transfer_strategy: clipboard_import`, `apply_strategy: canonical_store_sync` e `reload_required: false`, deixando explicito que o dominio muda primeiro no contrato canonico sem rebootar o bundle
@@ -198,7 +198,7 @@ Estado final desejado:
 
 Leitura operacional atual:
 
-- `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso aparece de forma explicita na telemetria de apply, sem parecer live sync parcial
+- `dice` agora tambem pode fechar por `canonical_store_sync` sem rebootar o bundle quando a shell so altera resultado canonico de rolagem com `turn tracker` inativo; `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`
 - `settings` continua em `reload` por seguranca do bundle Lotus, e agora isso tambem aparece de forma explicita na telemetria de apply
 - `history` e `card search` seguem Lotus-first visualmente; quando a shell interna entra em cena, a observabilidade agora marca isso explicitamente como `native_fallback`
 - `history import` continua vindo pela sheet interna quando necessario, mas a observabilidade agora deixa explicito que a mudanca real acontece por sync canonico no ManaLoom, sem `reload`

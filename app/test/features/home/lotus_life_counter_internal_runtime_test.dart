@@ -1359,7 +1359,8 @@ void main() {
         final session = await LifeCounterSessionStore().load();
         expect(session, isNotNull);
         expect(session!.lastHighRolls.whereType<int>().length, 4);
-        expect(host.loadBundleCallCount, 2);
+        expect(session.firstPlayerIndex, isNotNull);
+        expect(host.loadBundleCallCount, 1);
         expect(
           logs.any(
             (message) =>
@@ -1372,8 +1373,9 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_dice_applied') &&
-                message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false'),
+                message.contains('apply_strategy: canonical_store_sync') &&
+                message.contains('live_patch_eligible: false') &&
+                message.contains('reload_required: false'),
           ),
           isTrue,
         );
