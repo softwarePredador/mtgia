@@ -214,6 +214,20 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains(
+                  'message=native_fallback_surface_requested',
+                ) &&
+                message.contains('message_type: open-native-player-state') &&
+                message.contains(
+                  'fallback_classification: ownership_bridge',
+                ) &&
+                message.contains('target_player_index: 1'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_player_state_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
                 message.contains(

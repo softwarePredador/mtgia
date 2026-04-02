@@ -49,6 +49,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `settings`, `day/night`, `turn tracker`, `game timer`, `dice` e `table state` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna assume o fluxo, padronizando a leitura das superfices utilitarias Lotus-first
 - `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna assume o fluxo, padronizando a leitura do runtime de jogador Lotus-first
 - os fluxos `open-native-*` agora tambem expõem `fallback_classification`, separando `ownership_bridge`, `support_utility` e `excluded_core_support` na propria trilha observavel da shell
+- a propria entrada da shell agora tambem registra `native_fallback_surface_requested` para cada `open-native-*`, fechando a auditoria de classificacao ja na borda do host
 - `player appearance export/import` agora tambem expõem `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos de clipboard dos eventos de apply do runtime de jogador
 - `player appearance profile save/delete` agora tambem expõem `persistence_strategy: owned_profile_store`, separando a store propria de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `player appearance profile select` agora tambem expõe `persistence_strategy: owned_profile_store`, separando o uso de preset salvo no draft da sheet dos eventos de apply do runtime de jogador

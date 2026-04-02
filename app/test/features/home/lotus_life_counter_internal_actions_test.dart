@@ -358,6 +358,22 @@ void main() {
         expect(find.text('Selected Surface'), findsOneWidget);
         expect(find.text('Continue With Planechase'), findsOneWidget);
 
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_requested',
+                ) &&
+                message.contains('message_type: open-native-game-modes') &&
+                message.contains(
+                  'fallback_classification: excluded_core_support',
+                ) &&
+                message.contains(
+                  'core_scope: excluded_from_canonical_core',
+                ),
+          ),
+          isTrue,
+        );
         await tester.tap(
           find.byKey(
             const Key('life-counter-native-game-modes-planechase-open'),

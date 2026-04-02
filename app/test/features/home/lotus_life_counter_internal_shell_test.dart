@@ -250,6 +250,19 @@ void main() {
         expect(
           logs.any(
             (message) =>
+                message.contains(
+                  'message=native_fallback_surface_requested',
+                ) &&
+                message.contains('message_type: open-native-history') &&
+                message.contains(
+                  'fallback_classification: support_utility',
+                ),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
                 message.contains('message=native_history_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
                 message.contains(

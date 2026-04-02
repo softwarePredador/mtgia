@@ -65,6 +65,25 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       'support_utility';
   static const String _excludedCoreSupportFallbackClassification =
       'excluded_core_support';
+  static const Map<String, String> _nativeFallbackClassificationByType =
+      <String, String>{
+        'open-native-settings': _ownershipBridgeFallbackClassification,
+        'open-native-history': _supportUtilityFallbackClassification,
+        'open-native-card-search': _supportUtilityFallbackClassification,
+        'open-native-turn-tracker': _ownershipBridgeFallbackClassification,
+        'open-native-game-timer': _ownershipBridgeFallbackClassification,
+        'open-native-game-modes': _excludedCoreSupportFallbackClassification,
+        'open-native-dice': _ownershipBridgeFallbackClassification,
+        'open-native-commander-damage':
+            _ownershipBridgeFallbackClassification,
+        'open-native-player-appearance':
+            _ownershipBridgeFallbackClassification,
+        'open-native-player-counter': _ownershipBridgeFallbackClassification,
+        'open-native-player-state': _ownershipBridgeFallbackClassification,
+        'open-native-set-life': _ownershipBridgeFallbackClassification,
+        'open-native-table-state': _ownershipBridgeFallbackClassification,
+        'open-native-day-night': _ownershipBridgeFallbackClassification,
+      };
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
   };
@@ -248,6 +267,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     try {
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
+        _recordNativeFallbackSurfaceRequested(decoded);
         if (decoded['type'] == 'open-native-settings') {
           unawaited(
             _openNativeSettingsSheet(
@@ -529,6 +549,55 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     } catch (_) {
       return false;
     }
+  }
+
+  void _recordNativeFallbackSurfaceRequested(Map<String, dynamic> decoded) {
+    final type = decoded['type'] as String?;
+    final fallbackClassification =
+        type == null ? null : _nativeFallbackClassificationByType[type];
+    if (type == null || fallbackClassification == null) {
+      return;
+    }
+
+    final source = (decoded['source'] as String?) ?? 'shell_shortcut';
+    final data = <String, Object?>{
+      'message_type': type,
+      'source': source,
+      'surface_strategy': 'native_fallback',
+      'fallback_classification': fallbackClassification,
+    };
+
+    final targetPlayerIndex = (decoded['targetPlayerIndex'] as num?)?.toInt();
+    if (targetPlayerIndex != null) {
+      data['target_player_index'] = targetPlayerIndex;
+    }
+
+    final counterKey = (decoded['counterKey'] as String?)?.trim();
+    if (counterKey != null && counterKey.isNotEmpty) {
+      data['counter_key'] = counterKey;
+    }
+
+    final preferredMode = (decoded['preferredMode'] as String?)?.trim();
+    if (preferredMode != null && preferredMode.isNotEmpty) {
+      data['preferred_mode'] = preferredMode;
+    }
+
+    final intent = (decoded['intent'] as String?)?.trim();
+    if (intent != null && intent.isNotEmpty) {
+      data['intent'] = intent;
+    }
+
+    if (type == 'open-native-game-modes') {
+      data['core_scope'] = 'excluded_from_canonical_core';
+    }
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_fallback_surface_requested',
+        category: 'life_counter.shell',
+        data: data,
+      ),
+    );
   }
 
   Future<void> _openNativeSettingsSheet({required String source}) async {
