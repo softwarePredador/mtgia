@@ -524,6 +524,76 @@ void main() {
       },
     );
 
+    testWidgets(
+      'resets the Lotus player surface after canonical sync apply from option-card takeover',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await tester.binding.setSurfaceSize(const Size(900, 1200));
+          addTearDown(() => tester.binding.setSurfaceSize(null));
+
+          await LifeCounterSettingsStore().save(
+            LifeCounterSettings.defaults.copyWith(
+              showCountersOnPlayerCard: true,
+              showRegularCounters: false,
+            ),
+          );
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4).copyWith(
+              lives: const [40, 32, 25, 11],
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":1}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(find.text('Partner commander'));
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.partnerCommanders[1], isTrue);
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_state_applied') &&
+                  message.contains('apply_strategy: canonical_store_sync') &&
+                  message.contains('reload_required: false') &&
+                  message.contains('surface_reset_required: true'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
     testWidgets('rolls player d20 from the player state hub', (tester) async {
       late _FakeLotusHost host;
       await _captureDebugLogs((logs) async {

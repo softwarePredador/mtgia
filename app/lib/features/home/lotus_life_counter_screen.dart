@@ -2904,6 +2904,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final shouldResetLotusSurface = _playerStateSurfaceResetSources.contains(
+      source,
+    );
     final previousSession =
         await _sessionStore.load() ??
         LifeCounterSession.initial(playerCount: session.playerCount);
@@ -3032,6 +3035,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
+          'surface_reset_required': shouldResetLotusSurface,
           'has_last_event': adjustedSession.lastTableEvent != null,
           'has_player_rolls':
               adjustedSession.lastPlayerRolls.whereType<int>().isNotEmpty,
@@ -3041,6 +3045,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
 
     if (!reloadRequired) {
+      if (shouldResetLotusSurface) {
+        unawaited(_hostController.loadBundle());
+      }
       return;
     }
 
