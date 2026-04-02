@@ -1762,42 +1762,54 @@ void main() {
       'resets the Lotus player surface when native player state is dismissed from option-card takeover',
       (tester) async {
         late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
 
-        await LifeCounterSessionStore().save(
-          LifeCounterSession.initial(playerCount: 4),
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: LotusLifeCounterScreen(
-              hostFactory: ({
-                required onAppReviewRequested,
-                required onShellMessageRequested,
-              }) {
-                host = _FakeLotusHost(
-                  onShellMessageRequested: onShellMessageRequested,
-                )..completeSuccessfulLoad();
-                return host;
-              },
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
             ),
-          ),
-        );
+          );
 
-        await tester.pump();
-        await tester.pump();
+          await tester.pump();
+          await tester.pump();
 
-        host.emitShellMessage(
-          '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":2}',
-        );
-        await tester.pumpAndSettle();
+          host.emitShellMessage(
+            '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":2}',
+          );
+          await tester.pumpAndSettle();
 
-        expect(find.text('Player State'), findsOneWidget);
+          expect(find.text('Player State'), findsOneWidget);
 
-        await tester.tap(find.text('Cancel'));
-        await tester.pumpAndSettle();
+          await tester.tap(find.text('Cancel'));
+          await tester.pumpAndSettle();
 
-        expect(find.text('Player State'), findsNothing);
-        expect(host.loadBundleCallCount, 2);
+          expect(find.text('Player State'), findsNothing);
+          expect(host.loadBundleCallCount, 2);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_state_dismissed') &&
+                  message.contains('source: player_option_card_presented') &&
+                  message.contains('changed: false') &&
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: bundle_reload'),
+            ),
+            isTrue,
+          );
+        });
       },
     );
   });
