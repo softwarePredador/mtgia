@@ -39,6 +39,7 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `player appearance export/import` agora tambem expõem `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos de clipboard dos eventos de apply do runtime de jogador
 - `player appearance profile save/delete` agora tambem expõem `persistence_strategy: owned_profile_store`, separando a store propria de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `player appearance profile select` agora tambem expõe `persistence_strategy: owned_profile_store`, separando o uso de preset salvo no draft da sheet dos eventos de apply do runtime de jogador
+- o fallback bootstrap do host agora tambem tem cobertura unitaria direta para `session/settings/timer/history` e `history-only`, provando que o payload Lotus pode ser reconstruido a partir das stores canonicas sem snapshot persistido
 - `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 
 ## Reading rule
@@ -173,6 +174,7 @@ Complemento desta rodada:
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a transporte por clipboard
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a persistencia propria de perfis ManaLoom-owned
 - em `player appearance`, a observabilidade agora tambem deixa explicito quando a interacao auxiliar ficou restrita a carregar um preset salvo no draft da sheet, sem apply real na mesa
+- o caminho `canonical -> bootstrap Lotus` agora tambem fica provado sem snapshot persistido, reduzindo a dependencia implicita de `localStorage` preexistente como requisito de reabertura
 - `history` e `card search` continuam como suporte interno Lotus-first, e agora isso tambem fica explicito na observabilidade das sheets nativas
 
 ### 3. Runtime Lotus-first visual paths

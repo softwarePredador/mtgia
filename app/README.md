@@ -79,6 +79,7 @@ Estado vivo do contador hoje:
 - `player appearance export/import` agora tambem anotam `surface_strategy: native_fallback` e `transfer_strategy: clipboard_export/clipboard_import`, deixando explicito quando o fluxo auxiliar usa clipboard
 - `player appearance profile save/delete` agora tambem anotam `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando o fluxo auxiliar usa a store propria de perfis do ManaLoom
 - `player appearance profile select` agora tambem anota `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo no draft local
+- o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `session`, `settings`, `timer`, `history` e o caminho `history-only`
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`
@@ -183,6 +184,7 @@ Estado vivo do contador hoje:
 - `player appearance export/import` agora tambem anotam `transfer_strategy: clipboard_export/clipboard_import`, separando os eventos auxiliares de clipboard dos eventos de apply do runtime de jogador
 - `player appearance profile save/delete` agora tambem anotam `persistence_strategy: owned_profile_store`, separando a persistencia de perfis ManaLoom-owned dos eventos de apply do runtime de jogador
 - `player appearance profile select` agora tambem anota `persistence_strategy: owned_profile_store`, separando o uso de preset salvo no draft da sheet dos eventos de apply do runtime de jogador
+- o caminho `storage_bootstrap_restored_from_canonical` agora tambem tem prova unitaria dedicada em `test/features/home/lotus_host_controller_bootstrap_test.dart`
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`

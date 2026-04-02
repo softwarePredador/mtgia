@@ -23,6 +23,42 @@ import 'lotus_storage_snapshot_store.dart';
 import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
 
+Future<Map<String, String>> buildLotusFallbackBootstrapValues({
+  required LifeCounterGameTimerStateStore gameTimerStateStore,
+  required LifeCounterHistoryStore historyStore,
+  required LifeCounterSessionStore sessionStore,
+  required LifeCounterSettingsStore settingsStore,
+}) async {
+  final gameTimerState = await gameTimerStateStore.load();
+  final history = await historyStore.load();
+  final session = await sessionStore.load();
+  final settings = await settingsStore.load();
+  final values = <String, String>{};
+  if (gameTimerState != null) {
+    values.addAll(
+      LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState),
+    );
+  }
+  if (settings != null) {
+    values.addAll(
+      LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
+    );
+  }
+  if (session != null) {
+    values.addAll(
+      LotusLifeCounterSessionAdapter.buildSnapshotValues(
+        session,
+        history: history,
+        settings: settings,
+      ),
+    );
+  }
+  if (session == null && history != null) {
+    values.addAll(history.buildLotusSnapshotValues());
+  }
+  return values;
+}
+
 class LotusHostController implements LotusHost {
   static const String _bundleLoadErrorMessage =
       'ManaLoom could not open the embedded life counter. '
@@ -337,34 +373,12 @@ class LotusHostController implements LotusHost {
   }
 
   Future<Map<String, String>> _buildFallbackBootstrapValues() async {
-    final gameTimerState = await _gameTimerStateStore.load();
-    final history = await _historyStore.load();
-    final session = await _sessionStore.load();
-    final settings = await _settingsStore.load();
-    final values = <String, String>{};
-    if (gameTimerState != null) {
-      values.addAll(
-        LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState),
-      );
-    }
-    if (settings != null) {
-      values.addAll(
-        LotusLifeCounterSettingsAdapter.buildSnapshotValues(settings),
-      );
-    }
-    if (session != null) {
-      values.addAll(
-        LotusLifeCounterSessionAdapter.buildSnapshotValues(
-          session,
-          history: history,
-          settings: settings,
-        ),
-      );
-    }
-    if (session == null && history != null) {
-      values.addAll(history.buildLotusSnapshotValues());
-    }
-    return values;
+    return buildLotusFallbackBootstrapValues(
+      gameTimerStateStore: _gameTimerStateStore,
+      historyStore: _historyStore,
+      sessionStore: _sessionStore,
+      settingsStore: _settingsStore,
+    );
   }
 
   void dismissLoadingOverlay() {
