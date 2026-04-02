@@ -156,6 +156,30 @@ Future<LotusCanonicalMirrorResult> persistCanonicalMirrorFromLotusSnapshot({
   );
 }
 
+bool shouldSkipLotusStoragePersistObservability({
+  required bool didRecordStoragePersistThisLoad,
+  required bool didRecordCanonicalSessionMirrorThisLoad,
+  required bool didRecordCanonicalSettingsMirrorThisLoad,
+  required bool didRecordCanonicalGameTimerMirrorThisLoad,
+  required bool didRecordCanonicalDayNightMirrorThisLoad,
+  required bool didRecordCanonicalHistoryMirrorThisLoad,
+  required LifeCounterSession? derivedSession,
+  required LifeCounterSettings? derivedSettings,
+  required LifeCounterGameTimerState? derivedGameTimer,
+  required LifeCounterDayNightState? derivedDayNight,
+  required LifeCounterHistoryState derivedHistory,
+}) {
+  if (!didRecordStoragePersistThisLoad) {
+    return false;
+  }
+
+  return (derivedSession == null || didRecordCanonicalSessionMirrorThisLoad) &&
+      (derivedSettings == null || didRecordCanonicalSettingsMirrorThisLoad) &&
+      (derivedDayNight == null || didRecordCanonicalDayNightMirrorThisLoad) &&
+      (derivedGameTimer == null || didRecordCanonicalGameTimerMirrorThisLoad) &&
+      (!derivedHistory.hasContent || didRecordCanonicalHistoryMirrorThisLoad);
+}
+
 class LotusHostController implements LotusHost {
   static const String _bundleLoadErrorMessage =
       'ManaLoom could not open the embedded life counter. '
@@ -200,6 +224,7 @@ class LotusHostController implements LotusHost {
   bool _didRecordCanonicalSettingsMirrorThisLoad = false;
   bool _didRecordCanonicalGameTimerMirrorThisLoad = false;
   bool _didRecordCanonicalDayNightMirrorThisLoad = false;
+  bool _didRecordCanonicalHistoryMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
   DateTime? _ignoreBeforeUnloadSnapshotUntil;
 
@@ -226,6 +251,7 @@ class LotusHostController implements LotusHost {
     _didRecordCanonicalSettingsMirrorThisLoad = false;
     _didRecordCanonicalGameTimerMirrorThisLoad = false;
     _didRecordCanonicalDayNightMirrorThisLoad = false;
+    _didRecordCanonicalHistoryMirrorThisLoad = false;
     unawaited(
       AppObservability.instance.recordEvent(
         isRetry ? 'bundle_retry_requested' : 'bundle_load_started',
@@ -345,19 +371,32 @@ class LotusHostController implements LotusHost {
     );
     final derivedDayNight = mirror.dayNightState;
     final derivedGameTimer = mirror.gameTimerState;
+    final derivedHistory = mirror.history;
     final derivedSession = mirror.session;
     final derivedSettings = mirror.settings;
 
-    if (_didRecordStoragePersistThisLoad) {
-      if ((derivedSettings == null ||
-              _didRecordCanonicalSettingsMirrorThisLoad) &&
-          (derivedDayNight == null ||
-              _didRecordCanonicalDayNightMirrorThisLoad) &&
-          (derivedGameTimer == null ||
-              _didRecordCanonicalGameTimerMirrorThisLoad)) {
-        return;
-      }
-    } else {
+    if (shouldSkipLotusStoragePersistObservability(
+      didRecordStoragePersistThisLoad: _didRecordStoragePersistThisLoad,
+      didRecordCanonicalSessionMirrorThisLoad:
+          _didRecordCanonicalSessionMirrorThisLoad,
+      didRecordCanonicalSettingsMirrorThisLoad:
+          _didRecordCanonicalSettingsMirrorThisLoad,
+      didRecordCanonicalGameTimerMirrorThisLoad:
+          _didRecordCanonicalGameTimerMirrorThisLoad,
+      didRecordCanonicalDayNightMirrorThisLoad:
+          _didRecordCanonicalDayNightMirrorThisLoad,
+      didRecordCanonicalHistoryMirrorThisLoad:
+          _didRecordCanonicalHistoryMirrorThisLoad,
+      derivedSession: derivedSession,
+      derivedSettings: derivedSettings,
+      derivedGameTimer: derivedGameTimer,
+      derivedDayNight: derivedDayNight,
+      derivedHistory: derivedHistory,
+    )) {
+      return;
+    }
+
+    if (!_didRecordStoragePersistThisLoad) {
       _didRecordStoragePersistThisLoad = true;
       unawaited(
         AppObservability.instance.recordEvent(
@@ -420,6 +459,23 @@ class LotusHostController implements LotusHost {
             'is_active': derivedGameTimer.isActive,
             'is_paused': derivedGameTimer.isPaused,
             'has_paused_time': derivedGameTimer.pausedTimeEpochMs != null,
+          },
+        ),
+      );
+    }
+
+    if (derivedHistory.hasContent &&
+        !_didRecordCanonicalHistoryMirrorThisLoad) {
+      _didRecordCanonicalHistoryMirrorThisLoad = true;
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'canonical_history_mirrored_from_lotus',
+          category: 'life_counter.history',
+          data: {
+            'current_game_entries': derivedHistory.currentGameEntries.length,
+            'archive_entries': derivedHistory.archiveEntries.length,
+            'game_counter': derivedHistory.gameCounter,
+            'has_last_table_event': derivedHistory.lastTableEvent != null,
           },
         ),
       );

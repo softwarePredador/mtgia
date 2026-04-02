@@ -67,6 +67,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, os caminhos `session/settings/timer/history`, `history-only` e `day/night-only`
 - o host agora tambem espelha `day/night` do `persist_snapshot` Lotus para a store canonica, e limpa estado stale quando a chave `__manaloom_day_night_mode` deixa de existir no snapshot
 - o mirror canonico do host agora tambem limpa `session` e `settings` stale quando o snapshot Lotus deixa de trazer `players` ou `gameSettings`, alinhando esse comportamento ao cleanup ja existente de `day/night`, `game timer` e `history`
+- a deduplicacao de observabilidade do `persist_snapshot` no host agora tambem respeita o primeiro mirror de `session` e `history`, evitando que uma carga parcial anterior esconda o primeiro espelhamento canonico desses dominios na mesma carga do Lotus
 - `history` e `card search` agora identificam explicitamente na observabilidade que a sheet nativa acionada por atalho interno eh `native_fallback`; `history export` tambem marca o transporte como `clipboard_export`
 
 ## Ja ManaLoom-owned

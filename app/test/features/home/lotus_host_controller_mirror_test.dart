@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_history.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
@@ -12,6 +13,86 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  group('shouldSkipLotusStoragePersistObservability', () {
+    test('keeps session mirror observable after earlier storage persist', () {
+      final shouldSkip = shouldSkipLotusStoragePersistObservability(
+        didRecordStoragePersistThisLoad: true,
+        didRecordCanonicalSessionMirrorThisLoad: false,
+        didRecordCanonicalSettingsMirrorThisLoad: true,
+        didRecordCanonicalGameTimerMirrorThisLoad: true,
+        didRecordCanonicalDayNightMirrorThisLoad: true,
+        didRecordCanonicalHistoryMirrorThisLoad: true,
+        derivedSession: LifeCounterSession.initial(playerCount: 4),
+        derivedSettings: null,
+        derivedGameTimer: null,
+        derivedDayNight: null,
+        derivedHistory: const LifeCounterHistoryState(
+          currentGameEntries: [],
+          archiveEntries: [],
+          archivedGameCount: 0,
+        ),
+      );
+
+      expect(shouldSkip, isFalse);
+    });
+
+    test('keeps history mirror observable after earlier storage persist', () {
+      final shouldSkip = shouldSkipLotusStoragePersistObservability(
+        didRecordStoragePersistThisLoad: true,
+        didRecordCanonicalSessionMirrorThisLoad: true,
+        didRecordCanonicalSettingsMirrorThisLoad: true,
+        didRecordCanonicalGameTimerMirrorThisLoad: true,
+        didRecordCanonicalDayNightMirrorThisLoad: true,
+        didRecordCanonicalHistoryMirrorThisLoad: false,
+        derivedSession: null,
+        derivedSettings: null,
+        derivedGameTimer: null,
+        derivedDayNight: null,
+        derivedHistory: const LifeCounterHistoryState(
+          currentGameEntries: [
+            LifeCounterHistoryEntry(
+              message: 'Player 1 gained 3 life',
+              source: LifeCounterHistoryEntrySource.currentGame,
+            ),
+          ],
+          archiveEntries: [],
+          archivedGameCount: 0,
+          gameCounter: 2,
+        ),
+      );
+
+      expect(shouldSkip, isFalse);
+    });
+
+    test('skips only when every mirrored domain is already observed', () {
+      final shouldSkip = shouldSkipLotusStoragePersistObservability(
+        didRecordStoragePersistThisLoad: true,
+        didRecordCanonicalSessionMirrorThisLoad: true,
+        didRecordCanonicalSettingsMirrorThisLoad: true,
+        didRecordCanonicalGameTimerMirrorThisLoad: true,
+        didRecordCanonicalDayNightMirrorThisLoad: true,
+        didRecordCanonicalHistoryMirrorThisLoad: true,
+        derivedSession: LifeCounterSession.initial(playerCount: 4),
+        derivedSettings: null,
+        derivedGameTimer: null,
+        derivedDayNight: null,
+        derivedHistory: const LifeCounterHistoryState(
+          currentGameEntries: [
+            LifeCounterHistoryEntry(
+              message: 'Player 2 lost 4 life',
+              source: LifeCounterHistoryEntrySource.currentGame,
+            ),
+          ],
+          archiveEntries: [],
+          archivedGameCount: 0,
+          gameCounter: 3,
+        ),
+      );
+
+      expect(shouldSkip, isTrue);
+    });
+  });
+
   group('persistCanonicalMirrorFromLotusSnapshot', () {
     late LifeCounterDayNightStateStore dayNightStateStore;
     late LifeCounterGameTimerStateStore gameTimerStateStore;
@@ -47,51 +128,59 @@ void main() {
       expect(storedState!.isNight, isTrue);
     });
 
-    test('clears stale canonical day night state when Lotus snapshot omits it', () async {
-      await dayNightStateStore.save(const LifeCounterDayNightState(isNight: true));
+    test(
+      'clears stale canonical day night state when Lotus snapshot omits it',
+      () async {
+        await dayNightStateStore.save(
+          const LifeCounterDayNightState(isNight: true),
+        );
 
-      final result = await persistCanonicalMirrorFromLotusSnapshot(
-        dayNightStateStore: dayNightStateStore,
-        gameTimerStateStore: gameTimerStateStore,
-        historyStore: historyStore,
-        sessionStore: sessionStore,
-        settingsStore: settingsStore,
-        snapshot: const LotusStorageSnapshot(values: {}),
-      );
+        final result = await persistCanonicalMirrorFromLotusSnapshot(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+          snapshot: const LotusStorageSnapshot(values: {}),
+        );
 
-      final storedState = await dayNightStateStore.load();
-      expect(result.dayNightState, isNull);
-      expect(storedState, isNull);
-    });
+        final storedState = await dayNightStateStore.load();
+        expect(result.dayNightState, isNull);
+        expect(storedState, isNull);
+      },
+    );
 
-    test('clears stale canonical session and settings when Lotus snapshot omits them', () async {
-      await sessionStore.save(
-        LifeCounterSession.initial(playerCount: 4).copyWith(
-          lives: const [30, 30, 30, 30],
-        ),
-      );
-      await settingsStore.save(
-        LifeCounterSettings.defaults.copyWith(
-          autoKill: true,
-          gameTimer: true,
-        ),
-      );
+    test(
+      'clears stale canonical session and settings when Lotus snapshot omits them',
+      () async {
+        await sessionStore.save(
+          LifeCounterSession.initial(
+            playerCount: 4,
+          ).copyWith(lives: const [30, 30, 30, 30]),
+        );
+        await settingsStore.save(
+          LifeCounterSettings.defaults.copyWith(
+            autoKill: true,
+            gameTimer: true,
+          ),
+        );
 
-      final result = await persistCanonicalMirrorFromLotusSnapshot(
-        dayNightStateStore: dayNightStateStore,
-        gameTimerStateStore: gameTimerStateStore,
-        historyStore: historyStore,
-        sessionStore: sessionStore,
-        settingsStore: settingsStore,
-        snapshot: const LotusStorageSnapshot(values: {}),
-      );
+        final result = await persistCanonicalMirrorFromLotusSnapshot(
+          dayNightStateStore: dayNightStateStore,
+          gameTimerStateStore: gameTimerStateStore,
+          historyStore: historyStore,
+          sessionStore: sessionStore,
+          settingsStore: settingsStore,
+          snapshot: const LotusStorageSnapshot(values: {}),
+        );
 
-      final storedSession = await sessionStore.load();
-      final storedSettings = await settingsStore.load();
-      expect(result.session, isNull);
-      expect(result.settings, isNull);
-      expect(storedSession, isNull);
-      expect(storedSettings, isNull);
-    });
+        final storedSession = await sessionStore.load();
+        final storedSettings = await settingsStore.load();
+        expect(result.session, isNull);
+        expect(result.settings, isNull);
+        expect(storedSession, isNull);
+        expect(storedSettings, isNull);
+      },
+    );
   });
 }
