@@ -91,6 +91,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_game_modes_settings_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_two_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_three_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_four_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_five_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_six_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 
@@ -114,7 +115,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `commander casts` tambem ficou coberto no mesmo padrao: `players[].partnerCommander` e `players[].counters.tax-*` canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz tax stale zerado.
 - `extra counters` tambem ficou coberto no mesmo padrao: `players[].counters` canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz counters customizados stale ou vazios.
 - o smoke de `6 players` precisou de reinicio do daemon `adb` durante a rodada; o rerun passou sem mudanca de produto.
-- os player counts suportados agora ficam cobertos explicitamente na bateria Android em `2`, `3`, `5` e `6` jogadores, com bootstrap canonico no runtime Lotus.
+- os player counts suportados agora ficam cobertos explicitamente na bateria Android em `2`, `3`, `4`, `5` e `6` jogadores, com bootstrap canonico no runtime Lotus.
 
 ## Final done definition
 
