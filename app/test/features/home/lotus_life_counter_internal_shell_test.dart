@@ -277,6 +277,55 @@ void main() {
       });
     });
 
+    testWidgets('uses shared default source for history fallback requests', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage('{"type":"open-native-history"}');
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_requested',
+                ) &&
+                message.contains('message_type: open-native-history') &&
+                message.contains('source: shell_shortcut'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_history_opened') &&
+                message.contains('source: shell_shortcut'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets('exports native history from a shell fallback shortcut', (
       tester,
     ) async {

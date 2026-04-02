@@ -242,6 +242,56 @@ void main() {
       });
     });
 
+    testWidgets('uses shared default source for day night fallback requests', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage('{"type":"open-native-day-night"}');
+        await tester.pumpAndSettle();
+
+        expect(
+          logs.any(
+            (message) =>
+                message.contains(
+                  'message=native_fallback_surface_requested',
+                ) &&
+                message.contains('message_type: open-native-day-night') &&
+                message.contains('source: day_night_surface'),
+          ),
+          isTrue,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_day_night_opened') &&
+                message.contains('source: day_night_surface'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets(
       'reloads the Lotus bundle when day night live sync cannot confirm the switcher',
       (tester) async {

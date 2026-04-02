@@ -84,6 +84,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         'open-native-table-state': _ownershipBridgeFallbackClassification,
         'open-native-day-night': _ownershipBridgeFallbackClassification,
       };
+  static const Map<String, String> _nativeFallbackDefaultSourceByType =
+      <String, String>{
+        'open-native-settings': 'shell_shortcut',
+        'open-native-history': 'shell_shortcut',
+        'open-native-card-search': 'shell_shortcut',
+        'open-native-turn-tracker': 'turn_tracker_surface_pressed',
+        'open-native-game-timer': 'game_timer_surface_pressed',
+        'open-native-game-modes': 'game_modes_shortcut',
+        'open-native-dice': 'dice_shortcut_pressed',
+        'open-native-commander-damage': 'commander_damage_surface_pressed',
+        'open-native-player-appearance': 'player_background_surface_pressed',
+        'open-native-player-counter': 'player_counter_surface_pressed',
+        'open-native-player-state': 'player_state_surface_pressed',
+        'open-native-set-life': 'player_life_total_surface_pressed',
+        'open-native-table-state': 'table_state_surface',
+        'open-native-day-night': 'day_night_surface',
+      };
   static const Map<String, String> _nativeFallbackDomainKeyByType =
       <String, String>{
         'open-native-settings': 'settings',
@@ -288,7 +305,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-settings') {
           unawaited(
             _openNativeSettingsSheet(
-              source: (decoded['source'] as String?) ?? 'shell_shortcut',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -296,7 +313,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-history') {
           unawaited(
             _openNativeHistorySheet(
-              source: (decoded['source'] as String?) ?? 'shell_shortcut',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -304,7 +321,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-card-search') {
           unawaited(
             _openNativeCardSearchSheet(
-              source: (decoded['source'] as String?) ?? 'shell_shortcut',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -312,9 +329,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-turn-tracker') {
           unawaited(
             _openNativeTurnTrackerSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'turn_tracker_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -322,9 +337,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-game-timer') {
           unawaited(
             _openNativeGameTimerSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'game_timer_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -332,7 +345,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-game-modes') {
           unawaited(
             _openNativeGameModesSheet(
-              source: (decoded['source'] as String?) ?? 'game_modes_shortcut',
+              source: _nativeFallbackSourceForMessage(decoded),
               preferredAction: _decodePreferredGameModeAction(
                 decoded['preferredMode'] as String?,
               ),
@@ -346,7 +359,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-dice') {
           unawaited(
             _openNativeDiceSheet(
-              source: (decoded['source'] as String?) ?? 'dice_shortcut_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -354,9 +367,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-commander-damage') {
           unawaited(
             _openNativeCommanderDamageSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'commander_damage_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
             ),
@@ -366,9 +377,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-player-appearance') {
           unawaited(
             _openNativePlayerAppearanceSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'player_background_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
             ),
@@ -378,9 +387,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-player-counter') {
           unawaited(
             _openNativePlayerCounterSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'player_counter_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
               counterKey: (decoded['counterKey'] as String?)?.trim(),
@@ -391,9 +398,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-player-state') {
           unawaited(
             _openNativePlayerStateSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'player_state_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
             ),
@@ -403,9 +408,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-set-life') {
           unawaited(
             _openNativeSetLifeSheet(
-              source:
-                  (decoded['source'] as String?) ??
-                  'player_life_total_surface_pressed',
+              source: _nativeFallbackSourceForMessage(decoded),
               targetPlayerIndex:
                   (decoded['targetPlayerIndex'] as num?)?.toInt(),
             ),
@@ -415,7 +418,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-table-state') {
           unawaited(
             _openNativeTableStateSheet(
-              source: (decoded['source'] as String?) ?? 'table_state_surface',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -423,7 +426,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         if (decoded['type'] == 'open-native-day-night') {
           unawaited(
             _openNativeDayNightSheet(
-              source: (decoded['source'] as String?) ?? 'day_night_surface',
+              source: _nativeFallbackSourceForMessage(decoded),
             ),
           );
           return;
@@ -577,7 +580,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
-    final source = (decoded['source'] as String?) ?? 'shell_shortcut';
+    final source = _nativeFallbackSourceForMessage(decoded);
     final reviewStatus =
         switch (fallbackClassification) {
           _ownershipBridgeFallbackClassification => 'ownership_in_progress',
@@ -625,6 +628,16 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         data: data,
       ),
     );
+  }
+
+  String _nativeFallbackSourceForMessage(Map<String, dynamic> decoded) {
+    final rawSource = (decoded['source'] as String?)?.trim();
+    if (rawSource != null && rawSource.isNotEmpty) {
+      return rawSource;
+    }
+
+    final type = decoded['type'] as String?;
+    return _nativeFallbackDefaultSourceByType[type] ?? 'shell_shortcut';
   }
 
   Future<void> _openNativeSettingsSheet({required String source}) async {
