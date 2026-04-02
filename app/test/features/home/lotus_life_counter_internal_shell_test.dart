@@ -176,152 +176,180 @@ void main() {
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      final session = LifeCounterSession.tryFromJson({
-        ...LifeCounterSession.initial(playerCount: 4).toJson(),
-        'last_table_event': 'Player 1 lost 3 life',
-      });
-      expect(session, isNotNull);
-      await LifeCounterSessionStore().save(session!);
-      await LotusStorageSnapshotStore().save(
-        const LotusStorageSnapshot(
-          values: {
-            'currentGameMeta': '{"name":"Game #12"}',
-            'gameHistory':
-                '[{"message":"Player 2 gained 2 life","timestamp":1711800000000}]',
-            'allGamesHistory':
-                '[{"name":"Game #11","history":[{"message":"Player 3 was eliminated"}]}]',
-          },
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
+      await _captureDebugLogs((logs) async {
+        final session = LifeCounterSession.tryFromJson({
+          ...LifeCounterSession.initial(playerCount: 4).toJson(),
+          'last_table_event': 'Player 1 lost 3 life',
+        });
+        expect(session, isNotNull);
+        await LifeCounterSessionStore().save(session!);
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'currentGameMeta': '{"name":"Game #12"}',
+              'gameHistory':
+                  '[{"message":"Player 2 gained 2 life","timestamp":1711800000000}]',
+              'allGamesHistory':
+                  '[{"name":"Game #11","history":[{"message":"Player 3 was eliminated"}]}]',
             },
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-history","source":"history_shortcut_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      expect(find.text('Life Counter History'), findsOneWidget);
-      expect(
-        find.byKey(const Key('life-counter-native-history-last-event')),
-        findsOneWidget,
-      );
-      expect(find.text('Player 1 lost 3 life'), findsOneWidget);
-      expect(find.text('Player 2 gained 2 life'), findsOneWidget);
-      expect(
-        find.text('Player 3 was eliminated', skipOffstage: false),
-        findsOneWidget,
-      );
+        host.emitShellMessage(
+          '{"type":"open-native-history","source":"history_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Life Counter History'), findsOneWidget);
+        expect(
+          find.byKey(const Key('life-counter-native-history-last-event')),
+          findsOneWidget,
+        );
+        expect(find.text('Player 1 lost 3 life'), findsOneWidget);
+        expect(find.text('Player 2 gained 2 life'), findsOneWidget);
+        expect(
+          find.text('Player 3 was eliminated', skipOffstage: false),
+          findsOneWidget,
+        );
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_history_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('exports native history from a shell fallback shortcut', (
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      final session = LifeCounterSession.tryFromJson({
-        ...LifeCounterSession.initial(playerCount: 4).toJson(),
-        'last_table_event': 'Player 1 lost 3 life',
-      });
-      expect(session, isNotNull);
-      await LifeCounterSessionStore().save(session!);
-      await LotusStorageSnapshotStore().save(
-        const LotusStorageSnapshot(
-          values: {
-            'currentGameMeta': '{"name":"Game #12"}',
-            'gameHistory':
-                '[{"message":"Player 2 gained 2 life","timestamp":1711800000000}]',
-          },
-        ),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
+      await _captureDebugLogs((logs) async {
+        final session = LifeCounterSession.tryFromJson({
+          ...LifeCounterSession.initial(playerCount: 4).toJson(),
+          'last_table_event': 'Player 1 lost 3 life',
+        });
+        expect(session, isNotNull);
+        await LifeCounterSessionStore().save(session!);
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'currentGameMeta': '{"name":"Game #12"}',
+              'gameHistory':
+                  '[{"message":"Player 2 gained 2 life","timestamp":1711800000000}]',
             },
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
 
-      host.emitShellMessage(
-        '{"type":"open-native-history","source":"history_shortcut_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump();
 
-      await tester.tap(
-        find.byKey(const Key('life-counter-native-history-export')),
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-history","source":"history_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(clipboardText, isNotNull);
-      expect(clipboardText, contains('Player 2 gained 2 life'));
-      expect(clipboardText, contains('Game #12'));
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-history-export')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(clipboardText, isNotNull);
+        expect(clipboardText, contains('Player 2 gained 2 life'));
+        expect(clipboardText, contains('Game #12'));
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_history_exported') &&
+                message.contains('surface_strategy: native_fallback') &&
+                message.contains('transfer_strategy: clipboard_export'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('opens native card search from a shell fallback shortcut', (
       tester,
     ) async {
       late _FakeLotusHost host;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: LotusLifeCounterScreen(
-            hostFactory: ({
-              required onAppReviewRequested,
-              required onShellMessageRequested,
-            }) {
-              host = _FakeLotusHost(
-                onShellMessageRequested: onShellMessageRequested,
-              )..completeSuccessfulLoad();
-              return host;
-            },
+      await _captureDebugLogs((logs) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      await tester.pump();
+        await tester.pump();
+        await tester.pump();
 
-      host.emitShellMessage(
-        '{"type":"open-native-card-search","source":"card_search_shortcut_pressed"}',
-      );
-      await tester.pumpAndSettle();
+        host.emitShellMessage(
+          '{"type":"open-native-card-search","source":"card_search_shortcut_pressed"}',
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Card Search'), findsOneWidget);
-      expect(
-        find.byKey(const Key('life-counter-native-card-search-input')),
-        findsOneWidget,
-      );
-      expect(find.text('SOL RING'), findsOneWidget);
+        expect(find.text('Card Search'), findsOneWidget);
+        expect(
+          find.byKey(const Key('life-counter-native-card-search-input')),
+          findsOneWidget,
+        );
+        expect(find.text('SOL RING'), findsOneWidget);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_card_search_opened') &&
+                message.contains('surface_strategy: native_fallback'),
+          ),
+          isTrue,
+        );
+      });
     });
 
     testWidgets('shows ManaLoom-owned feedback for blocked external links', (

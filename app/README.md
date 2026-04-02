@@ -72,6 +72,7 @@ Estado vivo do contador hoje:
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, alinhando sua trilha de apply/fallback ao mesmo contrato observavel
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam `reload-only`, e agora tambem anotam isso explicitamente na observabilidade de apply com `live_patch_eligible: false` e `apply_strategy: reload_fallback`
 - `settings` continua `reload-only` por seguranca do bundle Lotus, e agora tambem anota isso explicitamente na observabilidade de apply com `live_patch_eligible: false` e `apply_strategy: reload_fallback`
+- `history` e `card search` continuam Lotus-first visuais, e as sheets internas agora anotam explicitamente `surface_strategy: native_fallback`; `history export` tambem anota `transfer_strategy: clipboard_export`
 - validacao final de produto registrada em `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 - definicao operacional de encerramento atual:
   - visual oficial: Lotus no `WebView`
@@ -169,6 +170,7 @@ Estado vivo do contador hoje:
 - `day/night` agora tambem anota `apply_strategy` (`live_runtime` vs `reload_fallback`) e `live_patch_eligible` no evento de apply
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem anotam `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que ainda dependem de rehydrate completo
 - `settings` agora tambem anota `apply_strategy: reload_fallback` e `live_patch_eligible: false`, deixando explicito no log que esse dominio continua dependente de rehydrate completo
+- `history` e `card search` agora tambem anotam `surface_strategy: native_fallback` nos eventos da sheet interna, deixando explicito no log que esses atalhos sao suporte nativo e nao takeover visual principal
 - suite de fallback interno para `player appearance`: `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - suite de fallback interno para `commander damage` e `player counter`: `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - suite de fallback interno para `player state` e `set life`: `test/features/home/lotus_life_counter_internal_player_state_test.dart`

@@ -32,6 +32,8 @@ Estado registrado depois da rodada de `2026-04-02`:
 - `day/night` agora tambem expõe `live_patch_eligible` e `apply_strategy`, alinhando sua leitura operacional aos outros recortes com apply live
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` agora tambem expõem `live_patch_eligible: false` e `apply_strategy: reload_fallback`, fechando a leitura observavel dos dominios de runtime de jogador que ainda nao tem caminho live seguro
 - `settings` agora tambem expõe `live_patch_eligible: false` e `apply_strategy: reload_fallback`, deixando visivel no log que esse dominio continua fora do live sync por seguranca
+- `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a shell interna assume o fluxo, separando esses eventos dos dominios que realmente aplicam estado no runtime
+- `history` e `card search` agora tambem expõem `surface_strategy: native_fallback` quando a sheet interna e acionada; `history export` marca `transfer_strategy: clipboard_export`
 
 ## Reading rule
 
@@ -158,6 +160,8 @@ Complemento desta rodada:
 - `day/night` agora tambem registra `live_patch_eligible` e `apply_strategy`, deixando explicito quando a troca foi aplicada live e quando o host precisou recarregar o bundle
 - `dice`, `commander damage`, `player appearance`, `player counter`, `player state` e `set life` continuam em `reload`, mas agora isso tambem fica explicito na observabilidade de apply, sem ambiguidade com os dominios que ja tem recortes live
 - `settings` continua em `reload`, e agora isso tambem fica explicito na observabilidade de apply, alinhando o dominio com o mesmo contrato de leitura operacional
+- `history` e `card search` seguem sem apply de runtime nessa shell interna; a observabilidade agora deixa explicito quando o fluxo foi apenas `native_fallback`
+- `history` e `card search` continuam como suporte interno Lotus-first, e agora isso tambem fica explicito na observabilidade das sheets nativas
 
 ### 3. Runtime Lotus-first visual paths
 

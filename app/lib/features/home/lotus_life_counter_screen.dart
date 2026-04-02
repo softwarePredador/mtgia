@@ -1183,6 +1183,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativeHistorySheetOpen = true;
     final historyState = await _historyStore.load();
     final session = await _sessionStore.load();
@@ -1204,6 +1205,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.history',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
           'current_game_events': history.currentGameEventCount,
           'archived_games': history.archivedGameCount,
           'archived_events': history.archivedEventCount,
@@ -1228,7 +1230,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_history_dismissed',
         category: 'life_counter.history',
-        data: {'source': source, 'had_content': history.hasContent},
+        data: {
+          'source': source,
+          'had_content': history.hasContent,
+          'surface_strategy': surfaceStrategy,
+        },
       ),
     );
   }
@@ -1237,6 +1243,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterHistorySnapshot history, {
     required String source,
   }) async {
+    const surfaceStrategy = 'native_fallback';
+    const transferStrategy = 'clipboard_export';
     final transfer = LifeCounterHistoryTransfer.fromSnapshot(history);
     await Clipboard.setData(ClipboardData(text: transfer.toJsonString()));
     unawaited(
@@ -1245,6 +1253,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.history',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
+          'transfer_strategy': transferStrategy,
           'current_game_events': history.currentGameEventCount,
           'archived_events': history.archivedEventCount,
         },
@@ -1256,13 +1266,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     String rawPayload, {
     required String source,
   }) async {
+    const surfaceStrategy = 'native_fallback';
     final transfer = LifeCounterHistoryTransfer.tryParse(rawPayload);
     if (transfer == null) {
       unawaited(
         AppObservability.instance.recordEvent(
           'native_history_import_failed',
           category: 'life_counter.history',
-          data: {'source': source, 'reason': 'invalid_payload'},
+          data: {
+            'source': source,
+            'surface_strategy': surfaceStrategy,
+            'reason': 'invalid_payload',
+          },
         ),
       );
       return false;
@@ -1333,6 +1348,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         category: 'life_counter.history',
         data: {
           'source': source,
+          'surface_strategy': surfaceStrategy,
           'current_game_events': transfer.currentGameEntries.length,
           'archived_events': transfer.archiveEntries.length,
         },
@@ -1346,12 +1362,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return;
     }
 
+    const surfaceStrategy = 'native_fallback';
     _isNativeCardSearchSheetOpen = true;
     unawaited(
       AppObservability.instance.recordEvent(
         'native_card_search_opened',
         category: 'life_counter.search',
-        data: {'source': source},
+        data: {'source': source, 'surface_strategy': surfaceStrategy},
       ),
     );
 
@@ -1366,7 +1383,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       AppObservability.instance.recordEvent(
         'native_card_search_dismissed',
         category: 'life_counter.search',
-        data: {'source': source},
+        data: {'source': source, 'surface_strategy': surfaceStrategy},
       ),
     );
   }
