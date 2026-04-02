@@ -63,7 +63,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `player appearance export/import` agora tambem registram `surface_strategy: native_fallback` e `transfer_strategy` (`clipboard_export` / `clipboard_import`), deixando explicito quando o fluxo auxiliar usa transporte por clipboard
 - `player appearance profile save/delete` agora tambem registram `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, separando persistencia de perfis ManaLoom-owned dos eventos de apply e clipboard
 - `player appearance profile select` agora tambem registra `surface_strategy: native_fallback` e `persistence_strategy: owned_profile_store`, deixando explicito quando a sheet apenas carrega um preset salvo para o draft local
-- o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo os caminhos `session/settings/timer/history` e `history-only`
+- o host agora tambem tem cobertura unitaria para o fallback `canonical -> bootstrap Lotus` sem snapshot persistido, incluindo `day/night`, os caminhos `session/settings/timer/history`, `history-only` e `day/night-only`
 - `history` e `card search` agora identificam explicitamente na observabilidade que a sheet nativa acionada por atalho interno eh `native_fallback`; `history export` tambem marca o transporte como `clipboard_export`
 
 ## Ja ManaLoom-owned
@@ -206,7 +206,7 @@ Leitura operacional atual:
 - em `player appearance`, os eventos auxiliares de save/delete de perfil agora tambem deixam explicito quando o fluxo passou por persistencia propria do ManaLoom, em vez de parecer mutacao direta do runtime Lotus
 - em `player appearance`, a selecao de perfil salvo agora tambem fica observavel como uso de preset ManaLoom-owned no draft da sheet, sem parecer apply real da mesa
 - `history` e `card search` continuam Lotus-first visuais no produto, e a observabilidade das sheets internas agora deixa explicito quando o fluxo registrado e apenas fallback nativo de suporte
-- o caminho `storage_bootstrap_restored_from_canonical` agora tem prova unitaria do payload de fallback gerado a partir das stores canonicas, sem depender de `localStorage` Lotus previamente salvo
+- o caminho `storage_bootstrap_restored_from_canonical` agora tem prova unitaria do payload de fallback gerado a partir das stores canonicas, incluindo `day/night`, sem depender de `localStorage` Lotus previamente salvo
 
 ### 3. `History` ja entrou em contrato canonico, mas a compatibilidade Lotus ainda existe
 

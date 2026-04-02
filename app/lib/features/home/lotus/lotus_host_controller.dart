@@ -6,6 +6,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/observability/app_observability.dart';
+import '../life_counter/life_counter_day_night_state_store.dart';
 import '../life_counter/life_counter_game_timer_state_store.dart';
 import '../life_counter/life_counter_history.dart';
 import '../life_counter/life_counter_history_store.dart';
@@ -24,16 +25,21 @@ import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
 
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
+  required LifeCounterDayNightStateStore dayNightStateStore,
   required LifeCounterGameTimerStateStore gameTimerStateStore,
   required LifeCounterHistoryStore historyStore,
   required LifeCounterSessionStore sessionStore,
   required LifeCounterSettingsStore settingsStore,
 }) async {
+  final dayNightState = await dayNightStateStore.load();
   final gameTimerState = await gameTimerStateStore.load();
   final history = await historyStore.load();
   final session = await sessionStore.load();
   final settings = await settingsStore.load();
   final values = <String, String>{};
+  if (dayNightState != null) {
+    values['__manaloom_day_night_mode'] = dayNightState.mode;
+  }
   if (gameTimerState != null) {
     values.addAll(
       LotusLifeCounterGameTimerAdapter.buildSnapshotValues(gameTimerState),
@@ -70,6 +76,7 @@ class LotusHostController implements LotusHost {
   }) : webViewController = WebViewController(),
        isLoading = ValueNotifier<bool>(true),
        errorMessage = ValueNotifier<String?>(null),
+       _dayNightStateStore = LifeCounterDayNightStateStore(),
        _gameTimerStateStore = LifeCounterGameTimerStateStore(),
        _historyStore = LifeCounterHistoryStore(),
        _settingsStore = LifeCounterSettingsStore(),
@@ -85,6 +92,7 @@ class LotusHostController implements LotusHost {
   final ValueNotifier<bool> isLoading;
   @override
   final ValueNotifier<String?> errorMessage;
+  final LifeCounterDayNightStateStore _dayNightStateStore;
   final LifeCounterGameTimerStateStore _gameTimerStateStore;
   final LifeCounterHistoryStore _historyStore;
   final LifeCounterSettingsStore _settingsStore;
@@ -374,6 +382,7 @@ class LotusHostController implements LotusHost {
 
   Future<Map<String, String>> _buildFallbackBootstrapValues() async {
     return buildLotusFallbackBootstrapValues(
+      dayNightStateStore: _dayNightStateStore,
       gameTimerStateStore: _gameTimerStateStore,
       historyStore: _historyStore,
       sessionStore: _sessionStore,

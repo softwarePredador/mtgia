@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_day_night_state.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_day_night_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history.dart';
@@ -16,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('buildLotusFallbackBootstrapValues', () {
+    late LifeCounterDayNightStateStore dayNightStateStore;
     late LifeCounterGameTimerStateStore gameTimerStateStore;
     late LifeCounterHistoryStore historyStore;
     late LifeCounterSessionStore sessionStore;
@@ -23,6 +26,7 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
+      dayNightStateStore = LifeCounterDayNightStateStore();
       gameTimerStateStore = LifeCounterGameTimerStateStore();
       historyStore = LifeCounterHistoryStore();
       sessionStore = LifeCounterSessionStore();
@@ -30,6 +34,7 @@ void main() {
     });
 
     test('builds canonical bootstrap values when Lotus snapshot is missing', () async {
+      await dayNightStateStore.save(const LifeCounterDayNightState(isNight: true));
       await sessionStore.save(
         const LifeCounterSession(
           playerCount: 4,
@@ -129,12 +134,14 @@ void main() {
       );
 
       final values = await buildLotusFallbackBootstrapValues(
+        dayNightStateStore: dayNightStateStore,
         gameTimerStateStore: gameTimerStateStore,
         historyStore: historyStore,
         sessionStore: sessionStore,
         settingsStore: settingsStore,
       );
 
+      expect(values['__manaloom_day_night_mode'], 'night');
       expect(values['players'], isNotNull);
       expect(values['gameSettings'], isNotNull);
       expect(values['gameTimerState'], isNotNull);
@@ -192,6 +199,7 @@ void main() {
     });
 
     test('builds history-only bootstrap values when only canonical history exists', () async {
+      await dayNightStateStore.save(const LifeCounterDayNightState(isNight: true));
       await historyStore.save(
         const LifeCounterHistoryState(
           currentGameName: 'Imported History',
@@ -220,12 +228,14 @@ void main() {
       );
 
       final values = await buildLotusFallbackBootstrapValues(
+        dayNightStateStore: dayNightStateStore,
         gameTimerStateStore: gameTimerStateStore,
         historyStore: historyStore,
         sessionStore: sessionStore,
         settingsStore: settingsStore,
       );
 
+      expect(values['__manaloom_day_night_mode'], 'night');
       expect(values['players'], isNull);
       expect(values['gameSettings'], isNull);
       expect(values['gameTimerState'], isNull);
@@ -247,6 +257,20 @@ void main() {
       expect(restoredHistory.archiveEntries.single.message, 'Player 3 left the table');
       expect(restoredHistory.gameCounter, 3);
       expect(restoredHistory.lastTableEvent, isNull);
+    });
+
+    test('builds day night bootstrap values when only canonical day night exists', () async {
+      await dayNightStateStore.save(const LifeCounterDayNightState(isNight: true));
+
+      final values = await buildLotusFallbackBootstrapValues(
+        dayNightStateStore: dayNightStateStore,
+        gameTimerStateStore: gameTimerStateStore,
+        historyStore: historyStore,
+        sessionStore: sessionStore,
+        settingsStore: settingsStore,
+      );
+
+      expect(values, {'__manaloom_day_night_mode': 'night'});
     });
   });
 }
