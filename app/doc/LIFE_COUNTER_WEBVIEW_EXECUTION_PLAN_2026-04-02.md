@@ -233,6 +233,7 @@ Refatorar a suite de testes para separar:
 - quarta extracao concluida em `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - quinta extracao concluida em `test/features/home/lotus_life_counter_internal_player_values_test.dart`
 - sexta extracao concluida em `test/features/home/lotus_life_counter_internal_player_state_test.dart`
+- setima extracao concluida em `test/features/home/lotus_life_counter_internal_state_outcomes_test.dart`
 - `lotus_life_counter_screen_test.dart` agora fica nomeado como cobertura de `host and backend behavior`
 
 ### Task C
