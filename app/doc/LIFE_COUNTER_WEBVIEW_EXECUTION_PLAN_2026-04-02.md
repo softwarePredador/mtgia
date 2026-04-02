@@ -230,6 +230,7 @@ Refatorar a suite de testes para separar:
 - primeira extracao concluida em `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - segunda extracao concluida em `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - terceira extracao concluida em `test/features/home/lotus_life_counter_internal_runtime_test.dart`
+- quarta extracao concluida em `test/features/home/lotus_life_counter_internal_player_appearance_test.dart`
 - `lotus_life_counter_screen_test.dart` agora fica nomeado como cobertura de `host and backend behavior`
 
 ### Task C
