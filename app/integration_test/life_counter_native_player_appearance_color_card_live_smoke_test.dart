@@ -82,9 +82,16 @@ Future<Map<String, dynamic>> _readPlayerAppearanceState(
     const appearances = rawAppearances ? JSON.parse(rawAppearances) : [];
     const player = Array.isArray(players) && players.length > 2 ? players[2] : null;
     const appearance = Array.isArray(appearances) && appearances.length > 2 ? appearances[2] : null;
+    const playerCards = Array.from(document.querySelectorAll('.player-card'));
+    const targetCard = playerCards[2];
     localStorage.setItem('$storageKey', JSON.stringify({
       player_background: player?.background ?? null,
-      appearance_background: appearance?.background ?? null
+      appearance_background: appearance?.background ?? null,
+      probe: window.__manaloomAppearanceColorCardApplyProbe ?? null,
+      option_card_count:
+        targetCard instanceof HTMLElement
+          ? targetCard.querySelectorAll('.player-card-inner.option-card').length
+          : null
     }));
     localStorage.setItem('$nonceKey', '$nonce');
   } catch (_) {}
@@ -182,6 +189,11 @@ void main() {
       await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+      await state.debugRunJavaScript('''
+(() => {
+  window.__manaloomAppearanceColorCardApplyProbe = 'alive';
+})()
+''');
       await state.debugHandleShellMessage(
         '{"type":"open-native-player-appearance","source":"player_background_color_card_presented","targetPlayerIndex":2}',
       );
@@ -214,6 +226,8 @@ void main() {
       );
       expect(appearanceState['player_background'], '#CF7AEF');
       expect(appearanceState['appearance_background'], '#CF7AEF');
+      expect(appearanceState['probe'], 'alive');
+      expect(appearanceState['option_card_count'], 0);
 
       final rawSnapshot = await snapshotStore.load();
       expect(rawSnapshot, isNotNull);
