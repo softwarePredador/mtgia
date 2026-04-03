@@ -65,6 +65,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_lotus_card_search_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_clock_visual_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_clock_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_history_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_settings_ui_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_day_night_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_settings_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -134,6 +135,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `settings` tambem ficou coberto no mesmo padrao de reopen: `gameSettings` canonico volta a prevalecer no bootstrap mesmo quando o snapshot Lotus salvo traz flags stale.
 - o `clock` Lotus-first tambem ficou validado explicitamente no caminho vivo: com `showClockOnMainScreen=true` e `gameTimer=false`, o runtime mostra relogio sem subir timer visualmente.
 - o recorte `clock-only -> native game timer sheet` tambem ficou validado no caminho vivo: com `showClockOnMainScreen=true` e `gameTimer=false`, tocar o relogio continua abrindo a sheet interna de timer sem quebrar a superficie Lotus-first.
+- o atalho de `History` tambem ficou validado como `support_utility` no Android real: abrir a surface interna continua mostrando `lastTableEvent`, eventos do jogo atual e arquivo historico sem depender do overlay visual Lotus.
 - os flags visuais principais de `settings` tambem ficaram validados explicitamente no caminho vivo: `setLifeByTapEnabled`, `verticalTapAreas`, `cleanLook`, counters visiveis, timer e clock realmente entram e saem do runtime Lotus conforme o bootstrap canonico.
 - o atalho direto de `Set Life` tambem ficou validado no caminho vivo: abrir a sheet nativa a partir do total de vida, aplicar um delta curto e confirmar que a vida e o payload `players` do Lotus sao atualizados sem reboot completo do bundle, limpando o `lastTableEvent` canonico anterior.
 - o hub de `Player State -> Manage Counters` tambem ficou validado no caminho vivo no recorte oculto: com counters escondidos no player card, aplicar `poison` pelo hub atualiza a sessao canonica e o payload `players` do Lotus sem reboot completo do bundle.
