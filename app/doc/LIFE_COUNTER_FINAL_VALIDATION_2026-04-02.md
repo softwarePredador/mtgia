@@ -163,6 +163,10 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_five_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_six_players_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 
+Checkpoint desta rodada:
+
+- a bateria acima agora enumera explicitamente todos os arquivos `life_counter*_smoke_test.dart` presentes em `app/integration_test`, sem lista residual pendente fora da validacao final.
+
 ## Notes from final validation
 
 - `life_counter_webview_smoke_test.dart` foi alinhado com a regra canonica atual do tracker: quando o `startingPlayerIndex` do snapshot aponta para jogador fora da mesa, o bootstrap canonico reescreve `firstPlayerIndex` para o primeiro jogador ativo.
