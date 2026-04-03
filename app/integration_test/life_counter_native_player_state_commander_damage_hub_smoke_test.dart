@@ -89,42 +89,47 @@ void main() {
 
       await tester.scrollUntilVisible(
         find.byKey(
-          const Key(
-            'life-counter-native-player-state-manage-commander-damage',
-          ),
+          const Key('life-counter-native-player-state-manage-commander-damage'),
         ),
         250,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.ensureVisible(
         find.byKey(
-          const Key(
-            'life-counter-native-player-state-manage-commander-damage',
-          ),
+          const Key('life-counter-native-player-state-manage-commander-damage'),
         ),
       );
       await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(
-          const Key(
-            'life-counter-native-player-state-manage-commander-damage',
-          ),
+          const Key('life-counter-native-player-state-manage-commander-damage'),
         ),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Commander Damage'), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-native-commander-damage-apply')),
+        findsOneWidget,
+      );
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
         250,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-commander-damage-plus-1-c1')),
       );
       await tester.pumpAndSettle();
 
+      await tester.ensureVisible(
+        find.byKey(const Key('life-counter-native-commander-damage-apply')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const Key('life-counter-native-commander-damage-apply')),
       );
