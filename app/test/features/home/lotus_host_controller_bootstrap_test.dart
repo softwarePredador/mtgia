@@ -20,9 +20,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('mergeLotusBootstrapValues', () {
-    test('prunes stale canonical domains from saved Lotus snapshot', () {
-      final merged = mergeLotusBootstrapValues(
-        snapshotValues: const {
+    test(
+      'preserves saved Lotus snapshot domains when canonical fallback is empty',
+      () {
+        final merged = mergeLotusBootstrapValues(
+          snapshotValues: const {
+            'players': '[{"name":"Player 1"}]',
+            'playerCount': '4',
+            'gameSettings': '{"autoKO":true}',
+            'gameTimerState': '{"startTime":1}',
+            '__manaloom_day_night_mode': 'night',
+            'gameHistory': '["stale"]',
+            'allGamesHistory': '["stale-archive"]',
+            'currentGameMeta': '{"id":"stale"}',
+            'gameCounter': '9',
+            'shellCleanupComplete_v1': 'true',
+          },
+          fallbackValues: const {},
+        );
+
+        expect(merged, const <String, String>{
           'players': '[{"name":"Player 1"}]',
           'playerCount': '4',
           'gameSettings': '{"autoKO":true}',
@@ -33,39 +50,39 @@ void main() {
           'currentGameMeta': '{"id":"stale"}',
           'gameCounter': '9',
           'shellCleanupComplete_v1': 'true',
-        },
-        fallbackValues: const {},
-      );
+        });
+      },
+    );
 
-      expect(merged, const <String, String>{'shellCleanupComplete_v1': 'true'});
-    });
+    test(
+      'keeps snapshot session keys while overriding domains provided by canonical fallback',
+      () {
+        final merged = mergeLotusBootstrapValues(
+          snapshotValues: const {
+            'players': '[{"name":"Player 1"}]',
+            'turnTracker': '{"isActive":true}',
+            'gameHistory': '["stale"]',
+            'allGamesHistory': '["stale-archive"]',
+            'currentGameMeta': '{"id":"stale"}',
+            'gameCounter': '9',
+            'turnTrackerHintOverlay_v1': 'true',
+          },
+          fallbackValues: const {
+            'gameHistory': '["canonical"]',
+            'allGamesHistory': '[]',
+            'currentGameMeta': '{"id":"canonical"}',
+            'gameCounter': '3',
+          },
+        );
 
-    test('keeps history fallback while pruning stale session keys', () {
-      final merged = mergeLotusBootstrapValues(
-        snapshotValues: const {
-          'players': '[{"name":"Player 1"}]',
-          'turnTracker': '{"isActive":true}',
-          'gameHistory': '["stale"]',
-          'allGamesHistory': '["stale-archive"]',
-          'currentGameMeta': '{"id":"stale"}',
-          'gameCounter': '9',
-          'turnTrackerHintOverlay_v1': 'true',
-        },
-        fallbackValues: const {
-          'gameHistory': '["canonical"]',
-          'allGamesHistory': '[]',
-          'currentGameMeta': '{"id":"canonical"}',
-          'gameCounter': '3',
-        },
-      );
-
-      expect(merged['players'], isNull);
-      expect(merged['turnTracker'], isNull);
-      expect(merged['gameHistory'], '["canonical"]');
-      expect(merged['currentGameMeta'], '{"id":"canonical"}');
-      expect(merged['gameCounter'], '3');
-      expect(merged['turnTrackerHintOverlay_v1'], 'true');
-    });
+        expect(merged['players'], '[{"name":"Player 1"}]');
+        expect(merged['turnTracker'], '{"isActive":true}');
+        expect(merged['gameHistory'], '["canonical"]');
+        expect(merged['currentGameMeta'], '{"id":"canonical"}');
+        expect(merged['gameCounter'], '3');
+        expect(merged['turnTrackerHintOverlay_v1'], 'true');
+      },
+    );
   });
 
   group('buildLotusFallbackBootstrapValues', () {

@@ -28,24 +28,6 @@ import 'lotus_storage_snapshot_store.dart';
 import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
 
-const Set<String> _lotusSessionBootstrapKeys = <String>{
-  'playerCount',
-  'startingLife2P',
-  'startingLifeMP',
-  'layoutType',
-  'players',
-  'turnTracker',
-  '__manaloom_player_special_states',
-  '__manaloom_player_appearances',
-  '__manaloom_table_state',
-};
-
-const Set<String> _lotusSettingsBootstrapKeys = <String>{'gameSettings'};
-const Set<String> _lotusGameTimerBootstrapKeys = <String>{'gameTimerState'};
-const Set<String> _lotusDayNightBootstrapKeys = <String>{
-  '__manaloom_day_night_mode',
-};
-
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
   required LifeCounterDayNightStateStore dayNightStateStore,
   required LifeCounterGameTimerStateStore gameTimerStateStore,
@@ -92,49 +74,8 @@ Map<String, String> mergeLotusBootstrapValues({
   required Map<String, String> fallbackValues,
 }) {
   final mergedValues = <String, String>{...?snapshotValues};
-
-  _pruneStaleBootstrapDomain(
-    mergedValues,
-    fallbackValues: fallbackValues,
-    domainKeys: _lotusSessionBootstrapKeys,
-  );
-  _pruneStaleBootstrapDomain(
-    mergedValues,
-    fallbackValues: fallbackValues,
-    domainKeys: LifeCounterHistoryState.snapshotDomainKeys,
-  );
-  _pruneStaleBootstrapDomain(
-    mergedValues,
-    fallbackValues: fallbackValues,
-    domainKeys: _lotusSettingsBootstrapKeys,
-  );
-  _pruneStaleBootstrapDomain(
-    mergedValues,
-    fallbackValues: fallbackValues,
-    domainKeys: _lotusGameTimerBootstrapKeys,
-  );
-  _pruneStaleBootstrapDomain(
-    mergedValues,
-    fallbackValues: fallbackValues,
-    domainKeys: _lotusDayNightBootstrapKeys,
-  );
-
   mergedValues.addAll(fallbackValues);
   return mergedValues;
-}
-
-void _pruneStaleBootstrapDomain(
-  Map<String, String> mergedValues, {
-  required Map<String, String> fallbackValues,
-  required Set<String> domainKeys,
-}) {
-  if (domainKeys.any(fallbackValues.containsKey)) {
-    return;
-  }
-
-  for (final key in domainKeys) {
-    mergedValues.remove(key);
-  }
 }
 
 LifeCounterDayNightState? buildLotusDayNightStateFromSnapshot(
