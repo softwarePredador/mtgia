@@ -945,6 +945,86 @@ void main() {
       });
     });
 
+    testWidgets('resets active game timer live from shell shortcut', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+
+      await _captureDebugLogs((logs) async {
+        await LifeCounterGameTimerStateStore().save(
+          const LifeCounterGameTimerState(
+            startTimeEpochMs: 1_000,
+            isPaused: false,
+            pausedTimeEpochMs: null,
+          ),
+        );
+        await LotusStorageSnapshotStore().save(
+          const LotusStorageSnapshot(
+            values: {
+              'gameTimerState':
+                  '{"startTime":1000,"isPaused":false,"pausedTime":0}',
+            },
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Game Timer'), findsOneWidget);
+
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('life-counter-native-game-timer-reset')),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-reset')),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-game-timer-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final state = await LifeCounterGameTimerStateStore().load();
+        expect(state, isNull);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_game_timer_applied') &&
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('live_patch_eligible: true') &&
+                message.contains('reload_required: false') &&
+                message.contains('sync_blockers: []'),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets(
       'applies monarch and initiative table state without reloading the Lotus bundle',
       (tester) async {

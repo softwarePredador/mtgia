@@ -2214,9 +2214,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterGameTimerState next,
   ) {
     final blockers = <String>[];
-    if (!next.isActive) {
-      blockers.add('next_timer_inactive');
-    }
     if (next.isActive && next.startTimeEpochMs == null) {
       blockers.add('next_start_time_missing');
     }
@@ -2242,10 +2239,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   try {
     const startTime = ${state.startTimeEpochMs ?? 'null'};
     const pausedTime = ${state.pausedTimeEpochMs ?? 0};
-    if (startTime == null) {
-      return JSON.stringify({ ok: false, reason: 'start_time_missing' });
-    }
-
     const formatElapsed = (effectiveStartTime, effectivePausedTime, isPaused) => {
       const elapsedSeconds = Math.max(
         0,
@@ -2271,6 +2264,18 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       );
       timer.classList.toggle('paused', isPaused);
     };
+
+    const clock = document.querySelector('.game-timer.current-time-clock');
+    if (startTime == null) {
+      const existingTimer = document.querySelector('.game-timer:not(.current-time-clock)');
+      if (existingTimer instanceof HTMLElement) {
+        existingTimer.remove();
+      }
+      if (clock instanceof HTMLElement) {
+        clock.classList.remove('with-game-timer');
+      }
+      return JSON.stringify({ ok: true, removed: true });
+    }
 
     let timer = document.querySelector('.game-timer:not(.current-time-clock)');
     let created = false;
@@ -2326,7 +2331,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
     applyVisualState(timer, startTime, pausedTime, ${state.isPaused ? 'true' : 'false'});
 
-    const clock = document.querySelector('.game-timer.current-time-clock');
     if (clock instanceof HTMLElement) {
       clock.classList.add('with-game-timer');
     }
