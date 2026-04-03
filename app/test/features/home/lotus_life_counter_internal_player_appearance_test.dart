@@ -1186,6 +1186,81 @@ void main() {
     );
 
     testWidgets(
+      'resets the Lotus appearance surface when native player appearance is dismissed from player background takeover',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-appearance","source":"player_background_surface_pressed","targetPlayerIndex":1}',
+          );
+          await tester.pumpAndSettle();
+
+          expect(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+            findsOneWidget,
+          );
+
+          await tester.tap(find.text('Cancel'));
+          await tester.pumpAndSettle();
+
+          expect(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+            findsNothing,
+          );
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains(
+                    'message=native_player_appearance_dismissed',
+                  ) &&
+                  message.contains(
+                    'source: player_background_surface_pressed',
+                  ) &&
+                  message.contains('changed: false') &&
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: live_dom_reset'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
+    testWidgets(
       'keeps solid player appearance live when applying from color-card takeover',
       (tester) async {
         late _FakeLotusHost host;
