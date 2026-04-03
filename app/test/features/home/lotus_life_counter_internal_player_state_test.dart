@@ -1631,6 +1631,170 @@ void main() {
     );
 
     testWidgets(
+      'resets the Lotus option-card surface after hidden commander damage canonical sync apply',
+      (tester) async {
+        late _FakeLotusHost host;
+        await _captureDebugLogs((logs) async {
+          await tester.binding.setSurfaceSize(const Size(900, 1200));
+          addTearDown(() => tester.binding.setSurfaceSize(null));
+
+          await LifeCounterSettingsStore().save(
+            LifeCounterSettings.defaults.copyWith(
+              autoKill: false,
+              lifeLossOnCommanderDamage: false,
+              showCountersOnPlayerCard: false,
+              showCommanderDamageCounters: false,
+            ),
+          );
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 32, 25, 11],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              partnerCommanders: [false, true, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: null,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":0}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key(
+                'life-counter-native-player-state-manage-commander-damage',
+              ),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key(
+                'life-counter-native-player-state-manage-commander-damage',
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key(
+                'life-counter-native-player-state-manage-commander-damage',
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-commander-damage-plus-1-c1'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-commander-damage-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Player State'), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.commanderDamage[0][1], 1);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_state_applied') &&
+                  message.contains('apply_strategy: canonical_store_sync') &&
+                  message.contains('reload_required: false') &&
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: live_dom_reset') &&
+                  message.contains('sync_blockers: []'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
+    testWidgets(
       'keeps hidden commander damage canonical sync through the player state hub',
       (tester) async {
         late _FakeLotusHost host;
