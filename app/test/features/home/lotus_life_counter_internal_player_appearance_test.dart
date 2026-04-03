@@ -1062,5 +1062,75 @@ void main() {
         });
       },
     );
+
+    testWidgets(
+      'keeps solid player appearance live when applying from color-card takeover',
+      (tester) async {
+        late _FakeLotusHost host;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-appearance","source":"player_background_color_card_presented","targetPlayerIndex":2}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.resolvedPlayerAppearances[2].background, '#CF7AEF');
+        });
+      },
+    );
   });
 }

@@ -2973,10 +2973,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     required String source,
   }) {
     final blockers = <String>[];
-    if (source == 'player_background_color_card_presented') {
-      blockers.add('player_background_color_card_presented');
-    }
-
     final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
       previous,
       next,
