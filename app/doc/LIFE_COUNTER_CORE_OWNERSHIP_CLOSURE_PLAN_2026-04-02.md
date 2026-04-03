@@ -518,7 +518,7 @@ Checklist curto de execucao:
 - [x] criar contrato canonico proprio para `history`
 - [x] decidir escopo final de `Game Modes`
 - [ ] reduzir `reload bundle` como caminho padrao
-- [ ] criar mecanismo de patch incremental do runtime Lotus
+- [x] criar mecanismo de patch incremental do runtime Lotus
 - [x] provar reopen com estado canonico mesmo sem snapshot Lotus confiavel
 - [x] revisar quais `open-native-*` ainda sao fallback real e quais escondem ownership incompleto
 
@@ -556,6 +556,7 @@ Depois desta rodada, a leitura mais correta e:
 - `history` ja tem owner canonico ManaLoom
 - o renderer Lotus ainda recebe `history/meta/counter` em formato legado por compatibilidade
 - `receivePatch` existe e ja reduz reload em parte do `game timer`
+- o mecanismo de patch incremental do runtime Lotus fica formalmente fechado por `app/assets/lotus/flutter_bootstrap.js` (`receivePatch`) e pela cobertura/uso vivo nos dominios que ja fecham em `live_runtime`
 - o `turn tracker` ja tem casos seguros de sync pelo proprio runtime do Lotus, disparando `click` para avancar e `long press` simulado para rewind curto limitado, inclusive para mudanca curta de starting player em `Turn 1`, sem rebootar o bundle
 - `settings` nao devem migrar para patch cego enquanto o runtime do Lotus continuar mantendo esse estado em memoria interna
 - o proximo alvo tecnico com melhor relacao ganho/risco continua sendo mapear de forma conservadora quais dominios aceitam patch incremental real
