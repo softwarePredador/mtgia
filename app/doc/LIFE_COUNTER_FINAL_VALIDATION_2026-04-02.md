@@ -119,6 +119,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_commander_damage_hidden_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_commander_damage_hidden_lifeloss_fallback_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_dismiss_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_background_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
