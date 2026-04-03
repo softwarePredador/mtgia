@@ -41,6 +41,7 @@ import 'lotus/lotus_host.dart';
 import 'lotus/lotus_host_controller.dart';
 import 'lotus/lotus_host_overlays.dart';
 import 'lotus/lotus_life_counter_game_timer_adapter.dart';
+import 'lotus/lotus_lifecycle_diagnostic_store.dart';
 import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
@@ -204,6 +205,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       LifeCounterPlayerAppearanceProfileStore();
   final LifeCounterSettingsStore _settingsStore = LifeCounterSettingsStore();
   final LifeCounterSessionStore _sessionStore = LifeCounterSessionStore();
+  final LotusLifecycleDiagnosticStore _lifecycleDiagnosticStore =
+      LotusLifecycleDiagnosticStore();
   final LotusStorageSnapshotStore _snapshotStore = LotusStorageSnapshotStore();
   DateTime? _lastShellMessageAt;
   DateTime? _lastDiagnosticTriggerAt;
@@ -284,16 +287,25 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _lastObservedLifecycleState = state;
+    final diagnostics = _buildLifecycleDiagnostics(<String, Object?>{
+      'state': state.name,
+      'source': 'flutter_binding',
+    });
+    _persistLifecycleDiagnostic(
+      'lifecycle_changed',
+      diagnostics,
+    );
     unawaited(
       AppObservability.instance.recordEvent(
         'lifecycle_changed',
         category: 'life_counter.lifecycle',
-        data: _buildLifecycleDiagnostics(<String, Object?>{
-          'state': state.name,
-          'source': 'flutter_binding',
-        }),
+        data: diagnostics,
       ),
     );
+
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_dumpRecentLifecycleDiagnostics());
+    }
   }
 
   void _syncLoadingOverlay() {
@@ -619,17 +631,23 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       _ => const <String, Object?>{},
     };
 
+    final diagnostics = _buildLifecycleDiagnostics(<String, Object?>{
+      'method': call.method,
+      'source': 'android_activity',
+      ...arguments,
+    });
+    unawaited(_persistLifecycleDiagnostic('native_lifecycle_signal', diagnostics));
     unawaited(
       AppObservability.instance.recordEvent(
         'native_lifecycle_signal',
         category: 'life_counter.lifecycle',
-        data: _buildLifecycleDiagnostics(<String, Object?>{
-          'method': call.method,
-          'source': 'android_activity',
-          ...arguments,
-        }),
+        data: diagnostics,
       ),
     );
+
+    if (call.method == 'activityResumed') {
+      unawaited(_dumpRecentLifecycleDiagnostics());
+    }
   }
 
   void _rememberDiagnosticTrigger(
@@ -639,6 +657,37 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     _lastDiagnosticTriggerAt = DateTime.now();
     _lastDiagnosticTrigger = trigger;
     _lastDiagnosticTriggerData = data;
+  }
+
+  Future<void> _persistLifecycleDiagnostic(
+    String eventName,
+    Map<String, Object?> data,
+  ) async {
+    await _lifecycleDiagnosticStore.append(<String, Object?>{
+      'timestamp': DateTime.now().toIso8601String(),
+      'event': eventName,
+      'data': data,
+    });
+  }
+
+  Future<void> _dumpRecentLifecycleDiagnostics() async {
+    final entries = await _lifecycleDiagnosticStore.load();
+    if (entries.isEmpty) {
+      return;
+    }
+
+    final recentEntries = entries.length > 6
+        ? entries.sublist(entries.length - 6)
+        : entries;
+    final summary = recentEntries
+        .map((entry) {
+          final event = entry['event'];
+          final data = entry['data'];
+          return '$event=$data';
+        })
+        .join(' | ');
+
+    debugPrint('$lotusLogPrefix recent lifecycle trace: $summary');
   }
 
   Map<String, Object?> _diagnosticPayloadForShellMessage(String message) {
