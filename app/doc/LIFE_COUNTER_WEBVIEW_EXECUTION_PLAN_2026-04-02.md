@@ -353,4 +353,5 @@ Trabalho futuro, se houver novo briefing:
 Auditoria viva complementar:
 
 - `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`
+- `app/doc/LIFE_COUNTER_OWNERSHIP_BRIDGE_STATUS_2026-04-03.md`
 - os `open-native-*` restantes agora ficam fechados como inventario operacional, nao como gap ambiguo

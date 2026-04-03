@@ -562,3 +562,4 @@ Depois desta rodada, a leitura mais correta e:
 - o proximo alvo tecnico com melhor relacao ganho/risco continua sendo mapear de forma conservadora quais dominios aceitam patch incremental real
 - a auditoria viva dos `open-native-*` foi fechada em `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`, separando formalmente `ownership_bridge`, `support_utility` e `excluded_core_support`
 - a prova de reopen com estado canonico sem snapshot Lotus confiavel fica fechada por `test/features/home/lotus_host_controller_bootstrap_test.dart`, especialmente nos cenarios `builds canonical bootstrap values when Lotus snapshot is missing` e `reopens from stale partial Lotus snapshot using canonical fallback values`
+- o estado operacional dos dominios `ownership_bridge` agora tambem fica consolidado em `app/doc/LIFE_COUNTER_OWNERSHIP_BRIDGE_STATUS_2026-04-03.md`, separando claramente os dominios `reload-only`, `canonical_store_sync`, `live_runtime` e `mixed`
