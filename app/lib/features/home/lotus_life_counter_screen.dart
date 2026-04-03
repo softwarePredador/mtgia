@@ -3701,7 +3701,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         !playerCounterCanonicalSyncEligible &&
         !partnerCommanderCanonicalSyncEligible;
     final liveSurfaceResetEligible =
-        shouldResetLotusSurface && partnerCommanderCanonicalSyncEligible;
+        shouldResetLotusSurface &&
+        (partnerCommanderCanonicalSyncEligible ||
+            playerCounterCanonicalSyncEligible);
     final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
       source: source,
       targetPlayerIndex: targetPlayerIndex,
