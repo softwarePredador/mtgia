@@ -2902,13 +2902,49 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
-    await _persistOwnedSessionSnapshot(session);
-    const livePatchEligible = false;
-    const applyStrategy = 'reload_fallback';
-    const reloadRequired = true;
-    const syncBlockers = <String>[
-      'player_appearance_visual_surface_requires_reload',
-    ];
+    final previousSession =
+        await _sessionStore.load() ??
+        LifeCounterSession.initial(playerCount: session.playerCount);
+    final adjustedSession = await _normalizeOwnedPlayerRuntimeSession(session);
+    await _persistOwnedSessionSnapshot(adjustedSession);
+    final livePatchBlockers = _playerAppearanceLivePatchBlockers(
+      previousSession,
+      adjustedSession,
+      source: source,
+    );
+    final livePatchEligible = livePatchBlockers.isEmpty;
+    String? failureReason;
+    final appliedLive =
+        livePatchEligible
+            ? (() async {
+              final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
+                previousSession,
+                adjustedSession,
+              );
+              if (targetPlayerIndex == null) {
+                failureReason = 'player_appearance_target_missing';
+                return false;
+              }
+              failureReason =
+                  await _applyOwnedPlayerAppearanceRuntimeFailureReason(
+                    adjustedSession,
+                    targetPlayerIndex: targetPlayerIndex,
+                  );
+              return failureReason == null;
+            })()
+            : Future<bool>.value(false);
+    final appliedLiveResolved = await appliedLive;
+    final applyStrategy =
+        appliedLiveResolved ? 'live_runtime' : 'reload_fallback';
+    final reloadRequired = !appliedLiveResolved;
+    final syncBlockers =
+        appliedLiveResolved
+            ? const <String>[]
+            : (livePatchBlockers.isNotEmpty
+                ? livePatchBlockers
+                : <String>[
+                  failureReason ?? 'player_appearance_live_runtime_rejected',
+                ]);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2924,7 +2960,167 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       ),
     );
 
+    if (!reloadRequired) {
+      return;
+    }
+
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  List<String> _playerAppearanceLivePatchBlockers(
+    LifeCounterSession previous,
+    LifeCounterSession next, {
+    required String source,
+  }) {
+    final blockers = <String>[];
+    if (source == 'player_background_color_card_presented') {
+      blockers.add('player_background_color_card_presented');
+    }
+
+    final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
+      previous,
+      next,
+    );
+    if (targetPlayerIndex == null) {
+      blockers.add('multiple_player_appearances_changed');
+      return blockers;
+    }
+
+    final previousAppearance =
+        previous.resolvedPlayerAppearances[targetPlayerIndex];
+    final nextAppearance = next.resolvedPlayerAppearances[targetPlayerIndex];
+    if (previousAppearance.nickname != nextAppearance.nickname) {
+      blockers.add('nickname_changed');
+    }
+    if (previousAppearance.backgroundImage != null ||
+        nextAppearance.backgroundImage != null) {
+      blockers.add('background_image_present');
+    }
+    if (previousAppearance.backgroundImagePartner != null ||
+        nextAppearance.backgroundImagePartner != null) {
+      blockers.add('partner_background_image_present');
+    }
+
+    final expected = previous.copyWith(
+      playerAppearances: next.resolvedPlayerAppearances,
+    );
+    if (expected.toJsonString() != next.toJsonString()) {
+      blockers.add('session_change_outside_player_appearance');
+    }
+    return blockers;
+  }
+
+  int? _singleChangedPlayerAppearanceIndex(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    int? targetPlayerIndex;
+    for (var index = 0; index < next.playerCount; index += 1) {
+      if (previous.resolvedPlayerAppearances[index] ==
+          next.resolvedPlayerAppearances[index]) {
+        continue;
+      }
+      if (targetPlayerIndex != null) {
+        return null;
+      }
+      targetPlayerIndex = index;
+    }
+    return targetPlayerIndex;
+  }
+
+  Future<String?> _applyOwnedPlayerAppearanceRuntimeFailureReason(
+    LifeCounterSession session, {
+    required int targetPlayerIndex,
+  }) async {
+    final patched = await _applyLiveLotusStoragePatch(
+      LotusLifeCounterSessionAdapter.buildPlayerRuntimeSnapshotValues(session),
+    );
+    if (!patched) {
+      return 'storage_patch_failed';
+    }
+
+    final appearance = session.resolvedPlayerAppearances[targetPlayerIndex];
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const playerCards = Array.from(document.querySelectorAll('.player-card'));
+    const playerCard = playerCards[$targetPlayerIndex];
+    if (!(playerCard instanceof HTMLElement)) {
+      return JSON.stringify({ ok: false, reason: 'player_card_missing' });
+    }
+
+    const innerCard = playerCard.children[0];
+    if (!(innerCard instanceof HTMLElement)) {
+      return JSON.stringify({ ok: false, reason: 'player_card_inner_missing' });
+    }
+
+    const background = ${jsonEncode(appearance.background)};
+    const parseHexColor = (value) => {
+      if (typeof value !== 'string') {
+        return null;
+      }
+      const normalized = value.trim();
+      const shortHexMatch = normalized.match(/^#([0-9a-fA-F]{3})\$/);
+      if (shortHexMatch) {
+        const expanded = shortHexMatch[1]
+          .split('')
+          .map((entry) => entry + entry)
+          .join('');
+        return [
+          Number.parseInt(expanded.slice(0, 2), 16),
+          Number.parseInt(expanded.slice(2, 4), 16),
+          Number.parseInt(expanded.slice(4, 6), 16),
+        ];
+      }
+
+      const hexMatch = normalized.match(/^#([0-9a-fA-F]{6})\$/);
+      if (!hexMatch) {
+        return null;
+      }
+
+      return [
+        Number.parseInt(hexMatch[1].slice(0, 2), 16),
+        Number.parseInt(hexMatch[1].slice(2, 4), 16),
+        Number.parseInt(hexMatch[1].slice(4, 6), 16),
+      ];
+    };
+
+    playerCard.style.setProperty('--bg', background);
+    playerCard.style.removeProperty('--bgImage');
+    playerCard.style.removeProperty('background-image');
+    innerCard.style.removeProperty('background-image');
+    innerCard.style.removeProperty('background-image-partner');
+    innerCard.classList.remove('white-text');
+
+    const rgb = parseHexColor(background);
+    if (rgb != null) {
+      const [red, green, blue] = rgb;
+      const luminance = (red * 299 + green * 587 + blue * 114) / 1000;
+      if (luminance < 140) {
+        innerCard.classList.add('white-text');
+      }
+    }
+
+    return JSON.stringify({ ok: true });
+  } catch (error) {
+    return JSON.stringify({
+      ok: false,
+      reason: error && error.message ? String(error.message) : 'player_appearance_patch_failed',
+    });
+  }
+})()
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      if (decoded is! Map<String, dynamic> || decoded['ok'] != true) {
+        return (decoded is Map<String, dynamic> ? decoded['reason'] : null)
+                as String? ??
+            'player_appearance_patch_failed';
+      }
+      return null;
+    } catch (_) {
+      return 'player_appearance_patch_exception';
+    }
   }
 
   Future<void> _exportNativePlayerAppearance(

@@ -31,7 +31,7 @@ O inventario abaixo traduz isso para o estado real de cada dominio `ownership_br
 | `game_timer` | `live_runtime` | ja evita `reload` em `active -> active` e `inactive -> active` quando a superficie `.game-timer` responde |
 | `dice` | `canonical_store_sync` | ja evita `reload` quando a mutacao fica limitada ao resultado canonico e nao muda estruturalmente o tracker |
 | `commander_damage` | `canonical_store_sync` | ja evita `reload` apenas quando o settings garante ausencia de reflexo visual na mesa |
-| `player_appearance` | `reload_fallback` | continua dominado pela superficie visual do board e pelos assets do jogador |
+| `player_appearance` | `mixed` | agora abre `live_runtime` apenas para troca simples de background solido em um unico jogador; nickname e imagens ainda ficam em `reload_fallback` |
 | `player_counter` | `canonical_store_sync` | ja evita `reload` quando counters ficam ocultos e `poison` nao pode disparar `autoKill` |
 | `player_state` | `mixed` | combina `canonical_store_sync`, `live_runtime` e `reload_fallback` conforme o subfluxo final do hub |
 | `set_life` | `live_runtime` | ja evita `reload` em delta medio de vida no jogador alvo quando o runtime Lotus confirma os controles |
@@ -45,29 +45,38 @@ O inventario abaixo traduz isso para o estado real de cada dominio `ownership_br
 Entram aqui:
 
 - `settings`
-- `player_appearance`
 
 Leitura:
 
-- esses dois ainda nao tem um recorte live confiavel o bastante para virar default
+- esse dominio ainda nao tem um recorte live confiavel o bastante para virar default
 - `settings` e um caso explicitamente arquitetural
-- `player_appearance` continua acoplado a reflexo visual direto do board Lotus
 
-### 2. Sync canonico sem reboot
+### 2. Mixed
+
+Entram aqui:
+
+- `player_appearance`
+- parte de `player_state`
+
+Leitura:
+
+- esses dominios ja tem recortes seguros sem `reload`
+- mas ainda mantem fallback para casos com reflexo visual mais sensivel ou mutacao composta
+
+### 3. Sync canonico sem reboot
 
 Entram aqui:
 
 - `dice`
 - `commander_damage`
 - `player_counter`
-- parte de `player_state`
 
 Leitura:
 
 - o estado ja fica correto sem recarregar o bundle
 - mas o host ainda depende de gates conservadores para nao vender sync silencioso em caso com reflexo visual real
 
-### 3. Live runtime real
+### 4. Live runtime real
 
 Entram aqui:
 
@@ -88,8 +97,8 @@ Leitura:
 Se o objetivo for continuar reduzindo `reload bundle` como caminho padrao, a ordem mais promissora hoje e:
 
 1. `player_appearance`
-   - maior bloco ainda `reload-only` fora `settings`
-   - mas tambem o mais sensivel visualmente
+   - saiu de `reload-only`, mas continua sendo o dominio visualmente mais sensivel
+   - o proximo ganho real seria expandir alem de `background` solido de um unico jogador
 2. `player_state`
    - ainda mistura varios subfluxos
    - existe espaco para abrir mais recortes seguros

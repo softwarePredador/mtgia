@@ -1800,5 +1800,147 @@ void main() {
         });
       },
     );
+    testWidgets(
+      'applies solid player appearance background live without reloading the Lotus bundle',
+      (tester) async {
+        late _FakeLotusHost host;
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            const LifeCounterSession(
+              playerCount: 4,
+              startingLifeTwoPlayer: 20,
+              startingLifeMultiPlayer: 40,
+              lives: [40, 32, 25, 11],
+              poison: [0, 0, 0, 0],
+              energy: [0, 0, 0, 0],
+              experience: [0, 0, 0, 0],
+              commanderCasts: [0, 0, 0, 0],
+              playerAppearances: [
+                LifeCounterPlayerAppearance(background: '#FFB51E'),
+                LifeCounterPlayerAppearance(background: '#FF0A5B'),
+                LifeCounterPlayerAppearance(background: '#CF7AEF'),
+                LifeCounterPlayerAppearance(background: '#4B57FF'),
+              ],
+              partnerCommanders: [false, false, false, false],
+              playerSpecialStates: [
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+                LifeCounterPlayerSpecialState.none,
+              ],
+              lastPlayerRolls: [null, null, null, null],
+              lastHighRolls: [null, null, null, null],
+              commanderDamage: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              stormCount: 0,
+              monarchPlayer: null,
+              initiativePlayer: null,
+              firstPlayerIndex: null,
+              turnTrackerActive: false,
+              turnTrackerOngoingGame: false,
+              turnTrackerAutoHighRoll: false,
+              currentTurnPlayerIndex: null,
+              currentTurnNumber: 1,
+              turnTimerActive: false,
+              turnTimerSeconds: 0,
+              lastTableEvent: null,
+            ),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-appearance","source":"player_background_surface_pressed","targetPlayerIndex":1}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains('receivePatch') &&
+                  script.contains('__manaloom_player_appearances'),
+            ),
+            isTrue,
+          );
+          expect(
+            host.executedScripts.any(
+              (script) =>
+                  script.contains(
+                    "document.querySelectorAll('.player-card')",
+                  ) &&
+                  script.contains('player_card_missing'),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains(
+                    'message=native_player_appearance_applied',
+                  ) &&
+                  message.contains('apply_strategy: live_runtime') &&
+                  message.contains('live_patch_eligible: true') &&
+                  message.contains('reload_required: false') &&
+                  message.contains('sync_blockers: []'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
   });
 }
