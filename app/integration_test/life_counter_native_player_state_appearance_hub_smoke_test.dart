@@ -16,8 +16,7 @@ Future<LifeCounterSession?> _pumpUntilAppearanceApplied(
     var attempt = 0;
     attempt < 20 &&
         (session == null ||
-            session.resolvedPlayerAppearances[1].nickname !=
-                'State Hub Pilot');
+            session.resolvedPlayerAppearances[1].nickname != 'State Hub Pilot');
     attempt += 1
   ) {
     await tester.pump(const Duration(seconds: 1));
@@ -116,20 +115,19 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Player Appearance'), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-native-player-appearance-apply')),
+        findsOneWidget,
+      );
 
       await tester.enterText(
-        find.byKey(
-          const Key('life-counter-native-player-appearance-nickname'),
-        ),
+        find.byKey(const Key('life-counter-native-player-appearance-nickname')),
         'State Hub Pilot',
       );
       await tester.pumpAndSettle();
 
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-player-appearance-apply'),
-        ),
+        find.byKey(const Key('life-counter-native-player-appearance-apply')),
       );
       await tester.pumpAndSettle();
 
