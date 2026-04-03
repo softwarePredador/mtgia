@@ -110,6 +110,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_player_state_option_card_partner_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_option_card_hidden_counter_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_option_card_hidden_commander_damage_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_player_state_option_card_appearance_background_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_counter_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_commander_damage_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -161,6 +162,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o takeover de `Player State` vindo de `player_option_card_presented` tambem ficou validado no recorte seguro de `Partner commander`: aplicar a mudanca agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - o takeover de `Player State` vindo de `player_option_card_presented` tambem ficou validado no recorte seguro de `Manage Counters` com counters ocultos: aplicar `poison` agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - o takeover de `Player State` vindo de `player_option_card_presented` tambem ficou validado no recorte seguro de `Commander Damage` com counters ocultos: aplicar o dano agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
+- o takeover de `Player State` vindo de `player_option_card_presented` tambem ficou validado no recorte seguro de `Appearance` com `background` solido: aplicar a cor agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - `player appearance` tambem ficou coberto no mesmo padrao: `players` e `__manaloom_player_appearances` canonicos voltam a prevalecer sobre um snapshot Lotus stale no bootstrap e no reopen.
 - os `appearance profiles` do ManaLoom tambem ficaram validados no caminho vivo: aplicar um perfil salvo pelo fallback interno atualiza a sessao canonica e o runtime Lotus sem quebrar o fluxo visual principal.
 - o apply direto de `player appearance` tambem ficou validado no caminho vivo: editar nickname e preset pela shell interna atualiza a sessao canonica sem quebrar o runtime Lotus.

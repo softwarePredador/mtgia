@@ -456,6 +456,122 @@ void main() {
       },
     );
 
+    testWidgets(
+      'resets the Lotus option-card surface after solid player appearance live apply from player state takeover',
+      (tester) async {
+        late _FakeLotusHost host;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":1}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Player State'), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_state_applied') &&
+                  message.contains('apply_strategy: live_runtime') &&
+                  message.contains('reload_required: false') &&
+                  message.contains('surface_reset_required: true') &&
+                  message.contains('surface_reset_strategy: live_dom_reset') &&
+                  message.contains('sync_blockers: []'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
+
     testWidgets('exports native player appearance to clipboard', (
       tester,
     ) async {
