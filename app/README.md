@@ -85,6 +85,7 @@ Estado vivo do contador hoje:
 - quando `player state` nasce de takeover do option-card do Lotus e a sheet e fechada sem apply, o evento de dismiss agora tambem expõe `surface_reset_required` e `surface_reset_strategy`, deixando explicito o reset do bundle usado so para limpar a superficie takeover
 - `player state` agora tambem tem um recorte sem `reload` por `live_runtime` quando o efeito final do hub fica limitado a um `set life` curto em um unico jogador, reaproveitando os controles reais do Lotus
 - `player appearance` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mutacao fica limitada ao background solido de um unico jogador; nickname e imagens continuam em `reload_fallback`
+- `player state` agora tambem herda `live_runtime` quando o efeito final do hub fica limitado a esse mesmo recorte seguro de `player appearance` com background solido de um unico jogador
 - `commander damage` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que esse dano fica invisivel na mesa e sem efeito colateral de vida ou auto-kill
 - `player counter` agora tambem tem um recorte sem `reload` por `canonical_store_sync` quando o settings ja garante que counters ficam invisiveis na mesa e `poison` nao pode acionar `autoKill`
 - o atalho direto de `set life` agora tambem tem um recorte sem `reload` por `live_runtime` quando a mudanca fica limitada a um delta medio de vida no jogador alvo e o runtime real do Lotus confirma os controles da mesa

@@ -3649,57 +3649,86 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final partnerCommanderCanonicalSyncEligible =
         partnerCommanderSyncBlockers.isEmpty &&
         _hasPartnerCommanderDelta(previousSession, adjustedSession);
+    final playerAppearanceTargetPlayerIndex =
+        canonicalSyncEligible ||
+                appliedLive ||
+                commanderDamageCanonicalSyncEligible ||
+                playerCounterCanonicalSyncEligible ||
+                partnerCommanderCanonicalSyncEligible
+            ? null
+            : _singleChangedPlayerAppearanceIndex(
+              previousSession,
+              adjustedSession,
+            );
+    String? playerAppearanceFailureReason;
+    List<String> playerAppearanceSyncBlockers = const <String>[];
+    var playerAppearanceAppliedLive = false;
+
+    if (playerAppearanceTargetPlayerIndex != null) {
+      playerAppearanceSyncBlockers = _playerAppearanceLivePatchBlockers(
+        previousSession,
+        adjustedSession,
+        source: source,
+      );
+      if (playerAppearanceSyncBlockers.isEmpty) {
+        livePatchEligible = true;
+        playerAppearanceFailureReason =
+            await _applyOwnedPlayerAppearanceRuntimeFailureReason(
+              adjustedSession,
+              targetPlayerIndex: playerAppearanceTargetPlayerIndex,
+            );
+        playerAppearanceAppliedLive = playerAppearanceFailureReason == null;
+      }
+    }
 
     final applyStrategy =
-        canonicalSyncEligible
+        canonicalSyncEligible ||
+                commanderDamageCanonicalSyncEligible ||
+                playerCounterCanonicalSyncEligible ||
+                partnerCommanderCanonicalSyncEligible
             ? 'canonical_store_sync'
-            : (appliedLive
+            : (appliedLive || playerAppearanceAppliedLive
                 ? 'live_runtime'
-                : (commanderDamageCanonicalSyncEligible ||
-                        playerCounterCanonicalSyncEligible ||
-                        partnerCommanderCanonicalSyncEligible
-                    ? 'canonical_store_sync'
-                    : 'reload_fallback'));
+                : 'reload_fallback');
     final reloadRequired =
         !canonicalSyncEligible &&
         !appliedLive &&
+        !playerAppearanceAppliedLive &&
         !commanderDamageCanonicalSyncEligible &&
         !playerCounterCanonicalSyncEligible &&
         !partnerCommanderCanonicalSyncEligible;
     final surfaceResetStrategy =
         shouldResetLotusSurface ? 'bundle_reload' : 'none';
-    final syncBlockers =
-        canonicalSyncEligible
-            ? const <String>[]
-            : (appliedLive
-                ? const <String>[]
-                : (commanderDamageCanonicalSyncEligible ||
-                        playerCounterCanonicalSyncEligible ||
-                        partnerCommanderCanonicalSyncEligible
-                    ? const <String>[]
-                    : (setLifeTargetPlayerIndex != null
-                        ? (setLifeSyncBlockers.isNotEmpty
-                            ? setLifeSyncBlockers
-                            : <String>[
-                              setLifeFailureReason ??
-                                  'player_state_live_rejected',
-                            ])
-                        : (_hasCommanderDamageDelta(
-                              previousSession,
-                              adjustedSession,
-                            )
-                            ? commanderDamageSyncBlockers
-                            : (_hasPlayerCounterDelta(
-                                  previousSession,
-                                  adjustedSession,
-                                )
-                                ? playerCounterSyncBlockers
-                                : (_hasPartnerCommanderDelta(
-                                      previousSession,
-                                      adjustedSession,
-                                    )
-                                    ? partnerCommanderSyncBlockers
-                                    : rollSyncBlockers))))));
+    final List<String> syncBlockers;
+    if (canonicalSyncEligible ||
+        appliedLive ||
+        playerAppearanceAppliedLive ||
+        commanderDamageCanonicalSyncEligible ||
+        playerCounterCanonicalSyncEligible ||
+        partnerCommanderCanonicalSyncEligible) {
+      syncBlockers = const <String>[];
+    } else if (setLifeTargetPlayerIndex != null) {
+      syncBlockers =
+          setLifeSyncBlockers.isNotEmpty
+              ? setLifeSyncBlockers
+              : <String>[setLifeFailureReason ?? 'player_state_live_rejected'];
+    } else if (_hasCommanderDamageDelta(previousSession, adjustedSession)) {
+      syncBlockers = commanderDamageSyncBlockers;
+    } else if (_hasPlayerCounterDelta(previousSession, adjustedSession)) {
+      syncBlockers = playerCounterSyncBlockers;
+    } else if (_hasPartnerCommanderDelta(previousSession, adjustedSession)) {
+      syncBlockers = partnerCommanderSyncBlockers;
+    } else if (_hasPlayerAppearanceDelta(previousSession, adjustedSession)) {
+      syncBlockers =
+          playerAppearanceSyncBlockers.isNotEmpty
+              ? playerAppearanceSyncBlockers
+              : <String>[
+                playerAppearanceFailureReason ??
+                    'player_state_player_appearance_live_rejected',
+              ];
+    } else {
+      syncBlockers = rollSyncBlockers;
+    }
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -3786,6 +3815,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   ) {
     return previous.partnerCommanders.join(',') !=
         next.partnerCommanders.join(',');
+  }
+
+  bool _hasPlayerAppearanceDelta(
+    LifeCounterSession previous,
+    LifeCounterSession next,
+  ) {
+    for (var index = 0; index < next.playerCount; index += 1) {
+      if (previous.resolvedPlayerAppearances[index] !=
+          next.resolvedPlayerAppearances[index]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   List<String> _partnerCommanderCanonicalSyncBlockers(

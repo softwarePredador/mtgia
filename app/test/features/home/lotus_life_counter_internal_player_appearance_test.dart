@@ -24,6 +24,7 @@ class _FakeLotusHost implements LotusHost {
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
 
   int loadBundleCallCount = 0;
+  final List<String> executedScripts = <String>[];
 
   @override
   Widget buildView(BuildContext context) {
@@ -42,10 +43,22 @@ class _FakeLotusHost implements LotusHost {
   }
 
   @override
-  Future<void> runJavaScript(String script) async {}
+  Future<void> runJavaScript(String script) async {
+    executedScripts.add(script);
+  }
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
+    executedScripts.add(script);
+
+    if (script.contains('receivePatch')) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
+    if (script.contains(".player-card")) {
+      return jsonEncode(<String, Object>{'ok': true});
+    }
+
     return jsonEncode(<String, Object>{
       'planechaseAvailable': true,
       'planechaseActive': false,
@@ -333,6 +346,115 @@ void main() {
       expect(session!.resolvedPlayerAppearances[1].nickname, 'State Hub Pilot');
       expect(host.loadBundleCallCount, 2);
     });
+
+    testWidgets(
+      'keeps solid player appearance live through the player state hub without reloading the Lotus bundle',
+      (tester) async {
+        late _FakeLotusHost host;
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await _captureDebugLogs((logs) async {
+          await LifeCounterSessionStore().save(
+            LifeCounterSession.initial(playerCount: 4),
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LotusLifeCounterScreen(
+                hostFactory: ({
+                  required onAppReviewRequested,
+                  required onShellMessageRequested,
+                }) {
+                  host = _FakeLotusHost(
+                    onShellMessageRequested: onShellMessageRequested,
+                  )..completeSuccessfulLoad();
+                  return host;
+                },
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump();
+
+          host.emitShellMessage(
+            '{"type":"open-native-player-state","source":"player_state_surface_pressed","targetPlayerIndex":1}',
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-state-manage-appearance'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.scrollUntilVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+            250,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-preset-2'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(
+            find.byKey(
+              const Key('life-counter-native-player-appearance-apply'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('Player State'), findsOneWidget);
+
+          await tester.tap(
+            find.byKey(const Key('life-counter-native-player-state-apply')),
+          );
+          await tester.pumpAndSettle();
+
+          final session = await LifeCounterSessionStore().load();
+          expect(session, isNotNull);
+          expect(session!.resolvedPlayerAppearances[1].background, '#CF7AEF');
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            logs.any(
+              (message) =>
+                  message.contains('message=native_player_state_applied') &&
+                  message.contains('apply_strategy: live_runtime') &&
+                  message.contains('live_patch_eligible: true') &&
+                  message.contains('reload_required: false') &&
+                  message.contains('sync_blockers: []'),
+            ),
+            isTrue,
+          );
+        });
+      },
+    );
 
     testWidgets('exports native player appearance to clipboard', (
       tester,

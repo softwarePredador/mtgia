@@ -33,7 +33,7 @@ O inventario abaixo traduz isso para o estado real de cada dominio `ownership_br
 | `commander_damage` | `canonical_store_sync` | ja evita `reload` apenas quando o settings garante ausencia de reflexo visual na mesa |
 | `player_appearance` | `mixed` | agora abre `live_runtime` apenas para troca simples de background solido em um unico jogador; nickname e imagens ainda ficam em `reload_fallback` |
 | `player_counter` | `canonical_store_sync` | ja evita `reload` quando counters ficam ocultos e `poison` nao pode disparar `autoKill` |
-| `player_state` | `mixed` | combina `canonical_store_sync`, `live_runtime` e `reload_fallback` conforme o subfluxo final do hub |
+| `player_state` | `mixed` | combina `canonical_store_sync`, `live_runtime` e `reload_fallback`; agora tambem herda o recorte seguro de `player_appearance` com background solido |
 | `set_life` | `live_runtime` | ja evita `reload` em delta medio de vida no jogador alvo quando o runtime Lotus confirma os controles |
 | `table_state` | `live_runtime` | ja evita `reload` para `storm`, `monarch` e `initiative` quando o DOM alvo responde |
 | `day_night` | `live_runtime` | ja evita `reload` quando `.day-night-switcher` confirma a troca |
