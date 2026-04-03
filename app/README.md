@@ -205,7 +205,7 @@ Estado vivo do contador hoje:
 - suite de fallback interno do host/shell: `test/features/home/lotus_life_counter_internal_shell_test.dart`
 - suite de fallback interno para `day night` e `game modes`: `test/features/home/lotus_life_counter_internal_actions_test.dart`
 - suite de fallback interno para `turn tracker`, `game timer / clock` e `dice`: `test/features/home/lotus_life_counter_internal_runtime_test.dart`
-- `game timer` agora ja evita `reload` no caso seguro `active -> active`, usando patch incremental do runtime Lotus, mas so quando o alvo `.game-timer` esta presente no DOM real
+- `game timer` agora ja evita `reload` nos casos seguros `active -> active` e `inactive -> active`, usando patch incremental do runtime Lotus, mas so quando o alvo `.game-timer` esta presente no DOM real
 - `turn tracker` agora tambem evita `reload` nos casos seguros de avancar turnos para frente, fazer rewind curto limitado e mudar o starting player por rewind curto em `Turn 1`, com tracker ja ativo, dirigindo o proprio runtime do Lotus, mas so quando o alvo `.turn-time-tracker` esta presente no DOM real
 - `table state` agora tambem evita `reload` para `storm`, `monarch` e `initiative`; `storm` fecha por patch no payload canonico, e `monarch/initiative` continuam reaplicando ou limpando moedas, ownership visual e estado da `menu-button` direto no DOM do Lotus
 - `day/night` continua live no Lotus, mas agora so fecha sem fallback quando o `.day-night-switcher` confirma a troca; se nao confirmar, o host recarrega o bundle

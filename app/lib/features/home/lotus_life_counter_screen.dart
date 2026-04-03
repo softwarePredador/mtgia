@@ -2210,15 +2210,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }
 
   List<String> _gameTimerLivePatchBlockers(
-    LifeCounterGameTimerState previous,
+    LifeCounterGameTimerState _,
     LifeCounterGameTimerState next,
   ) {
     final blockers = <String>[];
-    if (!previous.isActive) {
-      blockers.add('previous_timer_inactive');
-    }
     if (!next.isActive) {
       blockers.add('next_timer_inactive');
+    }
+    if (next.isActive && next.startTimeEpochMs == null) {
+      blockers.add('next_start_time_missing');
     }
     return blockers;
   }

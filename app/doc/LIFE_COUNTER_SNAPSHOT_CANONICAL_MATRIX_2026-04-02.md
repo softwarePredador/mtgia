@@ -190,7 +190,7 @@ Leitura:
 Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
-- `game timer` ja tem um caso seguro de patch incremental sem `reload`, desde que o alvo `.game-timer` exista e responda
+- `game timer` ja tem casos seguros de patch incremental sem `reload` em `active -> active` e `inactive -> active`, desde que o alvo `.game-timer` exista e responda
 - `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural e com o alvo `.turn-time-tracker` presente
 - `table state` ja tem um caso seguro de sync incremental sem `reload` para `storm`, `monarch` e `initiative`; `storm` fecha por patch no payload canonico, e `monarch/initiative` continuam exigindo `.player-card` presentes e `menu-button` sincronizada para o ajuste visual no DOM do Lotus
 - `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca

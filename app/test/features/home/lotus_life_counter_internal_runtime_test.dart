@@ -866,7 +866,7 @@ void main() {
       });
     });
 
-    testWidgets('opens native game timer from clock shell shortcut', (
+    testWidgets('starts inactive game timer live from clock shell shortcut', (
       tester,
     ) async {
       late _FakeLotusHost host;
@@ -918,7 +918,11 @@ void main() {
         expect(state, isNotNull);
         expect(state!.isActive, isTrue);
         expect(state.isPaused, isFalse);
-        expect(host.loadBundleCallCount, 2);
+        expect(host.loadBundleCallCount, 1);
+        expect(
+          host.executedScripts.any((script) => script.contains(".game-timer")),
+          isTrue,
+        );
         expect(
           logs.any(
             (message) =>
@@ -931,10 +935,10 @@ void main() {
           logs.any(
             (message) =>
                 message.contains('message=native_game_timer_applied') &&
-                message.contains('apply_strategy: reload_fallback') &&
-                message.contains('live_patch_eligible: false') &&
-                message.contains('reload_required: true') &&
-                message.contains('previous_timer_inactive'),
+                message.contains('apply_strategy: live_runtime') &&
+                message.contains('live_patch_eligible: true') &&
+                message.contains('reload_required: false') &&
+                message.contains('sync_blockers: []'),
           ),
           isTrue,
         );

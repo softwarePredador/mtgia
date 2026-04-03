@@ -47,7 +47,7 @@ Checkpoint objetivo desta trilha em `2026-04-02`:
 - `currentGameMeta` e `gameCounter` agora tambem vivem dentro do contrato canonico de `history`
 - `Wave 4` iniciada: existe ponte de patch incremental para o runtime Lotus
 - `settings` permanecem em `reload` por seguranca, porque o bundle Lotus mantem esse dominio em memoria propria
-- `game timer` ja aceita sync incremental no caso seguro `active -> active`, mas so evita `reload` quando o alvo `.game-timer` esta presente e responde no DOM real do Lotus
+- `game timer` ja aceita sync incremental nos casos seguros `active -> active` e `inactive -> active`, mas so evita `reload` quando o alvo `.game-timer` esta presente e responde no DOM real do Lotus
 - `turn tracker` agora tambem aceita sync incremental no recorte seguro `active -> active` com avanco para frente, rewind curto limitado e mudanca curta de starting player em `Turn 1`, sem mudanca estrutural fora desse gesto, e so evita `reload` quando o alvo `.turn-time-tracker` esta presente e responde no DOM real do Lotus
 - `table state` agora tambem aceita sync incremental para `storm`, `monarch` e `initiative`; o `storm` passa a fechar por storage patch sem rebootar o bundle, e `monarch/initiative` continuam reaplicando ou limpando ownership visual quando os `.player-card` do DOM real do Lotus estao presentes
 - `day/night` continua live sem takeover visual, mas agora so considera sucesso quando o `.day-night-switcher` responde; se falhar, cai em `reload` de fallback
@@ -483,7 +483,7 @@ Implementado nesta rodada:
 
 - `flutter_bootstrap.js` agora expoe `receivePatch` para aplicar mutacoes pontuais no `localStorage`
 - o host consegue tentar patch incremental antes do reload completo
-- `game timer` usa sync incremental no caso seguro `active -> active`, mas agora so considera sucesso quando o DOM `.game-timer` existe e confirma a aplicacao
+- `game timer` usa sync incremental nos casos seguros `active -> active` e `inactive -> active`, mas agora so considera sucesso quando o DOM `.game-timer` existe e confirma a aplicacao
 - `turn tracker` usa sync incremental quando o tracker ja esta ativo, mantem a mesma configuracao estrutural e a mutacao e apenas avancar turnos para frente, voltar poucos passos ou mudar o starting player por rewind curto em `Turn 1`, mas agora so considera sucesso quando o DOM `.turn-time-tracker` existe e confirma a aplicacao
 - `table state` usa sync incremental para `storm`, `monarch` e `initiative`; o `storm` fecha por storage patch sem rebootar o bundle, enquanto `monarch/initiative` reaplicam ou limpam classes, moedas e estado da `menu-button` no DOM do Lotus
 - `day/night` atualiza `__manaloom_day_night_mode` e o `.day-night-switcher` com confirmacao explicita de sucesso; se o switcher nao responder, o host faz fallback via `reload`
