@@ -20,6 +20,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  void _returnToLogin() {
+    if (Navigator.of(context).canPop()) {
+      context.pop();
+      return;
+    }
+    context.go('/login');
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -66,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-          onPressed: () => context.go('/login'),
+          onPressed: _returnToLogin,
         ),
       ),
       body: Container(
@@ -358,7 +366,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: theme.textTheme.bodyMedium,
                             ),
                             TextButton(
-                              onPressed: () => context.go('/login'),
+                              onPressed: _returnToLogin,
                               child: Text(
                                 'Entrar',
                                 style: TextStyle(

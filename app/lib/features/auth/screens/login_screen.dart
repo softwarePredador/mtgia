@@ -283,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: theme.textTheme.bodyMedium,
                             ),
                             TextButton(
-                              onPressed: () => context.go('/register'),
+                              onPressed: () => context.push('/register'),
                               child: Text(
                                 'Criar conta',
                                 style: TextStyle(
