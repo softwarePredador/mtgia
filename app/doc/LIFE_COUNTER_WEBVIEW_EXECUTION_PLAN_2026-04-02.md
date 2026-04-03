@@ -349,3 +349,8 @@ Trabalho futuro, se houver novo briefing:
 1. fortalecer ainda mais o backend invisivel em pontos especificos sem mexer no visual
 2. podar fallback interno adicional somente quando houver ganho claro e cobertura equivalente
 3. customizar o proprio Lotus no `WebView` quando houver pedido visual explicito
+
+Auditoria viva complementar:
+
+- `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`
+- os `open-native-*` restantes agora ficam fechados como inventario operacional, nao como gap ambiguo

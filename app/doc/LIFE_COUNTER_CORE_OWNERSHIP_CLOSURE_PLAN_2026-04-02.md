@@ -520,7 +520,7 @@ Checklist curto de execucao:
 - [ ] reduzir `reload bundle` como caminho padrao
 - [ ] criar mecanismo de patch incremental do runtime Lotus
 - [ ] provar reopen com estado canonico mesmo sem snapshot Lotus confiavel
-- [ ] revisar quais `open-native-*` ainda sao fallback real e quais escondem ownership incompleto
+- [x] revisar quais `open-native-*` ainda sao fallback real e quais escondem ownership incompleto
 
 ## Performance note
 
@@ -559,3 +559,4 @@ Depois desta rodada, a leitura mais correta e:
 - o `turn tracker` ja tem casos seguros de sync pelo proprio runtime do Lotus, disparando `click` para avancar e `long press` simulado para rewind curto limitado, inclusive para mudanca curta de starting player em `Turn 1`, sem rebootar o bundle
 - `settings` nao devem migrar para patch cego enquanto o runtime do Lotus continuar mantendo esse estado em memoria interna
 - o proximo alvo tecnico com melhor relacao ganho/risco continua sendo mapear de forma conservadora quais dominios aceitam patch incremental real
+- a auditoria viva dos `open-native-*` foi fechada em `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`, separando formalmente `ownership_bridge`, `support_utility` e `excluded_core_support`

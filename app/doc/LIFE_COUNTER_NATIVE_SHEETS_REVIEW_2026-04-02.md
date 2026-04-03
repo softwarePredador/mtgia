@@ -133,3 +133,13 @@ Antes de podar qualquer sheet:
 - nao existe poda obrigatoria pendente para considerar o life counter fechado nesta arquitetura
 - as sheets restantes continuam de forma intencional como `fallback interno` ou `backend support`
 - qualquer remocao adicional passa a ser melhoria futura, nao requisito para encerramento do contador Lotus-first
+
+Documento complementar:
+
+- `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`
+
+Ele fecha a correspondencia entre:
+
+- cada `native sheet`
+- cada `open-native-*`
+- a classificacao viva do host (`ownership_bridge`, `support_utility`, `excluded_core_support`)

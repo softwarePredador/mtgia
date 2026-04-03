@@ -37,6 +37,7 @@ Documento complementar importante para a frente do contador:
 - `app/doc/LIFE_COUNTER_SNAPSHOT_CANONICAL_MATRIX_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_WEBVIEW_EXECUTION_PLAN_2026-04-02.md`
 - `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+- `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`
 - `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md`
 
 Estado vivo do contador hoje:
@@ -237,6 +238,7 @@ Estado vivo do contador hoje:
 - suite de fallback interno para `table state` e outcomes simples de `autoKill`: `test/features/home/lotus_life_counter_internal_state_outcomes_test.dart`
 - suite dedicada de normalizacao canonica do host: `test/features/home/lotus_life_counter_host_normalization_test.dart`
 - revisao formal do papel das native sheets: `app/doc/LIFE_COUNTER_NATIVE_SHEETS_REVIEW_2026-04-02.md`
+- auditoria viva dos `open-native-*`: `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`
 
 ## Comandos
 
