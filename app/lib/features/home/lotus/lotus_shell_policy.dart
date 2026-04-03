@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'lotus_js_bridges.dart';
+import 'lotus_webview_contract.dart';
+
 const Set<String> lotusBlockedExternalHosts = {
   'apps.apple.com',
   'play.google.com',
@@ -63,7 +66,7 @@ String get lotusShellCleanupScript {
   const STYLE_ID = 'manaloom-lotus-shell-policy';
   const SUPPRESSED_ATTR = 'data-manaloom-shell-suppressed';
   const TELEMETRY_ATTR = 'data-manaloom-telemetry-seen';
-  const SHELL_CHANNEL = 'FlutterManaLoomShellBridge';
+  const SHELL_CHANNEL = '${LotusJavaScriptBridges.shellChannelName}';
   document.title = 'ManaLoom Life Counter';
   const postShellMessage = (payload) => {
     try {
@@ -168,7 +171,7 @@ String get lotusShellCleanupScript {
     event.stopPropagation();
     console.log('[ManaLoomShell] Blocked branded link:', href);
     postShellMessage({
-      type: 'blocked-link',
+      type: '${LotusShellMessageTypes.blockedLink}',
       href,
     });
   };
@@ -181,7 +184,7 @@ String get lotusShellCleanupScript {
     if (isBlockedUrl(url)) {
       console.log('[ManaLoomShell] Blocked branded window.open:', url);
       postShellMessage({
-        type: 'blocked-window-open',
+        type: '${LotusShellMessageTypes.blockedWindowOpen}',
         href: url,
       });
       return null;

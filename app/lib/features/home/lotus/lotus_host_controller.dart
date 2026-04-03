@@ -27,6 +27,7 @@ import 'lotus_storage_snapshot.dart';
 import 'lotus_storage_snapshot_store.dart';
 import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
+import 'lotus_webview_contract.dart';
 
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
   required LifeCounterDayNightStateStore dayNightStateStore,
@@ -639,6 +640,7 @@ class LotusHostController implements LotusHost {
     }
 
     try {
+      await webViewController.runJavaScript(lotusInjectedContractScript);
       await webViewController.runJavaScript(lotusShellCleanupScript);
     } catch (error) {
       debugPrint('$lotusLogPrefix shell cleanup error: $error');
@@ -718,8 +720,8 @@ class LotusHostController implements LotusHost {
             };
           };
 
-          const firstPlayerCard = document.querySelector('.player-card');
-          const firstOverlay = document.querySelector('[class*="overlay"]');
+          const firstPlayerCard = document.querySelector('${LotusDomSelectors.playerCard}');
+          const firstOverlay = document.querySelector('${LotusDomSelectors.overlay}');
 
           return JSON.stringify({
             readyState: document.readyState,
@@ -738,9 +740,9 @@ class LotusHostController implements LotusHost {
             hasContentGlobal: typeof Content !== 'undefined',
             contentIsConnected: typeof Content !== 'undefined' ? Content.isConnected : null,
             contentInnerHtmlLength: typeof Content !== 'undefined' ? Content.innerHTML.length : -1,
-            playerCardCount: document.querySelectorAll('.player-card').length,
+            playerCardCount: document.querySelectorAll('${LotusDomSelectors.playerCard}').length,
             emptyPlayerCardCount: document.querySelectorAll('.empty-player-card').length,
-            overlayCount: document.querySelectorAll('[class*="overlay"]').length,
+            overlayCount: document.querySelectorAll('${LotusDomSelectors.overlay}').length,
             firstPlayerCard: firstPlayerCard ? describeNode(firstPlayerCard) : null,
             firstOverlay: firstOverlay ? describeNode(firstOverlay) : null,
             firstBodyChildren: document.body
@@ -788,38 +790,38 @@ class LotusHostController implements LotusHost {
             document.body.classList.contains('clean-look')
           ),
           regular_counter_count: document.querySelectorAll(
-            '.player-card .counters-on-card:not(.commander-damage-counters) .counter'
+            '${LotusDomSelectors.regularCounters}'
           ).length,
           commander_damage_counter_count: document.querySelectorAll(
-            '.player-card .commander-damage-counters .commander-damage-counter'
+            '${LotusDomSelectors.commanderDamageCounters}'
           ).length,
           game_timer_count: document.querySelectorAll(
-            '.game-timer:not(.current-time-clock)'
+            '${LotusDomSelectors.mainGameTimer}'
           ).length,
           game_timer_paused_count: document.querySelectorAll(
-            '.game-timer.paused:not(.current-time-clock)'
+            '${LotusDomSelectors.mainGameTimer}.paused'
           ).length,
           game_timer_text: (() => {
             const node = document.querySelector(
-              '.game-timer:not(.current-time-clock)'
+              '${LotusDomSelectors.mainGameTimer}'
             );
             return node ? (node.textContent || '').trim() : '';
           })(),
-          clock_count: document.querySelectorAll('.current-time-clock').length,
+          clock_count: document.querySelectorAll('${LotusDomSelectors.currentTimeClock}').length,
           clock_with_game_timer_count: document.querySelectorAll(
-            '.current-time-clock.with-game-timer'
+            '${LotusDomSelectors.currentTimeClock}.with-game-timer'
           ).length,
           first_player_card_width: (() => {
-            const node = document.querySelector('.player-card');
+            const node = document.querySelector('${LotusDomSelectors.playerCard}');
             if (!node) return 0;
             return node.getBoundingClientRect().width || 0;
           })(),
           first_player_card_height: (() => {
-            const node = document.querySelector('.player-card');
+            const node = document.querySelector('${LotusDomSelectors.playerCard}');
             if (!node) return 0;
             return node.getBoundingClientRect().height || 0;
           })(),
-          player_card_count: document.querySelectorAll('.player-card').length
+          player_card_count: document.querySelectorAll('${LotusDomSelectors.playerCard}').length
         }))()
       ''',
       );
@@ -934,7 +936,7 @@ class LotusHostController implements LotusHost {
     }
 
     final type = payload['type'];
-    if (type == 'analytics') {
+    if (type == LotusShellMessageTypes.analytics) {
       final name = payload['name'];
       final category = payload['category'];
       if (name is String && category is String) {
@@ -960,7 +962,8 @@ class LotusHostController implements LotusHost {
       return;
     }
 
-    if (type == 'blocked-link' || type == 'blocked-window-open') {
+    if (type == LotusShellMessageTypes.blockedLink ||
+        type == LotusShellMessageTypes.blockedWindowOpen) {
       final href = payload['href'];
       unawaited(
         AppObservability.instance.recordEvent(

@@ -45,6 +45,7 @@ import 'lotus/lotus_lifecycle_diagnostic_store.dart';
 import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
+import 'lotus/lotus_webview_contract.dart';
 
 class _NativeFallbackDescriptor {
   const _NativeFallbackDescriptor({
@@ -291,10 +292,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       'state': state.name,
       'source': 'flutter_binding',
     });
-    _persistLifecycleDiagnostic(
-      'lifecycle_changed',
-      diagnostics,
-    );
+    _persistLifecycleDiagnostic('lifecycle_changed', diagnostics);
     unawaited(
       AppObservability.instance.recordEvent(
         'lifecycle_changed',
@@ -306,6 +304,39 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     if (state == AppLifecycleState.resumed) {
       unawaited(_dumpRecentLifecycleDiagnostics());
     }
+  }
+
+  void _exitLifeCounter({
+    required String source,
+    bool requestedFromShell = false,
+  }) {
+    if (!mounted) {
+      return;
+    }
+
+    final canPop = canPopLifeCounterRoute(context);
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'exit_requested',
+        category: 'life_counter.screen',
+        data: {
+          'route': lifeCounterRoutePath,
+          'source': source,
+          'requested_from_shell': requestedFromShell,
+          'can_pop': canPop,
+        },
+      ),
+    );
+
+    closeLifeCounterRoute(context);
+  }
+
+  void _handleBackNavigationAttempt(bool didPop) {
+    if (didPop || !mounted) {
+      return;
+    }
+
+    _exitLifeCounter(source: 'system_back_fallback');
   }
 
   void _syncLoadingOverlay() {
@@ -386,10 +417,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   }
 
   void _handleAppReviewRequested(String message) {
-    _rememberDiagnosticTrigger(
-      'app_review_requested',
-      <String, Object?>{'message': message},
-    );
+    _rememberDiagnosticTrigger('app_review_requested', <String, Object?>{
+      'message': message,
+    });
     debugPrint('$lotusLogPrefix AppReview requested: $message');
     unawaited(
       AppObservability.instance.recordEvent(
@@ -414,7 +444,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
         final type = decoded['type'] as String?;
-        if (type != null && type.startsWith('open-native-')) {
+        if (type == LotusShellMessageTypes.closeLifeCounter) {
+          final rawSource = (decoded['source'] as String?)?.trim();
+          _exitLifeCounter(
+            source:
+                rawSource != null && rawSource.isNotEmpty
+                    ? rawSource
+                    : 'shell_close_request',
+            requestedFromShell: true,
+          );
+          return;
+        }
+        if (type != null &&
+            type.startsWith(LotusShellMessageTypes.openNativePrefix)) {
           final descriptor = _nativeFallbackDescriptors[type];
           if (descriptor == null) {
             _recordNativeFallbackSurfaceRejected(
@@ -588,7 +630,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
         final type = decoded['type'];
-        if (type == 'blocked-window-open' || type == 'blocked-link') {
+        if (type == LotusShellMessageTypes.blockedWindowOpen ||
+            type == LotusShellMessageTypes.blockedLink) {
           displayMessage =
               'External shortcut disabled while ManaLoom owns the life counter shell.';
         }
@@ -636,7 +679,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       'source': 'android_activity',
       ...arguments,
     });
-    unawaited(_persistLifecycleDiagnostic('native_lifecycle_signal', diagnostics));
+    unawaited(
+      _persistLifecycleDiagnostic('native_lifecycle_signal', diagnostics),
+    );
     unawaited(
       AppObservability.instance.recordEvent(
         'native_lifecycle_signal',
@@ -650,10 +695,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
     }
   }
 
-  void _rememberDiagnosticTrigger(
-    String trigger,
-    Map<String, Object?> data,
-  ) {
+  void _rememberDiagnosticTrigger(String trigger, Map<String, Object?> data) {
     _lastDiagnosticTriggerAt = DateTime.now();
     _lastDiagnosticTrigger = trigger;
     _lastDiagnosticTriggerData = data;
@@ -676,9 +718,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       return;
     }
 
-    final recentEntries = entries.length > 6
-        ? entries.sublist(entries.length - 6)
-        : entries;
+    final recentEntries =
+        entries.length > 6 ? entries.sublist(entries.length - 6) : entries;
     final summary = recentEntries
         .map((entry) {
           final event = entry['event'];
@@ -718,9 +759,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
     if (_lastDiagnosticTriggerAt != null) {
       data['last_trigger'] = _lastDiagnosticTrigger;
-      data['last_trigger_age_ms'] = DateTime.now()
-          .difference(_lastDiagnosticTriggerAt!)
-          .inMilliseconds;
+      data['last_trigger_age_ms'] =
+          DateTime.now().difference(_lastDiagnosticTriggerAt!).inMilliseconds;
     }
     if (_lastDiagnosticTriggerData != null &&
         _lastDiagnosticTriggerData!.isNotEmpty) {
@@ -4733,11 +4773,17 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      // A plain body avoids the zero-sized viewport issue we hit when wrapping
-      // this PlatformView in a Stack on Android.
-      body: _hostController.buildView(context),
+    return PopScope<void>(
+      canPop: canPopLifeCounterRoute(context),
+      onPopInvokedWithResult: (didPop, _) {
+        _handleBackNavigationAttempt(didPop);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        // A plain body avoids the zero-sized viewport issue we hit when wrapping
+        // this PlatformView in a Stack on Android.
+        body: _hostController.buildView(context),
+      ),
     );
   }
 }

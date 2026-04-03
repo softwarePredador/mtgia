@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.favorite,
                           label: 'Vida',
                           accentColor: AppTheme.textSecondary,
-                          onTap: () => context.push(lifeCounterRoutePath),
+                          onTap: () => openLifeCounterRoute(context),
                         ),
                       ),
                       const SizedBox(width: 12),

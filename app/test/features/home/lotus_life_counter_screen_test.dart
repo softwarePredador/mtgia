@@ -11,10 +11,7 @@ import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeLotusHost implements LotusHost {
-  _FakeLotusHost({
-    required this.onShellMessageRequested,
-    this.onLoadBundle,
-  });
+  _FakeLotusHost({required this.onShellMessageRequested, this.onLoadBundle});
 
   final LotusShellMessageCallback onShellMessageRequested;
   final Future<void> Function(_FakeLotusHost host)? onLoadBundle;
@@ -211,6 +208,140 @@ void main() {
       expect(host.loadBundleCallCount, 1);
     });
 
+    testWidgets(
+      'close shell message returns to home when life counter is stacked',
+      (tester) async {
+        late _FakeLotusHost host;
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder:
+                  (context, state) => Scaffold(
+                    body: TextButton(
+                      onPressed: () => openLifeCounterRoute(context),
+                      child: const Text('open-life-counter'),
+                    ),
+                  ),
+            ),
+            GoRoute(
+              path: lifeCounterRoutePath,
+              builder:
+                  (context, state) => LotusLifeCounterScreen(
+                    hostFactory: ({
+                      required onAppReviewRequested,
+                      required onShellMessageRequested,
+                    }) {
+                      host = _FakeLotusHost(
+                        onShellMessageRequested: onShellMessageRequested,
+                        onLoadBundle:
+                            (host) async => host.completeSuccessfulLoad(),
+                      );
+                      return host;
+                    },
+                  ),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('open-life-counter'));
+        await tester.pumpAndSettle();
+
+        host.emitShellMessage(
+          '{"type":"close-life-counter","source":"test_shell"}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('open-life-counter'), findsOneWidget);
+      },
+    );
+
+    testWidgets('close shell message falls back to home when route is direct', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      final router = GoRouter(
+        initialLocation: lifeCounterRoutePath,
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder:
+                (context, state) => const Scaffold(body: Text('home-screen')),
+          ),
+          GoRoute(
+            path: lifeCounterRoutePath,
+            builder:
+                (context, state) => LotusLifeCounterScreen(
+                  hostFactory: ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                      onLoadBundle:
+                          (host) async => host.completeSuccessfulLoad(),
+                    );
+                    return host;
+                  },
+                ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+
+      host.emitShellMessage(
+        '{"type":"close-life-counter","source":"direct_route_shell"}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('home-screen'), findsOneWidget);
+    });
+
+    testWidgets('system back falls back to home on direct route', (
+      tester,
+    ) async {
+      final router = GoRouter(
+        initialLocation: lifeCounterRoutePath,
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder:
+                (context, state) => const Scaffold(body: Text('home-screen')),
+          ),
+          GoRoute(
+            path: lifeCounterRoutePath,
+            builder:
+                (context, state) => LotusLifeCounterScreen(
+                  hostFactory: ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    return _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                      onLoadBundle:
+                          (host) async => host.completeSuccessfulLoad(),
+                    );
+                  },
+                ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.text('home-screen'), findsOneWidget);
+    });
+
     testWidgets('records Flutter lifecycle pause diagnostics', (tester) async {
       final debugLogs = <String>[];
       final originalDebugPrint = debugPrint;
@@ -308,4 +439,3 @@ void main() {
     });
   });
 }
-
