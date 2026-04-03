@@ -108,6 +108,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_player_state_hidden_commander_damage_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_player_state_partner_commander_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_game_modes_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_game_modes_card_pool_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_game_modes_settings_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -131,6 +132,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o hub de `Player State -> Commander Damage` tambem ficou validado no caminho vivo no recorte oculto: com commander damage escondido no player card, aplicar dano pelo hub atualiza a sessao canonica e o payload `players` do Lotus sem reboot completo do bundle.
 - o hub de `Player State -> Commander Damage` tambem ficou validado no recorte misto em que o player card continua visivel, mas os commander damage counters ficam escondidos: aplicar dano pelo hub continua atualizando a sessao canonica e o payload `players` do Lotus sem reboot completo do bundle.
 - o toggle de `Partner commander` pelo `Player State` tambem ficou validado no caminho vivo no recorte oculto: com counters escondidos no player card, ativar o partner commander pelo hub atualiza a sessao canonica e o payload `players` do Lotus sem reboot completo do bundle.
+- o toggle de `Partner commander` pelo `Player State` tambem ficou validado no recorte misto em que o player card continua visivel, mas os counters regulares ficam escondidos: ativar o partner commander pelo hub continua atualizando a sessao canonica e o payload `players` do Lotus sem reboot completo do bundle.
 - `player appearance` tambem ficou coberto no mesmo padrao: `players` e `__manaloom_player_appearances` canonicos voltam a prevalecer sobre um snapshot Lotus stale no bootstrap e no reopen.
 - os `appearance profiles` do ManaLoom tambem ficaram validados no caminho vivo: aplicar um perfil salvo pelo fallback interno atualiza a sessao canonica e o runtime Lotus sem quebrar o fluxo visual principal.
 - o apply direto de `player appearance` tambem ficou validado no caminho vivo: editar nickname e preset pela shell interna atualiza a sessao canonica sem quebrar o runtime Lotus.
