@@ -54,6 +54,12 @@ Os comandos abaixo passaram:
 - `flutter analyze --no-version-check`
 - `flutter test test/features/home --no-version-check`
 
+## Operational observability validation
+
+Os comandos abaixo passaram no `emulator-5554` como prova operacional de instrumentacao, fora da bateria funcional do life counter:
+
+- `flutter test integration_test/mobile_sentry_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+
 ## Android smoke battery
 
 Os comandos abaixo passaram no `emulator-5554`:
@@ -182,6 +188,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `extra counters` tambem ficou coberto no mesmo padrao: `players[].counters` canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz counters customizados stale ou vazios.
 - o smoke de `6 players` precisou de reinicio do daemon `adb` durante a rodada; o rerun passou sem mudanca de produto.
 - os player counts suportados agora ficam cobertos explicitamente na bateria Android em `2`, `3`, `4`, `5` e `6` jogadores, com bootstrap canonico no runtime Lotus.
+- a verificacao operacional de `mobile_sentry_smoke_test.dart` tambem passou no Android real; ela foi mantida separada da bateria funcional do life counter por validar observabilidade do app, nao comportamento de mesa.
 
 ## Final done definition
 
