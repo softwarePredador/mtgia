@@ -106,6 +106,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_player_counter_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_d20_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_commander_damage_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_set_life_autokill_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_set_life_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_player_state_hidden_counter_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -146,6 +147,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o hub de `Player State -> Player Counter` tambem ficou validado no caminho vivo: abrir `Player Counter` a partir do `Player State`, criar um counter customizado e aplicar preserva a sessao canonica, mas este recorte segue classificado como `reload_fallback` quando `showCountersOnPlayerCard=true`.
 - o hub de `Player State -> Roll D20` tambem ficou validado no caminho vivo: abrir `Roll D20` a partir do `Player State` atualiza a sessao canonica com `lastPlayerRolls` e `lastTableEvent`; este recorte usa `canonical_store_sync`, mas ainda exige `surface_reset_strategy: bundle_reload` por materializar evento/roll no runtime Lotus.
 - o hub direto de `Player State -> Commander Damage` tambem ficou validado no caminho vivo: abrir `Commander Damage` a partir do `Player State` e aplicar dano preserva a sessao canonica, mas este recorte segue classificado como `reload_fallback` no cenario padrao com `autoKill` e `lifeLossOnCommanderDamage` habilitados.
+- o hub de `Player State -> Set Life` tambem ficou validado no caminho vivo: abrir `Set Life` a partir do `Player State`, aplicar um novo total e limpar `lastTableEvent` preserva a sessao canonica, mas este recorte segue classificado como `reload_fallback` quando o delta de vida excede o limite seguro de patch live.
 - `player special state` tambem ficou coberto no mesmo padrao: `players.alive` e `__manaloom_player_special_states` canonicos voltam a prevalecer sobre um snapshot Lotus stale no bootstrap e no reopen.
 - `life totals` tambem ficaram cobertos no mesmo padrao: `players[].life` canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz vidas stale.
 - `poison`, `energy` e `experience` tambem ficaram cobertos no mesmo padrao: os counters regulares canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz valores stale zerados.
