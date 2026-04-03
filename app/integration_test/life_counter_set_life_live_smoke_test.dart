@@ -68,6 +68,44 @@ Future<LifeCounterSession?> _pumpUntilSetLifeApplied(
   return session;
 }
 
+Future<Map<String, dynamic>> _readSetLifeLiveState(
+  WidgetTester tester,
+  LotusStorageSnapshotStore snapshotStore,
+  dynamic screenState,
+) async {
+  const storageKey = '__manaloom_test_set_life_live';
+  const nonceKey = '__manaloom_test_set_life_live_nonce';
+  final nonce = DateTime.now().microsecondsSinceEpoch.toString();
+
+  await screenState.debugRunJavaScript('''
+(() => {
+  try {
+    localStorage.setItem('$storageKey', JSON.stringify({
+      probe: window.__manaloomSetLifeLiveProbe ?? null
+    }));
+    localStorage.setItem('$nonceKey', '$nonce');
+  } catch (_) {}
+})()
+''');
+
+  String? encodedState;
+  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 300));
+    final snapshot = await snapshotStore.load();
+    if (snapshot == null) {
+      continue;
+    }
+    if (snapshot.values[nonceKey] != nonce) {
+      continue;
+    }
+    encodedState = snapshot.values[storageKey];
+  }
+
+  expect(encodedState, isNotNull);
+  final decoded = jsonDecode(encodedState!);
+  return Map<String, dynamic>.from(decoded as Map);
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -135,6 +173,11 @@ void main() {
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
 
     final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+    await state.debugRunJavaScript('''
+(() => {
+  window.__manaloomSetLifeLiveProbe = 'alive';
+})()
+''');
     await state.debugHandleShellMessage(
       '{"type":"open-native-set-life","source":"player_life_total_surface_pressed","targetPlayerIndex":1}',
     );
@@ -185,5 +228,8 @@ void main() {
       ),
     );
     expect(players[1]['life'], 35);
+
+    final liveState = await _readSetLifeLiveState(tester, snapshotStore, state);
+    expect(liveState['probe'], 'alive');
   });
 }
