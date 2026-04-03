@@ -74,6 +74,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_turn_tracker_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_ownership_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_table_state_clear_ownership_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_storm_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_commander_damage_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_commander_cast_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -130,6 +131,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o timer pausado tambem ficou coberto em reopen: `startTime`, `pausedTime` e `isPaused=true` permanecem coerentes apos fechar e reabrir a tela.
 - `table state` tambem ficou coberto no mesmo padrao: `__manaloom_table_state` canonico volta a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz `storm`, `monarch` e `initiative` stale.
 - o recorte `monarch + initiative` de `table state` tambem ficou validado no caminho vivo: abrir a sheet nativa, atribuir os dois owners e aplicar atualiza a sessao canonica e `__manaloom_table_state` no runtime Lotus sem reboot completo do bundle.
+- o recorte de limpeza de `monarch + initiative` tambem ficou validado no caminho vivo: abrir a sheet nativa com owners ativos, limpar ambos e aplicar zera a sessao canonica e `__manaloom_table_state` no runtime Lotus sem reboot completo do bundle.
 - o recorte `storm-only` de `table state` tambem ficou validado no caminho vivo: abrir a sheet nativa, aumentar `Storm` e aplicar atualiza a sessao canonica e `__manaloom_table_state` no runtime Lotus sem tocar nos owners auxiliares da mesa.
 - `commander damage` tambem ficou coberto no mesmo padrao: `players[].commanderDamage` canonico volta a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz dano stale zerado.
 - `commander casts` tambem ficou coberto no mesmo padrao: `players[].partnerCommander` e `players[].counters.tax-*` canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz tax stale zerado.
