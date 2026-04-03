@@ -154,6 +154,9 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `life_counter_webview_smoke_test.dart` foi alinhado com a regra canonica atual do tracker: quando o `startingPlayerIndex` do snapshot aponta para jogador fora da mesa, o bootstrap canonico reescreve `firstPlayerIndex` para o primeiro jogador ativo.
 - `life_counter_native_player_state_smoke_test.dart` foi endurecido para limpar o store explicitamente e acionar `Decked Out` pelo botao dedicado da sheet, evitando heranca de estado entre cenarios.
 - os smokes de `Game Modes` passaram a esperar o modal explicitamente antes das assercoes, reduzindo sensibilidade ao tempo de animacao do overlay.
+- o shell interno de `Game Modes` tambem ficou validado no Android real como `excluded_core_support`: a surface lista `Planechase`, `Archenemy` e `Bounty` corretamente quando os gatilhos do Lotus estao disponiveis.
+- o fluxo de `Game Modes -> Card Pool` tambem ficou validado no Android real: quando o editor de cards de `Planechase` ja esta ativo no bundle embutido, a shell explicita o estado `Card Pool Open` e oferece a acao de fechamento correspondente sem depender de UI Flutter principal.
+- o fluxo de `Game Modes -> Settings` tambem ficou validado no Android real: quando o modo preferido nao esta disponivel no bundle, a shell interna continua expondo a acao de configuracoes e handoff para `Life Counter Settings`.
 - `day / night` tambem ficou coberto no caminho vivo de reopen: a preferencia canonica ManaLoom volta a prevalecer mesmo quando o snapshot Lotus e propositalmente regravado com valor stale antes da reabertura.
 - `settings` tambem ficou coberto no mesmo padrao de reopen: `gameSettings` canonico volta a prevalecer no bootstrap mesmo quando o snapshot Lotus salvo traz flags stale.
 - o `clock` Lotus-first tambem ficou validado explicitamente no caminho vivo: com `showClockOnMainScreen=true` e `gameTimer=false`, o runtime mostra relogio sem subir timer visualmente.
