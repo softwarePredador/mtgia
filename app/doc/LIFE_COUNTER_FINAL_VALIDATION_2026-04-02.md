@@ -77,6 +77,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_turn_tracker_live_previous_two_steps_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_dice_d20_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_dice_high_roll_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_dice_first_player_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_ownership_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_clear_ownership_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -131,6 +132,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o recorte de voltar `turn tracker` ativo em dois passos tambem ficou validado no caminho vivo: abrir a sheet nativa, usar `Previous` duas vezes e aplicar mantem a sessao canonica e o payload `turnTracker` do Lotus sincronizados sem reboot completo do bundle.
 - o recorte `D20` de `dice` tambem ficou validado no caminho vivo quando o tracker segue ativo e o `first player` nao muda: abrir a sheet nativa, usar `D20` e aplicar atualiza a sessao canonica e o espelho de `history.lastTableEvent` sem reboot completo do bundle, preservando o payload `turnTracker` do Lotus.
 - o recorte `High Roll` de `dice` tambem ficou validado no caminho vivo: abrir a sheet nativa, usar `High Roll` e aplicar persiste `lastHighRolls`, `firstPlayerIndex` quando houver vencedor unico e o espelho de `history.lastTableEvent` sem reboot completo do bundle, mantendo `__manaloom_table_state` coerente com a sessao canonica.
+- o recorte `Roll 1st` de `dice` tambem ficou validado no caminho vivo quando o tracker esta inativo: abrir a sheet nativa, usar `Roll 1st` e aplicar persiste `firstPlayerIndex` e o espelho de `history.lastTableEvent` sem reboot completo do bundle, mantendo `__manaloom_table_state` coerente com a sessao canonica.
 - o fallback de bootstrap do host tambem ficou provado sem depender de snapshot Lotus confiavel: a suite `lotus_host_controller_bootstrap_test.dart` cobre tanto o caso sem snapshot salvo quanto o caso de snapshot parcial e stale sendo corrigido pelos stores canonicos.
 - o mecanismo de patch incremental do Lotus tambem ficou efetivamente validado no produto: os recortes `live_runtime` de `day/night`, `turn tracker`, `game timer` e `table state` passaram na bateria local e/ou nos smokes Android sem exigir reboot completo do bundle nesses casos seguros.
 - o `game timer` tambem ficou validado no caminho vivo saindo de inativo para ativo: abrir a sheet a partir do `clock`, iniciar o timer e aplicar passa a reconstruir o estado canonico e a superficie Lotus sem precisar reboot completo do bundle nesse recorte seguro.
