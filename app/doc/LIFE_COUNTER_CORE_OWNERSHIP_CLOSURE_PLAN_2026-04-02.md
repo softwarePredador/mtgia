@@ -519,7 +519,7 @@ Checklist curto de execucao:
 - [x] decidir escopo final de `Game Modes`
 - [ ] reduzir `reload bundle` como caminho padrao
 - [ ] criar mecanismo de patch incremental do runtime Lotus
-- [ ] provar reopen com estado canonico mesmo sem snapshot Lotus confiavel
+- [x] provar reopen com estado canonico mesmo sem snapshot Lotus confiavel
 - [x] revisar quais `open-native-*` ainda sao fallback real e quais escondem ownership incompleto
 
 ## Performance note
@@ -560,3 +560,4 @@ Depois desta rodada, a leitura mais correta e:
 - `settings` nao devem migrar para patch cego enquanto o runtime do Lotus continuar mantendo esse estado em memoria interna
 - o proximo alvo tecnico com melhor relacao ganho/risco continua sendo mapear de forma conservadora quais dominios aceitam patch incremental real
 - a auditoria viva dos `open-native-*` foi fechada em `app/doc/LIFE_COUNTER_NATIVE_FALLBACK_AUDIT_2026-04-03.md`, separando formalmente `ownership_bridge`, `support_utility` e `excluded_core_support`
+- a prova de reopen com estado canonico sem snapshot Lotus confiavel fica fechada por `test/features/home/lotus_host_controller_bootstrap_test.dart`, especialmente nos cenarios `builds canonical bootstrap values when Lotus snapshot is missing` e `reopens from stale partial Lotus snapshot using canonical fallback values`
