@@ -119,6 +119,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_player_appearance_background_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_color_card_dismiss_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_player_appearance_profile_image_fallback_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_profiles_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_appearance_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_appearance_dismiss_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -170,6 +171,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o takeover de `Player State -> Appearance` vindo de `player_option_card_presented` tambem ficou validado no dismiss sem mudanca: cancelar `Player Appearance`, voltar ao `Player State` e aplicar sem alteracoes limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - `player appearance` tambem ficou coberto no mesmo padrao: `players` e `__manaloom_player_appearances` canonicos voltam a prevalecer sobre um snapshot Lotus stale no bootstrap e no reopen.
 - os `appearance profiles` do ManaLoom tambem ficaram validados no caminho vivo: aplicar um perfil salvo pelo fallback interno atualiza a sessao canonica e o runtime Lotus sem quebrar o fluxo visual principal.
+- os `appearance profiles` com `backgroundImage` e `backgroundImagePartner` tambem ficaram validados no caminho vivo: aplicar um perfil salvo com referencias de imagem preserva a sessao canonica, e o probe JS confirma que esse recorte segue em `reload_fallback` quando o payload ainda carrega assets visuais do Lotus.
 - o apply direto de `player appearance` tambem ficou validado no caminho vivo: editar nickname e preset pela shell interna atualiza a sessao canonica, e o probe JS confirma que este recorte segue em `reload_fallback` quando `nickname_changed` entra no payload.
 - o dismiss sem mudanca de `player appearance` vindo da surface direta do player tambem ficou validado no caminho vivo: fechar a sheet agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - o apply direto de `player appearance` tambem ficou validado no recorte seguro de `background` solido para um unico jogador: aplicar apenas o preset de cor preserva a sessao canonica e o payload Lotus sem alterar nickname, mantendo a `option-card` limpa no DOM e sem precisar reboot completo do bundle.

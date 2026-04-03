@@ -1110,6 +1110,148 @@ void main() {
       });
     });
 
+    testWidgets('keeps image-backed player appearance profiles on reload fallback', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      await _captureDebugLogs((logs) async {
+        await tester.binding.setSurfaceSize(const Size(900, 1200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await LifeCounterSessionStore().save(
+          const LifeCounterSession(
+            playerCount: 4,
+            startingLifeTwoPlayer: 20,
+            startingLifeMultiPlayer: 40,
+            lives: [40, 40, 40, 40],
+            poison: [0, 0, 0, 0],
+            energy: [0, 0, 0, 0],
+            experience: [0, 0, 0, 0],
+            commanderCasts: [0, 0, 0, 0],
+            playerAppearances: [
+              LifeCounterPlayerAppearance(background: '#FFB51E'),
+              LifeCounterPlayerAppearance(background: '#FF0A5B'),
+              LifeCounterPlayerAppearance(background: '#CF7AEF'),
+              LifeCounterPlayerAppearance(background: '#4B57FF'),
+            ],
+            partnerCommanders: [false, true, false, false],
+            playerSpecialStates: [
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+              LifeCounterPlayerSpecialState.none,
+            ],
+            lastPlayerRolls: [null, null, null, null],
+            lastHighRolls: [null, null, null, null],
+            commanderDamage: [
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            stormCount: 0,
+            monarchPlayer: null,
+            initiativePlayer: null,
+            firstPlayerIndex: null,
+            turnTrackerActive: false,
+            turnTrackerOngoingGame: false,
+            turnTrackerAutoHighRoll: false,
+            currentTurnPlayerIndex: null,
+            currentTurnNumber: 1,
+            turnTimerActive: false,
+            turnTimerSeconds: 0,
+            lastTableEvent: null,
+          ),
+        );
+
+        final store = LifeCounterPlayerAppearanceProfileStore();
+        final seededProfiles = await store.saveProfile(
+          name: 'Image Pod',
+          appearance: const LifeCounterPlayerAppearance(
+            background: '#40B9FF',
+            backgroundImage: 'indexeddb://imageDatabase/images/10',
+            backgroundImagePartner: 'indexeddb://imageDatabase/images/11',
+          ),
+        );
+        final profileId = seededProfiles.single.id;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                host = _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                )..completeSuccessfulLoad();
+                return host;
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump();
+
+        host.emitShellMessage(
+          '{"type":"open-native-player-appearance","source":"player_background_surface_pressed","targetPlayerIndex":1}',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.byKey(
+            Key(
+              'life-counter-native-player-appearance-apply-profile-$profileId',
+            ),
+          ),
+          250,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(
+            Key(
+              'life-counter-native-player-appearance-apply-profile-$profileId',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('life-counter-native-player-appearance-apply')),
+        );
+        await tester.pumpAndSettle();
+
+        final session = await LifeCounterSessionStore().load();
+        expect(session, isNotNull);
+        expect(session!.resolvedPlayerAppearances[1].background, '#40B9FF');
+        expect(
+          session.resolvedPlayerAppearances[1].backgroundImage,
+          'indexeddb://imageDatabase/images/10',
+        );
+        expect(
+          session.resolvedPlayerAppearances[1].backgroundImagePartner,
+          'indexeddb://imageDatabase/images/11',
+        );
+        expect(host.loadBundleCallCount, 2);
+        expect(
+          logs.any(
+            (message) =>
+                message.contains('message=native_player_appearance_applied') &&
+                message.contains('apply_strategy: reload_fallback') &&
+                message.contains('live_patch_eligible: false') &&
+                message.contains('reload_required: true') &&
+                message.contains(
+                  'sync_blockers: [background_image_present, partner_background_image_present]',
+                ),
+          ),
+          isTrue,
+        );
+      });
+    });
+
     testWidgets(
       'resets the Lotus appearance surface when native player appearance is dismissed from color-card takeover',
       (tester) async {
