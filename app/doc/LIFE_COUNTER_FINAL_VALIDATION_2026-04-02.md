@@ -78,6 +78,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_extra_counters_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_reset_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_game_timer_resume_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_start_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_game_timer_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_paused_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -122,6 +123,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o `game timer` tambem ficou validado no caminho vivo saindo de inativo para ativo: abrir a sheet a partir do `clock`, iniciar o timer e aplicar passa a reconstruir o estado canonico e a superficie Lotus sem precisar reboot completo do bundle nesse recorte seguro.
 - o `game timer` tambem ficou validado no caminho vivo saindo de ativo para inativo: abrir a sheet com o timer correndo, usar `Reset` e aplicar remove o timer da superficie Lotus, limpa o `gameTimerState` persistido e evita reboot completo do bundle nesse recorte seguro.
 - o `game timer` tambem ficou validado no caminho vivo saindo de ativo para pausado: abrir a sheet com o timer correndo, usar `Pause` e aplicar mantem store canonica, snapshot persistido e classe `.paused` coerentes no runtime Lotus sem reboot completo do bundle.
+- o `game timer` tambem ficou validado no caminho vivo saindo de pausado para ativo: abrir a sheet com o timer pausado, usar `Resume` e aplicar remove a classe `.paused`, limpa `pausedTime` e mantem store canonica e snapshot persistido coerentes no runtime Lotus sem reboot completo do bundle.
 - o timer pausado tambem ficou explicitamente validado no caminho vivo: quando o bootstrap canonico traz `isPaused=true`, o runtime Lotus reabre com o texto pausado correto e persiste o estado esperado.
 - o timer pausado tambem ficou coberto em reopen: `startTime`, `pausedTime` e `isPaused=true` permanecem coerentes apos fechar e reabrir a tela.
 - `table state` tambem ficou coberto no mesmo padrao: `__manaloom_table_state` canonico volta a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz `storm`, `monarch` e `initiative` stale.

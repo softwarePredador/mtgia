@@ -190,8 +190,7 @@ Leitura:
 Complemento desta rodada:
 
 - `history` agora passa primeiro pelo store canonico antes de qualquer serializacao Lotus
-- `game timer` ja tem casos seguros de patch incremental sem `reload` em `active -> active`, `inactive -> active` e `active -> inactive`; quando necessario, o host cria ou remove a superficie `.game-timer` e sincroniza o estado auxiliar do clock sem reboot completo do bundle
-- o recorte `active -> paused` do `game timer` agora tambem tem prova Android explicita em `live_runtime`, validando store canonica, snapshot persistido e classe `.paused` coerentes no DOM do Lotus
+- `game timer` ja tem casos seguros de patch incremental sem `reload` em `active -> active`, `inactive -> active`, `active -> inactive`, `active -> paused` e `paused -> active`; quando necessario, o host cria, atualiza ou remove a superficie `.game-timer` e sincroniza o estado auxiliar do clock sem reboot completo do bundle
 - `turn tracker` ja tem casos seguros de sync incremental sem `reload`, desde que a mutacao seja apenas avancar turnos para frente, fazer rewind curto limitado, ou mudar o starting player por rewind curto em `Turn 1`, mantendo a mesma configuracao estrutural e com o alvo `.turn-time-tracker` presente
 - `table state` ja tem um caso seguro de sync incremental sem `reload` para `storm`, `monarch` e `initiative`; `storm` fecha por patch no payload canonico, e `monarch/initiative` continuam exigindo `.player-card` presentes e `menu-button` sincronizada para o ajuste visual no DOM do Lotus
 - `day/night` continua sendo aplicado live, mas agora so fecha sem `reload` quando o `.day-night-switcher` confirma a troca
