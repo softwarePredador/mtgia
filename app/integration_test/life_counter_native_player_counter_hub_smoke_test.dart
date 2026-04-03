@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -6,6 +8,44 @@ import 'package:manaloom/features/home/life_counter/life_counter_session_store.d
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
+
+Future<Map<String, dynamic>> _readPlayerCounterHubState(
+  WidgetTester tester,
+  LotusStorageSnapshotStore snapshotStore,
+  dynamic screenState,
+) async {
+  const storageKey = '__manaloom_test_player_counter_hub';
+  const nonceKey = '__manaloom_test_player_counter_hub_nonce';
+  final nonce = DateTime.now().microsecondsSinceEpoch.toString();
+
+  await screenState.debugRunJavaScript('''
+(() => {
+  try {
+    localStorage.setItem('$storageKey', JSON.stringify({
+      probe: window.__manaloomPlayerCounterHubProbe ?? null
+    }));
+    localStorage.setItem('$nonceKey', '$nonce');
+  } catch (_) {}
+})()
+''');
+
+  String? encodedState;
+  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 300));
+    final snapshot = await snapshotStore.load();
+    if (snapshot == null) {
+      continue;
+    }
+    if (snapshot.values[nonceKey] != nonce) {
+      continue;
+    }
+    encodedState = snapshot.values[storageKey];
+  }
+
+  expect(encodedState, isNotNull);
+  final decoded = jsonDecode(encodedState!);
+  return Map<String, dynamic>.from(decoded as Map);
+}
 
 Future<LifeCounterSession?> _pumpUntilCounterApplied(
   WidgetTester tester,
@@ -31,7 +71,8 @@ void main() {
   testWidgets(
     'opens the ManaLoom player counter hub from player state and creates a custom counter on the live WebView path',
     (tester) async {
-      await LotusStorageSnapshotStore().clear();
+      final snapshotStore = LotusStorageSnapshotStore();
+      await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().save(
         const LifeCounterSession(
@@ -80,6 +121,11 @@ void main() {
       await tester.pump(const Duration(seconds: 8));
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+      await state.debugRunJavaScript('''
+(() => {
+  window.__manaloomPlayerCounterHubProbe = 'alive';
+})()
+''');
       await state.debugHandleShellMessage(
         '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":0}',
       );
@@ -110,21 +156,15 @@ void main() {
       expect(find.text('Player Counter'), findsOneWidget);
 
       await tester.enterText(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-name'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-name')),
         'Quest Counter',
       );
       await tester.ensureVisible(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-add'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-add')),
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-player-counter-custom-add'),
-        ),
+        find.byKey(const Key('life-counter-native-player-counter-custom-add')),
       );
       await tester.pumpAndSettle();
 
@@ -151,6 +191,13 @@ void main() {
       );
       expect(session, isNotNull);
       expect(session!.resolvedPlayerExtraCounters[0]['quest-counter'], 1);
+
+      final counterHubState = await _readPlayerCounterHubState(
+        tester,
+        snapshotStore,
+        state,
+      );
+      expect(counterHubState['probe'], isNull);
     },
   );
 }
