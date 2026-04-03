@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/features/home/life_counter_route.dart';
@@ -208,6 +209,102 @@ void main() {
       expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
       expect(find.byKey(const Key('fake-lotus-host-view')), findsOneWidget);
       expect(host.loadBundleCallCount, 1);
+    });
+
+    testWidgets('records Flutter lifecycle pause diagnostics', (tester) async {
+      final debugLogs = <String>[];
+      final originalDebugPrint = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) {
+          debugLogs.add(message);
+        }
+      };
+
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                return _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pump();
+
+        expect(
+          debugLogs.any(
+            (log) =>
+                log.contains('category=life_counter.lifecycle') &&
+                log.contains('message=lifecycle_changed') &&
+                log.contains('state: paused'),
+          ),
+          isTrue,
+        );
+      } finally {
+        debugPrint = originalDebugPrint;
+      }
+    });
+
+    testWidgets('records native user leave hint diagnostics', (tester) async {
+      const channel = MethodChannel('manaloom/life_counter_lifecycle');
+      const codec = StandardMethodCodec();
+      final debugLogs = <String>[];
+      final originalDebugPrint = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) {
+          debugLogs.add(message);
+        }
+      };
+
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LotusLifeCounterScreen(
+              hostFactory: ({
+                required onAppReviewRequested,
+                required onShellMessageRequested,
+              }) {
+                return _FakeLotusHost(
+                  onShellMessageRequested: onShellMessageRequested,
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+          channel.name,
+          codec.encodeMethodCall(
+            const MethodCall('userLeaveHint', <String, Object?>{
+              'timestampMs': 1,
+            }),
+          ),
+          (_) {},
+        );
+        await tester.pump();
+
+        expect(
+          debugLogs.any(
+            (log) =>
+                log.contains('category=life_counter.lifecycle') &&
+                log.contains('message=native_lifecycle_signal') &&
+                log.contains('method: userLeaveHint'),
+          ),
+          isTrue,
+        );
+      } finally {
+        debugPrint = originalDebugPrint;
+      }
     });
   });
 }

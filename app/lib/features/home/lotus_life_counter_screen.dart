@@ -78,11 +78,15 @@ class LotusLifeCounterScreen extends StatefulWidget {
   State<LotusLifeCounterScreen> createState() => _LotusLifeCounterScreenState();
 }
 
-class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
+class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
+    with WidgetsBindingObserver {
   static const int _maxLiveSetLifeDelta = 10;
   static const int _maxLiveTurnTrackerBackwardSteps = 3;
   static const int _turnTrackerLongPressDurationMs = 1100;
   static const int _turnTrackerLongPressCycleMs = 1150;
+  static const MethodChannel _nativeLifecycleChannel = MethodChannel(
+    'manaloom/life_counter_lifecycle',
+  );
   static const String _ownershipBridgeFallbackClassification =
       'ownership_bridge';
   static const String _supportUtilityFallbackClassification = 'support_utility';
@@ -202,6 +206,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   final LifeCounterSessionStore _sessionStore = LifeCounterSessionStore();
   final LotusStorageSnapshotStore _snapshotStore = LotusStorageSnapshotStore();
   DateTime? _lastShellMessageAt;
+  DateTime? _lastDiagnosticTriggerAt;
+  String? _lastDiagnosticTrigger;
+  Map<String, Object?>? _lastDiagnosticTriggerData;
+  AppLifecycleState? _lastObservedLifecycleState;
   OverlayEntry? _loadingOverlayEntry;
   OverlayEntry? _errorOverlayEntry;
   bool _isNativeSettingsSheetOpen = false;
@@ -222,6 +230,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _nativeLifecycleChannel.setMethodCallHandler(_handleNativeLifecycleSignal);
     _hostController = (widget.hostFactory ?? LotusHostController.new)(
       onAppReviewRequested: _handleAppReviewRequested,
       onShellMessageRequested: _handleShellMessageRequested,
@@ -251,6 +261,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _nativeLifecycleChannel.setMethodCallHandler(null);
     _hostController.isLoading.removeListener(_syncLoadingOverlay);
     _hostController.errorMessage.removeListener(_syncErrorOverlay);
     _removeLoadingOverlay();
@@ -267,6 +279,21 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
     _hostController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _lastObservedLifecycleState = state;
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'lifecycle_changed',
+        category: 'life_counter.lifecycle',
+        data: _buildLifecycleDiagnostics(<String, Object?>{
+          'state': state.name,
+          'source': 'flutter_binding',
+        }),
+      ),
+    );
   }
 
   void _syncLoadingOverlay() {
@@ -347,6 +374,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   }
 
   void _handleAppReviewRequested(String message) {
+    _rememberDiagnosticTrigger(
+      'app_review_requested',
+      <String, Object?>{'message': message},
+    );
     debugPrint('$lotusLogPrefix AppReview requested: $message');
     unawaited(
       AppObservability.instance.recordEvent(
@@ -361,6 +392,11 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     if (!mounted) {
       return;
     }
+
+    _rememberDiagnosticTrigger(
+      'shell_message',
+      _diagnosticPayloadForShellMessage(message),
+    );
 
     try {
       final decoded = jsonDecode(message);
@@ -569,6 +605,89 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   Future<void> debugHandleShellMessage(String message) async {
     _handleShellMessageRequested(message);
     await Future<void>.delayed(Duration.zero);
+  }
+
+  Future<void> _handleNativeLifecycleSignal(MethodCall call) async {
+    if (!mounted) {
+      return;
+    }
+
+    final arguments = switch (call.arguments) {
+      final Map<Object?, Object?> raw => raw.map(
+        (key, value) => MapEntry('$key', value),
+      ),
+      _ => const <String, Object?>{},
+    };
+
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'native_lifecycle_signal',
+        category: 'life_counter.lifecycle',
+        data: _buildLifecycleDiagnostics(<String, Object?>{
+          'method': call.method,
+          'source': 'android_activity',
+          ...arguments,
+        }),
+      ),
+    );
+  }
+
+  void _rememberDiagnosticTrigger(
+    String trigger,
+    Map<String, Object?> data,
+  ) {
+    _lastDiagnosticTriggerAt = DateTime.now();
+    _lastDiagnosticTrigger = trigger;
+    _lastDiagnosticTriggerData = data;
+  }
+
+  Map<String, Object?> _diagnosticPayloadForShellMessage(String message) {
+    try {
+      final decoded = jsonDecode(message);
+      if (decoded is Map<String, dynamic>) {
+        return <String, Object?>{
+          'message_type': decoded['type'],
+          'message_source': decoded['source'],
+        };
+      }
+    } catch (_) {}
+
+    return <String, Object?>{
+      'message_preview': _truncateDiagnosticMessage(message),
+    };
+  }
+
+  Map<String, Object?> _buildLifecycleDiagnostics(
+    Map<String, Object?> baseData,
+  ) {
+    final data = <String, Object?>{
+      ...baseData,
+      'route': lifeCounterRoutePath,
+      'implementation': 'embedded_lotus',
+      'last_observed_lifecycle_state': _lastObservedLifecycleState?.name,
+    };
+
+    if (_lastDiagnosticTriggerAt != null) {
+      data['last_trigger'] = _lastDiagnosticTrigger;
+      data['last_trigger_age_ms'] = DateTime.now()
+          .difference(_lastDiagnosticTriggerAt!)
+          .inMilliseconds;
+    }
+    if (_lastDiagnosticTriggerData != null &&
+        _lastDiagnosticTriggerData!.isNotEmpty) {
+      data['last_trigger_data'] = _lastDiagnosticTriggerData;
+    }
+
+    return data;
+  }
+
+  String _truncateDiagnosticMessage(String message) {
+    const maxLength = 180;
+    if (message.length <= maxLength) {
+      return message;
+    }
+
+    return '${message.substring(0, maxLength)}...';
   }
 
   Future<void> debugRunJavaScript(String script) {
