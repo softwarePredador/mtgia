@@ -31,7 +31,7 @@ O inventario abaixo traduz isso para o estado real de cada dominio `ownership_br
 | `game_timer` | `live_runtime` | ja evita `reload` em `active -> active` e `inactive -> active` quando a superficie `.game-timer` responde |
 | `dice` | `canonical_store_sync` | ja evita `reload` quando a mutacao fica limitada ao resultado canonico e nao muda estruturalmente o tracker |
 | `commander_damage` | `canonical_store_sync` | ja evita `reload` apenas quando o settings garante ausencia de reflexo visual na mesa |
-| `player_appearance` | `mixed` | agora abre `live_runtime` para troca simples de background solido em um unico jogador, inclusive no takeover do `color card`; nickname e imagens ainda ficam em `reload_fallback` |
+| `player_appearance` | `mixed` | agora abre `live_runtime` para troca simples de background solido em um unico jogador, inclusive no takeover do `color card`; o dismiss sem mudanca do `color card` tambem ja fecha por reset live do DOM; nickname e imagens ainda ficam em `reload_fallback` |
 | `player_counter` | `canonical_store_sync` | ja evita `reload` quando counters ficam ocultos e `poison` nao pode disparar `autoKill` |
 | `player_state` | `mixed` | combina `canonical_store_sync`, `live_runtime` e `reload_fallback`; agora tambem herda o recorte seguro de `player_appearance` com background solido e o reset live da `option-card` nos subcasos seguros de `partner commander`, `player counter` oculto, `commander damage` oculto e `appearance` com fundo solido |
 | `set_life` | `live_runtime` | ja evita `reload` em delta medio de vida no jogador alvo quando o runtime Lotus confirma os controles |

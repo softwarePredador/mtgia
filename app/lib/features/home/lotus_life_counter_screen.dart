@@ -2800,8 +2800,6 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             : targetPlayerIndex;
     final shouldResetLotusSurface = _playerAppearanceSurfaceResetSources
         .contains(source);
-    final surfaceResetStrategy =
-        shouldResetLotusSurface ? 'bundle_reload' : 'none';
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -2854,6 +2852,12 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     _isNativePlayerAppearanceSheetOpen = false;
 
     if (!mounted || updatedSession == null) {
+      final surfaceResetStrategy =
+          await _applyPlayerAppearanceSurfaceResetStrategy(
+            source: source,
+            targetPlayerIndex: normalizedTargetIndex,
+            allowLiveReset: shouldResetLotusSurface,
+          );
       unawaited(
         AppObservability.instance.recordEvent(
           'native_player_appearance_dismissed',
@@ -2868,13 +2872,19 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           },
         ),
       );
-      if (shouldResetLotusSurface) {
+      if (surfaceResetStrategy == 'bundle_reload') {
         unawaited(_hostController.loadBundle());
       }
       return;
     }
 
     if (updatedSession.toJsonString() == session.toJsonString()) {
+      final surfaceResetStrategy =
+          await _applyPlayerAppearanceSurfaceResetStrategy(
+            source: source,
+            targetPlayerIndex: normalizedTargetIndex,
+            allowLiveReset: shouldResetLotusSurface,
+          );
       unawaited(
         AppObservability.instance.recordEvent(
           'native_player_appearance_dismissed',
@@ -2889,7 +2899,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           },
         ),
       );
-      if (shouldResetLotusSurface) {
+      if (surfaceResetStrategy == 'bundle_reload') {
         unawaited(_hostController.loadBundle());
       }
       return;
@@ -2902,6 +2912,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     LifeCounterSession session, {
     required String source,
   }) async {
+    final shouldResetLotusSurface = _playerAppearanceSurfaceResetSources
+        .contains(source);
     final previousSession =
         await _sessionStore.load() ??
         LifeCounterSession.initial(playerCount: session.playerCount);
@@ -2934,9 +2946,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
             })()
             : Future<bool>.value(false);
     final appliedLiveResolved = await appliedLive;
+    final targetPlayerIndex = _singleChangedPlayerAppearanceIndex(
+      previousSession,
+      adjustedSession,
+    );
+    final surfaceResetStrategy =
+        await _applyPlayerAppearanceSurfaceResetStrategy(
+          source: source,
+          targetPlayerIndex: targetPlayerIndex,
+          allowLiveReset: appliedLiveResolved && shouldResetLotusSurface,
+        );
     final applyStrategy =
         appliedLiveResolved ? 'live_runtime' : 'reload_fallback';
-    final reloadRequired = !appliedLiveResolved;
+    final reloadRequired =
+        !appliedLiveResolved || surfaceResetStrategy == 'bundle_reload';
     final syncBlockers =
         appliedLiveResolved
             ? const <String>[]
@@ -2955,6 +2978,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           'live_patch_eligible': livePatchEligible,
           'apply_strategy': applyStrategy,
           'reload_required': reloadRequired,
+          'surface_reset_required': shouldResetLotusSurface,
+          'surface_reset_strategy': surfaceResetStrategy,
           'sync_blockers': syncBlockers,
         },
       ),
@@ -2965,6 +2990,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  Future<String> _applyPlayerAppearanceSurfaceResetStrategy({
+    required String source,
+    required int? targetPlayerIndex,
+    required bool allowLiveReset,
+  }) async {
+    if (!_playerAppearanceSurfaceResetSources.contains(source)) {
+      return 'none';
+    }
+
+    if (allowLiveReset) {
+      final failureReason = await _resetLotusPlayerOptionCardFailureReason(
+        targetPlayerIndex: targetPlayerIndex,
+      );
+      if (failureReason == null) {
+        return 'live_dom_reset';
+      }
+    }
+
+    return 'bundle_reload';
   }
 
   List<String> _playerAppearanceLivePatchBlockers(

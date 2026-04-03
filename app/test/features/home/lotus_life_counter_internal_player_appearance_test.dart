@@ -1159,7 +1159,13 @@ void main() {
             ),
             findsNothing,
           );
-          expect(host.loadBundleCallCount, 2);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
           expect(
             logs.any(
               (message) =>
@@ -1171,7 +1177,7 @@ void main() {
                   ) &&
                   message.contains('changed: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: bundle_reload'),
+                  message.contains('surface_reset_strategy: live_dom_reset'),
             ),
             isTrue,
           );
@@ -1245,6 +1251,13 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.resolvedPlayerAppearances[2].background, '#CF7AEF');
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
         });
       },
     );

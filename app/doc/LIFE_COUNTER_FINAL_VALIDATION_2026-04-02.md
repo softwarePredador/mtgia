@@ -116,6 +116,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_native_player_appearance_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_background_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_native_player_appearance_color_card_dismiss_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_appearance_profiles_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_appearance_hub_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_native_player_state_appearance_background_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -168,6 +169,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - o apply direto de `player appearance` tambem ficou validado no caminho vivo: editar nickname e preset pela shell interna atualiza a sessao canonica sem quebrar o runtime Lotus.
 - o apply direto de `player appearance` tambem ficou validado no recorte seguro de `background` solido para um unico jogador: aplicar apenas o preset de cor preserva a sessao canonica e o payload Lotus sem alterar nickname e sem precisar reboot completo do bundle.
 - o takeover de `player appearance` vindo do `color card` tambem ficou validado no recorte seguro de `background` solido para um unico jogador: aplicar apenas o preset de cor preserva a sessao canonica e o payload Lotus em `live_runtime`, sem reboot completo do bundle.
+- o takeover de `player appearance` vindo do `color card` tambem ficou validado no dismiss sem mudanca: fechar a surface agora limpa a `option-card` diretamente no DOM e preserva a sessao canonica sem reboot completo do bundle.
 - o hub de `Player State -> Appearance` tambem ficou validado no caminho vivo: abrir `Player Appearance` a partir do `Player State`, editar nickname e aplicar preserva a sessao canonica, mas este recorte segue classificado como `reload_fallback` por ainda mudar estrutura fora do patch incremental seguro do runtime Lotus.
 - o hub de `Player State -> Appearance` tambem ficou validado no recorte seguro de `background` solido para um unico jogador vindo de `player_state_surface_pressed`: aplicar apenas o preset de cor preserva a sessao canonica e o payload Lotus em `live_runtime`, sem reboot completo do bundle.
 - o hub de `Player State -> Player Counter` tambem ficou validado no caminho vivo: abrir `Player Counter` a partir do `Player State`, criar um counter customizado e aplicar preserva a sessao canonica, mas este recorte segue classificado como `reload_fallback` quando `showCountersOnPlayerCard=true`.
