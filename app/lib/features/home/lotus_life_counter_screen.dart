@@ -2236,36 +2236,102 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
-    try {
-      final rawResult = await _hostController.runJavaScriptReturningResult('''
+      try {
+        final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
-    const timer = document.querySelector('.game-timer');
-    if (!(timer instanceof HTMLElement)) {
-      return JSON.stringify({ ok: false, reason: 'timer_missing' });
-    }
-
     const startTime = ${state.startTimeEpochMs ?? 'null'};
     const pausedTime = ${state.pausedTimeEpochMs ?? 0};
     if (startTime == null) {
       return JSON.stringify({ ok: false, reason: 'start_time_missing' });
     }
 
-    const elapsedSeconds = Math.max(
-      0,
-      Math.floor((${state.isPaused ? 'pausedTime' : 'Date.now()'} - startTime) / 1000)
-    );
-    const hours = Math.floor(elapsedSeconds / 3600);
-    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-    const seconds = elapsedSeconds % 60;
-    const prefix = hours > 0 ? String(hours).padStart(2, '0') + ':' : '';
-    timer.textContent =
-      prefix +
-      String(minutes).padStart(2, '0') +
-      ':' +
-      String(seconds).padStart(2, '0');
-    timer.classList.toggle('paused', ${state.isPaused ? 'true' : 'false'});
-    return JSON.stringify({ ok: true });
+    const formatElapsed = (effectiveStartTime, effectivePausedTime, isPaused) => {
+      const elapsedSeconds = Math.max(
+        0,
+        Math.floor(((isPaused ? effectivePausedTime : Date.now()) - effectiveStartTime) / 1000)
+      );
+      const hours = Math.floor(elapsedSeconds / 3600);
+      const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+      const seconds = elapsedSeconds % 60;
+      const prefix = hours > 0 ? String(hours).padStart(2, '0') + ':' : '';
+      return (
+        prefix +
+        String(minutes).padStart(2, '0') +
+        ':' +
+        String(seconds).padStart(2, '0')
+      );
+    };
+
+    const applyVisualState = (timer, effectiveStartTime, effectivePausedTime, isPaused) => {
+      timer.textContent = formatElapsed(
+        effectiveStartTime,
+        effectivePausedTime,
+        isPaused,
+      );
+      timer.classList.toggle('paused', isPaused);
+    };
+
+    let timer = document.querySelector('.game-timer:not(.current-time-clock)');
+    let created = false;
+    if (!(timer instanceof HTMLElement)) {
+      const parent =
+        document.querySelector('.other-buttons') ??
+        document.querySelector('.current-time-clock')?.parentElement ??
+        document.body;
+      if (!(parent instanceof HTMLElement)) {
+        return JSON.stringify({ ok: false, reason: 'timer_parent_missing' });
+      }
+
+      timer = document.createElement('div');
+      timer.className = 'game-timer';
+      parent.appendChild(timer);
+      created = true;
+    }
+
+    if (timer.dataset.manaloomTimerBound !== 'true') {
+      timer.addEventListener('click', () => {
+        try {
+          const raw = localStorage.getItem('gameTimerState');
+          if (!raw) {
+            return;
+          }
+
+          const payload = JSON.parse(raw);
+          if (!payload || typeof payload.startTime !== 'number') {
+            return;
+          }
+
+          if (payload.isPaused) {
+            const delta = Date.now() - (typeof payload.pausedTime === 'number' ? payload.pausedTime : Date.now());
+            payload.startTime += delta;
+            payload.isPaused = false;
+            payload.pausedTime = 0;
+          } else {
+            payload.isPaused = true;
+            payload.pausedTime = Date.now();
+          }
+
+          localStorage.setItem('gameTimerState', JSON.stringify(payload));
+          applyVisualState(
+            timer,
+            payload.startTime,
+            typeof payload.pausedTime === 'number' ? payload.pausedTime : 0,
+            payload.isPaused === true,
+          );
+        } catch (_) {}
+      });
+      timer.dataset.manaloomTimerBound = 'true';
+    }
+
+    applyVisualState(timer, startTime, pausedTime, ${state.isPaused ? 'true' : 'false'});
+
+    const clock = document.querySelector('.game-timer.current-time-clock');
+    if (clock instanceof HTMLElement) {
+      clock.classList.add('with-game-timer');
+    }
+
+    return JSON.stringify({ ok: true, created });
   } catch (_) {}
   return JSON.stringify({ ok: false, reason: 'timer_patch_failed' });
 })();

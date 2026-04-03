@@ -77,6 +77,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `flutter test integration_test/life_counter_commander_cast_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_extra_counters_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
+- `flutter test integration_test/life_counter_game_timer_start_live_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_paused_reopen_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_game_timer_paused_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
 - `flutter test integration_test/life_counter_table_state_roundtrip_smoke_test.dart -d emulator-5554 --reporter expanded --no-version-check`
@@ -116,6 +117,7 @@ Os comandos abaixo passaram no `emulator-5554`:
 - `turnTracker` tambem ficou coberto no mesmo padrao: flags, ponteiros e turno atual canonicos voltam a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz tracker stale.
 - o fallback de bootstrap do host tambem ficou provado sem depender de snapshot Lotus confiavel: a suite `lotus_host_controller_bootstrap_test.dart` cobre tanto o caso sem snapshot salvo quanto o caso de snapshot parcial e stale sendo corrigido pelos stores canonicos.
 - o mecanismo de patch incremental do Lotus tambem ficou efetivamente validado no produto: os recortes `live_runtime` de `day/night`, `turn tracker`, `game timer` e `table state` passaram na bateria local e/ou nos smokes Android sem exigir reboot completo do bundle nesses casos seguros.
+- o `game timer` tambem ficou validado no caminho vivo saindo de inativo para ativo: abrir a sheet a partir do `clock`, iniciar o timer e aplicar passa a reconstruir o estado canonico e a superficie Lotus sem precisar reboot completo do bundle nesse recorte seguro.
 - o timer pausado tambem ficou explicitamente validado no caminho vivo: quando o bootstrap canonico traz `isPaused=true`, o runtime Lotus reabre com o texto pausado correto e persiste o estado esperado.
 - o timer pausado tambem ficou coberto em reopen: `startTime`, `pausedTime` e `isPaused=true` permanecem coerentes apos fechar e reabrir a tela.
 - `table state` tambem ficou coberto no mesmo padrao: `__manaloom_table_state` canonico volta a prevalecer no bootstrap e no reopen mesmo quando o snapshot Lotus salvo traz `storm`, `monarch` e `initiative` stale.
