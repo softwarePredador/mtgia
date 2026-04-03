@@ -73,6 +73,7 @@
 
   function readViewportWidth() {
     return (
+      (window.visualViewport && window.visualViewport.width) ||
       window.innerWidth ||
       document.documentElement.clientWidth ||
       document.body.clientWidth ||
@@ -82,6 +83,7 @@
 
   function readViewportHeight() {
     return (
+      (window.visualViewport && window.visualViewport.height) ||
       window.innerHeight ||
       document.documentElement.clientHeight ||
       document.body.clientHeight ||
@@ -89,20 +91,29 @@
     );
   }
 
-  function readScreenWidth() {
-    return (window.screen && window.screen.width) || readViewportWidth();
+  function readEmbeddedWidth() {
+    return readViewportWidth();
   }
 
-  function readScreenHeight() {
-    return (window.screen && window.screen.height) || readViewportHeight();
+  function readEmbeddedHeight() {
+    return readViewportHeight();
+  }
+
+  function suppressEmbeddedReviewPrompt() {
+    try {
+      window.localStorage.setItem('reviewPrompt', 'true');
+    } catch (error) {}
   }
 
   function applyEmbeddedViewportFrame() {
-    var width = readScreenWidth();
-    var height = readScreenHeight();
+    var width = readEmbeddedWidth();
+    var height = readEmbeddedHeight();
     if (!width || !height) {
       return;
     }
+
+    document.documentElement.style.setProperty('--vw', width + 'px');
+    document.documentElement.style.setProperty('--vh', height + 'px');
 
     var targets = [document.documentElement, document.body];
     for (var i = 0; i < targets.length; i += 1) {
@@ -116,19 +127,21 @@
       target.style.maxWidth = width + 'px';
       target.style.height = height + 'px';
       target.style.minHeight = height + 'px';
+      target.style.maxHeight = height + 'px';
     }
   }
 
-  patchScreenDimension('width', readViewportWidth);
-  patchScreenDimension('height', readViewportHeight);
-  patchScreenDimension('availWidth', readViewportWidth);
-  patchScreenDimension('availHeight', readViewportHeight);
+  patchScreenDimension('width', readEmbeddedWidth);
+  patchScreenDimension('height', readEmbeddedHeight);
+  patchScreenDimension('availWidth', readEmbeddedWidth);
+  patchScreenDimension('availHeight', readEmbeddedHeight);
 
   function fireDeviceReady() {
     document.dispatchEvent(new Event('deviceready'));
   }
 
   function prepareAppBoot() {
+    suppressEmbeddedReviewPrompt();
     applyEmbeddedViewportFrame();
     requestAnimationFrame(function () {
       applyEmbeddedViewportFrame();
@@ -150,6 +163,7 @@
 
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) {
+      suppressEmbeddedReviewPrompt();
       applyEmbeddedViewportFrame();
       document.dispatchEvent(new Event('resume'));
     }

@@ -739,9 +739,6 @@ class LotusHostController implements LotusHost {
       await webViewController.runJavaScript(
         "navigator.clipboard.writeText('__lotus_clipboard_probe__');",
       );
-      await webViewController.runJavaScript(
-        "window.cordova.plugins.AppReview.requestReview();",
-      );
     } catch (error) {
       debugPrint('$lotusLogPrefix bridge probe error: $error');
     }
