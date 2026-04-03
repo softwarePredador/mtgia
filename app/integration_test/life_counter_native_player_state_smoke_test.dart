@@ -87,10 +87,24 @@ void main() {
 
       expect(find.text('Player State'), findsOneWidget);
 
+      await tester.scrollUntilVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-partner-toggle'),
+        ),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(
+        find.byKey(
+          const Key('life-counter-native-player-state-partner-toggle'),
+        ),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(
           const Key('life-counter-native-player-state-partner-toggle'),
         ),
+        warnIfMissed: false,
       );
       await tester.pumpAndSettle();
 
