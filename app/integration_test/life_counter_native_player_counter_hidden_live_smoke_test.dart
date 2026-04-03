@@ -138,6 +138,11 @@ void main() {
 
       expect(find.text('Player Counter'), findsOneWidget);
 
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-player-counter-plus')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.ensureVisible(
         find.byKey(const Key('life-counter-native-player-counter-plus')),
       );
