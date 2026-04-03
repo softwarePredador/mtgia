@@ -34,8 +34,6 @@ Future<void> _stabilizeHarness(
   required LifeCounterSessionStore sessionStore,
   required LifeCounterSettingsStore settingsStore,
 }) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump(const Duration(seconds: 2));
   await snapshotStore.clear();
@@ -114,72 +112,73 @@ Future<void> _pumpUntilGameTimerInactive(
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('resets the game timer live from an active state on the live WebView path', (
-    tester,
-  ) async {
-    final gameTimerStateStore = LifeCounterGameTimerStateStore();
-    final sessionStore = LifeCounterSessionStore();
-    final settingsStore = LifeCounterSettingsStore();
-    final snapshotStore = LotusStorageSnapshotStore();
-    final uiSnapshotStore = LotusUiSnapshotStore();
+  testWidgets(
+    'resets the game timer live from an active state on the live WebView path',
+    (tester) async {
+      final gameTimerStateStore = LifeCounterGameTimerStateStore();
+      final sessionStore = LifeCounterSessionStore();
+      final settingsStore = LifeCounterSettingsStore();
+      final snapshotStore = LotusStorageSnapshotStore();
+      final uiSnapshotStore = LotusUiSnapshotStore();
 
-    await _stabilizeHarness(
-      tester,
-      snapshotStore: snapshotStore,
-      uiSnapshotStore: uiSnapshotStore,
-      gameTimerStateStore: gameTimerStateStore,
-      sessionStore: sessionStore,
-      settingsStore: settingsStore,
-    );
+      await _stabilizeHarness(
+        tester,
+        snapshotStore: snapshotStore,
+        uiSnapshotStore: uiSnapshotStore,
+        gameTimerStateStore: gameTimerStateStore,
+        sessionStore: sessionStore,
+        settingsStore: settingsStore,
+      );
 
-    await gameTimerStateStore.save(
-      LifeCounterGameTimerState(
-        startTimeEpochMs:
-            DateTime.now().millisecondsSinceEpoch -
-            const Duration(seconds: 45).inMilliseconds,
-        isPaused: false,
-        pausedTimeEpochMs: null,
-      ),
-    );
-    await sessionStore.save(LifeCounterSession.initial(playerCount: 4));
+      await gameTimerStateStore.save(
+        LifeCounterGameTimerState(
+          startTimeEpochMs:
+              DateTime.now().millisecondsSinceEpoch -
+              const Duration(seconds: 45).inMilliseconds,
+          isPaused: false,
+          pausedTimeEpochMs: null,
+        ),
+      );
+      await sessionStore.save(LifeCounterSession.initial(playerCount: 4));
 
-    await tester.pumpWidget(
-      const MaterialApp(home: LotusLifeCounterScreen()),
-    );
-    await tester.pump();
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
+      await tester.pump();
 
-    await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
+      await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
 
-    final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
-    await state.debugHandleShellMessage(
-      '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
-    );
-    await tester.pumpAndSettle();
+      final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+      await state.debugHandleShellMessage(
+        '{"type":"open-native-game-timer","source":"game_timer_surface_pressed"}',
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Game Timer'), findsOneWidget);
+      expect(find.text('Game Timer'), findsOneWidget);
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('life-counter-native-game-timer-reset')),
-      250,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(
-      find.byKey(const Key('life-counter-native-game-timer-reset')),
-    );
-    await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('life-counter-native-game-timer-reset')),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-reset')),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(
-      find.byKey(const Key('life-counter-native-game-timer-apply')),
-    );
-    await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-native-game-timer-apply')),
+      );
+      await tester.pumpAndSettle();
 
-    await _pumpUntilGameTimerInactive(tester, snapshotStore, state);
+      await _pumpUntilGameTimerInactive(tester, snapshotStore, state);
 
-    final updatedState = await gameTimerStateStore.load();
-    expect(updatedState, isNull);
+      final updatedState = await gameTimerStateStore.load();
+      expect(updatedState, isNull);
 
-    final rawSnapshot = await snapshotStore.load();
-    expect(rawSnapshot, isNotNull);
-    expect(rawSnapshot!.values['gameTimerState'], isNull);
-  });
+      final rawSnapshot = await snapshotStore.load();
+      expect(rawSnapshot, isNotNull);
+      expect(rawSnapshot!.values['gameTimerState'], isNull);
+    },
+  );
 }

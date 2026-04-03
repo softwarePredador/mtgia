@@ -13,11 +13,7 @@ void main() {
     await AppObservability.instance.bootstrap(() async {
       runApp(
         const MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: Text('mobile-sentry-smoke'),
-            ),
-          ),
+          home: Scaffold(body: Center(child: Text('mobile-sentry-smoke'))),
         ),
       );
     });
@@ -27,10 +23,7 @@ void main() {
 
     final eventId = await AppObservability.instance.captureException(
       Exception('MTGIA mobile sentry smoke'),
-      tags: {
-        'source': 'mobile_smoke',
-        'smoke_id': smokeId,
-      },
+      tags: {'source': 'mobile_smoke', 'smoke_id': smokeId},
       extras: {
         'smoke_id': smokeId,
         'runner': 'app/integration_test/mobile_sentry_smoke_test.dart',

@@ -33,8 +33,6 @@ void main() {
   testWidgets(
     'auto-knocks out from the ManaLoom player state set life hub on the live WebView path',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().save(
         LifeCounterSettings.defaults.copyWith(autoKill: true),

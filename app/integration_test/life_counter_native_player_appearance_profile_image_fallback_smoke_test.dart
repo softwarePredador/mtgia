@@ -90,8 +90,6 @@ void main() {
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
       final profileStore = LifeCounterPlayerAppearanceProfileStore();
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
       await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().clear();

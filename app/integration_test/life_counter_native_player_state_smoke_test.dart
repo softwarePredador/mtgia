@@ -30,8 +30,6 @@ void main() {
   testWidgets(
     'applies answer-left from the option-card player state shell on the live WebView path',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().clear();
@@ -135,8 +133,6 @@ void main() {
   testWidgets(
     'applies decked-out from the killed-overlay player state shell on the live WebView path',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().clear();

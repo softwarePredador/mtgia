@@ -70,8 +70,6 @@ void main() {
     'opens the ManaLoom-owned player counter shell on the live WebView path',
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();

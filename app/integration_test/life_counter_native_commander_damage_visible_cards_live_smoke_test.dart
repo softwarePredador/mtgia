@@ -73,8 +73,6 @@ void main() {
     'applies direct commander damage with visible player cards without reload',
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await snapshotStore.clear();
       await LifeCounterSettingsStore().save(

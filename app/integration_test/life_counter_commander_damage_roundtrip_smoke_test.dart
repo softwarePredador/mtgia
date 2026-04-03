@@ -173,9 +173,11 @@ void main() {
 
       final players = jsonDecode(snapshot!.values['players']!) as List<dynamic>;
       final playerOneCommanderDamage =
-          (players[0] as Map<String, dynamic>)['commanderDamage'] as List<dynamic>;
+          (players[0] as Map<String, dynamic>)['commanderDamage']
+              as List<dynamic>;
       final playerThreeCommanderDamage =
-          (players[2] as Map<String, dynamic>)['commanderDamage'] as List<dynamic>;
+          (players[2] as Map<String, dynamic>)['commanderDamage']
+              as List<dynamic>;
 
       expect((players[1] as Map<String, dynamic>)['partnerCommander'], isTrue);
       expect(
@@ -202,7 +204,12 @@ void main() {
       final restoredSession = await sessionStore.load();
 
       expect(restoredSession, isNotNull);
-      expect(restoredSession!.partnerCommanders, const [false, true, false, false]);
+      expect(restoredSession!.partnerCommanders, const [
+        false,
+        true,
+        false,
+        false,
+      ]);
       expect(
         restoredSession.resolvedCommanderDamageDetails[0][1],
         const LifeCounterCommanderDamageDetail(

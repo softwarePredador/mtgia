@@ -33,9 +33,6 @@ void main() {
   testWidgets(
     'applies a saved ManaLoom player appearance profile on the live WebView path',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
       final profileStore = LifeCounterPlayerAppearanceProfileStore();
       await LotusStorageSnapshotStore().clear();
       await LifeCounterSettingsStore().clear();
@@ -99,7 +96,9 @@ void main() {
       expect(profiles, hasLength(1));
       final profileId = profiles.first.id;
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 
@@ -126,9 +125,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(
-        find.byKey(
-          const Key('life-counter-native-player-appearance-apply'),
-        ),
+        find.byKey(const Key('life-counter-native-player-appearance-apply')),
       );
       await tester.pumpAndSettle();
 

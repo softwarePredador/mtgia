@@ -13,11 +13,13 @@ Future<void> _pumpUntilSnapshotAvailable(
   int expectedPlayerCount,
 ) async {
   var snapshot = await snapshotStore.load();
-  for (var attempt = 0;
-      attempt < 20 &&
-          (snapshot == null ||
-              snapshot.values['playerCount'] != '$expectedPlayerCount');
-      attempt += 1) {
+  for (
+    var attempt = 0;
+    attempt < 20 &&
+        (snapshot == null ||
+            snapshot.values['playerCount'] != '$expectedPlayerCount');
+    attempt += 1
+  ) {
     await tester.pump(const Duration(seconds: 1));
     snapshot = await snapshotStore.load();
   }
@@ -31,10 +33,12 @@ Future<void> _pumpUntilCanonicalSessionAvailable(
   int expectedPlayerCount,
 ) async {
   var session = await sessionStore.load();
-  for (var attempt = 0;
-      attempt < 20 &&
-          (session == null || session.playerCount != expectedPlayerCount);
-      attempt += 1) {
+  for (
+    var attempt = 0;
+    attempt < 20 &&
+        (session == null || session.playerCount != expectedPlayerCount);
+    attempt += 1
+  ) {
     await tester.pump(const Duration(seconds: 1));
     session = await sessionStore.load();
   }
@@ -125,15 +129,15 @@ Future<void> runPlayerCountScenario(
 
   expect(await snapshotStore.load(), isNull);
 
-  await tester.pumpWidget(
-    const MaterialApp(
-      home: LotusLifeCounterScreen(),
-    ),
-  );
+  await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
   await tester.pump();
   expect(find.text('Life counter unavailable'), findsNothing);
 
-  await _pumpUntilSnapshotAvailable(tester, snapshotStore, scenario.playerCount);
+  await _pumpUntilSnapshotAvailable(
+    tester,
+    snapshotStore,
+    scenario.playerCount,
+  );
   await _pumpUntilCanonicalSessionAvailable(
     tester,
     sessionStore,
@@ -147,8 +151,9 @@ Future<void> runPlayerCountScenario(
   expect(snapshot, isNotNull);
   expect(snapshot!.values['playerCount'], '${scenario.playerCount}');
   expect(
-    snapshot.values[
-        scenario.playerCount == 2 ? 'startingLife2P' : 'startingLifeMP'],
+    snapshot.values[scenario.playerCount == 2
+        ? 'startingLife2P'
+        : 'startingLifeMP'],
     '${scenario.startingLife}',
   );
 

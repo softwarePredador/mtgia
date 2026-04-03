@@ -71,8 +71,6 @@ void main() {
     'applies direct player counter while counters stay hidden without reload',
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await snapshotStore.clear();
       await LifeCounterSettingsStore().save(

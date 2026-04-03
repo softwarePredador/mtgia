@@ -34,8 +34,6 @@ Future<void> _stabilizeHarness(
   required LifeCounterSessionStore sessionStore,
   required LifeCounterSettingsStore settingsStore,
 }) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump(const Duration(seconds: 2));
   await snapshotStore.clear();

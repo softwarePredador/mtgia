@@ -32,8 +32,6 @@ Future<void> _stabilizeHarness(
   required LifeCounterSessionStore sessionStore,
   required LifeCounterSettingsStore settingsStore,
 }) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump(const Duration(seconds: 2));
   await snapshotStore.clear();
@@ -164,11 +162,7 @@ void main() {
     );
     await prepareStores(enabledSettings);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LotusLifeCounterScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
     await tester.pump();
 
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
@@ -199,11 +193,7 @@ void main() {
     );
     await prepareStores(disabledSettings);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LotusLifeCounterScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
     await tester.pump();
 
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);

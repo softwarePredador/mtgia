@@ -61,11 +61,7 @@ void main() {
   ) async {
     final uiSnapshotStore = LotusUiSnapshotStore();
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LotusLifeCounterScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
 
     await tester.pump();
 
@@ -88,157 +84,157 @@ void main() {
     expect(uiSnapshot.firstPlayerCardHeight, greaterThan(300));
   });
 
-  testWidgets('bootstraps Lotus from canonical state when raw snapshot is absent', (
-    tester,
-  ) async {
-    final snapshotStore = LotusStorageSnapshotStore();
-    final uiSnapshotStore = LotusUiSnapshotStore();
-    final gameTimerStateStore = LifeCounterGameTimerStateStore();
-    final sessionStore = LifeCounterSessionStore();
-    final settingsStore = LifeCounterSettingsStore();
+  testWidgets(
+    'bootstraps Lotus from canonical state when raw snapshot is absent',
+    (tester) async {
+      final snapshotStore = LotusStorageSnapshotStore();
+      final uiSnapshotStore = LotusUiSnapshotStore();
+      final gameTimerStateStore = LifeCounterGameTimerStateStore();
+      final sessionStore = LifeCounterSessionStore();
+      final settingsStore = LifeCounterSettingsStore();
 
-    await _stabilizeHarness(
-      tester,
-      snapshotStore,
-      uiSnapshotStore,
-      gameTimerStateStore,
-      sessionStore,
-      settingsStore,
-    );
-    await snapshotStore.clear();
-    await gameTimerStateStore.save(
-      const LifeCounterGameTimerState(
-        startTimeEpochMs: 1711800000000,
-        isPaused: true,
-        pausedTimeEpochMs: 1711800005000,
-      ),
-    );
-    await sessionStore.save(
-      const LifeCounterSession(
-        playerCount: 4,
-        startingLifeTwoPlayer: 20,
-        startingLifeMultiPlayer: 40,
-        lives: [40, 27, 12, 3],
-        poison: [0, 1, 7, 10],
-        energy: [2, 0, 5, 1],
-        experience: [0, 4, 0, 2],
-        commanderCasts: [0, 1, 3, 2],
-        partnerCommanders: [false, true, false, false],
-        playerSpecialStates: [
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.none,
-          LifeCounterPlayerSpecialState.deckedOut,
-          LifeCounterPlayerSpecialState.answerLeft,
-        ],
-        lastPlayerRolls: [null, null, null, null],
-        lastHighRolls: [null, null, null, null],
-        commanderDamage: [
-          [0, 5, 0, 0],
-          [0, 0, 8, 0],
-          [0, 0, 0, 3],
-          [11, 0, 0, 0],
-        ],
-        stormCount: 0,
-        monarchPlayer: null,
-        initiativePlayer: null,
-        firstPlayerIndex: 2,
-        turnTrackerActive: true,
-        turnTrackerOngoingGame: true,
-        turnTrackerAutoHighRoll: true,
-        currentTurnPlayerIndex: 1,
-        currentTurnNumber: 7,
-        turnTimerActive: true,
-        turnTimerSeconds: 93,
-        lastTableEvent: null,
-      ),
-    );
-    await settingsStore.save(
-      const LifeCounterSettings(
-        autoKill: false,
-        lifeLossOnCommanderDamage: false,
-        showCountersOnPlayerCard: true,
-        showRegularCounters: true,
-        showCommanderDamageCounters: true,
-        clickableCommanderDamageCounters: true,
-        keepZeroCountersOnPlayerCard: true,
-        saltyDefeatMessages: false,
-        cycleSaltyDefeatMessages: false,
-        gameTimer: true,
-        gameTimerMainScreen: true,
-        showClockOnMainScreen: true,
-        randomPlayerColors: true,
-        preserveBackgroundImagesOnShuffle: false,
-        setLifeByTappingNumber: false,
-        verticalTapAreas: true,
-        cleanLook: true,
-        criticalDamageWarning: false,
-        customLongTapEnabled: true,
-        customLongTapValue: 25,
-        whitelabelIcon: null,
-      ),
-    );
+      await _stabilizeHarness(
+        tester,
+        snapshotStore,
+        uiSnapshotStore,
+        gameTimerStateStore,
+        sessionStore,
+        settingsStore,
+      );
+      await snapshotStore.clear();
+      await gameTimerStateStore.save(
+        const LifeCounterGameTimerState(
+          startTimeEpochMs: 1711800000000,
+          isPaused: true,
+          pausedTimeEpochMs: 1711800005000,
+        ),
+      );
+      await sessionStore.save(
+        const LifeCounterSession(
+          playerCount: 4,
+          startingLifeTwoPlayer: 20,
+          startingLifeMultiPlayer: 40,
+          lives: [40, 27, 12, 3],
+          poison: [0, 1, 7, 10],
+          energy: [2, 0, 5, 1],
+          experience: [0, 4, 0, 2],
+          commanderCasts: [0, 1, 3, 2],
+          partnerCommanders: [false, true, false, false],
+          playerSpecialStates: [
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.none,
+            LifeCounterPlayerSpecialState.deckedOut,
+            LifeCounterPlayerSpecialState.answerLeft,
+          ],
+          lastPlayerRolls: [null, null, null, null],
+          lastHighRolls: [null, null, null, null],
+          commanderDamage: [
+            [0, 5, 0, 0],
+            [0, 0, 8, 0],
+            [0, 0, 0, 3],
+            [11, 0, 0, 0],
+          ],
+          stormCount: 0,
+          monarchPlayer: null,
+          initiativePlayer: null,
+          firstPlayerIndex: 2,
+          turnTrackerActive: true,
+          turnTrackerOngoingGame: true,
+          turnTrackerAutoHighRoll: true,
+          currentTurnPlayerIndex: 1,
+          currentTurnNumber: 7,
+          turnTimerActive: true,
+          turnTimerSeconds: 93,
+          lastTableEvent: null,
+        ),
+      );
+      await settingsStore.save(
+        const LifeCounterSettings(
+          autoKill: false,
+          lifeLossOnCommanderDamage: false,
+          showCountersOnPlayerCard: true,
+          showRegularCounters: true,
+          showCommanderDamageCounters: true,
+          clickableCommanderDamageCounters: true,
+          keepZeroCountersOnPlayerCard: true,
+          saltyDefeatMessages: false,
+          cycleSaltyDefeatMessages: false,
+          gameTimer: true,
+          gameTimerMainScreen: true,
+          showClockOnMainScreen: true,
+          randomPlayerColors: true,
+          preserveBackgroundImagesOnShuffle: false,
+          setLifeByTappingNumber: false,
+          verticalTapAreas: true,
+          cleanLook: true,
+          criticalDamageWarning: false,
+          customLongTapEnabled: true,
+          customLongTapValue: 25,
+          whitelabelIcon: null,
+        ),
+      );
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LotusLifeCounterScreen(),
-      ),
-    );
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
 
-    await tester.pump();
-    expect(find.text('Life counter unavailable'), findsNothing);
+      await tester.pump();
+      expect(find.text('Life counter unavailable'), findsNothing);
 
-    await _pumpUntilSnapshotAvailable(tester, snapshotStore);
-    await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
-    final restoredSnapshot = await snapshotStore.load();
-    final uiSnapshot = await uiSnapshotStore.load();
+      await _pumpUntilSnapshotAvailable(tester, snapshotStore);
+      await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
+      final restoredSnapshot = await snapshotStore.load();
+      final uiSnapshot = await uiSnapshotStore.load();
 
-    expect(restoredSnapshot, isNotNull);
-    expect(restoredSnapshot!.values['playerCount'], '4');
-    expect(restoredSnapshot.values['startingLifeMP'], '40');
-    expect(restoredSnapshot.values['players'], isNotNull);
-    expect(restoredSnapshot.values['gameSettings'], isNotNull);
-    expect(restoredSnapshot.values['gameTimerState'], isNotNull);
-    expect(uiSnapshot, isNotNull);
-    expect(uiSnapshot!.viewportWidth, greaterThan(300));
-    expect(uiSnapshot.viewportHeight, greaterThan(600));
-    expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
+      expect(restoredSnapshot, isNotNull);
+      expect(restoredSnapshot!.values['playerCount'], '4');
+      expect(restoredSnapshot.values['startingLifeMP'], '40');
+      expect(restoredSnapshot.values['players'], isNotNull);
+      expect(restoredSnapshot.values['gameSettings'], isNotNull);
+      expect(restoredSnapshot.values['gameTimerState'], isNotNull);
+      expect(uiSnapshot, isNotNull);
+      expect(uiSnapshot!.viewportWidth, greaterThan(300));
+      expect(uiSnapshot.viewportHeight, greaterThan(600));
+      expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
 
-    final rebuiltGameTimerState = await gameTimerStateStore.load();
-    final rebuiltSession = await sessionStore.load();
-    final rebuiltSettings = await settingsStore.load();
+      final rebuiltGameTimerState = await gameTimerStateStore.load();
+      final rebuiltSession = await sessionStore.load();
+      final rebuiltSettings = await settingsStore.load();
 
-    expect(rebuiltGameTimerState, isNotNull);
-    expect(rebuiltGameTimerState!.startTimeEpochMs, 1711800000000);
-    expect(rebuiltGameTimerState.isPaused, isTrue);
-    expect(rebuiltGameTimerState.pausedTimeEpochMs, 1711800005000);
-    expect(rebuiltSession, isNotNull);
-    expect(rebuiltSession!.lives, const [40, 27, 12, 3]);
-    expect(rebuiltSession.poison, const [0, 1, 7, 10]);
-    expect(rebuiltSession.commanderDamage[3][0], 11);
-    expect(rebuiltSession.partnerCommanders, const [false, true, false, false]);
-    expect(
-      rebuiltSession.playerSpecialStates,
-      const [
+      expect(rebuiltGameTimerState, isNotNull);
+      expect(rebuiltGameTimerState!.startTimeEpochMs, 1711800000000);
+      expect(rebuiltGameTimerState.isPaused, isTrue);
+      expect(rebuiltGameTimerState.pausedTimeEpochMs, 1711800005000);
+      expect(rebuiltSession, isNotNull);
+      expect(rebuiltSession!.lives, const [40, 27, 12, 3]);
+      expect(rebuiltSession.poison, const [0, 1, 7, 10]);
+      expect(rebuiltSession.commanderDamage[3][0], 11);
+      expect(rebuiltSession.partnerCommanders, const [
+        false,
+        true,
+        false,
+        false,
+      ]);
+      expect(rebuiltSession.playerSpecialStates, const [
         LifeCounterPlayerSpecialState.none,
         LifeCounterPlayerSpecialState.none,
         LifeCounterPlayerSpecialState.deckedOut,
         LifeCounterPlayerSpecialState.answerLeft,
-      ],
-    );
-    expect(rebuiltSession.firstPlayerIndex, 1);
-    expect(rebuiltSession.turnTrackerActive, isTrue);
-    expect(rebuiltSession.turnTrackerOngoingGame, isTrue);
-    expect(rebuiltSession.turnTrackerAutoHighRoll, isTrue);
-    expect(rebuiltSession.currentTurnPlayerIndex, 1);
-    expect(rebuiltSession.currentTurnNumber, 7);
-    expect(rebuiltSession.turnTimerActive, isTrue);
-    expect(rebuiltSession.turnTimerSeconds, greaterThanOrEqualTo(93));
+      ]);
+      expect(rebuiltSession.firstPlayerIndex, 1);
+      expect(rebuiltSession.turnTrackerActive, isTrue);
+      expect(rebuiltSession.turnTrackerOngoingGame, isTrue);
+      expect(rebuiltSession.turnTrackerAutoHighRoll, isTrue);
+      expect(rebuiltSession.currentTurnPlayerIndex, 1);
+      expect(rebuiltSession.currentTurnNumber, 7);
+      expect(rebuiltSession.turnTimerActive, isTrue);
+      expect(rebuiltSession.turnTimerSeconds, greaterThanOrEqualTo(93));
 
-    expect(rebuiltSettings, isNotNull);
-    expect(rebuiltSettings!.autoKill, isFalse);
-    expect(rebuiltSettings.gameTimer, isTrue);
-    expect(rebuiltSettings.customLongTapValue, 25);
-    expect(rebuiltSettings.whitelabelIcon, isNull);
-  });
-
+      expect(rebuiltSettings, isNotNull);
+      expect(rebuiltSettings!.autoKill, isFalse);
+      expect(rebuiltSettings.gameTimer, isTrue);
+      expect(rebuiltSettings.customLongTapValue, 25);
+      expect(rebuiltSettings.whitelabelIcon, isNull);
+    },
+  );
 }

@@ -73,8 +73,6 @@ void main() {
     'keeps player state appearance on reload fallback when image references are already present',
     (tester) async {
       final snapshotStore = LotusStorageSnapshotStore();
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
       await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().clear();

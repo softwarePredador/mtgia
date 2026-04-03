@@ -13,9 +13,6 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
 Future<void> _bootLiveLotus(WidgetTester tester) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
-
   await LotusStorageSnapshotStore().clear();
   await LifeCounterSettingsStore().clear();
   await LifeCounterSessionStore().clear();
@@ -33,7 +30,11 @@ Future<void> _pumpUntilVisible(
   Finder finder, {
   int attempts = 30,
 }) async {
-  for (var attempt = 0; attempt < attempts && finder.evaluate().isEmpty; attempt += 1) {
+  for (
+    var attempt = 0;
+    attempt < attempts && finder.evaluate().isEmpty;
+    attempt += 1
+  ) {
     await tester.pump(const Duration(milliseconds: 200));
   }
 }
@@ -111,7 +112,11 @@ void main() {
       expect(savedState, isNotNull);
       expect(savedState!.isNight, isTrue);
 
-      final liveState = await _readDayNightState(tester, snapshotStore, screenState);
+      final liveState = await _readDayNightState(
+        tester,
+        snapshotStore,
+        screenState,
+      );
       expect(liveState['mode'], 'night');
       if (liveState['switcher_present'] == true) {
         expect(liveState['switcher_has_night_class'], isTrue);
@@ -131,7 +136,9 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 2));
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 

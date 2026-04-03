@@ -53,9 +53,6 @@ void main() {
   testWidgets(
     'dismisses player appearance from the player state hub without reloading the WebView bundle',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1200));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
       final snapshotStore = LotusStorageSnapshotStore();
       await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();

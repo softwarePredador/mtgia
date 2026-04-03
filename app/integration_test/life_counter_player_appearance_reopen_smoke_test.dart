@@ -15,9 +15,6 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
 Future<void> _bootHarness(WidgetTester tester) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
-
   await LotusStorageSnapshotStore().clear();
   await LifeCounterSettingsStore().clear();
   await LifeCounterSessionStore().clear();
@@ -88,10 +85,7 @@ LifeCounterSession _buildSessionWithAppearance({
     commanderCasts: const [0, 0, 0, 0],
     playerAppearances: <LifeCounterPlayerAppearance>[
       const LifeCounterPlayerAppearance(background: '#FFB51E'),
-      LifeCounterPlayerAppearance(
-        nickname: nickname,
-        background: background,
-      ),
+      LifeCounterPlayerAppearance(nickname: nickname, background: background),
       const LifeCounterPlayerAppearance(background: '#CF7AEF'),
       const LifeCounterPlayerAppearance(background: '#4B57FF'),
     ],
@@ -154,7 +148,9 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 
@@ -177,7 +173,9 @@ void main() {
       await sessionStore.clear();
       await tester.pump(const Duration(milliseconds: 300));
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 

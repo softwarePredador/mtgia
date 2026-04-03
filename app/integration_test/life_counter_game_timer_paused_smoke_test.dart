@@ -99,11 +99,7 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LotusLifeCounterScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
     await tester.pump();
 
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);

@@ -51,103 +51,98 @@ Future<void> _stabilizeHarness(
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    'round-trips table state through the live Lotus snapshot',
-    (tester) async {
-      final snapshotStore = LotusStorageSnapshotStore();
-      final sessionStore = LifeCounterSessionStore();
-      final settingsStore = LifeCounterSettingsStore();
+  testWidgets('round-trips table state through the live Lotus snapshot', (
+    tester,
+  ) async {
+    final snapshotStore = LotusStorageSnapshotStore();
+    final sessionStore = LifeCounterSessionStore();
+    final settingsStore = LifeCounterSettingsStore();
 
-      await _stabilizeHarness(
-        tester,
-        snapshotStore: snapshotStore,
-        sessionStore: sessionStore,
-        settingsStore: settingsStore,
-      );
+    await _stabilizeHarness(
+      tester,
+      snapshotStore: snapshotStore,
+      sessionStore: sessionStore,
+      settingsStore: settingsStore,
+    );
 
-      await sessionStore.save(
-        const LifeCounterSession(
-          playerCount: 4,
-          startingLifeTwoPlayer: 20,
-          startingLifeMultiPlayer: 40,
-          lives: [40, 33, 18, 12],
-          poison: [0, 0, 0, 0],
-          energy: [0, 0, 0, 0],
-          experience: [0, 0, 0, 0],
-          commanderCasts: [0, 0, 0, 0],
-          partnerCommanders: [false, false, false, false],
-          playerSpecialStates: [
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-            LifeCounterPlayerSpecialState.none,
-          ],
-          lastPlayerRolls: [13, null, 7, 20],
-          lastHighRolls: [18, 11, null, 19],
-          commanderDamage: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
-          stormCount: 9,
-          monarchPlayer: 2,
-          initiativePlayer: 1,
-          firstPlayerIndex: 0,
-          turnTrackerActive: false,
-          turnTrackerOngoingGame: false,
-          turnTrackerAutoHighRoll: false,
-          currentTurnPlayerIndex: null,
-          currentTurnNumber: 1,
-          turnTimerActive: false,
-          turnTimerSeconds: 0,
-          lastTableEvent: null,
-        ),
-      );
-      await settingsStore.save(LifeCounterSettings.defaults);
+    await sessionStore.save(
+      const LifeCounterSession(
+        playerCount: 4,
+        startingLifeTwoPlayer: 20,
+        startingLifeMultiPlayer: 40,
+        lives: [40, 33, 18, 12],
+        poison: [0, 0, 0, 0],
+        energy: [0, 0, 0, 0],
+        experience: [0, 0, 0, 0],
+        commanderCasts: [0, 0, 0, 0],
+        partnerCommanders: [false, false, false, false],
+        playerSpecialStates: [
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+          LifeCounterPlayerSpecialState.none,
+        ],
+        lastPlayerRolls: [13, null, 7, 20],
+        lastHighRolls: [18, 11, null, 19],
+        commanderDamage: [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+        ],
+        stormCount: 9,
+        monarchPlayer: 2,
+        initiativePlayer: 1,
+        firstPlayerIndex: 0,
+        turnTrackerActive: false,
+        turnTrackerOngoingGame: false,
+        turnTrackerAutoHighRoll: false,
+        currentTurnPlayerIndex: null,
+        currentTurnNumber: 1,
+        turnTimerActive: false,
+        turnTimerSeconds: 0,
+        lastTableEvent: null,
+      ),
+    );
+    await settingsStore.save(LifeCounterSettings.defaults);
 
-      await tester.pumpWidget(
-        const MaterialApp(home: LotusLifeCounterScreen()),
-      );
-      await tester.pump();
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+    await tester.pump();
 
-      await _pumpUntilSnapshotAvailable(tester, snapshotStore);
-      final snapshot = await snapshotStore.load();
-      expect(snapshot, isNotNull);
+    await _pumpUntilSnapshotAvailable(tester, snapshotStore);
+    final snapshot = await snapshotStore.load();
+    expect(snapshot, isNotNull);
 
-      final rawTableState =
-          jsonDecode(snapshot!.values['__manaloom_table_state']!)
-              as Map<String, dynamic>;
-      expect(rawTableState, {
-        'stormCount': 9,
-        'monarchPlayer': 2,
-        'initiativePlayer': 1,
-        'lastPlayerRolls': [13, null, 7, 20],
-        'lastHighRolls': [18, 11, null, 19],
-        'firstPlayerIndex': 0,
-      });
+    final rawTableState =
+        jsonDecode(snapshot!.values['__manaloom_table_state']!)
+            as Map<String, dynamic>;
+    expect(rawTableState, {
+      'stormCount': 9,
+      'monarchPlayer': 2,
+      'initiativePlayer': 1,
+      'lastPlayerRolls': [13, null, 7, 20],
+      'lastHighRolls': [18, 11, null, 19],
+      'firstPlayerIndex': 0,
+    });
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump(const Duration(seconds: 2));
-      await sessionStore.clear();
-      await settingsStore.clear();
-      await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 2));
+    await sessionStore.clear();
+    await settingsStore.clear();
+    await tester.pump(const Duration(milliseconds: 300));
 
-      await tester.pumpWidget(
-        const MaterialApp(home: LotusLifeCounterScreen()),
-      );
-      await tester.pump();
+    await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+    await tester.pump();
 
-      await _pumpUntilCanonicalSessionAvailable(tester, sessionStore);
-      final restoredSession = await sessionStore.load();
+    await _pumpUntilCanonicalSessionAvailable(tester, sessionStore);
+    final restoredSession = await sessionStore.load();
 
-      expect(restoredSession, isNotNull);
-      expect(restoredSession!.stormCount, 9);
-      expect(restoredSession.monarchPlayer, 2);
-      expect(restoredSession.initiativePlayer, 1);
-      expect(restoredSession.lastPlayerRolls, [13, null, 7, 20]);
-      expect(restoredSession.lastHighRolls, [18, 11, null, 19]);
-      expect(restoredSession.firstPlayerIndex, 0);
-    },
-  );
+    expect(restoredSession, isNotNull);
+    expect(restoredSession!.stormCount, 9);
+    expect(restoredSession.monarchPlayer, 2);
+    expect(restoredSession.initiativePlayer, 1);
+    expect(restoredSession.lastPlayerRolls, [13, null, 7, 20]);
+    expect(restoredSession.lastHighRolls, [18, 11, null, 19]);
+    expect(restoredSession.firstPlayerIndex, 0);
+  });
 }

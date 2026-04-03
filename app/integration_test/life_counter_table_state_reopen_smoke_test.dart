@@ -15,9 +15,6 @@ import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
 Future<void> _bootHarness(WidgetTester tester) async {
-  await tester.binding.setSurfaceSize(const Size(900, 1200));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
-
   await LotusStorageSnapshotStore().clear();
   await LifeCounterSettingsStore().clear();
   await LifeCounterSessionStore().clear();
@@ -136,14 +133,20 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 
       final dynamic screenState = tester.state(
         find.byType(LotusLifeCounterScreen),
       );
-      final liveState = await _readTableState(tester, snapshotStore, screenState);
+      final liveState = await _readTableState(
+        tester,
+        snapshotStore,
+        screenState,
+      );
 
       expect(liveState['stormCount'], 9);
       expect(liveState['monarchPlayer'], 2);
@@ -157,7 +160,9 @@ void main() {
       await sessionStore.clear();
       await tester.pump(const Duration(milliseconds: 300));
 
-      await tester.pumpWidget(const MaterialApp(home: LotusLifeCounterScreen()));
+      await tester.pumpWidget(
+        const MaterialApp(home: LotusLifeCounterScreen()),
+      );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
 
