@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -6,6 +8,44 @@ import 'package:manaloom/features/home/life_counter/life_counter_session_store.d
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
+
+Future<Map<String, dynamic>> _readAppearanceHubState(
+  WidgetTester tester,
+  LotusStorageSnapshotStore snapshotStore,
+  dynamic screenState,
+) async {
+  const storageKey = '__manaloom_test_player_state_appearance_hub';
+  const nonceKey = '__manaloom_test_player_state_appearance_hub_nonce';
+  final nonce = DateTime.now().microsecondsSinceEpoch.toString();
+
+  await screenState.debugRunJavaScript('''
+(() => {
+  try {
+    localStorage.setItem('$storageKey', JSON.stringify({
+      probe: window.__manaloomPlayerStateAppearanceHubProbe ?? null
+    }));
+    localStorage.setItem('$nonceKey', '$nonce');
+  } catch (_) {}
+})()
+''');
+
+  String? encodedState;
+  for (var attempt = 0; attempt < 20 && encodedState == null; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 300));
+    final snapshot = await snapshotStore.load();
+    if (snapshot == null) {
+      continue;
+    }
+    if (snapshot.values[nonceKey] != nonce) {
+      continue;
+    }
+    encodedState = snapshot.values[storageKey];
+  }
+
+  expect(encodedState, isNotNull);
+  final decoded = jsonDecode(encodedState!);
+  return Map<String, dynamic>.from(decoded as Map);
+}
 
 Future<LifeCounterSession?> _pumpUntilAppearanceApplied(
   WidgetTester tester,
@@ -31,9 +71,10 @@ void main() {
   testWidgets(
     'opens player appearance from the ManaLoom player state hub on the live WebView path',
     (tester) async {
+      final snapshotStore = LotusStorageSnapshotStore();
       await tester.binding.setSurfaceSize(const Size(900, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      await LotusStorageSnapshotStore().clear();
+      await snapshotStore.clear();
       await LifeCounterSettingsStore().clear();
       await LifeCounterSessionStore().save(
         const LifeCounterSession(
@@ -88,6 +129,11 @@ void main() {
       await tester.pump(const Duration(seconds: 8));
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
+      await state.debugRunJavaScript('''
+(() => {
+  window.__manaloomPlayerStateAppearanceHubProbe = 'alive';
+})()
+''');
       await state.debugHandleShellMessage(
         '{"type":"open-native-player-state","source":"player_option_card_presented","targetPlayerIndex":1}',
       );
@@ -144,6 +190,13 @@ void main() {
       );
       expect(session, isNotNull);
       expect(session!.resolvedPlayerAppearances[1].nickname, 'State Hub Pilot');
+
+      final appearanceHubState = await _readAppearanceHubState(
+        tester,
+        snapshotStore,
+        state,
+      );
+      expect(appearanceHubState['probe'], isNull);
     },
   );
 }
