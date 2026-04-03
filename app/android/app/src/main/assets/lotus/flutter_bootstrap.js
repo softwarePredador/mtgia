@@ -8,17 +8,17 @@
   };
   window.plugins = window.plugins || {};
   window.cordova.plugins = window.cordova.plugins || {};
-  window.cordova.plugins.AppReview =
-    window.cordova.plugins.AppReview || {
-      requestReview: function () {
-        if (
-          window.FlutterAppReviewBridge &&
-          typeof window.FlutterAppReviewBridge.postMessage === 'function'
-        ) {
-          window.FlutterAppReviewBridge.postMessage('requestReview');
-        }
-      },
-    };
+  var embeddedAppReviewBridge = {
+    requestReview: function () {
+      if (
+        window.FlutterAppReviewBridge &&
+        typeof window.FlutterAppReviewBridge.postMessage === 'function'
+      ) {
+        window.FlutterAppReviewBridge.postMessage('requestReview');
+      }
+      return false;
+    },
+  };
   window.plugins.insomnia = window.plugins.insomnia || {
     keepAwake: function () {},
     allowSleepAgain: function () {},
@@ -105,6 +105,26 @@
     } catch (error) {}
   }
 
+  function installEmbeddedAppReviewGuard() {
+    window.cordova = window.cordova || {
+      platformId: platformId,
+      plugins: {},
+    };
+    window.cordova.plugins = window.cordova.plugins || {};
+
+    try {
+      Object.defineProperty(window.cordova.plugins, 'AppReview', {
+        configurable: true,
+        get: function () {
+          return embeddedAppReviewBridge;
+        },
+        set: function () {},
+      });
+    } catch (error) {
+      window.cordova.plugins.AppReview = embeddedAppReviewBridge;
+    }
+  }
+
   function applyEmbeddedViewportFrame() {
     var width = readEmbeddedWidth();
     var height = readEmbeddedHeight();
@@ -141,12 +161,16 @@
   }
 
   function prepareAppBoot() {
+    installEmbeddedAppReviewGuard();
     suppressEmbeddedReviewPrompt();
     applyEmbeddedViewportFrame();
     requestAnimationFrame(function () {
+      installEmbeddedAppReviewGuard();
       applyEmbeddedViewportFrame();
       setTimeout(fireDeviceReady, 0);
     });
+    setTimeout(installEmbeddedAppReviewGuard, 300);
+    setTimeout(installEmbeddedAppReviewGuard, 1200);
   }
 
   if (document.readyState === 'loading') {
@@ -163,6 +187,7 @@
 
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) {
+      installEmbeddedAppReviewGuard();
       suppressEmbeddedReviewPrompt();
       applyEmbeddedViewportFrame();
       document.dispatchEvent(new Event('resume'));
