@@ -85,8 +85,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
   static const int _turnTrackerLongPressCycleMs = 1150;
   static const String _ownershipBridgeFallbackClassification =
       'ownership_bridge';
-  static const String _supportUtilityFallbackClassification =
-      'support_utility';
+  static const String _supportUtilityFallbackClassification = 'support_utility';
   static const String _excludedCoreSupportFallbackClassification =
       'excluded_core_support';
   static const Set<String> _nativeFallbackPlayerTargetTypes = <String>{
@@ -96,93 +95,93 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     'open-native-player-state',
     'open-native-set-life',
   };
-  static const Map<String, _NativeFallbackDescriptor> _nativeFallbackDescriptors =
-      <String, _NativeFallbackDescriptor>{
-        'open-native-settings': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'settings',
-          defaultSource: 'shell_shortcut',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-history': _NativeFallbackDescriptor(
-          classification: _supportUtilityFallbackClassification,
-          domainKey: 'history',
-          defaultSource: 'shell_shortcut',
-          reviewStatus: 'support_utility',
-        ),
-        'open-native-card-search': _NativeFallbackDescriptor(
-          classification: _supportUtilityFallbackClassification,
-          domainKey: 'card_search',
-          defaultSource: 'shell_shortcut',
-          reviewStatus: 'support_utility',
-        ),
-        'open-native-turn-tracker': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'turn_tracker',
-          defaultSource: 'turn_tracker_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-game-timer': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'game_timer',
-          defaultSource: 'game_timer_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-game-modes': _NativeFallbackDescriptor(
-          classification: _excludedCoreSupportFallbackClassification,
-          domainKey: 'game_modes',
-          defaultSource: 'game_modes_shortcut',
-          reviewStatus: 'excluded_from_core',
-        ),
-        'open-native-dice': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'dice',
-          defaultSource: 'dice_shortcut_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-commander-damage': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'commander_damage',
-          defaultSource: 'commander_damage_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-player-appearance': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'player_appearance',
-          defaultSource: 'player_background_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-player-counter': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'player_counter',
-          defaultSource: 'player_counter_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-player-state': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'player_state',
-          defaultSource: 'player_state_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-set-life': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'set_life',
-          defaultSource: 'player_life_total_surface_pressed',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-table-state': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'table_state',
-          defaultSource: 'table_state_surface',
-          reviewStatus: 'ownership_in_progress',
-        ),
-        'open-native-day-night': _NativeFallbackDescriptor(
-          classification: _ownershipBridgeFallbackClassification,
-          domainKey: 'day_night',
-          defaultSource: 'day_night_surface',
-          reviewStatus: 'ownership_in_progress',
-        ),
-      };
+  static const Map<String, _NativeFallbackDescriptor>
+  _nativeFallbackDescriptors = <String, _NativeFallbackDescriptor>{
+    'open-native-settings': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'settings',
+      defaultSource: 'shell_shortcut',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-history': _NativeFallbackDescriptor(
+      classification: _supportUtilityFallbackClassification,
+      domainKey: 'history',
+      defaultSource: 'shell_shortcut',
+      reviewStatus: 'support_utility',
+    ),
+    'open-native-card-search': _NativeFallbackDescriptor(
+      classification: _supportUtilityFallbackClassification,
+      domainKey: 'card_search',
+      defaultSource: 'shell_shortcut',
+      reviewStatus: 'support_utility',
+    ),
+    'open-native-turn-tracker': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'turn_tracker',
+      defaultSource: 'turn_tracker_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-game-timer': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'game_timer',
+      defaultSource: 'game_timer_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-game-modes': _NativeFallbackDescriptor(
+      classification: _excludedCoreSupportFallbackClassification,
+      domainKey: 'game_modes',
+      defaultSource: 'game_modes_shortcut',
+      reviewStatus: 'excluded_from_core',
+    ),
+    'open-native-dice': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'dice',
+      defaultSource: 'dice_shortcut_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-commander-damage': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'commander_damage',
+      defaultSource: 'commander_damage_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-player-appearance': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'player_appearance',
+      defaultSource: 'player_background_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-player-counter': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'player_counter',
+      defaultSource: 'player_counter_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-player-state': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'player_state',
+      defaultSource: 'player_state_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-set-life': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'set_life',
+      defaultSource: 'player_life_total_surface_pressed',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-table-state': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'table_state',
+      defaultSource: 'table_state_surface',
+      reviewStatus: 'ownership_in_progress',
+    ),
+    'open-native-day-night': _NativeFallbackDescriptor(
+      classification: _ownershipBridgeFallbackClassification,
+      domainKey: 'day_night',
+      defaultSource: 'day_night_surface',
+      reviewStatus: 'ownership_in_progress',
+    ),
+  };
   static const Set<String> _playerStateSurfaceResetSources = <String>{
     'player_option_card_presented',
   };
@@ -1520,7 +1519,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       snapshot: snapshot,
     );
     final historyDomainPresent =
-        historyState != null || LifeCounterHistoryState.hasSnapshotDomain(snapshot);
+        historyState != null ||
+        LifeCounterHistoryState.hasSnapshotDomain(snapshot);
 
     unawaited(
       AppObservability.instance.recordEvent(
@@ -1662,7 +1662,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           (transfer.archiveEntries.isEmpty ? 0 : 1),
       gameCounter:
           transfer.gameCounter ??
-          LifeCounterHistoryState.decodeGameCounter(snapshot?.values['gameCounter']),
+          LifeCounterHistoryState.decodeGameCounter(
+            snapshot?.values['gameCounter'],
+          ),
       lastTableEvent: transfer.lastTableEvent,
     );
     await _historyStore.save(importedHistory);
@@ -2003,7 +2005,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
 })();
 ''');
         final decoded = _decodeJavaScriptResult(rawResult);
-        return decoded is Map<String, dynamic> && decoded['ok'] == true;
+        if (decoded is! Map<String, dynamic> || decoded['ok'] != true) {
+          return false;
+        }
+        return _syncOwnedTurnTrackerRuntimeStorage(next);
       } catch (_) {
         return false;
       }
@@ -2058,10 +2063,27 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       await Future<void>.delayed(
         Duration(milliseconds: backwardSteps * _turnTrackerLongPressCycleMs),
       );
-      return true;
+      return _syncOwnedTurnTrackerRuntimeStorage(next);
     } catch (_) {
       return false;
     }
+  }
+
+  Future<bool> _syncOwnedTurnTrackerRuntimeStorage(
+    LifeCounterSession session,
+  ) async {
+    final snapshot = await _snapshotStore.load();
+    final values =
+        LotusLifeCounterSessionAdapter.buildTurnTrackerSnapshotValues(
+          session,
+          layoutType:
+              snapshot == null
+                  ? null
+                  : LotusLifeCounterSessionAdapter.tryReadLayoutType(snapshot),
+        );
+    return _applyLiveLotusStoragePatch(<String, String?>{
+      'turnTracker': values['turnTracker'],
+    });
   }
 
   Future<void> _openNativeGameTimerSheet({required String source}) async {
@@ -2233,8 +2255,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
       return false;
     }
 
-      try {
-        final rawResult = await _hostController.runJavaScriptReturningResult('''
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
 (() => {
   try {
     const startTime = ${state.startTimeEpochMs ?? 'null'};
