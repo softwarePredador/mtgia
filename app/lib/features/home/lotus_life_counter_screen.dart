@@ -3510,10 +3510,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     final shouldResetLotusSurface = _playerStateSurfaceResetSources.contains(
       source,
     );
-    final surfaceResetStrategy =
-        shouldResetLotusSurface ? 'bundle_reload' : 'none';
 
     if (!mounted || updatedSession == null) {
+      final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
+        source: source,
+        targetPlayerIndex: normalizedTargetIndex,
+        allowLiveReset: shouldResetLotusSurface,
+      );
       unawaited(
         AppObservability.instance.recordEvent(
           'native_player_state_dismissed',
@@ -3528,13 +3531,15 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           },
         ),
       );
-      if (shouldResetLotusSurface) {
-        unawaited(_hostController.loadBundle());
-      }
       return;
     }
 
     if (updatedSession.toJsonString() == session.toJsonString()) {
+      final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
+        source: source,
+        targetPlayerIndex: normalizedTargetIndex,
+        allowLiveReset: shouldResetLotusSurface,
+      );
       unawaited(
         AppObservability.instance.recordEvent(
           'native_player_state_dismissed',
@@ -3549,18 +3554,20 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
           },
         ),
       );
-      if (shouldResetLotusSurface) {
-        unawaited(_hostController.loadBundle());
-      }
       return;
     }
 
-    await _applyNativePlayerState(updatedSession, source: source);
+    await _applyNativePlayerState(
+      updatedSession,
+      source: source,
+      targetPlayerIndex: normalizedTargetIndex,
+    );
   }
 
   Future<void> _applyNativePlayerState(
     LifeCounterSession session, {
     required String source,
+    required int targetPlayerIndex,
   }) async {
     final shouldResetLotusSurface = _playerStateSurfaceResetSources.contains(
       source,
@@ -3693,8 +3700,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
         !commanderDamageCanonicalSyncEligible &&
         !playerCounterCanonicalSyncEligible &&
         !partnerCommanderCanonicalSyncEligible;
-    final surfaceResetStrategy =
-        shouldResetLotusSurface ? 'bundle_reload' : 'none';
+    final liveSurfaceResetEligible =
+        shouldResetLotusSurface && partnerCommanderCanonicalSyncEligible;
+    final surfaceResetStrategy = await _applyPlayerStateSurfaceResetStrategy(
+      source: source,
+      targetPlayerIndex: targetPlayerIndex,
+      allowLiveReset: !reloadRequired && liveSurfaceResetEligible,
+    );
     final List<String> syncBlockers;
     if (canonicalSyncEligible ||
         appliedLive ||
@@ -3746,13 +3758,87 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen> {
     );
 
     if (!reloadRequired) {
-      if (shouldResetLotusSurface) {
-        unawaited(_hostController.loadBundle());
-      }
       return;
     }
 
     unawaited(_reloadLotusBundleFromOwnedSnapshot());
+  }
+
+  Future<String> _applyPlayerStateSurfaceResetStrategy({
+    required String source,
+    required int? targetPlayerIndex,
+    required bool allowLiveReset,
+  }) async {
+    if (!_playerStateSurfaceResetSources.contains(source)) {
+      return 'none';
+    }
+
+    if (allowLiveReset) {
+      final failureReason = await _resetLotusPlayerOptionCardFailureReason(
+        targetPlayerIndex: targetPlayerIndex,
+      );
+      if (failureReason == null) {
+        return 'live_dom_reset';
+      }
+    }
+
+    unawaited(_hostController.loadBundle());
+    return 'bundle_reload';
+  }
+
+  Future<String?> _resetLotusPlayerOptionCardFailureReason({
+    required int? targetPlayerIndex,
+  }) async {
+    try {
+      final rawResult = await _hostController.runJavaScriptReturningResult('''
+(() => {
+  try {
+    const playerCards = Array.from(document.querySelectorAll('.player-card'));
+    const targetCards =
+      ${targetPlayerIndex == null ? 'playerCards' : '''
+      [playerCards[$targetPlayerIndex]].filter((card) => card instanceof HTMLElement)
+      '''};
+
+    if (targetCards.length === 0) {
+      return JSON.stringify({ ok: false, reason: 'player_card_missing' });
+    }
+
+    let removed = 0;
+    targetCards.forEach((card) => {
+      card.querySelectorAll('.player-card-inner.option-card').forEach((node) => {
+        if (node instanceof HTMLElement) {
+          node.remove();
+          removed += 1;
+        }
+      });
+    });
+
+    document.querySelectorAll('.close-controls-backdrop').forEach((node) => {
+      if (node instanceof HTMLElement) {
+        node.remove();
+      }
+    });
+
+    return JSON.stringify({ ok: true, removed });
+  } catch (_) {}
+  return JSON.stringify({
+    ok: false,
+    reason: 'player_option_card_surface_reset_failed',
+  });
+})()
+''');
+      final decoded = _decodeJavaScriptResult(rawResult);
+      if (decoded is Map<String, dynamic> && decoded['ok'] == true) {
+        return null;
+      }
+      if (decoded is Map<String, dynamic>) {
+        return decoded['reason'] as String? ??
+            'player_option_card_surface_reset_rejected';
+      }
+    } catch (_) {
+      return 'player_option_card_surface_reset_failed';
+    }
+    return 'player_option_card_surface_reset_rejected';
   }
 
   bool _hasCommanderDamageDelta(

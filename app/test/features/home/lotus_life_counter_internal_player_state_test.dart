@@ -42,7 +42,9 @@ class _FakeLotusHost implements LotusHost {
   }
 
   @override
-  Future<void> runJavaScript(String script) async {}
+  Future<void> runJavaScript(String script) async {
+    executedScripts.add(script);
+  }
 
   @override
   Future<Object?> runJavaScriptReturningResult(String script) async {
@@ -50,7 +52,8 @@ class _FakeLotusHost implements LotusHost {
 
     if (script.contains('.increase-button.life') ||
         script.contains('.decrease-button.life') ||
-        script.contains('.player-card')) {
+        script.contains('.player-card') ||
+        script.contains('.player-card-inner.option-card')) {
       return jsonEncode(<String, Object>{'ok': true});
     }
 
@@ -214,14 +217,10 @@ void main() {
         expect(
           logs.any(
             (message) =>
-                message.contains(
-                  'message=native_fallback_surface_requested',
-                ) &&
+                message.contains('message=native_fallback_surface_requested') &&
                 message.contains('message_type: open-native-player-state') &&
                 message.contains('domain_key: player_state') &&
-                message.contains(
-                  'fallback_classification: ownership_bridge',
-                ) &&
+                message.contains('fallback_classification: ownership_bridge') &&
                 message.contains('review_status: ownership_in_progress') &&
                 message.contains('target_player_index: 1'),
           ),
@@ -232,9 +231,7 @@ void main() {
             (message) =>
                 message.contains('message=native_player_state_opened') &&
                 message.contains('surface_strategy: native_fallback') &&
-                message.contains(
-                  'fallback_classification: ownership_bridge',
-                ),
+                message.contains('fallback_classification: ownership_bridge'),
           ),
           isTrue,
         );
@@ -598,7 +595,13 @@ void main() {
           final session = await LifeCounterSessionStore().load();
           expect(session, isNotNull);
           expect(session!.partnerCommanders[1], isTrue);
-          expect(host.loadBundleCallCount, 2);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
           expect(
             logs.any(
               (message) =>
@@ -606,7 +609,7 @@ void main() {
                   message.contains('apply_strategy: canonical_store_sync') &&
                   message.contains('reload_required: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: bundle_reload'),
+                  message.contains('surface_reset_strategy: live_dom_reset'),
             ),
             isTrue,
           );
@@ -1816,7 +1819,13 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(find.text('Player State'), findsNothing);
-          expect(host.loadBundleCallCount, 2);
+          expect(host.loadBundleCallCount, 1);
+          expect(
+            host.executedScripts.any(
+              (script) => script.contains('.player-card-inner.option-card'),
+            ),
+            isTrue,
+          );
           expect(
             logs.any(
               (message) =>
@@ -1824,7 +1833,7 @@ void main() {
                   message.contains('source: player_option_card_presented') &&
                   message.contains('changed: false') &&
                   message.contains('surface_reset_required: true') &&
-                  message.contains('surface_reset_strategy: bundle_reload'),
+                  message.contains('surface_reset_strategy: live_dom_reset'),
             ),
             isTrue,
           );
