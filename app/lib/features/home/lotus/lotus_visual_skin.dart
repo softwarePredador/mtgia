@@ -134,6 +134,65 @@ ${LotusDomSelectors.optionCard} h3 {
   letter-spacing: 0.01em;
 }
 
+.commander-damage-overlay,
+.turn-tracker-hint-overlay,
+.show-counters-hint-overlay,
+.max-game-modes-warning,
+.input-overlay {
+  box-sizing: border-box;
+  width: min(86vw, 340px);
+  max-width: calc(100vw - 32px);
+  padding: 18px 18px 16px;
+  border-radius: 24px;
+  border: 1px solid var(--manaloom-shell-border);
+  box-shadow: var(--manaloom-shell-shadow);
+  backdrop-filter: var(--manaloom-shell-backdrop);
+  background:
+    linear-gradient(180deg, rgba(12, 21, 40, 0.97), rgba(6, 11, 24, 0.94));
+}
+
+.commander-damage-overlay .font,
+.commander-damage-overlay .text,
+.turn-tracker-hint-overlay .font,
+.show-counters-hint-overlay .font,
+.max-game-modes-warning .text,
+.input-overlay .overlay-text {
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(14px, 4.7vw, 22px) !important;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.commander-damage-overlay .font,
+.turn-tracker-hint-overlay .font,
+.show-counters-hint-overlay .font {
+  font-weight: 700 !important;
+}
+
+.commander-damage-overlay .btn,
+.turn-tracker-hint-overlay .btn,
+.show-counters-hint-overlay .btn,
+.max-game-modes-warning .close,
+.input-overlay .btn {
+  min-height: 42px;
+  height: auto;
+  padding: 10px 18px;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(14px, 4vw, 18px) !important;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: normal;
+}
+
+.commander-damage-overlay .btn-wrapper,
+.show-counters-hint-overlay .btn-wrapper,
+.input-overlay .btn-wrapper {
+  gap: 10px;
+}
+
 ${LotusDomSelectors.mainGameTimer},
 ${LotusDomSelectors.currentTimeClock},
 ${LotusDomSelectors.turnTracker},

@@ -37,6 +37,14 @@ void main() {
         lotusInjectedVisualSkinScript,
         contains(LotusDomSelectors.optionCard),
       );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.commander-damage-overlay'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('.turn-tracker-hint-overlay'),
+      );
     });
 
     test('uses ManaLoom typography and visual tokens', () {
@@ -47,6 +55,10 @@ void main() {
         contains('--manaloom-shell-shadow'),
       );
       expect(lotusInjectedVisualSkinScript, contains('--manaloom-shell-panel'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('clamp(14px, 4.7vw, 22px)'),
+      );
     });
   });
 }
