@@ -210,12 +210,12 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme() {
-    final base = GoogleFonts.interTextTheme(
+    final base = GoogleFonts.manropeTextTheme(
       ThemeData.dark().textTheme,
     ).apply(bodyColor: textPrimary, displayColor: textPrimary);
 
     TextStyle? display(TextStyle? s) =>
-        s == null ? null : GoogleFonts.crimsonPro(textStyle: s);
+        s == null ? null : GoogleFonts.fraunces(textStyle: s);
 
     return base.copyWith(
       displayLarge: display(base.displayLarge),
