@@ -27,6 +27,7 @@ import 'lotus_storage_snapshot.dart';
 import 'lotus_storage_snapshot_store.dart';
 import 'lotus_ui_snapshot.dart';
 import 'lotus_ui_snapshot_store.dart';
+import 'lotus_visual_skin.dart';
 import 'lotus_webview_contract.dart';
 
 Future<Map<String, String>> buildLotusFallbackBootstrapValues({
@@ -641,6 +642,7 @@ class LotusHostController implements LotusHost {
 
     try {
       await webViewController.runJavaScript(lotusInjectedContractScript);
+      await webViewController.runJavaScript(lotusInjectedVisualSkinScript);
       await webViewController.runJavaScript(lotusShellCleanupScript);
     } catch (error) {
       debugPrint('$lotusLogPrefix shell cleanup error: $error');
