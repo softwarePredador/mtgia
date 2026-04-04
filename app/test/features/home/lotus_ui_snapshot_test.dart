@@ -22,6 +22,10 @@ void main() {
         'clean_look_enabled': true,
         'first_player_card_width': 199.8,
         'first_player_card_height': 451.3,
+        'first_player_life_box_width': 92.0,
+        'first_player_life_box_height': 118.0,
+        'first_player_name_font_family': 'Fraunces, serif',
+        'first_player_name_font_size': 22.0,
         'first_life_count_font_family': 'mtg',
         'first_life_count_font_size': 82.0,
         'regular_counter_count': 6,
@@ -46,6 +50,10 @@ void main() {
       expect(snapshot.uiFontFamily, contains('Manrope'));
       expect(snapshot.documentScrollWidth, 412.0);
       expect(snapshot.horizontalOverflowPx, 0.0);
+      expect(snapshot.firstPlayerLifeBoxWidth, 92.0);
+      expect(snapshot.firstPlayerLifeBoxHeight, 118.0);
+      expect(snapshot.firstPlayerNameFontFamily, contains('Fraunces'));
+      expect(snapshot.firstPlayerNameFontSize, 22.0);
       expect(snapshot.firstLifeCountFontFamily, 'mtg');
       expect(snapshot.firstLifeCountFontSize, 82.0);
       expect(snapshot.gameTimerFontSize, 32.0);
@@ -75,6 +83,10 @@ void main() {
         'clean_look_enabled': true,
         'first_player_card_width': 199.8,
         'first_player_card_height': 451.3,
+        'first_player_life_box_width': 92.0,
+        'first_player_life_box_height': 118.0,
+        'first_player_name_font_family': 'Fraunces, serif',
+        'first_player_name_font_size': 22.0,
         'first_life_count_font_family': 'mtg',
         'first_life_count_font_size': 82.0,
         'regular_counter_count': 6,

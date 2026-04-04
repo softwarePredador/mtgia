@@ -86,6 +86,8 @@ void main() {
     expect(uiSnapshot.playerCardCount, 4);
     expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
     expect(uiSnapshot.firstPlayerCardHeight, greaterThan(300));
+    expect(uiSnapshot.firstPlayerLifeBoxWidth, greaterThan(60));
+    expect(uiSnapshot.firstPlayerLifeBoxHeight, greaterThan(80));
     expect(uiSnapshot.firstLifeCountFontSize, greaterThan(0));
   });
 
@@ -209,6 +211,8 @@ void main() {
       expect(uiSnapshot.turnTrackerFontSize, inInclusiveRange(18, 28));
       expect(uiSnapshot.horizontalOverflowPx, lessThanOrEqualTo(1.5));
       expect(uiSnapshot.verticalOverflowPx, lessThanOrEqualTo(1.5));
+      expect(uiSnapshot.firstPlayerLifeBoxWidth, greaterThan(60));
+      expect(uiSnapshot.firstPlayerLifeBoxHeight, greaterThan(80));
 
       final rebuiltGameTimerState = await gameTimerStateStore.load();
       final rebuiltSession = await sessionStore.load();

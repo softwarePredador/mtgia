@@ -788,6 +788,16 @@ class LotusHostController implements LotusHost {
             );
             const bodyStyle = safeStyle(body);
             const firstLifeStyle = safeStyle(firstLifeNode);
+            const firstPlayerNameNode = document.querySelector(
+              '${LotusDomSelectors.playerCard} .player-name'
+            );
+            const firstPlayerNameStyle = safeStyle(firstPlayerNameNode);
+            const firstLifeContainerNode = document.querySelector(
+              '.player-life-count'
+            );
+            const firstLifeContainerRect = firstLifeContainerNode
+              ? firstLifeContainerNode.getBoundingClientRect()
+              : null;
             const gameTimerStyle = safeStyle(gameTimerNode);
             const turnTrackerStyle = safeStyle(turnTrackerNode);
             const scrollWidth = Math.max(
@@ -814,6 +824,18 @@ class LotusHostController implements LotusHost {
                 '${LotusVisualSkinStyleIds.primary}'
               ),
               ui_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
+              first_player_name_font_family: firstPlayerNameStyle
+                ? firstPlayerNameStyle.fontFamily || ''
+                : '',
+              first_player_name_font_size: firstPlayerNameStyle
+                ? parseFloat(firstPlayerNameStyle.fontSize || '0') || 0
+                : 0,
+              first_player_life_box_width: firstLifeContainerRect
+                ? firstLifeContainerRect.width || 0
+                : 0,
+              first_player_life_box_height: firstLifeContainerRect
+                ? firstLifeContainerRect.height || 0
+                : 0,
               first_life_count_font_family: firstLifeStyle
                 ? firstLifeStyle.fontFamily || ''
                 : '',

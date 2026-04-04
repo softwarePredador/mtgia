@@ -24,6 +24,10 @@ class LotusUiSnapshot {
     required this.cleanLookEnabled,
     required this.firstPlayerCardWidth,
     required this.firstPlayerCardHeight,
+    required this.firstPlayerLifeBoxWidth,
+    required this.firstPlayerLifeBoxHeight,
+    required this.firstPlayerNameFontFamily,
+    required this.firstPlayerNameFontSize,
     required this.firstLifeCountFontFamily,
     required this.firstLifeCountFontSize,
     required this.regularCounterCount,
@@ -57,6 +61,10 @@ class LotusUiSnapshot {
   final bool cleanLookEnabled;
   final double firstPlayerCardWidth;
   final double firstPlayerCardHeight;
+  final double firstPlayerLifeBoxWidth;
+  final double firstPlayerLifeBoxHeight;
+  final String firstPlayerNameFontFamily;
+  final double firstPlayerNameFontSize;
   final String firstLifeCountFontFamily;
   final double firstLifeCountFontSize;
   final int regularCounterCount;
@@ -91,6 +99,10 @@ class LotusUiSnapshot {
       'clean_look_enabled': cleanLookEnabled,
       'first_player_card_width': firstPlayerCardWidth,
       'first_player_card_height': firstPlayerCardHeight,
+      'first_player_life_box_width': firstPlayerLifeBoxWidth,
+      'first_player_life_box_height': firstPlayerLifeBoxHeight,
+      'first_player_name_font_family': firstPlayerNameFontFamily,
+      'first_player_name_font_size': firstPlayerNameFontSize,
       'first_life_count_font_family': firstLifeCountFontFamily,
       'first_life_count_font_size': firstLifeCountFontSize,
       'regular_counter_count': regularCounterCount,
@@ -152,6 +164,13 @@ class LotusUiSnapshot {
         (payload['first_player_card_width'] as num?)?.toDouble();
     final firstPlayerCardHeight =
         (payload['first_player_card_height'] as num?)?.toDouble();
+    final firstPlayerLifeBoxWidth =
+        (payload['first_player_life_box_width'] as num?)?.toDouble();
+    final firstPlayerLifeBoxHeight =
+        (payload['first_player_life_box_height'] as num?)?.toDouble();
+    final firstPlayerNameFontFamily = payload['first_player_name_font_family'];
+    final firstPlayerNameFontSize =
+        (payload['first_player_name_font_size'] as num?)?.toDouble();
     final firstLifeCountFontFamily = payload['first_life_count_font_family'];
     final firstLifeCountFontSize =
         (payload['first_life_count_font_size'] as num?)?.toDouble();
@@ -191,6 +210,10 @@ class LotusUiSnapshot {
         cleanLookEnabled is! bool ||
         firstPlayerCardWidth == null ||
         firstPlayerCardHeight == null ||
+        firstPlayerLifeBoxWidth == null ||
+        firstPlayerLifeBoxHeight == null ||
+        firstPlayerNameFontFamily is! String ||
+        firstPlayerNameFontSize == null ||
         firstLifeCountFontFamily is! String ||
         firstLifeCountFontSize == null ||
         regularCounterCount == null ||
@@ -226,6 +249,10 @@ class LotusUiSnapshot {
       cleanLookEnabled: cleanLookEnabled,
       firstPlayerCardWidth: firstPlayerCardWidth,
       firstPlayerCardHeight: firstPlayerCardHeight,
+      firstPlayerLifeBoxWidth: firstPlayerLifeBoxWidth,
+      firstPlayerLifeBoxHeight: firstPlayerLifeBoxHeight,
+      firstPlayerNameFontFamily: firstPlayerNameFontFamily,
+      firstPlayerNameFontSize: firstPlayerNameFontSize,
       firstLifeCountFontFamily: firstLifeCountFontFamily,
       firstLifeCountFontSize: firstLifeCountFontSize,
       regularCounterCount: regularCounterCount,

@@ -65,6 +65,24 @@ ${LotusDomSelectors.playerCard} .commander-damage-counters .counter {
   font-family: var(--manaloom-ui-font) !important;
 }
 
+${LotusDomSelectors.playerCard} .player-name,
+${LotusDomSelectors.playerCard} .player-name-input {
+  font-family: var(--manaloom-display-font) !important;
+  font-weight: 650;
+  letter-spacing: 0.015em;
+  text-shadow: 0 2px 18px rgba(3, 8, 21, 0.35);
+}
+
+${LotusDomSelectors.playerCard} .player-life-count {
+  filter: drop-shadow(0 14px 22px rgba(2, 7, 19, 0.28));
+}
+
+${LotusDomSelectors.playerCard} .player-life-count .font {
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.08),
+    0 10px 18px rgba(1, 7, 18, 0.22);
+}
+
 ${LotusDomSelectors.playerCard} .counters-on-card .counter {
   background: linear-gradient(
     180deg,
