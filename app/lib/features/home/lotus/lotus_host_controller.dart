@@ -773,6 +773,67 @@ class LotusHostController implements LotusHost {
       final rawSnapshot = await webViewController.runJavaScriptReturningResult(
         '''
         (() => JSON.stringify({
+          ...(() => {
+            const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
+            const root = document.documentElement;
+            const body = document.body;
+            const firstLifeNode = document.querySelector(
+              '.player-life-count .font, .player-life-count, ${LotusDomSelectors.playerCard} .font'
+            );
+            const gameTimerNode = document.querySelector(
+              '${LotusDomSelectors.mainGameTimer}'
+            );
+            const turnTrackerNode = document.querySelector(
+              '${LotusDomSelectors.turnTracker}'
+            );
+            const bodyStyle = safeStyle(body);
+            const firstLifeStyle = safeStyle(firstLifeNode);
+            const gameTimerStyle = safeStyle(gameTimerNode);
+            const turnTrackerStyle = safeStyle(turnTrackerNode);
+            const scrollWidth = Math.max(
+              document.body ? document.body.scrollWidth : 0,
+              root ? root.scrollWidth : 0,
+            );
+            const scrollHeight = Math.max(
+              document.body ? document.body.scrollHeight : 0,
+              root ? root.scrollHeight : 0,
+            );
+
+            return {
+              document_scroll_width: scrollWidth,
+              document_scroll_height: scrollHeight,
+              horizontal_overflow_px: Math.max(
+                0,
+                scrollWidth - (window.innerWidth || 0),
+              ),
+              vertical_overflow_px: Math.max(
+                0,
+                scrollHeight - (window.innerHeight || 0),
+              ),
+              visual_skin_applied: !!document.getElementById(
+                '${LotusVisualSkinStyleIds.primary}'
+              ),
+              ui_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
+              first_life_count_font_family: firstLifeStyle
+                ? firstLifeStyle.fontFamily || ''
+                : '',
+              first_life_count_font_size: firstLifeStyle
+                ? parseFloat(firstLifeStyle.fontSize || '0') || 0
+                : 0,
+              game_timer_font_family: gameTimerStyle
+                ? gameTimerStyle.fontFamily || ''
+                : '',
+              game_timer_font_size: gameTimerStyle
+                ? parseFloat(gameTimerStyle.fontSize || '0') || 0
+                : 0,
+              turn_tracker_font_family: turnTrackerStyle
+                ? turnTrackerStyle.fontFamily || ''
+                : '',
+              turn_tracker_font_size: turnTrackerStyle
+                ? parseFloat(turnTrackerStyle.fontSize || '0') || 0
+                : 0,
+            };
+          })(),
           captured_at_epoch_ms: Date.now(),
           body_class_name: document.body ? document.body.className : '',
           viewport_width: window.innerWidth || 0,

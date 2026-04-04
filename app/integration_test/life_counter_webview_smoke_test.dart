@@ -79,9 +79,14 @@ void main() {
     expect(uiSnapshot.viewportHeight, greaterThan(600));
     expect(uiSnapshot.screenWidth, closeTo(uiSnapshot.viewportWidth, 1));
     expect(uiSnapshot.screenHeight, closeTo(uiSnapshot.viewportHeight, 1));
+    expect(uiSnapshot.visualSkinApplied, isTrue);
+    expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+    expect(uiSnapshot.horizontalOverflowPx, lessThanOrEqualTo(1.5));
+    expect(uiSnapshot.verticalOverflowPx, lessThanOrEqualTo(1.5));
     expect(uiSnapshot.playerCardCount, 4);
     expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
     expect(uiSnapshot.firstPlayerCardHeight, greaterThan(300));
+    expect(uiSnapshot.firstLifeCountFontSize, greaterThan(0));
   });
 
   testWidgets(
@@ -196,6 +201,14 @@ void main() {
       expect(uiSnapshot!.viewportWidth, greaterThan(300));
       expect(uiSnapshot.viewportHeight, greaterThan(600));
       expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
+      expect(uiSnapshot.visualSkinApplied, isTrue);
+      expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+      expect(uiSnapshot.gameTimerFontFamily, contains('Manrope'));
+      expect(uiSnapshot.turnTrackerFontFamily, contains('Manrope'));
+      expect(uiSnapshot.gameTimerFontSize, inInclusiveRange(24, 40));
+      expect(uiSnapshot.turnTrackerFontSize, inInclusiveRange(18, 28));
+      expect(uiSnapshot.horizontalOverflowPx, lessThanOrEqualTo(1.5));
+      expect(uiSnapshot.verticalOverflowPx, lessThanOrEqualTo(1.5));
 
       final rebuiltGameTimerState = await gameTimerStateStore.load();
       final rebuiltSession = await sessionStore.load();
