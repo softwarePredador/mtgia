@@ -19,6 +19,10 @@ Em termos praticos:
 - o host Flutter deve agir como uma camada invisivel
 - quando quisermos melhorar o visual, o caminho preferencial e editar o `WebView` em si
 
+Documento operacional complementar para essa frente:
+
+- `app/doc/LIFE_COUNTER_WEBVIEW_EDITING_GUARDRAILS_2026-04-04.md`
+
 ## Immediate Goal
 
 Fechar o baseline `Lotus visual + backend ManaLoom` sem abrir uma frente nova de redesign.

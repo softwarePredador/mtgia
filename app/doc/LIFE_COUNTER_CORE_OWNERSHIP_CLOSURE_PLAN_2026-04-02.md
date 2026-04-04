@@ -21,6 +21,7 @@ Ele responde apenas:
 Documento de apoio desta fase:
 
 - `app/doc/LIFE_COUNTER_SNAPSHOT_CANONICAL_MATRIX_2026-04-02.md`
+- `app/doc/LIFE_COUNTER_WEBVIEW_EDITING_GUARDRAILS_2026-04-04.md`
 
 ## Target architecture
 
