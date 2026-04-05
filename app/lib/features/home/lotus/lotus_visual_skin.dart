@@ -55,21 +55,21 @@ body {
 
 body {
   background:
-    radial-gradient(circle at top, rgba(120, 168, 255, 0.14), transparent 34%),
-    linear-gradient(165deg, rgba(9, 15, 31, 0.94), rgba(4, 10, 24, 0.98));
+    radial-gradient(circle at top, rgba(92, 124, 189, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(7, 12, 23, 0.95), rgba(2, 6, 16, 0.99));
   letter-spacing: 0.01em;
 }
 
 ${LotusDomSelectors.playerCard} {
-  filter: saturate(1.04) contrast(1.02);
+  filter: saturate(0.84) brightness(0.96) contrast(0.99);
 }
 
 ${LotusDomSelectors.playerCard} .player-card-inner:not(.option-card):not(.color-card) {
   border-radius: calc(var(--borderRadius) * 1.15);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -24px 36px rgba(1, 6, 16, 0.18),
-    var(--manaloom-shell-shadow);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -20px 28px rgba(1, 6, 16, 0.18),
+    0 12px 24px rgba(1, 8, 22, 0.16);
 }
 
 ${LotusDomSelectors.playerCard} .player-name,
@@ -127,8 +127,9 @@ ${LotusDomSelectors.menuButton},
 }
 
 ${LotusDomSelectors.menuButton} {
+  transform: translate(-50%, 50%) scale(0.92);
   background:
-    linear-gradient(180deg, rgba(20, 32, 61, 0.94), rgba(8, 14, 30, 0.88));
+    linear-gradient(180deg, rgba(18, 25, 43, 0.96), rgba(8, 12, 24, 0.92));
 }
 
 ${LotusDomSelectors.optionCard} {
@@ -149,9 +150,246 @@ ${LotusDomSelectors.optionCard} h3 {
   letter-spacing: 0.01em;
 }
 
+.menu-button-overlay .game-states-wrapper {
+  box-sizing: border-box;
+  gap: 10px !important;
+  padding:
+    12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px) !important;
+  background:
+    linear-gradient(180deg, rgba(10, 16, 30, 0.96), rgba(5, 9, 20, 0.94)) !important;
+  box-shadow: 0 -18px 28px rgba(2, 9, 22, 0.36) !important;
+  backdrop-filter: blur(18px) saturate(1.2) !important;
+}
+
+.menu-button-overlay .game-states-wrapper > * {
+  height: 40px !important;
+  padding: 0 14px 0 10px !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.015em !important;
+  background: rgba(9, 14, 27, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.16) !important;
+}
+
+.menu-button-overlay .game-states-wrapper > *:before,
+.menu-button-overlay .game-states-wrapper > *:after {
+  width: 32px !important;
+  height: 32px !important;
+  background-size: 20px !important;
+}
+
+.first-time-user-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 120 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 16px !important;
+  padding:
+    18px 16px calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+  box-sizing: border-box !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 7, 18, 0.08),
+      rgba(3, 7, 18, 0.52) 40%,
+      rgba(2, 6, 16, 0.76)
+    ) !important;
+}
+
+.first-time-user-overlay .text-wrapper {
+  width: min(100%, 340px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 18px 16px 20px !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(180deg, rgba(9, 14, 27, 0.95), rgba(5, 9, 20, 0.95)) !important;
+  box-shadow: 0 22px 34px rgba(1, 9, 24, 0.28) !important;
+}
+
+.first-time-user-overlay .image {
+  position: relative !important;
+  width: min(82vw, 290px) !important;
+  min-height: 180px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+.first-time-user-overlay .cover-card {
+  width: min(72vw, 238px) !important;
+  height: min(42vw, 150px) !important;
+  border-radius: 26px !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 30px rgba(1, 9, 24, 0.28) !important;
+  transform: translateY(-10px) scale(0.76) !important;
+  opacity: 0.44 !important;
+  filter: saturate(0.9) brightness(0.92) !important;
+}
+
+.first-time-user-overlay .cover-card .life-count {
+  font-size: clamp(92px, 26vw, 120px) !important;
+}
+
+.first-time-user-overlay .commander-card {
+  width: min(72vw, 236px) !important;
+  min-height: 92px !important;
+  margin-top: -12px !important;
+  padding: 14px 14px 12px !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(180deg, rgba(30, 34, 47, 0.98), rgba(17, 21, 31, 0.96)) !important;
+  box-shadow: 0 16px 28px rgba(1, 9, 24, 0.34) !important;
+}
+
+.first-time-user-overlay .commander-card .label {
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+}
+
+.first-time-user-overlay .commander-card .label b {
+  display: block !important;
+  margin-bottom: 2px !important;
+  font-size: clamp(28px, 8vw, 34px) !important;
+  line-height: 0.92 !important;
+}
+
+.first-time-user-overlay .commander-card .button {
+  height: auto !important;
+  min-height: 38px !important;
+  margin-top: 10px !important;
+  padding: 10px 14px !important;
+  border-radius: 999px !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.first-time-user-overlay .options-card {
+  width: min(76vw, 252px) !important;
+  min-height: 120px !important;
+  margin-top: -12px !important;
+  padding: 16px 14px 14px !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(180deg, rgba(32, 35, 48, 0.98), rgba(19, 22, 31, 0.96)) !important;
+  box-shadow: 0 16px 28px rgba(1, 9, 24, 0.34) !important;
+}
+
+.first-time-user-overlay .options-card .inner {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  align-items: start !important;
+}
+
+.first-time-user-overlay .options-card .option-entry {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+.first-time-user-overlay .options-card .option-entry-icon {
+  width: 50px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.first-time-user-overlay .options-card .option-entry-text {
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+.first-time-user-overlay .headline {
+  max-width: 320px !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(18px, 6vw, 26px) !important;
+  font-weight: 800 !important;
+  line-height: 0.96 !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+}
+
+.first-time-user-overlay .text {
+  max-width: 320px !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(14px, 4.8vw, 21px) !important;
+  font-weight: 700 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.01em !important;
+  text-align: center !important;
+  text-wrap: balance !important;
+}
+
+.first-time-user-overlay .text b {
+  color: var(--manaloom-shell-accent-warm) !important;
+}
+
+.first-time-user-overlay > .btn {
+  min-width: 160px !important;
+  min-height: 50px !important;
+  padding: 12px 24px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  color: #fff !important;
+}
+
+.first-time-user-overlay .commander-card.hide {
+  display: none !important;
+}
+
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_commander_damage"] .cover-card,
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_player_options"] .cover-card {
+  display: none !important;
+}
+
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_commander_damage"] .image,
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_player_options"] .image {
+  min-height: 116px !important;
+}
+
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_fullscreen_mode"] .image {
+  display: none !important;
+}
+
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_commander_damage"] .commander-card,
+.first-time-user-overlay[data-manaloom-visual-proof-key="first_time_player_options"] .options-card {
+  margin-top: 0 !important;
+}
+
 .commander-damage-overlay,
+.own-commander-damage-hint-overlay,
 .turn-tracker-hint-overlay,
+.manaloom-turn-tracker-proof,
 .show-counters-hint-overlay,
+.manaloom-show-counters-proof,
 .max-game-modes-warning,
 .input-overlay {
   box-sizing: border-box;
@@ -168,8 +406,16 @@ ${LotusDomSelectors.optionCard} h3 {
 
 .commander-damage-overlay .font,
 .commander-damage-overlay .text,
+.own-commander-damage-hint-overlay .font,
+.own-commander-damage-hint-overlay .text,
 .turn-tracker-hint-overlay .font,
+.turn-tracker-hint-overlay .text,
+.manaloom-turn-tracker-proof .font,
+.manaloom-turn-tracker-proof .text,
 .show-counters-hint-overlay .font,
+.show-counters-hint-overlay .text,
+.manaloom-show-counters-proof .font,
+.manaloom-show-counters-proof .text,
 .max-game-modes-warning .text,
 .input-overlay .overlay-text {
   font-family: var(--manaloom-ui-font) !important;
@@ -186,16 +432,22 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .commander-damage-overlay .font,
+.own-commander-damage-hint-overlay .font,
 .turn-tracker-hint-overlay .font,
-.show-counters-hint-overlay .font {
+.manaloom-turn-tracker-proof .font,
+.show-counters-hint-overlay .font,
+.manaloom-show-counters-proof .font {
   font-size: clamp(16px, 5vw, 24px) !important;
   font-weight: 700 !important;
   line-height: 0.98;
 }
 
 .commander-damage-overlay .btn,
+.own-commander-damage-hint-overlay .btn,
 .turn-tracker-hint-overlay .btn,
+.manaloom-turn-tracker-proof .btn,
 .show-counters-hint-overlay .btn,
+.manaloom-show-counters-proof .btn,
 .max-game-modes-warning .close,
 .input-overlay .btn {
   min-height: 42px;
@@ -209,9 +461,155 @@ ${LotusDomSelectors.optionCard} h3 {
 }
 
 .commander-damage-overlay .btn-wrapper,
+.own-commander-damage-hint-overlay .btn-wrapper,
+.manaloom-turn-tracker-proof .btn-wrapper,
 .show-counters-hint-overlay .btn-wrapper,
+.manaloom-show-counters-proof .btn-wrapper,
 .input-overlay .btn-wrapper {
   gap: 10px;
+}
+
+.manaloom-proof-title {
+  width: 100% !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(16px, 4.8vw, 22px) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+  color: var(--manaloom-shell-text) !important;
+}
+
+.manaloom-proof-body {
+  width: 100% !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: clamp(13px, 4vw, 18px) !important;
+  font-weight: 700 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.01em !important;
+  text-align: center !important;
+  color: var(--manaloom-shell-text) !important;
+  text-wrap: balance !important;
+}
+
+.manaloom-proof-actions {
+  width: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.commander-damage-overlay,
+.own-commander-damage-hint-overlay,
+.turn-tracker-hint-overlay,
+.manaloom-turn-tracker-proof,
+.show-counters-hint-overlay,
+.manaloom-show-counters-proof {
+  position: fixed !important;
+  inset: auto 16px calc(env(safe-area-inset-bottom, 0px) + 22px) 16px !important;
+  z-index: 120 !important;
+  width: auto !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+  backdrop-filter: none !important;
+  background:
+    linear-gradient(180deg, rgb(10, 16, 30), rgb(5, 9, 20)) !important;
+}
+
+.commander-damage-overlay .btn-wrapper,
+.own-commander-damage-hint-overlay .btn-wrapper,
+.turn-tracker-hint-overlay .btn-wrapper,
+.manaloom-turn-tracker-proof .btn-wrapper,
+.show-counters-hint-overlay .btn-wrapper,
+.manaloom-show-counters-proof .btn-wrapper {
+  width: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+
+.commander-damage-overlay .btn,
+.own-commander-damage-hint-overlay .btn,
+.turn-tracker-hint-overlay .btn,
+.manaloom-turn-tracker-proof .btn,
+.show-counters-hint-overlay .btn,
+.manaloom-show-counters-proof .btn {
+  flex: 1 1 0 !important;
+  max-width: 180px !important;
+  border-radius: 999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(180deg, #ff2f86, #f31269) !important;
+  color: #fff !important;
+}
+
+.own-commander-damage-hint-overlay .font,
+.turn-tracker-hint-overlay .font,
+.manaloom-turn-tracker-proof .font,
+.show-counters-hint-overlay .font,
+.manaloom-show-counters-proof .font {
+  font-size: clamp(15px, 4.6vw, 21px) !important;
+  line-height: 1 !important;
+}
+
+.own-commander-damage-hint-overlay .text,
+.turn-tracker-hint-overlay .text,
+.manaloom-turn-tracker-proof .text,
+.show-counters-hint-overlay .text,
+.manaloom-show-counters-proof .text {
+  font-size: clamp(13px, 4vw, 17px) !important;
+  line-height: 1.08 !important;
+}
+
+.manaloom-show-counters-proof .player-card {
+  position: relative !important;
+  width: min(54vw, 168px) !important;
+  height: min(24vh, 156px) !important;
+  margin: 8px auto 0 !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+}
+
+.manaloom-show-counters-proof .player-card .player-card-inner {
+  border-radius: 18px !important;
+}
+
+.manaloom-show-counters-proof .player-card .player-life-count {
+  opacity: 0.18 !important;
+  transform: scale(0.44) !important;
+  transform-origin: center !important;
+}
+
+.manaloom-show-counters-proof .player-card .counters-on-card {
+  transform: scale(0.82) !important;
+  transform-origin: bottom center !important;
+}
+
+.manaloom-show-counters-proof .player-card {
+  display: none !important;
+}
+
+.manaloom-show-counters-proof::before {
+  content: "" !important;
+  display: block !important;
+  width: 142px !important;
+  height: 92px !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 76% 24%, rgba(255, 255, 255, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(58, 64, 92, 0.92), rgba(27, 31, 46, 0.96)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 12px 22px rgba(0, 0, 0, 0.16) !important;
 }
 
 ${LotusDomSelectors.mainGameTimer},
@@ -322,52 +720,276 @@ String? get lotusInjectedVisualProofScript {
     return null;
   }
 
-  late final String overlayClass;
-  late final String title;
-  late final String text;
-  late final List<String> buttons;
-
   switch (proof) {
     case 'commander_damage':
-      overlayClass = 'commander-damage-overlay';
-      title = "COMMANDER DAMAGE YOU'VE RECEIVED";
-      text = 'SWIPE LEFT OR RIGHT TO TRACK COMMANDER DAMAGE';
-      buttons = const ['RETURN TO GAME', 'GOT IT!'];
+      return _buildSimpleVisualProofScript(
+        proofKey: proof,
+        overlayClass: 'commander-damage-overlay',
+        title: "COMMANDER DAMAGE YOU'VE RECEIVED",
+        text: 'SWIPE LEFT OR RIGHT TO TRACK COMMANDER DAMAGE',
+        buttons: const ['RETURN TO GAME', 'GOT IT!'],
+      );
     case 'turn_tracker_hint':
-      overlayClass = 'turn-tracker-hint-overlay';
-      title = 'TURN TRACKER';
-      text = 'TAP NEXT OR PREVIOUS TO FOLLOW THE ACTIVE TURN';
-      buttons = const ['GOT IT!'];
+      return _buildSimpleVisualProofScript(
+        proofKey: proof,
+        overlayClass: 'manaloom-turn-tracker-proof',
+        title: 'TURN TRACKER',
+        text: 'TAP NEXT OR PREVIOUS TO FOLLOW THE ACTIVE TURN',
+        buttons: const ['GOT IT!'],
+      );
+    case 'turn_tracker_hint_step1':
+      return _buildSimpleVisualProofScript(
+        proofKey: proof,
+        overlayClass: 'manaloom-turn-tracker-proof',
+        title: 'TURN TRACKER',
+        text:
+            'LONG PRESS THE TURN TRACKER TO MOVE IT BACK TO THE PREVIOUS PLAYER IF YOU MISSCLICKED',
+        buttons: const ['NEXT'],
+      );
+    case 'turn_tracker_hint_step2':
+      return _buildSimpleVisualProofScript(
+        proofKey: proof,
+        overlayClass: 'manaloom-turn-tracker-proof',
+        title: 'TURN TRACKER',
+        text:
+            'WHEN AT TURN 1 ON THE STARTING PLAYER, LONG PRESS TO CHANGE WHO STARTS FIRST',
+        buttons: const ['GOT IT!'],
+      );
     case 'show_counters_hint':
-      overlayClass = 'show-counters-hint-overlay';
-      title = 'PLAYER COUNTERS';
-      text = 'TAP A COUNTER TO OPEN QUICK CONTROLS';
-      buttons = const ['GOT IT!'];
+      return _buildShowCountersVisualProofScript(proofKey: proof);
+    case 'menu_overlay':
+      return _buildMenuOverlayVisualProofScript(proofKey: proof);
+    case 'first_time_commander_damage':
+      return _buildFirstTimeUserVisualProofScript(
+        proofKey: proof,
+        headline: 'Commander damage',
+        text: 'Swipe <b>left</b> or <b>right</b> to track Commander damage',
+        buttonLabel: 'Got it!',
+        coverCardClassName: 'cover-card swipe-left',
+        commanderCardClassName: 'commander-card',
+      );
+    case 'first_time_player_options':
+      return _buildFirstTimeUserVisualProofScript(
+        proofKey: proof,
+        headline: 'Make it yours',
+        text: 'Swipe <b>up</b> or <b>down</b> to show player options',
+        buttonLabel: 'Alright!',
+        coverCardClassName: 'cover-card swipe-up',
+        commanderCardClassName: 'commander-card hide',
+      );
+    case 'first_time_fullscreen_mode':
+      return _buildFirstTimeUserVisualProofScript(
+        proofKey: proof,
+        headline: 'Fullscreen mode',
+        text: 'Add website to <b>home screen</b> for fullscreen mode',
+        buttonLabel: 'Good to know!',
+        coverCardClassName: 'cover-card swipe-up',
+        commanderCardClassName: 'commander-card hide',
+      );
+    case 'own_commander_damage_hint':
+      return _buildSimpleVisualProofScript(
+        proofKey: proof,
+        overlayClass: 'own-commander-damage-hint-overlay',
+        title: 'OWN COMMANDER DAMAGE',
+        text:
+            'GOT BETRAYED?<br><span>TAP THE DAGGER TO TRACK DAMAGE TAKEN FROM YOUR OWN COMMANDER.</span>',
+        buttons: const ['GOT IT!'],
+      );
     default:
       return null;
   }
+}
 
-  final buttonsHtml = buttons
-      .map((label) => '<div class="btn">$label</div>')
-      .join();
+String get _visualProofChromeCleanupScript => '''
+  [
+    ${jsonEncode(LotusDomSelectors.menuButton)},
+    ${jsonEncode(LotusDomSelectors.turnTracker)},
+    ${jsonEncode(LotusDomSelectors.mainGameTimer)},
+    ${jsonEncode(LotusDomSelectors.currentTimeClock)},
+    '.other-buttons-wrapper',
+    '.feedback-btn-wrapper',
+    '.patreon-btn-wrapper',
+    '.lotus',
+    '.patreon',
+    '.toast'
+  ].forEach((selector) => {
+    document.querySelectorAll(selector).forEach((node) => {
+      if (!(node instanceof HTMLElement)) {
+        return;
+      }
+      node.style.setProperty('display', 'none', 'important');
+      node.style.setProperty('opacity', '0', 'important');
+      node.style.setProperty('pointer-events', 'none', 'important');
+    });
+  });
+''';
+
+String get _visualProofIsolatedCanvasScript => '''
+  Array.from(document.body.children).forEach((node) => {
+    if (!(node instanceof HTMLElement)) {
+      return;
+    }
+    node.style.setProperty('visibility', 'hidden', 'important');
+    node.style.setProperty('pointer-events', 'none', 'important');
+  });
+  document.body.style.setProperty(
+    'background',
+    'linear-gradient(180deg, rgb(6, 11, 23), rgb(3, 7, 17))',
+    'important',
+  );
+''';
+
+String _buildSimpleVisualProofScript({
+  required String proofKey,
+  required String overlayClass,
+  required String title,
+  required String text,
+  required List<String> buttons,
+}) {
+  final buttonsHtml =
+      buttons.map((label) => '<div class="btn">$label</div>').join();
   final overlayClassJson = jsonEncode(overlayClass);
   final titleJson = jsonEncode(title);
   final textJson = jsonEncode(text);
   final buttonsHtmlJson = jsonEncode(buttonsHtml);
-  final proofJson = jsonEncode(proof);
+  final proofJson = jsonEncode(proofKey);
 
   return '''
 (() => {
   document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+$_visualProofIsolatedCanvasScript
 
   const overlay = document.createElement('div');
   overlay.className = $overlayClassJson;
   overlay.setAttribute('data-manaloom-visual-proof', 'true');
   overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
   overlay.innerHTML =
-    '<div class="font">' + $titleJson + '</div>' +
-    '<div class="text">' + $textJson + '</div>' +
-    '<div class="btn-wrapper">' + $buttonsHtmlJson + '</div>';
+    '<div class="manaloom-proof-title">' + $titleJson + '</div>' +
+    '<div class="manaloom-proof-body">' + $textJson + '</div>' +
+    '<div class="manaloom-proof-actions">' + $buttonsHtmlJson + '</div>';
+
+  document.body.appendChild(overlay);
+})();
+''';
+}
+
+String _buildFirstTimeUserVisualProofScript({
+  required String proofKey,
+  required String headline,
+  required String text,
+  required String buttonLabel,
+  required String coverCardClassName,
+  required String commanderCardClassName,
+}) {
+  final overlayHtml = jsonEncode('''
+<div class="text-wrapper">
+  <div class="image">
+    <div class="$coverCardClassName">
+      <div class="life-count">40</div>
+      <div class="side minus">-</div>
+      <div class="side plus">+</div>
+    </div>
+    <div class="$commanderCardClassName">
+      <div class="label"><b>Commander</b>Damage you've received</div>
+      <div class="button">Return to Game</div>
+    </div>
+    <div class="options-card">
+      <div class="inner">
+        <div class="option-entry background">
+          <div class="option-entry-icon"></div>
+          <div class="option-entry-text">Background</div>
+        </div>
+        <div class="option-entry kill">
+          <div class="option-entry-icon"></div>
+          <div class="option-entry-text">Kill</div>
+        </div>
+        <div class="option-entry partner">
+          <div class="option-entry-icon"></div>
+          <div class="option-entry-text">Partner</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="headline">$headline</div>
+  <div class="text">$text</div>
+</div>
+<div class="btn">$buttonLabel</div>
+''');
+  final proofJson = jsonEncode(proofKey);
+
+  return '''
+(() => {
+  document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+$_visualProofChromeCleanupScript
+
+  const overlay = document.createElement('div');
+  overlay.className = 'first-time-user-overlay';
+  overlay.setAttribute('data-manaloom-visual-proof', 'true');
+  overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
+  overlay.innerHTML = $overlayHtml;
+
+  document.body.appendChild(overlay);
+})();
+''';
+}
+
+String _buildMenuOverlayVisualProofScript({required String proofKey}) {
+  final overlayHtml = jsonEncode('''
+<div class="game-states-wrapper">
+  <div class="dice-btn">Dice</div>
+  <div class="life-history-btn">History</div>
+  <div class="initiative-btn">Initiative</div>
+  <div class="monarch-btn">Monarch</div>
+  <div class="card-search-btn">Card Search</div>
+</div>
+''');
+  final proofJson = jsonEncode(proofKey);
+
+  return '''
+(() => {
+  document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+$_visualProofChromeCleanupScript
+
+  const overlay = document.createElement('div');
+  overlay.className = 'menu-button-overlay';
+  overlay.setAttribute('data-manaloom-visual-proof', 'true');
+  overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
+  overlay.innerHTML = $overlayHtml;
+
+  document.body.appendChild(overlay);
+})();
+''';
+}
+
+String _buildShowCountersVisualProofScript({required String proofKey}) {
+  final overlayHtml = jsonEncode('''
+<div class="player-card">
+  <div class="player-card-inner">
+    <div class="player-life-count">40</div>
+    <div class="counters-on-card">
+      <div class="counter poison">4</div>
+      <div class="counter energy">2</div>
+    </div>
+  </div>
+</div>
+<div class="manaloom-proof-title">DISPLAY COUNTERS ON PLAYER CARDS? <br><span>(YOU CAN TOGGLE THIS IN THE SETTINGS)</span></div>
+<div class="manaloom-proof-actions">
+  <div class="btn disable">NO</div>
+  <div class="btn confirm">YES</div>
+</div>
+''');
+  final proofJson = jsonEncode(proofKey);
+
+  return '''
+(() => {
+  document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+$_visualProofIsolatedCanvasScript
+
+  const overlay = document.createElement('div');
+  overlay.className = 'manaloom-show-counters-proof';
+  overlay.setAttribute('data-manaloom-visual-proof', 'true');
+  overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
+  overlay.innerHTML = $overlayHtml;
 
   document.body.appendChild(overlay);
 })();

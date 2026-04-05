@@ -37,6 +37,35 @@ Future<void> _pumpUntilUiSnapshotAvailable(
   expect(snapshot, isNotNull);
 }
 
+Future<dynamic> _pumpUntilUiSnapshotFontsReady(
+  WidgetTester tester,
+  LotusUiSnapshotStore uiSnapshotStore, {
+  bool requireTimerFonts = false,
+}) async {
+  dynamic snapshot = await uiSnapshotStore.load();
+  for (var attempt = 0; attempt < 12; attempt += 1) {
+    final fontsLoaded =
+        snapshot != null &&
+        snapshot.documentFontsStatus == 'loaded' &&
+        snapshot.uiFontReady == true &&
+        snapshot.displayFontReady == true &&
+        snapshot.uiFontFamily.contains('Manrope');
+    final timerFontsLoaded =
+        !requireTimerFonts ||
+        (snapshot != null &&
+            snapshot.gameTimerFontFamily.contains('Manrope') &&
+            snapshot.turnTrackerFontFamily.contains('Manrope'));
+    if (fontsLoaded && timerFontsLoaded) {
+      return snapshot;
+    }
+
+    await tester.pump(const Duration(seconds: 1));
+    snapshot = await uiSnapshotStore.load();
+  }
+
+  return snapshot;
+}
+
 Map<String, dynamic> _decodeJavaScriptMap(Object? rawResult) {
   Object? value = rawResult;
 
@@ -103,6 +132,26 @@ Future<Map<String, dynamic>> _readFontDiagnostics(dynamic screenState) async {
   return _decodeJavaScriptMap(rawResult);
 }
 
+Future<Map<String, dynamic>> _pumpUntilFontsLoaded(
+  WidgetTester tester,
+  dynamic screenState,
+) async {
+  var diagnostics = await _readFontDiagnostics(screenState);
+  for (var attempt = 0; attempt < 12; attempt += 1) {
+    final fontsLoaded = diagnostics['fonts_status'] == 'loaded';
+    final manropeReady = diagnostics['manrope_ready'] == true;
+    final frauncesReady = diagnostics['fraunces_ready'] == true;
+    if (fontsLoaded && manropeReady && frauncesReady) {
+      return diagnostics;
+    }
+
+    await tester.pump(const Duration(seconds: 1));
+    diagnostics = await _readFontDiagnostics(screenState);
+  }
+
+  return diagnostics;
+}
+
 Future<void> _stabilizeHarness(
   WidgetTester tester,
   LotusStorageSnapshotStore snapshotStore,
@@ -139,13 +188,22 @@ void main() {
     await tester.pump(const Duration(seconds: 8));
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
 
-    final uiSnapshot = await uiSnapshotStore.load();
+    final uiSnapshot = await _pumpUntilUiSnapshotFontsReady(
+      tester,
+      uiSnapshotStore,
+    );
     final dynamic screenState = tester.state(
       find.byType(LotusLifeCounterScreen),
     );
-    final firstFontDiagnostics = await _readFontDiagnostics(screenState);
+    final firstFontDiagnostics = await _pumpUntilFontsLoaded(
+      tester,
+      screenState,
+    );
     await tester.pump(const Duration(seconds: 2));
-    final secondFontDiagnostics = await _readFontDiagnostics(screenState);
+    final secondFontDiagnostics = await _pumpUntilFontsLoaded(
+      tester,
+      screenState,
+    );
 
     expect(find.text('Life counter unavailable'), findsNothing);
     expect(uiSnapshot, isNotNull);
@@ -303,7 +361,11 @@ void main() {
       await _pumpUntilSnapshotAvailable(tester, snapshotStore);
       await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
       final restoredSnapshot = await snapshotStore.load();
-      final uiSnapshot = await uiSnapshotStore.load();
+      final uiSnapshot = await _pumpUntilUiSnapshotFontsReady(
+        tester,
+        uiSnapshotStore,
+        requireTimerFonts: true,
+      );
 
       expect(restoredSnapshot, isNotNull);
       expect(restoredSnapshot!.values['playerCount'], '4');
