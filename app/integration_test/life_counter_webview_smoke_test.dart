@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -33,6 +35,72 @@ Future<void> _pumpUntilUiSnapshotAvailable(
     snapshot = await uiSnapshotStore.load();
   }
   expect(snapshot, isNotNull);
+}
+
+Map<String, dynamic> _decodeJavaScriptMap(Object? rawResult) {
+  Object? value = rawResult;
+
+  for (var attempt = 0; attempt < 3; attempt += 1) {
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+
+    if (value is Map) {
+      return value.cast<String, dynamic>();
+    }
+
+    if (value is! String || value.isEmpty) {
+      break;
+    }
+
+    value = jsonDecode(value);
+  }
+
+  throw StateError('Could not decode JavaScript result: $rawResult');
+}
+
+Future<Map<String, dynamic>> _readFontDiagnostics(dynamic screenState) async {
+  final rawResult = await screenState.debugRunJavaScriptReturningResult('''
+(() => JSON.stringify((() => {
+  const safeRect = (node) => node ? node.getBoundingClientRect() : null;
+  const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
+  const fontSet = document.fonts;
+  const body = document.body;
+  const firstName = document.querySelector('.player-name');
+  const firstLifeBox = document.querySelector('.player-life-count');
+  const timer = document.querySelector('.game-timer');
+  const tracker = document.querySelector('.turn-time-tracker');
+  const firstNameRect = safeRect(firstName);
+  const firstLifeBoxRect = safeRect(firstLifeBox);
+  const timerRect = safeRect(timer);
+  const trackerRect = safeRect(tracker);
+  const bodyStyle = safeStyle(body);
+  const nameStyle = safeStyle(firstName);
+
+  return {
+    fonts_status: fontSet ? fontSet.status || '' : 'unsupported',
+    body_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
+    first_name_present: !!firstName,
+    first_name_font_family: nameStyle ? nameStyle.fontFamily || '' : '',
+    manrope_ready: bodyStyle
+      ? (bodyStyle.fontFamily || '').includes('Manrope')
+      : (fontSet ? fontSet.check('16px "Manrope"') : false),
+    fraunces_ready: nameStyle
+      ? (nameStyle.fontFamily || '').includes('Fraunces')
+      : (fontSet ? fontSet.check('16px "Fraunces"') : false),
+    first_name_width: firstNameRect ? firstNameRect.width || 0 : 0,
+    first_name_height: firstNameRect ? firstNameRect.height || 0 : 0,
+    first_life_box_width: firstLifeBoxRect ? firstLifeBoxRect.width || 0 : 0,
+    first_life_box_height: firstLifeBoxRect ? firstLifeBoxRect.height || 0 : 0,
+    timer_width: timerRect ? timerRect.width || 0 : 0,
+    timer_height: timerRect ? timerRect.height || 0 : 0,
+    tracker_width: trackerRect ? trackerRect.width || 0 : 0,
+    tracker_height: trackerRect ? trackerRect.height || 0 : 0,
+  };
+})()))()
+''');
+
+  return _decodeJavaScriptMap(rawResult);
 }
 
 Future<void> _stabilizeHarness(
@@ -72,6 +140,12 @@ void main() {
     await _pumpUntilUiSnapshotAvailable(tester, uiSnapshotStore);
 
     final uiSnapshot = await uiSnapshotStore.load();
+    final dynamic screenState = tester.state(
+      find.byType(LotusLifeCounterScreen),
+    );
+    final firstFontDiagnostics = await _readFontDiagnostics(screenState);
+    await tester.pump(const Duration(seconds: 2));
+    final secondFontDiagnostics = await _readFontDiagnostics(screenState);
 
     expect(find.text('Life counter unavailable'), findsNothing);
     expect(uiSnapshot, isNotNull);
@@ -81,6 +155,9 @@ void main() {
     expect(uiSnapshot.screenHeight, closeTo(uiSnapshot.viewportHeight, 1));
     expect(uiSnapshot.visualSkinApplied, isTrue);
     expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+    expect(uiSnapshot.documentFontsStatus, 'loaded');
+    expect(uiSnapshot.uiFontReady, isTrue);
+    expect(uiSnapshot.displayFontReady, isTrue);
     expect(uiSnapshot.horizontalOverflowPx, lessThanOrEqualTo(1.5));
     expect(uiSnapshot.verticalOverflowPx, lessThanOrEqualTo(1.5));
     expect(uiSnapshot.playerCardCount, 4);
@@ -89,6 +166,41 @@ void main() {
     expect(uiSnapshot.firstPlayerLifeBoxWidth, greaterThan(60));
     expect(uiSnapshot.firstPlayerLifeBoxHeight, greaterThan(80));
     expect(uiSnapshot.firstLifeCountFontSize, greaterThan(0));
+    expect(firstFontDiagnostics['fonts_status'], 'loaded');
+    expect(firstFontDiagnostics['manrope_ready'], isTrue);
+    expect(firstFontDiagnostics['fraunces_ready'], isTrue);
+    expect(firstFontDiagnostics['body_font_family'], contains('Manrope'));
+    if (firstFontDiagnostics['first_name_present'] == true) {
+      expect(
+        firstFontDiagnostics['first_name_font_family'],
+        contains('Fraunces'),
+      );
+    }
+    expect(secondFontDiagnostics['fonts_status'], 'loaded');
+    expect(secondFontDiagnostics['manrope_ready'], isTrue);
+    expect(secondFontDiagnostics['fraunces_ready'], isTrue);
+    expect(
+      (secondFontDiagnostics['first_life_box_width'] as num).toDouble(),
+      closeTo(
+        (firstFontDiagnostics['first_life_box_width'] as num).toDouble(),
+        0.5,
+      ),
+    );
+    expect(
+      (secondFontDiagnostics['first_life_box_height'] as num).toDouble(),
+      closeTo(
+        (firstFontDiagnostics['first_life_box_height'] as num).toDouble(),
+        0.5,
+      ),
+    );
+    expect(
+      (secondFontDiagnostics['timer_width'] as num).toDouble(),
+      closeTo((firstFontDiagnostics['timer_width'] as num).toDouble(), 0.5),
+    );
+    expect(
+      (secondFontDiagnostics['tracker_width'] as num).toDouble(),
+      closeTo((firstFontDiagnostics['tracker_width'] as num).toDouble(), 0.5),
+    );
   });
 
   testWidgets(
@@ -205,6 +317,9 @@ void main() {
       expect(uiSnapshot.firstPlayerCardWidth, greaterThan(150));
       expect(uiSnapshot.visualSkinApplied, isTrue);
       expect(uiSnapshot.uiFontFamily, contains('Manrope'));
+      expect(uiSnapshot.documentFontsStatus, 'loaded');
+      expect(uiSnapshot.uiFontReady, isTrue);
+      expect(uiSnapshot.displayFontReady, isTrue);
       expect(uiSnapshot.gameTimerFontFamily, contains('Manrope'));
       expect(uiSnapshot.turnTrackerFontFamily, contains('Manrope'));
       expect(uiSnapshot.gameTimerFontSize, inInclusiveRange(24, 40));

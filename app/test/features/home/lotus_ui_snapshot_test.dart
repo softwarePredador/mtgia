@@ -17,6 +17,9 @@ void main() {
         'vertical_overflow_px': 0.0,
         'visual_skin_applied': true,
         'ui_font_family': 'Manrope, sans-serif',
+        'document_fonts_status': 'loaded',
+        'ui_font_ready': true,
+        'display_font_ready': true,
         'set_life_by_tap_enabled': true,
         'vertical_tap_areas_enabled': false,
         'clean_look_enabled': true,
@@ -48,6 +51,9 @@ void main() {
       expect(snapshot.gameTimerText, '01:05');
       expect(snapshot.visualSkinApplied, isTrue);
       expect(snapshot.uiFontFamily, contains('Manrope'));
+      expect(snapshot.documentFontsStatus, 'loaded');
+      expect(snapshot.uiFontReady, isTrue);
+      expect(snapshot.displayFontReady, isTrue);
       expect(snapshot.documentScrollWidth, 412.0);
       expect(snapshot.horizontalOverflowPx, 0.0);
       expect(snapshot.firstPlayerLifeBoxWidth, 92.0);
@@ -78,6 +84,9 @@ void main() {
         'vertical_overflow_px': 0.0,
         'visual_skin_applied': true,
         'ui_font_family': 'Manrope, sans-serif',
+        'document_fonts_status': 'loaded',
+        'ui_font_ready': true,
+        'display_font_ready': true,
         'set_life_by_tap_enabled': true,
         'vertical_tap_areas_enabled': false,
         'clean_look_enabled': true,

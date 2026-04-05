@@ -50,6 +50,21 @@ void main() {
     test('uses ManaLoom typography and visual tokens', () {
       expect(lotusInjectedVisualSkinScript, contains('Manrope'));
       expect(lotusInjectedVisualSkinScript, contains('Fraunces'));
+      expect(lotusInjectedVisualSkinScript, contains('@font-face'));
+      expect(lotusInjectedVisualSkinScript, contains('fonts/Manrope.ttf'));
+      expect(lotusInjectedVisualSkinScript, contains('fonts/Fraunces.ttf'));
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('fontSet.load(\'400 16px "Manrope"\')'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        contains('fontSet.load(\'650 16px "Fraunces"\')'),
+      );
+      expect(
+        lotusInjectedVisualSkinScript,
+        isNot(contains('fonts.googleapis.com')),
+      );
       expect(
         lotusInjectedVisualSkinScript,
         contains('--manaloom-shell-shadow'),

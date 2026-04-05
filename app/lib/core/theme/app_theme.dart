@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// ManaLoom Theme: "Calm Abyss" Palette
 /// Neutral dark UI — card artwork is the main visual focus.
@@ -16,6 +15,9 @@ import 'package:google_fonts/google_fonts.dart';
 /// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
 /// FONT SCALE:   fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
+  static const String uiFontFamily = 'Manrope';
+  static const String displayFontFamily = 'Fraunces';
+
   // ── Brand palette (layout) ──────────────────────────────────
   static const Color backgroundAbyss = Color(0xFF0B0F1A);
   static const Color surfaceSlate = Color(0xFF141B2D);
@@ -210,12 +212,14 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme() {
-    final base = GoogleFonts.manropeTextTheme(
-      ThemeData.dark().textTheme,
-    ).apply(bodyColor: textPrimary, displayColor: textPrimary);
+    final base = ThemeData.dark().textTheme.apply(
+      fontFamily: uiFontFamily,
+      bodyColor: textPrimary,
+      displayColor: textPrimary,
+    );
 
     TextStyle? display(TextStyle? s) =>
-        s == null ? null : GoogleFonts.fraunces(textStyle: s);
+        s?.copyWith(fontFamily: displayFontFamily);
 
     return base.copyWith(
       displayLarge: display(base.displayLarge),

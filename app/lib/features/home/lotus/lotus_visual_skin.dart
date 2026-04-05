@@ -8,7 +8,21 @@ abstract final class LotusVisualSkinStyleIds {
 
 String get lotusInjectedVisualSkinScript {
   final css = '''
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,600,0;9..144,700,0&family=Manrope:wght@500;600;700;800&display=swap");
+@font-face {
+  font-family: "Manrope";
+  src: url("fonts/Manrope.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("fonts/Fraunces.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 :root {
   --manaloom-ui-font: "Manrope", BlinkMacSystemFont, -apple-system, "Segoe UI",
@@ -285,6 +299,12 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
   }
 
   style.textContent = css;
+
+  const fontSet = document.fonts;
+  if (fontSet && typeof fontSet.load === 'function') {
+    fontSet.load('400 16px "Manrope"').catch(() => {});
+    fontSet.load('650 16px "Fraunces"').catch(() => {});
+  }
 })();
 ''';
 }

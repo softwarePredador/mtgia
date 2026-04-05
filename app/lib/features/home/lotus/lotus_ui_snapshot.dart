@@ -19,6 +19,9 @@ class LotusUiSnapshot {
     required this.verticalOverflowPx,
     required this.visualSkinApplied,
     required this.uiFontFamily,
+    required this.documentFontsStatus,
+    required this.uiFontReady,
+    required this.displayFontReady,
     required this.setLifeByTapEnabled,
     required this.verticalTapAreasEnabled,
     required this.cleanLookEnabled,
@@ -56,6 +59,9 @@ class LotusUiSnapshot {
   final double verticalOverflowPx;
   final bool visualSkinApplied;
   final String uiFontFamily;
+  final String documentFontsStatus;
+  final bool uiFontReady;
+  final bool displayFontReady;
   final bool setLifeByTapEnabled;
   final bool verticalTapAreasEnabled;
   final bool cleanLookEnabled;
@@ -94,6 +100,9 @@ class LotusUiSnapshot {
       'vertical_overflow_px': verticalOverflowPx,
       'visual_skin_applied': visualSkinApplied,
       'ui_font_family': uiFontFamily,
+      'document_fonts_status': documentFontsStatus,
+      'ui_font_ready': uiFontReady,
+      'display_font_ready': displayFontReady,
       'set_life_by_tap_enabled': setLifeByTapEnabled,
       'vertical_tap_areas_enabled': verticalTapAreasEnabled,
       'clean_look_enabled': cleanLookEnabled,
@@ -157,6 +166,9 @@ class LotusUiSnapshot {
         (payload['vertical_overflow_px'] as num?)?.toDouble();
     final visualSkinApplied = payload['visual_skin_applied'];
     final uiFontFamily = payload['ui_font_family'];
+    final documentFontsStatus = payload['document_fonts_status'];
+    final uiFontReady = payload['ui_font_ready'];
+    final displayFontReady = payload['display_font_ready'];
     final setLifeByTapEnabled = payload['set_life_by_tap_enabled'];
     final verticalTapAreasEnabled = payload['vertical_tap_areas_enabled'];
     final cleanLookEnabled = payload['clean_look_enabled'];
@@ -205,6 +217,9 @@ class LotusUiSnapshot {
         verticalOverflowPx == null ||
         visualSkinApplied is! bool ||
         uiFontFamily is! String ||
+        documentFontsStatus is! String ||
+        uiFontReady is! bool ||
+        displayFontReady is! bool ||
         setLifeByTapEnabled is! bool ||
         verticalTapAreasEnabled is! bool ||
         cleanLookEnabled is! bool ||
@@ -244,6 +259,9 @@ class LotusUiSnapshot {
       verticalOverflowPx: verticalOverflowPx,
       visualSkinApplied: visualSkinApplied,
       uiFontFamily: uiFontFamily,
+      documentFontsStatus: documentFontsStatus,
+      uiFontReady: uiFontReady,
+      displayFontReady: displayFontReady,
       setLifeByTapEnabled: setLifeByTapEnabled,
       verticalTapAreasEnabled: verticalTapAreasEnabled,
       cleanLookEnabled: cleanLookEnabled,

@@ -777,6 +777,7 @@ class LotusHostController implements LotusHost {
             const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
             const root = document.documentElement;
             const body = document.body;
+            const fontSet = document.fonts;
             const firstLifeNode = document.querySelector(
               '.player-life-count .font, .player-life-count, ${LotusDomSelectors.playerCard} .font'
             );
@@ -824,6 +825,13 @@ class LotusHostController implements LotusHost {
                 '${LotusVisualSkinStyleIds.primary}'
               ),
               ui_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
+              document_fonts_status: fontSet ? fontSet.status || '' : 'unsupported',
+              ui_font_ready: bodyStyle
+                ? (bodyStyle.fontFamily || '').includes('Manrope')
+                : (fontSet ? fontSet.check('16px "Manrope"') : false),
+              display_font_ready: firstPlayerNameStyle
+                ? (firstPlayerNameStyle.fontFamily || '').includes('Fraunces')
+                : (fontSet ? fontSet.check('16px "Fraunces"') : false),
               first_player_name_font_family: firstPlayerNameStyle
                 ? firstPlayerNameStyle.fontFamily || ''
                 : '',
