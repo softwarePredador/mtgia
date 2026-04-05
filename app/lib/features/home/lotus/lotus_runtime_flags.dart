@@ -25,6 +25,11 @@ const bool debugLotusFailFirstBundleLoad = bool.fromEnvironment(
   defaultValue: false,
 );
 
+const String debugLotusVisualProof = String.fromEnvironment(
+  'DEBUG_LOTUS_VISUAL_PROOF',
+  defaultValue: '',
+);
+
 const Duration lotusLoadingOverlayTimeout = Duration(seconds: 6);
 const int lotusLoadingOverlayDismissProgress = 80;
 const String lotusFlutterAssetEntry = 'assets/lotus/index.html';
@@ -33,5 +38,6 @@ const String lotusLogPrefix = '[LotusLifeCounter]';
 
 bool get lotusShouldRunBridgeProbe => kDebugMode && debugLotusBridgeProbe;
 bool get lotusShouldRunDomProbe => kDebugMode && debugLotusDomProbe;
+bool get lotusHasVisualProof => kDebugMode && debugLotusVisualProof.isNotEmpty;
 
 bool get lotusShouldEnforceShellCleanup => !debugLotusDisableShellCleanup;

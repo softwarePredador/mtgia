@@ -644,6 +644,12 @@ class LotusHostController implements LotusHost {
       await webViewController.runJavaScript(lotusInjectedContractScript);
       await webViewController.runJavaScript(lotusInjectedVisualSkinScript);
       await webViewController.runJavaScript(lotusShellCleanupScript);
+      if (lotusHasVisualProof) {
+        final proofScript = lotusInjectedVisualProofScript;
+        if (proofScript != null) {
+          await webViewController.runJavaScript(proofScript);
+        }
+      }
     } catch (error) {
       debugPrint('$lotusLogPrefix shell cleanup error: $error');
     }

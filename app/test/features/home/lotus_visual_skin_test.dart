@@ -72,8 +72,10 @@ void main() {
       expect(lotusInjectedVisualSkinScript, contains('--manaloom-shell-panel'));
       expect(
         lotusInjectedVisualSkinScript,
-        contains('clamp(14px, 4.7vw, 22px)'),
+        contains('clamp(13px, 4vw, 19px)'),
       );
+      expect(lotusInjectedVisualSkinScript, contains('white-space: normal'));
+      expect(lotusInjectedVisualSkinScript, contains('word-break: break-word'));
     });
   });
 }

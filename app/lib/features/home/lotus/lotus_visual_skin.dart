@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'lotus_runtime_flags.dart';
 import 'lotus_webview_contract.dart';
 
 abstract final class LotusVisualSkinStyleIds {
@@ -172,18 +173,24 @@ ${LotusDomSelectors.optionCard} h3 {
 .max-game-modes-warning .text,
 .input-overlay .overlay-text {
   font-family: var(--manaloom-ui-font) !important;
-  font-size: clamp(14px, 4.7vw, 22px) !important;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
+  display: block !important;
+  width: 100%;
+  white-space: normal !important;
+  font-size: clamp(13px, 4vw, 19px) !important;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   text-wrap: balance;
   overflow-wrap: anywhere;
-  word-break: normal;
+  word-break: break-word;
+  text-align: center;
 }
 
 .commander-damage-overlay .font,
 .turn-tracker-hint-overlay .font,
 .show-counters-hint-overlay .font {
+  font-size: clamp(16px, 5vw, 24px) !important;
   font-weight: 700 !important;
+  line-height: 0.98;
 }
 
 .commander-damage-overlay .btn,
@@ -305,6 +312,64 @@ ${LotusDomSelectors.turnTracker} .minutes-seconds:before {
     fontSet.load('400 16px "Manrope"').catch(() => {});
     fontSet.load('650 16px "Fraunces"').catch(() => {});
   }
+})();
+''';
+}
+
+String? get lotusInjectedVisualProofScript {
+  final proof = debugLotusVisualProof.trim();
+  if (proof.isEmpty) {
+    return null;
+  }
+
+  late final String overlayClass;
+  late final String title;
+  late final String text;
+  late final List<String> buttons;
+
+  switch (proof) {
+    case 'commander_damage':
+      overlayClass = 'commander-damage-overlay';
+      title = "COMMANDER DAMAGE YOU'VE RECEIVED";
+      text = 'SWIPE LEFT OR RIGHT TO TRACK COMMANDER DAMAGE';
+      buttons = const ['RETURN TO GAME', 'GOT IT!'];
+    case 'turn_tracker_hint':
+      overlayClass = 'turn-tracker-hint-overlay';
+      title = 'TURN TRACKER';
+      text = 'TAP NEXT OR PREVIOUS TO FOLLOW THE ACTIVE TURN';
+      buttons = const ['GOT IT!'];
+    case 'show_counters_hint':
+      overlayClass = 'show-counters-hint-overlay';
+      title = 'PLAYER COUNTERS';
+      text = 'TAP A COUNTER TO OPEN QUICK CONTROLS';
+      buttons = const ['GOT IT!'];
+    default:
+      return null;
+  }
+
+  final buttonsHtml = buttons
+      .map((label) => '<div class="btn">$label</div>')
+      .join();
+  final overlayClassJson = jsonEncode(overlayClass);
+  final titleJson = jsonEncode(title);
+  final textJson = jsonEncode(text);
+  final buttonsHtmlJson = jsonEncode(buttonsHtml);
+  final proofJson = jsonEncode(proof);
+
+  return '''
+(() => {
+  document.querySelectorAll('[data-manaloom-visual-proof="true"]').forEach((node) => node.remove());
+
+  const overlay = document.createElement('div');
+  overlay.className = $overlayClassJson;
+  overlay.setAttribute('data-manaloom-visual-proof', 'true');
+  overlay.setAttribute('data-manaloom-visual-proof-key', $proofJson);
+  overlay.innerHTML =
+    '<div class="font">' + $titleJson + '</div>' +
+    '<div class="text">' + $textJson + '</div>' +
+    '<div class="btn-wrapper">' + $buttonsHtmlJson + '</div>';
+
+  document.body.appendChild(overlay);
 })();
 ''';
 }
