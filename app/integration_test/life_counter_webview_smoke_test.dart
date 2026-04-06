@@ -132,6 +132,46 @@ Future<Map<String, dynamic>> _readFontDiagnostics(dynamic screenState) async {
   return _decodeJavaScriptMap(rawResult);
 }
 
+Future<Map<String, dynamic>> _readIntroDiagnostics(dynamic screenState) async {
+  final rawResult = await screenState.debugRunJavaScriptReturningResult('''
+(() => JSON.stringify((() => {
+  const hasVisibleNode = (selector) => {
+    const node = document.querySelector(selector);
+    if (!node) {
+      return false;
+    }
+
+    const style = window.getComputedStyle(node);
+    return (
+      style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      style.opacity !== '0'
+    );
+  };
+
+  return {
+    tutorial_overlay_seen:
+      window.localStorage.getItem('tutorialOverlay_v1') === 'true',
+    own_commander_hint_seen:
+      window.localStorage.getItem('ownCommanderDamageHintOverlay_v1') === 'true',
+    turn_tracker_hint_seen:
+      window.localStorage.getItem('turnTrackerHintOverlay_v1') === 'true',
+    counters_hint_seen:
+      window.localStorage.getItem('countersOnPlayerCardHintOverlay_v1') ===
+      'true',
+    first_time_overlay_visible: hasVisibleNode('.first-time-user-overlay'),
+    own_commander_hint_visible: hasVisibleNode(
+      '.own-commander-damage-hint-overlay'
+    ),
+    turn_tracker_hint_visible: hasVisibleNode('.turn-tracker-hint-overlay'),
+    counters_hint_visible: hasVisibleNode('.show-counters-hint-overlay'),
+  };
+})()))()
+''');
+
+  return _decodeJavaScriptMap(rawResult);
+}
+
 Future<Map<String, dynamic>> _pumpUntilFontsLoaded(
   WidgetTester tester,
   dynamic screenState,
@@ -199,6 +239,7 @@ void main() {
       tester,
       screenState,
     );
+    final introDiagnostics = await _readIntroDiagnostics(screenState);
     await tester.pump(const Duration(seconds: 2));
     final secondFontDiagnostics = await _pumpUntilFontsLoaded(
       tester,
@@ -227,6 +268,14 @@ void main() {
     expect(firstFontDiagnostics['fonts_status'], 'loaded');
     expect(firstFontDiagnostics['manrope_ready'], isTrue);
     expect(firstFontDiagnostics['fraunces_ready'], isTrue);
+    expect(introDiagnostics['tutorial_overlay_seen'], isTrue);
+    expect(introDiagnostics['own_commander_hint_seen'], isTrue);
+    expect(introDiagnostics['turn_tracker_hint_seen'], isTrue);
+    expect(introDiagnostics['counters_hint_seen'], isTrue);
+    expect(introDiagnostics['first_time_overlay_visible'], isFalse);
+    expect(introDiagnostics['own_commander_hint_visible'], isFalse);
+    expect(introDiagnostics['turn_tracker_hint_visible'], isFalse);
+    expect(introDiagnostics['counters_hint_visible'], isFalse);
     expect(firstFontDiagnostics['body_font_family'], contains('Manrope'));
     if (firstFontDiagnostics['first_name_present'] == true) {
       expect(
@@ -366,6 +415,10 @@ void main() {
         uiSnapshotStore,
         requireTimerFonts: true,
       );
+      final dynamic screenState = tester.state(
+        find.byType(LotusLifeCounterScreen),
+      );
+      final introDiagnostics = await _readIntroDiagnostics(screenState);
 
       expect(restoredSnapshot, isNotNull);
       expect(restoredSnapshot!.values['playerCount'], '4');
@@ -390,6 +443,14 @@ void main() {
       expect(uiSnapshot.verticalOverflowPx, lessThanOrEqualTo(1.5));
       expect(uiSnapshot.firstPlayerLifeBoxWidth, greaterThan(60));
       expect(uiSnapshot.firstPlayerLifeBoxHeight, greaterThan(80));
+      expect(introDiagnostics['tutorial_overlay_seen'], isTrue);
+      expect(introDiagnostics['own_commander_hint_seen'], isTrue);
+      expect(introDiagnostics['turn_tracker_hint_seen'], isTrue);
+      expect(introDiagnostics['counters_hint_seen'], isTrue);
+      expect(introDiagnostics['first_time_overlay_visible'], isFalse);
+      expect(introDiagnostics['own_commander_hint_visible'], isFalse);
+      expect(introDiagnostics['turn_tracker_hint_visible'], isFalse);
+      expect(introDiagnostics['counters_hint_visible'], isFalse);
 
       final rebuiltGameTimerState = await gameTimerStateStore.load();
       final rebuiltSession = await sessionStore.load();

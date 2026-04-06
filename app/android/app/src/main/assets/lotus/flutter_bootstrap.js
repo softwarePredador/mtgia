@@ -105,6 +105,21 @@
     } catch (error) {}
   }
 
+  function suppressEmbeddedTutorialOverlays() {
+    var completedTutorialKeys = [
+      'tutorialOverlay_v1',
+      'ownCommanderDamageHintOverlay_v1',
+      'turnTrackerHintOverlay_v1',
+      'countersOnPlayerCardHintOverlay_v1',
+    ];
+
+    try {
+      for (var i = 0; i < completedTutorialKeys.length; i += 1) {
+        window.localStorage.setItem(completedTutorialKeys[i], 'true');
+      }
+    } catch (error) {}
+  }
+
   function installEmbeddedAppReviewGuard() {
     window.cordova = window.cordova || {
       platformId: platformId,
@@ -163,9 +178,11 @@
   function prepareAppBoot() {
     installEmbeddedAppReviewGuard();
     suppressEmbeddedReviewPrompt();
+    suppressEmbeddedTutorialOverlays();
     applyEmbeddedViewportFrame();
     requestAnimationFrame(function () {
       installEmbeddedAppReviewGuard();
+      suppressEmbeddedTutorialOverlays();
       applyEmbeddedViewportFrame();
       setTimeout(fireDeviceReady, 0);
     });
@@ -189,6 +206,7 @@
     if (!document.hidden) {
       installEmbeddedAppReviewGuard();
       suppressEmbeddedReviewPrompt();
+      suppressEmbeddedTutorialOverlays();
       applyEmbeddedViewportFrame();
       document.dispatchEvent(new Event('resume'));
     }

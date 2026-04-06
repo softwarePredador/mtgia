@@ -26,6 +26,8 @@ const List<String> lotusSuppressedShellSelectors = <String>[
   '.feedback-btn',
   '.patreon-btn-wrapper',
   '.patreon-btn',
+  '.first-time-user-overlay',
+  '.own-commander-damage-hint-overlay',
   '.turn-tracker-hint-overlay',
   '.show-counters-hint-overlay',
 ];
@@ -61,6 +63,8 @@ String get lotusShellCleanupScript {
 (() => {
   const BLOCKED_HOSTS = new Set($blockedHosts);
   const SUPPRESSED_SELECTORS = $suppressedSelectors;
+  const TUTORIAL_OVERLAY_KEY = 'tutorialOverlay_v1';
+  const OWN_COMMANDER_DAMAGE_HINT_KEY = 'ownCommanderDamageHintOverlay_v1';
   const TURN_TRACKER_HINT_KEY = 'turnTrackerHintOverlay_v1';
   const COUNTERS_HINT_KEY = 'countersOnPlayerCardHintOverlay_v1';
   const STYLE_ID = 'manaloom-lotus-shell-policy';
@@ -199,6 +203,8 @@ String get lotusShellCleanupScript {
 
   const applyPolicy = () => {
     try {
+      localStorage.setItem(TUTORIAL_OVERLAY_KEY, 'true');
+      localStorage.setItem(OWN_COMMANDER_DAMAGE_HINT_KEY, 'true');
       localStorage.setItem(TURN_TRACKER_HINT_KEY, 'true');
       localStorage.setItem(COUNTERS_HINT_KEY, 'true');
     } catch (_) {}
