@@ -106,7 +106,9 @@ Future<Response> _validateList(RequestContext context) async {
     final typeLine = card['type_line'] as String;
     final quantity = card['quantity'] as int;
     final isCommander = card['is_commander'] == true;
-    final isBasicLand = typeLine.toLowerCase().contains('basic land');
+    final typeLineLower = typeLine.toLowerCase();
+    final isBasicLand = typeLineLower.contains('basic land') ||
+        typeLineLower.contains('basic snow land');
 
     if (isCommander && quantity != 1) {
       warnings

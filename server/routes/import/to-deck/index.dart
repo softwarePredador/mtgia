@@ -124,7 +124,9 @@ Future<Response> _importToDeck(RequestContext context) async {
     final name = card['name'] as String;
     final typeLine = card['type_line'] as String;
     final quantity = card['quantity'] as int;
-    final isBasicLand = typeLine.toLowerCase().contains('basic land');
+    final typeLineLower = typeLine.toLowerCase();
+    final isBasicLand = typeLineLower.contains('basic land') ||
+        typeLineLower.contains('basic snow land');
 
     if (!isBasicLand && quantity > limit) {
       warnings.add('$name: $quantity cópias (limite $limit)');
