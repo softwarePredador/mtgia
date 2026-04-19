@@ -61,6 +61,4 @@ try {
     exit 0
 } finally {
     & .\stop_local_test_server.ps1
-    Get-Process dart -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-    Get-Process dart_frog -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 }
