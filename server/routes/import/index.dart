@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/import_card_lookup_service.dart';
 import '../../lib/import_list_service.dart';
@@ -52,6 +53,8 @@ Future<Response> _importDeck(RequestContext context) async {
     return badRequest('Fields name, format, and list are required.');
   }
 
+  final normalizedFormat = format.trim().toLowerCase();
+
   late final List<String> lines;
   try {
     lines = normalizeImportLines(rawList);
@@ -75,9 +78,8 @@ Future<Response> _importDeck(RequestContext context) async {
 
     final originalKey = (item['name'] as String).toLowerCase();
     final cleanedKey = cleanImportLookupKey(originalKey);
-    final nameKey = foundCardsMap.containsKey(originalKey)
-      ? originalKey
-      : cleanedKey;
+    final nameKey =
+        foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
 
     if (foundCardsMap.containsKey(nameKey)) {
       final cardData = foundCardsMap[nameKey]!;
@@ -116,69 +118,63 @@ Future<Response> _importDeck(RequestContext context) async {
 
   final consolidatedCards = _consolidateCardsById(cardsToInsert);
 
-  // 6.5. Validação de Comandante para formatos que exigem
-  if (format == 'commander' || format == 'brawl') {
+  final warnings = <String>[];
+
+  final requiresCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+
+  if (requiresCommander) {
     final hasCommander =
         consolidatedCards.any((c) => c['is_commander'] == true);
-
     if (!hasCommander) {
-      // Tenta detectar automaticamente um comandante baseado no tipo
-      // Procura por Legendary Creature ou Planeswalker com "can be your commander"
-      for (final card in consolidatedCards) {
-        final typeLine = (card['type_line'] as String).toLowerCase();
-        final isLegendaryCreature =
-            typeLine.contains('legendary') && typeLine.contains('creature');
-
-        if (isLegendaryCreature) {
-          // Marca a primeira Legendary Creature como comandante
-          card['is_commander'] = true;
-          break;
-        }
-      }
-    }
-  }
-
-  // 7. Validação de Regras (Banlist e Limites)
-  final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
-  final cardIdsToCheck = <String>[];
-
-  for (final card in consolidatedCards) {
-    final name = card['name'] as String;
-    final typeLine = card['type_line'] as String;
-    final quantity = card['quantity'] as int;
-    final isBasicLand = typeLine.toLowerCase().contains('basic land');
-
-    if (!isBasicLand && quantity > limit) {
-      return badRequest('Regra violada: $name tem $quantity cópias (Limite: $limit).');
-    }
-    cardIdsToCheck.add(card['card_id'] as String);
-  }
-
-  if (cardIdsToCheck.isNotEmpty) {
-    final legalityResult = await pool.execute(
-        Sql.named(
-            'SELECT c.name, cl.status FROM card_legalities cl JOIN cards c ON c.id = cl.card_id WHERE cl.card_id = ANY(@ids) AND cl.format = @format'),
-        parameters: {
-          'ids': TypedValue(Type.uuidArray, cardIdsToCheck),
-          'format': format,
-        });
-
-    final bannedCards = <String>[];
-    for (final row in legalityResult) {
-      if (row[1] == 'banned') {
-        bannedCards.add(row[0] as String);
-      }
-    }
-
-    if (bannedCards.isNotEmpty) {
-      return badRequest(
-        'O deck contém cartas BANIDAS no formato $format: ${bannedCards.join(", ")}',
+      warnings.add(
+        'Nenhum comandante foi detectado. Marque um comandante (tag na lista ou campo "commander") para validar identidade de cor.',
       );
+    }
+
+    if (commanderName != null && commanderName.trim().isNotEmpty) {
+      final normalizedCommander = commanderName.trim().toLowerCase();
+      final matched = consolidatedCards.any(
+        (c) => (c['name'] as String?)?.toLowerCase() == normalizedCommander,
+      );
+      if (!matched) {
+        warnings.add(
+          'Comandante informado ("$commanderName") não foi encontrado na lista importada.',
+        );
+      }
+    }
+  }
+
+  // Garantia: commanders sempre com quantity = 1 (mantém import resiliente)
+  for (final card in consolidatedCards) {
+    if (card['is_commander'] == true) {
+      final qty = card['quantity'] as int? ?? 1;
+      if (qty != 1) {
+        warnings.add(
+          'Comandante "${card['name']}" estava com quantidade $qty; ajustado para 1.',
+        );
+        card['quantity'] = 1;
+      }
     }
   }
 
   try {
     final newDeck = await pool.runTx((session) async {
+      final validatedCards = <Map<String, dynamic>>[
+        for (final card in consolidatedCards)
+          {
+            'card_id': card['card_id'],
+            'quantity': card['quantity'],
+            'is_commander': card['is_commander'] ?? false,
+          },
+      ];
+
+      await DeckRulesService(session).validateAndThrow(
+        format: normalizedFormat,
+        cards: validatedCards,
+        strict: false,
+      );
+
       // 1. Criar o Deck
       final deckResult = await session.execute(
         Sql.named(
@@ -187,7 +183,7 @@ Future<Response> _importDeck(RequestContext context) async {
         parameters: {
           'userId': userId,
           'name': name,
-          'format': format,
+          'format': normalizedFormat,
           'desc': description,
         },
       );
@@ -195,14 +191,14 @@ Future<Response> _importDeck(RequestContext context) async {
       final newDeckId = deckResult.first.toColumnMap()['id'];
 
       // 2. Inserir as Cartas (Bulk Insert)
-      if (consolidatedCards.isNotEmpty) {
+      if (validatedCards.isNotEmpty) {
         final valueStrings = <String>[];
         final params = <String, dynamic>{
           'deckId': newDeckId,
         };
 
-        for (var i = 0; i < consolidatedCards.length; i++) {
-          final card = consolidatedCards[i];
+        for (var i = 0; i < validatedCards.length; i++) {
+          final card = validatedCards[i];
           final pCardId = 'c$i';
           final pQty = 'q$i';
           final pCmdr = 'cmd$i';
@@ -227,16 +223,6 @@ Future<Response> _importDeck(RequestContext context) async {
       return deckMap;
     });
 
-    // Prepara warnings para a resposta
-    final warnings = <String>[];
-
-    // Verifica se é formato Commander/Brawl sem comandante detectado
-    if ((format == 'commander' || format == 'brawl') &&
-        !consolidatedCards.any((c) => c['is_commander'] == true)) {
-      warnings.add(
-          'Nenhum comandante foi detectado. Considere marcar uma carta como comandante.');
-    }
-
     final responseBody = {
       'deck': newDeck,
       'cards_imported': _sumQuantities(consolidatedCards),
@@ -248,6 +234,16 @@ Future<Response> _importDeck(RequestContext context) async {
     }
 
     return Response.json(body: responseBody);
+  } on DeckRulesException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {
+        'error': e.message,
+        'not_found': notFoundCards,
+        'not_found_lines': notFoundCards,
+        if (warnings.isNotEmpty) 'warnings': warnings,
+      },
+    );
   } catch (e) {
     print('[ERROR] Failed to import deck: $e');
     return internalServerError('Failed to import deck');

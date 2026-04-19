@@ -41,6 +41,7 @@ Future<Response> _importToDeck(RequestContext context) async {
   }
 
   final format = deckCheck.first[1] as String;
+  final normalizedFormat = format.trim().toLowerCase();
 
   late final List<String> lines;
   try {
@@ -66,7 +67,8 @@ Future<Response> _importToDeck(RequestContext context) async {
 
     final originalKey = (item['name'] as String).toLowerCase();
     final cleanedKey = cleanImportLookupKey(originalKey);
-    final nameKey = foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
+    final nameKey =
+        foundCardsMap.containsKey(originalKey) ? originalKey : cleanedKey;
 
     if (foundCardsMap.containsKey(nameKey)) {
       final cardData = foundCardsMap[nameKey]!;
@@ -88,12 +90,14 @@ Future<Response> _importToDeck(RequestContext context) async {
   if (cardsToInsert.isEmpty) {
     return badRequest('No valid cards found in the list.', details: {
       'not_found_lines': notFoundCards,
-      'hint': 'Confira formato das linhas (ex: "1 Sol Ring") e nomes das cartas.',
+      'hint':
+          'Confira formato das linhas (ex: "1 Sol Ring") e nomes das cartas.',
     });
   }
 
   // 6. Validação de regras
-  final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
+  final limit =
+      (normalizedFormat == 'commander' || normalizedFormat == 'brawl') ? 1 : 4;
 
   // Agrupa cartas por card_id para evitar duplicatas
   final cardMap = <String, Map<String, dynamic>>{};
@@ -172,15 +176,14 @@ Future<Response> _importToDeck(RequestContext context) async {
         byId[cardId] = {
           ...existing,
           'quantity': (existing['quantity'] as int) + (card['quantity'] as int),
-          'is_commander':
-              (existing['is_commander'] as bool? ?? false) ||
+          'is_commander': (existing['is_commander'] as bool? ?? false) ||
               (card['is_commander'] as bool? ?? false),
         };
       }
 
       final validatedCards = byId.values.toList();
       await DeckRulesService(session).validateAndThrow(
-        format: format.toLowerCase(),
+        format: normalizedFormat,
         cards: validatedCards,
         strict: false,
       );

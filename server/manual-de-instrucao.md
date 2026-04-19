@@ -1669,10 +1669,11 @@ openssl rand -base64 48
 Fornecer feedback visual e validação de regras para o usuário, garantindo que o deck seja legal e tenha uma curva de mana saudável.
 
 **Implementação Backend:**
-- **Validação de Regras (`routes/import/index.dart` e `routes/decks/[id]/index.dart`):**
-  - Verifica limites de cópias (1x para Commander, 4x para outros).
-  - Consulta a tabela `card_legalities` para bloquear cartas banidas.
-  - Retorna erros específicos (ex: "Regra violada: Sol Ring é BANIDA").
+- **Validação de Regras (DeckRulesService):**
+  - Usada em `routes/decks/*` e `routes/import/*` (e também na validação de decks gerados via IA).
+  - Valida: limite de cópias por **NOME** (1x Commander/Brawl, 4x demais; básicos livres), `banned`, `restricted` (máx. 1) e `not_legal` via `card_legalities`.
+  - Em Commander/Brawl, aplica regras de comandante (qty=1, dupla de comandantes só com Partner/Background) e valida identidade de cor quando um comandante está marcado.
+  - Retorna erro específico no primeiro bloqueio (ex: "BANIDA", "RESTRITA", "não é válida", "fora da identidade").
 
 **Implementação Frontend:**
 - **ManaHelper (`core/utils/mana_helper.dart`):**
@@ -5547,6 +5548,8 @@ Fluxo interno:
 3. retorna mapa resolvido para montagem final de `found_cards`/`cardsToInsert`
 
 As duas rotas de import agora reutilizam exatamente essa função, mantendo o mesmo contrato de resposta.
+
+Obs: `POST /import` também foi alinhado para validar regras via `DeckRulesService` (mesmo motor de regras do CRUD de decks), reduzindo drift entre import/criar/atualizar.
 
 ### 40.3 Benefícios
 
