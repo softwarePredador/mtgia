@@ -9,17 +9,18 @@
 
 ### O Como — Server
 
-1. **`server/lib/ai/optimize_job.dart`** (NOVO): In-memory job store com `OptimizeJobStore` (static Map + autocleanup 30min). Cada job tem: id, status (pending→processing→completed/failed), stage, stageNumber, totalStages, result, error.
+1. **`server/lib/ai/optimize_job.dart`**: Job store via Postgres (tabela `ai_optimize_jobs`) com cleanup por TTL (~30min). Cada job tem: id, status (pending→processing→completed/failed), stage, stageNumber, totalStages, result, error.
 
-2. **`server/routes/ai/optimize/jobs/[id].dart`** (NOVO): Endpoint GET de polling que herda JWT da middleware de `/ai/`. Retorna job.toJson() com status e progresso.
+2. **`server/routes/ai/optimize/jobs/[id].dart`**: Endpoint GET de polling que herda JWT da middleware de `/ai/`. Retorna job.toJson() com status e progresso.
 
 3. **`server/routes/ai/optimize/index.dart`** (MODIFICADO):
    - Modo **complete** agora é interceptado ANTES do processamento pesado:
      - Cria job via `OptimizeJobStore.create()`
-     - Chama `unawaited(_processCompleteModeAsync(...))` (fire-and-forget via event loop)
+     - Dispara processamento em background com `unawaited(runZonedGuarded(() => _processCompleteModeAsync(...)))` para evitar crash do processo em erros não tratados
      - Retorna 202 com `job_id` + `poll_url` + `poll_interval_ms`
+     - Suporte a modo determinístico (sem OpenAI) via `OPTIMIZE_COMPLETE_DISABLE_OPENAI=1`
    - Modo **optimize** (troca simples de cartas) continua síncrono.
-   - Função `_processCompleteModeAsync()` contém a lógica extraída dos ~800 lines do complete mode, com `OptimizeJobStore.progress()` chamado em 6 estágios.
+   - Função `_processCompleteModeAsync()` contém a lógica extraída do complete mode, com `OptimizeJobStore.progress()` chamado em 6 estágios.
 
 ### O Como — Flutter Client
 
@@ -52,10 +53,10 @@ Cliente GET /ai/optimize/jobs/:id (a cada 2s)
   ↓ status: failed → throw Exception
 ```
 
-### Decisão arquitetural: por que in-memory e não DB?
-- É um MVP: o job vive 30 minutos e serve apenas para a sessão ativa do usuário.
-- Pool é singleton — a closure captura a referência e continua operando após retornar 202.
-- Para scale-out (múltiplos pods), migrar para Redis ou tabela `optimize_jobs`.
+### Decisão arquitetural: por que Postgres e não in-memory?
+- O polling fica consistente mesmo com múltiplas requisições em sequência (suites de teste/QA) e facilita inspeção/diagnóstico.
+- TTL cleanup remove jobs antigos automaticamente.
+- Para scale-out real (múltiplos pods), o store precisa virar Redis/queue (ou outra estratégia de coordenação), mas o modelo de job continua o mesmo.
 
 ---
 

@@ -1,9 +1,9 @@
 {
   "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
   "source_deck_name": "goblins",
-  "clone_deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
+  "clone_deck_id": "3d7e29b2-4b70-4b68-946a-d1a76f645fe5",
   "optimize_request": {
-    "deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
+    "deck_id": "3d7e29b2-4b70-4b68-946a-d1a76f645fe5",
     "archetype": "aggro",
     "bracket": 4,
     "keep_theme": true
@@ -33,7 +33,7 @@
       "type": "rebuild_guided",
       "endpoint": "/ai/rebuild",
       "payload": {
-        "deck_id": "226f5322-b161-45b5-b7eb-8f7d04a809bd",
+        "deck_id": "3d7e29b2-4b70-4b68-946a-d1a76f645fe5",
         "bracket": 4,
         "archetype": "aggro",
         "theme": "counters",

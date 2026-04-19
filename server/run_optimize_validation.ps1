@@ -3,14 +3,33 @@ $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
 try {
+    $runTag = [Guid]::NewGuid().ToString('N').Substring(0, 8)
+    $env:LOCAL_TEST_SERVER_TAG = $runTag
+
+    if (-not $env:OPTIMIZE_COMPLETE_DISABLE_OPENAI) {
+        $env:OPTIMIZE_COMPLETE_DISABLE_OPENAI = '1'
+    }
+
+    $fileStem = "local_test_server.$runTag"
     & .\start_local_test_server.ps1
 
-    Write-Host 'Aguardando backend local iniciar em http://127.0.0.1:8080 ...'
+    $portFile = Join-Path $PSScriptRoot "test\artifacts\$fileStem.port"
+    $port = 8080
+    if (Test-Path $portFile) {
+        $portValue = (Get-Content $portFile -ErrorAction SilentlyContinue | Select-Object -First 1)
+        if ($portValue) {
+            $parsedPort = [int]$portValue
+            if ($parsedPort -gt 0) { $port = $parsedPort }
+        }
+    }
+
+    $baseUrl = "http://127.0.0.1:$port"
+    Write-Host "Aguardando backend local iniciar em $baseUrl ..."
     $isUp = $false
 
     for ($attempt = 1; $attempt -le 12; $attempt++) {
         Start-Sleep -Seconds 5
-        $statusCode = & curl.exe -s -o NUL -w "%{http_code}" http://127.0.0.1:8080/health/live
+        $statusCode = & curl.exe -s -o NUL -w "%{http_code}" "$baseUrl/health/live"
         if ($statusCode -eq '200') {
             $isUp = $true
             break
@@ -19,8 +38,8 @@ try {
 
     if (-not $isUp) {
         Write-Host 'Backend nao respondeu dentro da janela esperada.'
-        $stdoutLog = Join-Path $PSScriptRoot 'test\artifacts\local_test_server.stdout.log'
-        $stderrLog = Join-Path $PSScriptRoot 'test\artifacts\local_test_server.stderr.log'
+        $stdoutLog = Join-Path $PSScriptRoot "test\artifacts\$fileStem.stdout.log"
+        $stderrLog = Join-Path $PSScriptRoot "test\artifacts\$fileStem.stderr.log"
         if (Test-Path $stdoutLog) {
             Get-Content $stdoutLog | Write-Host
         }
@@ -31,6 +50,7 @@ try {
     }
 
     $env:RUN_INTEGRATION_TESTS = '1'
+    $env:TEST_API_BASE_URL = $baseUrl
 
     Write-Host "`n=== CORE TESTS ===`n"
     & dart test `

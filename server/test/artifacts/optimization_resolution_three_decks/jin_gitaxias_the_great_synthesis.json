@@ -1,10 +1,10 @@
 {
   "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
   "source_deck_name": "jin",
-  "clone_deck_id": "b9e657fb-582e-4741-b950-421ed9267b31",
-  "final_deck_id": "b9e657fb-582e-4741-b950-421ed9267b31",
+  "clone_deck_id": "2b71dcb0-9486-4ec7-ac99-5ac2c998a1e5",
+  "final_deck_id": "2b71dcb0-9486-4ec7-ac99-5ac2c998a1e5",
   "optimize_request": {
-    "deck_id": "b9e657fb-582e-4741-b950-421ed9267b31",
+    "deck_id": "2b71dcb0-9486-4ec7-ac99-5ac2c998a1e5",
     "archetype": "control",
     "bracket": 2,
     "keep_theme": true
@@ -12,14 +12,13 @@
   "optimize_status": 200,
   "optimize_response": {
     "mode": "optimize",
-    "strategy_source": "ai_after_deterministic_fallback",
-    "fallback_trigger": "deterministic_rejected_quality_gate",
+    "strategy_source": "deterministic_first",
     "constraints": {
       "keep_theme": true
     },
     "cache": {
       "hit": false,
-      "cache_key": "v6:7d69443b"
+      "cache_key": "v6:6f91f35c"
     },
     "preferences": {
       "memory_applied": false,
@@ -44,12 +43,12 @@
       ]
     },
     "removals": [
-      "Dramatic Reversal"
+      "Sea Gate Restoration // Sea Gate, Reborn"
     ],
     "additions": [
-      "Experimental Augury"
+      "Brainstorm"
     ],
-    "reasoning": "",
+    "reasoning": "O backend priorizou swaps determinísticos para control antes da IA, usando função das cartas, prioridade competitiva do comandante e histórico de rejeição.",
     "deck_analysis": {
       "detected_archetype": "control",
       "average_cmc": "3.07",
@@ -69,12 +68,12 @@
       "archetype_confidence": "média"
     },
     "post_analysis": {
-      "detected_archetype": "control",
-      "average_cmc": "3.07",
+      "detected_archetype": "combo",
+      "average_cmc": "2.97",
       "type_distribution": {
         "creatures": 10,
-        "instants": 17,
-        "sorceries": 8,
+        "instants": 18,
+        "sorceries": 7,
         "enchantments": 5,
         "artifacts": 24,
         "planeswalkers": 0,
@@ -82,60 +81,32 @@
         "battles": 0
       },
       "total_cards": 100,
-      "mana_curve_assessment": "BOA: Curva adequada para Control",
+      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
       "mana_base_assessment": "Base de mana equilibrada",
       "archetype_confidence": "média",
+      "improvements": [
+        "Mais interação instant-speed adicionada"
+      ],
       "validation": {
-        "validation_score": 72,
+        "validation_score": 65,
         "deck_health_score": 88,
-        "improvement_score": 49,
+        "improvement_score": 31,
         "verdict": "aprovado",
         "monte_carlo": {
           "before": {
             "simulations": 1000,
-            "consistency_score": 89,
+            "consistency_score": 91,
             "mana_analysis": {
               "land_count": 40,
-              "screw_rate": 0.164,
-              "flood_rate": 0.023,
-              "keepable_rate": 0.813
-            },
-            "curve_analysis": {
-              "avg_cmc": 3.07,
-              "turn_1_play": 0.749,
-              "turn_2_play": 0.924,
-              "turn_3_play": 0.988,
-              "turn_4_play": 0.993,
-              "cmc_distribution": {
-                "5": 3,
-                "7": 3,
-                "1": 15,
-                "2": 12,
-                "3": 13,
-                "4": 5,
-                "0": 4,
-                "10": 4,
-                "9": 1
-              }
-            },
-            "recommendations": [
-              "Alta taxa de mana screw (16.4%). Considere adicionar 2-4 terrenos."
-            ]
-          },
-          "after": {
-            "simulations": 1000,
-            "consistency_score": 89,
-            "mana_analysis": {
-              "land_count": 40,
-              "screw_rate": 0.15,
-              "flood_rate": 0.014,
-              "keepable_rate": 0.836
+              "screw_rate": 0.136,
+              "flood_rate": 0.018,
+              "keepable_rate": 0.846
             },
             "curve_analysis": {
               "avg_cmc": 3.07,
               "turn_1_play": 0.732,
-              "turn_2_play": 0.919,
-              "turn_3_play": 0.982,
+              "turn_2_play": 0.946,
+              "turn_3_play": 0.987,
               "turn_4_play": 0.995,
               "cmc_distribution": {
                 "5": 3,
@@ -153,94 +124,122 @@
               "Deck bem balanceado! Métricas dentro do ideal para Commander."
             ]
           },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 90,
+            "mana_analysis": {
+              "land_count": 40,
+              "screw_rate": 0.154,
+              "flood_rate": 0.015,
+              "keepable_rate": 0.831
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.97,
+              "turn_1_play": 0.765,
+              "turn_2_play": 0.94,
+              "turn_3_play": 0.988,
+              "turn_4_play": 0.997,
+              "cmc_distribution": {
+                "5": 3,
+                "7": 2,
+                "1": 16,
+                "2": 12,
+                "3": 13,
+                "4": 5,
+                "0": 4,
+                "10": 4,
+                "9": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (15.4%). Considere adicionar 2-4 terrenos."
+            ]
+          },
           "mulligan_before": {
             "runs": 500,
-            "avg_mulligans": 0.1,
-            "keep_at_7": 0.912,
-            "keep_at_6": 0.076,
-            "keep_at_5": 0.012,
+            "avg_mulligans": 0.09,
+            "keep_at_7": 0.914,
+            "keep_at_6": 0.084,
+            "keep_at_5": 0.002,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.916
+            "keepable_after_mull": 0.926
           },
           "mulligan_after": {
             "runs": 500,
-            "avg_mulligans": 0.13,
-            "keep_at_7": 0.88,
-            "keep_at_6": 0.106,
-            "keep_at_5": 0.014,
+            "avg_mulligans": 0.1,
+            "keep_at_7": 0.904,
+            "keep_at_6": 0.088,
+            "keep_at_5": 0.008,
             "keep_at_4_or_less": 0.0,
-            "keepable_after_mull": 0.91
+            "keepable_after_mull": 0.912
           },
           "deltas": {
-            "consistency_score": 0,
-            "screw_rate_delta": -0.014,
-            "flood_rate_delta": -0.009,
-            "keepable_rate_delta": 0.023,
-            "turn2_play_delta": -0.005,
-            "mulligan_keep7_delta": -0.032
+            "consistency_score": -1,
+            "screw_rate_delta": 0.018,
+            "flood_rate_delta": -0.003,
+            "keepable_rate_delta": -0.015,
+            "turn2_play_delta": -0.006,
+            "mulligan_keep7_delta": -0.01
           }
         },
         "functional_analysis": {
           "swaps": [
             {
-              "removed": "Dramatic Reversal",
-              "added": "Experimental Augury",
-              "removed_role": "utility",
+              "removed": "Sea Gate Restoration // Sea Gate, Reborn",
+              "added": "Brainstorm",
+              "removed_role": "draw",
               "added_role": "draw",
-              "role_preserved": false,
-              "cmc_delta": 0,
-              "verdict": "tradeoff"
+              "role_preserved": true,
+              "cmc_delta": -6,
+              "verdict": "upgrade"
             }
           ],
           "summary": {
-            "upgrades": 0,
+            "upgrades": 1,
             "sidegrades": 0,
-            "tradeoffs": 1,
+            "tradeoffs": 0,
             "questionable": 0
           },
           "role_delta": {
-            "draw": 1,
+            "draw": 0,
             "removal": 0,
             "ramp": 0,
             "creature": 0,
             "artifact": 0,
             "enchantment": 0,
             "land": 0,
-            "utility": -1,
+            "utility": 0,
             "wipe": 0,
             "tutor": 0,
             "protection": 0
           }
         },
         "critic_ai": {
-          "approval_score": 65,
-          "verdict": "aprovado_com_ressalvas",
+          "approval_score": 45,
+          "verdict": "reprovado",
           "concerns": [
-            "A troca reduz a capacidade de gerar mana de forma eficiente, o que pode impactar o controle do jogo.",
-            "A diminuição na taxa de mulligan free keep pode indicar que a nova carta não se encaixa tão bem no deck quanto a anterior."
+            "A troca resultou em uma diminuição na consistência do deck, conforme indicado pelo Score de Consistência que caiu de 91 para 90.",
+            "A taxa de mulligan-free keep também foi afetada negativamente, caindo de 91.4% para 90.4%, o que indica que é mais difícil manter mãos jogáveis.",
+            "O aumento na taxa de mana screw de 13.6% para 15.4% é preocupante, pois isso pode levar a jogadas menos eficientes e atrasos no jogo."
           ],
           "strong_swaps": [],
           "weak_swaps": [
             {
-              "card": "Dramatic Reversal",
-              "justification": "A carta oferece uma sinergia com mana e pode permitir jogadas explosivas, enquanto Experimental Augury é mais focada em card draw, o que pode não ser suficiente em um deck de controle."
+              "swap": "OUT: Sea Gate Restoration // Sea Gate, Reborn → IN: Brainstorm",
+              "justification": "Embora Brainstorm seja uma carta poderosa, a troca não trouxe melhorias significativas e, na verdade, piorou a consistência e a taxa de manter mãos jogáveis."
             }
           ],
-          "overall_assessment": "A troca apresenta tradeoffs significativos que podem comprometer a eficácia do deck, especialmente em um ambiente de controle."
+          "overall_assessment": "A troca proposta não é benéfica para o deck, resultando em uma piora geral na consistência e na jogabilidade."
         },
         "warnings": [
-          "A melhoria incremental foi pequena (49/100)."
+          "A melhoria incremental foi pequena (31/100)."
         ]
       }
     },
     "validation_warnings": [
-      "🔒 Gate de qualidade removeu 5 troca(s) insegura(s) antes da resposta final.",
-      "🔒 All Is Dust -> Jin-Gitaxias, Progress Tyrant removida pelo gate: papel wipe -> creature, delta CMC +0.",
-      "🔒 Expedition Map -> Brainstorm removida pelo gate: papel ramp -> draw, delta CMC +0.",
-      "🔒 Blast Zone -> Counterspell removida pelo gate: papel land -> removal, delta CMC +2.",
-      "🔒 Swan Song -> Tezzeret's Gambit removida pelo gate: papel removal -> draw, delta CMC +3.",
-      "🔒 Academy Ruins -> Flux Channeler removida pelo gate: papel land -> creature, delta CMC +3.",
-      "A melhoria incremental foi pequena (49/100)."
+      "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Engulf the Shore -> Command Tower removida pelo gate: papel utility -> land, delta CMC -4.",
+      "A melhoria incremental foi pequena (31/100)."
     ],
     "bracket": 2,
     "target_additions": null,
@@ -253,7 +252,7 @@
         "pair_count": 0
       },
       "empty_suggestions_fallback_aggregate": {
-        "request_count": 26,
+        "request_count": 5,
         "triggered_count": 0,
         "applied_count": 0,
         "no_candidate_count": 0,
@@ -263,16 +262,16 @@
       },
       "empty_suggestions_fallback_aggregate_persisted": {
         "all_time": {
-          "request_count": 72,
+          "request_count": 81,
           "triggered_count": 23,
           "applied_count": 0,
           "no_candidate_count": 23,
           "no_replacement_count": 0,
-          "trigger_rate": 0.3194444444444444,
+          "trigger_rate": 0.2839506172839506,
           "apply_rate": 0.0
         },
         "last_24h": {
-          "request_count": 23,
+          "request_count": 3,
           "triggered_count": 0,
           "applied_count": 0,
           "no_candidate_count": 0,
@@ -284,14 +283,14 @@
     },
     "edhrec_validation": {
       "commander": "Jin-Gitaxias // The Great Synthesis",
-      "deck_count": 3388,
+      "deck_count": 3479,
       "themes": [
         "Cantrips",
         "Control",
         "Combo",
-        "Wheels",
         "Card Draw",
         "Extra Turns",
+        "Wheels",
         "Infect",
         "Spellslinger",
         "Phyrexians",
@@ -299,51 +298,54 @@
         "Proliferate",
         "Mill",
         "Counterspells",
-        "Midrange",
         "Planeswalkers",
-        "Ramp",
+        "Midrange",
         "Storm",
-        "Big Mana",
         "Hand Size",
+        "Ramp",
+        "Big Mana",
+        "Stax",
         "+1/+1 Counters",
         "Commander Matters",
-        "Stax",
         "Clones",
+        "Enchantress",
         "Self-Mill",
-        "Blue Moon",
         "Devotion",
+        "Good Stuff",
+        "Tokens",
+        "Blue Moon",
         "Burn",
         "Equipment",
-        "Good Stuff",
         "Historic",
         "Persistent Petitioners",
         "Praetors",
         "Sagas",
-        "Tokens",
-        "Enchantress",
-        "Oil Counters",
-        "Pillow Fort",
         "Self-Damage",
-        "Theft",
         "Ad Nauseam",
         "Counters Matter",
+        "Group Slug",
+        "Oil Counters",
+        "Pillow Fort",
+        "Tempo",
+        "Theft",
         "Cycling",
         "Discard",
+        "Eldrazi",
         "Flash",
-        "Group Slug",
+        "Flying",
         "Lifegain",
         "Prison",
-        "Tempo",
+        "Spell Copy",
         "Toolbox",
         "Unnatural",
         "Activated Abilities",
         "Aggro",
         "Blink",
+        "Bobbleheads",
         "Bounce",
         "Chaos",
-        "Eldrazi",
+        "Charge Counters",
         "Extra Upkeeps",
-        "Flying",
         "Glass Cannon",
         "Hatebears",
         "Horrors",
@@ -351,23 +353,26 @@
         "Rock",
         "Sea Creatures",
         "Slivers",
+        "Sneak Attack",
         "Snow",
-        "Spell Copy",
+        "Sphinxes",
+        "Stompy",
         "Tap / Untap",
         "Toughness Matters",
         "Triggered Abilities",
         "Vehicles",
-        "Voltron",
-        "Wizards"
+        "Voltron"
       ],
-      "additions_validated": 1,
-      "additions_not_in_edhrec": []
+      "additions_validated": 0,
+      "additions_not_in_edhrec": [
+        "Command Tower"
+      ]
     },
     "additions_detailed": [
       {
         "type": "add",
-        "name": "Experimental Augury",
-        "card_id": "6055258c-8b2d-4b93-82c0-e7ed7ddadacd",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
         "quantity": 1,
         "is_basic_land": false,
         "reason": "Sugestão de entrada para alinhar o deck ao plano control e melhorar consistência geral.",
@@ -376,7 +381,7 @@
           "score": 0.9
         },
         "impact_estimate": {
-          "curve": "ΔCMC 0.00",
+          "curve": "ΔCMC -0.10",
           "consistency": "alta",
           "synergy": "melhora",
           "legality": "mantida"
@@ -386,8 +391,8 @@
     "removals_detailed": [
       {
         "type": "remove",
-        "name": "Dramatic Reversal",
-        "card_id": "82c4ed2b-09ef-486c-8ebc-b471a58e5ab6",
+        "name": "Sea Gate Restoration // Sea Gate, Reborn",
+        "card_id": "0abb6410-6267-49f1-aba4-7480e73d5447",
         "quantity": 1,
         "is_basic_land": false,
         "reason": "Sugestão de saída para alinhar o deck ao plano control e melhorar consistência geral.",
@@ -396,7 +401,7 @@
           "score": 0.9
         },
         "impact_estimate": {
-          "curve": "ΔCMC 0.00",
+          "curve": "ΔCMC -0.10",
           "consistency": "alta",
           "synergy": "ajuste",
           "legality": "mantida"
@@ -406,8 +411,8 @@
     "recommendations": [
       {
         "type": "remove",
-        "name": "Dramatic Reversal",
-        "card_id": "82c4ed2b-09ef-486c-8ebc-b471a58e5ab6",
+        "name": "Sea Gate Restoration // Sea Gate, Reborn",
+        "card_id": "0abb6410-6267-49f1-aba4-7480e73d5447",
         "quantity": 1,
         "is_basic_land": false,
         "reason": "Sugestão de saída para alinhar o deck ao plano control e melhorar consistência geral.",
@@ -416,7 +421,7 @@
           "score": 0.9
         },
         "impact_estimate": {
-          "curve": "ΔCMC 0.00",
+          "curve": "ΔCMC -0.10",
           "consistency": "alta",
           "synergy": "ajuste",
           "legality": "mantida"
@@ -424,8 +429,8 @@
       },
       {
         "type": "add",
-        "name": "Experimental Augury",
-        "card_id": "6055258c-8b2d-4b93-82c0-e7ed7ddadacd",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
         "quantity": 1,
         "is_basic_land": false,
         "reason": "Sugestão de entrada para alinhar o deck ao plano control e melhorar consistência geral.",
@@ -434,23 +439,13 @@
           "score": 0.9
         },
         "impact_estimate": {
-          "curve": "ΔCMC 0.00",
+          "curve": "ΔCMC -0.10",
           "consistency": "alta",
           "synergy": "melhora",
           "legality": "mantida"
         }
       }
     ],
-    "warnings": {
-      "blocked_by_theme": {
-        "keep_theme": true,
-        "blocked_removals": [
-          "Chain of Vapor",
-          "Fabricate"
-        ],
-        "message": "Algumas remoções sugeridas foram bloqueadas para preservar o tema do deck."
-      }
-    },
     "deck_state": {
       "status": "healthy",
       "recommended_mode": "optimize",
@@ -464,15 +459,15 @@
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "b9e657fb-582e-4741-b950-421ed9267b31"
+    "deck_id": "2b71dcb0-9486-4ec7-ac99-5ac2c998a1e5"
   },
   "final_analysis": {
-    "detected_archetype": "control",
-    "average_cmc": "3.07",
+    "detected_archetype": "combo",
+    "average_cmc": "2.97",
     "type_distribution": {
       "creatures": 10,
-      "instants": 17,
-      "sorceries": 8,
+      "instants": 18,
+      "sorceries": 7,
       "enchantments": 5,
       "artifacts": 24,
       "planeswalkers": 0,
@@ -480,7 +475,7 @@
       "battles": 0
     },
     "total_cards": 100,
-    "mana_curve_assessment": "BOA: Curva adequada para Control",
+    "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis",
     "mana_base_assessment": "Base de mana equilibrada",
     "archetype_confidence": "média"
   },

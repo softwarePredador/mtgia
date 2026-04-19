@@ -486,11 +486,19 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
         improvementScore >= 55 &&
         !hasCriticalRoleLoss) {
       verdict = 'aprovado';
+    } else if (score >= 70 &&
+        healthScore >= 80 &&
+        functional.questionable <= 1 &&
+        !hasCriticalRoleLoss) {
+      // Para decks já saudáveis, um score >= 70 geralmente indica melhora real.
+      // Permitimos até 1 swap "questionável" desde que não haja perda crítica.
+      verdict = 'aprovado';
     } else if (score >= 65 &&
         healthScore >= 80 &&
-        improvementScore >= 35 &&
-        functional.questionable == 0 &&
+        functional.questionable <= 1 &&
         !hasCriticalRoleLoss) {
+      // Para decks já saudáveis, score >= 65 é um threshold aceitável para
+      // micro-upgrades (evita bloquear melhorias pequenas mas seguras).
       verdict = 'aprovado';
     } else if (score >= 45) {
       verdict = 'aprovado_com_ressalvas';

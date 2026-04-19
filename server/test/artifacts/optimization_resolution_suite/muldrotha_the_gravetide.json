@@ -1,29 +1,532 @@
 {
   "source_deck_id": "5bf67c2e-fdeb-40a9-be91-ebb7edac7489",
   "source_deck_name": "Corpus Seed - Muldrotha, the Gravetide",
-  "clone_deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
-  "final_deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
+  "clone_deck_id": "fc14856b-1bd8-46cc-8508-c68ea3fb032d",
+  "final_deck_id": "fc14856b-1bd8-46cc-8508-c68ea3fb032d",
   "optimize_request": {
-    "deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529",
+    "deck_id": "fc14856b-1bd8-46cc-8508-c68ea3fb032d",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
-  "optimize_status": 422,
+  "optimize_status": 200,
   "optimize_response": {
-    "error": "Nenhuma troca segura restou apos o gate de qualidade da otimizacao.",
-    "quality_error": {
-      "code": "OPTIMIZE_NO_SAFE_SWAPS",
-      "message": "As trocas sugeridas pioravam funcao, curva ou consistencia do deck.",
-      "dropped_swaps": [
-        "🔒 Gate de qualidade removeu 2 troca(s) insegura(s) antes da resposta final.",
-        "🔒 Opulent Palace -> Fellwar Stone removida pelo gate: papel land -> ramp, delta CMC +2.",
-        "🔒 Woodland Cemetery -> Beast Within removida pelo gate: papel land -> removal, delta CMC +3."
+    "mode": "optimize",
+    "strategy_source": "deterministic_first",
+    "constraints": {
+      "keep_theme": true
+    },
+    "cache": {
+      "hit": false,
+      "cache_key": "v6:f781dcf2"
+    },
+    "preferences": {
+      "memory_applied": false,
+      "keep_theme": true,
+      "preferred_bracket": 2
+    },
+    "theme": {
+      "theme": "aristocrats",
+      "confidence": "baixa",
+      "match_score": 0.1875,
+      "core_cards": [
+        "Muldrotha, the Gravetide",
+        "Syr Konrad, the Grim",
+        "Mystic Remora",
+        "The Gitrog Monster",
+        "Haywire Mite",
+        "Birds of Paradise",
+        "Crop Rotation",
+        "Eternal Witness",
+        "Sol Ring",
+        "River Kelpie"
       ]
     },
-    "mode": "optimize",
-    "removals": [],
-    "additions": [],
+    "removals": [
+      "Gravebreaker Lamia"
+    ],
+    "additions": [
+      "Brainstorm"
+    ],
+    "reasoning": "O backend priorizou swaps determinísticos para midrange antes da IA, usando função das cartas, prioridade competitiva do comandante e histórico de rejeição.",
+    "deck_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.61",
+      "type_distribution": {
+        "creatures": 32,
+        "instants": 6,
+        "sorceries": 6,
+        "enchantments": 10,
+        "artifacts": 12,
+        "planeswalkers": 2,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média"
+    },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.55",
+      "type_distribution": {
+        "creatures": 31,
+        "instants": 7,
+        "sorceries": 6,
+        "enchantments": 9,
+        "artifacts": 12,
+        "planeswalkers": 2,
+        "lands": 36,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média",
+      "improvements": [
+        "CMC médio otimizado: 2.61 → 2.55",
+        "Mais interação instant-speed adicionada"
+      ],
+      "validation": {
+        "validation_score": 69,
+        "deck_health_score": 82,
+        "improvement_score": 50,
+        "verdict": "aprovado",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 82,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.226,
+              "flood_rate": 0.01,
+              "keepable_rate": 0.764
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.61,
+              "turn_1_play": 0.374,
+              "turn_2_play": 0.798,
+              "turn_3_play": 0.918,
+              "turn_4_play": 0.958,
+              "cmc_distribution": {
+                "6": 1,
+                "2": 23,
+                "3": 11,
+                "1": 12,
+                "4": 10,
+                "5": 6,
+                "0": 1
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (22.6%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 82,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.218,
+              "flood_rate": 0.004,
+              "keepable_rate": 0.778
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.55,
+              "turn_1_play": 0.42,
+              "turn_2_play": 0.799,
+              "turn_3_play": 0.918,
+              "turn_4_play": 0.953,
+              "cmc_distribution": {
+                "6": 1,
+                "2": 23,
+                "3": 11,
+                "1": 13,
+                "4": 10,
+                "0": 1,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (21.8%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.22,
+            "keep_at_7": 0.814,
+            "keep_at_6": 0.15,
+            "keep_at_5": 0.036,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.948
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.2,
+            "keep_at_7": 0.828,
+            "keep_at_6": 0.14,
+            "keep_at_5": 0.032,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.94
+          },
+          "deltas": {
+            "consistency_score": 0,
+            "screw_rate_delta": -0.008,
+            "flood_rate_delta": -0.006,
+            "keepable_rate_delta": 0.014,
+            "turn2_play_delta": 0.001,
+            "mulligan_keep7_delta": 0.014
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Gravebreaker Lamia",
+              "added": "Brainstorm",
+              "removed_role": "tutor",
+              "added_role": "draw",
+              "role_preserved": false,
+              "cmc_delta": -4,
+              "verdict": "tradeoff"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 1,
+            "questionable": 0
+          },
+          "role_delta": {
+            "draw": 1,
+            "removal": 0,
+            "ramp": 0,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": 0,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": -1,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 70,
+          "verdict": "aprovado_com_ressalvas",
+          "concerns": [
+            "A troca de um tutor por uma carta de compra pode diminuir a capacidade de buscar respostas específicas ou peças-chave do deck.",
+            "Embora a taxa de mulligan tenha melhorado, a perda de um tutor pode impactar a consistência em encontrar cartas essenciais em momentos críticos."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Gravebreaker Lamia → Brainstorm",
+              "justification": "A troca reduz a capacidade de tutorizar cartas específicas, o que é crucial em um deck de Muldrotha que depende de sinergias e respostas."
+            }
+          ],
+          "overall_assessment": "A troca melhora a consistência em termos de compra, mas sacrifica a capacidade de buscar cartas específicas, o que pode ser problemático em um deck midrange."
+        },
+        "warnings": [
+          "A melhoria incremental foi pequena (50/100)."
+        ]
+      }
+    },
+    "validation_warnings": [
+      "🔒 Gate de qualidade removeu 1 troca(s) insegura(s) antes da resposta final.",
+      "🔒 Hedge Shredder -> Dark Ritual removida pelo gate: papel artifact -> ramp, delta CMC -3.",
+      "A melhoria incremental foi pequena (50/100)."
+    ],
+    "bracket": 2,
+    "target_additions": null,
+    "optimize_diagnostics": {
+      "empty_suggestions_fallback": {
+        "triggered": false,
+        "applied": false,
+        "candidate_count": 0,
+        "replacement_count": 0,
+        "pair_count": 0
+      },
+      "empty_suggestions_fallback_aggregate": {
+        "request_count": 5,
+        "triggered_count": 0,
+        "applied_count": 0,
+        "no_candidate_count": 0,
+        "no_replacement_count": 0,
+        "trigger_rate": 0.0,
+        "apply_rate": 0.0
+      },
+      "empty_suggestions_fallback_aggregate_persisted": {
+        "all_time": {
+          "request_count": 84,
+          "triggered_count": 23,
+          "applied_count": 0,
+          "no_candidate_count": 23,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.27380952380952384,
+          "apply_rate": 0.0
+        },
+        "last_24h": {
+          "request_count": 6,
+          "triggered_count": 0,
+          "applied_count": 0,
+          "no_candidate_count": 0,
+          "no_replacement_count": 0,
+          "trigger_rate": 0.0,
+          "apply_rate": 0.0
+        }
+      }
+    },
+    "edhrec_validation": {
+      "commander": "Muldrotha, the Gravetide",
+      "deck_count": 22813,
+      "themes": [
+        "Sacrifice",
+        "Mill",
+        "Reanimator",
+        "Graveyard",
+        "Self-Mill",
+        "Combo",
+        "Lands Matter",
+        "Dredge",
+        "Control",
+        "Midrange",
+        "Birthing Pod",
+        "Ramp",
+        "Toolbox",
+        "Good Stuff",
+        "Landfall",
+        "Aristocrats",
+        "Zombies",
+        "Tokens",
+        "Primal Surge",
+        "Clones",
+        "+1/+1 Counters",
+        "Discard",
+        "Commander Matters",
+        "Planeswalkers",
+        "Artifacts",
+        "Infect",
+        "Persistent Petitioners",
+        "Stax",
+        "Flashback",
+        "Enchantress",
+        "Gyruda Companion",
+        "ETB",
+        "Skeletons",
+        "Oozes",
+        "Card Draw",
+        "Mutate",
+        "Blink",
+        "Hatebears",
+        "Big Mana",
+        "Land Destruction",
+        "Extra Turns",
+        "Snow",
+        "Tempo",
+        "Cycling",
+        "Legends",
+        "Pillow Fort",
+        "Frogs",
+        "Aggro",
+        "Elves",
+        "Group Slug",
+        "Lifedrain",
+        "Elementals",
+        "Historic",
+        "Theft",
+        "Wheels",
+        "X Spells",
+        "Cantrips",
+        "Delver",
+        "Lifegain",
+        "Morph",
+        "Storm",
+        "-1/-1 Counters",
+        "Ad Nauseam",
+        "Group Hug",
+        "Deathtouch",
+        "Eldrazi",
+        "Exile",
+        "Flying",
+        "Rad Counters",
+        "Stompy",
+        "Prison",
+        "Sea Creatures",
+        "Self-Damage",
+        "Unnatural",
+        "Zoo",
+        "Auras",
+        "Burn",
+        "Chaos",
+        "Phyrexians",
+        "Proliferate",
+        "Rock",
+        "Self-Discard",
+        "Spellslinger",
+        "Surveil",
+        "Topdeck",
+        "Vehicles",
+        "Devotion",
+        "Insects",
+        "Land Animation",
+        "Pirates",
+        "Rat Colony",
+        "Shapeshifters",
+        "Snakes",
+        "Triggered Abilities",
+        "Activated Abilities",
+        "Cascade",
+        "Clues",
+        "Counters Matter",
+        "Curses",
+        "Energy",
+        "Evoke",
+        "Horrors",
+        "Merfolk",
+        "Modular",
+        "Pingers",
+        "Shadowborn Apostles",
+        "Slime Against Humanity",
+        "Toughness Matters",
+        "Treasure",
+        "Affinity",
+        "Anthems",
+        "Attack Triggers",
+        "Bounce",
+        "Counterspells",
+        "Dragons",
+        "Dungeon",
+        "Eggs",
+        "Equipment",
+        "Faeries",
+        "Flash",
+        "Improvise",
+        "Monarch",
+        "Ninjutsu",
+        "Power",
+        "Relentless Rats",
+        "Sagas",
+        "Spiders",
+        "Umori Companion",
+        "Unblockable",
+        "Voltron",
+        "Wurms",
+        "Aikido",
+        "Assassins",
+        "Attractions",
+        "Blue Moon",
+        "Craft",
+        "Defenders",
+        "Demons",
+        "Descend",
+        "Deserts",
+        "Discover",
+        "Donate",
+        "Exploit",
+        "Explore",
+        "Extra Combats",
+        "Forced Combat",
+        "Hydras",
+        "Indestructible",
+        "Lhurgoyfs",
+        "LTB Effects",
+        "Necrons",
+        "Ninjas",
+        "Plants",
+        "Praetors",
+        "Rogues",
+        "Rooms",
+        "Saprolings",
+        "Squirrels",
+        "Stickers",
+        "Stoneblade",
+        "Tron",
+        "Vampires"
+      ],
+      "additions_validated": 0,
+      "additions_not_in_edhrec": [
+        "Brainstorm"
+      ]
+    },
+    "additions_detailed": [
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "baixa",
+          "score": 0.5
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.06",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "removals_detailed": [
+      {
+        "type": "remove",
+        "name": "Gravebreaker Lamia",
+        "card_id": "aebfa78f-d02b-4941-a588-d243b88085d6",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "baixa",
+          "score": 0.5
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.06",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "remove",
+        "name": "Gravebreaker Lamia",
+        "card_id": "aebfa78f-d02b-4941-a588-d243b88085d6",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de saída para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "baixa",
+          "score": 0.5
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.06",
+          "consistency": "alta",
+          "synergy": "ajuste",
+          "legality": "mantida"
+        }
+      },
+      {
+        "type": "add",
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false,
+        "reason": "Sugestão de entrada para alinhar o deck ao plano midrange e melhorar consistência geral.",
+        "confidence": {
+          "level": "baixa",
+          "score": 0.5
+        },
+        "impact_estimate": {
+          "curve": "ΔCMC -0.06",
+          "consistency": "alta",
+          "synergy": "melhora",
+          "legality": "mantida"
+        }
+      }
+    ],
     "deck_state": {
       "status": "healthy",
       "recommended_mode": "optimize",
@@ -31,22 +534,22 @@
       "severity_score": 0,
       "reasons": []
     },
-    "outcome_code": "no_safe_upgrade_found"
+    "outcome_code": "optimized"
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "b880f7f5-5928-4794-8d8a-18ef07f71529"
+    "deck_id": "fc14856b-1bd8-46cc-8508-c68ea3fb032d"
   },
   "final_analysis": {
     "detected_archetype": "midrange",
-    "average_cmc": "2.61",
+    "average_cmc": "2.55",
     "type_distribution": {
-      "creatures": 32,
-      "instants": 6,
+      "creatures": 31,
+      "instants": 7,
       "sorceries": 6,
-      "enchantments": 10,
+      "enchantments": 9,
       "artifacts": 12,
       "planeswalkers": 2,
       "lands": 36,

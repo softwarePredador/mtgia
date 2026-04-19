@@ -1365,7 +1365,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           )
         ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
       ) sub
-      ORDER BY sub.pop_score DESC, RANDOM()
+      ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
       LIMIT 300
     '''),
     parameters: {
@@ -1948,7 +1948,11 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     final recommendedLandCount =
         recommendedLandCountForOptimizeArchetype(targetArchetype);
     final excessLands = landCount - recommendedLandCount;
-    if (excessLands > 0) {
+
+    // Evitar cortar terrenos só porque está 1-3 acima do recomendado.
+    // Em decks saudáveis (especialmente control), isso frequentemente aumenta screw.
+    // Mantemos o corte de lands apenas quando há excesso material.
+    if (excessLands >= 4) {
       for (final card in allCardData) {
         final name = ((card['name'] as String?) ?? '').trim();
         if (name.isEmpty) continue;
@@ -1990,6 +1994,84 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
             'oracle_text': (card['oracle_text'] as String?) ?? '',
           });
         }
+      }
+    }
+
+    // Se o deck está "saudável" (sem excesso claro de papéis) o algoritmo por surplus
+    // pode ficar sem alvos e acabar forçando cortes de terrenos (que frequentemente
+    // pioram mana screw). Neste caso, preferimos sugerir 1-2 cortes de topo de curva
+    // fora de papéis críticos para abrir espaço a upgrades mais baratos.
+    final nonLandRemovalCount =
+        removalCandidates.where((c) => (c['role'] as String?) != 'land').length;
+    if (!structuralRecoveryScenario && nonLandRemovalCount < 2) {
+      final criticalRoles = switch (targetArchetype.trim().toLowerCase()) {
+        'aggro' => {'creature', 'ramp', 'removal', 'protection'},
+        'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection'},
+        'midrange' => {'removal', 'ramp', 'draw'},
+        _ => {'removal', 'ramp'},
+      };
+
+      final existing = removalCandidates
+          .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
+          .where((n) => n.isNotEmpty)
+          .toSet();
+
+      final extra = <Map<String, dynamic>>[];
+      for (final card in allCardData) {
+        final name = ((card['name'] as String?) ?? '').trim();
+        if (name.isEmpty) continue;
+        final lower = name.toLowerCase();
+        if (existing.contains(lower)) continue;
+        if (commanderLower.contains(lower)) continue;
+
+        final isCore = keepTheme && coreLower.contains(lower);
+        if (isCore && !allowCoreTradeoffs) continue;
+
+        final typeLine = (card['type_line'] as String?) ?? '';
+        if (typeLine.toLowerCase().contains('land')) continue;
+
+        final cmc = (card['cmc'] as num?)?.toDouble() ?? 0.0;
+        if (cmc < 6) continue;
+
+        final role = inferFunctionalRole(
+          name: name,
+          typeLine: typeLine,
+          oracleText: (card['oracle_text'] as String?) ?? '',
+        );
+        if (criticalRoles.contains(role)) continue;
+
+        final preferredPenalty = preferredNames.contains(lower) ? 220 : 0;
+        final corePenalty = isCore ? 240 : 0;
+        final score = (cmc * 30).round() - preferredPenalty - corePenalty;
+        if (score <= 0) continue;
+
+        extra.add({
+          'name': name,
+          'role': role,
+          'cmc': cmc,
+          'score': score,
+          'type_line': typeLine,
+          'oracle_text': (card['oracle_text'] as String?) ?? '',
+        });
+      }
+
+      extra.sort((a, b) {
+        final byScore = (b['score'] as int).compareTo(a['score'] as int);
+        if (byScore != 0) return byScore;
+        return ((a['name'] as String)).compareTo(b['name'] as String);
+      });
+
+      for (final candidate in extra) {
+        if (removalCandidates
+                .where((c) => (c['role'] as String?) != 'land')
+                .length >=
+            2) {
+          break;
+        }
+        final lower = ((candidate['name'] as String?) ?? '').trim().toLowerCase();
+        if (lower.isEmpty || existing.contains(lower)) continue;
+        removalCandidates.add(candidate);
+        existing.add(lower);
       }
     }
 
@@ -2160,7 +2242,16 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     });
   }
 
-  return pairs;
+  // Em decks já saudáveis, reduzir o número de swaps diminui risco de regressão.
+  final maxPairs = structuralRecoveryScenario
+      ? computeOptimizeStructuralRecoverySwapTarget(
+          allCardData: allCardData,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+        )
+      : 2;
+
+  return pairs.take(maxPairs).toList();
 }
 
 Map<String, dynamic> buildDeterministicOptimizeResponse({

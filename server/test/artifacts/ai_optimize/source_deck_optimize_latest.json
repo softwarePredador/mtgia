@@ -12,9 +12,9 @@
       "error": "Deck not found or is not public."
     }
   },
-  "cloned_deck_id": "05c5660c-95d1-4ad3-8ae8-f56680af9865",
+  "cloned_deck_id": "460fbc92-e1d3-4f0a-9fd2-36906403bd08",
   "optimize_request": {
-    "deck_id": "05c5660c-95d1-4ad3-8ae8-f56680af9865",
+    "deck_id": "460fbc92-e1d3-4f0a-9fd2-36906403bd08",
     "archetype": "Control",
     "bracket": 2,
     "keep_theme": true
@@ -23,726 +23,86 @@
   "optimize_response": {
     "mode": "complete",
     "theme": {
-      "theme": "tribal-phyrexian",
+      "theme": "counters",
       "confidence": "alta",
       "core_cards": [
         "Atraxa, Praetors' Voice"
       ],
-      "match_score": 1.0
+      "match_score": 1.55
     },
     "bracket": 2,
     "removals": [],
-    "warnings": {
-      "invalid_cards": [
-        "Proliferate"
-      ],
-      "blocked_by_bracket": {
-        "blocked_additions": [
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Mana Drain",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Kodama's Reach",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Terramorphic Expanse",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Scalding Tarn",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Cultivate",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Evolving Wilds",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Solemn Simulacrum",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Farseek",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Myriad Landscape",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Polluted Delta",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Mana Drain",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Sol Ring",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "fastMana"
-            ]
-          },
-          {
-            "name": "Kodama's Reach",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Terramorphic Expanse",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Cultivate",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Evolving Wilds",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Solemn Simulacrum",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Farseek",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Myriad Landscape",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Rampant Growth",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Nature's Lore",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Kodama's Reach",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Terramorphic Expanse",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Cultivate",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Rampant Growth",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Nature's Lore",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Kodama's Reach",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Terramorphic Expanse",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Cultivate",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Evolving Wilds",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Farseek",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          },
-          {
-            "name": "Rampant Growth",
-            "reason": "Excede o limite do bracket 2.",
-            "categories": [
-              "tutor"
-            ]
-          }
-        ]
-      },
-      "filtered_by_color_identity": {
-        "removed_additions": [
-          "Chaos Warp",
-          "Stranglehold",
-          "Chaos Warp"
-        ]
-      }
-    },
     "additions": [
-      "Tezzeret's Gambit",
-      "Evolution Sage",
-      "Misty Rainforest",
-      "Sol Ring",
-      "Counterspell",
-      "Polluted Delta",
-      "Ixhel, Scion of Atraxa",
-      "Deepglow Skate",
-      "Delay",
-      "Doubling Season",
-      "Drown in Ichor",
-      "Experimental Augury",
-      "Flooded Strand",
-      "Mana Tithe",
-      "Skithiryx, the Blight Dragon",
-      "Tamiyo, Field Researcher",
-      "Vorinclex, Monstrous Raider",
-      "Vraska, Betrayal's Sting",
-      "Unnatural Restoration",
-      "Cankerbloom",
-      "Bloated Contaminator",
-      "Venerated Rotpriest",
-      "Thought Vessel",
-      "Brokers Ascendancy",
-      "Mind Stone",
-      "Contagion Engine",
-      "Three Steps Ahead",
-      "Rewind",
-      "Narset, Parter of Veils",
-      "Archmage's Charm",
-      "Flare of Denial",
-      "An Offer You Can't Refuse",
-      "Commander's Sphere",
-      "Generous Gift",
-      "Notion Thief",
-      "Grafdigger's Cage",
       "Arcane Signet",
-      "Prologue to Phyresis",
-      "Leyline of the Void",
-      "Rest in Peace",
-      "Blighted Agent",
-      "Chromatic Lantern",
-      "Ichor Rats",
-      "Mystic Confluence",
-      "Disallow",
-      "Swords to Plowshares",
-      "Cryptic Command",
-      "Bojuka Bog",
       "Beast Within",
-      "Spirit of the Labyrinth",
-      "Inexorable Tide",
-      "Long River's Pull",
-      "Cancel",
-      "Infectious Inquiry",
-      "Mana Leak",
-      "Dark Ritual",
-      "Thrummingbird",
-      "Heroic Intervention",
-      "Siren Stormtamer",
-      "Path to Exile",
-      "Sublime Epiphany",
-      "Drown in the Loch",
-      "Arcane Denial",
-      "Everflowing Chalice",
-      "Kozilek, the Great Distortion",
-      "Glistening Sphere",
-      "Rebuff the Wicked",
-      "Cabal Coffers",
-      "Exotic Orchard",
       "Command Tower",
-      "Karn's Bastion",
+      "Counterspell",
+      "Cultivate",
+      "Fact or Fiction",
+      "Farseek",
+      "Generous Gift",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Nature's Lore",
+      "Negate",
+      "Path to Exile",
+      "Ponder",
+      "Preordain",
+      "Read the Bones",
+      "Sol Ring",
+      "Ajani, Sleeper Agent",
+      "Astral Cornucopia",
+      "Atomize",
+      "Bilious Skulldweller",
+      "Birds of Paradise",
+      "Blightbelly Rat",
+      "Blighted Agent",
+      "Bloated Contaminator",
+      "Brokers Ascendancy",
+      "Cankerbloom",
+      "Carth the Lion",
+      "Chromatic Lantern",
+      "Contagion Clasp",
+      "Contagion Engine",
+      "Contaminant Grafter",
+      "Contentious Plan",
+      "Cyclonic Rift",
+      "Deepglow Skate",
+      "Doubling Season",
+      "Dreamtide Whale",
+      "Drown in Ichor",
+      "Everflowing Chalice",
+      "Evolution Sage",
+      "Experimental Augury",
+      "Ezuri, Stalker of Spheres",
+      "Fellwar Stone",
+      "Flux Channeler",
+      "Glistening Sphere",
+      "Grateful Apparition",
+      "Ichormoon Gauntlet",
+      "Ichor Rats",
+      "Inexorable Tide",
+      "Infectious Bite",
+      "Infectious Inquiry",
+      "Innkeeper's Talent",
+      "Ixhel, Scion of Atraxa",
+      "Lae'zel, Vlaakith's Champion",
+      "Metastatic Evangel",
+      "Narset, Parter of Veils",
+      "Necrogen Rotpriest",
+      "Norn's Choirmaster",
+      "Norn's Decree",
+      "Oath of Teferi",
+      "Oko, Thief of Crowns",
+      "Phyresis Outbreak",
       "Forest",
       "Island",
       "Plains",
       "Swamp"
     ],
     "reasoning": "Deck completado com cartas sinérgicas ao arquétipo Control, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
-    "iterations": 4,
+    "iterations": 0,
     "constraints": {
       "keep_theme": true
     },
@@ -765,32 +125,32 @@
       "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
     },
     "post_analysis": {
-      "average_cmc": "2.89",
+      "average_cmc": "2.76",
       "total_cards": 100,
       "type_distribution": {
-        "lands": 36,
+        "lands": 37,
         "battles": 0,
-        "instants": 26,
-        "artifacts": 10,
-        "creatures": 16,
-        "sorceries": 4,
+        "instants": 10,
+        "artifacts": 12,
+        "creatures": 21,
+        "sorceries": 11,
         "enchantments": 6,
         "planeswalkers": 3
       },
-      "detected_archetype": "combo",
+      "detected_archetype": "midrange",
       "archetype_confidence": "média",
-      "mana_base_assessment": "Falta mana U (Tem 12 fontes, ideal > 15)",
-      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis"
+      "mana_base_assessment": "Falta mana U (Tem 10 fontes, ideal > 15). Falta mana G (Tem 10 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
     },
     "consistency_slo": {
       "added_total": 99,
-      "basic_added": 28,
+      "basic_added": 36,
       "target_total": 99,
-      "ai_stage_used": true,
-      "non_basic_added": 71,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
       "completed_target": true,
       "deterministic_stage_used": false,
-      "average_deck_seed_stage_used": false,
+      "average_deck_seed_stage_used": true,
       "competitive_model_stage_used": true,
       "guaranteed_basics_stage_used": false
     },
@@ -798,290 +158,8 @@
     "removals_detailed": [],
     "additions_detailed": [
       {
-        "name": "Tezzeret's Gambit",
-        "card_id": "39ee4043-eedf-4e96-9a38-8a7208fe897c",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Evolution Sage",
-        "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Misty Rainforest",
-        "card_id": "9e65e875-19cc-4f3f-b17c-96ec1fd2c0e3",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Sol Ring",
-        "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Counterspell",
-        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Polluted Delta",
-        "card_id": "1db42a2f-9db1-452b-bb79-96b13d50456a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Ixhel, Scion of Atraxa",
-        "card_id": "99c75488-c483-471b-b460-dac7b1165f32",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Deepglow Skate",
-        "card_id": "e5d0d61c-7aaa-4763-b77c-4a915691c00a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Delay",
-        "card_id": "909eeb1c-fe6e-4b8c-9563-54cd35d86c61",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Doubling Season",
-        "card_id": "a7a73990-39b9-4d0c-aba0-941d6bd6d6bd",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Drown in Ichor",
-        "card_id": "4f282636-3461-45ed-9f84-23e1ab2b77f0",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Experimental Augury",
-        "card_id": "6055258c-8b2d-4b93-82c0-e7ed7ddadacd",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Flooded Strand",
-        "card_id": "7fe642fa-a4b1-4ec5-b137-c75805ee5ce9",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mana Tithe",
-        "card_id": "592a2539-73af-4d14-8268-211ee04f0bd7",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Skithiryx, the Blight Dragon",
-        "card_id": "42170ff5-05b1-4205-bc51-add98a11fcc8",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Tamiyo, Field Researcher",
-        "card_id": "19ff21f3-f22a-42c2-b995-f24470d29021",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Vorinclex, Monstrous Raider",
-        "card_id": "72157043-c99b-42f5-bc6c-9a16ee55132e",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Vraska, Betrayal's Sting",
-        "card_id": "b4268854-b4e2-4765-9bb7-78d8c16e2ee4",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Unnatural Restoration",
-        "card_id": "c0649805-6547-44dd-882f-ccaa0b551ba2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Cankerbloom",
-        "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Bloated Contaminator",
-        "card_id": "f93ed0a7-2799-4f32-b61b-11cc685d7874",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Venerated Rotpriest",
-        "card_id": "213bda7c-f40d-4197-891d-ab3ae4da475d",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Thought Vessel",
-        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Brokers Ascendancy",
-        "card_id": "a90b8ca8-21b9-421e-8695-f69d77cd7352",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mind Stone",
-        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Contagion Engine",
-        "card_id": "b0060bb7-c1f3-4d1b-9742-14a011a86733",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Three Steps Ahead",
-        "card_id": "4c3ebe4a-acda-4601-999f-65d95a92170f",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Rewind",
-        "card_id": "84e2e339-5207-4fa4-b4e4-f1e404ae7184",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Narset, Parter of Veils",
-        "card_id": "a145d081-4887-445a-bf1e-0a9bc6b0b1ec",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Archmage's Charm",
-        "card_id": "4e6d13f8-9fa8-4998-b578-17cb646ebdc7",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Flare of Denial",
-        "card_id": "afe950e2-821d-4f26-9248-b8ede2e0f52a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "An Offer You Can't Refuse",
-        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Commander's Sphere",
-        "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Generous Gift",
-        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Notion Thief",
-        "card_id": "e841defc-c8b6-48d0-ab9c-4e65b3f09e61",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Grafdigger's Cage",
-        "card_id": "e944ac14-9029-4f29-b4f7-6ed808c0fd3a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Arcane Signet",
         "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Prologue to Phyresis",
-        "card_id": "936c9e62-d9ae-4abd-8490-5b8c45697c4b",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Leyline of the Void",
-        "card_id": "f049553d-11c4-4a9d-8753-164ec4d3ac86",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Rest in Peace",
-        "card_id": "9a426f34-9917-4788-84b4-27eb26d67d50",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Blighted Agent",
-        "card_id": "3f7666e5-f540-4d76-8e02-d1a3f9dbd08e",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Chromatic Lantern",
-        "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Ichor Rats",
-        "card_id": "2f398fd7-4e14-4da7-966f-464ce57ff8b2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mystic Confluence",
-        "card_id": "2422914d-e21e-4c6b-aeb1-c2595faf270b",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Disallow",
-        "card_id": "6a1fcb8c-a488-4cdb-a58b-c0675305f620",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Swords to Plowshares",
-        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Cryptic Command",
-        "card_id": "84c84d70-4b9b-4581-b037-266d8da36a05",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Bojuka Bog",
-        "card_id": "7d22229a-9253-4b79-bf95-1bab33d129ae",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -1092,62 +170,68 @@
         "is_basic_land": false
       },
       {
-        "name": "Spirit of the Labyrinth",
-        "card_id": "01ca02c6-104b-4e8a-bca5-f5504e14929e",
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Inexorable Tide",
-        "card_id": "18e84b42-3de3-489a-8826-53ee73dbff09",
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Long River's Pull",
-        "card_id": "e3c08210-2c52-45f8-b2dd-1db09f3670e7",
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Cancel",
-        "card_id": "e07f761b-a78b-41a9-9127-65b666f098da",
+        "name": "Fact or Fiction",
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Infectious Inquiry",
-        "card_id": "6982cd96-f6fe-4491-85c8-5874f5c21cac",
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Mana Leak",
-        "card_id": "6513259e-3aac-41af-b33d-4234edb8b4cb",
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Dark Ritual",
-        "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Thrummingbird",
-        "card_id": "05b4d7d5-b418-418d-b3e6-daeedac17aec",
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Heroic Intervention",
-        "card_id": "eb81625b-60df-4040-8a9d-4b392030c44f",
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Siren Stormtamer",
-        "card_id": "217f6662-a112-49ea-bf2f-c25689d206c9",
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Negate",
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -1158,20 +242,152 @@
         "is_basic_land": false
       },
       {
-        "name": "Sublime Epiphany",
-        "card_id": "a7db6296-500d-435d-8b73-020ef0d3e69c",
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Drown in the Loch",
-        "card_id": "1d479e4b-9cca-44e9-a207-1f6f57140982",
+        "name": "Preordain",
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Arcane Denial",
-        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ajani, Sleeper Agent",
+        "card_id": "5f71759e-ef2b-4412-9594-b831cc09b655",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Astral Cornucopia",
+        "card_id": "f8f29a09-fbf8-4015-b4a3-b1168219a422",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Atomize",
+        "card_id": "86118692-807a-49f5-97a1-9f1f958f6673",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bilious Skulldweller",
+        "card_id": "c2fda49c-16d3-4061-afbb-62a6faddf7cc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Birds of Paradise",
+        "card_id": "c6b5c8cb-2398-4650-b281-229fbd0038e6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blightbelly Rat",
+        "card_id": "6ff3335b-6cef-490b-a133-92fb0de03b7e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blighted Agent",
+        "card_id": "3f7666e5-f540-4d76-8e02-d1a3f9dbd08e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloated Contaminator",
+        "card_id": "f93ed0a7-2799-4f32-b61b-11cc685d7874",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brokers Ascendancy",
+        "card_id": "a90b8ca8-21b9-421e-8695-f69d77cd7352",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cankerbloom",
+        "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Carth the Lion",
+        "card_id": "55a5321f-996e-408b-88b5-60dd4fec0304",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chromatic Lantern",
+        "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contagion Clasp",
+        "card_id": "15fb3ab4-b224-4848-a3f7-14ad636c68d7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contagion Engine",
+        "card_id": "b0060bb7-c1f3-4d1b-9742-14a011a86733",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contaminant Grafter",
+        "card_id": "fa954ae8-e4ff-412d-a36d-13b573bb9a9b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contentious Plan",
+        "card_id": "ffcdd902-8500-4262-9c1c-ad2455237b4a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "d6ec3235-ed2f-48bb-9579-499e00024c58",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deepglow Skate",
+        "card_id": "e5d0d61c-7aaa-4763-b77c-4a915691c00a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Doubling Season",
+        "card_id": "a7a73990-39b9-4d0c-aba0-941d6bd6d6bd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dreamtide Whale",
+        "card_id": "bb44774c-279e-4a84-818d-99ea413b21ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Drown in Ichor",
+        "card_id": "4f282636-3461-45ed-9f84-23e1ab2b77f0",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -1182,8 +398,32 @@
         "is_basic_land": false
       },
       {
-        "name": "Kozilek, the Great Distortion",
-        "card_id": "31ca10ef-ca02-47e1-938e-70a079630108",
+        "name": "Evolution Sage",
+        "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Experimental Augury",
+        "card_id": "6055258c-8b2d-4b93-82c0-e7ed7ddadacd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ezuri, Stalker of Spheres",
+        "card_id": "6c7ffcc4-265a-423c-8666-825e08c7481f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Flux Channeler",
+        "card_id": "c577d7f7-b415-4bbd-ac1e-32207085b9d0",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -1194,57 +434,129 @@
         "is_basic_land": false
       },
       {
-        "name": "Rebuff the Wicked",
-        "card_id": "f1373cf5-33f5-497a-9786-67daf9fd4eef",
+        "name": "Grateful Apparition",
+        "card_id": "9256148e-308b-4e9a-9227-eba890468fcf",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Cabal Coffers",
-        "card_id": "b73034ec-cdb1-49b7-a708-cf1eec3ef3bf",
+        "name": "Ichormoon Gauntlet",
+        "card_id": "4f6be188-0514-48df-b386-5acd8564c223",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Exotic Orchard",
-        "card_id": "f9fecf31-2518-4620-97bd-1e0abcc4785e",
+        "name": "Ichor Rats",
+        "card_id": "2f398fd7-4e14-4da7-966f-464ce57ff8b2",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Command Tower",
-        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "name": "Inexorable Tide",
+        "card_id": "18e84b42-3de3-489a-8826-53ee73dbff09",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Karn's Bastion",
-        "card_id": "fc638814-e184-4e58-ad04-221fe81ee8f5",
+        "name": "Infectious Bite",
+        "card_id": "2d66e63b-8dbf-4024-865a-aca11445199a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Infectious Inquiry",
+        "card_id": "6982cd96-f6fe-4491-85c8-5874f5c21cac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Innkeeper's Talent",
+        "card_id": "3d55242d-26b0-4f23-b012-dd78f6437637",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ixhel, Scion of Atraxa",
+        "card_id": "99c75488-c483-471b-b460-dac7b1165f32",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lae'zel, Vlaakith's Champion",
+        "card_id": "daac975e-3bf9-44d6-ab4e-e805bb8c6fb1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Metastatic Evangel",
+        "card_id": "5525ec36-9f79-4434-8ea9-7765bb56cf0e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Narset, Parter of Veils",
+        "card_id": "a145d081-4887-445a-bf1e-0a9bc6b0b1ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Necrogen Rotpriest",
+        "card_id": "d9ac4b4a-be8d-49e6-90ed-00a8343e575d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Norn's Choirmaster",
+        "card_id": "638fbe36-9c30-4ee1-9984-1d475e48479f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Norn's Decree",
+        "card_id": "73a51fd0-94f3-482e-ab86-d88bb0caca35",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Oath of Teferi",
+        "card_id": "3a629788-ac76-4326-bdc3-dc64c52b8c6a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Oko, Thief of Crowns",
+        "card_id": "6b43c3ee-712c-47e7-bd78-4e64d37f2c84",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Phyresis Outbreak",
+        "card_id": "db7e96e1-13eb-4314-88d0-4837a9868bf2",
         "quantity": 1,
         "is_basic_land": false
       },
       {
         "name": "Forest",
         "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
-        "quantity": 7,
+        "quantity": 9,
         "is_basic_land": true
       },
       {
         "name": "Island",
         "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
-        "quantity": 7,
+        "quantity": 9,
         "is_basic_land": true
       },
       {
         "name": "Plains",
         "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
-        "quantity": 7,
+        "quantity": 9,
         "is_basic_land": true
       },
       {
         "name": "Swamp",
         "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
-        "quantity": 7,
+        "quantity": 9,
         "is_basic_land": true
       }
     ],

@@ -38,3 +38,8 @@ app/doc/menu_icon_iteration_*/
 
 # Local server test artifacts
 server/test/artifacts/*.pid
+server/test/artifacts/*.port
+
+# AI optimize debug artifacts (generated during HTTP optimize flow tests)
+server/test/artifacts/ai_optimize/source_deck_optimize_*.json
+!server/test/artifacts/ai_optimize/source_deck_optimize_latest.json

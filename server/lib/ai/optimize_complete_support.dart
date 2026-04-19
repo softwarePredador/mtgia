@@ -156,7 +156,7 @@ Future<void> prepareCompleteCommanderSeed({
 
 Future<void> runCompleteAiSuggestionLoop({
   required Pool pool,
-  required DeckOptimizerService optimizer,
+  DeckOptimizerService? optimizer,
   required List<String> commanders,
   required Set<String> deckColors,
   required Set<String> commanderColorIdentity,
@@ -170,6 +170,11 @@ Future<void> runCompleteAiSuggestionLoop({
   required CompleteBuildAccumulator state,
   int maxIterations = 4,
 }) async {
+  if (optimizer == null) {
+    Log.i('Complete mode: IA desativada; pulando loop de sugestões.');
+    return;
+  }
+
   while (state.iterations < maxIterations && state.virtualTotal < maxTotal) {
     state.iterations++;
     final missingNow = maxTotal - state.virtualTotal;

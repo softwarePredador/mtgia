@@ -588,24 +588,11 @@ Future<Response> onRequest(RequestContext context) async {
     // 2. Otimização via DeckOptimizerService (IA + RAG)
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final apiKey = env['OPENAI_API_KEY'];
+    final disableCompleteAi = env['OPTIMIZE_COMPLETE_DISABLE_OPENAI'] == '1';
 
-    if (apiKey == null || apiKey.isEmpty) {
-      // Mock response for development
-      return Response.json(body: {
-        'removals': ['Basic Land', 'Weak Card'],
-        'additions': ['Sol Ring', 'Arcane Signet'],
-        'reasoning':
-            'Mock optimization (No API Key): Adicionando staples recomendados.',
-        'deck_analysis': deckAnalysis,
-        'constraints': {
-          'keep_theme': keepTheme,
-        },
-        'theme': themeProfile.toJson(),
-        'is_mock': true
-      });
-    }
-
-    final optimizer = DeckOptimizerService(apiKey, db: pool);
+    final deckOptimizer = (apiKey != null && apiKey.isNotEmpty)
+        ? DeckOptimizerService(apiKey, db: pool)
+        : null;
 
     // Preparar dados para o otimizador
     final deckData = {
@@ -748,30 +735,40 @@ Future<Response> onRequest(RequestContext context) async {
       // Fire-and-forget: processamento pesado roda em background.
       // A closure captura todas as variáveis do setup (pool, allCardData, etc.)
       // O Pool é singleton e sobrevive ao ciclo do request.
-      unawaited(_processCompleteModeAsync(
-        jobId: jobId,
-        pool: pool,
-        deckId: deckId,
-        deckFormat: deckFormat,
-        maxTotal: maxTotal,
-        currentTotalCards: currentTotalCards,
-        commanders: commanders,
-        allCardData: allCardData,
-        deckColors: deckColors,
-        commanderColorIdentity: commanderColorIdentity,
-        originalCountsById: originalCountsById,
-        optimizer: optimizer,
-        themeProfile: themeProfile,
-        targetArchetype: targetArchetype,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        deckAnalysis: deckAnalysis,
-        userId: userId,
-        cacheKey: cacheKey,
-        userPreferences: userPreferences,
-        hasBracketOverride: hasBracketOverride,
-        hasKeepThemeOverride: hasKeepThemeOverride,
-      ));
+      unawaited(
+        runZonedGuarded(
+          () => _processCompleteModeAsync(
+            jobId: jobId,
+            pool: pool,
+            deckId: deckId,
+            deckFormat: deckFormat,
+            maxTotal: maxTotal,
+            currentTotalCards: currentTotalCards,
+            commanders: commanders,
+            allCardData: allCardData,
+            deckColors: deckColors,
+            commanderColorIdentity: commanderColorIdentity,
+            originalCountsById: originalCountsById,
+            optimizer: disableCompleteAi ? null : deckOptimizer,
+            themeProfile: themeProfile,
+            targetArchetype: targetArchetype,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            deckAnalysis: deckAnalysis,
+            userId: userId,
+            cacheKey: cacheKey,
+            userPreferences: userPreferences,
+            hasBracketOverride: hasBracketOverride,
+            hasKeepThemeOverride: hasKeepThemeOverride,
+          ),
+          (error, stackTrace) {
+            Log.e('Background optimize job $jobId crashed: $error\n$stackTrace');
+            unawaited(
+              OptimizeJobStore.fail(pool, jobId, error: error.toString()),
+            );
+          },
+        ),
+      );
 
       return Response.json(
         statusCode: HttpStatus.accepted,
@@ -790,8 +787,27 @@ Future<Response> onRequest(RequestContext context) async {
     // ================================================================
     //  SYNC MODE: optimize simples (troca de cartas) — roda inline
     // ================================================================
-    final deterministicFirstEnabled =
-        effectiveMode == 'optimize' && deterministicSwapCandidates.length >= 3;
+    if (deckOptimizer == null) {
+      // Mock response for development (optimize-only).
+      return Response.json(body: {
+        'removals': ['Basic Land', 'Weak Card'],
+        'additions': ['Sol Ring', 'Arcane Signet'],
+        'reasoning':
+            'Mock optimization (No API Key): Adicionando staples recomendados.',
+        'deck_analysis': deckAnalysis,
+        'constraints': {
+          'keep_theme': keepTheme,
+        },
+        'theme': themeProfile.toJson(),
+        'mode': 'optimize',
+        'is_mock': true
+      });
+    }
+
+    final optimizer = deckOptimizer;
+
+    final deterministicFirstEnabled = effectiveMode == 'optimize' &&
+        deterministicSwapCandidates.isNotEmpty;
     var optimizeFallbackAttempted = false;
 
     Future<Map<String, dynamic>?> runAiOptimizeAttempt({
@@ -1979,29 +1995,28 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       if (!isComplete && optimizationValidationReport != null) {
-        final postAnalysisMap = postAnalysis ?? const <String, dynamic>{};
-        final rejectionReasons = buildOptimizationRejectionReasons(
-          validationReport: optimizationValidationReport,
-          archetype: effectiveOptimizeArchetype,
-          preCurve:
-              double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0,
-          postCurve:
-              double.tryParse('${postAnalysisMap['average_cmc'] ?? '0'}') ??
-                  0.0,
-          preManaAssessment:
-              deckAnalysis['mana_base_assessment']?.toString() ?? '',
-          postManaAssessment:
-              postAnalysisMap['mana_base_assessment']?.toString() ?? '',
-        );
         final hardQualityRejected =
             optimizationValidationReport.verdict != 'aprovado';
-        final effectiveRejectionReasons = rejectionReasons.isNotEmpty
-            ? rejectionReasons
-            : (hardQualityRejected
-                ? <String>[
-                    'A validação final não fechou como "aprovado" (score ${optimizationValidationReport.score}/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
-                  ]
-                : const <String>[]);
+
+        // Quando a validação já fechou como "aprovado", confiamos no validador
+        // como fonte de verdade e não reprovamos novamente via reasons derivadas.
+        // Isso evita inconsistência (veredito aprovado + reasons não-vazias).
+        final effectiveRejectionReasons = hardQualityRejected
+            ? buildOptimizationRejectionReasons(
+                validationReport: optimizationValidationReport,
+                archetype: effectiveOptimizeArchetype,
+                preCurve: double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ??
+                    0.0,
+                postCurve: double.tryParse(
+                      '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
+                    ) ??
+                    0.0,
+                preManaAssessment:
+                    deckAnalysis['mana_base_assessment']?.toString() ?? '',
+                postManaAssessment: (postAnalysis?['mana_base_assessment']?.toString()) ??
+                    '',
+              )
+            : const <String>[];
 
         if (hardQualityRejected || effectiveRejectionReasons.isNotEmpty) {
           if (shouldRetryOptimizeWithAiFallback(
@@ -2602,7 +2617,7 @@ Future<void> _processCompleteModeAsync({
   required Set<String> deckColors,
   required Set<String> commanderColorIdentity,
   required Map<String, int> originalCountsById,
-  required DeckOptimizerService optimizer,
+  DeckOptimizerService? optimizer,
   required DeckThemeProfile themeProfile,
   required String targetArchetype,
   required int? bracket,
@@ -2632,23 +2647,28 @@ Future<void> _processCompleteModeAsync({
       state: state,
     );
 
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Consultando IA para sugestões...', stageNumber: 2);
-    await optimize_complete.runCompleteAiSuggestionLoop(
-      pool: pool,
-      optimizer: optimizer,
-      commanders: commanders,
-      deckColors: deckColors,
-      commanderColorIdentity: commanderColorIdentity,
-      deckFormat: deckFormat,
-      targetArchetype: targetArchetype,
-      bracket: bracket,
-      keepTheme: keepTheme,
-      detectedTheme: themeProfile.theme,
-      coreCards: themeProfile.coreCards,
-      maxTotal: maxTotal,
-      state: state,
-    );
+    if (optimizer != null) {
+      await OptimizeJobStore.progress(pool, jobId,
+          stage: 'Consultando IA para sugestões...', stageNumber: 2);
+      await optimize_complete.runCompleteAiSuggestionLoop(
+        pool: pool,
+        optimizer: optimizer,
+        commanders: commanders,
+        deckColors: deckColors,
+        commanderColorIdentity: commanderColorIdentity,
+        deckFormat: deckFormat,
+        targetArchetype: targetArchetype,
+        bracket: bracket,
+        keepTheme: keepTheme,
+        detectedTheme: themeProfile.theme,
+        coreCards: themeProfile.coreCards,
+        maxTotal: maxTotal,
+        state: state,
+      );
+    } else {
+      await OptimizeJobStore.progress(pool, jobId,
+          stage: 'Pulando IA (modo determinístico)...', stageNumber: 2);
+    }
 
     optimize_complete.rebalanceCompleteDeckForLandDeficit(
       state: state,

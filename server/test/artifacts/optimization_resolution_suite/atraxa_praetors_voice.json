@@ -1,26 +1,179 @@
 {
   "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
   "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
-  "clone_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
-  "final_deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+  "clone_deck_id": "f2355af2-fa91-4b69-a780-2b0a8bceda57",
+  "final_deck_id": "f2355af2-fa91-4b69-a780-2b0a8bceda57",
   "optimize_request": {
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873",
+    "deck_id": "f2355af2-fa91-4b69-a780-2b0a8bceda57",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
   },
   "optimize_status": 422,
   "optimize_response": {
-    "error": "A otimizacao nao encontrou trocas acionaveis apos os filtros de seguranca.",
+    "error": "A otimizacao sugerida nao passou no gate final de qualidade.",
     "quality_error": {
-      "code": "OPTIMIZE_NO_ACTIONABLE_SWAPS",
-      "message": "As sugestoes remanescentes foram bloqueadas por tema, bracket, protecao de mana ou qualidade funcional.",
-      "blocked_by_theme": [],
-      "blocked_by_bracket": []
+      "code": "OPTIMIZE_QUALITY_REJECTED",
+      "message": "As trocas foram recusadas porque degradam funcoes criticas ou nao atingem qualidade minima.",
+      "reasons": [
+        "A validação final não fechou como \"aprovado\" (score 55/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.",
+        "Score final abaixo do mínimo para aceitar a otimização com sucesso (55/100; mínimo 70).",
+        "A segunda revisão crítica da IA rejeitou a proposta (approval_score 25/100).",
+        "As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano."
+      ],
+      "validation": {
+        "validation_score": 55,
+        "deck_health_score": 80,
+        "improvement_score": 17,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 81,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.203,
+              "flood_rate": 0.013,
+              "keepable_rate": 0.784
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.89,
+              "turn_1_play": 0.324,
+              "turn_2_play": 0.745,
+              "turn_3_play": 0.908,
+              "turn_4_play": 0.948,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 6,
+                "3": 18,
+                "6": 4,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.3%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 80,
+            "mana_analysis": {
+              "land_count": 35,
+              "screw_rate": 0.216,
+              "flood_rate": 0.005,
+              "keepable_rate": 0.779
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.86,
+              "turn_1_play": 0.353,
+              "turn_2_play": 0.735,
+              "turn_3_play": 0.892,
+              "turn_4_play": 0.94,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 7,
+                "3": 18,
+                "6": 4,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (21.6%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.17,
+            "keep_at_7": 0.86,
+            "keep_at_6": 0.112,
+            "keep_at_5": 0.028,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.922
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.19,
+            "keep_at_7": 0.838,
+            "keep_at_6": 0.136,
+            "keep_at_5": 0.026,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.912
+          },
+          "deltas": {
+            "consistency_score": -1,
+            "screw_rate_delta": 0.013,
+            "flood_rate_delta": -0.008,
+            "keepable_rate_delta": -0.005,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": -0.022
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Polluted Delta",
+              "added": "Brainstorm",
+              "removed_role": "land",
+              "added_role": "draw",
+              "role_preserved": false,
+              "cmc_delta": 1,
+              "verdict": "questionável"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 0,
+            "questionable": 1
+          },
+          "role_delta": {
+            "draw": 1,
+            "removal": 0,
+            "ramp": 0,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": -1,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 25,
+          "verdict": "reprovado",
+          "concerns": [
+            "A troca de uma land por uma carta de draw resultou em uma diminuição na consistência do deck.",
+            "A taxa de mulligan-free keep caiu significativamente, indicando que a mão inicial se tornou menos jogável.",
+            "O aumento na taxa de mana screw sugere que a perda de uma fonte de mana confiável é prejudicial para o desempenho do deck."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Polluted Delta → Brainstorm",
+              "justificativa": "A perda de uma land que fornece acesso a mana de duas cores em favor de uma carta de draw que não garante mana adicional é uma troca desfavorável, especialmente em um deck midrange que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca proposta é prejudicial à consistência e à jogabilidade do deck, tornando-a uma escolha ruim."
+        },
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+          "A melhoria incremental foi pequena (17/100)."
+        ]
+      }
     },
     "mode": "optimize",
-    "removals": [],
-    "additions": [],
+    "removals": [
+      "Polluted Delta"
+    ],
+    "additions": [
+      "Brainstorm"
+    ],
     "deck_analysis": {
       "detected_archetype": "midrange",
       "average_cmc": "2.89",
@@ -39,6 +192,177 @@
       "mana_base_assessment": "Base de mana equilibrada",
       "archetype_confidence": "média"
     },
+    "post_analysis": {
+      "detected_archetype": "midrange",
+      "average_cmc": "2.86",
+      "type_distribution": {
+        "creatures": 25,
+        "instants": 10,
+        "sorceries": 8,
+        "enchantments": 7,
+        "artifacts": 10,
+        "planeswalkers": 6,
+        "lands": 35,
+        "battles": 0
+      },
+      "total_cards": 100,
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "archetype_confidence": "média",
+      "improvements": [
+        "CMC médio otimizado: 2.89 → 2.86",
+        "Mais interação instant-speed adicionada"
+      ],
+      "validation": {
+        "validation_score": 55,
+        "deck_health_score": 80,
+        "improvement_score": 17,
+        "verdict": "aprovado_com_ressalvas",
+        "monte_carlo": {
+          "before": {
+            "simulations": 1000,
+            "consistency_score": 81,
+            "mana_analysis": {
+              "land_count": 36,
+              "screw_rate": 0.203,
+              "flood_rate": 0.013,
+              "keepable_rate": 0.784
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.89,
+              "turn_1_play": 0.324,
+              "turn_2_play": 0.745,
+              "turn_3_play": 0.908,
+              "turn_4_play": 0.948,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 6,
+                "3": 18,
+                "6": 4,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (20.3%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "after": {
+            "simulations": 1000,
+            "consistency_score": 80,
+            "mana_analysis": {
+              "land_count": 35,
+              "screw_rate": 0.216,
+              "flood_rate": 0.005,
+              "keepable_rate": 0.779
+            },
+            "curve_analysis": {
+              "avg_cmc": 2.86,
+              "turn_1_play": 0.353,
+              "turn_2_play": 0.735,
+              "turn_3_play": 0.892,
+              "turn_4_play": 0.94,
+              "cmc_distribution": {
+                "4": 9,
+                "2": 20,
+                "0": 2,
+                "1": 7,
+                "3": 18,
+                "6": 4,
+                "5": 5
+              }
+            },
+            "recommendations": [
+              "Alta taxa de mana screw (21.6%). Considere adicionar 2-4 terrenos."
+            ]
+          },
+          "mulligan_before": {
+            "runs": 500,
+            "avg_mulligans": 0.17,
+            "keep_at_7": 0.86,
+            "keep_at_6": 0.112,
+            "keep_at_5": 0.028,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.922
+          },
+          "mulligan_after": {
+            "runs": 500,
+            "avg_mulligans": 0.19,
+            "keep_at_7": 0.838,
+            "keep_at_6": 0.136,
+            "keep_at_5": 0.026,
+            "keep_at_4_or_less": 0.0,
+            "keepable_after_mull": 0.912
+          },
+          "deltas": {
+            "consistency_score": -1,
+            "screw_rate_delta": 0.013,
+            "flood_rate_delta": -0.008,
+            "keepable_rate_delta": -0.005,
+            "turn2_play_delta": -0.01,
+            "mulligan_keep7_delta": -0.022
+          }
+        },
+        "functional_analysis": {
+          "swaps": [
+            {
+              "removed": "Polluted Delta",
+              "added": "Brainstorm",
+              "removed_role": "land",
+              "added_role": "draw",
+              "role_preserved": false,
+              "cmc_delta": 1,
+              "verdict": "questionável"
+            }
+          ],
+          "summary": {
+            "upgrades": 0,
+            "sidegrades": 0,
+            "tradeoffs": 0,
+            "questionable": 1
+          },
+          "role_delta": {
+            "draw": 1,
+            "removal": 0,
+            "ramp": 0,
+            "creature": 0,
+            "artifact": 0,
+            "enchantment": 0,
+            "land": -1,
+            "utility": 0,
+            "wipe": 0,
+            "tutor": 0,
+            "protection": 0
+          }
+        },
+        "critic_ai": {
+          "approval_score": 25,
+          "verdict": "reprovado",
+          "concerns": [
+            "A troca de uma land por uma carta de draw resultou em uma diminuição na consistência do deck.",
+            "A taxa de mulligan-free keep caiu significativamente, indicando que a mão inicial se tornou menos jogável.",
+            "O aumento na taxa de mana screw sugere que a perda de uma fonte de mana confiável é prejudicial para o desempenho do deck."
+          ],
+          "strong_swaps": [],
+          "weak_swaps": [
+            {
+              "swap": "Polluted Delta → Brainstorm",
+              "justificativa": "A perda de uma land que fornece acesso a mana de duas cores em favor de uma carta de draw que não garante mana adicional é uma troca desfavorável, especialmente em um deck midrange que depende de uma base de mana sólida."
+            }
+          ],
+          "overall_assessment": "A troca proposta é prejudicial à consistência e à jogabilidade do deck, tornando-a uma escolha ruim."
+        },
+        "warnings": [
+          "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+          "A melhoria incremental foi pequena (17/100)."
+        ]
+      }
+    },
+    "validation_warnings": [
+      "1 troca(s) questionável(is) — mudou função E ficou mais cara.",
+      "A melhoria incremental foi pequena (17/100)."
+    ],
     "deck_state": {
       "status": "healthy",
       "recommended_mode": "optimize",
@@ -46,13 +370,13 @@
       "severity_score": 0,
       "reasons": []
     },
-    "outcome_code": "no_safe_upgrade_found"
+    "outcome_code": "near_peak"
   },
   "final_validate_status": 200,
   "final_validate_response": {
     "ok": true,
     "format": "commander",
-    "deck_id": "02dd9ad7-395c-468b-b64b-329f14538873"
+    "deck_id": "f2355af2-fa91-4b69-a780-2b0a8bceda57"
   },
   "final_analysis": {
     "detected_archetype": "midrange",

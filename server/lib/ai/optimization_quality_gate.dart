@@ -30,8 +30,10 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   final safeRemovals = <String>[];
   final safeAdditions = <String>[];
   final droppedReasons = <String>[];
+
   final structuralRecoveryScenario =
       _isStructuralRecoveryScenario(originalDeck);
+  final landTrimContext = _computeLandTrimContext(originalDeck, archetype);
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -65,9 +67,25 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           archetype: archetype,
           cmcDelta: cmcDelta,
         );
+
     final addedIsLand = ((addedCard['type_line'] as String?) ?? '')
         .toLowerCase()
         .contains('land');
+
+    final removedIsLand = removedRole == 'land' ||
+        (((removedCard['type_line'] as String?) ?? '')
+            .toLowerCase()
+            .contains('land'));
+    final removedLandColorProducing = removedIsLand && _landLooksColorProducing(removedCard);
+
+    // Permitir swaps "land -> spell" quando o deck está claramente acima do alvo de terrenos.
+    // Isso evita o gate bloquear ajustes reais de flood/mana base em decks saudáveis.
+    final landTrimUpgrade = landTrimContext.excessLands >= 2 &&
+        removedIsLand &&
+        !addedIsLand &&
+        cmcDelta <= 3 &&
+        (!removedLandColorProducing || landTrimContext.excessLands >= 4);
+
     final nonStructuralLandSwap = addedIsLand && removedRole != 'land';
     final temporaryManaBurst = _isTemporaryManaBurstCard(addedCard);
     final riskyTemporaryRampSwap = temporaryManaBurst &&
@@ -85,7 +103,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
           archetype: archetype,
         );
 
-    if (shouldDrop && !structuralRecoveryUpgrade) {
+    if (shouldDrop && !structuralRecoveryUpgrade && !landTrimUpgrade) {
       droppedReasons.add(
         '$removalName -> $additionName removida pelo gate: '
         'papel $removedRole -> $addedRole, delta CMC ${cmcDelta >= 0 ? '+' : ''}$cmcDelta.',
@@ -132,6 +150,52 @@ bool _isStructuralRecoveryScenario(List<Map<String, dynamic>> originalDeck) {
       landCount >= 50 ||
       nonLandCount <= 20 ||
       (landCount >= 40 && colorProducingLandCount <= 8);
+}
+
+class _LandTrimContext {
+  _LandTrimContext({
+    required this.totalCards,
+    required this.landCount,
+    required this.recommendedLandCount,
+  });
+
+  final int totalCards;
+  final int landCount;
+  final int recommendedLandCount;
+
+  int get excessLands => landCount - recommendedLandCount;
+}
+
+int _recommendedLandCountForArchetype(String archetype) {
+  final normalized = archetype.trim().toLowerCase();
+  if (normalized.contains('aggro')) return 34;
+  if (normalized.contains('combo')) return 33;
+  if (normalized.contains('control')) return 37;
+  return 35;
+}
+
+_LandTrimContext _computeLandTrimContext(
+  List<Map<String, dynamic>> originalDeck,
+  String archetype,
+) {
+  var totalCards = 0;
+  var landCount = 0;
+
+  for (final card in originalDeck) {
+    final qty = (card['quantity'] as int?) ?? 1;
+    totalCards += qty;
+
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (typeLine.contains('land')) {
+      landCount += qty;
+    }
+  }
+
+  return _LandTrimContext(
+    totalCards: totalCards,
+    landCount: landCount,
+    recommendedLandCount: _recommendedLandCountForArchetype(archetype),
+  );
 }
 
 bool _isTemporaryManaBurstCard(Map<String, dynamic> card) {
@@ -260,12 +324,16 @@ List<String> buildOptimizationRejectionReasons({
     );
   }
 
-  if (!_hasMaterialImprovement(
-    validationReport: validationReport,
-    archetype: archetype,
-    preManaAssessment: preManaAssessment,
-    postManaAssessment: postManaAssessment,
-  )) {
+  // Se a validação já fechou como "aprovado", não exigimos um delta mínimo
+  // adicional aqui — evita o gate bloquear micro-upgrades que passaram no score.
+  final demandMaterialImprovement = validationReport.verdict != 'aprovado';
+  if (demandMaterialImprovement &&
+      !_hasMaterialImprovement(
+        validationReport: validationReport,
+        archetype: archetype,
+        preManaAssessment: preManaAssessment,
+        postManaAssessment: postManaAssessment,
+      )) {
     reasons.add(
       'As trocas não demonstraram ganho mensurável suficiente em consistência, mana ou execução do plano.',
     );

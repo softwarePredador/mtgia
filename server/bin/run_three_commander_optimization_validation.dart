@@ -688,8 +688,16 @@ Future<DeckRunResult> _runOptimizationForDeck({
     headers: _authHeaders(token),
   );
 
+  // Enriquecer o deck original com mana_cost/cmc/oracle_text para que a
+  // validação local (Monte Carlo) use os mesmos inputs do backend.
+  final enrichedOriginalCards = await _applyRecommendations(
+    pool: pool,
+    originalCards: candidate.cards,
+    responseBody: const <String, dynamic>{},
+  );
+
   final preAnalysis = optimize_route.DeckArchetypeAnalyzer(
-          candidate.cards, candidate.commanderColors)
+          enrichedOriginalCards, candidate.commanderColors)
       .generateAnalysis();
   final postAnalysis = optimize_route.DeckArchetypeAnalyzer(
           optimizedCards, candidate.commanderColors)
@@ -698,7 +706,7 @@ Future<DeckRunResult> _runOptimizationForDeck({
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final validator = OptimizationValidator(openAiKey: env['OPENAI_API_KEY']);
   final localValidation = await validator.validate(
-    originalDeck: candidate.cards,
+    originalDeck: enrichedOriginalCards,
     optimizedDeck: optimizedCards,
     removals: _extractNames(optimizeBody['removals']),
     additions: _extractNames(optimizeBody['additions']),
@@ -1006,10 +1014,17 @@ Future<List<Map<String, dynamic>>> _applyRecommendations({
   }
 
   final missingCardIds = next
-      .where((card) =>
-          (card['card_id']?.toString().isNotEmpty ?? false) &&
-          (((card['type_line'] as String?) ?? '').isEmpty ||
-              ((card['oracle_text'] as String?) ?? '').isEmpty))
+      .where((card) {
+        if (!(card['card_id']?.toString().isNotEmpty ?? false)) return false;
+        final typeLine = (card['type_line'] as String?) ?? '';
+        final oracleText = (card['oracle_text'] as String?) ?? '';
+        final manaCost = (card['mana_cost'] as String?) ?? '';
+
+        // Para a validação local (Monte Carlo), precisamos de mana_cost/cmc coerentes.
+        // Terrenos podem ter mana_cost vazio sem prejuízo, mas mantemos a consulta
+        // quando algum campo essencial está ausente.
+        return typeLine.isEmpty || oracleText.isEmpty || manaCost.isEmpty;
+      })
       .map((card) => card['card_id'].toString())
       .toSet()
       .toList();
