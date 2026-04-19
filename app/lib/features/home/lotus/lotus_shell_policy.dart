@@ -107,6 +107,28 @@ String get lotusShellCleanupScript {
     }
   };
 
+  const ensureLocalFlag = (key) => {
+    try {
+      if (localStorage.getItem(key) === 'true') {
+        return;
+      }
+      localStorage.setItem(key, 'true');
+    } catch (_) {}
+  };
+
+  const queryWithin = (root, selector) => {
+    if (!(root instanceof Element) && root !== document) {
+      return [];
+    }
+
+    const matches = [];
+    if (root instanceof Element && root.matches(selector)) {
+      matches.push(root);
+    }
+    matches.push(...root.querySelectorAll(selector));
+    return matches;
+  };
+
   const ensureStyle = () => {
     if (document.getElementById(STYLE_ID)) {
       return;
@@ -114,11 +136,78 @@ String get lotusShellCleanupScript {
 
     const style = document.createElement('style');
     style.id = STYLE_ID;
-    style.textContent = SUPPRESSED_SELECTORS.join(',') + ` {
-      display: none !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }`;
+    const EXTRA_CSS = `
+.close-controls-backdrop {
+  background: rgba(2, 6, 16, 0.58) !important;
+  backdrop-filter: blur(14px) saturate(1.08) !important;
+  pointer-events: auto !important;
+}
+
+.life-history-overlay,
+.settings-overlay,
+.card-search-overlay,
+.planechase-overlay,
+.archenemy-overlay,
+.bounty-overlay,
+.edit-planechase-cards-overlay,
+.edit-archenemy-cards-overlay,
+.edit-bounty-cards-overlay,
+.game-mode-info-overlay {
+  font-family: var(--manaloom-ui-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !important;
+  color: rgba(245, 247, 252, 0.96) !important;
+  background: rgba(4, 8, 18, 0.68) !important;
+}
+
+.life-history-overlay button,
+.settings-overlay button,
+.card-search-overlay button,
+.planechase-overlay button,
+.archenemy-overlay button,
+.bounty-overlay button,
+.edit-planechase-cards-overlay button,
+.edit-archenemy-cards-overlay button,
+.edit-bounty-cards-overlay button,
+.game-mode-info-overlay button {
+  font-family: var(--manaloom-ui-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: linear-gradient(180deg, rgba(18, 26, 46, 0.98), rgba(8, 13, 27, 0.96)) !important;
+  color: rgba(245, 247, 252, 0.96) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 10px 20px rgba(0, 0, 0, 0.22) !important;
+}
+
+.life-history-overlay input,
+.settings-overlay input,
+.card-search-overlay input,
+.life-history-overlay select,
+.settings-overlay select,
+.card-search-overlay select,
+.life-history-overlay textarea,
+.settings-overlay textarea,
+.card-search-overlay textarea {
+  font-family: var(--manaloom-ui-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(7, 13, 28, 0.72) !important;
+  color: rgba(245, 247, 252, 0.96) !important;
+}
+
+.list > * .btn {
+  width: 62px !important;
+  height: 62px !important;
+  min-width: 62px !important;
+  min-height: 62px !important;
+}
+`;
+
+    style.textContent =
+      SUPPRESSED_SELECTORS.join(',') + ` {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }` + EXTRA_CSS;
     document.head.appendChild(style);
   };
 
@@ -140,12 +229,12 @@ String get lotusShellCleanupScript {
 
   const suppressShell = (root = document) => {
     SUPPRESSED_SELECTORS.forEach((selector) => {
-      root.querySelectorAll(selector).forEach(suppressNode);
+      queryWithin(root, selector).forEach(suppressNode);
     });
   };
 
   const protectBlockedLinks = (root = document) => {
-    root.querySelectorAll('a[href]').forEach((link) => {
+    queryWithin(root, 'a[href]').forEach((link) => {
       const href = link.getAttribute('href') || link.href;
       if (!isBlockedUrl(href)) {
         return;
@@ -201,40 +290,50 @@ String get lotusShellCleanupScript {
     return originalOpen(url, target, features);
   };
 
-  const applyPolicy = () => {
-    try {
-      localStorage.setItem(TUTORIAL_OVERLAY_KEY, 'true');
-      localStorage.setItem(OWN_COMMANDER_DAMAGE_HINT_KEY, 'true');
-      localStorage.setItem(TURN_TRACKER_HINT_KEY, 'true');
-      localStorage.setItem(COUNTERS_HINT_KEY, 'true');
-    } catch (_) {}
-
+  const applyPolicy = (root = document) => {
+    ensureLocalFlag(TUTORIAL_OVERLAY_KEY);
+    ensureLocalFlag(OWN_COMMANDER_DAMAGE_HINT_KEY);
+    ensureLocalFlag(TURN_TRACKER_HINT_KEY);
+    ensureLocalFlag(COUNTERS_HINT_KEY);
     ensureStyle();
-    suppressShell(document);
-    protectBlockedLinks(document);
-    observeUiSurface('.menu-button-overlay', 'menu_overlay_opened');
-    observeUiSurface('.settings-overlay', 'settings_overlay_opened');
-    observeUiSurface('.life-history-overlay', 'history_overlay_opened');
-    observeUiSurface('.card-search-overlay', 'card_search_overlay_opened');
-    observeUiSurface('.planechase-overlay', 'planechase_overlay_opened');
-    observeUiSurface('.archenemy-overlay', 'archenemy_overlay_opened');
-    observeUiSurface('.bounty-overlay', 'bounty_overlay_opened');
+    suppressShell(root);
+    protectBlockedLinks(root);
+    observeUiSurface(root, '.menu-button-overlay', 'menu_overlay_opened');
+    observeUiSurface(root, '.settings-overlay', 'settings_overlay_opened');
+    observeUiSurface(root, '.life-history-overlay', 'history_overlay_opened');
+    observeUiSurface(root, '.card-search-overlay', 'card_search_overlay_opened');
+    observeUiSurface(root, '.planechase-overlay', 'planechase_overlay_opened');
+    observeUiSurface(root, '.archenemy-overlay', 'archenemy_overlay_opened');
+    observeUiSurface(root, '.bounty-overlay', 'bounty_overlay_opened');
     observeUiSurface(
+      root,
       '.edit-planechase-cards-overlay',
       'planechase_card_pool_overlay_opened'
     );
     observeUiSurface(
+      root,
       '.edit-archenemy-cards-overlay',
       'archenemy_card_pool_overlay_opened'
     );
     observeUiSurface(
+      root,
       '.edit-bounty-cards-overlay',
       'bounty_card_pool_overlay_opened'
     );
-    observeUiSurface('.game-mode-info-overlay', 'game_mode_info_overlay_opened');
-    observeUiSurface('.max-game-modes-warning', 'max_game_modes_warning_opened');
+    observeUiSurface(
+      root,
+      '.game-mode-info-overlay',
+      'game_mode_info_overlay_opened'
+    );
+    observeUiSurface(
+      root,
+      '.max-game-modes-warning',
+      'max_game_modes_warning_opened'
+    );
     const dayNightMode = localStorage.getItem('__manaloom_day_night_mode');
-    const switcher = document.querySelector('.day-night-switcher');
+    const switcher =
+      queryWithin(root, '.day-night-switcher')[0] ??
+      document.querySelector('.day-night-switcher');
     if (
       switcher &&
       (dayNightMode === 'day' || dayNightMode === 'night')
@@ -243,8 +342,8 @@ String get lotusShellCleanupScript {
     }
   };
 
-  const observeUiSurface = (selector, eventName) => {
-    document.querySelectorAll(selector).forEach((node) => {
+  const observeUiSurface = (root, selector, eventName) => {
+    queryWithin(root, selector).forEach((node) => {
       if (!(node instanceof Element)) {
         return;
       }
@@ -261,7 +360,13 @@ String get lotusShellCleanupScript {
   };
 
   let applyQueued = false;
-  const queueApplyPolicy = () => {
+  let pendingRoots = new Set();
+  const queueApplyPolicy = (root = document) => {
+    if (root instanceof Element || root === document) {
+      pendingRoots.add(root);
+    } else {
+      pendingRoots.add(document);
+    }
     if (applyQueued) {
       return;
     }
@@ -274,19 +379,37 @@ String get lotusShellCleanupScript {
       };
     schedule(() => {
       applyQueued = false;
-      applyPolicy();
+      const roots = pendingRoots.size > 0 ? Array.from(pendingRoots) : [document];
+      pendingRoots = new Set();
+      roots.forEach((root) => applyPolicy(root));
     });
   };
 
   document.addEventListener('click', clickGuard, true);
 
   const observer = new MutationObserver((records) => {
-    if (
-      records.some((record) =>
-        record.type === 'childList' && record.addedNodes.length > 0
-      )
-    ) {
-      queueApplyPolicy();
+    let shouldApply = false;
+    records.forEach((record) => {
+      if (record.type === 'attributes' && record.target instanceof Element) {
+        shouldApply = true;
+        queueApplyPolicy(record.target);
+        return;
+      }
+
+      if (record.type !== 'childList' || record.addedNodes.length == 0) {
+        return;
+      }
+
+      shouldApply = true;
+      record.addedNodes.forEach((node) => {
+        if (node instanceof Element) {
+          queueApplyPolicy(node);
+        }
+      });
+    });
+
+    if (shouldApply) {
+      return;
     }
   });
 

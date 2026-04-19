@@ -23,3 +23,18 @@ build/
 server/cache/
 .credentials.env
 wget-log
+
+# Copilot/agent local configs
+.github/agents/
+
+# Local QA / visual proof artifacts (do not commit)
+app/doc/*proofs*/
+app/doc/*_proof_*/
+app/doc/visual_qa_*/
+app/doc/current_screen_proofs_*/
+app/doc/live_menu_proofs_*/
+app/doc/menu_audit_iteration_*/
+app/doc/menu_icon_iteration_*/
+
+# Local server test artifacts
+server/test/artifacts/*.pid

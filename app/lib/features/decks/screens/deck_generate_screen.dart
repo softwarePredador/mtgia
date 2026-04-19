@@ -109,8 +109,26 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     }
   }
 
+  bool _isGeneratedDeckValid() {
+    final validation = _generatedDeck?['validation'];
+    if (validation is Map) {
+      return validation['is_valid'] == true;
+    }
+    return true;
+  }
+
   Future<void> _saveDeck() async {
     if (_generatedDeck == null) return;
+    if (!_isGeneratedDeckValid()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Deck inválido. Corrija os erros antes de salvar.'),
+          ),
+        );
+      }
+      return;
+    }
 
     final deckName =
         _deckNameController.text.trim().isEmpty
@@ -382,7 +400,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
               // Save Button
               ElevatedButton.icon(
-                onPressed: _saveDeck,
+                onPressed: _isGeneratedDeckValid() ? _saveDeck : null,
                 icon: const Icon(Icons.save),
                 label: const Text(
                   'Salvar Deck',
@@ -410,41 +428,46 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
     final theme = Theme.of(context);
     final generatedDeckData =
-        _generatedDeck!['generated_deck'] as Map<String, dynamic>;
-    final cardsList = generatedDeckData['cards'] as List;
+        (_generatedDeck!['generated_deck'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+
+    final cardsListRaw = (generatedDeckData['cards'] as List?) ?? const [];
     final commander = generatedDeckData['commander'];
 
-    // Group cards by type for better visualization
-    final Map<String, List<Map<String, dynamic>>> groupedCards = {};
-
-    for (final card in cardsList) {
-      final cardMap = card as Map<String, dynamic>;
-      final name = cardMap['name'] as String;
-
-      // Simple type categorization based on common patterns
-      String category = 'Other';
-      if (name.toLowerCase().contains('land') ||
-          name.toLowerCase().contains('forest') ||
-          name.toLowerCase().contains('island') ||
-          name.toLowerCase().contains('mountain') ||
-          name.toLowerCase().contains('plains') ||
-          name.toLowerCase().contains('swamp')) {
-        category = 'Lands';
-      } else if (name.toLowerCase().contains('creature')) {
-        category = 'Creatures';
-      } else if (name.toLowerCase().contains('instant')) {
-        category = 'Instants';
-      } else if (name.toLowerCase().contains('sorcery')) {
-        category = 'Sorceries';
-      } else if (name.toLowerCase().contains('artifact')) {
-        category = 'Artifacts';
-      } else if (name.toLowerCase().contains('enchantment')) {
-        category = 'Enchantments';
+    final cardsList = <Map<String, dynamic>>[];
+    for (final item in cardsListRaw) {
+      if (item is Map) {
+        cardsList.add(item.cast<String, dynamic>());
       }
-
-      groupedCards.putIfAbsent(category, () => []);
-      groupedCards[category]!.add(cardMap);
     }
+
+    int parseQty(dynamic raw) {
+      if (raw is int) return raw;
+      return int.tryParse(raw?.toString() ?? '') ?? 1;
+    }
+
+    final String? commanderName =
+        commander is Map ? commander['name']?.toString().trim() : null;
+    final hasCommander = commanderName != null && commanderName.isNotEmpty;
+    final totalMain = cardsList.fold<int>(0, (sum, card) {
+      return sum + parseQty(card['quantity']);
+    });
+    final totalCards = totalMain + (hasCommander ? 1 : 0);
+
+    cardsList.sort((a, b) {
+      final aName = (a['name'] ?? '').toString();
+      final bName = (b['name'] ?? '').toString();
+      return aName.toLowerCase().compareTo(bName.toLowerCase());
+    });
+
+    final warnings = _generatedDeck!['warnings'];
+    final isMock = _generatedDeck!['is_mock'] == true;
+    final validation = _generatedDeck!['validation'];
+    final validationErrors =
+        validation is Map && validation['errors'] is List
+            ? (validation['errors'] as List)
+            : const <dynamic>[];
+    final isValid = validation is Map ? validation['is_valid'] == true : true;
 
     return Container(
       decoration: BoxDecoration(
@@ -465,7 +488,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Total: ${cardsList.length} cartas',
+                'Total: $totalCards cartas',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -474,7 +497,79 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          if (commander is Map && commander['name'] != null) ...[
+          if (!isValid && validationErrors.isNotEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(color: theme.colorScheme.outline),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Erros de validação',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...validationErrors.map((e) => Text(
+                        e.toString(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      )),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (isMock || warnings is Map) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                border: Border.all(color: theme.colorScheme.outline),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Avisos',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  if (isMock)
+                    const Text(
+                      'Este deck foi gerado em modo mock (sem OpenAI configurada).',
+                    ),
+                  if (warnings is Map) ...[
+                    if (warnings['message'] != null)
+                      Text(warnings['message'].toString()),
+                    if (warnings['messages'] is List)
+                      ...(warnings['messages'] as List)
+                          .map((m) => Text(m.toString())),
+                    if (warnings['invalid_cards'] is List)
+                      Text(
+                        'Cartas removidas por não serem encontradas: '
+                        '${(warnings['invalid_cards'] as List).join(', ')}',
+                      ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          if (hasCommander) ...[
             Text(
               'Comandante',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -486,34 +581,26 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12, left: 8),
               child: Text(
-                '1x ${commander['name']}',
+                '1x $commanderName',
                 style: theme.textTheme.bodyMedium,
               ),
             ),
           ],
-          ...groupedCards.entries.map((entry) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${entry.key} (${entry.value.length})',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.secondary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ...entry.value.map((card) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 4, left: 8),
-                    child: Text(
-                      '${card['quantity'] ?? 1}x ${card['name']}',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  );
-                }),
-                const SizedBox(height: 12),
-              ],
+          Text(
+            'Main deck (${cardsList.length} linhas)',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.secondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...cardsList.map((card) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4, left: 8),
+              child: Text(
+                '${parseQty(card['quantity'])}x ${card['name']}',
+                style: theme.textTheme.bodyMedium,
+              ),
             );
           }),
         ],

@@ -178,6 +178,13 @@ class GeneratedDeckValidationService {
       }
     }
 
+    if (resolvedCommander != null) {
+      final commanderCardId = resolvedCommander['card_id'] as String;
+      resolvedCards.removeWhere(
+        (card) => card['card_id'] == commanderCardId,
+      );
+    }
+
     final consolidatedCards = _consolidateResolvedCards([
       ...resolvedCards,
       if (resolvedCommander != null) resolvedCommander,

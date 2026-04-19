@@ -61,6 +61,36 @@ void main() {
       );
     });
 
+    test('ignores commander duplicated inside cards list', () async {
+      final service = GeneratedDeckValidationService(
+        _FakeGeneratedDeckRepository(
+          cardsByName: {
+            'isamaru, hound of konda': {
+              'id': 'cmdr-id',
+              'name': 'Isamaru, Hound of Konda',
+            },
+            'plains': {'id': 'plains-id', 'name': 'Plains'},
+          },
+        ),
+      );
+
+      final result = await service.validate(
+        format: 'commander',
+        commanderName: 'Isamaru, Hound of Konda',
+        cards: [
+          {'name': 'Plains', 'quantity': 99},
+          {'name': 'Isamaru, Hound of Konda', 'quantity': 1},
+        ],
+      );
+
+      expect(result.isValid, isTrue);
+      expect(result.generatedDeck['commander'], {'name': 'Isamaru, Hound of Konda'});
+      expect((result.generatedDeck['cards'] as List).single, {
+        'name': 'Plains',
+        'quantity': 99,
+      });
+    });
+
     test(
         'fails commander generation when unresolved cards break exact deck size',
         () async {

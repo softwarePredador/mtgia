@@ -53,7 +53,8 @@ final bool _debugBootIntoLifeCounter =
     kDebugMode &&
     const bool.fromEnvironment(
       'DEBUG_BOOT_INTO_LIFE_COUNTER',
-      defaultValue: true,
+      // Default must be false so QA/dev boot into the normal app flow.
+      defaultValue: false,
     );
 
 void main() async {

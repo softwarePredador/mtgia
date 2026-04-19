@@ -7665,3 +7665,52 @@ Revisão completa do app sob a perspectiva de um jogador de MTG. Foram identific
 ```
 /life-counter → LifeCounterScreen (protegida)
 ```
+
+## 89. Hardening do `POST /ai/generate` + UX de validação (422) + desbloqueio de QA (boot normal)
+
+### 89.1 O porquê
+
+O fluxo de geração de decks é crítico e estava vulnerável a falhas comuns:
+- instabilidade/intermitência de resposta do provedor (timeouts, payload parcial, JSON inválido);
+- modelo retornando o comandante duplicado dentro de `cards[]` (quebra de regras/validação);
+- app descartando payloads úteis quando o server respondia `422` (o usuário não via os erros/avisos de validação);
+- QA bloqueado porque o app “bootava” direto no Life Counter (necessário abrir o fluxo normal para testar todas as telas e lógicas).
+
+### 89.2 O como (Server)
+
+Arquivos alterados:
+- `server/routes/ai/generate/index.dart`
+- `server/lib/generated_deck_validation_service.dart`
+- `server/test/generated_deck_validation_service_test.dart`
+
+Mudanças aplicadas:
+- **Timeout de 90s** na chamada ao provedor LLM para evitar requisições “presas” indefinidamente.
+- **Parsing defensivo** do retorno (erros mapeados para `502`/`504` com mensagem clara quando aplicável).
+- **Prompt reforçado** para reduzir casos de commander repetido na lista principal.
+- **Contexto de meta mais seguro** ao buscar insights no banco via padrões (`ILIKE ANY(@patterns)`), evitando acessos frágeis e mantendo o ranking por popularidade.
+- **Normalização/validação**: remoção de duplicata do comandante por `card_id` dentro do main deck antes da consolidação final (evita invalidação quando o LLM repete o commander em `cards[]`).
+
+Teste adicionado:
+- `GeneratedDeckValidationService` agora tem um teste garantindo que **ignora o comandante duplicado dentro de `cards[]`**.
+
+### 89.3 O como (App/Flutter)
+
+Arquivos alterados:
+- `app/lib/features/decks/providers/deck_provider_support_generation.dart`
+- `app/lib/features/decks/screens/deck_generate_screen.dart`
+- `app/lib/main.dart`
+
+Mudanças aplicadas:
+- `generateDeckFromPrompt(...)` trata `422` como resposta **rica** (não como erro genérico): o app preserva `generated_deck` + `validation`.
+- Tela de geração exibe **erros e warnings de validação** e bloqueia “Salvar Deck” quando o resultado está inválido.
+- Boot do app não aponta mais para Life Counter por padrão: o Life Counter abre apenas quando `DEBUG_BOOT_INTO_LIFE_COUNTER=true` (para permitir QA do fluxo normal).
+
+### 89.4 Validação
+
+- `dart analyze` / `dart test` no server.
+- `flutter analyze` / `flutter test` no app.
+
+Resultado esperado:
+- Geração resiliente a respostas imperfeitas.
+- Usuário enxerga exatamente o que precisa ajustar quando o deck gerado não passa na validação.
+- QA consegue navegar no app “normal” sem precisar desativar módulos do Life Counter.

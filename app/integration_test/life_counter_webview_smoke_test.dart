@@ -66,117 +66,162 @@ Future<dynamic> _pumpUntilUiSnapshotFontsReady(
   return snapshot;
 }
 
-Map<String, dynamic> _decodeJavaScriptMap(Object? rawResult) {
-  Object? value = rawResult;
+Future<Map<String, dynamic>> _runShellBridgeProbe(
+  WidgetTester tester,
+  dynamic screenState, {
+  required String type,
+  required int requestId,
+  required String script,
+}) async {
+  screenState.debugClearLastShellMessage();
+  await screenState.debugRunJavaScript(script);
 
-  for (var attempt = 0; attempt < 3; attempt += 1) {
-    if (value is Map<String, dynamic>) {
-      return value;
+  for (var attempt = 0; attempt < 12; attempt += 1) {
+    await tester.pump(const Duration(milliseconds: 200));
+    final raw = screenState.debugGetLastShellMessage();
+    if (raw == null) {
+      continue;
     }
 
-    if (value is Map) {
-      return value.cast<String, dynamic>();
-    }
-
-    if (value is! String || value.isEmpty) {
-      break;
-    }
-
-    value = jsonDecode(value);
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map &&
+          decoded['type'] == type &&
+          decoded['request_id'] == requestId) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {}
   }
 
-  throw StateError('Could not decode JavaScript result: $rawResult');
+  throw StateError('Shell probe not received (type=$type request_id=$requestId)');
 }
 
-Future<Map<String, dynamic>> _readFontDiagnostics(dynamic screenState) async {
-  final rawResult = await screenState.debugRunJavaScriptReturningResult('''
-(() => JSON.stringify((() => {
-  const safeRect = (node) => node ? node.getBoundingClientRect() : null;
-  const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
-  const fontSet = document.fonts;
-  const body = document.body;
-  const firstName = document.querySelector('.player-name');
-  const firstLifeBox = document.querySelector('.player-life-count');
-  const timer = document.querySelector('.game-timer');
-  const tracker = document.querySelector('.turn-time-tracker');
-  const firstNameRect = safeRect(firstName);
-  const firstLifeBoxRect = safeRect(firstLifeBox);
-  const timerRect = safeRect(timer);
-  const trackerRect = safeRect(tracker);
-  const bodyStyle = safeStyle(body);
-  const nameStyle = safeStyle(firstName);
+Future<Map<String, dynamic>> _readFontDiagnostics(
+  WidgetTester tester,
+  dynamic screenState,
+) async {
+  final requestId = DateTime.now().microsecondsSinceEpoch;
+  return _runShellBridgeProbe(
+    tester,
+    screenState,
+    type: 'debug_font_diagnostics',
+    requestId: requestId,
+    script: '''
+(() => {
+  try {
+    const safeRect = (node) => node ? node.getBoundingClientRect() : null;
+    const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
+    const fontSet = document.fonts;
+    const body = document.body;
+    const firstName = document.querySelector('.player-name');
+    const firstLifeBox = document.querySelector('.player-life-count');
+    const timer = document.querySelector('.game-timer');
+    const tracker = document.querySelector('.turn-time-tracker');
+    const firstNameRect = safeRect(firstName);
+    const firstLifeBoxRect = safeRect(firstLifeBox);
+    const timerRect = safeRect(timer);
+    const trackerRect = safeRect(tracker);
+    const bodyStyle = safeStyle(body);
+    const nameStyle = safeStyle(firstName);
 
-  return {
-    fonts_status: fontSet ? fontSet.status || '' : 'unsupported',
-    body_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
-    first_name_present: !!firstName,
-    first_name_font_family: nameStyle ? nameStyle.fontFamily || '' : '',
-    manrope_ready: bodyStyle
-      ? (bodyStyle.fontFamily || '').includes('Manrope')
-      : (fontSet ? fontSet.check('16px "Manrope"') : false),
-    fraunces_ready: nameStyle
-      ? (nameStyle.fontFamily || '').includes('Fraunces')
-      : (fontSet ? fontSet.check('16px "Fraunces"') : false),
-    first_name_width: firstNameRect ? firstNameRect.width || 0 : 0,
-    first_name_height: firstNameRect ? firstNameRect.height || 0 : 0,
-    first_life_box_width: firstLifeBoxRect ? firstLifeBoxRect.width || 0 : 0,
-    first_life_box_height: firstLifeBoxRect ? firstLifeBoxRect.height || 0 : 0,
-    timer_width: timerRect ? timerRect.width || 0 : 0,
-    timer_height: timerRect ? timerRect.height || 0 : 0,
-    tracker_width: trackerRect ? trackerRect.width || 0 : 0,
-    tracker_height: trackerRect ? trackerRect.height || 0 : 0,
-  };
-})()))()
-''');
-
-  return _decodeJavaScriptMap(rawResult);
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: 'debug_font_diagnostics',
+      request_id: $requestId,
+      fonts_status: fontSet ? fontSet.status || '' : 'unsupported',
+      body_font_family: bodyStyle ? bodyStyle.fontFamily || '' : '',
+      first_name_present: !!firstName,
+      first_name_font_family: nameStyle ? nameStyle.fontFamily || '' : '',
+      manrope_ready: bodyStyle
+        ? (bodyStyle.fontFamily || '').includes('Manrope')
+        : (fontSet ? fontSet.check('16px "Manrope"') : false),
+      fraunces_ready: nameStyle
+        ? (nameStyle.fontFamily || '').includes('Fraunces')
+        : (fontSet ? fontSet.check('16px "Fraunces"') : false),
+      first_name_width: firstNameRect ? firstNameRect.width || 0 : 0,
+      first_name_height: firstNameRect ? firstNameRect.height || 0 : 0,
+      first_life_box_width: firstLifeBoxRect ? firstLifeBoxRect.width || 0 : 0,
+      first_life_box_height: firstLifeBoxRect ? firstLifeBoxRect.height || 0 : 0,
+      timer_width: timerRect ? timerRect.width || 0 : 0,
+      timer_height: timerRect ? timerRect.height || 0 : 0,
+      tracker_width: trackerRect ? trackerRect.width || 0 : 0,
+      tracker_height: trackerRect ? trackerRect.height || 0 : 0,
+    }));
+  } catch (e) {
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: 'debug_font_diagnostics',
+      request_id: $requestId,
+      error: true,
+      message: String(e),
+    }));
+  }
+})()
+''',
+  );
 }
 
-Future<Map<String, dynamic>> _readIntroDiagnostics(dynamic screenState) async {
-  final rawResult = await screenState.debugRunJavaScriptReturningResult('''
-(() => JSON.stringify((() => {
-  const hasVisibleNode = (selector) => {
-    const node = document.querySelector(selector);
-    if (!node) {
-      return false;
-    }
+Future<Map<String, dynamic>> _readIntroDiagnostics(
+  WidgetTester tester,
+  dynamic screenState,
+) async {
+  final requestId = DateTime.now().microsecondsSinceEpoch;
+  return _runShellBridgeProbe(
+    tester,
+    screenState,
+    type: 'debug_intro_diagnostics',
+    requestId: requestId,
+    script: '''
+(() => {
+  try {
+    const hasVisibleNode = (selector) => {
+      const node = document.querySelector(selector);
+      if (!node) {
+        return false;
+      }
 
-    const style = window.getComputedStyle(node);
-    return (
-      style.display !== 'none' &&
-      style.visibility !== 'hidden' &&
-      style.opacity !== '0'
-    );
-  };
+      const style = window.getComputedStyle(node);
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        style.opacity !== '0'
+      );
+    };
 
-  return {
-    tutorial_overlay_seen:
-      window.localStorage.getItem('tutorialOverlay_v1') === 'true',
-    own_commander_hint_seen:
-      window.localStorage.getItem('ownCommanderDamageHintOverlay_v1') === 'true',
-    turn_tracker_hint_seen:
-      window.localStorage.getItem('turnTrackerHintOverlay_v1') === 'true',
-    counters_hint_seen:
-      window.localStorage.getItem('countersOnPlayerCardHintOverlay_v1') ===
-      'true',
-    first_time_overlay_visible: hasVisibleNode('.first-time-user-overlay'),
-    own_commander_hint_visible: hasVisibleNode(
-      '.own-commander-damage-hint-overlay'
-    ),
-    turn_tracker_hint_visible: hasVisibleNode('.turn-tracker-hint-overlay'),
-    counters_hint_visible: hasVisibleNode('.show-counters-hint-overlay'),
-  };
-})()))()
-''');
-
-  return _decodeJavaScriptMap(rawResult);
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: 'debug_intro_diagnostics',
+      request_id: $requestId,
+      tutorial_overlay_seen:
+        window.localStorage.getItem('tutorialOverlay_v1') === 'true',
+      own_commander_hint_seen:
+        window.localStorage.getItem('ownCommanderDamageHintOverlay_v1') === 'true',
+      turn_tracker_hint_seen:
+        window.localStorage.getItem('turnTrackerHintOverlay_v1') === 'true',
+      counters_hint_seen:
+        window.localStorage.getItem('countersOnPlayerCardHintOverlay_v1') === 'true',
+      first_time_overlay_visible: hasVisibleNode('.first-time-user-overlay'),
+      own_commander_hint_visible: hasVisibleNode(
+        '.own-commander-damage-hint-overlay'
+      ),
+      turn_tracker_hint_visible: hasVisibleNode('.turn-tracker-hint-overlay'),
+      counters_hint_visible: hasVisibleNode('.show-counters-hint-overlay'),
+    }));
+  } catch (e) {
+    FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+      type: 'debug_intro_diagnostics',
+      request_id: $requestId,
+      error: true,
+      message: String(e),
+    }));
+  }
+})()
+''',
+  );
 }
 
 Future<Map<String, dynamic>> _pumpUntilFontsLoaded(
   WidgetTester tester,
   dynamic screenState,
 ) async {
-  var diagnostics = await _readFontDiagnostics(screenState);
+  var diagnostics = await _readFontDiagnostics(tester, screenState);
   for (var attempt = 0; attempt < 12; attempt += 1) {
     final fontsLoaded = diagnostics['fonts_status'] == 'loaded';
     final manropeReady = diagnostics['manrope_ready'] == true;
@@ -186,7 +231,7 @@ Future<Map<String, dynamic>> _pumpUntilFontsLoaded(
     }
 
     await tester.pump(const Duration(seconds: 1));
-    diagnostics = await _readFontDiagnostics(screenState);
+    diagnostics = await _readFontDiagnostics(tester, screenState);
   }
 
   return diagnostics;
@@ -239,7 +284,7 @@ void main() {
       tester,
       screenState,
     );
-    final introDiagnostics = await _readIntroDiagnostics(screenState);
+    final introDiagnostics = await _readIntroDiagnostics(tester, screenState);
     await tester.pump(const Duration(seconds: 2));
     final secondFontDiagnostics = await _pumpUntilFontsLoaded(
       tester,
@@ -418,7 +463,7 @@ void main() {
       final dynamic screenState = tester.state(
         find.byType(LotusLifeCounterScreen),
       );
-      final introDiagnostics = await _readIntroDiagnostics(screenState);
+      final introDiagnostics = await _readIntroDiagnostics(tester, screenState);
 
       expect(restoredSnapshot, isNotNull);
       expect(restoredSnapshot!.values['playerCount'], '4');

@@ -333,7 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // Estado dropdown
                         SizedBox(
                           width: 116,
-                          child: DropdownButtonFormField<String>(
+                          child: DropdownButtonFormField<String?>(
                             initialValue: _selectedState,
                             isExpanded: true,
                             decoration: const InputDecoration(
@@ -345,13 +345,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             dropdownColor: AppTheme.surfaceSlate,
                             items: [
-                              const DropdownMenuItem<String>(
+                              const DropdownMenuItem<String?>(
                                 value: null,
                                 child: Text('--'),
                               ),
                               ..._brazilStates.map(
-                                (s) =>
-                                    DropdownMenuItem(value: s, child: Text(s)),
+                                (s) => DropdownMenuItem<String?>(
+                                  value: s,
+                                  child: Text(s),
+                                ),
                               ),
                             ],
                             onChanged:

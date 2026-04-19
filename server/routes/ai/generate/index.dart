@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dart_frog/dart_frog.dart';
@@ -44,33 +45,73 @@ Future<Response> onRequest(RequestContext context) async {
     var metaContext = '';
 
     try {
-      final keywords = prompt
+      final _ = prompt
           .split(' ')
           .where((word) => word.length > 3)
           .map((word) => "'%${word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')}%'")
           .join(' OR archetype ILIKE ');
 
-      if (keywords.isNotEmpty) {
+      final metaKeywordPatterns = prompt
+          .split(' ')
+          .where((word) => word.length > 3)
+          .map((word) => word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), ''))
+          .where((word) => word.isNotEmpty)
+          .map((word) => '%$word%')
+          .toSet()
+          .toList();
+
+      final normalizedFormat = format.trim().toLowerCase();
+      final metaFormats = <String>[];
+
+      switch (normalizedFormat) {
+        case 'commander':
+        case 'edh':
+          metaFormats.addAll(['EDH', 'cEDH']);
+          break;
+        case 'standard':
+          metaFormats.add('ST');
+          break;
+        case 'pioneer':
+          metaFormats.add('PI');
+          break;
+        case 'modern':
+          metaFormats.add('MO');
+          break;
+        case 'legacy':
+          metaFormats.add('LE');
+          break;
+        case 'vintage':
+          metaFormats.add('VI');
+          break;
+        case 'pauper':
+          metaFormats.add('PAU');
+          break;
+      }
+
+      if (metaKeywordPatterns.isNotEmpty && metaFormats.isNotEmpty) {
         final metaResult = await pool.execute(
           Sql.named('''
             SELECT archetype, card_list
             FROM meta_decks
-            WHERE format = @format
-              AND (archetype ILIKE $keywords)
+            WHERE format = ANY(@formats)
+              AND archetype ILIKE ANY(@patterns)
             LIMIT 3
           '''),
           parameters: {
-            'format': format == 'Commander'
-                ? 'EDH'
-                : (format == 'Standard' ? 'ST' : format),
+            'formats': TypedValue(Type.textArray, metaFormats),
+            'patterns': TypedValue(Type.textArray, metaKeywordPatterns),
           },
         );
 
         if (metaResult.isNotEmpty) {
-          metaContext = 'Here are some successful meta decks for inspiration:\n';
+          metaContext =
+              'Here are some successful meta decks for inspiration:\n';
           for (final row in metaResult) {
-            metaContext +=
-                'Archetype: ${row[0]}\nList: ${(row[1] as String).substring(0, 200)}...\n\n';
+            final cardList = (row[1] as String?) ?? '';
+            final excerpt =
+                cardList.length > 200 ? cardList.substring(0, 200) : cardList;
+            final suffix = cardList.length > 200 ? '...' : '';
+            metaContext += 'Archetype: ${row[0]}\nList: $excerpt$suffix\n\n';
           }
         }
       }
@@ -101,7 +142,8 @@ Commander (EDH):
 3. Only 1 copy of each card except basic lands (singleton rule).
 4. ALL cards must respect the commander's color identity.
 5. Do NOT include banned cards in the Commander format.
-6. Starting life is 40.
+6. Do NOT include the commander card inside the "cards" list.
+7. Starting life is 40.
 
 Brawl:
 1. Commander required (legendary creature or planeswalker).
@@ -133,37 +175,44 @@ Format: $format.
 $metaContext
 ''';
 
-    final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({
-        'model': aiConfig.modelFor(
-          key: 'OPENAI_MODEL_GENERATE',
-          fallback: 'gpt-4o-mini',
-          devFallback: 'gpt-4o-mini',
-          stagingFallback: 'gpt-4o-mini',
-          prodFallback: 'gpt-4o-mini',
-        ),
-        'messages': [
-          {
-            'role': 'system',
-            'content': '$systemPromptPrefix\nFormat: "$format".',
-          },
-          {'role': 'user', 'content': userMessage},
-        ],
-        'temperature': aiConfig.temperatureFor(
-          key: 'OPENAI_TEMP_GENERATE',
-          fallback: 0.4,
-          devFallback: 0.45,
-          stagingFallback: 0.4,
-          prodFallback: 0.35,
-        ),
-        'response_format': {'type': 'json_object'},
-      }),
-    );
+    http.Response response;
+    try {
+      response = await http
+          .post(
+            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $apiKey',
+            },
+            body: jsonEncode({
+              'model': aiConfig.modelFor(
+                key: 'OPENAI_MODEL_GENERATE',
+                fallback: 'gpt-4o-mini',
+                devFallback: 'gpt-4o-mini',
+                stagingFallback: 'gpt-4o-mini',
+                prodFallback: 'gpt-4o-mini',
+              ),
+              'messages': [
+                {
+                  'role': 'system',
+                  'content': '$systemPromptPrefix\nFormat: "$format".',
+                },
+                {'role': 'user', 'content': userMessage},
+              ],
+              'temperature': aiConfig.temperatureFor(
+                key: 'OPENAI_TEMP_GENERATE',
+                fallback: 0.4,
+                devFallback: 0.45,
+                stagingFallback: 0.4,
+                prodFallback: 0.35,
+              ),
+              'response_format': {'type': 'json_object'},
+            }),
+          )
+          .timeout(const Duration(seconds: 90));
+    } on TimeoutException {
+      return apiError(504, 'OpenAI request timed out');
+    }
 
     if (response.statusCode != 200) {
       if (aiConfig.shouldUseFallbackForInvalidApiKey(
@@ -187,11 +236,35 @@ $metaContext
       );
     }
 
-    final aiData = jsonDecode(utf8.decode(response.bodyBytes));
-    var content = aiData['choices'][0]['message']['content'] as String;
-    content = content.replaceAll('```json', '').replaceAll('```', '').trim();
+    dynamic aiData;
+    try {
+      aiData = jsonDecode(utf8.decode(response.bodyBytes));
+    } catch (e) {
+      return apiError(502, 'OpenAI returned invalid JSON');
+    }
 
-    final deckList = jsonDecode(content) as Map<String, dynamic>;
+    if (aiData is! Map ||
+        aiData['choices'] is! List ||
+        (aiData['choices'] as List).isEmpty) {
+      return apiError(502, 'OpenAI response missing choices');
+    }
+
+    final firstChoice = (aiData['choices'] as List).first;
+    final message = firstChoice is Map ? firstChoice['message'] : null;
+    final contentRaw = message is Map ? message['content'] : null;
+    if (contentRaw is! String || contentRaw.trim().isEmpty) {
+      return apiError(502, 'OpenAI returned empty content');
+    }
+
+    var content =
+        contentRaw.replaceAll('```json', '').replaceAll('```', '').trim();
+
+    Map<String, dynamic> deckList;
+    try {
+      deckList = jsonDecode(content) as Map<String, dynamic>;
+    } catch (e) {
+      return apiError(502, 'OpenAI returned invalid deck JSON');
+    }
     final commanderRaw = deckList['commander'];
     final cards =
         (deckList['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];

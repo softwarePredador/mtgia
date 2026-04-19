@@ -127,9 +127,306 @@ ${LotusDomSelectors.menuButton},
 }
 
 ${LotusDomSelectors.menuButton} {
-  transform: translate(-50%, 50%) scale(0.92);
+  transform: translate(-50%, 47%) scale(0.92);
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-shape,
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner,
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner:before,
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner:after {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  border-radius: 22px !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-shape {
+  width: 68px !important;
+  height: 68px !important;
+  background: transparent !important;
+  z-index: 1 !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner {
+  width: 60px !important;
+  height: 60px !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner:before {
+  width: 100% !important;
+  height: 100% !important;
   background:
-    linear-gradient(180deg, rgba(18, 25, 43, 0.96), rgba(8, 12, 24, 0.92));
+    linear-gradient(180deg, rgba(22, 31, 53, 0.98), rgba(8, 13, 27, 0.96)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 16px rgba(2, 8, 22, 0.16) !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-shape .menu-button-shape-inner:after {
+  width: 52px !important;
+  height: 52px !important;
+  background:
+    linear-gradient(180deg, rgba(6, 11, 23, 0.98), rgba(3, 7, 16, 0.96)) !important;
+  border: 1px solid rgba(188, 211, 255, 0.2) !important;
+  z-index: 2 !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-stroke {
+  width: 22px !important;
+  height: 3px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 2px !important;
+  z-index: 3 !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-stroke:after,
+${LotusDomSelectors.menuButton} .menu-button-stroke:before {
+  width: 22px !important;
+  height: 3px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 2px !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-stroke:after {
+  transform: translateY(-7px) !important;
+}
+
+${LotusDomSelectors.menuButton} .menu-button-stroke:before {
+  transform: translateY(7px) !important;
+}
+
+.list {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 18 !important;
+  pointer-events: none !important;
+}
+
+.list::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 182px !important;
+  height: 182px !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(160, 182, 226, 0.08) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 0 0 1px rgba(7, 13, 26, 0.18) !important;
+  opacity: 0.9 !important;
+}
+
+.list::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 124px !important;
+  height: 124px !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    rgba(120, 168, 255, 0.08),
+    rgba(120, 168, 255, 0.02) 54%,
+    transparent 72%
+  ) !important;
+  filter: blur(6px) !important;
+  opacity: 0.92 !important;
+}
+
+.list > * {
+  --manaloom-menu-x: 0px;
+  --manaloom-menu-y: 0px;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: auto !important;
+  height: auto !important;
+  pointer-events: none !important;
+  transform:
+    translate(
+      calc(-50% + var(--manaloom-menu-x)),
+      calc(-50% + var(--manaloom-menu-y))
+    ) !important;
+  rotate: 0deg !important;
+}
+
+.list > *.restart {
+  --manaloom-menu-y: -84px;
+}
+
+.list > *.players {
+  --manaloom-menu-x: -80px;
+  --manaloom-menu-y: -26px;
+}
+
+.list > *.settings {
+  --manaloom-menu-x: 49px;
+  --manaloom-menu-y: 68px;
+}
+
+.list > *.more {
+  --manaloom-menu-x: -49px;
+  --manaloom-menu-y: 68px;
+}
+
+.list > *.high-roll {
+  --manaloom-menu-x: 80px;
+  --manaloom-menu-y: -26px;
+}
+
+.list > * .btn {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+  padding: 0 !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background:
+    linear-gradient(180deg, rgba(16, 24, 44, 0.98), rgba(8, 13, 27, 0.96)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  pointer-events: auto !important;
+  backdrop-filter: var(--manaloom-shell-backdrop) !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.list > * .btn::before {
+  content: "" !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  opacity: 0.96 !important;
+}
+
+.list > *.players .btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(74, 212, 145, 0.36),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+}
+
+.list > *.players .btn::before {
+  background-image: url("images/player-avatar-white.svg") !important;
+  transform: translate(-1px, 1px) !important;
+}
+
+.list > *.restart .btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(237, 187, 70, 0.4),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+}
+
+.list > *.restart .btn::before {
+  background-image: url("images/flip.svg") !important;
+  transform: translateY(-1px) !important;
+}
+
+.list > *.settings .btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 112, 232, 0.42),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+}
+
+.list > *.settings .btn::before {
+  width: 22px !important;
+  height: 22px !important;
+  background-image: url("images/planechase-settings.svg") !important;
+  transform: translate(0.5px, 0.5px) !important;
+}
+
+.list > *.more .btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(231, 60, 122, 0.4),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+}
+
+.list > *.more .btn::before {
+  content: "?" !important;
+  width: auto !important;
+  height: auto !important;
+  background-image: none !important;
+  font-family: var(--manaloom-ui-font) !important;
+  font-size: 23px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  opacity: 1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.list > *.high-roll .btn {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(68, 168, 244, 0.42),
+    0 7px 14px rgba(1, 9, 24, 0.22) !important;
+}
+
+.list > *.high-roll .btn::before {
+  background-image: url("images/dice.svg") !important;
+  transform: translate(0.5px, 0.5px) !important;
+}
+
+${LotusDomSelectors.menuButton}.active {
+  transform: translate(-50%, 47%) scale(0.78) !important;
+  z-index: 19 !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-shape {
+  transform: none !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-shape .menu-button-shape-inner:before {
+  background:
+    linear-gradient(180deg, rgba(26, 36, 58, 0.98), rgba(10, 16, 30, 0.94)) !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-shape .menu-button-shape-inner:after {
+  background:
+    linear-gradient(180deg, rgba(10, 16, 29, 0.98), rgba(5, 9, 19, 0.96)) !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-stroke {
+  background: transparent !important;
+  transform: rotate(-90deg) !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-stroke:after,
+${LotusDomSelectors.menuButton}.active .menu-button-stroke:before {
+  background: rgba(255, 255, 255, 0.94) !important;
+  height: 4px !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-stroke:after {
+  transform: translateY(0) rotate(45deg) !important;
+}
+
+${LotusDomSelectors.menuButton}.active .menu-button-stroke:before {
+  transform: translateY(0) rotate(-45deg) !important;
 }
 
 ${LotusDomSelectors.optionCard} {
@@ -152,34 +449,73 @@ ${LotusDomSelectors.optionCard} h3 {
 
 .menu-button-overlay .game-states-wrapper {
   box-sizing: border-box;
-  gap: 10px !important;
+  width: min(320px, calc(100vw - 20px)) !important;
+  max-width: calc(100vw - 28px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-inline: auto !important;
+  transform: none !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 9px !important;
   padding:
-    12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px) !important;
+    10px 12px calc(env(safe-area-inset-bottom, 0px) + 9px) !important;
   background:
-    linear-gradient(180deg, rgba(10, 16, 30, 0.96), rgba(5, 9, 20, 0.94)) !important;
-  box-shadow: 0 -18px 28px rgba(2, 9, 22, 0.36) !important;
-  backdrop-filter: blur(18px) saturate(1.2) !important;
+    linear-gradient(180deg, rgba(9, 14, 27, 0.92), rgba(5, 9, 20, 0.9)) !important;
+  box-shadow: 0 -14px 24px rgba(2, 9, 22, 0.28) !important;
+  backdrop-filter: blur(14px) saturate(1.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
 }
 
 .menu-button-overlay .game-states-wrapper > * {
-  height: 40px !important;
-  padding: 0 14px 0 10px !important;
+  width: 62px !important;
+  min-width: 62px !important;
+  min-height: 56px !important;
+  flex: 0 0 62px !important;
+  padding: 8px 5px 7px !important;
   font-family: var(--manaloom-ui-font) !important;
-  font-size: 14px !important;
+  font-size: 9px !important;
+  line-height: 1.12 !important;
   font-weight: 700 !important;
-  letter-spacing: 0.015em !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  color: rgba(240, 244, 252, 0.92) !important;
   background: rgba(9, 14, 27, 0.92) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 8px 16px rgba(0, 0, 0, 0.16) !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 5px !important;
+  position: relative !important;
 }
 
 .menu-button-overlay .game-states-wrapper > *:before,
 .menu-button-overlay .game-states-wrapper > *:after {
-  width: 32px !important;
-  height: 32px !important;
-  background-size: 20px !important;
+  width: 16px !important;
+  height: 16px !important;
+  background-size: 16px !important;
+}
+
+.menu-button-overlay .game-states-wrapper > *:before {
+  position: absolute !important;
+  top: 9px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.menu-button-overlay .game-states-wrapper > *:after {
+  display: none !important;
 }
 
 .first-time-user-overlay {

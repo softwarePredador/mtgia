@@ -15,7 +15,8 @@ class MainScaffold extends StatelessWidget {
     if (location.startsWith('/decks')) {
       currentIndex = 1;
     } else if (location.startsWith('/collection') ||
-        location.startsWith('/trades')) {
+        location.startsWith('/trades') ||
+        location.startsWith('/market')) {
       currentIndex = 2;
     } else if (location.startsWith('/community')) {
       currentIndex = 3;

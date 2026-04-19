@@ -66,8 +66,53 @@ android {
             )
         }
     }
+
 }
 
 flutter {
     source = "../.."
+}
+
+// Flutter generates `GeneratedPluginRegistrant.java` under src/main/java.
+// In some setups it may include a hard reference to `integration_test` which is
+// not on the release classpath, breaking release compilation.
+//
+// We patch the generated file to register `integration_test` via reflection so:
+// - release builds compile (no compile-time dependency on IntegrationTestPlugin)
+// - debug / integration builds can still register the plugin when present
+val patchGeneratedPluginRegistrant by tasks.registering {
+    doLast {
+        val registrant =
+            file("src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java")
+        if (!registrant.exists()) return@doLast
+
+        val original = registrant.readText()
+        if (!original.contains("dev.flutter.plugins.integration_test.IntegrationTestPlugin")) {
+            return@doLast
+        }
+
+        val target =
+            "flutterEngine.getPlugins().add(new dev.flutter.plugins.integration_test.IntegrationTestPlugin());"
+
+        val replacement =
+            """
+try {
+  final Class<?> clazz = Class.forName("dev.flutter.plugins.integration_test.IntegrationTestPlugin");
+  final Object plugin = clazz.getDeclaredConstructor().newInstance();
+  flutterEngine.getPlugins().add((io.flutter.embedding.engine.plugins.FlutterPlugin) plugin);
+} catch (ClassNotFoundException e) {
+  // integration_test is not available on some build variants (e.g. release).
+}
+""".trimIndent()
+
+        val patched = original.replace(target, replacement)
+
+        if (patched != original) {
+            registrant.writeText(patched)
+        }
+    }
+}
+
+tasks.withType<org.gradle.api.tasks.compile.JavaCompile>().configureEach {
+    dependsOn(patchGeneratedPluginRegistrant)
 }

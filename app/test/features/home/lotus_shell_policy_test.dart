@@ -18,21 +18,19 @@ void main() {
     test('marks legacy tutorial hints as completed', () {
       expect(
         lotusShellCleanupScript,
-        contains("localStorage.setItem(TUTORIAL_OVERLAY_KEY, 'true');"),
+        contains("ensureLocalFlag(TUTORIAL_OVERLAY_KEY);"),
       );
       expect(
         lotusShellCleanupScript,
-        contains(
-          "localStorage.setItem(OWN_COMMANDER_DAMAGE_HINT_KEY, 'true');",
-        ),
+        contains("ensureLocalFlag(OWN_COMMANDER_DAMAGE_HINT_KEY);"),
       );
       expect(
         lotusShellCleanupScript,
-        contains("localStorage.setItem(TURN_TRACKER_HINT_KEY, 'true');"),
+        contains("ensureLocalFlag(TURN_TRACKER_HINT_KEY);"),
       );
       expect(
         lotusShellCleanupScript,
-        contains("localStorage.setItem(COUNTERS_HINT_KEY, 'true');"),
+        contains("ensureLocalFlag(COUNTERS_HINT_KEY);"),
       );
     });
 
@@ -53,9 +51,7 @@ void main() {
         expect(lotusShellCleanupScript, isNot(contains('.settings,')));
         expect(
           lotusShellCleanupScript,
-          contains(
-            "const switcher = document.querySelector('.day-night-switcher');",
-          ),
+          contains("queryWithin(root, '.day-night-switcher')[0] ??"),
         );
       },
     );
@@ -193,55 +189,58 @@ void main() {
       expect(
         lotusShellCleanupScript,
         contains(
-          "observeUiSurface('.card-search-overlay', 'card_search_overlay_opened');",
+          "observeUiSurface(root, '.card-search-overlay', 'card_search_overlay_opened');",
         ),
       );
       expect(
         lotusShellCleanupScript,
         contains(
-          "observeUiSurface('.planechase-overlay', 'planechase_overlay_opened');",
+          "observeUiSurface(root, '.planechase-overlay', 'planechase_overlay_opened');",
         ),
       );
       expect(
         lotusShellCleanupScript,
         contains(
-          "observeUiSurface('.archenemy-overlay', 'archenemy_overlay_opened');",
+          "observeUiSurface(root, '.archenemy-overlay', 'archenemy_overlay_opened');",
         ),
       );
       expect(
         lotusShellCleanupScript,
         contains(
-          "observeUiSurface('.bounty-overlay', 'bounty_overlay_opened');",
+          "observeUiSurface(root, '.bounty-overlay', 'bounty_overlay_opened');",
+        ),
+      );
+      expect(
+        lotusShellCleanupScript,
+        contains("'.edit-planechase-cards-overlay'"),
+      );
+      expect(
+        lotusShellCleanupScript,
+        contains("'planechase_card_pool_overlay_opened'"),
+      );
+      expect(
+        lotusShellCleanupScript,
+        contains("'.edit-archenemy-cards-overlay'"),
+      );
+      expect(
+        lotusShellCleanupScript,
+        contains("'archenemy_card_pool_overlay_opened'"),
+      );
+      expect(lotusShellCleanupScript, contains("'.edit-bounty-cards-overlay'"));
+      expect(
+        lotusShellCleanupScript,
+        contains("'bounty_card_pool_overlay_opened'"),
+      );
+      expect(
+        lotusShellCleanupScript,
+        contains(
+          "observeUiSurface(\n      root,\n      '.game-mode-info-overlay',\n      'game_mode_info_overlay_opened'",
         ),
       );
       expect(
         lotusShellCleanupScript,
         contains(
-          "observeUiSurface(\n      '.edit-planechase-cards-overlay',\n      'planechase_card_pool_overlay_opened'",
-        ),
-      );
-      expect(
-        lotusShellCleanupScript,
-        contains(
-          "observeUiSurface(\n      '.edit-archenemy-cards-overlay',\n      'archenemy_card_pool_overlay_opened'",
-        ),
-      );
-      expect(
-        lotusShellCleanupScript,
-        contains(
-          "observeUiSurface(\n      '.edit-bounty-cards-overlay',\n      'bounty_card_pool_overlay_opened'",
-        ),
-      );
-      expect(
-        lotusShellCleanupScript,
-        contains(
-          "observeUiSurface('.game-mode-info-overlay', 'game_mode_info_overlay_opened');",
-        ),
-      );
-      expect(
-        lotusShellCleanupScript,
-        contains(
-          "observeUiSurface('.max-game-modes-warning', 'max_game_modes_warning_opened');",
+          "observeUiSurface(\n      root,\n      '.max-game-modes-warning',\n      'max_game_modes_warning_opened'",
         ),
       );
     });

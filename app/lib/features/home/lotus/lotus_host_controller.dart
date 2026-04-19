@@ -1,6 +1,7 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -246,6 +247,7 @@ class LotusHostController implements LotusHost {
   bool _didRecordCanonicalHistoryMirrorThisLoad = false;
   Timer? _loadingOverlayFallbackTimer;
   DateTime? _ignoreBeforeUnloadSnapshotUntil;
+  DateTime? _lastUiSnapshotCapturedAt;
 
   @override
   Widget buildView(BuildContext context) {
@@ -766,9 +768,17 @@ class LotusHostController implements LotusHost {
   }
 
   Future<void> _captureUiSnapshot() async {
-    if (_isDisposed) {
+    if (_isDisposed || !kDebugMode) {
       return;
     }
+
+    final now = DateTime.now();
+    if (_lastUiSnapshotCapturedAt != null &&
+        now.difference(_lastUiSnapshotCapturedAt!) <
+            const Duration(seconds: 2)) {
+      return;
+    }
+    _lastUiSnapshotCapturedAt = now;
 
     try {
       await Future<void>.delayed(const Duration(milliseconds: 600));
@@ -776,10 +786,11 @@ class LotusHostController implements LotusHost {
         return;
       }
 
-      final rawSnapshot = await webViewController.runJavaScriptReturningResult(
+      final requestId = DateTime.now().microsecondsSinceEpoch;
+      await webViewController.runJavaScript(
         '''
-        (() => JSON.stringify({
-          ...(() => {
+        (() => {
+          try {
             const safeStyle = (node) => node ? window.getComputedStyle(node) : null;
             const root = document.documentElement;
             const body = document.body;
@@ -816,7 +827,9 @@ class LotusHostController implements LotusHost {
               root ? root.scrollHeight : 0,
             );
 
-            return {
+            FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+              type: 'debug_ui_snapshot',
+              request_id: $requestId,
               document_scroll_width: scrollWidth,
               document_scroll_height: scrollHeight,
               horizontal_overflow_px: Math.max(
@@ -868,103 +881,72 @@ class LotusHostController implements LotusHost {
               turn_tracker_font_size: turnTrackerStyle
                 ? parseFloat(turnTrackerStyle.fontSize || '0') || 0
                 : 0,
-            };
-          })(),
-          captured_at_epoch_ms: Date.now(),
-          body_class_name: document.body ? document.body.className : '',
-          viewport_width: window.innerWidth || 0,
-          viewport_height: window.innerHeight || 0,
-          screen_width: window.screen ? window.screen.width || 0 : 0,
-          screen_height: window.screen ? window.screen.height || 0 : 0,
-          set_life_by_tap_enabled: !!(
-            document.body &&
-            document.body.classList.contains('set-life-by-tap-enabled')
-          ),
-          vertical_tap_areas_enabled: !!(
-            document.body &&
-            document.body.classList.contains('vertical-tap-areas')
-          ),
-          clean_look_enabled: !!(
-            document.body &&
-            document.body.classList.contains('clean-look')
-          ),
-          regular_counter_count: document.querySelectorAll(
-            '${LotusDomSelectors.regularCounters}'
-          ).length,
-          commander_damage_counter_count: document.querySelectorAll(
-            '${LotusDomSelectors.commanderDamageCounters}'
-          ).length,
-          game_timer_count: document.querySelectorAll(
-            '${LotusDomSelectors.mainGameTimer}'
-          ).length,
-          game_timer_paused_count: document.querySelectorAll(
-            '${LotusDomSelectors.mainGameTimer}.paused'
-          ).length,
-          game_timer_text: (() => {
-            const node = document.querySelector(
-              '${LotusDomSelectors.mainGameTimer}'
-            );
-            return node ? (node.textContent || '').trim() : '';
-          })(),
-          clock_count: document.querySelectorAll('${LotusDomSelectors.currentTimeClock}').length,
-          clock_with_game_timer_count: document.querySelectorAll(
-            '${LotusDomSelectors.currentTimeClock}.with-game-timer'
-          ).length,
-          first_player_card_width: (() => {
-            const node = document.querySelector('${LotusDomSelectors.playerCard}');
-            if (!node) return 0;
-            return node.getBoundingClientRect().width || 0;
-          })(),
-          first_player_card_height: (() => {
-            const node = document.querySelector('${LotusDomSelectors.playerCard}');
-            if (!node) return 0;
-            return node.getBoundingClientRect().height || 0;
-          })(),
-          player_card_count: document.querySelectorAll('${LotusDomSelectors.playerCard}').length
-        }))()
+              captured_at_epoch_ms: Date.now(),
+              body_class_name: document.body ? document.body.className : '',
+              viewport_width: window.innerWidth || 0,
+              viewport_height: window.innerHeight || 0,
+              screen_width: window.screen ? window.screen.width || 0 : 0,
+              screen_height: window.screen ? window.screen.height || 0 : 0,
+              set_life_by_tap_enabled: !!(
+                document.body &&
+                document.body.classList.contains('set-life-by-tap-enabled')
+              ),
+              vertical_tap_areas_enabled: !!(
+                document.body &&
+                document.body.classList.contains('vertical-tap-areas')
+              ),
+              clean_look_enabled: !!(
+                document.body &&
+                document.body.classList.contains('clean-look')
+              ),
+              regular_counter_count: document.querySelectorAll(
+                '${LotusDomSelectors.regularCounters}'
+              ).length,
+              commander_damage_counter_count: document.querySelectorAll(
+                '${LotusDomSelectors.commanderDamageCounters}'
+              ).length,
+              game_timer_count: document.querySelectorAll(
+                '${LotusDomSelectors.mainGameTimer}'
+              ).length,
+              game_timer_paused_count: document.querySelectorAll(
+                '${LotusDomSelectors.mainGameTimer}.paused'
+              ).length,
+              game_timer_text: (() => {
+                const node = document.querySelector(
+                  '${LotusDomSelectors.mainGameTimer}'
+                );
+                return node ? (node.textContent || '').trim() : '';
+              })(),
+              clock_count: document.querySelectorAll('${LotusDomSelectors.currentTimeClock}').length,
+              clock_with_game_timer_count: document.querySelectorAll(
+                '${LotusDomSelectors.currentTimeClock}.with-game-timer'
+              ).length,
+              first_player_card_width: (() => {
+                const node = document.querySelector('${LotusDomSelectors.playerCard}');
+                if (!node) return 0;
+                return node.getBoundingClientRect().width || 0;
+              })(),
+              first_player_card_height: (() => {
+                const node = document.querySelector('${LotusDomSelectors.playerCard}');
+                if (!node) return 0;
+                return node.getBoundingClientRect().height || 0;
+              })(),
+              player_card_count: document.querySelectorAll('${LotusDomSelectors.playerCard}').length
+            }));
+          } catch (e) {
+            FlutterManaLoomShellBridge.postMessage(JSON.stringify({
+              type: 'debug_ui_snapshot',
+              request_id: $requestId,
+              error: true,
+              message: String(e),
+            }));
+          }
+        })()
       ''',
       );
-
-      final decoded = _decodeJavaScriptJsonResult(rawSnapshot);
-      if (decoded is! Map<String, dynamic>) {
-        return;
-      }
-
-      final snapshot = LotusUiSnapshot.tryFromJson(decoded);
-      if (snapshot == null) {
-        return;
-      }
-
-      await _uiSnapshotStore.save(snapshot);
     } catch (error) {
       debugPrint('$lotusLogPrefix UI snapshot error: $error');
     }
-  }
-
-  Object? _decodeJavaScriptJsonResult(Object? rawResult) {
-    Object? value = rawResult;
-
-    for (var attempt = 0; attempt < 3; attempt += 1) {
-      if (value is Map<String, dynamic>) {
-        return value;
-      }
-
-      if (value is Map) {
-        return value.cast<String, dynamic>();
-      }
-
-      if (value is! String || value.isEmpty) {
-        return value;
-      }
-
-      try {
-        value = jsonDecode(value);
-      } catch (_) {
-        return value;
-      }
-    }
-
-    return value;
   }
 
   void _notifyBlockedNavigation(String url) {
@@ -1035,6 +1017,13 @@ class LotusHostController implements LotusHost {
     }
 
     final type = payload['type'];
+    if (type == 'debug_ui_snapshot') {
+      final snapshot = LotusUiSnapshot.tryFromJson(payload);
+      if (snapshot != null) {
+        unawaited(_uiSnapshotStore.save(snapshot));
+      }
+    }
+
     if (type == LotusShellMessageTypes.analytics) {
       final name = payload['name'];
       final category = payload['category'];

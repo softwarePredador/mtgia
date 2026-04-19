@@ -391,10 +391,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                 ),
               ),
             ],
-        child: FloatingActionButton.extended(
-          onPressed: null,
-          icon: const Icon(Icons.add),
-          label: const Text('Novo Deck'),
+        child: IgnorePointer(
+          child: FloatingActionButton.extended(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+            label: const Text('Novo Deck'),
+          ),
         ),
       ),
     );

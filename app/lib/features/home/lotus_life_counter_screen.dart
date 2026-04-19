@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -214,6 +215,10 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   String? _lastDiagnosticTrigger;
   Map<String, Object?>? _lastDiagnosticTriggerData;
   AppLifecycleState? _lastObservedLifecycleState;
+
+  // Debug-only: helps integration tests observe WebView DOM state without
+  // relying on runJavaScriptReturningResult (can hang on some devices).
+  String? _debugLastShellMessage;
   OverlayEntry? _loadingOverlayEntry;
   OverlayEntry? _errorOverlayEntry;
   bool _isNativeSettingsSheetOpen = false;
@@ -435,6 +440,8 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       return;
     }
 
+    _debugLastShellMessage = message;
+
     _rememberDiagnosticTrigger(
       'shell_message',
       _diagnosticPayloadForShellMessage(message),
@@ -444,6 +451,13 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       final decoded = jsonDecode(message);
       if (decoded is Map<String, dynamic>) {
         final type = decoded['type'] as String?;
+
+        if (kDebugMode && type != null && type.startsWith('debug_')) {
+          // Integration tests use debug_* shell messages to fetch DOM state.
+          // Avoid snackbars / native fallbacks.
+          return;
+        }
+
         if (type == LotusShellMessageTypes.closeLifeCounter) {
           final rawSource = (decoded['source'] as String?)?.trim();
           _exitLifeCounter(
@@ -785,6 +799,14 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
 
   Future<Object?> debugRunJavaScriptReturningResult(String script) {
     return _hostController.runJavaScriptReturningResult(script);
+  }
+
+  void debugClearLastShellMessage() {
+    _debugLastShellMessage = null;
+  }
+
+  String? debugGetLastShellMessage() {
+    return _debugLastShellMessage;
   }
 
   Future<void> _reloadLotusBundleFromOwnedSnapshot() async {

@@ -164,8 +164,15 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     'format': format,
   });
 
-  if (response.statusCode == 200) {
-    return response.data as Map<String, dynamic>;
+  if (response.statusCode == 200 || response.statusCode == 422) {
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+    if (data is Map) {
+      return data.cast<String, dynamic>();
+    }
+    throw Exception('Resposta invalida ao gerar deck (${response.statusCode}).');
   }
 
   final data = response.data;
