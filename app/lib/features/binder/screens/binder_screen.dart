@@ -400,6 +400,12 @@ class _BinderListViewState extends State<_BinderListView>
     if (_items.isEmpty) {
       return Center(
         child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom + 88,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

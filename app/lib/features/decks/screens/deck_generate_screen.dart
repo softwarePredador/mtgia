@@ -55,11 +55,11 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   ];
 
   final List<String> _examplePrompts = [
-    'Deck agressivo de goblins vermelhos para Commander',
-    'Deck de controle azul e branco com contramágicas',
-    'Deck de elfos verdes focado em ramp e criaturas grandes',
+    'Deck agressivo de goblins vermelhos com curva baixa e muito burn',
+    'Deck de controle azul e branco com contramágicas e remoções',
+    'Deck de elfos verdes com muito ramp e criaturas grandes',
     'Deck aristocratas preto e branco com sacrifício',
-    'Deck de dragões vermelhos com muito tesouro',
+    'Deck de dragões vermelhos com tesouros',
     'Deck tribal de zumbis com sinergias de cemitério',
   ];
 
@@ -226,7 +226,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          16,
+          16,
+          16 + MediaQuery.of(context).padding.bottom + 88,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -300,7 +305,33 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 fillColor: theme.colorScheme.surface,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            // Generate Button (CTA primeiro, para não ficar “abaixo do fold”)
+            ElevatedButton.icon(
+              onPressed: _isGenerating ? null : _generateDeck,
+              icon:
+                  _isGenerating
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.auto_awesome),
+              label: Text(
+                _isGenerating ? 'Gerando...' : 'Gerar Deck',
+                style: const TextStyle(
+                  fontSize: AppTheme.fontLg,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+              ),
+            ),
+            const SizedBox(height: 20),
 
             // Example Prompts
             Text(
@@ -333,33 +364,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     );
                   }).toList(),
             ),
-            const SizedBox(height: 24),
-
-            // Generate Button
-            ElevatedButton.icon(
-              onPressed: _isGenerating ? null : _generateDeck,
-              icon:
-                  _isGenerating
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.auto_awesome),
-              label: Text(
-                _isGenerating ? 'Gerando...' : 'Gerar Deck',
-                style: const TextStyle(
-                  fontSize: AppTheme.fontLg,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-              ),
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
 
             // Generated Deck Preview
             if (_generatedDeck != null) ...[
@@ -518,12 +523,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...validationErrors.map((e) => Text(
-                        e.toString(),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onErrorContainer,
-                        ),
-                      )),
+                  ...validationErrors.map(
+                    (e) => Text(
+                      e.toString(),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -557,8 +564,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     if (warnings['message'] != null)
                       Text(warnings['message'].toString()),
                     if (warnings['messages'] is List)
-                      ...(warnings['messages'] as List)
-                          .map((m) => Text(m.toString())),
+                      ...(warnings['messages'] as List).map(
+                        (m) => Text(m.toString()),
+                      ),
                     if (warnings['invalid_cards'] is List)
                       Text(
                         'Cartas removidas por não serem encontradas: '

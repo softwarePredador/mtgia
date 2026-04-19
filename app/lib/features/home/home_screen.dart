@@ -92,6 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: const [ShellAppBarActions()],
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + 88,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
