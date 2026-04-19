@@ -302,6 +302,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     ),
                     const SizedBox(height: 24),
                     OutlinedButton.icon(
+                      onPressed: () => context.go('/decks/generate'),
+                      icon: const Icon(Icons.auto_awesome, size: 18),
+                      label: const Text('Gerar com IA'),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
                       onPressed: () => context.go('/onboarding/core-flow'),
                       icon: const Icon(Icons.flag_outlined, size: 18),
                       label: const Text('Fluxo guiado'),

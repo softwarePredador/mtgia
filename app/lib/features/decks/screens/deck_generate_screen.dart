@@ -488,6 +488,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final warnings = _generatedDeck!['warnings'];
     final isMock = _generatedDeck!['is_mock'] == true;
     final validation = _generatedDeck!['validation'];
+
+    final invalidCards = warnings is Map && warnings['invalid_cards'] is List
+        ? (warnings['invalid_cards'] as List)
+            .map((e) => e.toString())
+            .where((e) => e.trim().isNotEmpty)
+            .toList()
+        : const <String>[];
     final validationErrors =
         validation is Map && validation['errors'] is List
             ? (validation['errors'] as List)
@@ -586,10 +593,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                       ...(warnings['messages'] as List).map(
                         (m) => Text(m.toString()),
                       ),
-                    if (warnings['invalid_cards'] is List)
+                    if (invalidCards.isNotEmpty)
                       Text(
                         'Cartas removidas por não serem encontradas: '
-                        '${(warnings['invalid_cards'] as List).join(', ')}',
+                        '${invalidCards.join(', ')}',
                       ),
                   ],
                 ],

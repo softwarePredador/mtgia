@@ -31,12 +31,20 @@ Future<void> _ensureSurfaceConverted(
   if (_surfaceConverted) return;
   // ignore: avoid_print
   print('CAPTURE_CONVERT_BEGIN $forName');
-  await binding.convertFlutterSurfaceToImage().timeout(
-    const Duration(seconds: 25),
-  );
-  _surfaceConverted = true;
-  // ignore: avoid_print
-  print('CAPTURE_CONVERT_DONE $forName');
+  try {
+    await binding.convertFlutterSurfaceToImage().timeout(
+      const Duration(seconds: 25),
+    );
+    _surfaceConverted = true;
+    // ignore: avoid_print
+    print('CAPTURE_CONVERT_DONE $forName');
+  } catch (e, st) {
+    // ignore: avoid_print
+    print('CAPTURE_CONVERT_ERROR $forName $e');
+    // ignore: avoid_print
+    print(st);
+    rethrow;
+  }
 }
 
 Future<void> _capture(
@@ -50,13 +58,36 @@ Future<void> _capture(
 
   await _ensureSurfaceConverted(binding, name);
 
-  final screenshot = await binding
-      .takeScreenshot(name)
-      .timeout(const Duration(seconds: 90));
-  // ignore: avoid_print
-  print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
+  try {
+    // ignore: avoid_print
+    print('CAPTURE_TAKING $name');
+    final screenshot = await binding
+        .takeScreenshot(name)
+        .timeout(const Duration(seconds: 90));
+    // ignore: avoid_print
+    print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
 
-  _emitScreenshot(name, screenshot);
+    _emitScreenshot(name, screenshot);
+  } catch (e, st) {
+    // ignore: avoid_print
+    print('CAPTURE_ERROR $name $e');
+    // ignore: avoid_print
+    print(st);
+
+    // Retry once: some devices lose the converted surface after navigation.
+    _surfaceConverted = false;
+    await _ensureSurfaceConverted(binding, name);
+
+    // ignore: avoid_print
+    print('CAPTURE_RETRY_TAKING $name');
+    final screenshot = await binding
+        .takeScreenshot(name)
+        .timeout(const Duration(seconds: 90));
+    // ignore: avoid_print
+    print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
+
+    _emitScreenshot(name, screenshot);
+  }
 }
 
 Future<void> _pumpUntilFound(
@@ -135,7 +166,16 @@ void main() {
     // Open deck generator.
     await tester.tap(find.byType(PopupMenuButton<String>));
     await tester.pump(const Duration(seconds: 1));
-    await tester.tap(find.text('Gerar com IA'));
+
+    // The decks screen may also render an empty-state CTA with the same label,
+    // so constrain the tap to the popup menu overlay.
+    final generateEntry = find.descendant(
+      of: find.byType(PopupMenuItem<String>),
+      matching: find.text('Gerar com IA'),
+    );
+    expect(generateEntry, findsOneWidget);
+    await tester.tap(generateEntry);
+
     await tester.pump();
     await _pumpUntilFound(tester, find.text('Gerador de Decks'), attempts: 60);
     await tester.pump(const Duration(seconds: 1));
