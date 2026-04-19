@@ -111,6 +111,7 @@ class _ExploreTabState extends State<_ExploreTab>
 
   static const _formats = [
     'commander',
+    'brawl',
     'standard',
     'modern',
     'pioneer',

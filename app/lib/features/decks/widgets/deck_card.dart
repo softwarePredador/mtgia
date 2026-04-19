@@ -30,6 +30,7 @@ class DeckCard extends StatelessWidget {
   Color _formatAccentColor(String format) {
     switch (format.toLowerCase()) {
       case 'commander':
+      case 'brawl':
         return AppTheme.formatCommander;
       case 'standard':
         return AppTheme.formatStandard;

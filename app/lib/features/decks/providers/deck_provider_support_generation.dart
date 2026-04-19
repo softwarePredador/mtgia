@@ -159,9 +159,10 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   required String prompt,
   required String format,
 }) async {
+  final normalizedFormat = format.trim().toLowerCase();
   final response = await apiClient.post('/ai/generate', {
     'prompt': prompt,
-    'format': format,
+    'format': normalizedFormat,
   });
 
   if (response.statusCode == 200 || response.statusCode == 422) {

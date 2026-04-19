@@ -45,6 +45,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   final List<String> _formats = [
     'Commander',
+    'Brawl',
     'Standard',
     'Modern',
     'Pioneer',

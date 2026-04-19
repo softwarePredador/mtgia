@@ -32,6 +32,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
     bool isSubmitting = false;
     final formats = [
       'commander',
+      'brawl',
       'standard',
       'modern',
       'pioneer',
