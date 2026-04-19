@@ -28,20 +28,20 @@ Future<Response> onRequest(RequestContext context) async {
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
+    final pool = context.read<Pool>();
 
     if (apiKey == null || apiKey.isEmpty) {
-      return Response.json(
-        body: _buildMockGenerateResponse(
-          prompt: prompt,
-          format: format,
-          warningCode: 'openai_api_key_missing',
-          warningMessage:
-              'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
-        ),
+      final mockBody = await _buildMockGenerateResponse(
+        pool: pool,
+        prompt: prompt,
+        format: format,
+        warningCode: 'openai_api_key_missing',
+        warningMessage:
+            'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
       );
+      return Response.json(body: mockBody);
     }
 
-    final pool = context.read<Pool>();
     var metaContext = '';
 
     try {
@@ -219,15 +219,15 @@ $metaContext
         statusCode: response.statusCode,
         responseBody: response.body,
       )) {
-        return Response.json(
-          body: _buildMockGenerateResponse(
-            prompt: prompt,
-            format: format,
-            warningCode: 'openai_api_key_invalid_dev_fallback',
-            warningMessage:
-                'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
-          ),
+        final mockBody = await _buildMockGenerateResponse(
+          pool: pool,
+          prompt: prompt,
+          format: format,
+          warningCode: 'openai_api_key_invalid_dev_fallback',
+          warningMessage:
+              'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
         );
+        return Response.json(body: mockBody);
       }
 
       return apiError(
@@ -325,29 +325,89 @@ $metaContext
   }
 }
 
-Map<String, dynamic> _buildMockGenerateResponse({
+Future<Map<String, dynamic>> _buildMockGenerateResponse({
+  required Pool pool,
   required String prompt,
   required String format,
   required String warningCode,
   required String warningMessage,
-}) {
+}) async {
   final mockDeck = _mockGeneratedDeck(format);
-  return {
-    'prompt': prompt,
-    'format': format,
-    'generated_deck': mockDeck,
-    'meta_context_used': false,
-    'is_mock': true,
-    'stats': {
-      'total_suggested': (mockDeck['cards'] as List).length,
-      'valid_cards': (mockDeck['cards'] as List).length,
-      'invalid_cards': 0,
-    },
-    'warnings': {
+
+  String? commanderName;
+  final commanderRaw = mockDeck['commander'];
+  if (commanderRaw is Map && commanderRaw['name'] != null) {
+    commanderName = commanderRaw['name']?.toString();
+  }
+
+  final cardsRaw = (mockDeck['cards'] as List?) ?? const [];
+  final cards = <Map<String, dynamic>>[];
+  for (final item in cardsRaw) {
+    if (item is Map) {
+      cards.add(item.cast<String, dynamic>());
+    }
+  }
+
+  try {
+    final validationService = GeneratedDeckValidationService(
+      PostgresGeneratedDeckRepository(pool),
+    );
+
+    final validation = await validationService.validate(
+      format: format,
+      cards: cards,
+      commanderName: commanderName,
+    );
+
+    final warnings = <String, dynamic>{
       'code': warningCode,
       'message': warningMessage,
-    },
-  };
+      if (validation.warnings.isNotEmpty) 'messages': validation.warnings,
+      if (validation.invalidCards.isNotEmpty) 'invalid_cards': validation.invalidCards,
+      if (validation.suggestions.isNotEmpty) 'suggestions': validation.suggestions,
+    };
+
+    return {
+      'prompt': prompt,
+      'format': format,
+      'generated_deck': validation.generatedDeck,
+      'meta_context_used': false,
+      'is_mock': true,
+      'stats': {
+        'total_suggested': validation.totalSuggestedEntries,
+        'total_suggested_cards': validation.totalSuggestedCards,
+        'valid_cards': validation.totalResolvedEntries,
+        'valid_total_cards': validation.totalResolvedCards,
+        'invalid_cards': validation.invalidCards.length,
+      },
+      'validation': validation.validationSummary(),
+      'warnings': warnings,
+    };
+  } catch (e) {
+    return {
+      'prompt': prompt,
+      'format': format,
+      'generated_deck': mockDeck,
+      'meta_context_used': false,
+      'is_mock': true,
+      'stats': {
+        'total_suggested': (mockDeck['cards'] as List?)?.length ?? 0,
+        'valid_cards': (mockDeck['cards'] as List?)?.length ?? 0,
+        'invalid_cards': 0,
+      },
+      'validation': {
+        'is_valid': false,
+        'errors': ['Falha ao validar deck mock: $e'],
+        'invalid_cards': const <String>[],
+        'suggestions': const <String, List<String>>{},
+        'warnings': const <String>[],
+      },
+      'warnings': {
+        'code': warningCode,
+        'message': warningMessage,
+      },
+    };
+  }
 }
 
 Map<String, dynamic> _mockGeneratedDeck(String format) {
@@ -363,10 +423,9 @@ Map<String, dynamic> _mockGeneratedDeck(String format) {
 
   if (normalized == 'brawl') {
     return {
-      'commander': {'name': 'Kellan, Inquisitive Prodigy // Tail the Suspect'},
+      'commander': {'name': 'Isamaru, Hound of Konda'},
       'cards': [
-        {'name': 'Plains', 'quantity': 30},
-        {'name': 'Island', 'quantity': 29},
+        {'name': 'Plains', 'quantity': 59},
       ],
     };
   }
