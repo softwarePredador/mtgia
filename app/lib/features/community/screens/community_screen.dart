@@ -63,6 +63,7 @@ class _CommunityScreenState extends State<CommunityScreen>
         actions: const [ShellAppBarActions()],
         bottom: TabBar(
           controller: _tabController,
+          dividerColor: Colors.transparent,
           indicatorColor: AppTheme.manaViolet,
           labelColor: AppTheme.textPrimary,
           unselectedLabelColor: AppTheme.textSecondary,
@@ -280,7 +281,12 @@ class _ExploreTabState extends State<_ExploreTab>
 
               return ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.fromLTRB(
+                  12,
+                  12,
+                  12,
+                  12 + MediaQuery.of(context).padding.bottom + 88,
+                ),
                 itemCount: provider.decks.length + (provider.hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= provider.decks.length) {
@@ -442,7 +448,12 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           color: AppTheme.manaViolet,
           child: ListView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.fromLTRB(
+              12,
+              12,
+              12,
+              12 + MediaQuery.of(context).padding.bottom + 88,
+            ),
             itemCount:
                 provider.followingFeed.length + (provider.hasMoreFeed ? 1 : 0),
             itemBuilder: (context, index) {
@@ -634,7 +645,12 @@ class _UserSearchTabState extends State<_UserSearchTab>
               }
 
               return ListView.builder(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.fromLTRB(
+                  12,
+                  12,
+                  12,
+                  12 + MediaQuery.of(context).padding.bottom + 88,
+                ),
                 itemCount: provider.searchResults.length,
                 itemBuilder: (context, index) {
                   final user = provider.searchResults[index];
@@ -763,7 +779,9 @@ class _CommunityDeckCard extends StatelessWidget {
                               AppTheme.radiusXs,
                             ),
                             border: Border.all(
-                              color: AppTheme.primarySoft.withValues(alpha: 0.22),
+                              color: AppTheme.primarySoft.withValues(
+                                alpha: 0.22,
+                              ),
                             ),
                           ),
                           child: Text(
@@ -800,7 +818,9 @@ class _CommunityDeckCard extends StatelessWidget {
                                 AppTheme.radiusXs,
                               ),
                               border: Border.all(
-                                color: AppTheme.mythicGold.withValues(alpha: 0.18),
+                                color: AppTheme.mythicGold.withValues(
+                                  alpha: 0.18,
+                                ),
                               ),
                             ),
                             child: Row(
@@ -809,7 +829,9 @@ class _CommunityDeckCard extends StatelessWidget {
                                 Icon(
                                   Icons.auto_awesome,
                                   size: 12,
-                                  color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                                  color: AppTheme.mythicGold.withValues(
+                                    alpha: 0.8,
+                                  ),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -917,7 +939,9 @@ class _FollowingDeckCard extends StatelessWidget {
                               AppTheme.radiusXs,
                             ),
                             border: Border.all(
-                              color: AppTheme.primarySoft.withValues(alpha: 0.22),
+                              color: AppTheme.primarySoft.withValues(
+                                alpha: 0.22,
+                              ),
                             ),
                           ),
                           child: Text(
@@ -950,7 +974,9 @@ class _FollowingDeckCard extends StatelessWidget {
                                 AppTheme.radiusXs,
                               ),
                               border: Border.all(
-                                color: AppTheme.mythicGold.withValues(alpha: 0.18),
+                                color: AppTheme.mythicGold.withValues(
+                                  alpha: 0.18,
+                                ),
                               ),
                             ),
                             child: Row(
@@ -959,7 +985,9 @@ class _FollowingDeckCard extends StatelessWidget {
                                 Icon(
                                   Icons.auto_awesome,
                                   size: 11,
-                                  color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                                  color: AppTheme.mythicGold.withValues(
+                                    alpha: 0.8,
+                                  ),
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
@@ -1382,7 +1410,12 @@ class _CotacoesTabState extends State<_CotacoesTab>
       backgroundColor: AppTheme.surfaceSlate,
       onRefresh: () => provider.refresh(),
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.fromLTRB(
+          0,
+          8,
+          0,
+          8 + MediaQuery.of(context).padding.bottom + 88,
+        ),
         itemCount: movers.length,
         itemBuilder: (context, index) {
           final mover = movers[index];

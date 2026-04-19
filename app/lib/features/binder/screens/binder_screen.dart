@@ -53,12 +53,15 @@ class _BinderTabContentState extends State<BinderTabContent>
           color: AppTheme.surfaceElevated,
           child: TabBar(
             controller: _subTabController,
-            indicatorColor: _subTabController.index == 0
-                ? AppTheme.primarySoft
-                : AppTheme.mythicGold,
-            labelColor: _subTabController.index == 0
-                ? AppTheme.primarySoft
-                : AppTheme.mythicGold,
+            dividerColor: Colors.transparent,
+            indicatorColor:
+                _subTabController.index == 0
+                    ? AppTheme.primarySoft
+                    : AppTheme.mythicGold,
+            labelColor:
+                _subTabController.index == 0
+                    ? AppTheme.primarySoft
+                    : AppTheme.mythicGold,
             unselectedLabelColor: AppTheme.textSecondary,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,
@@ -203,40 +206,42 @@ class _BinderListViewState extends State<_BinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CardSearchScreen(
-          deckId: '',
-          mode: 'binder',
-          onCardSelectedForBinder: (card) {
-            if (!mounted) return;
-            final provider = context.read<BinderProvider>();
-            BinderItemEditor.show(
-              context,
-              cardId: card['id'] as String,
-              cardName: card['name'] as String?,
-              cardImageUrl: card['image_url'] as String?,
-              initialListType: widget.listType,
-              onSave: (data) async {
-                final ok = await provider.addItem(
-                  cardId: data['card_id'] as String,
-                  quantity: data['quantity'] as int? ?? 1,
-                  condition: data['condition'] as String? ?? 'NM',
-                  isFoil: data['is_foil'] as bool? ?? false,
-                  forTrade: data['for_trade'] as bool? ?? false,
-                  forSale: data['for_sale'] as bool? ?? false,
-                  price: data['price'] != null
-                      ? (data['price'] as num).toDouble()
-                      : null,
-                  notes: data['notes'] as String?,
-                  listType: data['list_type'] as String? ?? widget.listType,
+        builder:
+            (_) => CardSearchScreen(
+              deckId: '',
+              mode: 'binder',
+              onCardSelectedForBinder: (card) {
+                if (!mounted) return;
+                final provider = context.read<BinderProvider>();
+                BinderItemEditor.show(
+                  context,
+                  cardId: card['id'] as String,
+                  cardName: card['name'] as String?,
+                  cardImageUrl: card['image_url'] as String?,
+                  initialListType: widget.listType,
+                  onSave: (data) async {
+                    final ok = await provider.addItem(
+                      cardId: data['card_id'] as String,
+                      quantity: data['quantity'] as int? ?? 1,
+                      condition: data['condition'] as String? ?? 'NM',
+                      isFoil: data['is_foil'] as bool? ?? false,
+                      forTrade: data['for_trade'] as bool? ?? false,
+                      forSale: data['for_sale'] as bool? ?? false,
+                      price:
+                          data['price'] != null
+                              ? (data['price'] as num).toDouble()
+                              : null,
+                      notes: data['notes'] as String?,
+                      listType: data['list_type'] as String? ?? widget.listType,
+                    );
+                    if (ok && mounted) {
+                      _fetchItems(reset: true);
+                    }
+                    return ok;
+                  },
                 );
-                if (ok && mounted) {
-                  _fetchItems(reset: true);
-                }
-                return ok;
               },
-            );
-          },
-        ),
+            ),
       ),
     );
   }
@@ -245,40 +250,42 @@ class _BinderListViewState extends State<_BinderListView>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CardScannerScreen(
-          deckId: '',
-          mode: 'binder',
-          onCardScannedForBinder: (card) {
-            if (!mounted) return;
-            final provider = context.read<BinderProvider>();
-            BinderItemEditor.show(
-              context,
-              cardId: card['id'] as String,
-              cardName: card['name'] as String?,
-              cardImageUrl: card['image_url'] as String?,
-              initialListType: widget.listType,
-              onSave: (data) async {
-                final ok = await provider.addItem(
-                  cardId: data['card_id'] as String,
-                  quantity: data['quantity'] as int? ?? 1,
-                  condition: data['condition'] as String? ?? 'NM',
-                  isFoil: data['is_foil'] as bool? ?? false,
-                  forTrade: data['for_trade'] as bool? ?? false,
-                  forSale: data['for_sale'] as bool? ?? false,
-                  price: data['price'] != null
-                      ? (data['price'] as num).toDouble()
-                      : null,
-                  notes: data['notes'] as String?,
-                  listType: data['list_type'] as String? ?? widget.listType,
+        builder:
+            (_) => CardScannerScreen(
+              deckId: '',
+              mode: 'binder',
+              onCardScannedForBinder: (card) {
+                if (!mounted) return;
+                final provider = context.read<BinderProvider>();
+                BinderItemEditor.show(
+                  context,
+                  cardId: card['id'] as String,
+                  cardName: card['name'] as String?,
+                  cardImageUrl: card['image_url'] as String?,
+                  initialListType: widget.listType,
+                  onSave: (data) async {
+                    final ok = await provider.addItem(
+                      cardId: data['card_id'] as String,
+                      quantity: data['quantity'] as int? ?? 1,
+                      condition: data['condition'] as String? ?? 'NM',
+                      isFoil: data['is_foil'] as bool? ?? false,
+                      forTrade: data['for_trade'] as bool? ?? false,
+                      forSale: data['for_sale'] as bool? ?? false,
+                      price:
+                          data['price'] != null
+                              ? (data['price'] as num).toDouble()
+                              : null,
+                      notes: data['notes'] as String?,
+                      listType: data['list_type'] as String? ?? widget.listType,
+                    );
+                    if (ok && mounted) {
+                      _fetchItems(reset: true);
+                    }
+                    return ok;
+                  },
                 );
-                if (ok && mounted) {
-                  _fetchItems(reset: true);
-                }
-                return ok;
               },
-            );
-          },
-        ),
+            ),
       ),
     );
   }
@@ -319,7 +326,11 @@ class _BinderListViewState extends State<_BinderListView>
           children: [
             // Stats bar
             if (showStats)
-              _StatsBar(stats: stats, onAdd: _openAddCard, onScan: _openScanCard),
+              _StatsBar(
+                stats: stats,
+                onAdd: _openAddCard,
+                onScan: _openScanCard,
+              ),
 
             // Search + filters
             _SearchFilterBar(
@@ -366,11 +377,16 @@ class _BinderListViewState extends State<_BinderListView>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline,
-                size: 48, color: AppTheme.textSecondary),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppTheme.textSecondary,
+            ),
             const SizedBox(height: 12),
-            Text(_error!,
-                style: const TextStyle(color: AppTheme.textSecondary)),
+            Text(
+              _error!,
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => _fetchItems(reset: true),
@@ -451,7 +467,12 @@ class _BinderListViewState extends State<_BinderListView>
       color: AppTheme.manaViolet,
       child: ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.fromLTRB(
+          12,
+          12,
+          12,
+          12 + MediaQuery.of(context).padding.bottom + 88,
+        ),
         itemCount: _items.length + (_hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _items.length) {
@@ -623,12 +644,16 @@ class _SearchFilterBar extends StatelessWidget {
             controller: searchController,
             onSubmitted: (_) => onSearch(),
             style: const TextStyle(
-                color: AppTheme.textPrimary, fontSize: AppTheme.fontMd),
+              color: AppTheme.textPrimary,
+              fontSize: AppTheme.fontMd,
+            ),
             decoration: InputDecoration(
               hintText: 'Buscar carta...',
               hintStyle: const TextStyle(color: AppTheme.textSecondary),
-              prefixIcon:
-                  const Icon(Icons.search, color: AppTheme.textSecondary),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppTheme.textSecondary,
+              ),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
                 onPressed: () {
@@ -664,21 +689,26 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.primarySoft.withValues(alpha: 0.3),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color: tradeFilter == true
-                        ? AppTheme.primarySoft
-                        : AppTheme.textSecondary,
+                    color:
+                        tradeFilter == true
+                            ? AppTheme.primarySoft
+                            : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color: tradeFilter == true
-                        ? AppTheme.primarySoft
-                        : AppTheme.outlineMuted,
+                    color:
+                        tradeFilter == true
+                            ? AppTheme.primarySoft
+                            : AppTheme.outlineMuted,
                   ),
-                  avatar: Icon(Icons.swap_horiz,
-                      size: 14,
-                      color: tradeFilter == true
-                          ? AppTheme.primarySoft
-                          : AppTheme.textSecondary),
+                  avatar: Icon(
+                    Icons.swap_horiz,
+                    size: 14,
+                    color:
+                        tradeFilter == true
+                            ? AppTheme.primarySoft
+                            : AppTheme.textSecondary,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -688,21 +718,26 @@ class _SearchFilterBar extends StatelessWidget {
                   selectedColor: AppTheme.mythicGold.withValues(alpha: 0.3),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
-                    color: saleFilter == true
-                        ? AppTheme.mythicGold
-                        : AppTheme.textSecondary,
+                    color:
+                        saleFilter == true
+                            ? AppTheme.mythicGold
+                            : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
-                    color: saleFilter == true
-                        ? AppTheme.mythicGold
-                        : AppTheme.outlineMuted,
+                    color:
+                        saleFilter == true
+                            ? AppTheme.mythicGold
+                            : AppTheme.outlineMuted,
                   ),
-                  avatar: Icon(Icons.sell,
-                      size: 14,
-                      color: saleFilter == true
-                          ? AppTheme.mythicGold
-                          : AppTheme.textSecondary),
+                  avatar: Icon(
+                    Icons.sell,
+                    size: 14,
+                    color:
+                        saleFilter == true
+                            ? AppTheme.mythicGold
+                            : AppTheme.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -739,23 +774,32 @@ class _FilterDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
-          hint: Text(hint,
-              style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: AppTheme.fontSm)),
+          hint: Text(
+            hint,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontSm,
+            ),
+          ),
           dropdownColor: AppTheme.surfaceSlate,
-          icon: const Icon(Icons.arrow_drop_down,
-              color: AppTheme.textSecondary, size: 18),
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: AppTheme.textSecondary,
+            size: 18,
+          ),
           style: const TextStyle(
-              color: AppTheme.textPrimary, fontSize: AppTheme.fontSm),
+            color: AppTheme.textPrimary,
+            fontSize: AppTheme.fontSm,
+          ),
           items: [
             const DropdownMenuItem(
               value: null,
-              child: Text('Todas',
-                  style: TextStyle(color: AppTheme.textSecondary)),
+              child: Text(
+                'Todas',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
             ),
-            ...items.map(
-              (c) => DropdownMenuItem(value: c, child: Text(c)),
-            ),
+            ...items.map((c) => DropdownMenuItem(value: c, child: Text(c))),
           ],
           onChanged: onChanged,
         ),
@@ -821,9 +865,11 @@ class _BinderItemCard extends StatelessWidget {
                         _badge(item.condition, _conditionColor(item.condition)),
                         if (item.isFoil) ...[
                           const SizedBox(width: 6),
-                          Icon(Icons.auto_awesome,
-                              size: 14,
-                              color: AppTheme.mythicGold.withValues(alpha: 0.8)),
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 14,
+                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                          ),
                         ],
                         if (item.cardSetCode != null) ...[
                           const SizedBox(width: 6),
@@ -837,7 +883,9 @@ class _BinderItemCard extends StatelessWidget {
                         ],
                       ],
                     ),
-                    if (item.forTrade || item.forSale || item.price != null) ...[
+                    if (item.forTrade ||
+                        item.forSale ||
+                        item.price != null) ...[
                       const SizedBox(height: 2),
                       Row(
                         children: [
@@ -864,8 +912,11 @@ class _BinderItemCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppTheme.textSecondary, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppTheme.textSecondary,
+                size: 20,
+              ),
             ],
           ),
         ),
@@ -883,9 +934,10 @@ class _BinderItemCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color,
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -900,9 +952,10 @@ class _BinderItemCard extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color,
-            fontSize: AppTheme.fontXs,
-            fontWeight: FontWeight.w600),
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

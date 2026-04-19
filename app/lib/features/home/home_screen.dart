@@ -281,6 +281,9 @@ class _HeroBanner extends StatelessWidget {
               children: [
                 Text(
                   'Olá, $username',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     height: 1.2,
