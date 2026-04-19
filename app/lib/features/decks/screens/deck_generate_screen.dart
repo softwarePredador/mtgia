@@ -18,6 +18,9 @@ class DeckGenerateScreen extends StatefulWidget {
 class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   final _promptController = TextEditingController();
   final _deckNameController = TextEditingController();
+  final _scrollController = ScrollController();
+  final _previewKey = GlobalKey();
+
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
   Map<String, dynamic>? _generatedDeck;
@@ -67,6 +70,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   void dispose() {
     _promptController.dispose();
     _deckNameController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -95,6 +99,17 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       setState(() {
         _generatedDeck = result;
         _isGenerating = false;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = _previewKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOut,
+          );
+        }
       });
     } catch (e) {
       if (!mounted) return;
@@ -226,6 +241,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: EdgeInsets.fromLTRB(
           16,
           16,
@@ -333,44 +349,47 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Example Prompts
-            Text(
-              'Ou escolha um exemplo:',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: AppTheme.textSecondary,
+            if (_generatedDeck == null) ...[
+              // Example Prompts
+              Text(
+                'Ou escolha um exemplo:',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children:
-                  _examplePrompts.map((example) {
-                    return ActionChip(
-                      label: Text(
-                        example,
-                        style: const TextStyle(
-                          fontSize: AppTheme.fontSm,
-                          color: AppTheme.textSecondary,
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children:
+                    _examplePrompts.map((example) {
+                      return ActionChip(
+                        label: Text(
+                          example,
+                          style: const TextStyle(
+                            fontSize: AppTheme.fontSm,
+                            color: AppTheme.textSecondary,
+                          ),
                         ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _promptController.text = example;
-                        });
-                      },
-                      backgroundColor:
-                          theme.colorScheme.surfaceContainerHighest,
-                    );
-                  }).toList(),
-            ),
-            const SizedBox(height: 28),
+                        onPressed: () {
+                          setState(() {
+                            _promptController.text = example;
+                          });
+                        },
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                      );
+                    }).toList(),
+              ),
+              const SizedBox(height: 28),
+            ],
 
             // Generated Deck Preview
             if (_generatedDeck != null) ...[
               const Divider(),
               const SizedBox(height: 24),
               Row(
+                key: _previewKey,
                 children: [
                   Icon(Icons.preview, color: theme.colorScheme.secondary),
                   const SizedBox(width: 8),

@@ -7,7 +7,7 @@ import 'package:manaloom/main.dart' as app;
 
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
-  const chunkSize = 12000;
+  const chunkSize = 2000;
   // ignore: avoid_print
   print('SCREENSHOT_BEGIN $name');
   for (var offset = 0; offset < encoded.length; offset += chunkSize) {
@@ -55,6 +55,7 @@ Future<void> _capture(
       .timeout(const Duration(seconds: 90));
   // ignore: avoid_print
   print('CAPTURE_TAKEN $name bytes=${screenshot.length}');
+
   _emitScreenshot(name, screenshot);
 }
 
@@ -149,7 +150,9 @@ void main() {
     await tester.ensureVisible(generateButtonLabel);
     await tester.tap(generateButtonLabel);
     await tester.pump();
-    await _pumpUntilFound(tester, find.text('Preview do Deck'), attempts: 120);
+    final previewTitle = find.text('Preview do Deck');
+    await _pumpUntilFound(tester, previewTitle, attempts: 120);
+    await tester.ensureVisible(previewTitle);
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '06_generate_preview');
 
