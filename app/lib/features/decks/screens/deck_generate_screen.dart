@@ -489,12 +489,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final isMock = _generatedDeck!['is_mock'] == true;
     final validation = _generatedDeck!['validation'];
 
-    final invalidCards = warnings is Map && warnings['invalid_cards'] is List
-        ? (warnings['invalid_cards'] as List)
-            .map((e) => e.toString())
-            .where((e) => e.trim().isNotEmpty)
-            .toList()
-        : const <String>[];
+    final invalidCards =
+        warnings is Map && warnings['invalid_cards'] is List
+            ? (warnings['invalid_cards'] as List)
+                .map((e) => e.toString())
+                .where((e) => e.trim().isNotEmpty)
+                .toList()
+            : const <String>[];
     final validationErrors =
         validation is Map && validation['errors'] is List
             ? (validation['errors'] as List)
@@ -622,7 +623,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
           ],
           Text(
-            'Main deck (${cardsList.length} linhas)',
+            'Deck principal (${cardsList.length} linhas)',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.secondary,

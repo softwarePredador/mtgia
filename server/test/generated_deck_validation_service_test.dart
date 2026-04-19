@@ -57,7 +57,7 @@ void main() {
       expect(
         result.errors,
         contains(
-            'Deck commander precisa de um comandante valido no campo "commander".'),
+            'Deck commander precisa de um comandante válido no campo "commander".'),
       );
     });
 
@@ -84,7 +84,8 @@ void main() {
       );
 
       expect(result.isValid, isTrue);
-      expect(result.generatedDeck['commander'], {'name': 'Isamaru, Hound of Konda'});
+      expect(result.generatedDeck['commander'],
+          {'name': 'Isamaru, Hound of Konda'});
       expect((result.generatedDeck['cards'] as List).single, {
         'name': 'Plains',
         'quantity': 99,

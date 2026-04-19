@@ -202,18 +202,18 @@ class GeneratedDeckValidationService {
     final errors = <String>[];
     if (requiresCommander && resolvedCommander == null) {
       errors.add(
-        'Deck $normalizedFormat precisa de um comandante valido no campo "commander".',
+        'Deck $normalizedFormat precisa de um comandante válido no campo "commander".',
       );
     }
 
     if (invalidCards.isNotEmpty) {
       warnings.add(
-        '${invalidCards.length} carta(s) sugerida(s) nao foram encontradas e foram removidas.',
+        '${invalidCards.length} carta(s) sugerida(s) não foram encontradas e foram removidas.',
       );
     }
 
     if (consolidatedCards.isEmpty) {
-      errors.add('Nenhuma carta valida restou apos a resolucao dos nomes.');
+      errors.add('Nenhuma carta válida restou após a resolução dos nomes.');
     } else {
       try {
         await _repository.validateDeck(
@@ -255,7 +255,7 @@ class GeneratedDeckValidationService {
 
     if (uniqueInvalidCards.length > suggestionCandidates.length) {
       warnings.add(
-        'Sugestoes limitadas a $maxSuggestionLookups cartas invalidas para evitar lentidao.',
+        'Sugestões limitadas a $maxSuggestionLookups cartas inválidas para evitar lentidão.',
       );
     }
 
@@ -390,12 +390,12 @@ class GeneratedDeckValidationService {
 
     if (removedOffColor > 0) {
       warnings.add(
-        'Auto-repair: removidas $removedOffColor carta(s) fora da color identity do comandante.',
+        'Auto-reparo: removidas $removedOffColor carta(s) fora da identidade de cor do comandante.',
       );
     }
     if (reducedExtraCopies > 0) {
       warnings.add(
-        'Auto-repair: removidas $reducedExtraCopies copia(s) extras em cartas nao-basicas (singleton).',
+        'Auto-reparo: removidas $reducedExtraCopies cópia(s) extras em cartas não-básicas (singleton).',
       );
     }
 
@@ -460,7 +460,7 @@ class GeneratedDeckValidationService {
           ...resolvedBasicCards,
         ]);
         warnings.add(
-          'Auto-repair: completado com terrenos basicos para fechar o tamanho do deck.',
+          'Auto-reparo: completado com terrenos básicos para fechar o tamanho do deck.',
         );
       }
     }
@@ -505,7 +505,7 @@ class GeneratedDeckValidationService {
       consolidated =
           consolidated.where((c) => (c['quantity'] as int? ?? 0) > 0).toList();
       warnings.add(
-        'Auto-repair: removidos terrenos basicos excedentes para fechar o tamanho do deck.',
+        'Auto-reparo: removidos terrenos básicos excedentes para fechar o tamanho do deck.',
       );
     }
 

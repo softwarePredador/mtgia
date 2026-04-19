@@ -15,12 +15,26 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Evita que emails longos fiquem "rolados" para o final depois que o campo perde foco.
+    _emailFocusNode.addListener(() {
+      if (!_emailFocusNode.hasFocus) {
+        _emailController.selection = const TextSelection.collapsed(offset: 0);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -140,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Email
                         TextFormField(
                           controller: _emailController,
+                          focusNode: _emailFocusNode,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Email',

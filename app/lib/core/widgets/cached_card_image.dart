@@ -82,7 +82,9 @@ class CachedCardImage extends StatelessWidget {
       fadeInDuration: const Duration(milliseconds: 200),
       placeholder: (_, __) => _loadingWidget(),
       errorWidget: (_, __, error) {
-        debugPrint('[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error');
+        debugPrint(
+          '[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error',
+        );
         return Image.network(
           effectiveImageUrl,
           width: width,
@@ -97,10 +99,7 @@ class CachedCardImage extends StatelessWidget {
     );
 
     if (borderRadius != null) {
-      return ClipRRect(
-        borderRadius: borderRadius!,
-        child: image,
-      );
+      return ClipRRect(borderRadius: borderRadius!, child: image);
     }
 
     return image;
@@ -125,7 +124,7 @@ class CachedCardImage extends StatelessWidget {
     );
   }
 
-  /// Spinner de loading enquanto a imagem está baixando
+  /// Placeholder enquanto a imagem está baixando (sem spinner para não parecer "loading" permanente)
   Widget _loadingWidget() {
     return Container(
       width: width,
@@ -134,15 +133,8 @@ class CachedCardImage extends StatelessWidget {
         color: AppTheme.surfaceSlate,
         borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
       ),
-      child: Center(
-        child: SizedBox(
-          width: (width ?? 60) * 0.3,
-          height: (width ?? 60) * 0.3,
-          child: const CircularProgressIndicator(
-            strokeWidth: 2,
-            color: AppTheme.manaViolet,
-          ),
-        ),
+      child: const Center(
+        child: Icon(Icons.style, color: AppTheme.outlineMuted, size: 26),
       ),
     );
   }

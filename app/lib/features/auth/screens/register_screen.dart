@@ -17,8 +17,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Evita que emails longos fiquem "rolados" para o final depois que o campo perde foco,
+    // o que parece um corte do primeiro caractere.
+    _emailFocusNode.addListener(() {
+      if (!_emailFocusNode.hasFocus) {
+        _emailController.selection = const TextSelection.collapsed(offset: 0);
+      }
+    });
+  }
 
   void _returnToLogin() {
     if (Navigator.of(context).canPop()) {
@@ -34,6 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -182,6 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Email
                         TextFormField(
                           controller: _emailController,
+                          focusNode: _emailFocusNode,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Email',
