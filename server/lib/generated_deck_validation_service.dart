@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 
 import 'card_validation_service.dart';
+import 'color_identity.dart';
 import 'deck_rules_service.dart';
 import 'import_card_lookup_service.dart';
 
@@ -157,6 +158,10 @@ class GeneratedDeckValidationService {
       resolvedCards.add({
         'card_id': resolved['id'],
         'name': resolved['name'],
+        'type_line': resolved['type_line'],
+        'color_identity': resolved['color_identity'],
+        'colors': resolved['colors'],
+        'oracle_text': resolved['oracle_text'],
         'quantity': card['quantity'],
         'is_commander': false,
       });
@@ -172,6 +177,10 @@ class GeneratedDeckValidationService {
         resolvedCommander = {
           'card_id': commanderCard['id'],
           'name': commanderCard['name'],
+          'type_line': commanderCard['type_line'],
+          'color_identity': commanderCard['color_identity'],
+          'colors': commanderCard['colors'],
+          'oracle_text': commanderCard['oracle_text'],
           'quantity': 1,
           'is_commander': true,
         };
@@ -185,7 +194,7 @@ class GeneratedDeckValidationService {
       );
     }
 
-    final consolidatedCards = _consolidateResolvedCards([
+    var consolidatedCards = _consolidateResolvedCards([
       ...resolvedCards,
       if (resolvedCommander != null) resolvedCommander,
     ]);
@@ -212,7 +221,28 @@ class GeneratedDeckValidationService {
           cards: consolidatedCards,
         );
       } on DeckRulesException catch (e) {
-        errors.add(e.message);
+        final repaired = await _tryAutoRepairCommanderOrBrawl(
+          format: normalizedFormat,
+          cards: consolidatedCards,
+          commander: resolvedCommander,
+          warnings: warnings,
+        );
+
+        if (repaired != null) {
+          consolidatedCards = repaired;
+          try {
+            await _repository.validateDeck(
+              format: normalizedFormat,
+              cards: consolidatedCards,
+            );
+          } on DeckRulesException catch (e2) {
+            errors.add(e2.message);
+          } catch (e2) {
+            errors.add(e2.toString());
+          }
+        } else {
+          errors.add(e.message);
+        }
       } catch (e) {
         errors.add(e.toString());
       }
@@ -220,7 +250,8 @@ class GeneratedDeckValidationService {
 
     final uniqueInvalidCards = invalidCards.toSet().toList();
     const maxSuggestionLookups = 12;
-    final suggestionCandidates = uniqueInvalidCards.take(maxSuggestionLookups).toList();
+    final suggestionCandidates =
+        uniqueInvalidCards.take(maxSuggestionLookups).toList();
 
     if (uniqueInvalidCards.length > suggestionCandidates.length) {
       warnings.add(
@@ -262,6 +293,223 @@ class GeneratedDeckValidationService {
         (sum, card) => sum + (card['quantity'] as int),
       ),
     );
+  }
+
+  Future<List<Map<String, dynamic>>?> _tryAutoRepairCommanderOrBrawl({
+    required String format,
+    required List<Map<String, dynamic>> cards,
+    required Map<String, dynamic>? commander,
+    required List<String> warnings,
+  }) async {
+    final normalized = format.trim().toLowerCase();
+    if (normalized != 'commander' && normalized != 'brawl') return null;
+    if (commander == null) return null;
+
+    Iterable<String> toStrings(dynamic raw) {
+      if (raw == null) return const <String>[];
+      if (raw is Iterable) return raw.map((e) => e.toString());
+      return [raw.toString()];
+    }
+
+    Set<String> identityOf(Map<String, dynamic> card) {
+      final oracleText = card['oracle_text'];
+      return resolveCardColorIdentity(
+        colorIdentity: toStrings(card['color_identity']),
+        colors: toStrings(card['colors']),
+        oracleText: oracleText == null ? null : oracleText.toString(),
+      );
+    }
+
+    final commanderColors = identityOf(commander);
+
+    final targetNonCommander = normalized == 'brawl' ? 59 : 99;
+
+    final repaired = <Map<String, dynamic>>[
+      {
+        ...commander,
+        'quantity': 1,
+        'is_commander': true,
+      },
+    ];
+
+    var removedOffColor = 0;
+    var reducedExtraCopies = 0;
+
+    for (final card in cards) {
+      if (card['is_commander'] == true) continue;
+
+      final qtyRaw = card['quantity'];
+      final qty =
+          qtyRaw is int ? qtyRaw : int.tryParse(qtyRaw?.toString() ?? '') ?? 1;
+      if (qty <= 0) continue;
+
+      final typeLineRaw = (card['type_line'] ?? '').toString();
+      final typeLine = typeLineRaw.toLowerCase();
+      final hasTypeLine = typeLineRaw.trim().isNotEmpty;
+
+      final nameLower = (card['name'] ?? '').toString().trim().toLowerCase();
+      final isBasicLandByName = nameLower == 'plains' ||
+          nameLower == 'island' ||
+          nameLower == 'swamp' ||
+          nameLower == 'mountain' ||
+          nameLower == 'forest' ||
+          nameLower == 'wastes' ||
+          nameLower.startsWith('snow-covered plains') ||
+          nameLower.startsWith('snow-covered island') ||
+          nameLower.startsWith('snow-covered swamp') ||
+          nameLower.startsWith('snow-covered mountain') ||
+          nameLower.startsWith('snow-covered forest');
+
+      final isBasicLand = typeLine.contains('basic land') || isBasicLandByName;
+
+      final cardColors = identityOf(card);
+
+      final within = isWithinCommanderIdentity(
+        cardIdentity: cardColors,
+        commanderIdentity: commanderColors,
+      );
+      if (!within) {
+        removedOffColor += qty;
+        continue;
+      }
+
+      var finalQty = qty;
+      if (hasTypeLine && !isBasicLand && finalQty > 1) {
+        reducedExtraCopies += (finalQty - 1);
+        finalQty = 1;
+      }
+
+      repaired.add({
+        ...card,
+        'quantity': finalQty,
+        'is_commander': false,
+      });
+    }
+
+    var consolidated = _consolidateResolvedCards(repaired);
+
+    if (removedOffColor > 0) {
+      warnings.add(
+        'Auto-repair: removidas $removedOffColor carta(s) fora da color identity do comandante.',
+      );
+    }
+    if (reducedExtraCopies > 0) {
+      warnings.add(
+        'Auto-repair: removidas $reducedExtraCopies copia(s) extras em cartas nao-basicas (singleton).',
+      );
+    }
+
+    int currentNonCommander = 0;
+    for (final card in consolidated) {
+      if (card['is_commander'] == true) continue;
+      currentNonCommander += (card['quantity'] as int?) ?? 1;
+    }
+
+    if (currentNonCommander < targetNonCommander) {
+      var toAdd = targetNonCommander - currentNonCommander;
+      final colorToBasic = <String, String>{
+        'W': 'Plains',
+        'U': 'Island',
+        'B': 'Swamp',
+        'R': 'Mountain',
+        'G': 'Forest',
+      };
+
+      final basicNames = <String>[];
+      for (final color in ['W', 'U', 'B', 'R', 'G']) {
+        if (commanderColors.contains(color)) {
+          basicNames.add(colorToBasic[color]!);
+        }
+      }
+      if (basicNames.isEmpty) {
+        basicNames.add('Wastes');
+      }
+
+      final lookupItems = [
+        for (final name in basicNames) {'name': name}
+      ];
+      final resolvedBasics = await _repository.resolveCardNames(lookupItems);
+
+      final resolvedBasicCards = <Map<String, dynamic>>[];
+      final per = (toAdd / basicNames.length).floor();
+      var remaining = toAdd;
+
+      for (var i = 0; i < basicNames.length; i++) {
+        final name = basicNames[i];
+        final key = name.toLowerCase();
+        final resolved = resolvedBasics[key];
+        if (resolved == null) continue;
+
+        var qty = i == basicNames.length - 1 ? remaining : per;
+        if (qty <= 0) continue;
+        remaining -= qty;
+
+        resolvedBasicCards.add({
+          'card_id': resolved['id'],
+          'name': resolved['name'],
+          'type_line': resolved['type_line'],
+          'color_identity': resolved['color_identity'],
+          'quantity': qty,
+          'is_commander': false,
+        });
+      }
+
+      if (resolvedBasicCards.isNotEmpty) {
+        consolidated = _consolidateResolvedCards([
+          ...consolidated,
+          ...resolvedBasicCards,
+        ]);
+        warnings.add(
+          'Auto-repair: completado com terrenos basicos para fechar o tamanho do deck.',
+        );
+      }
+    }
+
+    // If we still overflow, trim basic lands first.
+    currentNonCommander = 0;
+    for (final card in consolidated) {
+      if (card['is_commander'] == true) continue;
+      currentNonCommander += (card['quantity'] as int?) ?? 1;
+    }
+
+    var overflow = currentNonCommander - targetNonCommander;
+    if (overflow > 0) {
+      for (final card in consolidated) {
+        if (overflow <= 0) break;
+        if (card['is_commander'] == true) continue;
+        final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
+        final nameLower = (card['name'] ?? '').toString().trim().toLowerCase();
+        final isBasicLandByName = nameLower == 'plains' ||
+            nameLower == 'island' ||
+            nameLower == 'swamp' ||
+            nameLower == 'mountain' ||
+            nameLower == 'forest' ||
+            nameLower == 'wastes' ||
+            nameLower.startsWith('snow-covered plains') ||
+            nameLower.startsWith('snow-covered island') ||
+            nameLower.startsWith('snow-covered swamp') ||
+            nameLower.startsWith('snow-covered mountain') ||
+            nameLower.startsWith('snow-covered forest');
+        final isBasicLand =
+            typeLine.contains('basic land') || isBasicLandByName;
+        if (!isBasicLand) continue;
+
+        final qty = (card['quantity'] as int?) ?? 1;
+        if (qty <= 0) continue;
+
+        final remove = qty >= overflow ? overflow : qty;
+        card['quantity'] = qty - remove;
+        overflow -= remove;
+      }
+
+      consolidated =
+          consolidated.where((c) => (c['quantity'] as int? ?? 0) > 0).toList();
+      warnings.add(
+        'Auto-repair: removidos terrenos basicos excedentes para fechar o tamanho do deck.',
+      );
+    }
+
+    return consolidated;
   }
 
   static List<Map<String, dynamic>> _consolidateResolvedCards(

@@ -467,6 +467,10 @@ Este documento serve como guia definitivo para o entendimento, manutenção e ex
 
 **Tratamento de Erros:**
 - ❌ Se a IA sugerir uma carta inexistente (hallucination), o lookup falha silenciosamente (logado) e a carta é ignorada.
+- ✅ **Auto-repair (Commander/Brawl):** quando a validação strict falha, o server tenta automaticamente:
+  - remover cartas fora da color identity do(s) comandante(s);
+  - aplicar singleton (reduz cópias extras em não-básicas);
+  - completar o deck com terrenos básicos para bater o tamanho exato (100/60).
 - ⚠️ Se `OPENAI_API_KEY` não estiver configurada, `POST /ai/generate` retorna um deck mock (`is_mock: true`) para desenvolvimento.
 - ❌ Se o `PUT /decks/:id` falhar ao aplicar otimização, rollback automático (sem mudanças no deck).
 
