@@ -96,10 +96,15 @@ class DeckMutationResult {
 }
 
 class DeckCreateResult {
-  const DeckCreateResult({required this.isSuccess, this.errorMessage});
+  const DeckCreateResult({
+    required this.isSuccess,
+    this.errorMessage,
+    this.deck,
+  });
 
   final bool isSuccess;
   final String? errorMessage;
+  final Deck? deck;
 }
 
 class DeckAiAnalysisPayload {

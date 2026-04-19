@@ -6,6 +6,15 @@ import 'deck_provider_support_generation.dart';
 
 DeckCreateResult parseCreateDeckResponse(ApiResponse response) {
   if (response.statusCode == 200 || response.statusCode == 201) {
+    final data = response.data;
+    if (data is Map) {
+      try {
+        final deck = Deck.fromJson(data.cast<String, dynamic>());
+        return DeckCreateResult(isSuccess: true, deck: deck);
+      } catch (_) {
+        // Fallback: backend retornou um payload não padrão, mas a criação foi OK.
+      }
+    }
     return const DeckCreateResult(isSuccess: true);
   }
   return DeckCreateResult(

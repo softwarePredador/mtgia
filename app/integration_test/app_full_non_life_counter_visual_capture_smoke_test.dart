@@ -105,6 +105,21 @@ Future<void> _pumpUntilFound(
   fail('Widget not found: $finder');
 }
 
+Future<void> _pumpUntilAbsent(
+  WidgetTester tester,
+  Finder finder, {
+  int attempts = 30,
+  Duration step = const Duration(seconds: 1),
+}) async {
+  for (var i = 0; i < attempts; i += 1) {
+    await tester.pump(step);
+    if (finder.evaluate().isEmpty) {
+      return;
+    }
+  }
+  fail('Widget still present: $finder');
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -163,20 +178,103 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await _capture(binding, tester, '04_decks');
 
-    // Open deck generator.
-    await tester.tap(find.byType(PopupMenuButton<String>));
-    await tester.pump(const Duration(seconds: 1));
-
-    // The decks screen may also render an empty-state CTA with the same label,
-    // so constrain the tap to the popup menu overlay.
-    final generateEntry = find.descendant(
-      of: find.byType(PopupMenuItem<String>),
-      matching: find.text('Gerar com IA'),
+    // Create a minimal deck to also validate/capture the Deck Details surface.
+    String? createdName;
+    final newDeckText = find.text('Novo Deck');
+    final newDeckButton = find.ancestor(
+      of: newDeckText,
+      matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
     );
-    expect(generateEntry, findsOneWidget);
-    await tester.tap(generateEntry);
+    if (newDeckText.evaluate().isNotEmpty) {
+      if (newDeckButton.evaluate().isNotEmpty) {
+        await tester.tap(newDeckButton.first);
+      } else {
+        await tester.tap(newDeckText.first);
+      }
+      await tester.pump();
 
-    await tester.pump();
+      final dialog = find.byType(AlertDialog);
+      await _pumpUntilFound(tester, dialog, attempts: 60);
+      await tester.pump(const Duration(milliseconds: 300));
+      await _capture(binding, tester, '04a_create_deck_dialog');
+
+      createdName = 'QA Deck $unique';
+      final nameField = find
+          .descendant(of: dialog, matching: find.byType(TextField))
+          .first;
+      await tester.enterText(nameField, createdName);
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final createButton = find.descendant(
+        of: dialog,
+        matching: find.widgetWithText(ElevatedButton, 'Criar'),
+      );
+      await tester.tap(createButton);
+      await tester.pump();
+
+      // Wait for the dialog to close before asserting the deck list updates.
+      await _pumpUntilAbsent(tester, dialog, attempts: 60);
+
+      final createdText = find.text(createdName);
+      await _pumpUntilFound(tester, createdText, attempts: 120);
+      await tester.ensureVisible(createdText);
+      await tester.pump(const Duration(seconds: 1));
+    }
+
+    if (createdName != null) {
+      final createdText = find.text(createdName);
+      final tappable = find.ancestor(of: createdText, matching: find.byType(InkWell));
+      if (tappable.evaluate().isNotEmpty) {
+        await tester.tap(tappable.first);
+      } else {
+        await tester.tap(createdText.first);
+      }
+      await tester.pump();
+      await _pumpUntilFound(tester, find.text('Detalhes do Deck'), attempts: 90);
+      await tester.pump(const Duration(seconds: 2));
+      await _capture(binding, tester, '04b_deck_details');
+
+      // Back to deck list.
+      final back = find.byType(BackButton);
+      if (back.evaluate().isNotEmpty) {
+        await tester.tap(back);
+        await tester.pump();
+      }
+      await _pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
+      await tester.pump(const Duration(seconds: 1));
+    }
+
+    // Open deck generator.
+    // NOTE: do not tap scanner/camera flows in this test; they can trigger OS
+    // permission prompts or external activities and make the app appear to go
+    // to background during automated runs.
+    final fabMenu = find.byType(PopupMenuButton<String>);
+    if (fabMenu.evaluate().isNotEmpty) {
+      await tester.tap(fabMenu);
+      await tester.pump(const Duration(seconds: 1));
+
+      // Constrain the tap to the popup menu overlay.
+      final generateEntry = find.descendant(
+        of: find.byType(PopupMenuItem<String>),
+        matching: find.text('Gerar com IA'),
+      );
+      expect(generateEntry, findsOneWidget);
+      await tester.tap(generateEntry);
+      await tester.pump();
+    } else {
+      final generateText = find.text('Gerar com IA');
+      final generateButton = find.ancestor(
+        of: generateText,
+        matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+      );
+      expect(generateText, findsWidgets);
+      if (generateButton.evaluate().isNotEmpty) {
+        await tester.tap(generateButton.first);
+      } else {
+        await tester.tap(generateText.first);
+      }
+      await tester.pump();
+    }
     await _pumpUntilFound(tester, find.text('Gerador de Decks'), attempts: 60);
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '05_generate');

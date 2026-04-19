@@ -1,4 +1,7 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
+
 import '../../../core/api/api_client.dart';
 import '../../../core/services/activation_funnel_service.dart';
 import '../../../core/utils/logger.dart';
@@ -276,12 +279,37 @@ class DeckProvider extends ChangeNotifier {
       );
 
       if (result.isSuccess) {
-        await fetchDecks(); // Recarrega a lista
-        await _trackActivationEvent(
-          'deck_created',
-          format: format,
-          source: 'deck_provider.createDeck',
+        final created =
+            (result.deck != null)
+                ? result.deck!.copyWith(description: description)
+                : null;
+
+        if (created != null) {
+          // Update otimista: evita depender do GET /decks (que pode time-outar no emulador).
+          _decks = [
+            created,
+            ..._decks.where((deck) => deck.id != created.id),
+          ];
+          notifyListeners();
+        }
+
+        // Recarrega em background para hidratar campos faltantes (ex.: card_count, description, etc).
+        unawaited(fetchDecks());
+
+        unawaited(
+          _trackActivationEvent(
+            'deck_created',
+            format: format,
+            source: 'deck_provider.createDeck',
+          ).catchError((e) {
+            AppLogger.error(
+              '[DeckProvider] Failed to track deck_created',
+              e is Object ? e : Exception('deck_created tracking failed: $e'),
+              StackTrace.current,
+            );
+          }),
         );
+
         return true;
       }
 

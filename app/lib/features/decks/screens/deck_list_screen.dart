@@ -187,6 +187,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final deckCount = context.select<DeckProvider, int>((p) => p.decks.length);
 
     return Scaffold(
       appBar: AppBar(
@@ -301,6 +302,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _showCreateDeckDialog(context),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Novo Deck'),
+                    ),
+                    const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => context.go('/decks/generate'),
                       icon: const Icon(Icons.auto_awesome, size: 18),
@@ -341,71 +348,77 @@ class _DeckListScreenState extends State<DeckListScreen> {
           );
         },
       ),
-      floatingActionButton: PopupMenuButton<String>(
-        onSelected: (value) {
-          switch (value) {
-            case 'create':
-              _showCreateDeckDialog(context);
-              break;
-            case 'generate':
-              context.go('/decks/generate');
-              break;
-            case 'import':
-              context.go('/decks/import');
-              break;
-          }
-        },
-        offset: const Offset(0, -160),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-        itemBuilder:
-            (context) => [
-              PopupMenuItem(
-                value: 'create',
-                child: ListTile(
-                  leading: Icon(Icons.add, color: theme.colorScheme.primary),
-                  title: const Text('Novo Deck'),
-                  subtitle: const Text('Criar do zero'),
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
+      floatingActionButton:
+          deckCount == 0
+              ? null
+              : PopupMenuButton<String>(
+                onSelected: (value) {
+                  switch (value) {
+                    case 'create':
+                      _showCreateDeckDialog(context);
+                      break;
+                    case 'generate':
+                      context.go('/decks/generate');
+                      break;
+                    case 'import':
+                      context.go('/decks/import');
+                      break;
+                  }
+                },
+                offset: const Offset(0, -160),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
-              ),
-              PopupMenuItem(
-                value: 'generate',
-                child: ListTile(
-                  leading: Icon(
-                    Icons.auto_awesome,
-                    color: theme.colorScheme.secondary,
+                itemBuilder:
+                    (context) => [
+                      PopupMenuItem(
+                        value: 'create',
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.add,
+                            color: theme.colorScheme.primary,
+                          ),
+                          title: const Text('Novo Deck'),
+                          subtitle: const Text('Criar do zero'),
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'generate',
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.auto_awesome,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          title: const Text('Gerar com IA'),
+                          subtitle: const Text('Descreva e a IA monta'),
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'import',
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.content_paste,
+                            color: AppTheme.mythicGold,
+                          ),
+                          title: const Text('Importar Lista'),
+                          subtitle: const Text('Colar de outro site'),
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                child: IgnorePointer(
+                  child: FloatingActionButton.extended(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add),
+                    label: const Text('Novo Deck'),
                   ),
-                  title: const Text('Gerar com IA'),
-                  subtitle: const Text('Descreva e a IA monta'),
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
                 ),
               ),
-              PopupMenuItem(
-                value: 'import',
-                child: ListTile(
-                  leading: Icon(
-                    Icons.content_paste,
-                    color: AppTheme.mythicGold,
-                  ),
-                  title: const Text('Importar Lista'),
-                  subtitle: const Text('Colar de outro site'),
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                ),
-              ),
-            ],
-        child: IgnorePointer(
-          child: FloatingActionButton.extended(
-            onPressed: () {},
-            icon: const Icon(Icons.add),
-            label: const Text('Novo Deck'),
-          ),
-        ),
-      ),
     );
   }
 
