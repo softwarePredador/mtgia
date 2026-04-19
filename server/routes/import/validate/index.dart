@@ -101,11 +101,14 @@ Future<Response> _validateList(RequestContext context) async {
   }
   final consolidated = byId.values.toList();
 
+  final copiesByName = <String, Map<String, dynamic>>{};
+
   for (final card in consolidated) {
-    final name = card['name'] as String;
+    final name = (card['name'] as String).trim();
     final typeLine = card['type_line'] as String;
     final quantity = card['quantity'] as int;
     final isCommander = card['is_commander'] == true;
+
     final typeLineLower = typeLine.toLowerCase();
     final isBasicLand = typeLineLower.contains('basic land') ||
         typeLineLower.contains('basic snow land');
@@ -115,8 +118,25 @@ Future<Response> _validateList(RequestContext context) async {
           .add('Comandante "$name" deve ter quantidade 1 (atual: $quantity).');
     }
 
-    if (!isBasicLand && !isCommander && quantity > limit) {
-      warnings.add('$name tem $quantity cópias (limite: $limit)');
+    if (isCommander || isBasicLand) continue;
+
+    final key = name.toLowerCase();
+    final existing = copiesByName[key];
+    if (existing == null) {
+      copiesByName[key] = {'name': name, 'qty': quantity};
+    } else {
+      copiesByName[key] = {
+        'name': existing['name'] as String,
+        'qty': (existing['qty'] as int) + quantity,
+      };
+    }
+  }
+
+  for (final entry in copiesByName.values) {
+    final name = entry['name'] as String;
+    final qty = entry['qty'] as int;
+    if (qty > limit) {
+      warnings.add('$name tem $qty cópias (limite: $limit)');
     }
   }
 

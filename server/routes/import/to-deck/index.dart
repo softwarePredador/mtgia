@@ -118,18 +118,39 @@ Future<Response> _importToDeck(RequestContext context) async {
 
   final consolidatedCards = cardMap.values.toList();
 
-  // Warnings com quantidades consolidadas
+  // Warnings com quantidades consolidadas (por NOME, para suportar múltiplas edições)
   warnings.clear();
+  final copiesByName = <String, Map<String, dynamic>>{};
+
   for (final card in consolidatedCards) {
-    final name = card['name'] as String;
+    final name = (card['name'] as String).trim();
     final typeLine = card['type_line'] as String;
     final quantity = card['quantity'] as int;
+    final isCommander = card['is_commander'] == true;
+
     final typeLineLower = typeLine.toLowerCase();
     final isBasicLand = typeLineLower.contains('basic land') ||
         typeLineLower.contains('basic snow land');
 
-    if (!isBasicLand && quantity > limit) {
-      warnings.add('$name: $quantity cópias (limite $limit)');
+    if (isCommander || isBasicLand) continue;
+
+    final key = name.toLowerCase();
+    final existing = copiesByName[key];
+    if (existing == null) {
+      copiesByName[key] = {'name': name, 'qty': quantity};
+    } else {
+      copiesByName[key] = {
+        'name': existing['name'] as String,
+        'qty': (existing['qty'] as int) + quantity,
+      };
+    }
+  }
+
+  for (final entry in copiesByName.values) {
+    final name = entry['name'] as String;
+    final qty = entry['qty'] as int;
+    if (qty > limit) {
+      warnings.add('$name: $qty cópias (limite $limit)');
     }
   }
 
