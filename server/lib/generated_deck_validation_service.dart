@@ -218,9 +218,19 @@ class GeneratedDeckValidationService {
       }
     }
 
-    final suggestions = invalidCards.isEmpty
+    final uniqueInvalidCards = invalidCards.toSet().toList();
+    const maxSuggestionLookups = 12;
+    final suggestionCandidates = uniqueInvalidCards.take(maxSuggestionLookups).toList();
+
+    if (uniqueInvalidCards.length > suggestionCandidates.length) {
+      warnings.add(
+        'Sugestoes limitadas a $maxSuggestionLookups cartas invalidas para evitar lentidao.',
+      );
+    }
+
+    final suggestions = suggestionCandidates.isEmpty
         ? const <String, List<String>>{}
-        : await _repository.findSuggestions(invalidCards.toSet().toList());
+        : await _repository.findSuggestions(suggestionCandidates);
 
     final generatedDeck = <String, dynamic>{
       if (resolvedCommander != null)
