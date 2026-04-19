@@ -137,18 +137,24 @@ Return ONLY a JSON object (no markdown). Use this schema:
 Format-specific rules:
 
 Commander (EDH):
-1. Commander is REQUIRED (a legendary creature or allowed planeswalker).
-2. Total must be exactly 100 cards including the commander (1 commander + 99 others).
-3. Only 1 copy of each card except basic lands (singleton rule).
-4. ALL cards must respect the commander's color identity.
-5. Do NOT include banned cards in the Commander format.
-6. Do NOT include the commander card inside the "cards" list.
-7. Starting life is 40.
+1. Commander is REQUIRED. Choose a LEGAL commander:
+   - typically a legendary creature, OR
+   - a card that explicitly says it "can be your commander", OR
+   - other commander-legal card types allowed by the rules (e.g., some Vehicles/Spacecraft with power/toughness).
+2. You may choose TWO commanders only if they have a compatible partner-style ability
+   (partner, partner with, friends forever, choose a Background, Doctor's companion). Never more than 2 commanders.
+3. Total must be exactly 100 cards including the commander(s).
+4. Only 1 copy of each card except basic lands (singleton rule). Copy limits are by English card NAME across printings.
+5. ALL cards must respect the combined commander color identity.
+6. Do NOT include banned cards in the Commander format.
+7. Do NOT include commander cards inside the "cards" list.
+8. Starting life is 40.
 
 Brawl:
-1. Commander required (legendary creature or planeswalker).
+1. Commander required (legendary creature or planeswalker, or a card that says it can be your commander).
 2. Total must be exactly 60 cards including the commander.
-3. Singleton (1 copy except basics). Cards must be Standard-legal.
+3. Singleton (1 copy except basics).
+4. Cards must be Standard-legal and respect the commander's color identity.
 
 Standard/Pioneer/Modern/Legacy/Vintage/Pauper:
 1. Minimum 60 cards in the main deck.
@@ -332,7 +338,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   required String warningCode,
   required String warningMessage,
 }) async {
-  final mockDeck = _mockGeneratedDeck(format);
+  final mockDeck = await _mockGeneratedDeck(pool, format);
 
   String? commanderName;
   final commanderRaw = mockDeck['commander'];
@@ -363,8 +369,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       'code': warningCode,
       'message': warningMessage,
       if (validation.warnings.isNotEmpty) 'messages': validation.warnings,
-      if (validation.invalidCards.isNotEmpty) 'invalid_cards': validation.invalidCards,
-      if (validation.suggestions.isNotEmpty) 'suggestions': validation.suggestions,
+      if (validation.invalidCards.isNotEmpty)
+        'invalid_cards': validation.invalidCards,
+      if (validation.suggestions.isNotEmpty)
+        'suggestions': validation.suggestions,
     };
 
     return {
@@ -410,8 +418,10 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   }
 }
 
-Map<String, dynamic> _mockGeneratedDeck(String format) {
+Future<Map<String, dynamic>> _mockGeneratedDeck(
+    Pool pool, String format) async {
   final normalized = format.trim().toLowerCase();
+
   if (normalized == 'commander' || normalized == 'edh') {
     return {
       'commander': {'name': 'Isamaru, Hound of Konda'},
@@ -422,16 +432,53 @@ Map<String, dynamic> _mockGeneratedDeck(String format) {
   }
 
   if (normalized == 'brawl') {
+    final resolved = await _pickMockBrawlCommander(pool);
+    final commanderName = resolved?['name'] as String?;
+    final colors = (resolved?['colors'] as List?)
+            ?.map((e) => e.toString().trim().toUpperCase())
+            .where((e) => e.isNotEmpty)
+            .toSet()
+            .toList() ??
+        const <String>[];
+
+    final fallbackCommander = commanderName ?? 'Isamaru, Hound of Konda';
+
     return {
-      'commander': {'name': 'Isamaru, Hound of Konda'},
-      'cards': [
-        {'name': 'Plains', 'quantity': 59},
-      ],
+      'commander': {'name': fallbackCommander},
+      'cards': _buildBasicLandMockCards(total: 59, colors: colors),
     };
   }
 
-  final basics = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest'];
-  const total = 60;
+  // 60-card formats: keep it simple and always legal by using only basic lands.
+  return {
+    'cards': _buildBasicLandMockCards(
+      total: 60,
+      colors: const ['W', 'U', 'B', 'R', 'G'],
+    ),
+  };
+}
+
+List<Map<String, dynamic>> _buildBasicLandMockCards({
+  required int total,
+  required List<String> colors,
+}) {
+  if (total <= 0) return const [];
+
+  final colorToBasic = <String, String>{
+    'W': 'Plains',
+    'U': 'Island',
+    'B': 'Swamp',
+    'R': 'Mountain',
+    'G': 'Forest',
+  };
+
+  final selectedBasics = <String>[];
+  for (final color in colors) {
+    final land = colorToBasic[color.toUpperCase()];
+    if (land != null) selectedBasics.add(land);
+  }
+
+  final basics = selectedBasics.isNotEmpty ? selectedBasics : const ['Wastes'];
   final per = (total / basics.length).floor();
   final cards = <Map<String, dynamic>>[];
 
@@ -448,5 +495,69 @@ Map<String, dynamic> _mockGeneratedDeck(String format) {
     i++;
   }
 
-  return {'cards': cards};
+  return cards;
+}
+
+Future<Map<String, dynamic>?> _pickMockBrawlCommander(Pool pool) async {
+  try {
+    // Prefer commanders explicitly marked as legal in brawl.
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT c.name, c.color_identity
+        FROM cards c
+        JOIN card_legalities cl ON cl.card_id = c.id
+        WHERE cl.format = 'brawl'
+          AND cl.status = 'legal'
+          AND lower(c.type_line) LIKE '%legendary%'
+          AND lower(c.type_line) LIKE '%creature%'
+          AND array_length(c.color_identity, 1) > 0
+        ORDER BY RANDOM()
+        LIMIT 1
+      '''),
+    );
+
+    if (result.isNotEmpty) {
+      final row = result.first;
+      final name = row[0] as String?;
+      final colorIdentityRaw = row[1] as List?;
+      if (name != null && name.trim().isNotEmpty) {
+        return {
+          'name': name.trim(),
+          'colors': colorIdentityRaw?.map((e) => e.toString()).toList() ??
+              const <String>[],
+        };
+      }
+    }
+
+    // If the DB doesn't have brawl legalities populated, pick any multi-colored
+    // legendary creature to keep the mock flow usable.
+    final fallback = await pool.execute(
+      Sql.named('''
+        SELECT c.name, c.color_identity
+        FROM cards c
+        WHERE lower(c.type_line) LIKE '%legendary%'
+          AND lower(c.type_line) LIKE '%creature%'
+          AND array_length(c.color_identity, 1) > 0
+        ORDER BY RANDOM()
+        LIMIT 1
+      '''),
+    );
+
+    if (fallback.isNotEmpty) {
+      final row = fallback.first;
+      final name = row[0] as String?;
+      final colorIdentityRaw = row[1] as List?;
+      if (name != null && name.trim().isNotEmpty) {
+        return {
+          'name': name.trim(),
+          'colors': colorIdentityRaw?.map((e) => e.toString()).toList() ??
+              const <String>[],
+        };
+      }
+    }
+  } catch (e) {
+    Log.w('Falha ao escolher comandante mock para brawl: $e');
+  }
+
+  return null;
 }
