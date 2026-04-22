@@ -175,28 +175,77 @@ Future<void> runCompleteAiSuggestionLoop({
     return;
   }
 
-  while (state.iterations < maxIterations && state.virtualTotal < maxTotal) {
+  const sparseInputCardThreshold = 12;
+  const sparseInputTargetAdditionsCap = 24;
+  const sparseInputMaxIterations = 1;
+  const sparseInputAiTimeout = Duration(seconds: 45);
+  const defaultAiTimeout = Duration(seconds: 75);
+  const sparseBootstrapMinAddedForAiSkip = 24;
+
+  final isSparseInput = state.virtualTotal <= sparseInputCardThreshold;
+  var sparseBootstrapAdded = 0;
+  if (isSparseInput) {
+    sparseBootstrapAdded = await _bootstrapSparseCompleteInput(
+      pool: pool,
+      state: state,
+      commanderColorIdentity: commanderColorIdentity,
+      deckFormat: deckFormat,
+      targetArchetype: targetArchetype,
+      detectedTheme: detectedTheme,
+      bracket: bracket,
+      maxTotal: maxTotal,
+    );
+  }
+  final effectiveMaxIterations =
+      isSparseInput ? sparseInputMaxIterations : maxIterations;
+  final aiTimeout = isSparseInput ? sparseInputAiTimeout : defaultAiTimeout;
+
+  if (isSparseInput) {
+    Log.i(
+      'Complete mode: sparse-input budget ativo '
+      '(initial_total=${state.virtualTotal}, max_iterations=$effectiveMaxIterations, '
+      'target_additions_cap=$sparseInputTargetAdditionsCap, timeout_s=${aiTimeout.inSeconds}).',
+    );
+    if (sparseBootstrapAdded >= sparseBootstrapMinAddedForAiSkip) {
+      Log.i(
+        'Complete mode: bootstrap determinístico já adicionou '
+        '$sparseBootstrapAdded cartas não-terreno; pulando IA e seguindo para fill remainder.',
+      );
+      return;
+    }
+  }
+
+  while (state.iterations < effectiveMaxIterations &&
+      state.virtualTotal < maxTotal) {
     state.iterations++;
     final missingNow = maxTotal - state.virtualTotal;
+    final requestedAdditions = isSparseInput &&
+            missingNow > sparseInputTargetAdditionsCap
+        ? sparseInputTargetAdditionsCap
+        : missingNow;
 
     Map<String, dynamic> iterResponse;
     try {
-      iterResponse = await optimizer.completeDeck(
-        deckData: {
-          'cards': state.virtualDeck,
-          'colors': deckColors.toList(),
-        },
-        commanders: commanders,
-        targetArchetype: targetArchetype,
-        targetAdditions: missingNow,
-        bracket: bracket,
-        keepTheme: keepTheme,
-        detectedTheme: detectedTheme,
-        coreCards: coreCards,
-      );
+      iterResponse = await optimizer
+          .completeDeck(
+            deckData: {
+              'cards': state.virtualDeck,
+              'colors': deckColors.toList(),
+            },
+            commanders: commanders,
+            targetArchetype: targetArchetype,
+            targetAdditions: requestedAdditions,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            detectedTheme: detectedTheme,
+            coreCards: coreCards,
+          )
+          .timeout(aiTimeout);
     } catch (e) {
       Log.w(
-        'Falha no completeDeck da IA; aplicando fallback determinístico. iteration=${state.iterations} missing=$missingNow error=$e',
+        'Falha no completeDeck da IA; aplicando fallback determinístico. '
+        'iteration=${state.iterations} missing=$missingNow requested=$requestedAdditions '
+        'timeout_s=${aiTimeout.inSeconds} error=$e',
       );
       break;
     }
@@ -333,6 +382,139 @@ Future<void> runCompleteAiSuggestionLoop({
   }
 }
 
+Future<int> _bootstrapSparseCompleteInput({
+  required Pool pool,
+  required CompleteBuildAccumulator state,
+  required Set<String> commanderColorIdentity,
+  required String deckFormat,
+  required String targetArchetype,
+  required String detectedTheme,
+  required int? bracket,
+  required int maxTotal,
+}) async {
+  final currentLands = _countCurrentLands(state.virtualDeck);
+  final targetLands = (state.commanderRecommendedLands ?? 36).clamp(32, 40);
+  final targetSpells =
+      (maxTotal - targetLands).clamp(state.virtualTotal, maxTotal);
+  final spellSlotsToFill = (targetSpells - state.virtualTotal).clamp(0, 48);
+  if (spellSlotsToFill <= 0) return 0;
+
+  final existingNames = state.virtualDeck
+      .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
+      .where((name) => name.isNotEmpty)
+      .toSet();
+
+  final selected = <Map<String, dynamic>>[];
+  final selectedNames = <String>{};
+
+  void addUnique(Iterable<Map<String, dynamic>> items) {
+    for (final item in items) {
+      final lowerName =
+          ((item['name'] as String?) ?? '').trim().toLowerCase();
+      if (lowerName.isEmpty) continue;
+      if (existingNames.contains(lowerName) || selectedNames.contains(lowerName)) {
+        continue;
+      }
+      selected.add(item);
+      selectedNames.add(lowerName);
+      if (selected.length >= spellSlotsToFill) {
+        return;
+      }
+    }
+  }
+
+  final foundationPool = await loadArchetypeCommanderFoundationFillers(
+    pool: pool,
+    commanderColorIdentity: commanderColorIdentity,
+    targetArchetype: targetArchetype,
+    detectedTheme: detectedTheme,
+    excludeNames: existingNames,
+    limit: spellSlotsToFill,
+  );
+  addUnique(foundationPool);
+
+  if (selected.length < spellSlotsToFill) {
+    final universalPool = await loadUniversalCommanderFallbacks(
+      pool: pool,
+      excludeNames: existingNames.union(selectedNames),
+      commanderColorIdentity: commanderColorIdentity,
+      limit: spellSlotsToFill - selected.length,
+    );
+    addUnique(universalPool);
+  }
+
+  final preferredPool = await loadPreferredNameFillers(
+    pool: pool,
+    preferredNames: state.aiSuggestedNames,
+    commanderColorIdentity: commanderColorIdentity,
+    excludeNames: existingNames.union(selectedNames),
+    limit: spellSlotsToFill - selected.length,
+  );
+  addUnique(preferredPool);
+
+  if (selected.length < spellSlotsToFill) {
+    final broadPool = await loadBroadCommanderNonLandFillers(
+      pool: pool,
+      commanderColorIdentity: commanderColorIdentity,
+      excludeNames: existingNames.union(selectedNames),
+      bracket: bracket,
+      limit: spellSlotsToFill - selected.length,
+    );
+    addUnique(broadPool);
+  }
+
+  if (selected.length < spellSlotsToFill) {
+    final identitySafePool = await loadIdentitySafeNonLandFillers(
+      pool: pool,
+      commanderColorIdentity: commanderColorIdentity,
+      excludeNames: existingNames.union(selectedNames),
+      limit: spellSlotsToFill - selected.length,
+    );
+    addUnique(identitySafePool);
+  }
+
+  var added = 0;
+  for (final candidate in selected) {
+    if (state.virtualTotal >= maxTotal) break;
+    final id = candidate['id'] as String;
+    final name = candidate['name'] as String;
+    final typeLine = candidate['type_line'] as String? ?? '';
+    final oracleText = candidate['oracle_text'] as String? ?? '';
+    final colors = (candidate['colors'] as List?)?.cast<String>() ?? const [];
+    final colorIdentity =
+        (candidate['color_identity'] as List?)?.cast<String>() ?? const [];
+    final nameLower = name.toLowerCase();
+    final maxCopies = maxCopiesForFormat(
+      deckFormat: deckFormat,
+      typeLine: typeLine,
+      name: name,
+    );
+
+    if ((state.virtualCountsByName[nameLower] ?? 0) >= maxCopies) continue;
+
+    _addCardToVirtualDeck(
+      state: state,
+      id: id,
+      name: name,
+      typeLine: typeLine,
+      oracleText: oracleText,
+      colors: colors,
+      colorIdentity: colorIdentity,
+    );
+    added += 1;
+  }
+
+  if (added > 0) {
+    state.deterministicStageUsed = true;
+    Log.i(
+      'Complete sparse bootstrap: current_lands=$currentLands target_lands=$targetLands '
+      'spell_slots=$spellSlotsToFill added=$added foundation_pool=${foundationPool.length} preferred_pool=${preferredPool.length}',
+    );
+  }
+
+  return added;
+}
+
 void rebalanceCompleteDeckForLandDeficit({
   required CompleteBuildAccumulator state,
   required int maxTotal,
@@ -449,8 +631,26 @@ Future<void> fillCompleteDeckRemainder({
       final existingNames = state.virtualDeck
           .map((c) => ((c['name'] as String?) ?? '').toLowerCase())
           .toSet();
+      final selectedSpells = <Map<String, dynamic>>[];
+      final selectedSpellNames = <String>{};
+      void mergeUniqueSpells(List<Map<String, dynamic>> incoming) {
+        for (final item in incoming) {
+          final lowerName =
+              ((item['name'] as String?) ?? '').trim().toLowerCase();
+          if (lowerName.isEmpty) continue;
+          if (existingNames.contains(lowerName) ||
+              selectedSpellNames.contains(lowerName)) {
+            continue;
+          }
+          selectedSpells.add(item);
+          selectedSpellNames.add(lowerName);
+          if (selectedSpells.length >= spellsNeeded) {
+            return;
+          }
+        }
+      }
 
-      var selectedSpells = await findSynergyReplacements(
+      final initialSynergySpells = await findSynergyReplacements(
         pool: pool,
         commanders: commanders,
         commanderColorIdentity: commanderColorIdentity,
@@ -465,18 +665,37 @@ Future<void> fillCompleteDeckRemainder({
         allCardData: state.virtualDeck,
         preferredNames: state.aiSuggestedNames,
       );
+      mergeUniqueSpells(dedupeCandidatesByName(initialSynergySpells));
 
       if (selectedSpells.isEmpty) {
         final universalFallback = await loadUniversalCommanderFallbacks(
           pool: pool,
           excludeNames: existingNames,
+          commanderColorIdentity: commanderColorIdentity,
           limit: spellsNeeded,
         );
         if (universalFallback.isNotEmpty) {
           Log.d(
             '  Synergy replacements vazios; aplicando fallback universal (${universalFallback.length} cartas).',
           );
-          selectedSpells = universalFallback;
+          mergeUniqueSpells(universalFallback);
+        }
+      }
+
+      if (selectedSpells.length < spellsNeeded) {
+        final foundationFallback = await loadArchetypeCommanderFoundationFillers(
+          pool: pool,
+          commanderColorIdentity: commanderColorIdentity,
+          targetArchetype: targetArchetype,
+          detectedTheme: detectedTheme,
+          excludeNames: existingNames.union(selectedSpellNames),
+          limit: spellsNeeded - selectedSpells.length,
+        );
+        if (foundationFallback.isNotEmpty) {
+          Log.d(
+            '  Fallback foundation aplicado (+${foundationFallback.length} cartas).',
+          );
+          mergeUniqueSpells(foundationFallback);
         }
       }
 
@@ -484,30 +703,25 @@ Future<void> fillCompleteDeckRemainder({
         Log.d(
           '  Expansão de spells ativada: selected=${selectedSpells.length}, spellsNeeded=$spellsNeeded, identity=${commanderColorIdentity.join(',')}',
         );
-        final alreadySelectedNames = selectedSpells
-            .map((e) => ((e['name'] as String?) ?? '').toLowerCase())
-            .where((name) => name.isNotEmpty)
-            .toSet();
-
         final preferredPool = await loadPreferredNameFillers(
           pool: pool,
           preferredNames: state.aiSuggestedNames,
           commanderColorIdentity: commanderColorIdentity,
-          excludeNames: existingNames.union(alreadySelectedNames),
+          excludeNames: existingNames.union(selectedSpellNames),
           limit: spellsNeeded - selectedSpells.length,
         );
         if (preferredPool.isNotEmpty) {
           Log.d(
             '  Fallback preferred-name aplicado (+${preferredPool.length} cartas).',
           );
-          selectedSpells = [...selectedSpells, ...preferredPool];
+          mergeUniqueSpells(preferredPool);
         }
 
         if (selectedSpells.length < spellsNeeded) {
           final broadPool = await loadBroadCommanderNonLandFillers(
             pool: pool,
             commanderColorIdentity: commanderColorIdentity,
-            excludeNames: existingNames.union(alreadySelectedNames),
+            excludeNames: existingNames.union(selectedSpellNames),
             bracket: bracket,
             limit: spellsNeeded - selectedSpells.length,
           );
@@ -516,7 +730,7 @@ Future<void> fillCompleteDeckRemainder({
             Log.d(
               '  Fallback broad pool aplicado (+${broadPool.length} cartas).',
             );
-            selectedSpells = [...selectedSpells, ...broadPool];
+            mergeUniqueSpells(broadPool);
           }
         }
 
@@ -524,18 +738,19 @@ Future<void> fillCompleteDeckRemainder({
           final emergencyIdentityPool = await loadIdentitySafeNonLandFillers(
             pool: pool,
             commanderColorIdentity: commanderColorIdentity,
-            excludeNames: existingNames.union(alreadySelectedNames),
+            excludeNames: existingNames.union(selectedSpellNames),
             limit: spellsNeeded - selectedSpells.length,
           );
           if (emergencyIdentityPool.isNotEmpty) {
             Log.d(
               '  Fallback identity-safe aplicado (+${emergencyIdentityPool.length} cartas).',
             );
-            selectedSpells = [...selectedSpells, ...emergencyIdentityPool];
+            mergeUniqueSpells(emergencyIdentityPool);
           }
         }
       }
 
+      var actuallyAddedSpells = 0;
       for (final spell in selectedSpells) {
         if (state.virtualTotal >= maxTotal) break;
         final id = spell['id'] as String;
@@ -563,9 +778,10 @@ Future<void> fillCompleteDeckRemainder({
           colors: const <String>[],
           colorIdentity: const <String>[],
         );
+        actuallyAddedSpells += 1;
       }
 
-      Log.d('  Spells não-terreno adicionadas: ${selectedSpells.length}');
+      Log.d('  Spells não-terreno adicionadas: $actuallyAddedSpells');
     } catch (e) {
       Log.w('Falha ao buscar spells sinérgicas: $e');
     }

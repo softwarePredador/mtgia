@@ -1,0 +1,770 @@
+﻿{
+    "base_url":  "http://127.0.0.1:8080",
+    "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+    "archetype":  "Proliferate Combo",
+    "runs":  1,
+    "generated_at":  "2026-04-21T12:38:07.2002013-03:00",
+    "avg_request_latency_ms":  6077,
+    "max_request_latency_ms":  6077,
+    "avg_total_job_time_ms":  338554,
+    "max_total_job_time_ms":  338554,
+    "results":  [
+                    {
+                        "run":  1,
+                        "requested_at":  "2026-04-21T12:32:28.2894685-03:00",
+                        "request_latency_ms":  6077,
+                        "status_code":  202,
+                        "initial_mode":  null,
+                        "initial_timings":  {
+                                                "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+                                                "request_mode":  "optimize",
+                                                "total_ms":  5604,
+                                                "stages_ms":  {
+                                                                  "request.deck_context":  1784,
+                                                                  "request.commander_priority_query":  1397,
+                                                                  "request.async_job_create":  1253,
+                                                                  "deck_context.theme_profile":  611,
+                                                                  "deck_context.cards_query":  588,
+                                                                  "deck_context.deck_query":  583,
+                                                                  "request.cache_lookup":  583,
+                                                                  "request.user_preferences":  582,
+                                                                  "request.commander_reference_cache":  580,
+                                                                  "deck_context.analysis":  0,
+                                                                  "deck_context.state_assessment":  0,
+                                                                  "deck_context.resolve_archetype":  0,
+                                                                  "request.commander_live_edhrec":  0,
+                                                                  "request.deterministic_shortlist":  0
+                                                              }
+                                            },
+                        "poll_interval_ms":  2000,
+                        "total_job_time_ms":  338554,
+                        "poll_count":  101,
+                        "polls":  [
+                                      {
+                                          "poll":  1,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  2,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  3,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  4,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  5,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  6,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  7,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  8,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  9,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  10,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  11,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  12,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  13,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  14,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  15,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  16,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  17,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  18,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  19,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  20,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  21,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  22,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  23,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  24,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  25,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  26,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  27,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  28,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  29,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  30,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  31,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  32,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  33,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  34,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  35,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  36,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  37,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  38,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  39,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  40,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  41,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  42,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  43,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  44,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  45,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  46,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  47,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  48,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  49,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  50,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  51,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  52,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  53,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  54,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  55,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  56,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  57,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  58,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  59,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  60,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  61,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  62,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  63,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  64,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  65,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  66,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  67,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  68,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  69,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  70,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  71,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  72,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  73,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  74,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  75,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  76,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  77,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  78,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  79,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  80,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  81,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  82,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  83,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  84,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  85,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  86,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  87,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  88,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  89,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  90,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  91,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  92,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  93,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  94,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  95,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  96,
+                                          "status":  "processing",
+                                          "stage":  "Consultando IA para sugestões...",
+                                          "stage_number":  2,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  97,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  98,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  99,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  100,
+                                          "status":  "processing",
+                                          "stage":  "Processando resultado final...",
+                                          "stage_number":  6,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  101,
+                                          "status":  "completed",
+                                          "stage":  "Concluído",
+                                          "stage_number":  6,
+                                          "total_stages":  6
+                                      }
+                                  ],
+                        "job_status":  "completed",
+                        "final_stage":  "Concluído",
+                        "result_mode":  "complete",
+                        "result_timings":  {
+                                               "job_id":  "91399cc311094642a576be34b273c95a",
+                                               "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+                                               "total_ms":  336128,
+                                               "stages_ms":  {
+                                                                 "complete.fill_remainder":  9243,
+                                                                 "complete.ai_suggestion_loop":  320074,
+                                                                 "complete.build_final_response":  1375,
+                                                                 "complete.prepare_commander_seed":  2085,
+                                                                 "complete.rebalance_land_deficit":  0,
+                                                                 "complete.build_intermediate_payload":  0
+                                                             },
+                                               "request_mode":  "complete_async"
+                                           }
+                    }
+                ]
+}

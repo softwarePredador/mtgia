@@ -1,0 +1,1407 @@
+{
+  "source_deck_id": "cca9f573-5366-44ab-96a8-4ca16456c3f8",
+  "source_deck_name": "Corpus Seed - Edgar Markov",
+  "seed_deck_id": "c45a0a9f-6d55-4633-a39c-a8c652853e66",
+  "optimize_request": {
+    "deck_id": "c45a0a9f-6d55-4633-a39c-a8c652853e66",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "core_cards": [
+        "Edgar Markov"
+      ],
+      "match_score": 2.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "17f761765f7a10cbae762acde0b22ba3",
+      "deck_id": "c45a0a9f-6d55-4633-a39c-a8c652853e66",
+      "total_ms": 12133,
+      "stages_ms": {
+        "complete.fill_remainder": 4269,
+        "complete.build_final_response": 1239,
+        "complete.prepare_commander_seed": 2494,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Signet",
+      "Command Tower",
+      "Generous Gift",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Path to Exile",
+      "Read the Bones",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Swords to Plowshares",
+      "Demonic Tutor",
+      "Dark Ritual",
+      "Vampiric Tutor",
+      "Skullclamp",
+      "Anguished Unmaking",
+      "Orzhov Signet",
+      "Patchwork Banner",
+      "Phyrexian Arena",
+      "Rakdos Signet",
+      "Village Rites",
+      "Welcoming Vampire",
+      "Ruthless Lawbringer",
+      "Baron Bertram Graywater",
+      "Clavileño, First of the Blessed",
+      "Dusk Legion Zealot",
+      "Falkenrath Pit Fighter",
+      "Vampire Gourmand",
+      "Vanquisher's Banner",
+      "Cruel Celebrant",
+      "Master of Dark Rites",
+      "Malakir Bloodwitch",
+      "Marauding Blight-Priest",
+      "Sanctum Seeker",
+      "Twilight Prophet",
+      "Damn",
+      "Preacher of the Schism",
+      "Talisman of Hierarchy",
+      "Smothering Tithe",
+      "Blood Artist",
+      "Elenda, the Dusk Rose",
+      "Shared Animosity",
+      "Viscera Seer",
+      "Vito, Thorn of the Dusk Rose",
+      "Yahenni, Undying Partisan",
+      "Champion of Dusk",
+      "Blade of the Bloodchief",
+      "Cordial Vampire",
+      "Creeping Bloodsucker",
+      "Indulgent Aristocrat",
+      "Knight of the Ebon Legion",
+      "Legion Lieutenant",
+      "Oathsworn Vampire",
+      "Vampire Socialite",
+      "Vampire of the Dire Moon",
+      "Vengeful Bloodwitch",
+      "Anowon, the Ruin Sage",
+      "Bloodletter of Aclazotz",
+      "Bloodthirsty Conqueror",
+      "Captivating Vampire",
+      "Door of Destinies",
+      "Drana and Linvala",
+      "Mountain",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "6.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 15). Falta mana B (Tem 0 fontes, ideal > 15). Falta mana R (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.59",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 7,
+        "artifacts": 15,
+        "creatures": 35,
+        "sorceries": 3,
+        "enchantments": 3,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana B (Tem 13 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "3d7d55a3-c301-4487-b6de-3cfbe9195cea",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Demonic Tutor",
+        "card_id": "b48f808a-7759-4d81-8cca-2adb4681ef51",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dark Ritual",
+        "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vampiric Tutor",
+        "card_id": "783ccf92-f6d0-4c8c-8b7b-3087d929a7a6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Skullclamp",
+        "card_id": "53f9ed4b-c7f3-42c6-a751-4b79287f4a0a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Anguished Unmaking",
+        "card_id": "6f7db9ae-2e75-4b50-ac8a-a16c632a9f71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Orzhov Signet",
+        "card_id": "1a35e0d3-86fe-4078-9156-f1e1bde97cac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Patchwork Banner",
+        "card_id": "7807a308-7070-4430-8c69-b7afcd004e4c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Phyrexian Arena",
+        "card_id": "234476eb-dade-4f68-90b4-3ad59f947f4a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rakdos Signet",
+        "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Village Rites",
+        "card_id": "8fabd105-05c1-4852-be76-e8666ef1d2d8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Welcoming Vampire",
+        "card_id": "e9c51842-6c07-4230-9a89-006bc33133a1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ruthless Lawbringer",
+        "card_id": "b406a56c-547e-44af-892b-cbe81ff486a4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Baron Bertram Graywater",
+        "card_id": "736ae61f-c71a-46de-bc02-cfd8cd65f21a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Clavileño, First of the Blessed",
+        "card_id": "66610aac-83ea-4e75-9387-d502c27eae88",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dusk Legion Zealot",
+        "card_id": "3044522f-310a-4cda-919e-3eb1031fe877",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Falkenrath Pit Fighter",
+        "card_id": "51a4cd6c-79e5-441c-b26a-540d2324f271",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vampire Gourmand",
+        "card_id": "66a4cd5d-7fc2-46f6-b618-395bb0f986e8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vanquisher's Banner",
+        "card_id": "ea496a3f-c480-40d7-aa55-a7b7fb1cd184",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cruel Celebrant",
+        "card_id": "796e4e13-445d-4876-b744-3e18ba0d9aa4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Master of Dark Rites",
+        "card_id": "6bd7e526-6c68-4f0b-9a5a-bd491e8094c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Malakir Bloodwitch",
+        "card_id": "f5678c82-c893-47ef-8d91-2ddf44d465d0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Marauding Blight-Priest",
+        "card_id": "c3e9c6ee-9392-40f6-a284-ddedd31b8ab4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sanctum Seeker",
+        "card_id": "9b4b56f7-6dce-4070-b50f-4ecadbedd8be",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Twilight Prophet",
+        "card_id": "e64da0ce-914e-4b97-bb63-537af916df1a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Damn",
+        "card_id": "e71e2ea9-a658-4c35-adcf-cd6d33d662c2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Preacher of the Schism",
+        "card_id": "bc0a4151-418e-4e08-9462-6e02610b6eb4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Hierarchy",
+        "card_id": "64a5958c-5fd6-4ef3-9a23-c1a4f77b54ea",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Smothering Tithe",
+        "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blood Artist",
+        "card_id": "fa96a3f0-2ef4-43c6-9934-1629dd650761",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Elenda, the Dusk Rose",
+        "card_id": "121e8efe-2250-4b40-815e-9afe453fb8eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Shared Animosity",
+        "card_id": "7ac8919d-01ee-4a12-9a1d-888c9515123b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Viscera Seer",
+        "card_id": "efe862e7-d114-48c5-a4f4-e2ad3802e888",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vito, Thorn of the Dusk Rose",
+        "card_id": "61a5216a-19e8-49db-95ac-6af55c828489",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Yahenni, Undying Partisan",
+        "card_id": "2c7aeff2-145d-46d9-a893-4cf9425ee14c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Champion of Dusk",
+        "card_id": "f49bd962-23a7-49f8-831e-9f8d392770d4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blade of the Bloodchief",
+        "card_id": "2b665895-1819-477f-b059-56beb88f6889",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cordial Vampire",
+        "card_id": "7b0e9826-11d1-4617-9466-a9010323a686",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Creeping Bloodsucker",
+        "card_id": "3a7a8d91-2892-4de9-b5cf-f997a841bf28",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Indulgent Aristocrat",
+        "card_id": "513313ce-af37-4457-abcd-e5885b8a6c9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Knight of the Ebon Legion",
+        "card_id": "58c3beeb-606e-45f6-9edc-82d6e2ffb127",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Legion Lieutenant",
+        "card_id": "86a8e567-c8a3-482e-8cfc-05274d7626f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Oathsworn Vampire",
+        "card_id": "22776c1d-5736-49ea-ba43-d6ddb5a1c898",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vampire Socialite",
+        "card_id": "718a1f9f-0195-40f2-ae8d-1e82a74162ba",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vampire of the Dire Moon",
+        "card_id": "da123d67-fc67-43c3-90dd-47d02555416d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vengeful Bloodwitch",
+        "card_id": "9876f3f3-73b5-454a-8231-20194aaef391",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Anowon, the Ruin Sage",
+        "card_id": "079e36ed-12a1-4987-b6af-e6f3880c10bf",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloodletter of Aclazotz",
+        "card_id": "128612a9-2ba2-4bb0-b213-268e6c502edc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloodthirsty Conqueror",
+        "card_id": "02adb705-71c8-4ade-a2f9-7bdcf90ed913",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Captivating Vampire",
+        "card_id": "28956b25-e7a9-40fd-8bcf-ecd477ec8e09",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Door of Destinies",
+        "card_id": "5bb426b7-2f62-42e4-b932-12aaa68d7a04",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Drana and Linvala",
+        "card_id": "562aaf2d-953b-4e4e-af8d-fbf065913065",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 12,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "09415448-0f19-42bb-a922-4a1f28142900",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Edgar Markov",
+      "type_line": "Legendary Creature — Vampire Knight",
+      "mana_cost": "{3}{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 6.0,
+      "oracle_text": "Eminence — Whenever you cast another Vampire spell, if Edgar is in the command zone or on the battlefield, create a 1/1 black Vampire creature token.\nFirst strike, haste\nWhenever Edgar attacks, put a +1/+1 counter on each Vampire you control."
+    },
+    {
+      "card_id": "6f7db9ae-2e75-4b50-ac8a-a16c632a9f71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Anguished Unmaking",
+      "type_line": "Instant",
+      "mana_cost": "{1}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Exile target nonland permanent. You lose 3 life."
+    },
+    {
+      "card_id": "079e36ed-12a1-4987-b6af-e6f3880c10bf",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Anowon, the Ruin Sage",
+      "type_line": "Legendary Creature — Vampire Shaman",
+      "mana_cost": "{3}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "At the beginning of your upkeep, each player sacrifices a non-Vampire creature of their choice."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "736ae61f-c71a-46de-bc02-cfd8cd65f21a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Baron Bertram Graywater",
+      "type_line": "Legendary Creature — Vampire Noble",
+      "mana_cost": "{2}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever one or more tokens you control enter, create a 1/1 black Vampire Rogue creature token with lifelink. This ability triggers only once each turn.\n{1}{B}, Sacrifice another creature or artifact: Draw a card."
+    },
+    {
+      "card_id": "2b665895-1819-477f-b059-56beb88f6889",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blade of the Bloodchief",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "Whenever a creature dies, put a +1/+1 counter on equipped creature. If equipped creature is a Vampire, put two +1/+1 counters on it instead.\nEquip {1}"
+    },
+    {
+      "card_id": "fa96a3f0-2ef4-43c6-9934-1629dd650761",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blood Artist",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "128612a9-2ba2-4bb0-b213-268e6c502edc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bloodletter of Aclazotz",
+      "type_line": "Creature — Vampire Demon",
+      "mana_cost": "{1}{B}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nIf an opponent would lose life during your turn, they lose twice that much life instead. (Damage causes loss of life.)"
+    },
+    {
+      "card_id": "02adb705-71c8-4ade-a2f9-7bdcf90ed913",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bloodthirsty Conqueror",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{3}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, deathtouch\nWhenever an opponent loses life, you gain that much life. (Damage causes loss of life.)"
+    },
+    {
+      "card_id": "28956b25-e7a9-40fd-8bcf-ecd477ec8e09",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Captivating Vampire",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{1}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Other Vampire creatures you control get +1/+1.\nTap five untapped Vampires you control: Gain control of target creature. It becomes a Vampire in addition to its other types."
+    },
+    {
+      "card_id": "f49bd962-23a7-49f8-831e-9f8d392770d4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Champion of Dusk",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{3}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "When this creature enters, you draw X cards and you lose X life, where X is the number of Vampires you control."
+    },
+    {
+      "card_id": "66610aac-83ea-4e75-9387-d502c27eae88",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Clavileño, First of the Blessed",
+      "type_line": "Legendary Creature — Vampire Cleric",
+      "mana_cost": "{1}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you attack, target attacking Vampire that isn't a Demon becomes a Demon in addition to its other types. It gains \"When this creature dies, draw a card and create a tapped 4/3 white and black Vampire Demon creature token with flying.\""
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "7b0e9826-11d1-4617-9466-a9010323a686",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cordial Vampire",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature dies, put a +1/+1 counter on each Vampire you control."
+    },
+    {
+      "card_id": "3a7a8d91-2892-4de9-b5cf-f997a841bf28",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Creeping Bloodsucker",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "At the beginning of your upkeep, this creature deals 1 damage to each opponent. You gain life equal to the damage dealt this way."
+    },
+    {
+      "card_id": "796e4e13-445d-4876-b744-3e18ba0d9aa4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cruel Celebrant",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature or planeswalker you control dies, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "e71e2ea9-a658-4c35-adcf-cd6d33d662c2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Damn",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target creature. A creature destroyed this way can't be regenerated.\nOverload {2}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dark Ritual",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Add {B}{B}{B}."
+    },
+    {
+      "card_id": "b48f808a-7759-4d81-8cca-2adb4681ef51",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Demonic Tutor",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a card, put that card into your hand, then shuffle."
+    },
+    {
+      "card_id": "5bb426b7-2f62-42e4-b932-12aaa68d7a04",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Door of Destinies",
+      "type_line": "Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "As this artifact enters, choose a creature type.\nWhenever you cast a spell of the chosen type, put a charge counter on this artifact.\nCreatures you control of the chosen type get +1/+1 for each charge counter on this artifact."
+    },
+    {
+      "card_id": "562aaf2d-953b-4e4e-af8d-fbf065913065",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Drana and Linvala",
+      "type_line": "Legendary Creature — Vampire Angel",
+      "mana_cost": "{1}{W}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying, vigilance\nActivated abilities of creatures your opponents control can't be activated.\nDrana and Linvala has all activated abilities of all creatures your opponents control. You may spend mana as though it were mana of any color to activate those abilities."
+    },
+    {
+      "card_id": "3044522f-310a-4cda-919e-3eb1031fe877",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dusk Legion Zealot",
+      "type_line": "Creature — Vampire Soldier",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When this creature enters, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "121e8efe-2250-4b40-815e-9afe453fb8eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Elenda, the Dusk Rose",
+      "type_line": "Legendary Creature — Vampire Knight",
+      "mana_cost": "{2}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Lifelink\nWhenever another creature dies, put a +1/+1 counter on Elenda.\nWhen Elenda dies, create X 1/1 white Vampire creature tokens with lifelink, where X is Elenda's power."
+    },
+    {
+      "card_id": "51a4cd6c-79e5-441c-b26a-540d2324f271",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Falkenrath Pit Fighter",
+      "type_line": "Creature — Vampire Warrior",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{1}{R}, Discard a card, Sacrifice a Vampire: Draw two cards. Activate only if an opponent lost life this turn."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Generous Gift",
+      "type_line": "Instant",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Elephant creature token."
+    },
+    {
+      "card_id": "513313ce-af37-4457-abcd-e5885b8a6c9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Indulgent Aristocrat",
+      "type_line": "Creature — Vampire Noble",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Lifelink\n{2}, Sacrifice a creature: Put a +1/+1 counter on each Vampire you control."
+    },
+    {
+      "card_id": "58c3beeb-606e-45f6-9edc-82d6e2ffb127",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Knight of the Ebon Legion",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{2}{B}: This creature gets +3/+3 and gains deathtouch until end of turn.\nAt the beginning of your end step, if a player lost 4 or more life this turn, put a +1/+1 counter on this creature. (Damage causes loss of life.)"
+    },
+    {
+      "card_id": "86a8e567-c8a3-482e-8cfc-05274d7626f9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Legion Lieutenant",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Other Vampires you control get +1/+1."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "f5678c82-c893-47ef-8d91-2ddf44d465d0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Malakir Bloodwitch",
+      "type_line": "Creature — Vampire Shaman",
+      "mana_cost": "{3}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, protection from white\nWhen this creature enters, each opponent loses life equal to the number of Vampires you control. You gain life equal to the life lost this way."
+    },
+    {
+      "card_id": "c3e9c6ee-9392-40f6-a284-ddedd31b8ab4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Marauding Blight-Priest",
+      "type_line": "Creature — Vampire Cleric",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you gain life, each opponent loses 1 life."
+    },
+    {
+      "card_id": "6bd7e526-6c68-4f0b-9a5a-bd491e8094c3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Master of Dark Rites",
+      "type_line": "Creature — Vampire Cleric",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}, Sacrifice another creature: Add {B}{B}{B}. Spend this mana only to cast Vampire, Cleric, and/or Demon spells."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "22776c1d-5736-49ea-ba43-d6ddb5a1c898",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Oathsworn Vampire",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "This creature enters tapped.\nYou may cast this card from your graveyard if you gained life this turn."
+    },
+    {
+      "card_id": "1a35e0d3-86fe-4078-9156-f1e1bde97cac",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Orzhov Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {W}{B}."
+    },
+    {
+      "card_id": "7807a308-7070-4430-8c69-b7afcd004e4c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Patchwork Banner",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "As this artifact enters, choose a creature type.\nCreatures you control of the chosen type get +1/+1.\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path to Exile",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "234476eb-dade-4f68-90b4-3ad59f947f4a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Phyrexian Arena",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your upkeep, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Plains",
+      "type_line": "Basic Land — Plains",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {W}.)"
+    },
+    {
+      "card_id": "bc0a4151-418e-4e08-9462-6e02610b6eb4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Preacher of the Schism",
+      "type_line": "Creature — Vampire Cleric",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Deathtouch\nWhenever this creature attacks the player with the most life or tied for most life, create a 1/1 white Vampire creature token with lifelink.\nWhenever this creature attacks while you have the most life or are tied for most life, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rakdos Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {B}{R}."
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "b406a56c-547e-44af-892b-cbe81ff486a4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ruthless Lawbringer",
+      "type_line": "Creature — Vampire Assassin",
+      "mana_cost": "{1}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "When this creature enters, you may sacrifice another creature. When you do, destroy target nonland permanent."
+    },
+    {
+      "card_id": "9b4b56f7-6dce-4070-b50f-4ecadbedd8be",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sanctum Seeker",
+      "type_line": "Creature — Vampire Knight",
+      "mana_cost": "{2}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever a Vampire you control attacks, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "7ac8919d-01ee-4a12-9a1d-888c9515123b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Shared Animosity",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it."
+    },
+    {
+      "card_id": "53f9ed4b-c7f3-42c6-a751-4b79287f4a0a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Skullclamp",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "Equipped creature gets +1/-1.\nWhenever equipped creature dies, draw two cards.\nEquip {1}"
+    },
+    {
+      "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Smothering Tithe",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "3d7d55a3-c301-4487-b6de-3cfbe9195cea",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power."
+    },
+    {
+      "card_id": "64a5958c-5fd6-4ef3-9a23-c1a4f77b54ea",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Hierarchy",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "e64da0ce-914e-4b97-bb63-537af916df1a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Twilight Prophet",
+      "type_line": "Creature — Vampire Cleric",
+      "mana_cost": "{2}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nAscend (If you control ten or more permanents, you get the city's blessing for the rest of the game.)\nAt the beginning of your upkeep, if you have the city's blessing, reveal the top card of your library and put it into your hand. Each opponent loses X life and you gain X life, where X is that card's mana value."
+    },
+    {
+      "card_id": "66a4cd5d-7fc2-46f6-b618-395bb0f986e8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vampire Gourmand",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature attacks, you may sacrifice another creature. If you do, draw a card and this creature can't be blocked this turn."
+    },
+    {
+      "card_id": "da123d67-fc67-43c3-90dd-47d02555416d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vampire of the Dire Moon",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Deathtouch (Any amount of damage this deals to a creature is enough to destroy it.)\nLifelink (Damage dealt by this creature also causes you to gain that much life.)"
+    },
+    {
+      "card_id": "718a1f9f-0195-40f2-ae8d-1e82a74162ba",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vampire Socialite",
+      "type_line": "Creature — Vampire Noble",
+      "mana_cost": "{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Menace (This creature can't be blocked except by two or more creatures.)\nWhen this creature enters, if an opponent lost life this turn, put a +1/+1 counter on each other Vampire you control.\nAs long as an opponent lost life this turn, each other Vampire you control enters with an additional +1/+1 counter on it."
+    },
+    {
+      "card_id": "783ccf92-f6d0-4c8c-8b7b-3087d929a7a6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vampiric Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for a card, then shuffle and put that card on top. You lose 2 life."
+    },
+    {
+      "card_id": "ea496a3f-c480-40d7-aa55-a7b7fb1cd184",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vanquisher's Banner",
+      "type_line": "Artifact",
+      "mana_cost": "{5}",
+      "colors": [],
+      "cmc": 5.0,
+      "oracle_text": "As this artifact enters, choose a creature type.\nCreatures you control of the chosen type get +1/+1.\nWhenever you cast a creature spell of the chosen type, draw a card."
+    },
+    {
+      "card_id": "9876f3f3-73b5-454a-8231-20194aaef391",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vengeful Bloodwitch",
+      "type_line": "Creature — Vampire Warlock",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature you control dies, target opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "8fabd105-05c1-4852-be76-e8666ef1d2d8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Village Rites",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nDraw two cards."
+    },
+    {
+      "card_id": "efe862e7-d114-48c5-a4f4-e2ad3802e888",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Viscera Seer",
+      "type_line": "Creature — Vampire Wizard",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Sacrifice a creature: Scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
+    },
+    {
+      "card_id": "61a5216a-19e8-49db-95ac-6af55c828489",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vito, Thorn of the Dusk Rose",
+      "type_line": "Legendary Creature — Vampire Cleric",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you gain life, target opponent loses that much life.\n{3}{B}{B}: Creatures you control gain lifelink until end of turn."
+    },
+    {
+      "card_id": "e9c51842-6c07-4230-9a89-006bc33133a1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Welcoming Vampire",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Flying\nWhenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn."
+    },
+    {
+      "card_id": "2c7aeff2-145d-46d9-a893-4cf9425ee14c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Yahenni, Undying Partisan",
+      "type_line": "Legendary Creature — Aetherborn Vampire",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Haste\nWhenever a creature an opponent controls dies, put a +1/+1 counter on Yahenni.\nSacrifice another creature: Yahenni gains indestructible until end of turn."
+    }
+  ]
+}

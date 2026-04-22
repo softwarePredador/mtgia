@@ -1,0 +1,1399 @@
+{
+  "source_deck_id": "c4b6065d-0750-4bf0-8f7b-972e722a67d8",
+  "source_deck_name": "Corpus Seed - Sythis, Harvest's Hand",
+  "seed_deck_id": "31c1593d-b883-4c25-a013-f79dbf107fc0",
+  "optimize_request": {
+    "deck_id": "31c1593d-b883-4c25-a013-f79dbf107fc0",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "enchantments",
+      "confidence": "alta",
+      "core_cards": [
+        "Sythis, Harvest's Hand"
+      ],
+      "match_score": 1.25
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "f3eddd98e54907f927b0f46689ffb470",
+      "deck_id": "31c1593d-b883-4c25-a013-f79dbf107fc0",
+      "total_ms": 11973,
+      "stages_ms": {
+        "complete.fill_remainder": 4224,
+        "complete.build_final_response": 1280,
+        "complete.prepare_commander_seed": 2360,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Signet",
+      "Beast Within",
+      "Command Tower",
+      "Cultivate",
+      "Farseek",
+      "Generous Gift",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Nature's Lore",
+      "Path to Exile",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Thought Vessel",
+      "Swords to Plowshares",
+      "Banishing Light",
+      "Blind Obedience",
+      "Utopia Sprawl",
+      "Aura of Silence",
+      "Calix, Destiny's Hand",
+      "Karmic Justice",
+      "Seal of Primordium",
+      "Abundant Growth",
+      "Argothian Enchantress",
+      "Eidolon of Blossoms",
+      "Enchantress's Presence",
+      "Kenrith's Transformation",
+      "Mesa Enchantress",
+      "Satyr Enchanter",
+      "Setessan Champion",
+      "Spirited Companion",
+      "Verduran Enchantress",
+      "Mirari's Wake",
+      "Enlightened Tutor",
+      "Wild Growth",
+      "Sheltered by Ghosts",
+      "Smothering Tithe",
+      "Aura Shards",
+      "Ossification",
+      "Seal of Cleansing",
+      "Authority of the Consuls",
+      "Dryad of the Ilysian Grove",
+      "Heliod, Sun-Crowned",
+      "Land Tax",
+      "Sanctum Weaver",
+      "Sylvan Library",
+      "Solitary Confinement",
+      "Alseid of Life's Bounty",
+      "Burgeoning",
+      "Composer of Spring",
+      "Destiny Spinner",
+      "Fertile Ground",
+      "Herald of the Pantheon",
+      "Jukai Naturalist",
+      "Resurgent Belief",
+      "Starfield Mystic",
+      "Sterling Grove",
+      "Weaver of Harmony",
+      "Wolfwillow Haven",
+      "Ajani's Chosen",
+      "Archon of Sun's Grace",
+      "Forest",
+      "Plains"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "2.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 1,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "aggro",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 15). Falta mana G (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "OK: Curva aceitável para Aggro"
+    },
+    "post_analysis": {
+      "average_cmc": "2.29",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 5,
+        "artifacts": 8,
+        "creatures": 20,
+        "sorceries": 5,
+        "enchantments": 34,
+        "planeswalkers": 1
+      },
+      "detected_archetype": "stax",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thought Vessel",
+        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Banishing Light",
+        "card_id": "d62df417-ae3c-435c-902f-8d3a3d57dbc9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blind Obedience",
+        "card_id": "86112bb9-98f9-4615-8464-fbe770a5235f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Utopia Sprawl",
+        "card_id": "820108be-4190-47b0-b050-91a7aa45e947",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Aura of Silence",
+        "card_id": "c38321cf-910b-471f-afe5-fda6096d3913",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Calix, Destiny's Hand",
+        "card_id": "e174d8ab-5631-4825-9a63-be8b807c35a0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Karmic Justice",
+        "card_id": "6887f015-254e-4084-8390-e00e36b841d7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Seal of Primordium",
+        "card_id": "2de24501-4a2d-43d8-bc22-fda34cfc8c6e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abundant Growth",
+        "card_id": "2b594f4f-c05e-4f21-8304-c867542b76a5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Argothian Enchantress",
+        "card_id": "596da680-d237-40e8-93f8-54a7b52bf502",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Eidolon of Blossoms",
+        "card_id": "b7391c9d-3d0b-4e19-99cd-7943c90b5de6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Enchantress's Presence",
+        "card_id": "ee35f493-410f-476b-8bcf-ccf0014394c0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kenrith's Transformation",
+        "card_id": "8abe94bf-330f-4ad3-9016-b1a9b1d76ccd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mesa Enchantress",
+        "card_id": "eade3199-3c19-4203-94e0-58b812cb1f12",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Satyr Enchanter",
+        "card_id": "1e2dc172-12eb-4bda-b79a-0fcf5adc71de",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Setessan Champion",
+        "card_id": "0194cb1e-a1de-4bdb-bc90-c5fa19989add",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Spirited Companion",
+        "card_id": "a0793bb8-d072-408a-8de5-cf8a4a36607a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Verduran Enchantress",
+        "card_id": "c4399da9-b6df-4937-a767-b643bf818c75",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mirari's Wake",
+        "card_id": "1a369861-cca8-49a2-b2f7-b3f3023e3281",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Enlightened Tutor",
+        "card_id": "0430f9cf-86cd-45f5-853c-a76c9ca9b64c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Wild Growth",
+        "card_id": "268577bd-6199-404a-975e-16143234fdcd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sheltered by Ghosts",
+        "card_id": "633aef4a-3760-482e-a103-bbf94a7024db",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Smothering Tithe",
+        "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Aura Shards",
+        "card_id": "f90ecb1a-1761-488e-b847-7488b73f2932",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ossification",
+        "card_id": "bf4848ae-db08-42a3-a9e3-c96df4b2c4f2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Seal of Cleansing",
+        "card_id": "c03e1ecf-96c5-4138-978e-2f324b89fab9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Authority of the Consuls",
+        "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dryad of the Ilysian Grove",
+        "card_id": "5791c797-1c6a-45c5-984b-408893b53b00",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Heliod, Sun-Crowned",
+        "card_id": "4c30f9fa-8e0b-4fcc-9e20-710034919330",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Land Tax",
+        "card_id": "c0bee05b-9be6-41d3-8acc-01ddf1fc8503",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sanctum Weaver",
+        "card_id": "bf2cb751-56aa-4829-8e9c-cf538e815ed1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sylvan Library",
+        "card_id": "24671e56-b0db-448d-90cb-3183068cbd5a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Solitary Confinement",
+        "card_id": "25248978-648c-446d-be92-009f2fe4e90f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Alseid of Life's Bounty",
+        "card_id": "4da57a98-47f6-4c6d-bb4e-0c7eaad2f8b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Burgeoning",
+        "card_id": "1dcec0ca-f739-4c2b-ba44-e7990dd50618",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Composer of Spring",
+        "card_id": "25cd4cbc-3409-42dd-8b81-68ca95408a0e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Destiny Spinner",
+        "card_id": "a1ae32b5-b108-40ea-b4cc-0a969a058e24",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fertile Ground",
+        "card_id": "00bb8942-3824-40af-b424-0017b19244c6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Herald of the Pantheon",
+        "card_id": "da1924ca-8a6a-4f4b-ad2c-e9405e7092ad",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Jukai Naturalist",
+        "card_id": "036f14c6-d61b-43b4-826e-1000ea909712",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Resurgent Belief",
+        "card_id": "86cd1522-7c44-4661-b86e-70dd968560a8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Starfield Mystic",
+        "card_id": "2dbf4723-064f-45c4-bbde-b2d9bb7509f0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sterling Grove",
+        "card_id": "232501d2-9096-4c5f-83a7-7b1bd30fcf6e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Weaver of Harmony",
+        "card_id": "2d8f9b5a-049d-4f4d-acfb-560d0221c231",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Wolfwillow Haven",
+        "card_id": "07182fe7-c763-4d31-9abb-894264421efe",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ajani's Chosen",
+        "card_id": "5b8b8789-edc3-4ce0-8433-822869ed26a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Archon of Sun's Grace",
+        "card_id": "6df2c5ae-68be-43e1-abcf-921343ef9f6d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 18,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 18,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "366760dc-2845-4698-9125-f32aed306420",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Sythis, Harvest's Hand",
+      "type_line": "Legendary Enchantment Creature — Nymph",
+      "mana_cost": "{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever you cast an enchantment spell, you gain 1 life and draw a card."
+    },
+    {
+      "card_id": "2b594f4f-c05e-4f21-8304-c867542b76a5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abundant Growth",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Enchant land\nWhen this Aura enters, draw a card.\nEnchanted land has \"{T}: Add one mana of any color.\""
+    },
+    {
+      "card_id": "5b8b8789-edc3-4ce0-8433-822869ed26a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ajani's Chosen",
+      "type_line": "Creature — Cat Soldier",
+      "mana_cost": "{2}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever an enchantment you control enters, create a 2/2 white Cat creature token. If that enchantment is an Aura, you may attach it to the token."
+    },
+    {
+      "card_id": "4da57a98-47f6-4c6d-bb4e-0c7eaad2f8b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Alseid of Life's Bounty",
+      "type_line": "Enchantment Creature — Nymph",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Lifelink\n{1}, Sacrifice this creature: Target creature or enchantment you control gains protection from the color of your choice until end of turn."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "6df2c5ae-68be-43e1-abcf-921343ef9f6d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Archon of Sun's Grace",
+      "type_line": "Creature — Archon",
+      "mana_cost": "{2}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nLifelink (Damage dealt by this creature also causes you to gain that much life.)\nPegasus creatures you control have lifelink.\nConstellation — Whenever an enchantment you control enters, create a 2/2 white Pegasus creature token with flying."
+    },
+    {
+      "card_id": "596da680-d237-40e8-93f8-54a7b52bf502",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Argothian Enchantress",
+      "type_line": "Creature — Human Druid",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Shroud (This creature can't be the target of spells or abilities.)\nWhenever you cast an enchantment spell, draw a card."
+    },
+    {
+      "card_id": "c38321cf-910b-471f-afe5-fda6096d3913",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Aura of Silence",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Artifact and enchantment spells your opponents cast cost {2} more to cast.\nSacrifice this enchantment: Destroy target artifact or enchantment."
+    },
+    {
+      "card_id": "f90ecb1a-1761-488e-b847-7488b73f2932",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Aura Shards",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a creature you control enters, you may destroy target artifact or enchantment."
+    },
+    {
+      "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Authority of the Consuls",
+      "type_line": "Enchantment",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Creatures your opponents control enter tapped.\nWhenever a creature an opponent controls enters, you gain 1 life."
+    },
+    {
+      "card_id": "d62df417-ae3c-435c-902f-8d3a3d57dbc9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Banishing Light",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield."
+    },
+    {
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Beast Within",
+      "type_line": "Instant",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+    },
+    {
+      "card_id": "86112bb9-98f9-4615-8464-fbe770a5235f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blind Obedience",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)\nArtifacts and creatures your opponents control enter tapped."
+    },
+    {
+      "card_id": "1dcec0ca-f739-4c2b-ba44-e7990dd50618",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Burgeoning",
+      "type_line": "Enchantment",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever an opponent plays a land, you may put a land card from your hand onto the battlefield."
+    },
+    {
+      "card_id": "e174d8ab-5631-4825-9a63-be8b807c35a0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Calix, Destiny's Hand",
+      "type_line": "Legendary Planeswalker — Calix",
+      "mana_cost": "{2}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "[+1]: Look at the top four cards of your library. You may reveal an enchantment card from among them and put that card into your hand. Put the rest on the bottom of your library in a random order.\n[−3]: Exile target creature or enchantment you don't control until target enchantment you control leaves the battlefield.\n[−7]: Return all enchantment cards from your graveyard to the battlefield."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "25cd4cbc-3409-42dd-8b81-68ca95408a0e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Composer of Spring",
+      "type_line": "Creature — Satyr Bard",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Constellation — Whenever an enchantment you control enters, you may put a land card from your hand onto the battlefield tapped. If you control six or more enchantments, instead you may put a creature or land card from your hand onto the battlefield tapped."
+    },
+    {
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cultivate",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "a1ae32b5-b108-40ea-b4cc-0a969a058e24",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Destiny Spinner",
+      "type_line": "Enchantment Creature — Human",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Creature and enchantment spells you control can't be countered.\n{3}{G}: Target land you control becomes an X/X Elemental creature with trample and haste until end of turn, where X is the number of enchantments you control. It's still a land."
+    },
+    {
+      "card_id": "5791c797-1c6a-45c5-984b-408893b53b00",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dryad of the Ilysian Grove",
+      "type_line": "Enchantment Creature — Nymph Dryad",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "You may play an additional land on each of your turns.\nLands you control are every basic land type in addition to their other types."
+    },
+    {
+      "card_id": "b7391c9d-3d0b-4e19-99cd-7943c90b5de6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Eidolon of Blossoms",
+      "type_line": "Enchantment Creature — Spirit",
+      "mana_cost": "{2}{G}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Constellation — Whenever this creature or another enchantment you control enters, draw a card."
+    },
+    {
+      "card_id": "ee35f493-410f-476b-8bcf-ccf0014394c0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Enchantress's Presence",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you cast an enchantment spell, draw a card."
+    },
+    {
+      "card_id": "0430f9cf-86cd-45f5-853c-a76c9ca9b64c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Enlightened Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for an artifact or enchantment card, reveal it, then shuffle and put that card on top."
+    },
+    {
+      "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Farseek",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "00bb8942-3824-40af-b424-0017b19244c6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fertile Ground",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchant land\nWhenever enchanted land is tapped for mana, its controller adds an additional one mana of any color."
+    },
+    {
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Forest",
+      "type_line": "Basic Land — Forest",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {G}.)"
+    },
+    {
+      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Generous Gift",
+      "type_line": "Instant",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Elephant creature token."
+    },
+    {
+      "card_id": "4c30f9fa-8e0b-4fcc-9e20-710034919330",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Heliod, Sun-Crowned",
+      "type_line": "Legendary Enchantment Creature — God",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Indestructible\nAs long as your devotion to white is less than five, Heliod isn't a creature.\nWhenever you gain life, put a +1/+1 counter on target creature or enchantment you control.\n{1}{W}: Another target creature gains lifelink until end of turn."
+    },
+    {
+      "card_id": "da1924ca-8a6a-4f4b-ad2c-e9405e7092ad",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Herald of the Pantheon",
+      "type_line": "Creature — Centaur Shaman",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchantment spells you cast cost {1} less to cast.\nWhenever you cast an enchantment spell, you gain 1 life."
+    },
+    {
+      "card_id": "036f14c6-d61b-43b4-826e-1000ea909712",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Jukai Naturalist",
+      "type_line": "Enchantment Creature — Human Monk",
+      "mana_cost": "{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Lifelink\nEnchantment spells you cast cost {1} less to cast."
+    },
+    {
+      "card_id": "6887f015-254e-4084-8390-e00e36b841d7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Karmic Justice",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a spell or ability an opponent controls destroys a noncreature permanent you control, you may destroy target permanent that opponent controls."
+    },
+    {
+      "card_id": "8abe94bf-330f-4ad3-9016-b1a9b1d76ccd",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kenrith's Transformation",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchant creature\nWhen this Aura enters, draw a card.\nEnchanted creature loses all abilities and is a green Elk creature with base power and toughness 3/3. (It loses all other card types and creature types.)"
+    },
+    {
+      "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kodama's Reach",
+      "type_line": "Sorcery — Arcane",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "c0bee05b-9be6-41d3-8acc-01ddf1fc8503",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Land Tax",
+      "type_line": "Enchantment",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "At the beginning of your upkeep, if an opponent controls more lands than you, you may search your library for up to three basic land cards, reveal them, put them into your hand, then shuffle."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "eade3199-3c19-4203-94e0-58b812cb1f12",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mesa Enchantress",
+      "type_line": "Creature — Human Druid",
+      "mana_cost": "{1}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you cast an enchantment spell, you may draw a card."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "1a369861-cca8-49a2-b2f7-b3f3023e3281",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mirari's Wake",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Creatures you control get +1/+1.\nWhenever you tap a land for mana, add one mana of any type that land produced."
+    },
+    {
+      "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Nature's Lore",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "bf4848ae-db08-42a3-a9e3-c96df4b2c4f2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ossification",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchant basic land you control\nWhen this Aura enters, exile target creature or planeswalker an opponent controls until this Aura leaves the battlefield."
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path to Exile",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Plains",
+      "type_line": "Basic Land — Plains",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {W}.)"
+    },
+    {
+      "card_id": "86cd1522-7c44-4661-b86e-70dd968560a8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Resurgent Belief",
+      "type_line": "Sorcery",
+      "mana_cost": "",
+      "colors": [
+        "W"
+      ],
+      "cmc": 0.0,
+      "oracle_text": "Suspend 2—{1}{W} (Rather than cast this card from your hand, pay {1}{W} and exile it with two time counters on it. At the beginning of your upkeep, remove a time counter. When the last is removed, you may cast it without paying its mana cost.)\nReturn all enchantment cards from your graveyard to the battlefield. (Auras with nothing to enchant remain in your graveyard.)"
+    },
+    {
+      "card_id": "bf2cb751-56aa-4829-8e9c-cf538e815ed1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sanctum Weaver",
+      "type_line": "Enchantment Creature — Dryad",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add X mana of any one color, where X is the number of enchantments you control."
+    },
+    {
+      "card_id": "1e2dc172-12eb-4bda-b79a-0fcf5adc71de",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Satyr Enchanter",
+      "type_line": "Creature — Satyr Druid",
+      "mana_cost": "{1}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you cast an enchantment spell, draw a card."
+    },
+    {
+      "card_id": "c03e1ecf-96c5-4138-978e-2f324b89fab9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Seal of Cleansing",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice this enchantment: Destroy target artifact or enchantment."
+    },
+    {
+      "card_id": "2de24501-4a2d-43d8-bc22-fda34cfc8c6e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Seal of Primordium",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice this enchantment: Destroy target artifact or enchantment."
+    },
+    {
+      "card_id": "0194cb1e-a1de-4bdb-bc90-c5fa19989add",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Setessan Champion",
+      "type_line": "Creature — Human Warrior",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Constellation — Whenever an enchantment you control enters, put a +1/+1 counter on this creature and draw a card."
+    },
+    {
+      "card_id": "633aef4a-3760-482e-a103-bbf94a7024db",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sheltered by Ghosts",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchant creature you control\nWhen this Aura enters, exile target nonland permanent an opponent controls until this Aura leaves the battlefield.\nEnchanted creature gets +1/+0 and has lifelink and ward {2}."
+    },
+    {
+      "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Smothering Tithe",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "25248978-648c-446d-be92-009f2fe4e90f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Solitary Confinement",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your upkeep, sacrifice this enchantment unless you discard a card.\nSkip your draw step.\nYou have shroud. (You can't be the target of spells or abilities.)\nPrevent all damage that would be dealt to you."
+    },
+    {
+      "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "a0793bb8-d072-408a-8de5-cf8a4a36607a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Spirited Companion",
+      "type_line": "Enchantment Creature — Dog",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When this creature enters, draw a card."
+    },
+    {
+      "card_id": "2dbf4723-064f-45c4-bbde-b2d9bb7509f0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Starfield Mystic",
+      "type_line": "Creature — Human Cleric",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchantment spells you cast cost {1} less to cast.\nWhenever an enchantment you control is put into a graveyard from the battlefield, put a +1/+1 counter on this creature."
+    },
+    {
+      "card_id": "232501d2-9096-4c5f-83a7-7b1bd30fcf6e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sterling Grove",
+      "type_line": "Enchantment",
+      "mana_cost": "{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Other enchantments you control have shroud. (They can't be the targets of spells or abilities.)\n{1}, Sacrifice this enchantment: Search your library for an enchantment card, reveal it, then shuffle and put that card on top."
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power."
+    },
+    {
+      "card_id": "24671e56-b0db-448d-90cb-3183068cbd5a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sylvan Library",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "At the beginning of your draw step, you may draw two additional cards. If you do, choose two cards in your hand drawn this turn. For each of those cards, pay 4 life or put the card on top of your library."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Thought Vessel",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "You have no maximum hand size.\n{T}: Add {C}."
+    },
+    {
+      "card_id": "820108be-4190-47b0-b050-91a7aa45e947",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Utopia Sprawl",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Enchant Forest\nAs this Aura enters, choose a color.\nWhenever enchanted Forest is tapped for mana, its controller adds an additional one mana of the chosen color."
+    },
+    {
+      "card_id": "c4399da9-b6df-4937-a767-b643bf818c75",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Verduran Enchantress",
+      "type_line": "Creature — Human Druid",
+      "mana_cost": "{1}{G}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you cast an enchantment spell, you may draw a card."
+    },
+    {
+      "card_id": "2d8f9b5a-049d-4f4d-acfb-560d0221c231",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Weaver of Harmony",
+      "type_line": "Enchantment Creature — Snake Druid",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Other enchantment creatures you control get +1/+1.\n{G}, {T}: Copy target activated or triggered ability you control from an enchantment source. You may choose new targets for the copy. (Mana abilities can't be targeted.)"
+    },
+    {
+      "card_id": "268577bd-6199-404a-975e-16143234fdcd",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Wild Growth",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Enchant land\nWhenever enchanted land is tapped for mana, its controller adds an additional {G}."
+    },
+    {
+      "card_id": "07182fe7-c763-4d31-9abb-894264421efe",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Wolfwillow Haven",
+      "type_line": "Enchantment — Aura",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Enchant land\nWhenever enchanted land is tapped for mana, its controller adds an additional {G}.\n{4}{G}, Sacrifice this Aura: Create a 2/2 green Wolf creature token. Activate only during your turn."
+    }
+  ]
+}

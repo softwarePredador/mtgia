@@ -3,6 +3,7 @@ import 'package:postgres/postgres.dart';
 import '../color_identity.dart';
 import '../logger.dart';
 import 'optimize_runtime_support.dart';
+import 'optimize_stage_telemetry.dart';
 import 'optimize_state_support.dart';
 
 class OptimizeDeckContextData {
@@ -56,11 +57,19 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required String requestMode,
   required int? bracket,
   required bool keepTheme,
+  OptimizeStageTelemetry? telemetry,
 }) async {
-  final deckResult = await pool.execute(
-    Sql.named('SELECT name, format FROM decks WHERE id = @id'),
-    parameters: {'id': deckId},
-  );
+  final deckResult = await (telemetry?.trackAsync(
+        'deck_context.deck_query',
+        () => pool.execute(
+          Sql.named('SELECT name, format FROM decks WHERE id = @id'),
+          parameters: {'id': deckId},
+        ),
+      ) ??
+      pool.execute(
+        Sql.named('SELECT name, format FROM decks WHERE id = @id'),
+        parameters: {'id': deckId},
+      ));
 
   if (deckResult.isEmpty) {
     throw const OptimizeDeckContextException('DECK_NOT_FOUND');
@@ -73,8 +82,10 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     throw const OptimizeDeckContextException('DECK_FORMAT_MISSING');
   }
 
-  final cardsResult = await pool.execute(
-    Sql.named('''
+  final cardsResult = await (telemetry?.trackAsync(
+        'deck_context.cards_query',
+        () => pool.execute(
+          Sql.named('''
       SELECT c.name, dc.is_commander, dc.quantity, c.type_line, c.mana_cost, c.colors,
              COALESCE(
                (SELECT SUM(
@@ -94,8 +105,32 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       JOIN cards c ON c.id = dc.card_id 
       WHERE dc.deck_id = @id
     '''),
-    parameters: {'id': deckId},
-  );
+          parameters: {'id': deckId},
+        ),
+      ) ??
+      pool.execute(
+        Sql.named('''
+      SELECT c.name, dc.is_commander, dc.quantity, c.type_line, c.mana_cost, c.colors,
+             COALESCE(
+               (SELECT SUM(
+                 CASE 
+                   WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                   WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                   WHEN m[1] = 'X' THEN 0
+                   ELSE 1
+                 END
+               ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
+               0
+             ) as cmc,
+             c.oracle_text,
+             c.color_identity,
+             c.id::text
+      FROM deck_cards dc 
+      JOIN cards c ON c.id = dc.card_id 
+      WHERE dc.deck_id = @id
+    '''),
+        parameters: {'id': deckId},
+      ));
 
   final currentTotalBeforeMode = cardsResult.fold<int>(
     0,
@@ -195,24 +230,55 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     );
   }
 
+  final themeProfileFuture = telemetry?.trackAsync(
+        'deck_context.theme_profile',
+        () => detectThemeProfile(
+          allCardData,
+          commanders: commanders,
+          pool: pool,
+        ),
+      ) ??
+      detectThemeProfile(
+        allCardData,
+        commanders: commanders,
+        pool: pool,
+      );
+
   final analyzer = DeckArchetypeAnalyzerCore(allCardData, deckColors.toList());
-  final deckAnalysis = analyzer.generateAnalysis();
-  final themeProfile = await detectThemeProfile(
-    allCardData,
-    commanders: commanders,
-    pool: pool,
-  );
-  final deckState = assessDeckOptimizationStateCore(
-    cards: allCardData,
-    deckAnalysis: deckAnalysis,
-    deckFormat: deckFormat,
-    currentTotalCards: currentTotalCards,
-    commanderColorIdentity: commanderColorIdentity,
-  );
-  final effectiveOptimizeArchetype = resolveOptimizeArchetype(
-    requestedArchetype: targetArchetype,
-    detectedArchetype: deckAnalysis['detected_archetype']?.toString(),
-  );
+  final deckAnalysis = telemetry?.trackSync(
+        'deck_context.analysis',
+        analyzer.generateAnalysis,
+      ) ??
+      analyzer.generateAnalysis();
+  final deckState = telemetry?.trackSync(
+        'deck_context.state_assessment',
+        () => assessDeckOptimizationStateCore(
+          cards: allCardData,
+          deckAnalysis: deckAnalysis,
+          deckFormat: deckFormat,
+          currentTotalCards: currentTotalCards,
+          commanderColorIdentity: commanderColorIdentity,
+        ),
+      ) ??
+      assessDeckOptimizationStateCore(
+        cards: allCardData,
+        deckAnalysis: deckAnalysis,
+        deckFormat: deckFormat,
+        currentTotalCards: currentTotalCards,
+        commanderColorIdentity: commanderColorIdentity,
+      );
+  final effectiveOptimizeArchetype = telemetry?.trackSync(
+        'deck_context.resolve_archetype',
+        () => resolveOptimizeArchetype(
+          requestedArchetype: targetArchetype,
+          detectedArchetype: deckAnalysis['detected_archetype']?.toString(),
+        ),
+      ) ??
+      resolveOptimizeArchetype(
+        requestedArchetype: targetArchetype,
+        detectedArchetype: deckAnalysis['detected_archetype']?.toString(),
+      );
+  final themeProfile = await themeProfileFuture;
 
   return OptimizeDeckContextData(
     deckFormat: deckFormat,

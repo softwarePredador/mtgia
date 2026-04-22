@@ -1,0 +1,837 @@
+#!/usr/bin/env dart
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dotenv/dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:postgres/postgres.dart';
+
+import '../lib/database.dart';
+
+const _defaultApiBaseUrl = 'http://127.0.0.1:8080';
+const _defaultCorpusPath = 'test/fixtures/optimization_resolution_corpus.json';
+const _defaultArtifactDir =
+    'test/artifacts/commander_only_optimization_validation';
+const _defaultSummaryJsonPath =
+    'test/artifacts/commander_only_optimization_validation/latest_summary.json';
+const _defaultSummaryMdPath =
+    'doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md';
+
+class ValidationCorpusEntry {
+  ValidationCorpusEntry({
+    required this.deckId,
+    this.label,
+    this.note,
+  });
+
+  final String deckId;
+  final String? label;
+  final String? note;
+}
+
+class SourceDeckCandidate {
+  SourceDeckCandidate({
+    required this.deckId,
+    required this.deckName,
+    required this.cards,
+    required this.commanderNames,
+    required this.commanderColors,
+    required this.archetype,
+    required this.bracket,
+    this.label,
+    this.note,
+  });
+
+  final String deckId;
+  final String deckName;
+  final List<Map<String, dynamic>> cards;
+  final List<String> commanderNames;
+  final Set<String> commanderColors;
+  final String archetype;
+  final int bracket;
+  final String? label;
+  final String? note;
+
+  String get commanderLabel => commanderNames.join(' + ');
+
+  int get commanderCount => commanderNames.length;
+
+  List<Map<String, dynamic>> get commanderOnlyCards => cards
+      .where((card) => card['is_commander'] == true)
+      .map((card) => {
+            'card_id': card['card_id'],
+            'quantity': card['quantity'],
+            'is_commander': true,
+          })
+      .toList();
+}
+
+class CommanderOnlyRunResult {
+  CommanderOnlyRunResult({
+    required this.commanderLabel,
+    required this.sourceDeckId,
+    required this.sourceDeckName,
+    required this.seedDeckId,
+    required this.archetype,
+    required this.bracket,
+    required this.resultKind,
+    required this.optimizeStatus,
+    required this.timings,
+    required this.savedArtifactPath,
+    required this.expectedChecks,
+    required this.failedChecks,
+    required this.warnings,
+    required this.summary,
+  });
+
+  final String commanderLabel;
+  final String sourceDeckId;
+  final String sourceDeckName;
+  final String seedDeckId;
+  final String archetype;
+  final int bracket;
+  final String resultKind;
+  final int optimizeStatus;
+  final Map<String, dynamic> timings;
+  final String savedArtifactPath;
+  final List<String> expectedChecks;
+  final List<String> failedChecks;
+  final List<String> warnings;
+  final Map<String, dynamic> summary;
+
+  bool get passed => failedChecks.isEmpty;
+
+  Map<String, dynamic> toJson() => {
+        'commander_label': commanderLabel,
+        'source_deck_id': sourceDeckId,
+        'source_deck_name': sourceDeckName,
+        'seed_deck_id': seedDeckId,
+        'archetype': archetype,
+        'bracket': bracket,
+        'result_kind': resultKind,
+        'optimize_status': optimizeStatus,
+        'timings': timings,
+        'saved_artifact_path': savedArtifactPath,
+        'expected_checks': expectedChecks,
+        'failed_checks': failedChecks,
+        'warnings': warnings,
+        'summary': summary,
+        'passed': passed,
+      };
+}
+
+Future<void> main() async {
+  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
+  final artifactDirPath =
+      env['VALIDATION_ARTIFACT_DIR'] ?? _defaultArtifactDir;
+  final summaryJsonPath =
+      env['VALIDATION_SUMMARY_JSON_PATH'] ?? _defaultSummaryJsonPath;
+  final summaryMdPath =
+      env['VALIDATION_SUMMARY_MD_PATH'] ?? _defaultSummaryMdPath;
+  final corpusPath = env['VALIDATION_CORPUS_PATH'] ?? _defaultCorpusPath;
+  final validationLimit = int.tryParse(env['VALIDATION_LIMIT'] ?? '') ?? 19;
+  final maxAllowedTotalMs =
+      int.tryParse(env['COMMANDER_ONLY_MAX_TOTAL_MS'] ?? '') ?? 90000;
+
+  final artifactsDir = Directory(artifactDirPath);
+  if (!artifactsDir.existsSync()) {
+    artifactsDir.createSync(recursive: true);
+  }
+
+  if (!await _ensureServerIsReachable(apiBaseUrl)) {
+    stderr.writeln('Servidor inacessivel em $apiBaseUrl.');
+    exitCode = 1;
+    return;
+  }
+
+  final db = Database();
+  await db.connect();
+  if (!db.isConnected) {
+    stderr.writeln('Falha ao conectar ao banco.');
+    exitCode = 1;
+    return;
+  }
+
+  final pool = db.connection;
+
+  try {
+    final token = await _getOrCreateAuthToken(apiBaseUrl);
+    final corpusEntries = _loadCorpusEntries(corpusPath);
+    final candidates = await _loadCandidatesFromCorpus(
+      pool: pool,
+      corpusEntries: corpusEntries,
+      limit: validationLimit,
+    );
+
+    if (candidates.isEmpty) {
+      stderr.writeln('Nenhum candidato valido encontrado no corpus.');
+      exitCode = 1;
+      return;
+    }
+
+    final runStartedAt = DateTime.now().toIso8601String();
+    final results = <CommanderOnlyRunResult>[];
+
+    for (final candidate in candidates) {
+      print('');
+      print('=== ${candidate.commanderLabel} | ${candidate.archetype} ===');
+      final result = await _runCommanderOnlyValidation(
+        apiBaseUrl: apiBaseUrl,
+        token: token,
+        pool: pool,
+        candidate: candidate,
+        artifactDirPath: artifactDirPath,
+        maxAllowedTotalMs: maxAllowedTotalMs,
+      );
+      results.add(result);
+      print(
+        '${result.passed ? 'PASSOU' : 'FALHOU'} | '
+        '${result.resultKind} | '
+        'tempo=${result.timings['total_ms'] ?? 'n/a'}ms',
+      );
+    }
+
+    final summary = {
+      'generated_at': DateTime.now().toIso8601String(),
+      'run_started_at': runStartedAt,
+      'api_base_url': apiBaseUrl,
+      'artifact_dir': artifactDirPath,
+      'corpus_path': corpusPath,
+      'validation_limit': validationLimit,
+      'max_allowed_total_ms': maxAllowedTotalMs,
+      'total': results.length,
+      'passed': results.where((r) => r.passed).length,
+      'failed': results.where((r) => !r.passed).length,
+      'completed': results.where((r) => r.resultKind == 'completed').length,
+      'protected_rejections':
+          results.where((r) => r.resultKind == 'protected_rejection').length,
+      'results': results.map((r) => r.toJson()).toList(),
+    };
+
+    await File(summaryJsonPath).writeAsString(
+      const JsonEncoder.withIndent('  ').convert(summary),
+    );
+    await File(summaryMdPath).writeAsString(_buildMarkdownReport(summary));
+
+    print('');
+    print('Resumo salvo em $summaryJsonPath');
+    print('Relatorio salvo em $summaryMdPath');
+
+    if (results.any((r) => !r.passed)) {
+      exitCode = 1;
+    }
+  } finally {
+    await db.close();
+  }
+}
+
+Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
+  required String apiBaseUrl,
+  required String token,
+  required Pool pool,
+  required SourceDeckCandidate candidate,
+  required String artifactDirPath,
+  required int maxAllowedTotalMs,
+}) async {
+  final seedDeckId = await _createCommanderOnlySeedDeck(
+    apiBaseUrl: apiBaseUrl,
+    token: token,
+    candidate: candidate,
+  );
+
+  final optimizePayload = {
+    'deck_id': seedDeckId,
+    'archetype': candidate.archetype,
+    'bracket': candidate.bracket,
+    'keep_theme': true,
+  };
+
+  final optimizeResponse = await _optimizeWithPolling(
+    apiBaseUrl: apiBaseUrl,
+    token: token,
+    payload: optimizePayload,
+  );
+  final optimizeBody = _decodeJson(optimizeResponse);
+
+  final qualityError = optimizeBody['quality_error'] as Map<String, dynamic>?;
+  final qualityCode = qualityError?['code']?.toString() ?? '';
+
+  if (optimizeResponse.statusCode != 200) {
+    final protectedRejection = optimizeResponse.statusCode == 422 &&
+        {
+          'OPTIMIZE_NEEDS_REPAIR',
+          'OPTIMIZE_NO_SAFE_SWAPS',
+          'OPTIMIZE_QUALITY_REJECTED',
+          'OPTIMIZE_NO_ACTIONABLE_SWAPS',
+        }.contains(qualityCode);
+
+    final artifactPath = await _writeArtifact(
+      artifactDirPath: artifactDirPath,
+      commanderLabel: candidate.commanderLabel,
+      payload: {
+        'source_deck_id': candidate.deckId,
+        'source_deck_name': candidate.deckName,
+        'seed_deck_id': seedDeckId,
+        'optimize_request': optimizePayload,
+        'optimize_status': optimizeResponse.statusCode,
+        'optimize_response': optimizeBody,
+      },
+    );
+
+    return CommanderOnlyRunResult(
+      commanderLabel: candidate.commanderLabel,
+      sourceDeckId: candidate.deckId,
+      sourceDeckName: candidate.deckName,
+      seedDeckId: seedDeckId,
+      archetype: candidate.archetype,
+      bracket: candidate.bracket,
+      resultKind: protectedRejection ? 'protected_rejection' : 'failure',
+      optimizeStatus: optimizeResponse.statusCode,
+      timings: _extractTimingSummary(optimizeBody),
+      savedArtifactPath: artifactPath,
+      expectedChecks: protectedRejection
+          ? const [
+              'o backend recusou o commander-only inseguro em vez de retornar um deck ruim',
+            ]
+          : const [],
+      failedChecks: protectedRejection
+          ? const []
+          : ['POST /ai/optimize retornou ${optimizeResponse.statusCode}'],
+      warnings: [
+        if (protectedRejection)
+          'Rejeicao protegida: ${qualityError?['message'] ?? qualityCode}',
+        ...((qualityError?['reasons'] as List?)?.map((e) => '$e') ??
+            const Iterable<String>.empty()),
+        _extractMessage(optimizeBody),
+      ],
+      summary: {
+        'mode': optimizeBody['mode'],
+        'quality_error_code': qualityCode,
+      },
+    );
+  }
+
+  final mode = optimizeBody['mode']?.toString() ?? '';
+  final additionsDetailed = (optimizeBody['additions_detailed'] as List?)
+          ?.whereType<Map>()
+          .map((e) => e.cast<String, dynamic>())
+          .where((item) => item['card_id'] is String)
+          .toList() ??
+      <Map<String, dynamic>>[];
+
+  final bulkResponse = await http.post(
+    Uri.parse('$apiBaseUrl/decks/$seedDeckId/cards/bulk'),
+    headers: _jsonHeaders(token),
+    body: jsonEncode({
+      'cards': additionsDetailed
+          .map((item) => {
+                'card_id': item['card_id'] as String,
+                'quantity': (item['quantity'] as int?) ?? 1,
+              })
+          .toList(),
+    }),
+  );
+
+  final validateResponse = await http.post(
+    Uri.parse('$apiBaseUrl/decks/$seedDeckId/validate'),
+    headers: _authHeaders(token),
+  );
+
+  final savedCards = await _loadDeckCards(pool, seedDeckId);
+  final finalCardCount = savedCards.fold<int>(
+    0,
+    (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+  );
+  final finalCommanderCount = savedCards
+      .where((card) => card['is_commander'] == true)
+      .fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  final landCount = savedCards.fold<int>(0, (sum, card) {
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (!typeLine.contains('land')) return sum;
+    return sum + ((card['quantity'] as int?) ?? 0);
+  });
+  final basicCount = savedCards.fold<int>(0, (sum, card) {
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    final isBasic = typeLine.contains('basic land');
+    if (!isBasic) return sum;
+    return sum + ((card['quantity'] as int?) ?? 0);
+  });
+
+  final postAnalysis =
+      (optimizeBody['post_analysis'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+  final consistencySlo =
+      (optimizeBody['consistency_slo'] as Map?)?.cast<String, dynamic>() ??
+          const <String, dynamic>{};
+  final timingSummary = _extractTimingSummary(optimizeBody);
+  final totalMs = (timingSummary['total_ms'] as int?) ?? 0;
+
+  final expectedChecks = <String>[];
+  final failedChecks = <String>[];
+
+  void expectCheck(String description, bool passed) {
+    expectedChecks.add(description);
+    if (!passed) failedChecks.add(description);
+  }
+
+  final manaAssessment = postAnalysis['mana_base_assessment']?.toString() ?? '';
+
+  expectCheck('optimize retornou mode=complete', mode == 'complete');
+  expectCheck('complete retornou additions_detailed utilizavel',
+      additionsDetailed.isNotEmpty);
+  expectCheck('POST /decks/:id/cards/bulk retornou sucesso',
+      bulkResponse.statusCode == 200);
+  expectCheck('POST /decks/:id/validate aprovou o deck final',
+      validateResponse.statusCode == 200);
+  expectCheck('deck final mantem 100 cartas', finalCardCount == 100);
+  expectCheck('deck final preserva a quantidade correta de comandantes',
+      finalCommanderCount == candidate.commanderCount);
+  expectCheck('land count final ficou em faixa segura',
+      landCount >= 28 && landCount <= 42);
+  expectCheck('basic lands nao inflaram acima do toleravel', basicCount <= 40);
+  expectCheck('pipeline terminou abaixo do budget de tempo',
+      totalMs > 0 && totalMs <= maxAllowedTotalMs);
+  expectCheck(
+    'mana base final nao ficou com alerta forte',
+    !manaAssessment.toLowerCase().contains('poucos terrenos') &&
+        !manaAssessment.toLowerCase().contains('falta mana'),
+  );
+  expectCheck(
+    'guaranteed basics stage nao precisou fechar o deck',
+    consistencySlo['guaranteed_basics_stage_used'] != true,
+  );
+
+  final artifactPath = await _writeArtifact(
+    artifactDirPath: artifactDirPath,
+    commanderLabel: candidate.commanderLabel,
+    payload: {
+      'source_deck_id': candidate.deckId,
+      'source_deck_name': candidate.deckName,
+      'seed_deck_id': seedDeckId,
+      'optimize_request': optimizePayload,
+      'optimize_response': optimizeBody,
+      'bulk_status': bulkResponse.statusCode,
+      'validate_status': validateResponse.statusCode,
+      'saved_cards': savedCards,
+    },
+  );
+
+  return CommanderOnlyRunResult(
+    commanderLabel: candidate.commanderLabel,
+    sourceDeckId: candidate.deckId,
+    sourceDeckName: candidate.deckName,
+    seedDeckId: seedDeckId,
+    archetype: candidate.archetype,
+    bracket: candidate.bracket,
+    resultKind: 'completed',
+    optimizeStatus: optimizeResponse.statusCode,
+    timings: timingSummary,
+    savedArtifactPath: artifactPath,
+    expectedChecks: expectedChecks,
+    failedChecks: failedChecks,
+    warnings: [
+      if (basicCount > 36) 'basic lands altos: $basicCount',
+      ...((optimizeBody['validation_warnings'] as List?)?.map((e) => '$e') ??
+          const Iterable<String>.empty()),
+      if (bulkResponse.statusCode != 200) 'bulk save falhou: ${bulkResponse.body}',
+      if (validateResponse.statusCode != 200)
+        'validate falhou: ${validateResponse.body}',
+    ],
+    summary: {
+      'mode': mode,
+      'final_card_count': finalCardCount,
+      'final_commander_count': finalCommanderCount,
+      'land_count': landCount,
+      'basic_count': basicCount,
+      'mana_base_assessment': manaAssessment,
+      'average_cmc': postAnalysis['average_cmc'],
+      'consistency_slo': consistencySlo,
+    },
+  );
+}
+
+Future<List<SourceDeckCandidate>> _loadCandidatesFromCorpus({
+  required Pool pool,
+  required List<ValidationCorpusEntry> corpusEntries,
+  required int limit,
+}) async {
+  final candidates = <SourceDeckCandidate>[];
+
+  for (final entry in corpusEntries.take(limit)) {
+    final deckResult = await pool.execute(
+      Sql.named('''
+        SELECT d.id::text, d.name, NULLIF(TRIM(d.archetype), '') AS archetype, d.bracket::int
+        FROM decks d
+        WHERE d.id = @deckId
+          AND d.deleted_at IS NULL
+          AND LOWER(d.format) = 'commander'
+      '''),
+      parameters: {'deckId': entry.deckId},
+    );
+
+    if (deckResult.isEmpty) continue;
+    final row = deckResult.first;
+    final cards = await _loadDeckCards(pool, entry.deckId);
+    final total = cards.fold<int>(
+      0,
+      (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+    );
+    final commanderCards =
+        cards.where((card) => card['is_commander'] == true).toList();
+    if (total != 100 || commanderCards.isEmpty) continue;
+
+    final commanderNames = commanderCards
+        .map((card) => card['name']?.toString().trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList();
+    final commanderColors = <String>{};
+    for (final card in commanderCards) {
+      final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
+      commanderColors.addAll(colors.map((color) => color.toUpperCase()));
+    }
+
+    candidates.add(
+      SourceDeckCandidate(
+        deckId: row[0] as String,
+        deckName: row[1] as String? ?? 'Commander Deck',
+        cards: cards,
+        commanderNames: commanderNames,
+        commanderColors: commanderColors,
+        archetype: _normalizeArchetype(row[2]?.toString()) ?? 'midrange',
+        bracket: row[3] as int? ?? 2,
+        label: entry.label,
+        note: entry.note,
+      ),
+    );
+  }
+
+  return candidates;
+}
+
+Future<List<Map<String, dynamic>>> _loadDeckCards(Pool pool, String deckId) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT
+        dc.card_id::text,
+        dc.quantity::int,
+        dc.is_commander,
+        c.name,
+        c.type_line,
+        COALESCE(c.mana_cost, '') AS mana_cost,
+        COALESCE(c.colors, ARRAY[]::text[]) AS colors,
+        COALESCE(
+          (
+            SELECT SUM(
+              CASE
+                WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
+                WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
+                WHEN m[1] = 'X' THEN 0
+                ELSE 1
+              END
+            )
+            FROM regexp_matches(COALESCE(c.mana_cost, ''), '\\{([^}]+)\\}', 'g') AS m(m)
+          ),
+          0
+        )::double precision AS cmc,
+        COALESCE(c.oracle_text, '') AS oracle_text
+      FROM deck_cards dc
+      JOIN cards c ON c.id = dc.card_id
+      WHERE dc.deck_id = @deckId
+      ORDER BY dc.is_commander DESC, c.name ASC
+    '''),
+    parameters: {'deckId': deckId},
+  );
+
+  return result
+      .map(
+        (row) => <String, dynamic>{
+          'card_id': row[0] as String,
+          'quantity': row[1] as int,
+          'is_commander': row[2] as bool? ?? false,
+          'name': row[3] as String? ?? '',
+          'type_line': row[4] as String? ?? '',
+          'mana_cost': row[5] as String? ?? '',
+          'colors': (row[6] as List?)?.cast<String>() ?? const <String>[],
+          'cmc': (row[7] as num?)?.toDouble() ?? 0.0,
+          'oracle_text': row[8] as String? ?? '',
+        },
+      )
+      .toList();
+}
+
+Future<String> _createCommanderOnlySeedDeck({
+  required String apiBaseUrl,
+  required String token,
+  required SourceDeckCandidate candidate,
+}) async {
+  final response = await http.post(
+    Uri.parse('$apiBaseUrl/decks'),
+    headers: _jsonHeaders(token),
+    body: jsonEncode({
+      'name':
+          'Commander Only Validation - ${candidate.commanderLabel} - ${DateTime.now().millisecondsSinceEpoch}',
+      'format': 'commander',
+      'description': 'Seed minima com apenas comandante(s) para validacao commander-only',
+      'is_public': false,
+      'cards': candidate.commanderOnlyCards,
+    }),
+  );
+
+  if (response.statusCode != 200 && response.statusCode != 201) {
+    throw Exception('Falha ao criar deck seed commander-only: ${response.body}');
+  }
+
+  final body = _decodeJson(response);
+  final deckId =
+      body['id']?.toString() ?? (body['deck']?['id']?.toString() ?? '');
+  if (deckId.isEmpty) {
+    throw Exception('Resposta sem id do deck seed: ${response.body}');
+  }
+  return deckId;
+}
+
+Future<http.Response> _optimizeWithPolling({
+  required String apiBaseUrl,
+  required String token,
+  required Map<String, dynamic> payload,
+}) async {
+  final response = await http.post(
+    Uri.parse('$apiBaseUrl/ai/optimize'),
+    headers: _jsonHeaders(token),
+    body: jsonEncode(payload),
+  );
+
+  if (response.statusCode != 202) {
+    return response;
+  }
+
+  final body = _decodeJson(response);
+  final jobId = body['job_id']?.toString();
+  if (jobId == null || jobId.isEmpty) {
+    throw Exception('Resposta 202 sem job_id: ${response.body}');
+  }
+
+  for (var poll = 0; poll < 150; poll++) {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    final pollResponse = await http.get(
+      Uri.parse('$apiBaseUrl/ai/optimize/jobs/$jobId'),
+      headers: _authHeaders(token),
+    );
+    final pollBody = _decodeJson(pollResponse);
+    final status = pollBody['status']?.toString();
+
+    if (status == 'completed') {
+      return http.Response(
+        jsonEncode(pollBody['result'] ?? <String, dynamic>{}),
+        200,
+      );
+    }
+    if (status == 'failed') {
+      return http.Response(jsonEncode(pollBody), 422);
+    }
+  }
+
+  return http.Response(
+    jsonEncode({'error': 'Polling timeout para optimize job'}),
+    500,
+  );
+}
+
+List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
+  final file = File(path);
+  if (!file.existsSync()) {
+    throw StateError('Corpus de validacao nao encontrado em $path');
+  }
+
+  final decoded = jsonDecode(file.readAsStringSync());
+  final rawEntries = switch (decoded) {
+    {'decks': final List decks} => decks,
+    final List decks => decks,
+    _ => throw StateError(
+        'Corpus invalido em $path: esperado lista ou objeto com "decks".'),
+  };
+
+  return rawEntries
+      .whereType<Map>()
+      .map((raw) => raw.cast<dynamic, dynamic>())
+      .map(
+        (entry) => ValidationCorpusEntry(
+          deckId: entry['deck_id']?.toString().trim() ?? '',
+          label: entry['label']?.toString(),
+          note: entry['note']?.toString(),
+        ),
+      )
+      .where((entry) => entry.deckId.isNotEmpty)
+      .toList();
+}
+
+Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
+  try {
+    final response = await http
+        .get(Uri.parse('$apiBaseUrl/health'))
+        .timeout(const Duration(seconds: 5));
+    return response.statusCode < 500;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<String> _getOrCreateAuthToken(String apiBaseUrl) async {
+  const email = 'optimization.validation.bot@example.com';
+  const password = 'OptimizationPass123!';
+  const username = 'optimization_validation_bot';
+
+  Future<http.Response> login() {
+    return http.post(
+      Uri.parse('$apiBaseUrl/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+  }
+
+  var response = await login();
+  if (response.statusCode != 200) {
+    final register = await http.post(
+      Uri.parse('$apiBaseUrl/auth/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+        'username': username,
+      }),
+    );
+
+    if (register.statusCode != 201 && register.statusCode != 400) {
+      throw Exception('Falha ao registrar usuario de teste: ${register.body}');
+    }
+
+    response = await login();
+  }
+
+  if (response.statusCode != 200) {
+    throw Exception('Falha ao autenticar usuario de teste: ${response.body}');
+  }
+
+  final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+  final token = decoded['token']?.toString();
+  if (token == null || token.isEmpty) {
+    throw Exception('Token ausente na autenticacao.');
+  }
+  return token;
+}
+
+Map<String, dynamic> _decodeJson(http.Response response) {
+  final body = response.body.trim();
+  if (body.isEmpty) return <String, dynamic>{};
+  final decoded = jsonDecode(body);
+  if (decoded is Map<String, dynamic>) return decoded;
+  return {'value': decoded};
+}
+
+Map<String, dynamic> _extractTimingSummary(Map<String, dynamic> body) {
+  final timings = (body['timings'] as Map?)?.cast<String, dynamic>() ??
+      const <String, dynamic>{};
+  return {
+    'total_ms': (timings['total_ms'] as num?)?.toInt() ?? 0,
+    'stages_ms':
+        (timings['stages_ms'] as Map?)?.cast<String, dynamic>() ??
+            const <String, dynamic>{},
+  };
+}
+
+Map<String, String> _authHeaders(String token) => {
+      'Authorization': 'Bearer $token',
+    };
+
+Map<String, String> _jsonHeaders(String token) => {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+String _extractMessage(Map<String, dynamic> body) {
+  return body['message']?.toString() ??
+      body['error']?.toString() ??
+      body['reason']?.toString() ??
+      '';
+}
+
+String? _normalizeArchetype(String? raw) {
+  final value = raw?.trim().toLowerCase() ?? '';
+  if (value.isEmpty) return null;
+  if (value.contains('control')) return 'control';
+  if (value.contains('aggro')) return 'aggro';
+  if (value.contains('combo')) return 'combo';
+  if (value.contains('stax')) return 'stax';
+  if (value.contains('tribal')) return 'tribal';
+  if (value.contains('midrange')) return 'midrange';
+  return value;
+}
+
+Future<String> _writeArtifact({
+  required String artifactDirPath,
+  required String commanderLabel,
+  required Map<String, dynamic> payload,
+}) async {
+  final safeName = commanderLabel
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+  final file = File('$artifactDirPath/$safeName.json');
+  await file.writeAsString(
+    const JsonEncoder.withIndent('  ').convert(payload),
+  );
+  return file.path;
+}
+
+String _buildMarkdownReport(Map<String, dynamic> summary) {
+  final buffer = StringBuffer()
+    ..writeln('# Validacao Commander-Only - 2026-04-21')
+    ..writeln()
+    ..writeln('- API base: `${summary['api_base_url']}`')
+    ..writeln('- Corpus: `${summary['corpus_path']}`')
+    ..writeln('- Total: `${summary['total']}`')
+    ..writeln('- Passed: `${summary['passed']}`')
+    ..writeln('- Failed: `${summary['failed']}`')
+    ..writeln('- Completed: `${summary['completed']}`')
+    ..writeln('- Protected rejections: `${summary['protected_rejections']}`')
+    ..writeln();
+
+  final results = (summary['results'] as List?)?.whereType<Map>().toList() ?? const [];
+  for (final raw in results) {
+    final result = raw.cast<dynamic, dynamic>();
+    buffer
+      ..writeln('## ${result['commander_label']}')
+      ..writeln()
+      ..writeln('- Result kind: `${result['result_kind']}`')
+      ..writeln('- Passed: `${result['passed']}`')
+      ..writeln('- Source deck: `${result['source_deck_id']}`')
+      ..writeln('- Seed deck: `${result['seed_deck_id']}`')
+      ..writeln('- Archetype: `${result['archetype']}`')
+      ..writeln('- Timings: `${jsonEncode(result['timings'])}`');
+
+    final failedChecks =
+        (result['failed_checks'] as List?)?.map((e) => '- $e').join('\n') ?? '';
+    if (failedChecks.isNotEmpty) {
+      buffer
+        ..writeln()
+        ..writeln('Failed checks:')
+        ..writeln(failedChecks);
+    }
+
+    final warnings =
+        (result['warnings'] as List?)?.map((e) => '- $e').join('\n') ?? '';
+    if (warnings.isNotEmpty) {
+      buffer
+        ..writeln()
+        ..writeln('Warnings:')
+        ..writeln(warnings);
+    }
+
+    buffer.writeln();
+  }
+
+  return buffer.toString();
+}

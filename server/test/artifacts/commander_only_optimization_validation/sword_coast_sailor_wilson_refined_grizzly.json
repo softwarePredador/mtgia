@@ -1,0 +1,32 @@
+{
+  "source_deck_id": "4a2e3a8f-32a3-4298-8309-a693b8e0f996",
+  "source_deck_name": "Corpus Seed - Wilson, Refined Grizzly + Sword Coast Sailor",
+  "seed_deck_id": "9e2d0120-3c66-4ec7-b762-d2b43ac8cab9",
+  "optimize_request": {
+    "deck_id": "9e2d0120-3c66-4ec7-b762-d2b43ac8cab9",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_status": 422,
+  "optimize_response": {
+    "job_id": "d38a74dc9b25222a24abc5858b116b1b",
+    "deck_id": "9e2d0120-3c66-4ec7-b762-d2b43ac8cab9",
+    "archetype": "midrange",
+    "status": "failed",
+    "stage": "Erro",
+    "stage_number": 6,
+    "total_stages": 6,
+    "error": "Complete mode não atingiu qualidade mínima.",
+    "quality_error": {
+      "code": "COMPLETE_QUALITY_PARTIAL",
+      "message": "Não foi possível completar o deck com qualidade mínima: adições insuficientes.",
+      "added_total": 69,
+      "basic_added": 44,
+      "non_basic_added": 25,
+      "target_additions": 98
+    },
+    "created_at": "2026-04-22T01:12:48.278985Z",
+    "updated_at": "2026-04-22T01:13:05.419677Z"
+  }
+}

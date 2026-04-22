@@ -1,0 +1,588 @@
+{
+  "source_deck_id": "458a8df7-afde-4232-b4da-e1ce8e9fbb0c",
+  "source_deck_name": "Corpus Seed - Kozilek, the Great Distortion",
+  "seed_deck_id": "881be5a7-6639-4d13-b67d-8eea73faaf5a",
+  "optimize_request": {
+    "deck_id": "881be5a7-6639-4d13-b67d-8eea73faaf5a",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "wheels",
+      "confidence": "alta",
+      "core_cards": [
+        "Kozilek, the Great Distortion"
+      ],
+      "match_score": 1.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "a36be8beb601e6fc832bc4137f069df7",
+      "deck_id": "881be5a7-6639-4d13-b67d-8eea73faaf5a",
+      "total_ms": 12012,
+      "stages_ms": {
+        "complete.fill_remainder": 4237,
+        "complete.build_final_response": 1293,
+        "complete.prepare_commander_seed": 2457,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Denial",
+      "Arcane Signet",
+      "Beast Within",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cultivate",
+      "Cyclonic Rift",
+      "Fact or Fiction",
+      "Farseek",
+      "Generous Gift",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Mystical Tutor",
+      "Nature's Lore",
+      "Negate",
+      "Path to Exile",
+      "Ponder",
+      "Preordain",
+      "Read the Bones",
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Mana Vault",
+      "Grim Monolith",
+      "Thought Vessel",
+      "Mox Opal",
+      "Expedition Map",
+      "Kozilek's Command",
+      "Glaring Fleshraker",
+      "Lion's Eye Diamond",
+      "Sensei's Divining Top",
+      "Everflowing Chalice",
+      "Hedron Archive",
+      "Liquimetal Torque",
+      "Solemn Simulacrum",
+      "Thran Dynamo",
+      "Warping Wail",
+      "Fractured Powerstone",
+      "Metalworker",
+      "Ring of the Lucii",
+      "The Eternity Elevator",
+      "The Irencrag",
+      "Unstable Obelisk",
+      "Worn Powerstone",
+      "Null Elemental Blast",
+      "Titan's Presence",
+      "Kozilek's Channeler",
+      "Skyclave Relic",
+      "Ultima, Origin of Oblivion",
+      "Warden of Geometries",
+      "Basalt Monolith",
+      "Wayfarer's Bauble",
+      "Manifold Key",
+      "Liberator, Urza's Battlethopter",
+      "Thought-Knot Seer",
+      "Eldrazi Mimic",
+      "It That Heralds the End",
+      "Forest",
+      "Island",
+      "Mountain",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "10.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "N/A",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.40",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 16,
+        "artifacts": 31,
+        "creatures": 11,
+        "sorceries": 7,
+        "enchantments": 1,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana U (Tem 8 fontes, ideal > 15). Falta mana G (Tem 9 fontes, ideal > 10)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fact or Fiction",
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystical Tutor",
+        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Negate",
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Preordain",
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "3d7d55a3-c301-4487-b6de-3cfbe9195cea",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mana Vault",
+        "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Grim Monolith",
+        "card_id": "cf3119bb-bce3-4be2-8ffd-2b63e57785bb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thought Vessel",
+        "card_id": "9ac0a95e-ca4b-48af-b0a4-64b4684bd064",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mox Opal",
+        "card_id": "f8a5f4c9-cc27-4540-acca-dfc4e0d0c8cd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Expedition Map",
+        "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kozilek's Command",
+        "card_id": "8cf4cade-d760-49f1-b0b3-b6cbb8cab8f5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Glaring Fleshraker",
+        "card_id": "54ad4b63-06a9-40a4-927c-8c63c03eb3a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lion's Eye Diamond",
+        "card_id": "4b478d5b-e8ba-4815-9968-45c6e70368ae",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sensei's Divining Top",
+        "card_id": "7c56bc66-8eb0-4c2e-9652-56274fa061e2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Everflowing Chalice",
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hedron Archive",
+        "card_id": "c2b7643c-e29e-47a5-b6d5-62dc0a5e1cc3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Liquimetal Torque",
+        "card_id": "28438157-7cea-4db4-b971-9fad04e48eaa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Solemn Simulacrum",
+        "card_id": "d599a4c3-9f07-47e7-ba5e-8202dbb2a6bb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thran Dynamo",
+        "card_id": "dfcf553a-fe62-4cd1-9d89-e9bcc31f0b3e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Warping Wail",
+        "card_id": "470c4f0c-29c8-49de-a437-8f38d011f061",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fractured Powerstone",
+        "card_id": "cff39263-cf03-481a-8539-9c1c785d5eaf",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Metalworker",
+        "card_id": "c487e527-c7a2-4af5-b78b-85bc4e639547",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ring of the Lucii",
+        "card_id": "47d0f12b-f2ad-4c4b-86c1-aede8e40fc97",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The Eternity Elevator",
+        "card_id": "385a9490-5567-463d-8498-acb9470d1649",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The Irencrag",
+        "card_id": "c9d89b9d-8912-452b-8825-6fab47342e90",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Unstable Obelisk",
+        "card_id": "f3532c47-1d10-402a-8e3a-a271485b2a38",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Worn Powerstone",
+        "card_id": "51f819ef-32e5-4138-92d8-06a20d3364d4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Null Elemental Blast",
+        "card_id": "5b0a7ba0-ecfc-465d-a5e7-c7aa43542501",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Titan's Presence",
+        "card_id": "a3f2fde5-5962-41fe-a164-5cc97dab602b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kozilek's Channeler",
+        "card_id": "5ad771af-da67-4d4f-9409-9765faf8e2ab",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Skyclave Relic",
+        "card_id": "c376ee15-dcd9-4999-a43e-393c05e73db4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ultima, Origin of Oblivion",
+        "card_id": "c89cd7f6-363c-45fa-b804-59d5a6841f00",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Warden of Geometries",
+        "card_id": "59175c62-bfba-430e-a156-9809caec50ea",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Basalt Monolith",
+        "card_id": "040b7976-58c1-4c54-b594-1c6e950a7592",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Wayfarer's Bauble",
+        "card_id": "b393933f-6ebf-4cf9-bbdc-58bdbb654a66",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Manifold Key",
+        "card_id": "ed8ddcc7-d08f-4e63-83fa-45b07d614253",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Liberator, Urza's Battlethopter",
+        "card_id": "f5c01506-2e0a-42a4-87d1-90151b735a5d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thought-Knot Seer",
+        "card_id": "b2bb223a-6155-4e77-b1d8-d1588ec884a0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Eldrazi Mimic",
+        "card_id": "988b22d8-e321-406e-9542-d9cefeaf2d8d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "It That Heralds the End",
+        "card_id": "a33ad3ce-78de-40ff-81d5-d709acc9eb46",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 8,
+        "is_basic_land": true
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 7,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 400,
+  "validate_status": 400,
+  "saved_cards": [
+    {
+      "card_id": "31ca10ef-ca02-47e1-938e-70a079630108",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Kozilek, the Great Distortion",
+      "type_line": "Legendary Creature — Eldrazi",
+      "mana_cost": "{8}{C}{C}",
+      "colors": [],
+      "cmc": 10.0,
+      "oracle_text": "When you cast this spell, if you have fewer than seven cards in hand, draw cards equal to the difference.\nMenace\nDiscard a card with mana value X: Counter target spell with mana value X."
+    }
+  ]
+}

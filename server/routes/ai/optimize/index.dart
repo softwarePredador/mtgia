@@ -10,6 +10,7 @@ import '../../../lib/ai/optimize_complete_support.dart' as optimize_complete;
 import '../../../lib/ai/optimize_deck_support.dart' as optimize_deck;
 import '../../../lib/ai/optimize_request_support.dart' as optimize_request;
 import '../../../lib/ai/optimize_state_support.dart' as optimize_state;
+import '../../../lib/ai/optimize_stage_telemetry.dart';
 import '../../../lib/ai/otimizacao.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
 import '../../../lib/ai/optimize_runtime_support.dart';
@@ -393,6 +394,10 @@ Future<Response> onRequest(RequestContext context) async {
     final requestMode =
         requestedModeRaw.contains('complete') ? 'complete' : 'optimize';
     final requestStopwatch = Stopwatch()..start();
+    final telemetry = OptimizeStageTelemetry(
+      deckId: deckId ?? 'unknown',
+      requestMode: requestMode,
+    );
     final hasBracketOverride = body.containsKey('bracket');
     final hasKeepThemeOverride = body.containsKey('keep_theme');
 
@@ -407,9 +412,12 @@ Future<Response> onRequest(RequestContext context) async {
 
     // Memória de preferências do usuário (se autenticado):
     // aplica default somente quando o request não enviar override explícito.
-    final userPreferences = await loadUserAiPreferences(
-      pool: pool,
-      userId: userId,
+    final userPreferences = await telemetry.trackAsync(
+      'request.user_preferences',
+      () => loadUserAiPreferences(
+        pool: pool,
+        userId: userId,
+      ),
     );
     final bracket = hasBracketOverride
         ? parsedBracket
@@ -420,13 +428,17 @@ Future<Response> onRequest(RequestContext context) async {
 
     late final optimize_request.OptimizeDeckContextData deckContext;
     try {
-      deckContext = await optimize_request.loadOptimizeDeckContext(
-        pool: pool,
-        deckId: deckId,
-        targetArchetype: archetype,
-        requestMode: requestMode,
-        bracket: bracket,
-        keepTheme: keepTheme,
+      deckContext = await telemetry.trackAsync(
+        'request.deck_context',
+        () => optimize_request.loadOptimizeDeckContext(
+          pool: pool,
+          deckId: deckId,
+          targetArchetype: archetype,
+          requestMode: requestMode,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          telemetry: telemetry,
+        ),
       );
     } on optimize_request.OptimizeDeckContextException catch (e) {
       if (e.code == 'DECK_NOT_FOUND') {
@@ -443,15 +455,20 @@ Future<Response> onRequest(RequestContext context) async {
     final deckSignature = deckContext.deckSignature;
     final cacheKey = deckContext.cacheKey;
 
-    final cachedResponse = await loadOptimizeCache(
-      pool: pool,
-      cacheKey: cacheKey,
+    final cachedResponse = await telemetry.trackAsync(
+      'request.cache_lookup',
+      () => loadOptimizeCache(
+        pool: pool,
+        cacheKey: cacheKey,
+      ),
     );
     if (cachedResponse != null) {
       cachedResponse['cache'] = {
         'hit': true,
         'cache_key': cacheKey,
       };
+      cachedResponse['timings'] = telemetry.snapshot();
+      telemetry.logSummary();
       cachedResponse['preferences'] = {
         'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
         'keep_theme': keepTheme,
@@ -510,6 +527,7 @@ Future<Response> onRequest(RequestContext context) async {
         deckState: deckState,
         validationReport: validationReport,
       );
+      responseBody['timings'] ??= telemetry.snapshot();
 
       await _recordOptimizeAnalysisOutcome(
         pool: pool,
@@ -549,6 +567,7 @@ Future<Response> onRequest(RequestContext context) async {
         executionTimeMs: requestStopwatch.elapsedMilliseconds,
       );
 
+      telemetry.logSummary();
       return Response.json(statusCode: statusCode, body: responseBody);
     }
 
@@ -604,22 +623,32 @@ Future<Response> onRequest(RequestContext context) async {
       try {
         final commanderName = commanders.first.trim();
         if (commanderName.isNotEmpty) {
-          final priorityNames = await loadCommanderCompetitivePriorities(
-            pool: pool,
-            commanderName: commanderName,
-            limit: 120,
+          final commanderReferenceFuture = telemetry.trackAsync(
+            'request.commander_reference_cache',
+            () => loadCommanderReferenceProfileFromCache(
+              pool: pool,
+              commanderName: commanderName,
+            ),
           );
+          final priorityNamesFuture = telemetry.trackAsync(
+            'request.commander_priority_query',
+            () => loadCommanderCompetitivePriorities(
+              pool: pool,
+              commanderName: commanderName,
+              limit: 120,
+            ),
+          );
+          final results = await Future.wait<dynamic>([
+            commanderReferenceFuture,
+            priorityNamesFuture,
+          ]);
+          final commanderReferenceProfile = results[0] as Map<String, dynamic>?;
+          final priorityNames = (results[1] as List).cast<String>();
 
           if (priorityNames.isNotEmpty) {
             optimizeCommanderPrioritySource = 'competitive_meta';
             optimizeCommanderPriorityNames.addAll(priorityNames);
           }
-
-          final commanderReferenceProfile =
-              await loadCommanderReferenceProfileFromCache(
-            pool: pool,
-            commanderName: commanderName,
-          );
           final averageDeckSeedNames = extractAverageDeckSeedNamesFromProfile(
             commanderReferenceProfile,
             limit: 80,
@@ -642,8 +671,10 @@ Future<Response> onRequest(RequestContext context) async {
             ..addAll(profileTopNames);
 
           if (optimizeCommanderPriorityNames.isEmpty) {
-            final liveEdhrec =
-                await EdhrecService().fetchCommanderData(commanderName);
+            final liveEdhrec = await telemetry.trackAsync(
+              'request.commander_live_edhrec',
+              () => EdhrecService().fetchCommanderData(commanderName),
+            );
             if (liveEdhrec != null && liveEdhrec.topCards.isNotEmpty) {
               optimizeCommanderPrioritySource = 'live_edhrec';
               optimizeCommanderPriorityNames.addAll(
@@ -681,8 +712,9 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     try {
-      deterministicSwapCandidates.addAll(
-        await buildDeterministicOptimizeSwapCandidates(
+      deterministicSwapCandidates.addAll(await telemetry.trackAsync(
+        'request.deterministic_shortlist',
+        () => buildDeterministicOptimizeSwapCandidates(
           pool: pool,
           allCardData: allCardData,
           commanders: commanders,
@@ -694,7 +726,7 @@ Future<Response> onRequest(RequestContext context) async {
           coreCards: themeProfile.coreCards,
           commanderPriorityNames: optimizeCommanderPriorityNames,
         ),
-      );
+      ));
       if (deterministicSwapCandidates.isNotEmpty) {
         Log.d(
           'Optimize deterministic shortlist carregado: ${deterministicSwapCandidates.length} swap(s)',
@@ -725,11 +757,14 @@ Future<Response> onRequest(RequestContext context) async {
         );
       }
 
-      final jobId = await OptimizeJobStore.create(
-        pool: pool,
-        deckId: deckId,
-        archetype: targetArchetype,
-        userId: userId,
+      final jobId = await telemetry.trackAsync(
+        'request.async_job_create',
+        () => OptimizeJobStore.create(
+          pool: pool,
+          deckId: deckId,
+          archetype: targetArchetype,
+          userId: userId,
+        ),
       );
 
       // Fire-and-forget: processamento pesado roda em background.
@@ -780,6 +815,7 @@ Future<Response> onRequest(RequestContext context) async {
           'poll_url': '/ai/optimize/jobs/$jobId',
           'poll_interval_ms': 2000,
           'total_stages': 6,
+          'timings': telemetry.snapshot(),
         },
       );
     }
@@ -814,16 +850,19 @@ Future<Response> onRequest(RequestContext context) async {
       required String trigger,
     }) async {
       try {
-        final aiResponse = await optimizer.optimizeDeck(
-          deckData: deckData,
-          commanders: commanders,
-          targetArchetype: effectiveOptimizeArchetype,
-          priorityPool: optimizeCommanderPriorityNames,
-          deterministicSwapCandidates: deterministicSwapCandidates,
-          bracket: bracket,
-          keepTheme: keepTheme,
-          detectedTheme: themeProfile.theme,
-          coreCards: themeProfile.coreCards,
+        final aiResponse = await telemetry.trackAsync(
+          'request.ai_optimize_call',
+          () => optimizer.optimizeDeck(
+            deckData: deckData,
+            commanders: commanders,
+            targetArchetype: effectiveOptimizeArchetype,
+            priorityPool: optimizeCommanderPriorityNames,
+            deterministicSwapCandidates: deterministicSwapCandidates,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            detectedTheme: themeProfile.theme,
+            coreCards: themeProfile.coreCards,
+          ),
         );
         aiResponse['mode'] ??= 'optimize';
         aiResponse['strategy_source'] ??= deterministicFirstEnabled
@@ -875,9 +914,12 @@ Future<Response> onRequest(RequestContext context) async {
 
     optimizeAttemptLoop:
     while (true) {
-      jsonResponse = normalizeOptimizePayload(
-        jsonResponse,
-        defaultMode: 'optimize',
+      jsonResponse = telemetry.trackSync(
+        'request.normalize_payload',
+        () => normalizeOptimizePayload(
+          jsonResponse,
+          defaultMode: 'optimize',
+        ),
       );
 
       // Se o modo complete já veio “determinístico” (com card_id/quantity),
@@ -2630,6 +2672,11 @@ Future<void> _processCompleteModeAsync({
   required bool hasKeepThemeOverride,
 }) async {
   try {
+    final telemetry = OptimizeStageTelemetry(
+      deckId: deckId,
+      requestMode: 'complete_async',
+      jobId: jobId,
+    );
     await OptimizeJobStore.progress(pool, jobId,
         stage: 'Preparando referências do commander...', stageNumber: 1);
 
@@ -2639,22 +2686,61 @@ Future<void> _processCompleteModeAsync({
       originalCountsById: originalCountsById,
       currentTotalCards: currentTotalCards,
     );
-    await optimize_complete.prepareCompleteCommanderSeed(
-      pool: pool,
-      commanders: commanders,
-      maxTotal: maxTotal,
-      currentTotalCards: currentTotalCards,
-      state: state,
+    await telemetry.trackAsync(
+      'complete.prepare_commander_seed',
+      () => optimize_complete.prepareCompleteCommanderSeed(
+        pool: pool,
+        commanders: commanders,
+        maxTotal: maxTotal,
+        currentTotalCards: currentTotalCards,
+        state: state,
+      ),
     );
 
     if (optimizer != null) {
       await OptimizeJobStore.progress(pool, jobId,
           stage: 'Consultando IA para sugestões...', stageNumber: 2);
-      await optimize_complete.runCompleteAiSuggestionLoop(
+      await telemetry.trackAsync(
+        'complete.ai_suggestion_loop',
+        () => optimize_complete.runCompleteAiSuggestionLoop(
+          pool: pool,
+          optimizer: optimizer,
+          commanders: commanders,
+          deckColors: deckColors,
+          commanderColorIdentity: commanderColorIdentity,
+          deckFormat: deckFormat,
+          targetArchetype: targetArchetype,
+          bracket: bracket,
+          keepTheme: keepTheme,
+          detectedTheme: themeProfile.theme,
+          coreCards: themeProfile.coreCards,
+          maxTotal: maxTotal,
+          state: state,
+        ),
+      );
+    } else {
+      await OptimizeJobStore.progress(pool, jobId,
+          stage: 'Pulando IA (modo determinístico)...', stageNumber: 2);
+    }
+
+    telemetry.trackSync(
+      'complete.rebalance_land_deficit',
+      () => optimize_complete.rebalanceCompleteDeckForLandDeficit(
+        state: state,
+        maxTotal: maxTotal,
+      ),
+    );
+
+    await OptimizeJobStore.progress(pool, jobId,
+        stage: 'Preenchendo com cartas sinérgicas...', stageNumber: 3);
+    await OptimizeJobStore.progress(pool, jobId,
+        stage: 'Ajustando base de mana...', stageNumber: 4);
+
+    await telemetry.trackAsync(
+      'complete.fill_remainder',
+      () => optimize_complete.fillCompleteDeckRemainder(
         pool: pool,
-        optimizer: optimizer,
         commanders: commanders,
-        deckColors: deckColors,
         commanderColorIdentity: commanderColorIdentity,
         deckFormat: deckFormat,
         targetArchetype: targetArchetype,
@@ -2664,41 +2750,17 @@ Future<void> _processCompleteModeAsync({
         coreCards: themeProfile.coreCards,
         maxTotal: maxTotal,
         state: state,
-      );
-    } else {
-      await OptimizeJobStore.progress(pool, jobId,
-          stage: 'Pulando IA (modo determinístico)...', stageNumber: 2);
-    }
-
-    optimize_complete.rebalanceCompleteDeckForLandDeficit(
-      state: state,
-      maxTotal: maxTotal,
+      ),
     );
 
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Preenchendo com cartas sinérgicas...', stageNumber: 3);
-    await OptimizeJobStore.progress(pool, jobId,
-        stage: 'Ajustando base de mana...', stageNumber: 4);
-
-    await optimize_complete.fillCompleteDeckRemainder(
-      pool: pool,
-      commanders: commanders,
-      commanderColorIdentity: commanderColorIdentity,
-      deckFormat: deckFormat,
-      targetArchetype: targetArchetype,
-      bracket: bracket,
-      keepTheme: keepTheme,
-      detectedTheme: themeProfile.theme,
-      coreCards: themeProfile.coreCards,
-      maxTotal: maxTotal,
-      state: state,
-    );
-
-    jsonResponse = optimize_complete.buildCompleteIntermediatePayload(
-      state: state,
-      maxTotal: maxTotal,
-      currentTotalCards: currentTotalCards,
-      targetArchetype: targetArchetype,
+    jsonResponse = telemetry.trackSync(
+      'complete.build_intermediate_payload',
+      () => optimize_complete.buildCompleteIntermediatePayload(
+        state: state,
+        maxTotal: maxTotal,
+        currentTotalCards: currentTotalCards,
+        targetArchetype: targetArchetype,
+      ),
     );
 
     await OptimizeJobStore.progress(pool, jobId,
@@ -2718,20 +2780,27 @@ Future<void> _processCompleteModeAsync({
         return;
       }
 
-      final responseBody = await optimize_complete.buildCompleteFinalResponse(
-        pool: pool,
-        deckFormat: deckFormat,
-        originalDeck: allCardData,
-        deckColors: deckColors,
-        keepTheme: keepTheme,
-        theme: themeProfile.toJson(),
-        bracket: bracket,
-        deckAnalysis: deckAnalysis,
-        jsonResponse: jsonResponse,
+      final responseBody = await telemetry.trackAsync(
+        'complete.build_final_response',
+        () => optimize_complete.buildCompleteFinalResponse(
+          pool: pool,
+          deckFormat: deckFormat,
+          originalDeck: allCardData,
+          deckColors: deckColors,
+          keepTheme: keepTheme,
+          theme: themeProfile.toJson(),
+          bracket: bracket,
+          deckAnalysis: deckAnalysis,
+          jsonResponse: jsonResponse,
+        ),
       );
+      responseBody['timings'] = telemetry.snapshot();
+      telemetry.logSummary();
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
       // Fallback: se por algum motivo não veio como complete
+      jsonResponse['timings'] = telemetry.snapshot();
+      telemetry.logSummary();
       await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
     }
   } catch (e, stackTrace) {

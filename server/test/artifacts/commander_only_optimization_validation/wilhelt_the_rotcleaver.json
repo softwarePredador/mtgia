@@ -1,0 +1,1384 @@
+{
+  "source_deck_id": "6cfa4644-16a6-4070-9e73-619acc5e77e3",
+  "source_deck_name": "Corpus Seed - Wilhelt, the Rotcleaver",
+  "seed_deck_id": "c6dd0353-7c22-4d53-814e-20d2ee10fee9",
+  "optimize_request": {
+    "deck_id": "c6dd0353-7c22-4d53-814e-20d2ee10fee9",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "core_cards": [
+        "Wilhelt, the Rotcleaver"
+      ],
+      "match_score": 2.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "389b1923de6d0a0bc1b461e578f771e1",
+      "deck_id": "c6dd0353-7c22-4d53-814e-20d2ee10fee9",
+      "total_ms": 12068,
+      "stages_ms": {
+        "complete.fill_remainder": 4470,
+        "complete.build_final_response": 1302,
+        "complete.prepare_commander_seed": 2120,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Denial",
+      "Arcane Signet",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cyclonic Rift",
+      "Fact or Fiction",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Mystical Tutor",
+      "Negate",
+      "Ponder",
+      "Preordain",
+      "Read the Bones",
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Dark Ritual",
+      "Skullclamp",
+      "Talisman of Dominance",
+      "Bastion of Remembrance",
+      "Cemetery Reaper",
+      "Commander's Sphere",
+      "Dimir Signet",
+      "Go for the Throat",
+      "Overcharged Amalgam",
+      "The Scarab God",
+      "Crowded Crypt",
+      "Cryptbreaker",
+      "Midnight Reaper",
+      "Undead Augur",
+      "Plague Belcher",
+      "Vengeful Dead",
+      "Warren Soultrader",
+      "Ashnod's Altar",
+      "Feed the Swarm",
+      "Phyrexian Altar",
+      "The Meathook Massacre",
+      "Diabolic Intent",
+      "Bontu's Monument",
+      "Distant Melody",
+      "Gray Merchant of Asphodel",
+      "Victimize",
+      "Corpse Augur",
+      "Hordewing Skaab",
+      "Bladestitched Skaab",
+      "Champion of the Perished",
+      "Dreadhorde Invasion",
+      "Empty the Laboratory",
+      "Gravecrawler",
+      "Relentless Dead",
+      "Zul Ashur, Lich Lord",
+      "Accursed Marauder",
+      "Acererak the Archlich",
+      "Archghoul of Thraben",
+      "Cleaver Skaab",
+      "Curse of the Restless Dead",
+      "Diregraf Captain",
+      "Diregraf Colossus",
+      "Island",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "4.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana U (Tem 0 fontes, ideal > 15). Falta mana B (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.46",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 11,
+        "artifacts": 15,
+        "creatures": 24,
+        "sorceries": 8,
+        "enchantments": 5,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fact or Fiction",
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystical Tutor",
+        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Negate",
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Preordain",
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "4c6e1907-ac1d-422f-bba4-430c72e1e2e9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dark Ritual",
+        "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Skullclamp",
+        "card_id": "53f9ed4b-c7f3-42c6-a751-4b79287f4a0a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Dominance",
+        "card_id": "c93e4156-7495-4ddf-a253-c522b00d5d88",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bastion of Remembrance",
+        "card_id": "63bfcf25-7cb4-45b5-b6fa-0c7abbc36160",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cemetery Reaper",
+        "card_id": "e925f436-44c4-4c27-8438-e2901da75010",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Commander's Sphere",
+        "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dimir Signet",
+        "card_id": "9b2a2dc2-75fd-4715-970a-c5afbbe5d661",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Go for the Throat",
+        "card_id": "f6d59f80-5da0-4025-921c-1cdd8b40e7e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Overcharged Amalgam",
+        "card_id": "f0834b93-26a2-49a1-8836-58ba07178157",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The Scarab God",
+        "card_id": "80216c8e-219d-47be-a79d-8f3ac7d375e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Crowded Crypt",
+        "card_id": "b83a10c1-fccc-4ec1-a546-b4ab25c9df02",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cryptbreaker",
+        "card_id": "bfb6f6f9-f204-4e67-93a8-af15a7baec0d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Midnight Reaper",
+        "card_id": "04da701a-abe1-46ff-8d09-5cef5556c737",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Undead Augur",
+        "card_id": "2a8a8d82-8172-4e73-a978-36d99b5f8ff6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Plague Belcher",
+        "card_id": "cfd62d4f-9f34-4249-9095-c264f71aab14",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vengeful Dead",
+        "card_id": "11e07ee8-b3ac-4113-8c6f-0fc78c436050",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Warren Soultrader",
+        "card_id": "4d520a67-a56f-47c7-af8c-141672d2f0bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ashnod's Altar",
+        "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Feed the Swarm",
+        "card_id": "80e163d0-c681-4cfa-b315-9fe4478b8403",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Phyrexian Altar",
+        "card_id": "ed66b43d-257e-442f-a72f-842b2898758a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The Meathook Massacre",
+        "card_id": "64838eb1-d64a-46de-b91d-d67393c9d899",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Diabolic Intent",
+        "card_id": "fd1ddd2a-9690-40a7-9e2e-6ff92f9458f8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bontu's Monument",
+        "card_id": "0a184cbd-cb09-4442-9363-6f3560075f78",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Distant Melody",
+        "card_id": "9161b675-e887-4006-ab51-d5c5e5c06cb1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gray Merchant of Asphodel",
+        "card_id": "29101f19-03a0-427c-8cca-2017c1862a2c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Victimize",
+        "card_id": "e08957e4-8334-4de2-81b5-9b91df0a7be2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Corpse Augur",
+        "card_id": "3e205f05-170d-4cad-9dee-28b4bcbfa17f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hordewing Skaab",
+        "card_id": "78c4e779-6de0-4042-9568-d143b8f195da",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bladestitched Skaab",
+        "card_id": "8f151d8b-1d94-4644-a1e6-cbc434436112",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Champion of the Perished",
+        "card_id": "b372ff5b-3106-4256-b5fd-81e56cfadd73",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dreadhorde Invasion",
+        "card_id": "79a9bbc1-90ba-44bf-ba4d-3055b1d9c362",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Empty the Laboratory",
+        "card_id": "c52503e2-b48b-4df9-b47e-889d361a22a4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gravecrawler",
+        "card_id": "1f50c6cb-861a-4f0b-83bd-dbc1047636f5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Relentless Dead",
+        "card_id": "b88435d1-d410-4357-8674-c735c6be3547",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Zul Ashur, Lich Lord",
+        "card_id": "2c8c0735-559c-4dd8-aa74-01c0a63ae399",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Accursed Marauder",
+        "card_id": "894b3f42-51c5-473a-ac58-14767382b396",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Acererak the Archlich",
+        "card_id": "6675ce96-6dd3-4951-b04a-32b441c9ecb9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Archghoul of Thraben",
+        "card_id": "b8d3c5be-ddc7-4890-b97e-18353977acda",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cleaver Skaab",
+        "card_id": "50c8c1a6-24aa-4da6-8b81-c5c0edebc346",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Curse of the Restless Dead",
+        "card_id": "4c76df5f-8175-49a1-89c5-97e15e007ce1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Diregraf Captain",
+        "card_id": "8863d263-4a28-4121-8d23-3518af67aff8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Diregraf Colossus",
+        "card_id": "3165063e-df39-46f0-ba56-eadf486a471d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 18,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 18,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "f02563d8-44f5-47c8-ad2d-bdb2fe472a28",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Wilhelt, the Rotcleaver",
+      "type_line": "Legendary Creature — Zombie Warrior",
+      "mana_cost": "{2}{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever another Zombie you control dies, if it didn't have decayed, create a 2/2 black Zombie creature token with decayed. (It can't block. When it attacks, sacrifice it at end of combat.)\nAt the beginning of your end step, you may sacrifice a Zombie. If you do, draw a card."
+    },
+    {
+      "card_id": "894b3f42-51c5-473a-ac58-14767382b396",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Accursed Marauder",
+      "type_line": "Creature — Zombie Warrior",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When this creature enters, each player sacrifices a nontoken creature of their choice."
+    },
+    {
+      "card_id": "6675ce96-6dd3-4951-b04a-32b441c9ecb9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Acererak the Archlich",
+      "type_line": "Legendary Creature — Zombie Wizard",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon.\nWhenever Acererak attacks, for each opponent, you create a 2/2 black Zombie creature token unless that player sacrifices a creature of their choice."
+    },
+    {
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "An Offer You Can't Refuse",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target noncreature spell. Its controller creates two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Denial",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell. Its controller may draw up to two cards at the beginning of the next turn's upkeep.\nYou draw a card at the beginning of the next turn's upkeep."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "b8d3c5be-ddc7-4890-b97e-18353977acda",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Archghoul of Thraben",
+      "type_line": "Creature — Zombie Cleric",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever this creature or another Zombie you control dies, look at the top card of your library. If it's a Zombie card, you may reveal it and put it into your hand. If you don't put the card into your hand, you may put it into your graveyard."
+    },
+    {
+      "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ashnod's Altar",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Sacrifice a creature: Add {C}{C}."
+    },
+    {
+      "card_id": "63bfcf25-7cb4-45b5-b6fa-0c7abbc36160",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bastion of Remembrance",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "When this enchantment enters, create a 1/1 white Human Soldier creature token.\nWhenever a creature you control dies, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "8f151d8b-1d94-4644-a1e6-cbc434436112",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bladestitched Skaab",
+      "type_line": "Creature — Zombie Soldier",
+      "mana_cost": "{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Other Zombies you control get +1/+0."
+    },
+    {
+      "card_id": "0a184cbd-cb09-4442-9363-6f3560075f78",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bontu's Monument",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Black creature spells you cast cost {1} less to cast.\nWhenever you cast a creature spell, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brainstorm",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order."
+    },
+    {
+      "card_id": "e925f436-44c4-4c27-8438-e2901da75010",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cemetery Reaper",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{1}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Other Zombie creatures you control get +1/+1.\n{2}{B}, {T}: Exile target creature card from a graveyard. Create a 2/2 black Zombie creature token."
+    },
+    {
+      "card_id": "b372ff5b-3106-4256-b5fd-81e56cfadd73",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Champion of the Perished",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever another Zombie you control enters, put a +1/+1 counter on this creature."
+    },
+    {
+      "card_id": "50c8c1a6-24aa-4da6-8b81-c5c0edebc346",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cleaver Skaab",
+      "type_line": "Creature — Zombie Horror",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "{3}, {T}, Sacrifice another Zombie: Create two tokens that are copies of the sacrificed creature."
+    },
+    {
+      "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Commander's Sphere",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity.\nSacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "3e205f05-170d-4cad-9dee-28b4bcbfa17f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Corpse Augur",
+      "type_line": "Creature — Zombie Wizard",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "When this creature dies, you draw X cards and you lose X life, where X is the number of creature cards in target player's graveyard."
+    },
+    {
+      "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Counterspell",
+      "type_line": "Instant",
+      "mana_cost": "{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell."
+    },
+    {
+      "card_id": "b83a10c1-fccc-4ec1-a546-b4ab25c9df02",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Crowded Crypt",
+      "type_line": "Artifact",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add {B}.\nWhenever a creature you control dies, put a corpse counter on this artifact.\n{4}{B}{B}, {T}, Sacrifice this artifact: Create a 2/2 black Zombie creature token with decayed for each corpse counter on this artifact. (A creature with decayed can't block. When it attacks, sacrifice it at end of combat.)"
+    },
+    {
+      "card_id": "bfb6f6f9-f204-4e67-93a8-af15a7baec0d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cryptbreaker",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{1}{B}, {T}, Discard a card: Create a 2/2 black Zombie creature token.\nTap three untapped Zombies you control: You draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "4c76df5f-8175-49a1-89c5-97e15e007ce1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Curse of the Restless Dead",
+      "type_line": "Enchantment — Aura Curse",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Enchant player\nWhenever a land enchanted player controls enters, you create a 2/2 black Zombie creature token with decayed. (It can't block. When it attacks, sacrifice it at end of combat.)"
+    },
+    {
+      "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cyclonic Rift",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dark Ritual",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Add {B}{B}{B}."
+    },
+    {
+      "card_id": "fd1ddd2a-9690-40a7-9e2e-6ff92f9458f8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Diabolic Intent",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nSearch your library for a card, put that card into your hand, then shuffle."
+    },
+    {
+      "card_id": "9b2a2dc2-75fd-4715-970a-c5afbbe5d661",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dimir Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {U}{B}."
+    },
+    {
+      "card_id": "8863d263-4a28-4121-8d23-3518af67aff8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Diregraf Captain",
+      "type_line": "Creature — Zombie Soldier",
+      "mana_cost": "{1}{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Deathtouch\nOther Zombie creatures you control get +1/+1.\nWhenever another Zombie you control dies, target opponent loses 1 life."
+    },
+    {
+      "card_id": "3165063e-df39-46f0-ba56-eadf486a471d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Diregraf Colossus",
+      "type_line": "Creature — Zombie Giant",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "This creature enters with a +1/+1 counter on it for each Zombie card in your graveyard.\nWhenever you cast a Zombie spell, create a tapped 2/2 black Zombie creature token."
+    },
+    {
+      "card_id": "9161b675-e887-4006-ab51-d5c5e5c06cb1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Distant Melody",
+      "type_line": "Sorcery",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Choose a creature type. Draw a card for each permanent you control of that type."
+    },
+    {
+      "card_id": "79a9bbc1-90ba-44bf-ba4d-3055b1d9c362",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dreadhorde Invasion",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "At the beginning of your upkeep, you lose 1 life and amass Zombies 1. (Put a +1/+1 counter on an Army you control. It's also a Zombie. If you don't control an Army, create a 0/0 black Zombie Army creature token first.)\nWhenever a Zombie token you control with power 6 or greater attacks, it gains lifelink until end of turn."
+    },
+    {
+      "card_id": "c52503e2-b48b-4df9-b47e-889d361a22a4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Empty the Laboratory",
+      "type_line": "Sorcery",
+      "mana_cost": "{X}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice X Zombies, then reveal cards from the top of your library until you reveal a number of Zombie creature cards equal to the number of Zombies sacrificed this way. Put those cards onto the battlefield and the rest on the bottom of your library in a random order."
+    },
+    {
+      "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fact or Fiction",
+      "type_line": "Instant",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your hand and the other into your graveyard."
+    },
+    {
+      "card_id": "80e163d0-c681-4cfa-b315-9fe4478b8403",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Feed the Swarm",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target creature or enchantment an opponent controls. You lose life equal to that permanent's mana value."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "f6d59f80-5da0-4025-921c-1cdd8b40e7e3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Go for the Throat",
+      "type_line": "Instant",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target nonartifact creature."
+    },
+    {
+      "card_id": "1f50c6cb-861a-4f0b-83bd-dbc1047636f5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gravecrawler",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "This creature can't block.\nYou may cast this card from your graveyard as long as you control a Zombie."
+    },
+    {
+      "card_id": "29101f19-03a0-427c-8cca-2017c1862a2c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gray Merchant of Asphodel",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{3}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "When this creature enters, each opponent loses X life, where X is your devotion to black. You gain life equal to the life lost this way. (Each {B} in the mana costs of permanents you control counts toward your devotion to black.)"
+    },
+    {
+      "card_id": "78c4e779-6de0-4042-9568-d143b8f195da",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hordewing Skaab",
+      "type_line": "Creature — Zombie Horror",
+      "mana_cost": "{4}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nOther Zombies you control have flying.\nWhenever one or more Zombies you control deal combat damage to one or more of your opponents, you may draw cards equal to the number of opponents dealt damage this way. If you do, discard that many cards."
+    },
+    {
+      "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Island",
+      "type_line": "Basic Land — Island",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {U}.)"
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "04da701a-abe1-46ff-8d09-5cef5556c737",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Midnight Reaper",
+      "type_line": "Creature — Zombie Knight",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a nontoken creature you control dies, this creature deals 1 damage to you and you draw a card."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystical Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for an instant or sorcery card, reveal it, then shuffle and put that card on top."
+    },
+    {
+      "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystic Remora",
+      "type_line": "Enchantment",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}."
+    },
+    {
+      "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Negate",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target noncreature spell."
+    },
+    {
+      "card_id": "f0834b93-26a2-49a1-8836-58ba07178157",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Overcharged Amalgam",
+      "type_line": "Creature — Zombie Horror",
+      "mana_cost": "{2}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flash\nFlying\nExploit (When this creature enters, you may sacrifice a creature.)\nWhen this creature exploits a creature, counter target spell, activated ability, or triggered ability."
+    },
+    {
+      "card_id": "ed66b43d-257e-442f-a72f-842b2898758a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Phyrexian Altar",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Sacrifice a creature: Add one mana of any color."
+    },
+    {
+      "card_id": "cfd62d4f-9f34-4249-9095-c264f71aab14",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Plague Belcher",
+      "type_line": "Creature — Zombie Beast",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Menace\nWhen this creature enters, put two -1/-1 counters on target creature you control.\nWhenever another Zombie you control dies, each opponent loses 1 life."
+    },
+    {
+      "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ponder",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+    },
+    {
+      "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Preordain",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "b88435d1-d410-4357-8674-c735c6be3547",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Relentless Dead",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Menace (This creature can't be blocked except by two or more creatures.)\nWhen this creature dies, you may pay {B}. If you do, return it to its owner's hand.\nWhen this creature dies, you may pay {X}. If you do, return another target Zombie creature card with mana value X from your graveyard to the battlefield."
+    },
+    {
+      "card_id": "53f9ed4b-c7f3-42c6-a751-4b79287f4a0a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Skullclamp",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "Equipped creature gets +1/-1.\nWhenever equipped creature dies, draw two cards.\nEquip {1}"
+    },
+    {
+      "card_id": "4c6e1907-ac1d-422f-bba4-430c72e1e2e9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swan Song",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target enchantment, instant, or sorcery spell. Its controller creates a 2/2 blue Bird creature token with flying."
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "c93e4156-7495-4ddf-a253-c522b00d5d88",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Dominance",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {U} or {B}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "64838eb1-d64a-46de-b91d-d67393c9d899",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The Meathook Massacre",
+      "type_line": "Legendary Enchantment",
+      "mana_cost": "{X}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When The Meathook Massacre enters, each creature gets -X/-X until end of turn.\nWhenever a creature you control dies, each opponent loses 1 life.\nWhenever a creature an opponent controls dies, you gain 1 life."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "80216c8e-219d-47be-a79d-8f3ac7d375e3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The Scarab God",
+      "type_line": "Legendary Creature — God",
+      "mana_cost": "{3}{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "At the beginning of your upkeep, each opponent loses X life and you scry X, where X is the number of Zombies you control.\n{2}{U}{B}: Exile target creature card from a graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie.\nWhen The Scarab God dies, return it to its owner's hand at the beginning of the next end step."
+    },
+    {
+      "card_id": "2a8a8d82-8172-4e73-a978-36d99b5f8ff6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Undead Augur",
+      "type_line": "Creature — Zombie Wizard",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another Zombie you control dies, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "11e07ee8-b3ac-4113-8c6f-0fc78c436050",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vengeful Dead",
+      "type_line": "Creature — Zombie",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever this creature or another Zombie dies, each opponent loses 1 life."
+    },
+    {
+      "card_id": "e08957e4-8334-4de2-81b5-9b91df0a7be2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Victimize",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Choose two target creature cards in your graveyard. Sacrifice a creature. If you do, return the chosen cards to the battlefield tapped."
+    },
+    {
+      "card_id": "4d520a67-a56f-47c7-af8c-141672d2f0bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Warren Soultrader",
+      "type_line": "Creature — Zombie Goblin Wizard",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Pay 1 life, Sacrifice another creature: Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "2c8c0735-559c-4dd8-aa74-01c0a63ae399",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Zul Ashur, Lich Lord",
+      "type_line": "Legendary Creature — Zombie Warlock",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Ward—Pay 2 life. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 2 life.)\n{T}: You may cast target Zombie creature card from your graveyard this turn."
+    }
+  ]
+}

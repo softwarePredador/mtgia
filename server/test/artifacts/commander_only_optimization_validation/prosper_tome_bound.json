@@ -1,0 +1,1393 @@
+{
+  "source_deck_id": "86cfa127-c737-43d7-aec9-b41d1668880e",
+  "source_deck_name": "Corpus Seed - Prosper, Tome-Bound",
+  "seed_deck_id": "648cfde8-0013-4450-a6d3-53d115706e23",
+  "optimize_request": {
+    "deck_id": "648cfde8-0013-4450-a6d3-53d115706e23",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "core_cards": [
+        "Prosper, Tome-Bound"
+      ],
+      "match_score": 2.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "70e316aa1b05ea98293111a85fcd6583",
+      "deck_id": "648cfde8-0013-4450-a6d3-53d115706e23",
+      "total_ms": 12180,
+      "stages_ms": {
+        "complete.fill_remainder": 4489,
+        "complete.build_final_response": 1351,
+        "complete.prepare_commander_seed": 2212,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Signet",
+      "Command Tower",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Read the Bones",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Dark Ritual",
+      "Ragavan, Nimble Pilferer",
+      "Sensei's Divining Top",
+      "Bedevil",
+      "Deadly Dispute",
+      "Mirkwood Bats",
+      "Rakdos Charm",
+      "Rakdos Signet",
+      "Vandalblast",
+      "Dire Fleet Daredevil",
+      "Hurl Through Hell",
+      "You Find Some Prisoners",
+      "Uba Mask",
+      "Urabrask, Heretic Praetor",
+      "Kalain, Reclusive Painter",
+      "Marionette Apprentice",
+      "Torment of Hailfire",
+      "Chandra, Torch of Defiance",
+      "Crime Novelist",
+      "Nadier's Nightblade",
+      "Revel in Riches",
+      "Jeska's Will",
+      "Terminate",
+      "Feed the Swarm",
+      "Talisman of Indulgence",
+      "Tibalt's Trickery",
+      "Dauthi Voidwalker",
+      "Reckless Fireweaver",
+      "Xorn",
+      "Reckless Impulse",
+      "Party Thrasher",
+      "Wild Wasteland",
+      "Disciple of the Vault",
+      "Dream Devourer",
+      "Juri, Master of the Revue",
+      "Magda, Brazen Outlaw",
+      "Passionate Archaeologist",
+      "Share the Spoils",
+      "Academy Manufactor",
+      "Alchemist's Talent",
+      "Bonehoard Dracosaur",
+      "Charred Foyer // Warped Space",
+      "Goldspan Dragon",
+      "Gonti, Lord of Luxury",
+      "Ingenious Artillerist",
+      "Laelia, the Blade Reforged",
+      "Ob Nixilis, Captive Kingpin",
+      "Outpost Siege",
+      "Plargg and Nassari",
+      "Professional Face-Breaker",
+      "Stolen Strategy",
+      "Theater of Horrors",
+      "Valakut Exploration",
+      "Weftstalker Ardent",
+      "Mountain",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "4.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana B (Tem 0 fontes, ideal > 15). Falta mana R (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.76",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 8,
+        "artifacts": 12,
+        "creatures": 27,
+        "sorceries": 6,
+        "enchantments": 10,
+        "planeswalkers": 1
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "1df62c7c-b8aa-48c0-aa53-35bc0f5e0d5f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dark Ritual",
+        "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "card_id": "d2bbc43d-02f7-4489-9714-9013a09178fc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sensei's Divining Top",
+        "card_id": "7c56bc66-8eb0-4c2e-9652-56274fa061e2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bedevil",
+        "card_id": "01ffeddd-6500-4659-9bce-e93a343df1f5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deadly Dispute",
+        "card_id": "5d8ed0f0-01ec-46ac-a1ad-7e89a40d7969",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mirkwood Bats",
+        "card_id": "f1f8509c-3795-4120-b9ef-2ed1361bd23e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rakdos Charm",
+        "card_id": "f6f1a789-1a65-42b9-b90b-30ebcc2dce5b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rakdos Signet",
+        "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vandalblast",
+        "card_id": "93a52a4c-a8d5-4cbf-9f5d-fa73c3233548",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dire Fleet Daredevil",
+        "card_id": "8e6585d4-c6ad-463f-a5a9-03e683dcb1ca",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hurl Through Hell",
+        "card_id": "4e88ae54-cbb2-48a8-8685-baf1cef0b66e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "You Find Some Prisoners",
+        "card_id": "e4fd01bb-9746-4097-a116-722c4ca78eff",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Uba Mask",
+        "card_id": "1127edf6-ed5a-413a-a7f9-722afa3cc999",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Urabrask, Heretic Praetor",
+        "card_id": "045ea24d-49ba-4c9b-ab8d-f9f0c939d96d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kalain, Reclusive Painter",
+        "card_id": "602ab03a-bc17-415a-9662-ea126457e543",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Marionette Apprentice",
+        "card_id": "03991c26-99e0-4fe0-aa13-9f9ad5deed88",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Torment of Hailfire",
+        "card_id": "c3518ecd-8385-4227-9447-c9460f37d3a6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chandra, Torch of Defiance",
+        "card_id": "bfbe1386-df47-4887-ae3a-99ba21ed9e26",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Crime Novelist",
+        "card_id": "1a1b3011-d6d3-483e-893f-7c1e1d35e649",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nadier's Nightblade",
+        "card_id": "e14e38ad-9f72-43db-a995-e5f6fd257a4f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Revel in Riches",
+        "card_id": "2a334dd5-47cd-4e17-ba58-9a84b6c2424a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Jeska's Will",
+        "card_id": "47b80e59-a15c-492b-8250-bcc701aa3d24",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Terminate",
+        "card_id": "b62bee68-6750-4b02-a731-49574e97f4d9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Feed the Swarm",
+        "card_id": "80e163d0-c681-4cfa-b315-9fe4478b8403",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Indulgence",
+        "card_id": "b69caae7-6c2c-4a9e-862d-01681e17964d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tibalt's Trickery",
+        "card_id": "60a6f6b9-9464-438b-b828-1b2e0a14e622",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dauthi Voidwalker",
+        "card_id": "02758253-123a-4c19-a8c3-ac5971a10396",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Reckless Fireweaver",
+        "card_id": "9c17720d-557e-428e-9544-81d47805c58d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Xorn",
+        "card_id": "5079111c-60cf-442e-96b6-362dfa1bb76f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Reckless Impulse",
+        "card_id": "2a5056e5-0924-4141-a1c2-1d0ed49ad9ce",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Party Thrasher",
+        "card_id": "f9a4d9b8-1356-4109-8ca1-b118e2203bfe",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Wild Wasteland",
+        "card_id": "cc794203-3bdc-4ff5-ab81-309cb27c9083",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Disciple of the Vault",
+        "card_id": "6f71b244-bad3-49f1-b775-97449f62aa7d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dream Devourer",
+        "card_id": "4092f3fe-8d09-4b2d-b905-e59e6f6baef0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Juri, Master of the Revue",
+        "card_id": "4f791b2e-491d-4ea1-9288-f0da8ba248b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Magda, Brazen Outlaw",
+        "card_id": "7d68da40-369b-4cc0-a144-b6b93c64d51e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Passionate Archaeologist",
+        "card_id": "ab5a9d36-bb42-4791-866a-18248e1ca1d6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Share the Spoils",
+        "card_id": "efae4886-87a4-4cbe-adc3-8dca6bd02b6b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Academy Manufactor",
+        "card_id": "f7b409bb-1c96-4bfb-b587-76384360ac86",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Alchemist's Talent",
+        "card_id": "b7fb1981-0279-4911-a255-341dcd5774d2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bonehoard Dracosaur",
+        "card_id": "2c0b49a8-6c45-49f1-9399-612aec5bbae2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Charred Foyer // Warped Space",
+        "card_id": "bb64f7c7-b75b-4ff8-8fc6-e91f3ea7101d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Goldspan Dragon",
+        "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gonti, Lord of Luxury",
+        "card_id": "476637c9-1e2f-496c-94ca-080f1d0128fc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ingenious Artillerist",
+        "card_id": "fa9123f1-a584-4fed-b292-824e545f1699",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Laelia, the Blade Reforged",
+        "card_id": "f99c7956-03a8-4736-9a1b-bd34a4f9fd40",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ob Nixilis, Captive Kingpin",
+        "card_id": "1430b574-a0eb-4a63-a154-2ccba0d2199c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Outpost Siege",
+        "card_id": "92852194-5d34-4cce-befa-1c3ae17aa358",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Plargg and Nassari",
+        "card_id": "085d8a66-5fc5-436b-a1ef-a96c24e55e3b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Professional Face-Breaker",
+        "card_id": "c40eef2b-e99d-4957-bbb3-64ffffff659e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Stolen Strategy",
+        "card_id": "32883290-4d41-4c29-b3dd-b4f909a41f8d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Theater of Horrors",
+        "card_id": "079e61b0-7d79-4970-a68c-c9a759d45c8b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Valakut Exploration",
+        "card_id": "a1f49bd9-54fe-4257-86f5-c6db57a48581",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Weftstalker Ardent",
+        "card_id": "1a6ae3a7-94bc-461d-a581-8ef5a2e937fc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 18,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 18,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Prosper, Tome-Bound",
+      "type_line": "Legendary Creature — Tiefling Warlock",
+      "mana_cost": "{2}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Deathtouch\nMystic Arcanum — At the beginning of your end step, exile the top card of your library. Until the end of your next turn, you may play that card.\nPact Boon — Whenever you play a card from exile, create a Treasure token."
+    },
+    {
+      "card_id": "f7b409bb-1c96-4bfb-b587-76384360ac86",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Academy Manufactor",
+      "type_line": "Artifact Creature — Assembly-Worker",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "If you would create a Clue, Food, or Treasure token, instead create one of each."
+    },
+    {
+      "card_id": "b7fb1981-0279-4911-a255-341dcd5774d2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Alchemist's Talent",
+      "type_line": "Enchantment — Class",
+      "mana_cost": "{3}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "(Gain the next level as a sorcery to add its ability.)\nWhen this Class enters, create two tapped Treasure tokens.\n{1}{R}: Level 2\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\"\n{4}{R}: Level 3\nWhenever you cast a spell, if mana from a Treasure was spent to cast it, this Class deals damage equal to that spell's mana value to each opponent."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "01ffeddd-6500-4659-9bce-e93a343df1f5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bedevil",
+      "type_line": "Instant",
+      "mana_cost": "{B}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target artifact, creature, or planeswalker."
+    },
+    {
+      "card_id": "2c0b49a8-6c45-49f1-9399-612aec5bbae2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bonehoard Dracosaur",
+      "type_line": "Creature — Dinosaur Dragon",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, first strike\nAt the beginning of your upkeep, exile the top two cards of your library. You may play them this turn. If you exiled a land card this way, create a 3/1 red Dinosaur creature token. If you exiled a nonland card this way, create a Treasure token."
+    },
+    {
+      "card_id": "bfbe1386-df47-4887-ae3a-99ba21ed9e26",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chandra, Torch of Defiance",
+      "type_line": "Legendary Planeswalker — Chandra",
+      "mana_cost": "{2}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "[+1]: Exile the top card of your library. You may cast that card. If you don't, Chandra deals 2 damage to each opponent.\n[+1]: Add {R}{R}.\n[−3]: Chandra deals 4 damage to target creature.\n[−7]: You get an emblem with \"Whenever you cast a spell, this emblem deals 5 damage to any target.\""
+    },
+    {
+      "card_id": "bb64f7c7-b75b-4ff8-8fc6-e91f3ea7101d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Charred Foyer // Warped Space",
+      "type_line": "Enchantment — Room",
+      "mana_cost": "{3}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "At the beginning of your upkeep, exile the top card of your library. You may play it this turn.\n(You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)"
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "1a1b3011-d6d3-483e-893f-7c1e1d35e649",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Crime Novelist",
+      "type_line": "Creature — Goblin Bard",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you sacrifice an artifact, put a +1/+1 counter on this creature and add {R}."
+    },
+    {
+      "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dark Ritual",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Add {B}{B}{B}."
+    },
+    {
+      "card_id": "02758253-123a-4c19-a8c3-ac5971a10396",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dauthi Voidwalker",
+      "type_line": "Creature — Dauthi Rogue",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Shadow (This creature can block or be blocked by only creatures with shadow.)\nIf a card would be put into an opponent's graveyard from anywhere, instead exile it with a void counter on it.\n{T}, Sacrifice this creature: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost."
+    },
+    {
+      "card_id": "5d8ed0f0-01ec-46ac-a1ad-7e89a40d7969",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Deadly Dispute",
+      "type_line": "Instant",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nDraw two cards and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "8e6585d4-c6ad-463f-a5a9-03e683dcb1ca",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dire Fleet Daredevil",
+      "type_line": "Creature — Human Pirate",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "First strike\nWhen this creature enters, exile target instant or sorcery card from an opponent's graveyard. You may cast it this turn, and mana of any type can be spent to cast that spell. If that spell would be put into a graveyard, exile it instead."
+    },
+    {
+      "card_id": "6f71b244-bad3-49f1-b775-97449f62aa7d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Disciple of the Vault",
+      "type_line": "Creature — Human Cleric",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever an artifact is put into a graveyard from the battlefield, you may have target opponent lose 1 life."
+    },
+    {
+      "card_id": "4092f3fe-8d09-4b2d-b905-e59e6f6baef0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dream Devourer",
+      "type_line": "Creature — Demon Cleric",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Each nonland card in your hand without foretell has foretell. Its foretell cost is equal to its mana cost reduced by {2}. (During your turn, you may pay {2} and exile it from your hand face down. Cast it on a later turn for its foretell cost.)\nWhenever you foretell a card, this creature gets +2/+0 until end of turn."
+    },
+    {
+      "card_id": "80e163d0-c681-4cfa-b315-9fe4478b8403",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Feed the Swarm",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target creature or enchantment an opponent controls. You lose life equal to that permanent's mana value."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Goldspan Dragon",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\""
+    },
+    {
+      "card_id": "476637c9-1e2f-496c-94ca-080f1d0128fc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gonti, Lord of Luxury",
+      "type_line": "Legendary Creature — Aetherborn Rogue",
+      "mana_cost": "{2}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Deathtouch\nWhen Gonti enters, look at the top four cards of target opponent's library, exile one of them face down, then put the rest on the bottom of that library in a random order. You may cast that card for as long as it remains exiled, and mana of any type can be spent to cast that spell."
+    },
+    {
+      "card_id": "4e88ae54-cbb2-48a8-8685-baf1cef0b66e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hurl Through Hell",
+      "type_line": "Instant",
+      "mana_cost": "{2}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Exile target creature. Until the end of your next turn, you may cast that card and you may spend mana as though it were mana of any color to cast that spell."
+    },
+    {
+      "card_id": "fa9123f1-a584-4fed-b292-824e545f1699",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ingenious Artillerist",
+      "type_line": "Creature — Human Artificer",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever one or more artifacts you control enter, this creature deals that much damage to each opponent."
+    },
+    {
+      "card_id": "47b80e59-a15c-492b-8250-bcc701aa3d24",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Jeska's Will",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Choose one. If you control a commander as you cast this spell, you may choose both instead.\n• Add {R} for each card in target opponent's hand.\n• Exile the top three cards of your library. You may play them this turn."
+    },
+    {
+      "card_id": "4f791b2e-491d-4ea1-9288-f0da8ba248b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Juri, Master of the Revue",
+      "type_line": "Legendary Creature — Human Shaman",
+      "mana_cost": "{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever you sacrifice a permanent, put a +1/+1 counter on Juri.\nWhen Juri dies, it deals damage equal to its power to any target."
+    },
+    {
+      "card_id": "602ab03a-bc17-415a-9662-ea126457e543",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kalain, Reclusive Painter",
+      "type_line": "Legendary Creature — Human Elf Bard",
+      "mana_cost": "{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When Kalain enters, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nOther creatures you control enter with an additional +1/+1 counter on them for each mana from a Treasure spent to cast them."
+    },
+    {
+      "card_id": "f99c7956-03a8-4736-9a1b-bd34a4f9fd40",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Laelia, the Blade Reforged",
+      "type_line": "Legendary Creature — Spirit Warrior",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Haste\nWhenever Laelia attacks, exile the top card of your library. You may play that card this turn.\nWhenever one or more cards are put into exile from your library and/or your graveyard, put a +1/+1 counter on Laelia."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "7d68da40-369b-4cc0-a144-b6b93c64d51e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Magda, Brazen Outlaw",
+      "type_line": "Legendary Creature — Dwarf Berserker",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Other Dwarves you control get +1/+0.\nWhenever a Dwarf you control becomes tapped, create a Treasure token.\nSacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "03991c26-99e0-4fe0-aa13-9f9ad5deed88",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Marionette Apprentice",
+      "type_line": "Creature — Human Artificer",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Fabricate 1 (When this creature enters, put a +1/+1 counter on it or create a 1/1 colorless Servo artifact creature token.)\nWhenever another creature or artifact you control is put into a graveyard from the battlefield, each opponent loses 1 life."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "f1f8509c-3795-4120-b9ef-2ed1361bd23e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mirkwood Bats",
+      "type_line": "Creature — Bat",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nWhenever you create or sacrifice a token, each opponent loses 1 life."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "e14e38ad-9f72-43db-a995-e5f6fd257a4f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Nadier's Nightblade",
+      "type_line": "Creature — Elf Warrior",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a token you control leaves the battlefield, each opponent loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "1430b574-a0eb-4a63-a154-2ccba0d2199c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ob Nixilis, Captive Kingpin",
+      "type_line": "Legendary Creature — Demon",
+      "mana_cost": "{2}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying, trample\nWhenever one or more opponents each lose exactly 1 life, put a +1/+1 counter on Ob Nixilis. Exile the top card of your library. Until your next end step, you may play that card."
+    },
+    {
+      "card_id": "92852194-5d34-4cce-befa-1c3ae17aa358",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Outpost Siege",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "As this enchantment enters, choose Khans or Dragons.\n• Khans — At the beginning of your upkeep, exile the top card of your library. Until end of turn, you may play that card.\n• Dragons — Whenever a creature you control leaves the battlefield, this enchantment deals 1 damage to any target."
+    },
+    {
+      "card_id": "f9a4d9b8-1356-4109-8ca1-b118e2203bfe",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Party Thrasher",
+      "type_line": "Creature — Lizard Wizard",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Noncreature spells you cast from exile have convoke. (Each creature you tap while casting a noncreature spell from exile pays for {1} or one mana of that creature's color.)\nAt the beginning of your first main phase, you may discard a card. If you do, exile the top two cards of your library, then choose one of them. You may play that card this turn."
+    },
+    {
+      "card_id": "ab5a9d36-bb42-4791-866a-18248e1ca1d6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Passionate Archaeologist",
+      "type_line": "Legendary Enchantment — Background",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Commander creatures you own have \"Whenever you cast a spell from exile, this creature deals damage equal to that spell's mana value to target opponent.\""
+    },
+    {
+      "card_id": "085d8a66-5fc5-436b-a1ef-a96c24e55e3b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Plargg and Nassari",
+      "type_line": "Legendary Creature — Orc Efreet",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "At the beginning of your upkeep, each player exiles cards from the top of their library until they exile a nonland card. An opponent chooses a nonland card exiled this way. You may cast up to two spells from among the other cards exiled this way without paying their mana costs."
+    },
+    {
+      "card_id": "c40eef2b-e99d-4957-bbb3-64ffffff659e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Professional Face-Breaker",
+      "type_line": "Creature — Human Warrior",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Menace\nWhenever one or more creatures you control deal combat damage to a player, create a Treasure token.\nSacrifice a Treasure: Exile the top card of your library. You may play that card this turn."
+    },
+    {
+      "card_id": "d2bbc43d-02f7-4489-9714-9013a09178fc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ragavan, Nimble Pilferer",
+      "type_line": "Legendary Creature — Monkey Pirate",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever Ragavan deals combat damage to a player, create a Treasure token and exile the top card of that player's library. Until end of turn, you may cast that card.\nDash {1}{R} (You may cast this spell for its dash cost. If you do, it gains haste, and it's returned from the battlefield to its owner's hand at the beginning of the next end step.)"
+    },
+    {
+      "card_id": "f6f1a789-1a65-42b9-b90b-30ebcc2dce5b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rakdos Charm",
+      "type_line": "Instant",
+      "mana_cost": "{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Choose one —\n• Exile target player's graveyard.\n• Destroy target artifact.\n• Each creature deals 1 damage to its controller."
+    },
+    {
+      "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rakdos Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {B}{R}."
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "9c17720d-557e-428e-9544-81d47805c58d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Reckless Fireweaver",
+      "type_line": "Creature — Human Artificer",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever an artifact you control enters, this creature deals 1 damage to each opponent."
+    },
+    {
+      "card_id": "2a5056e5-0924-4141-a1c2-1d0ed49ad9ce",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Reckless Impulse",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Exile the top two cards of your library. Until the end of your next turn, you may play those cards."
+    },
+    {
+      "card_id": "2a334dd5-47cd-4e17-ba58-9a84b6c2424a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Revel in Riches",
+      "type_line": "Enchantment",
+      "mana_cost": "{4}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Whenever a creature an opponent controls dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nAt the beginning of your upkeep, if you control ten or more Treasures, you win the game."
+    },
+    {
+      "card_id": "7c56bc66-8eb0-4c2e-9652-56274fa061e2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sensei's Divining Top",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{1}: Look at the top three cards of your library, then put them back in any order.\n{T}: Draw a card, then put this artifact on top of its owner's library."
+    },
+    {
+      "card_id": "efae4886-87a4-4cbe-adc3-8dca6bd02b6b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Share the Spoils",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When this enchantment enters and whenever an opponent loses the game, exile the top card of each player's library.\nDuring each player's turn, that player may play a land or cast a spell from among cards exiled with this enchantment, and they may spend mana as though it were mana of any color to cast that spell. When they do, exile the top card of their library."
+    },
+    {
+      "card_id": "1df62c7c-b8aa-48c0-aa53-35bc0f5e0d5f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "32883290-4d41-4c29-b3dd-b4f909a41f8d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Stolen Strategy",
+      "type_line": "Enchantment",
+      "mana_cost": "{4}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "At the beginning of your upkeep, exile the top card of each opponent's library. Until end of turn, you may cast spells from among those exiled cards, and you may spend mana as though it were mana of any color to cast those spells."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 18,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "b69caae7-6c2c-4a9e-862d-01681e17964d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Indulgence",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {R}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "b62bee68-6750-4b02-a731-49574e97f4d9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Terminate",
+      "type_line": "Instant",
+      "mana_cost": "{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target creature. It can't be regenerated."
+    },
+    {
+      "card_id": "079e61b0-7d79-4970-a68c-c9a759d45c8b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Theater of Horrors",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your upkeep, exile the top card of your library.\nDuring your turn, if an opponent lost life this turn, you may play lands and cast spells from among cards exiled with this enchantment.\n{3}{R}: This enchantment deals 1 damage to target opponent or planeswalker."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "60a6f6b9-9464-438b-b828-1b2e0a14e622",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Tibalt's Trickery",
+      "type_line": "Instant",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell. Choose 1, 2, or 3 at random. Its controller mills that many cards, then exiles cards from the top of their library until they exile a nonland card with a different name than that spell. They may cast that card without paying its mana cost. Then they put the exiled cards on the bottom of their library in a random order."
+    },
+    {
+      "card_id": "c3518ecd-8385-4227-9447-c9460f37d3a6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Torment of Hailfire",
+      "type_line": "Sorcery",
+      "mana_cost": "{X}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Repeat the following process X times. Each opponent loses 3 life unless that player sacrifices a nonland permanent of their choice or discards a card."
+    },
+    {
+      "card_id": "1127edf6-ed5a-413a-a7f9-722afa3cc999",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Uba Mask",
+      "type_line": "Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "If a player would draw a card, that player exiles that card face up instead.\nEach player may play lands and cast spells from among cards they exiled with this artifact this turn."
+    },
+    {
+      "card_id": "045ea24d-49ba-4c9b-ab8d-f9f0c939d96d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Urabrask, Heretic Praetor",
+      "type_line": "Legendary Creature — Phyrexian Praetor",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Haste\nAt the beginning of your upkeep, exile the top card of your library. You may play it this turn.\nAt the beginning of each opponent's upkeep, the next time they would draw a card this turn, instead they exile the top card of their library. They may play it this turn."
+    },
+    {
+      "card_id": "a1f49bd9-54fe-4257-86f5-c6db57a48581",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Valakut Exploration",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Landfall — Whenever a land you control enters, exile the top card of your library. You may play that card for as long as it remains exiled.\nAt the beginning of your end step, if there are cards exiled with this enchantment, put them into their owner's graveyard, then this enchantment deals that much damage to each opponent."
+    },
+    {
+      "card_id": "93a52a4c-a8d5-4cbf-9f5d-fa73c3233548",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vandalblast",
+      "type_line": "Sorcery",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "1a6ae3a7-94bc-461d-a581-8ef5a2e937fc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Weftstalker Ardent",
+      "type_line": "Creature — Drix Artificer",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever another creature or artifact you control enters, this creature deals 1 damage to each opponent.\nWarp {R} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)"
+    },
+    {
+      "card_id": "cc794203-3bdc-4ff5-ab81-309cb27c9083",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Wild Wasteland",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Skip your draw step.\nAt the beginning of your upkeep, exile the top two cards of your library. You may play those cards this turn."
+    },
+    {
+      "card_id": "5079111c-60cf-442e-96b6-362dfa1bb76f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Xorn",
+      "type_line": "Creature — Elemental",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "If you would create one or more Treasure tokens, instead create those tokens plus an additional Treasure token."
+    },
+    {
+      "card_id": "e4fd01bb-9746-4097-a116-722c4ca78eff",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "You Find Some Prisoners",
+      "type_line": "Instant",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Choose one —\n• Break Their Chains — Destroy target artifact.\n• Interrogate Them — Exile the top three cards of target opponent's library. Choose one of them. Until the end of your next turn, you may play that card, and you may spend mana as though it were mana of any color to cast it."
+    }
+  ]
+}

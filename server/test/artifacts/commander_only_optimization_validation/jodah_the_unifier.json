@@ -1,0 +1,1460 @@
+{
+  "source_deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
+  "source_deck_name": "Corpus Seed - Jodah, the Unifier",
+  "seed_deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
+  "optimize_request": {
+    "deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tribal-human",
+      "confidence": "alta",
+      "core_cards": [
+        "Jodah, the Unifier"
+      ],
+      "match_score": 1.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "354317bf4af3031c707e9fe44a109825",
+      "deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
+      "total_ms": 12629,
+      "stages_ms": {
+        "complete.fill_remainder": 4834,
+        "complete.build_final_response": 1465,
+        "complete.prepare_commander_seed": 2123,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Denial",
+      "Arcane Signet",
+      "Beast Within",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cultivate",
+      "Cyclonic Rift",
+      "Fact or Fiction",
+      "Farseek",
+      "Generous Gift",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Mystical Tutor",
+      "Nature's Lore",
+      "Negate",
+      "Path to Exile",
+      "Ponder",
+      "Preordain",
+      "Read the Bones",
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Rhystic Study",
+      "Swords to Plowshares",
+      "Birds of Paradise",
+      "Delighted Halfling",
+      "Mox Amber",
+      "Bloom Tender",
+      "Chromatic Lantern",
+      "Commander's Sphere",
+      "Jhoira, Weatherlight Captain",
+      "Timeless Lotus",
+      "Basim Ibn Ishaq",
+      "Grazilaxx, Illithid Scholar",
+      "Inga and Esika",
+      "Reki, the History of Kamigawa",
+      "Shanid, Sleepers' Scourge",
+      "Vega, the Watcher",
+      "Vraska Joins Up",
+      "Faeburrow Elder",
+      "Kutzil, Malamet Exemplar",
+      "Selvala, Heart of the Wilds",
+      "Toski, Bearer of Secrets",
+      "Relic of Legends",
+      "Smothering Tithe",
+      "Boromir, Warden of the Tower",
+      "Shalai, Voice of Plenty",
+      "Minsc & Boo, Timeless Heroes",
+      "Kenrith, the Returned King",
+      "Bard Class",
+      "Gold-Forged Thopteryx",
+      "Hajar, Loyal Bodyguard",
+      "K-9, Mark I",
+      "Pippin, Guard of the Citadel",
+      "Yoshimaru, Ever Faithful",
+      "Aragorn, the Uniter",
+      "Arvad the Cursed",
+      "Forest",
+      "Island",
+      "Mountain",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "5.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 10). Falta mana U (Tem 0 fontes, ideal > 10). Falta mana B (Tem 0 fontes, ideal > 10). Falta mana R (Tem 0 fontes, ideal > 10). Falta mana G (Tem 0 fontes, ideal > 10)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.51",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 13,
+        "artifacts": 14,
+        "creatures": 25,
+        "sorceries": 7,
+        "enchantments": 5,
+        "planeswalkers": 1
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana W (Tem 8 fontes, ideal > 10). Falta mana U (Tem 8 fontes, ideal > 15). Falta mana G (Tem 9 fontes, ideal > 10)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fact or Fiction",
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystical Tutor",
+        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Negate",
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Preordain",
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "c971ff63-79d9-45e4-a7d9-4aec4eecd525",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rhystic Study",
+        "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Birds of Paradise",
+        "card_id": "461498dd-f877-458e-b4f5-c674e250e6b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Delighted Halfling",
+        "card_id": "f833bd42-cd55-4eeb-91bd-f7e901fc06da",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mox Amber",
+        "card_id": "bcd7d52d-b4e2-42e1-9bca-768f1672bc4b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloom Tender",
+        "card_id": "5bbf2a68-94d3-4c98-a20d-bf41cf00291e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chromatic Lantern",
+        "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Commander's Sphere",
+        "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Jhoira, Weatherlight Captain",
+        "card_id": "4b4547c6-d082-4349-ba7f-d8724024a9b8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Timeless Lotus",
+        "card_id": "b1b14583-ae55-4522-b77e-6309ad55cb93",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Basim Ibn Ishaq",
+        "card_id": "bb7d81cd-e975-4c84-9bd3-fcb5a99e9fb2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Grazilaxx, Illithid Scholar",
+        "card_id": "d46795c3-9266-49ec-8646-df3e9c701594",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Inga and Esika",
+        "card_id": "9c592899-71e0-479c-b0b3-6b1425157451",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Reki, the History of Kamigawa",
+        "card_id": "2c2a8779-e217-41f9-b990-55c652102652",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Shanid, Sleepers' Scourge",
+        "card_id": "e4e46c1d-9edf-438b-b1ff-a216af3dbbb9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vega, the Watcher",
+        "card_id": "e5926dbf-dc35-4ecd-892e-1cfabad25dad",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vraska Joins Up",
+        "card_id": "8e705303-c4c3-40f7-b67d-37264f97eee1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Faeburrow Elder",
+        "card_id": "ea005602-5c63-4293-a1f7-52f5a2fb3532",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kutzil, Malamet Exemplar",
+        "card_id": "d3c2b16f-34ee-46c8-93a8-46ecdda81c9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Selvala, Heart of the Wilds",
+        "card_id": "d9ec1451-478e-4b72-a1d8-cd0949fcd171",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Toski, Bearer of Secrets",
+        "card_id": "9d4a5246-36f1-4f54-a7cd-7e52cefe3c38",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Relic of Legends",
+        "card_id": "6feb7ef4-bb3e-4b5f-938b-b54a67674131",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Smothering Tithe",
+        "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Boromir, Warden of the Tower",
+        "card_id": "098d718b-2e82-4365-a94d-00ebd437fa45",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Shalai, Voice of Plenty",
+        "card_id": "add6119f-93fb-4a65-9ffe-eb285da4080e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Minsc & Boo, Timeless Heroes",
+        "card_id": "0647f69c-fe1e-40e2-a704-019a1032440f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kenrith, the Returned King",
+        "card_id": "bf21a489-c2f3-4f99-806c-cc6475996dd0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bard Class",
+        "card_id": "06a25da6-259e-440d-8881-43bb00a83189",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gold-Forged Thopteryx",
+        "card_id": "bea56e01-ed27-42f6-b19c-2a9528f8fe9a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hajar, Loyal Bodyguard",
+        "card_id": "e90d5849-fbf6-460a-b901-eb8477d65c0a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "K-9, Mark I",
+        "card_id": "e1413f6a-aa28-4ed1-ac25-913e7e590cb9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Pippin, Guard of the Citadel",
+        "card_id": "aa63dcab-63a1-4e6e-87b7-6382fcd78952",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Yoshimaru, Ever Faithful",
+        "card_id": "d7120ce8-332c-477d-80e5-c582dcc3d94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Aragorn, the Uniter",
+        "card_id": "bf8e8886-73e8-4416-a1c0-a47448cd8574",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arvad the Cursed",
+        "card_id": "d15bf875-7c9e-4a21-8877-00cdbc5e6c84",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 8,
+        "is_basic_land": true
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 7,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 7,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "7fe52bc9-1b58-40bf-8d0c-d08c710f6098",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Jodah, the Unifier",
+      "type_line": "Legendary Creature — Human Wizard",
+      "mana_cost": "{W}{U}{B}{R}{G}",
+      "colors": [
+        "B",
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Legendary creatures you control get +X/+X, where X is the number of legendary creatures you control.\nWhenever you cast a legendary spell from your hand, exile cards from the top of your library until you exile a legendary nonland card with lesser mana value. You may cast that card without paying its mana cost. Put the rest on the bottom of your library in a random order."
+    },
+    {
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "An Offer You Can't Refuse",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target noncreature spell. Its controller creates two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "bf8e8886-73e8-4416-a1c0-a47448cd8574",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Aragorn, the Uniter",
+      "type_line": "Legendary Creature — Human Noble",
+      "mana_cost": "{R}{G}{W}{U}",
+      "colors": [
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever you cast a white spell, create a 1/1 white Human Soldier creature token.\nWhenever you cast a blue spell, scry 2.\nWhenever you cast a red spell, Aragorn deals 3 damage to target opponent.\nWhenever you cast a green spell, target creature gets +4/+4 until end of turn."
+    },
+    {
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Denial",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell. Its controller may draw up to two cards at the beginning of the next turn's upkeep.\nYou draw a card at the beginning of the next turn's upkeep."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "d15bf875-7c9e-4a21-8877-00cdbc5e6c84",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arvad the Cursed",
+      "type_line": "Legendary Creature — Vampire Knight",
+      "mana_cost": "{3}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Deathtouch, lifelink\nOther legendary creatures you control get +2/+2."
+    },
+    {
+      "card_id": "06a25da6-259e-440d-8881-43bb00a83189",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bard Class",
+      "type_line": "Enchantment — Class",
+      "mana_cost": "{R}{G}",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "(Gain the next level as a sorcery to add its ability.)\nLegendary creatures you control enter with an additional +1/+1 counter on them.\n{R}{G}: Level 2\nLegendary spells you cast cost {R}{G} less to cast. This effect reduces only the amount of colored mana you pay.\n{3}{R}{G}: Level 3\nWhenever you cast a legendary spell, exile the top two cards of your library. You may play them this turn."
+    },
+    {
+      "card_id": "bb7d81cd-e975-4c84-9bd3-fcb5a99e9fb2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Basim Ibn Ishaq",
+      "type_line": "Legendary Creature — Human Assassin",
+      "mana_cost": "{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever you cast a historic spell, draw a card. Basim Ibn Ishaq can't be blocked this turn. This ability triggers only once each turn. (Artifacts, legendaries, and Sagas are historic.)\nWhenever Basim Ibn Ishaq deals combat damage to a player, put a +1/+1 counter on it."
+    },
+    {
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Beast Within",
+      "type_line": "Instant",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+    },
+    {
+      "card_id": "461498dd-f877-458e-b4f5-c674e250e6b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Birds of Paradise",
+      "type_line": "Creature — Bird",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Flying\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "5bbf2a68-94d3-4c98-a20d-bf41cf00291e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bloom Tender",
+      "type_line": "Creature — Elf Druid",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Vivid — {T}: For each color among permanents you control, add one mana of that color."
+    },
+    {
+      "card_id": "098d718b-2e82-4365-a94d-00ebd437fa45",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Boromir, Warden of the Tower",
+      "type_line": "Legendary Creature — Human Soldier",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Vigilance\nWhenever an opponent casts a spell, if no mana was spent to cast it, counter that spell.\nSacrifice Boromir: Creatures you control gain indestructible until end of turn. The Ring tempts you."
+    },
+    {
+      "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brainstorm",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order."
+    },
+    {
+      "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chromatic Lantern",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Lands you control have \"{T}: Add one mana of any color.\"\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Commander's Sphere",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity.\nSacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Counterspell",
+      "type_line": "Instant",
+      "mana_cost": "{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell."
+    },
+    {
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cultivate",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cyclonic Rift",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "f833bd42-cd55-4eeb-91bd-f7e901fc06da",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Delighted Halfling",
+      "type_line": "Creature — Halfling Citizen",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell, and that spell can't be countered."
+    },
+    {
+      "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fact or Fiction",
+      "type_line": "Instant",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your hand and the other into your graveyard."
+    },
+    {
+      "card_id": "ea005602-5c63-4293-a1f7-52f5a2fb3532",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Faeburrow Elder",
+      "type_line": "Creature — Treefolk Druid",
+      "mana_cost": "{1}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Vigilance\nThis creature gets +1/+1 for each color among permanents you control.\n{T}: For each color among permanents you control, add one mana of that color."
+    },
+    {
+      "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Farseek",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 8,
+      "is_commander": false,
+      "name": "Forest",
+      "type_line": "Basic Land — Forest",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {G}.)"
+    },
+    {
+      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Generous Gift",
+      "type_line": "Instant",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Elephant creature token."
+    },
+    {
+      "card_id": "bea56e01-ed27-42f6-b19c-2a9528f8fe9a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gold-Forged Thopteryx",
+      "type_line": "Artifact Creature — Dinosaur Thopter",
+      "mana_cost": "{W}{U}",
+      "colors": [
+        "U",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying, lifelink\nEach legendary permanent you control has ward {2}. (Whenever it becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)"
+    },
+    {
+      "card_id": "d46795c3-9266-49ec-8646-df3e9c701594",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Grazilaxx, Illithid Scholar",
+      "type_line": "Legendary Creature — Horror",
+      "mana_cost": "{1}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a creature you control becomes blocked, you may return it to its owner's hand.\nWhenever one or more creatures you control deal combat damage to a player, draw a card."
+    },
+    {
+      "card_id": "e90d5849-fbf6-460a-b901-eb8477d65c0a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hajar, Loyal Bodyguard",
+      "type_line": "Legendary Creature — Human Soldier",
+      "mana_cost": "{R}{G}",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice Hajar: Legendary creatures you control get +1/+0 and gain indestructible until end of turn."
+    },
+    {
+      "card_id": "9c592899-71e0-479c-b0b3-6b1425157451",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Inga and Esika",
+      "type_line": "Legendary Creature — Human God",
+      "mana_cost": "{2}{G}{U}",
+      "colors": [
+        "G",
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Creatures you control have vigilance and \"{T}: Add one mana of any color. Spend this mana only to cast a creature spell.\"\nWhenever you cast a creature spell, if three or more mana from creatures was spent to cast it, draw a card."
+    },
+    {
+      "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+      "quantity": 7,
+      "is_commander": false,
+      "name": "Island",
+      "type_line": "Basic Land — Island",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {U}.)"
+    },
+    {
+      "card_id": "4b4547c6-d082-4349-ba7f-d8724024a9b8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Jhoira, Weatherlight Captain",
+      "type_line": "Legendary Creature — Human Artificer",
+      "mana_cost": "{2}{U}{R}",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever you cast a historic spell, draw a card. (Artifacts, legendaries, and Sagas are historic.)"
+    },
+    {
+      "card_id": "e1413f6a-aa28-4ed1-ac25-913e7e590cb9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "K-9, Mark I",
+      "type_line": "Legendary Artifact Creature — Robot Dog",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Negative — As long as K-9 is untapped, other legendary creatures you control have ward {1}.\nAffirmative — {1}{U}, {T}: Target legendary creature can't be blocked this turn.\nDoctor's companion (You can have two commanders if the other is the Doctor.)"
+    },
+    {
+      "card_id": "bf21a489-c2f3-4f99-806c-cc6475996dd0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kenrith, the Returned King",
+      "type_line": "Legendary Creature — Human Noble",
+      "mana_cost": "{4}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "{R}: All creatures gain trample and haste until end of turn.\n{1}{G}: Put a +1/+1 counter on target creature.\n{2}{W}: Target player gains 5 life.\n{3}{U}: Target player draws a card.\n{4}{B}: Put target creature card from a graveyard onto the battlefield under its owner's control."
+    },
+    {
+      "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kodama's Reach",
+      "type_line": "Sorcery — Arcane",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "d3c2b16f-34ee-46c8-93a8-46ecdda81c9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kutzil, Malamet Exemplar",
+      "type_line": "Legendary Creature — Cat Warrior",
+      "mana_cost": "{1}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Your opponents can't cast spells during your turn.\nWhenever one or more creatures you control each with power greater than its base power deals combat damage to a player, draw a card."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "0647f69c-fe1e-40e2-a704-019a1032440f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Minsc & Boo, Timeless Heroes",
+      "type_line": "Legendary Planeswalker — Minsc",
+      "mana_cost": "{2}{R}{G}",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste.\n[+1]: Put three +1/+1 counters on up to one target creature with trample or haste.\n[−2]: Sacrifice a creature. When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards.\nMinsc & Boo, Timeless Heroes can be your commander."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 7,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "bcd7d52d-b4e2-42e1-9bca-768f1672bc4b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mox Amber",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color among legendary creatures and planeswalkers you control."
+    },
+    {
+      "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystical Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for an instant or sorcery card, reveal it, then shuffle and put that card on top."
+    },
+    {
+      "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystic Remora",
+      "type_line": "Enchantment",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}."
+    },
+    {
+      "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Nature's Lore",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Negate",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target noncreature spell."
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path to Exile",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "aa63dcab-63a1-4e6e-87b7-6382fcd78952",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Pippin, Guard of the Citadel",
+      "type_line": "Legendary Creature — Halfling Soldier",
+      "mana_cost": "{W}{U}",
+      "colors": [
+        "U",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Vigilance, ward {1}\n{T}: Another target creature you control gains protection from the card type of your choice until end of turn. (It can't be blocked, targeted, dealt damage, enchanted, or equipped by anything of that type.)"
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "quantity": 7,
+      "is_commander": false,
+      "name": "Plains",
+      "type_line": "Basic Land — Plains",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {W}.)"
+    },
+    {
+      "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ponder",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+    },
+    {
+      "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Preordain",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "2c2a8779-e217-41f9-b990-55c652102652",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Reki, the History of Kamigawa",
+      "type_line": "Legendary Creature — Human Shaman",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you cast a legendary spell, draw a card."
+    },
+    {
+      "card_id": "6feb7ef4-bb3e-4b5f-938b-b54a67674131",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Relic of Legends",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add one mana of any color.\nTap an untapped legendary creature you control: Add one mana of any color."
+    },
+    {
+      "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rhystic Study",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
+    },
+    {
+      "card_id": "d9ec1451-478e-4b72-a1d8-cd0949fcd171",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Selvala, Heart of the Wilds",
+      "type_line": "Legendary Creature — Elf Scout",
+      "mana_cost": "{1}{G}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever another creature enters, its controller may draw a card if its power is greater than each other creature's power.\n{G}, {T}: Add X mana in any combination of colors, where X is the greatest power among creatures you control."
+    },
+    {
+      "card_id": "add6119f-93fb-4a65-9ffe-eb285da4080e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Shalai, Voice of Plenty",
+      "type_line": "Legendary Creature — Angel",
+      "mana_cost": "{3}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nYou, planeswalkers you control, and other creatures you control have hexproof.\n{4}{G}{G}: Put a +1/+1 counter on each creature you control."
+    },
+    {
+      "card_id": "e4e46c1d-9edf-438b-b1ff-a216af3dbbb9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Shanid, Sleepers' Scourge",
+      "type_line": "Legendary Creature — Human Knight",
+      "mana_cost": "{1}{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Menace\nOther legendary creatures you control have menace.\nWhenever you play a legendary land or cast a legendary spell, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Smothering Tithe",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "c971ff63-79d9-45e4-a7d9-4aec4eecd525",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 7,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swan Song",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target enchantment, instant, or sorcery spell. Its controller creates a 2/2 blue Bird creature token with flying."
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "b1b14583-ae55-4522-b77e-6309ad55cb93",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Timeless Lotus",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{5}",
+      "colors": [],
+      "cmc": 5.0,
+      "oracle_text": "Timeless Lotus enters tapped.\n{T}: Add {W}{U}{B}{R}{G}."
+    },
+    {
+      "card_id": "9d4a5246-36f1-4f54-a7cd-7e52cefe3c38",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Toski, Bearer of Secrets",
+      "type_line": "Legendary Creature — Squirrel",
+      "mana_cost": "{3}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "This spell can't be countered.\nIndestructible\nToski attacks each combat if able.\nWhenever a creature you control deals combat damage to a player, draw a card."
+    },
+    {
+      "card_id": "e5926dbf-dc35-4ecd-892e-1cfabad25dad",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vega, the Watcher",
+      "type_line": "Legendary Creature — Bird Spirit",
+      "mana_cost": "{1}{W}{U}",
+      "colors": [
+        "U",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Flying\nWhenever you cast a spell from anywhere other than your hand, draw a card."
+    },
+    {
+      "card_id": "8e705303-c4c3-40f7-b67d-37264f97eee1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vraska Joins Up",
+      "type_line": "Legendary Enchantment",
+      "mana_cost": "{B}{G}",
+      "colors": [
+        "B",
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When Vraska Joins Up enters, put a deathtouch counter on each creature you control.\nWhenever a legendary creature you control deals combat damage to a player, draw a card."
+    },
+    {
+      "card_id": "d7120ce8-332c-477d-80e5-c582dcc3d94e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Yoshimaru, Ever Faithful",
+      "type_line": "Legendary Creature — Dog",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever another legendary permanent you control enters, put a +1/+1 counter on Yoshimaru.\nPartner (You can have two commanders if both have partner.)"
+    }
+  ]
+}

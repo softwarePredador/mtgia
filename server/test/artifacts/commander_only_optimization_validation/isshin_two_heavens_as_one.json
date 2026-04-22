@@ -1,0 +1,1414 @@
+{
+  "source_deck_id": "7e8b7632-8a89-40d6-ae93-1db6d6a90745",
+  "source_deck_name": "Corpus Seed - Isshin, Two Heavens as One",
+  "seed_deck_id": "e60768cb-0257-4cd9-83cf-701d80d75be2",
+  "optimize_request": {
+    "deck_id": "e60768cb-0257-4cd9-83cf-701d80d75be2",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tribal-human",
+      "confidence": "alta",
+      "core_cards": [
+        "Isshin, Two Heavens as One"
+      ],
+      "match_score": 1.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "122c3fb62d9439be473fa6a4556604b9",
+      "deck_id": "e60768cb-0257-4cd9-83cf-701d80d75be2",
+      "total_ms": 11482,
+      "stages_ms": {
+        "complete.fill_remainder": 3877,
+        "complete.build_final_response": 1177,
+        "complete.prepare_commander_seed": 2411,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Signet",
+      "Command Tower",
+      "Generous Gift",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Path to Exile",
+      "Read the Bones",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Swords to Plowshares",
+      "Voice of Victory",
+      "Anguished Unmaking",
+      "Boros Signet",
+      "Captain Lannery Storm",
+      "Despark",
+      "Orzhov Signet",
+      "Rakdos Signet",
+      "Sword of the Animist",
+      "Talisman of Conviction",
+      "Vandalblast",
+      "Audacious Thief",
+      "Aurelia, the Law Above",
+      "Battle Angels of Tyr",
+      "Caesar, Legion's Emperor",
+      "Chivalric Alliance",
+      "Commissar Severina Raine",
+      "Karazikar, the Eye Tyrant",
+      "Star Athlete",
+      "Zurgo Stormrender",
+      "Curse of Opulence",
+      "Diamond Pick-Axe",
+      "Within Range",
+      "Damn",
+      "Talisman of Hierarchy",
+      "Talisman of Indulgence",
+      "Caustic Bronco",
+      "Karlach, Fury of Avernus",
+      "Krenko, Tin Street Kingpin",
+      "Ainok Strike Leader",
+      "Andúril, Narsil Reforged",
+      "Arabella, Abandoned Doll",
+      "Firebender Ascension",
+      "Goro-Goro, Disciple of Ryusei",
+      "Kinscaer Sentry",
+      "Selfless Samurai",
+      "Skyknight Vanguard",
+      "Adriana, Captain of the Guard",
+      "Ankle Shanker",
+      "Asari Captain",
+      "Brutal Hordechief",
+      "Delina, Wild Mage",
+      "Duelist's Heritage",
+      "Fervent Charge",
+      "Goldspan Dragon",
+      "Hammers of Moradin",
+      "Heiko Yamazaki, the General",
+      "Hellrider",
+      "Helm of the Host",
+      "Hero of Bladehold",
+      "Iroas, God of Victory",
+      "Kazuul, Tyrant of the Cliffs",
+      "Mountain",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "3.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 15). Falta mana B (Tem 0 fontes, ideal > 15). Falta mana R (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "post_analysis": {
+      "average_cmc": "2.86",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 5,
+        "artifacts": 18,
+        "creatures": 32,
+        "sorceries": 3,
+        "enchantments": 7,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana W (Tem 13 fontes, ideal > 15). Falta mana R (Tem 13 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Generous Gift",
+        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Voice of Victory",
+        "card_id": "a66c24eb-f66a-48cb-883c-ae8a1b296e83",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Anguished Unmaking",
+        "card_id": "6f7db9ae-2e75-4b50-ac8a-a16c632a9f71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Boros Signet",
+        "card_id": "472a0921-e401-4a72-8e25-68a0da983e51",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Captain Lannery Storm",
+        "card_id": "fb697a66-dcb1-4d22-a5bc-8cba5ad3d07e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Despark",
+        "card_id": "6a2d017a-c9c1-43ec-9542-2bbfcde90e91",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Orzhov Signet",
+        "card_id": "1a35e0d3-86fe-4078-9156-f1e1bde97cac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rakdos Signet",
+        "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sword of the Animist",
+        "card_id": "4a364525-dd4c-4b80-bca2-a5c36856198c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Conviction",
+        "card_id": "6a6b4572-5c96-4405-a480-45344904b697",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vandalblast",
+        "card_id": "93a52a4c-a8d5-4cbf-9f5d-fa73c3233548",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Audacious Thief",
+        "card_id": "a62c9f33-ec3c-4c69-b350-fb44a139342d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Aurelia, the Law Above",
+        "card_id": "f2651a37-cc72-449a-9f2f-dcc99feb1ef5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Battle Angels of Tyr",
+        "card_id": "e7b7b0ed-31a3-4038-bdae-0eabf78e54ca",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Caesar, Legion's Emperor",
+        "card_id": "722e8a70-f17b-4be8-9537-3ae3f9632e1d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chivalric Alliance",
+        "card_id": "04feeac6-7be3-434e-b3d6-a97de1736437",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Commissar Severina Raine",
+        "card_id": "623f6c4f-cdce-4c7d-a968-a12212b2806d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Karazikar, the Eye Tyrant",
+        "card_id": "70ac6aab-7663-4adc-8321-25a78b19e874",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Star Athlete",
+        "card_id": "34e4ab01-7512-4d4c-898c-57db4fe7194e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Zurgo Stormrender",
+        "card_id": "840f3609-df3c-4b90-8e69-dcfbb8578345",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Curse of Opulence",
+        "card_id": "42d038dd-b454-4793-8280-21c82d038ea1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Diamond Pick-Axe",
+        "card_id": "f3899b1e-4ba2-43f0-acff-244eb5a6d5b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Within Range",
+        "card_id": "f46631a5-6028-4e90-a213-ee9cad4d69da",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Damn",
+        "card_id": "e71e2ea9-a658-4c35-adcf-cd6d33d662c2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Hierarchy",
+        "card_id": "64a5958c-5fd6-4ef3-9a23-c1a4f77b54ea",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talisman of Indulgence",
+        "card_id": "b69caae7-6c2c-4a9e-862d-01681e17964d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Caustic Bronco",
+        "card_id": "07bcf5a0-54f4-45b4-bf77-11e0258cf995",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Karlach, Fury of Avernus",
+        "card_id": "df66dd0f-b624-4654-b1ab-ce5a26167654",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Krenko, Tin Street Kingpin",
+        "card_id": "43b56e08-d9f5-4df8-826b-0c0d4c4cd7ae",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ainok Strike Leader",
+        "card_id": "8da85848-d256-4785-be3a-71c79d30064b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Andúril, Narsil Reforged",
+        "card_id": "b49b5b67-708f-4daa-93c4-77881d969dd5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arabella, Abandoned Doll",
+        "card_id": "9e1d5fd8-270a-4f16-92cd-f4e43a888864",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Firebender Ascension",
+        "card_id": "b70b64a6-b258-4e64-b38a-5c56151fae1d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Goro-Goro, Disciple of Ryusei",
+        "card_id": "da615fc2-310d-45d7-8eae-0bd8a164dcf6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kinscaer Sentry",
+        "card_id": "3ca50406-0deb-4fba-ab02-cdf75143ea34",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Selfless Samurai",
+        "card_id": "6d128599-39b3-4825-9450-a3cab45753ac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Skyknight Vanguard",
+        "card_id": "9a10669b-dbe3-4299-92bc-990283a326c8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Adriana, Captain of the Guard",
+        "card_id": "70bedf36-cfef-4462-9545-4264deff98df",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ankle Shanker",
+        "card_id": "fdf5afd3-4089-4c91-8dc0-aced9c009024",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Asari Captain",
+        "card_id": "fdf34411-bd43-43df-b148-0cb8ce0ba102",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brutal Hordechief",
+        "card_id": "8d708bf3-e253-4c15-817a-46ed8c55d84e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Delina, Wild Mage",
+        "card_id": "5c89d941-c39d-4863-8b34-3be92af7ceb6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Duelist's Heritage",
+        "card_id": "a097f35b-7efb-4179-86b3-da7db629df4d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fervent Charge",
+        "card_id": "c5a0018a-3b1f-44ba-8afd-8a62c194d0bd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Goldspan Dragon",
+        "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hammers of Moradin",
+        "card_id": "dfbcf338-0b78-4b35-bef5-89f99d2d18e5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Heiko Yamazaki, the General",
+        "card_id": "0da89cc0-8050-499f-a413-97654754fdde",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hellrider",
+        "card_id": "7efdcff6-9d3b-4e1e-8738-efc679e7d162",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Helm of the Host",
+        "card_id": "22463f16-542d-412c-bc8b-b90b1d927039",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Hero of Bladehold",
+        "card_id": "787e3d4b-428c-41e6-b312-ae4bb75f4406",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Iroas, God of Victory",
+        "card_id": "b7f8bc19-ba3d-4b0c-8356-fd57f6a6337a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kazuul, Tyrant of the Cliffs",
+        "card_id": "ad823470-5a0b-43c6-b693-8ee4c7143bde",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 12,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "47065311-74e4-4694-a9f4-478e599abc1d",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Isshin, Two Heavens as One",
+      "type_line": "Legendary Creature — Human Samurai",
+      "mana_cost": "{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "If a creature attacking causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time."
+    },
+    {
+      "card_id": "70bedf36-cfef-4462-9545-4264deff98df",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Adriana, Captain of the Guard",
+      "type_line": "Legendary Creature — Human Knight",
+      "mana_cost": "{3}{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Melee (Whenever this creature attacks, it gets +1/+1 until end of turn for each opponent you attacked this combat.)\nOther creatures you control have melee. (If a creature has multiple instances of melee, each triggers separately.)"
+    },
+    {
+      "card_id": "8da85848-d256-4785-be3a-71c79d30064b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ainok Strike Leader",
+      "type_line": "Creature — Dog Warrior",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever you attack with this creature and/or your commander, for each opponent, create a 1/1 red Goblin creature token that's tapped and attacking that player.\nSacrifice this creature: Creature tokens you control gain indestructible until end of turn."
+    },
+    {
+      "card_id": "b49b5b67-708f-4daa-93c4-77881d969dd5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Andúril, Narsil Reforged",
+      "type_line": "Legendary Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Ascend (If you control ten or more permanents, you get the city's blessing for the rest of the game.)\nWhenever equipped creature attacks, put a +1/+1 counter on each creature you control. If you have the city's blessing, put two +1/+1 counters on each creature you control instead.\nEquip {3}"
+    },
+    {
+      "card_id": "6f7db9ae-2e75-4b50-ac8a-a16c632a9f71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Anguished Unmaking",
+      "type_line": "Instant",
+      "mana_cost": "{1}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Exile target nonland permanent. You lose 3 life."
+    },
+    {
+      "card_id": "fdf5afd3-4089-4c91-8dc0-aced9c009024",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ankle Shanker",
+      "type_line": "Creature — Goblin Berserker",
+      "mana_cost": "{2}{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Haste\nWhenever this creature attacks, creatures you control gain first strike and deathtouch until end of turn."
+    },
+    {
+      "card_id": "9e1d5fd8-270a-4f16-92cd-f4e43a888864",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arabella, Abandoned Doll",
+      "type_line": "Legendary Artifact Creature — Toy",
+      "mana_cost": "{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever Arabella attacks, it deals X damage to each opponent and you gain X life, where X is the number of creatures you control with power 2 or less."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "fdf34411-bd43-43df-b148-0cb8ce0ba102",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Asari Captain",
+      "type_line": "Creature — Human Samurai",
+      "mana_cost": "{3}{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Haste\nWhenever a Samurai or Warrior you control attacks alone, it gets +1/+0 until end of turn for each Samurai or Warrior you control."
+    },
+    {
+      "card_id": "a62c9f33-ec3c-4c69-b350-fb44a139342d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Audacious Thief",
+      "type_line": "Creature — Human Rogue",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever this creature attacks, you draw a card and you lose 1 life."
+    },
+    {
+      "card_id": "f2651a37-cc72-449a-9f2f-dcc99feb1ef5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Aurelia, the Law Above",
+      "type_line": "Legendary Creature — Angel",
+      "mana_cost": "{3}{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, vigilance, haste\nWhenever a player attacks with three or more creatures, you draw a card.\nWhenever a player attacks with five or more creatures, Aurelia deals 3 damage to each of your opponents and you gain 3 life."
+    },
+    {
+      "card_id": "e7b7b0ed-31a3-4038-bdae-0eabf78e54ca",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Battle Angels of Tyr",
+      "type_line": "Creature — Angel Knight",
+      "mana_cost": "{2}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying, myriad\nWhenever this creature deals combat damage to a player, draw a card if that player has more cards in hand than each other player. Then you create a Treasure token if that player controls more lands than each other player. Then you gain 3 life if that player has more life than each other player."
+    },
+    {
+      "card_id": "472a0921-e401-4a72-8e25-68a0da983e51",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Boros Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {R}{W}."
+    },
+    {
+      "card_id": "8d708bf3-e253-4c15-817a-46ed8c55d84e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brutal Hordechief",
+      "type_line": "Creature — Orc Warrior",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever a creature you control attacks, defending player loses 1 life and you gain 1 life.\n{3}{R/W}{R/W}: Creatures your opponents control block this turn if able, and you choose how those creatures block."
+    },
+    {
+      "card_id": "722e8a70-f17b-4be8-9537-3ae3f9632e1d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Caesar, Legion's Emperor",
+      "type_line": "Legendary Creature — Human Soldier",
+      "mana_cost": "{1}{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever you attack, you may sacrifice another creature. When you do, choose two —\n• Create two 1/1 red and white Soldier creature tokens with haste that are tapped and attacking.\n• You draw a card and you lose 1 life.\n• Caesar deals damage equal to the number of creature tokens you control to target opponent."
+    },
+    {
+      "card_id": "fb697a66-dcb1-4d22-a5bc-8cba5ad3d07e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Captain Lannery Storm",
+      "type_line": "Legendary Creature — Human Pirate",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Haste\nWhenever Captain Lannery Storm attacks, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nWhenever you sacrifice a Treasure, Captain Lannery Storm gets +1/+0 until end of turn."
+    },
+    {
+      "card_id": "07bcf5a0-54f4-45b4-bf77-11e0258cf995",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Caustic Bronco",
+      "type_line": "Creature — Snake Horse Mount",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature attacks, reveal the top card of your library and put it into your hand. You lose life equal to that card's mana value if this creature isn't saddled. Otherwise, each opponent loses that much life.\nSaddle 3 (Tap any number of other creatures you control with total power 3 or more: This Mount becomes saddled until end of turn. Saddle only as a sorcery.)"
+    },
+    {
+      "card_id": "04feeac6-7be3-434e-b3d6-a97de1736437",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chivalric Alliance",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever you attack with two or more creatures, draw a card.\n{2}, Discard a card: Create a 2/2 white and blue Knight creature token with vigilance."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "623f6c4f-cdce-4c7d-a968-a12212b2806d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Commissar Severina Raine",
+      "type_line": "Legendary Creature — Human Soldier",
+      "mana_cost": "{1}{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Leading from the Front — Whenever Commissar Severina Raine attacks, each opponent loses X life, where X is the number of other attacking creatures.\nSummary Execution — {2}, Sacrifice another creature: You gain 2 life and draw a card."
+    },
+    {
+      "card_id": "42d038dd-b454-4793-8280-21c82d038ea1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Curse of Opulence",
+      "type_line": "Enchantment — Aura Curse",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Enchant player\nWhenever enchanted player is attacked, create a Gold token. Each opponent attacking that player does the same. (A Gold token is an artifact with \"Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "e71e2ea9-a658-4c35-adcf-cd6d33d662c2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Damn",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target creature. A creature destroyed this way can't be regenerated.\nOverload {2}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "5c89d941-c39d-4863-8b34-3be92af7ceb6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Delina, Wild Mage",
+      "type_line": "Legendary Creature — Elf Shaman",
+      "mana_cost": "{3}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever Delina attacks, choose target creature you control, then roll a d20.\n1—14 | Create a tapped and attacking token that's a copy of that creature, except it's not legendary and it has \"At end of combat, exile this token.\"\n15—20 | Create one of those tokens. You may roll again."
+    },
+    {
+      "card_id": "6a2d017a-c9c1-43ec-9542-2bbfcde90e91",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Despark",
+      "type_line": "Instant",
+      "mana_cost": "{W}{B}",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Exile target permanent with mana value 4 or greater."
+    },
+    {
+      "card_id": "f3899b1e-4ba2-43f0-acff-244eb5a6d5b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Diamond Pick-Axe",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Indestructible (Effects that say \"destroy\" don't destroy this Equipment.)\nEquipped creature gets +1/+1 and has \"Whenever this creature attacks, create a Treasure token.\" (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nEquip {2}"
+    },
+    {
+      "card_id": "a097f35b-7efb-4179-86b3-da7db629df4d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Duelist's Heritage",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever one or more creatures attack, you may have target attacking creature gain double strike until end of turn."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "c5a0018a-3b1f-44ba-8afd-8a62c194d0bd",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fervent Charge",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever a creature you control attacks, it gets +2/+2 until end of turn."
+    },
+    {
+      "card_id": "b70b64a6-b258-4e64-b38a-5c56151fae1d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Firebender Ascension",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "When this enchantment enters, create a 2/2 red Soldier creature token with firebending 1.\nWhenever a creature you control attacking causes a triggered ability of that creature to trigger, put a quest counter on this enchantment. Then if it has four or more quest counters on it, you may copy that ability. You may choose new targets for the copy."
+    },
+    {
+      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Generous Gift",
+      "type_line": "Instant",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Elephant creature token."
+    },
+    {
+      "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Goldspan Dragon",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\""
+    },
+    {
+      "card_id": "da615fc2-310d-45d7-8eae-0bd8a164dcf6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Goro-Goro, Disciple of Ryusei",
+      "type_line": "Legendary Creature — Goblin Samurai",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "{R}: Creatures you control gain haste until end of turn.\n{3}{R}{R}: Create a 5/5 red Dragon Spirit creature token with flying. Activate only if you control an attacking modified creature. (Equipment, Auras you control, and counters are modifications.)"
+    },
+    {
+      "card_id": "dfbcf338-0b78-4b35-bef5-89f99d2d18e5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hammers of Moradin",
+      "type_line": "Creature — Dwarf Cleric",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Myriad (Whenever this creature attacks, for each opponent other than defending player, you may create a token copy that's tapped and attacking that player or a planeswalker they control. Exile the tokens at end of combat.)\nWhenever this creature attacks, for each opponent, tap up to one target creature that player controls."
+    },
+    {
+      "card_id": "0da89cc0-8050-499f-a413-97654754fdde",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Heiko Yamazaki, the General",
+      "type_line": "Legendary Creature — Human Samurai",
+      "mana_cost": "{3}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Trample\nWhenever a Samurai or Warrior you control attacks alone, you may cast target artifact card from your graveyard this turn."
+    },
+    {
+      "card_id": "7efdcff6-9d3b-4e1e-8738-efc679e7d162",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hellrider",
+      "type_line": "Creature — Devil",
+      "mana_cost": "{2}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Haste\nWhenever a creature you control attacks, this creature deals 1 damage to the player or planeswalker it's attacking."
+    },
+    {
+      "card_id": "22463f16-542d-412c-bc8b-b90b1d927039",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Helm of the Host",
+      "type_line": "Legendary Artifact — Equipment",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "At the beginning of combat on your turn, create a token that's a copy of equipped creature, except the token isn't legendary. That token gains haste.\nEquip {5}"
+    },
+    {
+      "card_id": "787e3d4b-428c-41e6-b312-ae4bb75f4406",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Hero of Bladehold",
+      "type_line": "Creature — Human Knight",
+      "mana_cost": "{2}{W}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)\nWhenever this creature attacks, create two 1/1 white Soldier creature tokens that are tapped and attacking."
+    },
+    {
+      "card_id": "b7f8bc19-ba3d-4b0c-8356-fd57f6a6337a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Iroas, God of Victory",
+      "type_line": "Legendary Enchantment Creature — God",
+      "mana_cost": "{2}{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nAs long as your devotion to red and white is less than seven, Iroas isn't a creature.\nCreatures you control have menace.\nPrevent all damage that would be dealt to attacking creatures you control."
+    },
+    {
+      "card_id": "70ac6aab-7663-4adc-8321-25a78b19e874",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Karazikar, the Eye Tyrant",
+      "type_line": "Legendary Creature — Beholder",
+      "mana_cost": "{3}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Whenever you attack a player, tap target creature that player controls and goad it. (Until your next turn, that creature attacks each combat if able and attacks a player other than you if able.)\nWhenever an opponent attacks another one of your opponents, you and the attacking player each draw a card and lose 1 life."
+    },
+    {
+      "card_id": "df66dd0f-b624-4654-b1ab-ce5a26167654",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Karlach, Fury of Avernus",
+      "type_line": "Legendary Creature — Tiefling Barbarian",
+      "mana_cost": "{4}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Whenever you attack, if it's the first combat phase of the turn, untap all attacking creatures. They gain first strike until end of turn. After this phase, there is an additional combat phase.\nChoose a Background (You can have a Background as a second commander.)"
+    },
+    {
+      "card_id": "ad823470-5a0b-43c6-b693-8ee4c7143bde",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kazuul, Tyrant of the Cliffs",
+      "type_line": "Legendary Creature — Ogre Warrior",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Whenever a creature an opponent controls attacks, if you're the defending player, create a 3/3 red Ogre creature token unless that creature's controller pays {3}."
+    },
+    {
+      "card_id": "3ca50406-0deb-4fba-ab02-cdf75143ea34",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kinscaer Sentry",
+      "type_line": "Creature — Kithkin Soldier",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "First strike, lifelink\nWhenever this creature attacks, you may put a creature card with mana value X or less from your hand onto the battlefield tapped and attacking, where X is the number of attacking creatures you control."
+    },
+    {
+      "card_id": "43b56e08-d9f5-4df8-826b-0c0d4c4cd7ae",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Krenko, Tin Street Kingpin",
+      "type_line": "Legendary Creature — Goblin",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever Krenko attacks, put a +1/+1 counter on it, then create a number of 1/1 red Goblin creature tokens equal to Krenko's power."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "1a35e0d3-86fe-4078-9156-f1e1bde97cac",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Orzhov Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {W}{B}."
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path to Exile",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Plains",
+      "type_line": "Basic Land — Plains",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {W}.)"
+    },
+    {
+      "card_id": "60bd2900-53d0-43e9-ad1e-e2a3305950a4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rakdos Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add {B}{R}."
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "6d128599-39b3-4825-9450-a3cab45753ac",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Selfless Samurai",
+      "type_line": "Creature — Fox Samurai",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever a Samurai or Warrior you control attacks alone, it gains lifelink until end of turn.\nSacrifice this creature: Another target creature you control gains indestructible until end of turn. (Damage and effects that say \"destroy\" don't destroy it.)"
+    },
+    {
+      "card_id": "9a10669b-dbe3-4299-92bc-990283a326c8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Skyknight Vanguard",
+      "type_line": "Creature — Human Knight",
+      "mana_cost": "{R}{W}",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying\nWhenever this creature attacks, create a 1/1 white Soldier creature token that's tapped and attacking."
+    },
+    {
+      "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "34e4ab01-7512-4d4c-898c-57db4fe7194e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Star Athlete",
+      "type_line": "Creature — Human Warrior",
+      "mana_cost": "{1}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Menace\nWhenever this creature attacks, choose up to one target nonland permanent. Its controller may sacrifice it. If they don't, this creature deals 5 damage to that player.\nBlitz {3}{R} (If you cast this spell for its blitz cost, it gains haste and \"When this creature dies, draw a card.\" Sacrifice it at the beginning of the next end step.)"
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "4a364525-dd4c-4b80-bca2-a5c36856198c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sword of the Animist",
+      "type_line": "Legendary Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature gets +1/+1.\nWhenever equipped creature attacks, you may search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nEquip {2}"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power."
+    },
+    {
+      "card_id": "6a6b4572-5c96-4405-a480-45344904b697",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Conviction",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "64a5958c-5fd6-4ef3-9a23-c1a4f77b54ea",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Hierarchy",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "b69caae7-6c2c-4a9e-862d-01681e17964d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talisman of Indulgence",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {R}. This artifact deals 1 damage to you."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "93a52a4c-a8d5-4cbf-9f5d-fa73c3233548",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vandalblast",
+      "type_line": "Sorcery",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "a66c24eb-f66a-48cb-883c-ae8a1b296e83",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Voice of Victory",
+      "type_line": "Creature — Human Bard",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents can't cast spells during your turn."
+    },
+    {
+      "card_id": "f46631a5-6028-4e90-a213-ee9cad4d69da",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Within Range",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "When this enchantment enters, create two 1/1 red Warrior creature tokens.\nWhenever you attack, each opponent loses life equal to the number of creatures attacking them."
+    },
+    {
+      "card_id": "840f3609-df3c-4b90-8e69-dcfbb8578345",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Zurgo Stormrender",
+      "type_line": "Legendary Creature — Orc Warrior",
+      "mana_cost": "{R}{W}{B}",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Mobilize 1 (Whenever this creature attacks, create a tapped and attacking 1/1 red Warrior creature token. Sacrifice it at the beginning of the next end step.)\nWhenever a creature token you control leaves the battlefield, draw a card if it was attacking. Otherwise, each opponent loses 1 life."
+    }
+  ]
+}

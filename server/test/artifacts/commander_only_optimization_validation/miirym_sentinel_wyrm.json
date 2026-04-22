@@ -1,0 +1,1415 @@
+{
+  "source_deck_id": "c017a412-0f8c-4d9f-b35a-df5395705fdf",
+  "source_deck_name": "Corpus Seed - Miirym, Sentinel Wyrm",
+  "seed_deck_id": "638e8a89-2ff4-498e-a689-524e0261fa2f",
+  "optimize_request": {
+    "deck_id": "638e8a89-2ff4-498e-a689-524e0261fa2f",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "tokens",
+      "confidence": "alta",
+      "core_cards": [
+        "Miirym, Sentinel Wyrm"
+      ],
+      "match_score": 2.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "c732c68686aa71338010f65cea31b75e",
+      "deck_id": "638e8a89-2ff4-498e-a689-524e0261fa2f",
+      "total_ms": 11657,
+      "stages_ms": {
+        "complete.fill_remainder": 3843,
+        "complete.build_final_response": 1170,
+        "complete.prepare_commander_seed": 2685,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Denial",
+      "Arcane Signet",
+      "Beast Within",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cultivate",
+      "Cyclonic Rift",
+      "Fact or Fiction",
+      "Farseek",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Mystical Tutor",
+      "Nature's Lore",
+      "Negate",
+      "Ponder",
+      "Preordain",
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Cursed Mirror",
+      "Garruk's Uprising",
+      "Rampant Growth",
+      "Carnelian Orb of Dragonkind",
+      "Jade Orb of Dragonkind",
+      "Lapis Orb of Dragonkind",
+      "Dragon's Hoard",
+      "Dragonborn Champion",
+      "Elemental Bond",
+      "Firkraag, Cunning Instigator",
+      "Iymrith, Desert Doom",
+      "Kindred Discovery",
+      "Sarkhan Unbroken",
+      "Temur Ascendancy",
+      "Mox Jasper",
+      "Scaled Nurturer",
+      "Dragonstorm Globe",
+      "Ganax, Astral Hunter",
+      "Rapacious Dragon",
+      "Spark Double",
+      "Deceptive Frostkite",
+      "Dragon Tempest",
+      "Dragonlord's Servant",
+      "Dragonmaster Outcast",
+      "Korlessa, Scale Singer",
+      "Orb of Dragonkind",
+      "Atsushi, the Blazing Sky",
+      "Draconic Muralists",
+      "Dragonspeaker Shaman",
+      "Goldspan Dragon",
+      "Herald's Horn",
+      "Lozhan, Dragons' Legacy",
+      "Reflections of Littjara",
+      "Renari, Merchant of Marvels",
+      "Roaming Throne",
+      "Sarkhan, Soul Aflame",
+      "Scourge of Valkas",
+      "Temur Battlecrier",
+      "Forest",
+      "Island",
+      "Mountain"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "6.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana U (Tem 0 fontes, ideal > 15). Falta mana R (Tem 0 fontes, ideal > 15). Falta mana G (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.87",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 10,
+        "artifacts": 17,
+        "creatures": 22,
+        "sorceries": 7,
+        "enchantments": 7,
+        "planeswalkers": 1
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana U (Tem 13 fontes, ideal > 15). Falta mana R (Tem 13 fontes, ideal > 15)",
+      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fact or Fiction",
+        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystical Tutor",
+        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Negate",
+        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Preordain",
+        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "be888cd6-b1d3-4d21-8b63-33bf86fa761a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cursed Mirror",
+        "card_id": "b3d2fcc4-bf78-4375-94a1-fc3fd3e8baba",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Garruk's Uprising",
+        "card_id": "af8c4a07-26d7-4fc1-a184-40977103147d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rampant Growth",
+        "card_id": "d553a5c8-1bf6-4648-b567-f6c68a6e30f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Carnelian Orb of Dragonkind",
+        "card_id": "95bde662-b762-4b05-80ba-df64bbe46951",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Jade Orb of Dragonkind",
+        "card_id": "52b142cb-4165-4ad5-aa98-f9ab5be86750",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lapis Orb of Dragonkind",
+        "card_id": "cea92c32-74b7-461a-9954-0b24dc7cfa85",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragon's Hoard",
+        "card_id": "b8e11b68-ad1b-4c75-ba42-06a965a1ff21",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragonborn Champion",
+        "card_id": "8c35fc88-7b37-4713-bea1-153a37cae2f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Elemental Bond",
+        "card_id": "6cf38314-5414-4522-98b8-4501af82eedb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Firkraag, Cunning Instigator",
+        "card_id": "56dc1c3e-ffb6-417c-a860-62b8601ed1eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Iymrith, Desert Doom",
+        "card_id": "ba875906-12ba-4a80-90b8-8fc9573f4b47",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kindred Discovery",
+        "card_id": "eb7794ec-4ed0-4deb-aaa8-1bd3c84c2bef",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sarkhan Unbroken",
+        "card_id": "d179c73d-0302-4697-9b6c-a4d87ec32768",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Temur Ascendancy",
+        "card_id": "190e46e4-64c8-4341-bf63-32bd7c26f884",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mox Jasper",
+        "card_id": "b32d991d-2a02-4fd2-a2d4-f6c8a994b3e5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Scaled Nurturer",
+        "card_id": "8145ee79-1e55-4547-8af6-73fcb834949c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragonstorm Globe",
+        "card_id": "d45f919a-858b-45e4-819f-d8747e3fc893",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ganax, Astral Hunter",
+        "card_id": "d019eca2-2457-4a4c-82a5-eb7847a3b890",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rapacious Dragon",
+        "card_id": "b09fa139-017c-4b8d-aaa8-5beaca66af61",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Spark Double",
+        "card_id": "e923039a-fdc5-4c82-8f30-df9bd970a8d3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deceptive Frostkite",
+        "card_id": "46a58878-24d3-4b7c-b479-51cbd78846d1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragon Tempest",
+        "card_id": "f54a7bc3-dd84-43a0-8920-f4d75a0d12b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragonlord's Servant",
+        "card_id": "fec897a0-953a-446e-92d7-694464402666",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragonmaster Outcast",
+        "card_id": "b444adc3-38a9-4579-8015-1bffbfdba398",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Korlessa, Scale Singer",
+        "card_id": "e5e5491b-e9f7-45d7-812b-f638c08635f2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Orb of Dragonkind",
+        "card_id": "910d1af0-6a3a-448a-97dc-0a496d5e07f7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Atsushi, the Blazing Sky",
+        "card_id": "966c3e13-8acb-4923-a70c-b6e1009dd29d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Draconic Muralists",
+        "card_id": "5770a729-729f-433e-83c8-3ad743e20114",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dragonspeaker Shaman",
+        "card_id": "edde63eb-d6a0-42f4-abc1-d492e4426384",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Goldspan Dragon",
+        "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Herald's Horn",
+        "card_id": "fa2f7f49-41ad-4535-a7ab-7a2bc1cd75b7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lozhan, Dragons' Legacy",
+        "card_id": "dd39bdd3-1824-4bee-a252-f93a4e15c34e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Reflections of Littjara",
+        "card_id": "b2724327-4cc3-4f4f-aed0-f82296980648",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Renari, Merchant of Marvels",
+        "card_id": "a2ae0289-7a7e-4997-9944-19196c48ad61",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Roaming Throne",
+        "card_id": "327fcc81-2038-4b2c-a12a-815b53540b9c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sarkhan, Soul Aflame",
+        "card_id": "7bd6b50a-27df-4fa8-a141-f391c984d826",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Scourge of Valkas",
+        "card_id": "ad676ae0-fd8c-49ec-b85b-5c8d40f8aa27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Temur Battlecrier",
+        "card_id": "1aa1360b-2bce-43a6-936a-a6ac20441107",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 12,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "853bb909-0d88-4e51-a76c-baf8268b4336",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Miirym, Sentinel Wyrm",
+      "type_line": "Legendary Creature — Dragon Spirit",
+      "mana_cost": "{3}{G}{U}{R}",
+      "colors": [
+        "G",
+        "R",
+        "U"
+      ],
+      "cmc": 6.0,
+      "oracle_text": "Flying, ward {2}\nWhenever another nontoken Dragon you control enters, create a token that's a copy of it, except the token isn't legendary."
+    },
+    {
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "An Offer You Can't Refuse",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target noncreature spell. Its controller creates two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Denial",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell. Its controller may draw up to two cards at the beginning of the next turn's upkeep.\nYou draw a card at the beginning of the next turn's upkeep."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "966c3e13-8acb-4923-a70c-b6e1009dd29d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Atsushi, the Blazing Sky",
+      "type_line": "Legendary Creature — Dragon Spirit",
+      "mana_cost": "{2}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying, trample\nWhen Atsushi dies, choose one —\n• Exile the top two cards of your library. Until the end of your next turn, you may play those cards.\n• Create three Treasure tokens."
+    },
+    {
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Beast Within",
+      "type_line": "Instant",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+    },
+    {
+      "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brainstorm",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order."
+    },
+    {
+      "card_id": "95bde662-b762-4b05-80ba-df64bbe46951",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Carnelian Orb of Dragonkind",
+      "type_line": "Artifact",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add {R}. If that mana is spent on a Dragon creature spell, it gains haste until end of turn."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Counterspell",
+      "type_line": "Instant",
+      "mana_cost": "{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell."
+    },
+    {
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cultivate",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "b3d2fcc4-bf78-4375-94a1-fc3fd3e8baba",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cursed Mirror",
+      "type_line": "Artifact",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add {R}.\nAs this artifact enters, you may have it become a copy of any creature on the battlefield until end of turn, except it has haste."
+    },
+    {
+      "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cyclonic Rift",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "46a58878-24d3-4b7c-b479-51cbd78846d1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Deceptive Frostkite",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying\nYou may have this creature enter as a copy of a creature you control with power 4 or greater, except it's a Dragon in addition to its other types and it has flying."
+    },
+    {
+      "card_id": "5770a729-729f-433e-83c8-3ad743e20114",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Draconic Muralists",
+      "type_line": "Creature — Dragon Bard",
+      "mana_cost": "{3}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "When this creature dies, you may search your library for a Dragon card, reveal it, put it into your hand, then shuffle."
+    },
+    {
+      "card_id": "8c35fc88-7b37-4713-bea1-153a37cae2f9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragonborn Champion",
+      "type_line": "Creature — Dragon Warrior",
+      "mana_cost": "{2}{R}{G}",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Trample\nWhenever a source you control deals 5 or more damage to a player, draw a card."
+    },
+    {
+      "card_id": "fec897a0-953a-446e-92d7-694464402666",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragonlord's Servant",
+      "type_line": "Creature — Goblin Shaman",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Dragon spells you cast cost {1} less to cast."
+    },
+    {
+      "card_id": "b444adc3-38a9-4579-8015-1bffbfdba398",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragonmaster Outcast",
+      "type_line": "Creature — Human Shaman",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "At the beginning of your upkeep, if you control six or more lands, create a 5/5 red Dragon creature token with flying."
+    },
+    {
+      "card_id": "b8e11b68-ad1b-4c75-ba42-06a965a1ff21",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragon's Hoard",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a Dragon you control enters, put a gold counter on this artifact.\n{T}, Remove a gold counter from this artifact: Draw a card.\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "edde63eb-d6a0-42f4-abc1-d492e4426384",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragonspeaker Shaman",
+      "type_line": "Creature — Human Barbarian Shaman",
+      "mana_cost": "{1}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Dragon spells you cast cost {2} less to cast."
+    },
+    {
+      "card_id": "d45f919a-858b-45e4-819f-d8747e3fc893",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragonstorm Globe",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Each Dragon you control enters with an additional +1/+1 counter on it.\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "f54a7bc3-dd84-43a0-8920-f4d75a0d12b3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dragon Tempest",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever a creature you control with flying enters, it gains haste until end of turn.\nWhenever a Dragon you control enters, it deals X damage to any target, where X is the number of Dragons you control."
+    },
+    {
+      "card_id": "6cf38314-5414-4522-98b8-4501af82eedb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Elemental Bond",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever a creature you control with power 3 or greater enters, draw a card."
+    },
+    {
+      "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fact or Fiction",
+      "type_line": "Instant",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your hand and the other into your graveyard."
+    },
+    {
+      "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Farseek",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "56dc1c3e-ffb6-417c-a860-62b8601ed1eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Firkraag, Cunning Instigator",
+      "type_line": "Legendary Creature — Dragon",
+      "mana_cost": "{3}{U}{R}",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, haste\nWhenever one or more Dragons you control attack an opponent, goad target creature that player controls.\nWhenever a creature deals combat damage to one of your opponents, if that creature had to attack this combat, you put a +1/+1 counter on Firkraag and you draw a card."
+    },
+    {
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Forest",
+      "type_line": "Basic Land — Forest",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {G}.)"
+    },
+    {
+      "card_id": "d019eca2-2457-4a4c-82a5-eb7847a3b890",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ganax, Astral Hunter",
+      "type_line": "Legendary Creature — Dragon",
+      "mana_cost": "{4}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nWhenever Ganax or another Dragon you control enters, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nChoose a Background (You can have a Background as a second commander.)"
+    },
+    {
+      "card_id": "af8c4a07-26d7-4fc1-a184-40977103147d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Garruk's Uprising",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "When this enchantment enters, if you control a creature with power 4 or greater, draw a card.\nCreatures you control have trample. (Each of those creatures can deal excess combat damage to the player or planeswalker it's attacking.)\nWhenever a creature you control with power 4 or greater enters, draw a card."
+    },
+    {
+      "card_id": "2581a523-f87a-4237-8029-20088a10ab98",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Goldspan Dragon",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{3}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying, haste\nWhenever this creature attacks or becomes the target of a spell, create a Treasure token.\nTreasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\""
+    },
+    {
+      "card_id": "fa2f7f49-41ad-4535-a7ab-7a2bc1cd75b7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Herald's Horn",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "As this artifact enters, choose a creature type.\nCreature spells you cast of the chosen type cost {1} less to cast.\nAt the beginning of your upkeep, look at the top card of your library. If it's a creature card of the chosen type, you may reveal it and put it into your hand."
+    },
+    {
+      "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Island",
+      "type_line": "Basic Land — Island",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {U}.)"
+    },
+    {
+      "card_id": "ba875906-12ba-4a80-90b8-8fc9573f4b47",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Iymrith, Desert Doom",
+      "type_line": "Legendary Creature — Dragon",
+      "mana_cost": "{3}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nIymrith has ward {4} as long as it's untapped.\nWhenever Iymrith deals combat damage to a player, draw a card. Then if you have fewer than three cards in hand, draw cards equal to the difference."
+    },
+    {
+      "card_id": "52b142cb-4165-4ad5-aa98-f9ab5be86750",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Jade Orb of Dragonkind",
+      "type_line": "Artifact",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add {G}. When you spend this mana to cast a Dragon creature spell, it enters with an additional +1/+1 counter on it and gains hexproof until your next turn. (It can't be the target of spells or abilities your opponents control.)"
+    },
+    {
+      "card_id": "eb7794ec-4ed0-4deb-aaa8-1bd3c84c2bef",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kindred Discovery",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "As this enchantment enters, choose a creature type.\nWhenever a creature you control of the chosen type enters or attacks, draw a card."
+    },
+    {
+      "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kodama's Reach",
+      "type_line": "Sorcery — Arcane",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "e5e5491b-e9f7-45d7-812b-f638c08635f2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Korlessa, Scale Singer",
+      "type_line": "Legendary Creature — Dragon Bard",
+      "mana_cost": "{G}{U}",
+      "colors": [
+        "G",
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "You may look at the top card of your library any time.\nYou may cast Dragon spells from the top of your library."
+    },
+    {
+      "card_id": "cea92c32-74b7-461a-9954-0b24dc7cfa85",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lapis Orb of Dragonkind",
+      "type_line": "Artifact",
+      "mana_cost": "{2}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "{T}: Add {U}. When you spend this mana to cast a Dragon creature spell, scry 2. (Look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "dd39bdd3-1824-4bee-a252-f93a4e15c34e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lozhan, Dragons' Legacy",
+      "type_line": "Legendary Creature — Dragon Shaman",
+      "mana_cost": "{3}{U}{R}",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nWhenever you cast an Adventure or Dragon spell, Lozhan deals damage equal to that spell's mana value to any target that isn't a commander."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "b32d991d-2a02-4fd2-a2d4-f6c8a994b3e5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mox Jasper",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color. Activate only if you control a Dragon."
+    },
+    {
+      "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystical Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for an instant or sorcery card, reveal it, then shuffle and put that card on top."
+    },
+    {
+      "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystic Remora",
+      "type_line": "Enchantment",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}."
+    },
+    {
+      "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Nature's Lore",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Negate",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target noncreature spell."
+    },
+    {
+      "card_id": "910d1af0-6a3a-448a-97dc-0a496d5e07f7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Orb of Dragonkind",
+      "type_line": "Artifact",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "{1}, {T}: Add two mana in any combination of colors. Spend this mana only to cast Dragon spells or activate abilities of Dragons.\n{R}, {T}, Sacrifice this artifact: Look at the top seven cards of your library. You may reveal a Dragon card from among them and put it into your hand. Put the rest on the bottom of your library in a random order."
+    },
+    {
+      "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ponder",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+    },
+    {
+      "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Preordain",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "d553a5c8-1bf6-4648-b567-f6c68a6e30f9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rampant Growth",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "b09fa139-017c-4b8d-aaa8-5beaca66af61",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rapacious Dragon",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{4}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nWhen this creature enters, create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "b2724327-4cc3-4f4f-aed0-f82296980648",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Reflections of Littjara",
+      "type_line": "Enchantment",
+      "mana_cost": "{4}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "As this enchantment enters, choose a creature type.\nWhenever you cast a spell of the chosen type, copy that spell. (A copy of a permanent spell becomes a token.)"
+    },
+    {
+      "card_id": "a2ae0289-7a7e-4997-9944-19196c48ad61",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Renari, Merchant of Marvels",
+      "type_line": "Legendary Creature — Dragon Artificer",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "You may cast Dragon spells and artifact spells as though they had flash.\nChoose a Background (You can have a Background as a second commander.)"
+    },
+    {
+      "card_id": "327fcc81-2038-4b2c-a12a-815b53540b9c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Roaming Throne",
+      "type_line": "Artifact Creature — Golem",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Ward {2}\nAs this creature enters, choose a creature type.\nThis creature is the chosen type in addition to its other types.\nIf a triggered ability of another creature you control of the chosen type triggers, it triggers an additional time."
+    },
+    {
+      "card_id": "7bd6b50a-27df-4fa8-a141-f391c984d826",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sarkhan, Soul Aflame",
+      "type_line": "Legendary Creature — Human Shaman",
+      "mana_cost": "{1}{U}{R}",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Dragon spells you cast cost {1} less to cast.\nWhenever a Dragon you control enters, you may have Sarkhan become a copy of it until end of turn, except its name is Sarkhan, Soul Aflame and it's legendary in addition to its other types."
+    },
+    {
+      "card_id": "d179c73d-0302-4697-9b6c-a4d87ec32768",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sarkhan Unbroken",
+      "type_line": "Legendary Planeswalker — Sarkhan",
+      "mana_cost": "{2}{G}{U}{R}",
+      "colors": [
+        "G",
+        "R",
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "[+1]: Draw a card, then add one mana of any color.\n[−2]: Create a 4/4 red Dragon creature token with flying.\n[−8]: Search your library for any number of Dragon creature cards, put them onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "8145ee79-1e55-4547-8af6-73fcb834949c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Scaled Nurturer",
+      "type_line": "Creature — Dragon Druid",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {G}. When you spend this mana to cast a Dragon creature spell, you gain 2 life."
+    },
+    {
+      "card_id": "ad676ae0-fd8c-49ec-b85b-5c8d40f8aa27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Scourge of Valkas",
+      "type_line": "Creature — Dragon",
+      "mana_cost": "{2}{R}{R}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nWhenever this creature or another Dragon you control enters, it deals X damage to any target, where X is the number of Dragons you control.\n{R}: This creature gets +1/+0 until end of turn."
+    },
+    {
+      "card_id": "be888cd6-b1d3-4d21-8b63-33bf86fa761a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "e923039a-fdc5-4c82-8f30-df9bd970a8d3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Spark Double",
+      "type_line": "Creature — Illusion",
+      "mana_cost": "{3}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "You may have this creature enter as a copy of a creature or planeswalker you control, except it enters with an additional +1/+1 counter on it if it's a creature, it enters with an additional loyalty counter on it if it's a planeswalker, and it isn't legendary."
+    },
+    {
+      "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swan Song",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target enchantment, instant, or sorcery spell. Its controller creates a 2/2 blue Bird creature token with flying."
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "190e46e4-64c8-4341-bf63-32bd7c26f884",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Temur Ascendancy",
+      "type_line": "Enchantment",
+      "mana_cost": "{G}{U}{R}",
+      "colors": [
+        "G",
+        "R",
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Creatures you control have haste.\nWhenever a creature you control with power 4 or greater enters, you may draw a card."
+    },
+    {
+      "card_id": "1aa1360b-2bce-43a6-936a-a6ac20441107",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Temur Battlecrier",
+      "type_line": "Creature — Orc Ranger",
+      "mana_cost": "{G}{U}{R}",
+      "colors": [
+        "G",
+        "R",
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "During your turn, spells you cast cost {1} less to cast for each creature you control with power 4 or greater."
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    }
+  ]
+}

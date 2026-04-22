@@ -1,0 +1,112 @@
+﻿{
+    "base_url":  "http://127.0.0.1:8080",
+    "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+    "archetype":  "Proliferate Combo",
+    "runs":  1,
+    "generated_at":  "2026-04-21T13:30:26.8629883-03:00",
+    "avg_request_latency_ms":  7872,
+    "max_request_latency_ms":  7872,
+    "avg_total_job_time_ms":  23673,
+    "max_total_job_time_ms":  23673,
+    "results":  [
+                    {
+                        "run":  1,
+                        "requested_at":  "2026-04-21T13:30:03.1007381-03:00",
+                        "request_latency_ms":  7872,
+                        "status_code":  202,
+                        "initial_mode":  null,
+                        "initial_timings":  {
+                                                "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+                                                "request_mode":  "optimize",
+                                                "total_ms":  7474,
+                                                "stages_ms":  {
+                                                                  "request.commander_priority_query":  2452,
+                                                                  "request.deck_context":  2196,
+                                                                  "request.async_job_create":  1235,
+                                                                  "deck_context.theme_profile":  752,
+                                                                  "deck_context.cards_query":  723,
+                                                                  "request.commander_reference_cache":  717,
+                                                                  "deck_context.deck_query":  716,
+                                                                  "request.cache_lookup":  716,
+                                                                  "request.user_preferences":  715,
+                                                                  "request.commander_live_edhrec":  147,
+                                                                  "deck_context.analysis":  2,
+                                                                  "request.deterministic_shortlist":  2,
+                                                                  "deck_context.state_assessment":  1,
+                                                                  "deck_context.resolve_archetype":  0
+                                                              }
+                                            },
+                        "poll_interval_ms":  2000,
+                        "total_job_time_ms":  23673,
+                        "poll_count":  7,
+                        "polls":  [
+                                      {
+                                          "poll":  1,
+                                          "status":  "processing",
+                                          "stage":  "Preparando referências do commander...",
+                                          "stage_number":  1,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  2,
+                                          "status":  "processing",
+                                          "stage":  "Preenchendo com cartas sinérgicas...",
+                                          "stage_number":  3,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  3,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  4,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  5,
+                                          "status":  "processing",
+                                          "stage":  "Ajustando base de mana...",
+                                          "stage_number":  4,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  6,
+                                          "status":  "processing",
+                                          "stage":  "Processando resultado final...",
+                                          "stage_number":  6,
+                                          "total_stages":  6
+                                      },
+                                      {
+                                          "poll":  7,
+                                          "status":  "completed",
+                                          "stage":  "Concluído",
+                                          "stage_number":  6,
+                                          "total_stages":  6
+                                      }
+                                  ],
+                        "job_status":  "completed",
+                        "final_stage":  "Concluído",
+                        "result_mode":  "complete",
+                        "result_timings":  {
+                                               "job_id":  "c882562234e459e47a0638bbe5906461",
+                                               "deck_id":  "2fb14ec7-7a00-4ad7-a7e9-5a5a85d7f9b2",
+                                               "total_ms":  20869,
+                                               "stages_ms":  {
+                                                                 "complete.fill_remainder":  11180,
+                                                                 "complete.ai_suggestion_loop":  1919,
+                                                                 "complete.build_final_response":  1343,
+                                                                 "complete.prepare_commander_seed":  2054,
+                                                                 "complete.rebalance_land_deficit":  1,
+                                                                 "complete.build_intermediate_payload":  1
+                                                             },
+                                               "request_mode":  "complete_async"
+                                           }
+                    }
+                ]
+}

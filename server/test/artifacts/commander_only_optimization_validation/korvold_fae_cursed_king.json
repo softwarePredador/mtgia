@@ -1,0 +1,1407 @@
+{
+  "source_deck_id": "764ce781-7fd9-44b2-839e-8ea563f0006f",
+  "source_deck_name": "Corpus Seed - Korvold, Fae-Cursed King",
+  "seed_deck_id": "554277cd-aa99-4b8b-aacc-72378616a801",
+  "optimize_request": {
+    "deck_id": "554277cd-aa99-4b8b-aacc-72378616a801",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "theme": {
+      "theme": "aristocrats",
+      "confidence": "alta",
+      "core_cards": [
+        "Korvold, Fae-Cursed King"
+      ],
+      "match_score": 1.0
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "0fbdcb9602a1d9199c39f8c073ab4077",
+      "deck_id": "554277cd-aa99-4b8b-aacc-72378616a801",
+      "total_ms": 11850,
+      "stages_ms": {
+        "complete.fill_remainder": 4035,
+        "complete.build_final_response": 1236,
+        "complete.prepare_commander_seed": 2523,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Arcane Signet",
+      "Beast Within",
+      "Command Tower",
+      "Cultivate",
+      "Farseek",
+      "Kodama's Reach",
+      "Lightning Greaves",
+      "Mind Stone",
+      "Nature's Lore",
+      "Read the Bones",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Fellwar Stone",
+      "Sol Ring",
+      "Mana Vault",
+      "Chrome Mox",
+      "Mox Diamond",
+      "Lotus Petal",
+      "Demonic Tutor",
+      "Orcish Bowmasters",
+      "Dark Ritual",
+      "Birds of Paradise",
+      "Delighted Halfling",
+      "Simian Spirit Guide",
+      "Veil of Summer",
+      "Crop Rotation",
+      "Elvish Spirit Guide",
+      "Deathrite Shaman",
+      "Vampiric Tutor",
+      "Abrupt Decay",
+      "Ignoble Hierarch",
+      "Pyroblast",
+      "Ragavan, Nimble Pilferer",
+      "Red Elemental Blast",
+      "Goblin Bombardment",
+      "Culling Ritual",
+      "Culling the Weak",
+      "Black Market Connections",
+      "Deadly Dispute",
+      "Mahadi, Emporium Master",
+      "Mirkwood Bats",
+      "Pitiless Plunderer",
+      "Sakura-Tribe Elder",
+      "Tireless Provisioner",
+      "Impulsive Pilferer",
+      "Marionette Apprentice",
+      "Awakening Zone",
+      "Crime Novelist",
+      "Revel in Riches",
+      "Braids, Arisen Nightmare",
+      "Warren Soultrader",
+      "Zulaport Cutthroat",
+      "Ashnod's Altar",
+      "Assassin's Trophy",
+      "Eldritch Evolution",
+      "Gilded Goose",
+      "Phyrexian Altar",
+      "Diabolic Intent",
+      "Underworld Breach",
+      "Tinder Wall",
+      "Imperial Seal",
+      "Worldly Tutor",
+      "Blood Artist",
+      "Forest",
+      "Mountain",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "deck_analysis": {
+      "average_cmc": "5.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana B (Tem 0 fontes, ideal > 15). Falta mana R (Tem 0 fontes, ideal > 15). Falta mana G (Tem 0 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.08",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 37,
+        "battles": 0,
+        "instants": 12,
+        "artifacts": 13,
+        "creatures": 23,
+        "sorceries": 10,
+        "enchantments": 5,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Falta mana B (Tem 13 fontes, ideal > 15). Falta mana G (Tem 13 fontes, ideal > 15)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 36,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 63,
+      "completed_target": true,
+      "deterministic_stage_used": false,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": true,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mind Stone",
+        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Nature's Lore",
+        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Read the Bones",
+        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "322c81d7-f3ae-4f1c-bea3-e4c345d4dab4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mana Vault",
+        "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chrome Mox",
+        "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mox Diamond",
+        "card_id": "b732f43f-bcda-4bcd-919a-22636567b41d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lotus Petal",
+        "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Demonic Tutor",
+        "card_id": "b48f808a-7759-4d81-8cca-2adb4681ef51",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Orcish Bowmasters",
+        "card_id": "c1d5d025-e7e1-4a62-a526-db25c6cd9cad",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Dark Ritual",
+        "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Birds of Paradise",
+        "card_id": "0834039a-5203-4785-9f87-179b4474e08c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Delighted Halfling",
+        "card_id": "f833bd42-cd55-4eeb-91bd-f7e901fc06da",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Simian Spirit Guide",
+        "card_id": "ad8cc08d-9f62-4f24-b010-e7ad21b412fc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Veil of Summer",
+        "card_id": "e42c5062-e75c-42cd-a991-b9d7a4be4c70",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Crop Rotation",
+        "card_id": "cc63576d-6d84-4933-95f4-bee29ac47835",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Elvish Spirit Guide",
+        "card_id": "12fb6723-88e7-4a45-af26-2bd021814380",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deathrite Shaman",
+        "card_id": "b0979bcf-7bcf-4e76-8d3a-b0b6bd1a1d82",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Vampiric Tutor",
+        "card_id": "783ccf92-f6d0-4c8c-8b7b-3087d929a7a6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abrupt Decay",
+        "card_id": "e58d80c6-423e-4530-95ac-7a4e2bfbf557",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ignoble Hierarch",
+        "card_id": "8e82e007-5103-4da7-8c80-bae1caef19c2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Pyroblast",
+        "card_id": "2ae4a86f-f983-451b-a62d-1c0e557fcd10",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ragavan, Nimble Pilferer",
+        "card_id": "d2bbc43d-02f7-4489-9714-9013a09178fc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Red Elemental Blast",
+        "card_id": "75fff401-252d-4bc0-8aa4-163e59eb3d8e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Goblin Bombardment",
+        "card_id": "863de905-eb4f-4cd4-a1a4-748ef57039af",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Culling Ritual",
+        "card_id": "520ef541-8820-42d6-bbd1-d9a9954b8e9c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Culling the Weak",
+        "card_id": "015d98f1-c614-4760-8785-dc83a3960334",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Black Market Connections",
+        "card_id": "cfb2a073-e15a-4906-aabd-2b3e73fbbaa0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deadly Dispute",
+        "card_id": "5d8ed0f0-01ec-46ac-a1ad-7e89a40d7969",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mahadi, Emporium Master",
+        "card_id": "87205cb4-7826-41db-b00d-6d08b02f6d77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mirkwood Bats",
+        "card_id": "f1f8509c-3795-4120-b9ef-2ed1361bd23e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Pitiless Plunderer",
+        "card_id": "11b0dcd7-caa1-4cc8-a845-0568afed2966",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sakura-Tribe Elder",
+        "card_id": "f7bfd97f-9287-48b0-9264-8265a8d03d79",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tireless Provisioner",
+        "card_id": "b3066b42-e500-480c-b271-8bb40b276dbb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Impulsive Pilferer",
+        "card_id": "9c192fa7-1593-4b77-bd62-6fd8dc6a48a3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Marionette Apprentice",
+        "card_id": "03991c26-99e0-4fe0-aa13-9f9ad5deed88",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Awakening Zone",
+        "card_id": "d2e083c9-23ae-4f70-8d1f-c8c4457f6f92",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Crime Novelist",
+        "card_id": "1a1b3011-d6d3-483e-893f-7c1e1d35e649",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Revel in Riches",
+        "card_id": "2a334dd5-47cd-4e17-ba58-9a84b6c2424a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Braids, Arisen Nightmare",
+        "card_id": "74e0a4af-6b46-4f8c-b4f8-9a24e2505dde",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Warren Soultrader",
+        "card_id": "4d520a67-a56f-47c7-af8c-141672d2f0bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Zulaport Cutthroat",
+        "card_id": "c72590c7-0454-4eab-915d-d6645753f2fd",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ashnod's Altar",
+        "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Assassin's Trophy",
+        "card_id": "81c7e15a-04ad-46dc-80af-d475f24f8156",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Eldritch Evolution",
+        "card_id": "f966e443-858f-4783-9b0b-f7bc2ffd781b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gilded Goose",
+        "card_id": "3434a07f-9a35-47d2-9e94-e48efc57f5c2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Phyrexian Altar",
+        "card_id": "ed66b43d-257e-442f-a72f-842b2898758a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Diabolic Intent",
+        "card_id": "fd1ddd2a-9690-40a7-9e2e-6ff92f9458f8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Underworld Breach",
+        "card_id": "1ecaad2c-0ab0-4d9d-9115-31a8078e09b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tinder Wall",
+        "card_id": "c9cde2c6-473d-4331-99a5-e199d5bf0606",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Imperial Seal",
+        "card_id": "b7403e71-b588-4b65-8194-8e570f615e45",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Worldly Tutor",
+        "card_id": "3fdf40a7-e08e-4a23-aff1-5e196a969c74",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blood Artist",
+        "card_id": "fa96a3f0-2ef4-43c6-9934-1629dd650761",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 12,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 12,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "saved_cards": [
+    {
+      "card_id": "755b5df2-a11e-46c8-beca-bb2a23e04518",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Korvold, Fae-Cursed King",
+      "type_line": "Legendary Creature — Dragon Noble",
+      "mana_cost": "{2}{B}{R}{G}",
+      "colors": [
+        "B",
+        "G",
+        "R"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Flying\nWhenever Korvold enters or attacks, sacrifice another permanent.\nWhenever you sacrifice a permanent, put a +1/+1 counter on Korvold and draw a card."
+    },
+    {
+      "card_id": "e58d80c6-423e-4530-95ac-7a4e2bfbf557",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abrupt Decay",
+      "type_line": "Instant",
+      "mana_cost": "{B}{G}",
+      "colors": [
+        "B",
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "This spell can't be countered.\nDestroy target nonland permanent with mana value 3 or less."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ashnod's Altar",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Sacrifice a creature: Add {C}{C}."
+    },
+    {
+      "card_id": "81c7e15a-04ad-46dc-80af-d475f24f8156",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Assassin's Trophy",
+      "type_line": "Instant",
+      "mana_cost": "{B}{G}",
+      "colors": [
+        "B",
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Destroy target permanent an opponent controls. Its controller may search their library for a basic land card, put it onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "d2e083c9-23ae-4f70-8d1f-c8c4457f6f92",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Awakening Zone",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your upkeep, you may create a 0/1 colorless Eldrazi Spawn creature token. It has \"Sacrifice this token: Add {C}.\""
+    },
+    {
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Beast Within",
+      "type_line": "Instant",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+    },
+    {
+      "card_id": "0834039a-5203-4785-9f87-179b4474e08c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Birds of Paradise",
+      "type_line": "Creature — Bird",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Flying\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "cfb2a073-e15a-4906-aabd-2b3e73fbbaa0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Black Market Connections",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your first main phase, choose one or more —\n• Sell Contraband — Create a Treasure token. You lose 1 life.\n• Buy Information — Draw a card. You lose 2 life.\n• Hire a Mercenary — Create a 3/2 colorless Shapeshifter creature token with changeling. You lose 3 life. (It is every creature type.)"
+    },
+    {
+      "card_id": "fa96a3f0-2ef4-43c6-9934-1629dd650761",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blood Artist",
+      "type_line": "Creature — Vampire",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life."
+    },
+    {
+      "card_id": "74e0a4af-6b46-4f8c-b4f8-9a24e2505dde",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Braids, Arisen Nightmare",
+      "type_line": "Legendary Creature — Nightmare",
+      "mana_cost": "{1}{B}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your end step, you may sacrifice an artifact, creature, enchantment, land, or planeswalker. If you do, each opponent may sacrifice a permanent of their choice that shares a card type with it. For each opponent who doesn't, that player loses 2 life and you draw a card."
+    },
+    {
+      "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chrome Mox",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.\n{T}: Add one mana of any of the exiled card's colors."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "1a1b3011-d6d3-483e-893f-7c1e1d35e649",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Crime Novelist",
+      "type_line": "Creature — Goblin Bard",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever you sacrifice an artifact, put a +1/+1 counter on this creature and add {R}."
+    },
+    {
+      "card_id": "cc63576d-6d84-4933-95f4-bee29ac47835",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Crop Rotation",
+      "type_line": "Instant",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a land.\nSearch your library for a land card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "520ef541-8820-42d6-bbd1-d9a9954b8e9c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Culling Ritual",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}{G}",
+      "colors": [
+        "B",
+        "G"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Destroy each nonland permanent with mana value 2 or less. Add {B} or {G} for each permanent destroyed this way."
+    },
+    {
+      "card_id": "015d98f1-c614-4760-8785-dc83a3960334",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Culling the Weak",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nAdd {B}{B}{B}{B}."
+    },
+    {
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cultivate",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "76605a67-bbfc-4c64-ad53-c637efed8c71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Dark Ritual",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Add {B}{B}{B}."
+    },
+    {
+      "card_id": "5d8ed0f0-01ec-46ac-a1ad-7e89a40d7969",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Deadly Dispute",
+      "type_line": "Instant",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nDraw two cards and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "b0979bcf-7bcf-4e76-8d3a-b0b6bd1a1d82",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Deathrite Shaman",
+      "type_line": "Creature — Elf Shaman",
+      "mana_cost": "{B/G}",
+      "colors": [
+        "B",
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Exile target land card from a graveyard. Add one mana of any color.\n{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.\n{G}, {T}: Exile target creature card from a graveyard. You gain 2 life."
+    },
+    {
+      "card_id": "f833bd42-cd55-4eeb-91bd-f7e901fc06da",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Delighted Halfling",
+      "type_line": "Creature — Halfling Citizen",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell, and that spell can't be countered."
+    },
+    {
+      "card_id": "b48f808a-7759-4d81-8cca-2adb4681ef51",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Demonic Tutor",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a card, put that card into your hand, then shuffle."
+    },
+    {
+      "card_id": "fd1ddd2a-9690-40a7-9e2e-6ff92f9458f8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Diabolic Intent",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nSearch your library for a card, put that card into your hand, then shuffle."
+    },
+    {
+      "card_id": "f966e443-858f-4783-9b0b-f7bc2ffd781b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Eldritch Evolution",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature.\nSearch your library for a creature card with mana value X or less, where X is 2 plus the sacrificed creature's mana value. Put that card onto the battlefield, then shuffle. Exile Eldritch Evolution."
+    },
+    {
+      "card_id": "12fb6723-88e7-4a45-af26-2bd021814380",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Elvish Spirit Guide",
+      "type_line": "Creature — Elf Spirit",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Exile this creature from your hand: Add {G}."
+    },
+    {
+      "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Farseek",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Forest",
+      "type_line": "Basic Land — Forest",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {G}.)"
+    },
+    {
+      "card_id": "3434a07f-9a35-47d2-9e94-e48efc57f5c2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gilded Goose",
+      "type_line": "Creature — Bird",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Flying\nWhen this creature enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\n{1}{G}, {T}: Create a Food token.\n{T}, Sacrifice a Food: Add one mana of any color."
+    },
+    {
+      "card_id": "863de905-eb4f-4cd4-a1a4-748ef57039af",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Goblin Bombardment",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target."
+    },
+    {
+      "card_id": "8e82e007-5103-4da7-8c80-bae1caef19c2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ignoble Hierarch",
+      "type_line": "Creature — Goblin Shaman",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exalted (Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.)\n{T}: Add {B}, {R}, or {G}."
+    },
+    {
+      "card_id": "b7403e71-b588-4b65-8194-8e570f615e45",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Imperial Seal",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for a card, then shuffle and put that card on top. You lose 2 life."
+    },
+    {
+      "card_id": "9c192fa7-1593-4b77-bd62-6fd8dc6a48a3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Impulsive Pilferer",
+      "type_line": "Creature — Goblin Pirate",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "When this creature dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nEncore {3}{R} ({3}{R}, Exile this card from your graveyard: For each opponent, create a token copy that attacks that opponent this turn if able. They gain haste. Sacrifice them at the beginning of the next end step. Activate only as a sorcery.)"
+    },
+    {
+      "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kodama's Reach",
+      "type_line": "Sorcery — Arcane",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lotus Petal",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color."
+    },
+    {
+      "card_id": "87205cb4-7826-41db-b00d-6d08b02f6d77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mahadi, Emporium Master",
+      "type_line": "Legendary Creature — Devil",
+      "mana_cost": "{1}{B}{R}",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your end step, create a Treasure token for each creature that died this turn. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mana Vault",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}."
+    },
+    {
+      "card_id": "03991c26-99e0-4fe0-aa13-9f9ad5deed88",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Marionette Apprentice",
+      "type_line": "Creature — Human Artificer",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Fabricate 1 (When this creature enters, put a +1/+1 counter on it or create a 1/1 colorless Servo artifact creature token.)\nWhenever another creature or artifact you control is put into a graveyard from the battlefield, each opponent loses 1 life."
+    },
+    {
+      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mind Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+    },
+    {
+      "card_id": "f1f8509c-3795-4120-b9ef-2ed1361bd23e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mirkwood Bats",
+      "type_line": "Creature — Bat",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying\nWhenever you create or sacrifice a token, each opponent loses 1 life."
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Mountain",
+      "type_line": "Basic Land — Mountain",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {R}.)"
+    },
+    {
+      "card_id": "b732f43f-bcda-4bcd-919a-22636567b41d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mox Diamond",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "If this artifact would enter, you may discard a land card instead. If you do, put this artifact onto the battlefield. If you don't, put it into its owner's graveyard.\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Nature's Lore",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle."
+    },
+    {
+      "card_id": "c1d5d025-e7e1-4a62-a526-db25c6cd9cad",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Orcish Bowmasters",
+      "type_line": "Creature — Orc Archer",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flash\nWhen this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1."
+    },
+    {
+      "card_id": "ed66b43d-257e-442f-a72f-842b2898758a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Phyrexian Altar",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Sacrifice a creature: Add one mana of any color."
+    },
+    {
+      "card_id": "11b0dcd7-caa1-4cc8-a845-0568afed2966",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Pitiless Plunderer",
+      "type_line": "Creature — Human Pirate",
+      "mana_cost": "{3}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever another creature you control dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "2ae4a86f-f983-451b-a62d-1c0e557fcd10",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Pyroblast",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Choose one —\n• Counter target spell if it's blue.\n• Destroy target permanent if it's blue."
+    },
+    {
+      "card_id": "d2bbc43d-02f7-4489-9714-9013a09178fc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ragavan, Nimble Pilferer",
+      "type_line": "Legendary Creature — Monkey Pirate",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Whenever Ragavan deals combat damage to a player, create a Treasure token and exile the top card of that player's library. Until end of turn, you may cast that card.\nDash {1}{R} (You may cast this spell for its dash cost. If you do, it gains haste, and it's returned from the battlefield to its owner's hand at the beginning of the next end step.)"
+    },
+    {
+      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Read the Bones",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+    },
+    {
+      "card_id": "75fff401-252d-4bc0-8aa4-163e59eb3d8e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Red Elemental Blast",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Choose one —\n• Counter target blue spell.\n• Destroy target blue permanent."
+    },
+    {
+      "card_id": "2a334dd5-47cd-4e17-ba58-9a84b6c2424a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Revel in Riches",
+      "type_line": "Enchantment",
+      "mana_cost": "{4}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Whenever a creature an opponent controls dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nAt the beginning of your upkeep, if you control ten or more Treasures, you win the game."
+    },
+    {
+      "card_id": "f7bfd97f-9287-48b0-9264-8265a8d03d79",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sakura-Tribe Elder",
+      "type_line": "Creature — Snake Shaman",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Sacrifice this creature: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "ad8cc08d-9f62-4f24-b010-e7ad21b412fc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Simian Spirit Guide",
+      "type_line": "Creature — Ape Spirit",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Exile this card from your hand: Add {R}."
+    },
+    {
+      "card_id": "322c81d7-f3ae-4f1c-bea3-e4c345d4dab4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 12,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "c9cde2c6-473d-4331-99a5-e199d5bf0606",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Tinder Wall",
+      "type_line": "Creature — Plant Wall",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Defender (This creature can't attack.)\nSacrifice this creature: Add {R}{R}.\n{R}, Sacrifice this creature: It deals 2 damage to target creature it's blocking."
+    },
+    {
+      "card_id": "b3066b42-e500-480c-b271-8bb40b276dbb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Tireless Provisioner",
+      "type_line": "Creature — Elf Scout",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Landfall — Whenever a land you control enters, create a Food token or a Treasure token. (Food is an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\" Treasure is an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "1ecaad2c-0ab0-4d9d-9115-31a8078e09b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Underworld Breach",
+      "type_line": "Enchantment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your graveyard for their escape cost.)\nAt the beginning of the end step, sacrifice this enchantment."
+    },
+    {
+      "card_id": "783ccf92-f6d0-4c8c-8b7b-3087d929a7a6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Vampiric Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for a card, then shuffle and put that card on top. You lose 2 life."
+    },
+    {
+      "card_id": "e42c5062-e75c-42cd-a991-b9d7a4be4c70",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Veil of Summer",
+      "type_line": "Instant",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw a card if an opponent has cast a blue or black spell this turn. Spells you control can't be countered this turn. You and permanents you control gain hexproof from blue and from black until end of turn. (You and they can't be the targets of blue or black spells or abilities your opponents control.)"
+    },
+    {
+      "card_id": "4d520a67-a56f-47c7-af8c-141672d2f0bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Warren Soultrader",
+      "type_line": "Creature — Zombie Goblin Wizard",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Pay 1 life, Sacrifice another creature: Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "3fdf40a7-e08e-4a23-aff1-5e196a969c74",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Worldly Tutor",
+      "type_line": "Instant",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Search your library for a creature card, reveal it, then shuffle and put the card on top."
+    },
+    {
+      "card_id": "c72590c7-0454-4eab-915d-d6645753f2fd",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Zulaport Cutthroat",
+      "type_line": "Creature — Human Rogue Ally",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever this creature or another creature you control dies, each opponent loses 1 life and you gain 1 life."
+    }
+  ]
+}
