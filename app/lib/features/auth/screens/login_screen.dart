@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
+                        color: AppTheme.backgroundAbyss.withValues(alpha: 0.18),
                         blurRadius: 16,
                         offset: const Offset(0, 10),
                       ),
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        AppTheme.backgroundAbyss,
                                       ),
                                     ),
                                   ),
@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                               ),
                               child: Material(
-                                color: Colors.transparent,
+                                color: AppTheme.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(
                                     AppTheme.radiusMd,
@@ -274,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Text(
                                       'Entrar',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppTheme.backgroundAbyss,
                                         fontSize: AppTheme.fontLg,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.3,

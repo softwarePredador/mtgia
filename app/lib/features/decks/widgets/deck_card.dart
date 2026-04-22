@@ -81,7 +81,7 @@ class DeckCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),

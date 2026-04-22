@@ -90,6 +90,22 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     };
   }
 
+  bool _shouldAutoValidateDeck({
+    required String format,
+    required int totalCards,
+  }) {
+    if (totalCards <= 0) return false;
+
+    switch (format.toLowerCase()) {
+      case 'commander':
+        return totalCards == 100;
+      case 'brawl':
+        return totalCards == 60;
+      default:
+        return totalCards >= 60;
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -265,6 +281,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               format == 'commander' ? 100 : (format == 'brawl' ? 60 : null);
           final totalCards = _totalCards(deck);
           final hasMeaningfulDeckState = totalCards > 0;
+          final isReadyForAutoValidation = _shouldAutoValidateDeck(
+            format: deck.format,
+            totalCards: totalCards,
+          );
 
           // Auto-load pricing when deck is ready
           if (hasMeaningfulDeckState &&
@@ -277,7 +297,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
           }
 
           // Auto-validate deck when ready
-          if (hasMeaningfulDeckState &&
+          if (isReadyForAutoValidation &&
               !_validationAutoLoaded &&
               !_isValidating) {
             _validationAutoLoaded = true;
@@ -545,12 +565,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.edit, color: Colors.white),
+            Icon(Icons.edit, color: AppTheme.textPrimary),
             SizedBox(width: 8),
             Text(
               'Editar',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -570,12 +590,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             Text(
               'Excluir',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(width: 8),
-            Icon(Icons.delete, color: Colors.white),
+            Icon(Icons.delete, color: AppTheme.textPrimary),
           ],
         ),
       ),

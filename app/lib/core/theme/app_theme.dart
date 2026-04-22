@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// ManaLoom Theme: "Calm Abyss" Palette
-/// Neutral dark UI — card artwork is the main visual focus.
+/// ManaLoom Theme: "Obsidian + Brass + Frost Blue"
+/// Dark, premium, low-noise UI — card artwork remains the main visual focus.
+///
+/// VISUAL BASELINE:
+///   docs/MANALOOM_VISUAL_EXECUTION_BASE_2026-04-19.md
 ///
 /// DESIGN RULES:
-///   1. Single primary accent (violet). No cyan.
-///   2. Gradients only for hero sections and primary buttons.
-///   3. Surface hierarchy: backgroundAbyss < surfaceSlate < surfaceElevated.
+///   1. Brass is the primary action color.
+///   2. Frost blue supports (filters, info, technical indicators) but does not lead.
+///   3. Large background regions stay within the obsidian/slate family.
+///   4. Gradients only for hero sections and primary buttons.
 ///
 /// COLOR BUDGET (24 tokens):
 ///   10 brand/layout + 5 semantic + 6 WUBRG + 1 hint + 2 format extras = 24
@@ -18,18 +22,34 @@ class AppTheme {
   static const String uiFontFamily = 'Manrope';
   static const String displayFontFamily = 'Fraunces';
 
-  // ── Brand palette (layout) ──────────────────────────────────
-  static const Color backgroundAbyss = Color(0xFF0B0F1A);
-  static const Color surfaceSlate = Color(0xFF141B2D);
-  static const Color surfaceElevated = Color(0xFF1C2438);
-  static const Color manaViolet = Color(0xFF7C3AED); // Primary
-  static const Color primarySoft = Color(0xFFA78BFA); // Primary soft
-  static const Color mythicGold = Color(0xFFF59E0B); // Accent / Tertiary
+  // Explicit token to avoid using a hardcoded transparent color at call-sites.
+  static const Color transparent = Color(0x00000000);
 
-  static const Color textPrimary = Color(0xFFE5E7EB);
-  static const Color textSecondary = Color(0xFF9CA3AF);
-  static const Color textHint = Color(0xFF6B7280); // Hints, placeholders
-  static const Color outlineMuted = Color(0xFF2A3552);
+  // ── Brand palette (layout) ──────────────────────────────────
+  // Core surfaces
+  static const Color backgroundAbyss = Color(0xFF0F1115); // obsidian-950
+  static const Color surfaceSlate = Color(0xFF171A21); // obsidian-900
+  static const Color surfaceElevated = Color(0xFF232735); // slate-800
+
+  // Product accents
+  static const Color brass500 = Color(0xFFC58B2A);
+  static const Color brass400 = Color(0xFFE0A93B);
+  static const Color brass700 = Color(0xFF8E641B);
+
+  static const Color frost400 = Color(0xFF6FA8DC);
+  static const Color frost600 = Color(0xFF3E5F8A);
+
+  // Back-compat brand tokens (keep call-sites stable)
+  // NOTE: kept without @Deprecated to avoid analyzer noise across the app.
+  static const Color manaViolet = brass500; // legacy name: primary action
+  static const Color primarySoft = frost400; // legacy name: secondary/support
+  static const Color mythicGold = brass400; // legacy name: gold accent
+
+  // Text
+  static const Color textPrimary = Color(0xFFF3EFE3); // ivory-100
+  static const Color textSecondary = Color(0xFFB8C0CC); // mist-300
+  static const Color textHint = Color(0xFF8A93A3); // mist-500 (hints/placeholders)
+  static const Color outlineMuted = Color(0xFF2B3142); // slate-700
 
   // ── Deprecated aliases (backward compat) ────────────────────
   @Deprecated('Use primarySoft instead')
@@ -38,10 +58,10 @@ class AppTheme {
   static const Color surfaceSlate2 = surfaceElevated;
 
   // ── Semantic (feedback) ─────────────────────────────────────
-  static const Color success = Color(0xFF22C55E);
-  static const Color error = Color(0xFFEF4444);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color disabled = Color(0xFF6B7280);
+  static const Color success = Color(0xFF4FAF7A);
+  static const Color warning = Color(0xFFD28B2C);
+  static const Color error = Color(0xFFC65A46);
+  static const Color disabled = textHint;
 
   // ── Gradients ───────────────────────────────────────────────
   // Gradients reserved for hero sections and primary buttons only.
@@ -49,20 +69,20 @@ class AppTheme {
   static const LinearGradient scaffoldGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [backgroundAbyss, Color(0xFF0D1224), Color(0xFF0B0F1A)],
+    colors: [backgroundAbyss, surfaceSlate, backgroundAbyss],
     stops: [0.0, 0.55, 1.0],
   );
 
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF1A0A2E), surfaceSlate, backgroundAbyss],
+    colors: [surfaceElevated, surfaceSlate, backgroundAbyss],
   );
 
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [manaViolet, Color(0xFF6D28D9)],
+    colors: [brass500, brass400],
   );
 
   /// Intentionally flat — no visible gradient on cards/list items.
@@ -75,7 +95,7 @@ class AppTheme {
   static const LinearGradient goldAccentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [mythicGold, Color(0xFFD97706)],
+    colors: [brass400, brass700],
   );
 
   // ── Border Radius Scale (5 tokens) ────────────────────────
@@ -112,12 +132,13 @@ class AppTheme {
   };
 
   // ── Format accent colors (deck card frames) ───────────────
-  static const Color formatCommander = mythicGold;
-  static const Color formatStandard = primarySoft;
-  static const Color formatModern = manaViolet;
-  static const Color formatPioneer = Color(0xFF34D399); // Emerald green
-  static const Color formatLegacy = Color(0xFFEC4899); // Rose pink
-  static const Color formatVintage = warning; // reuses warning orange
+  // Keep these restrained; avoid adding new loud accents.
+  static const Color formatCommander = brass500;
+  static const Color formatStandard = frost400;
+  static const Color formatModern = frost600;
+  static const Color formatPioneer = success;
+  static const Color formatLegacy = textHint;
+  static const Color formatVintage = warning;
   static const Color formatPauper = textSecondary;
 
   // ── Helpers derivados (sem cores novas) ────────────────────
@@ -175,7 +196,7 @@ class AppTheme {
       case 'C':
         return const Color(0xFF2A2A2A);
       default:
-        return Colors.white;
+        return textPrimary;
     }
   }
 
@@ -207,8 +228,8 @@ class AppTheme {
     if (normalized.length == 1) {
       return wubrg[normalized.first] ?? manaC;
     }
-    // Multi-color: default to brand violet; callers can render multi-badges.
-    return manaViolet;
+    // Multi-color: keep it quiet/technical; callers can render multi-badges.
+    return frost600;
   }
 
   static TextTheme _buildTextTheme() {
@@ -238,31 +259,32 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      primary: manaViolet,
-      secondary: primarySoft,
-      tertiary: mythicGold,
+      primary: brass500,
+      secondary: frost400,
+      tertiary: brass400,
       surface: surfaceSlate,
       surfaceContainerHighest: surfaceElevated,
       outline: outlineMuted,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
+      onPrimary: backgroundAbyss,
+      onSecondary: backgroundAbyss,
+      onTertiary: backgroundAbyss,
       onSurface: textPrimary,
     ),
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
     appBarTheme: AppBarTheme(
-      backgroundColor: surfaceElevated,
+      backgroundColor: surfaceSlate,
       foregroundColor: textPrimary,
       elevation: 0,
       centerTitle: true,
-      shadowColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
+      shadowColor: transparent,
+      surfaceTintColor: transparent,
       shape: const Border(bottom: BorderSide(color: outlineMuted, width: 0.5)),
     ),
     cardTheme: CardThemeData(
       color: surfaceSlate,
       elevation: 0,
-      shadowColor: Colors.transparent,
+      shadowColor: transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMd),
         side: const BorderSide(color: outlineMuted, width: 0.5),
@@ -270,19 +292,19 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: manaViolet,
-        foregroundColor: Colors.white,
+        backgroundColor: brass500,
+        foregroundColor: backgroundAbyss,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
         elevation: 0,
-        shadowColor: Colors.transparent,
+        shadowColor: transparent,
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: primarySoft,
+        foregroundColor: frost400,
         side: const BorderSide(color: outlineMuted, width: 1),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
@@ -303,7 +325,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        borderSide: const BorderSide(color: manaViolet, width: 1.5),
+        borderSide: const BorderSide(color: frost400, width: 1.5),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -316,7 +338,7 @@ class AppTheme {
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: surfaceElevated,
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: transparent,
       modalBackgroundColor: surfaceElevated,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(radiusLg)),
@@ -336,7 +358,7 @@ class AppTheme {
       ),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: manaViolet,
+      color: brass500,
       circularTrackColor: outlineMuted,
     ),
     dividerTheme: const DividerThemeData(
@@ -345,8 +367,8 @@ class AppTheme {
       space: 1,
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: surfaceElevated,
-      indicatorColor: manaViolet.withValues(alpha: 0.15),
+      backgroundColor: surfaceSlate,
+      indicatorColor: brass500.withValues(alpha: 0.15),
       indicatorShape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusSm),
       ),
@@ -355,21 +377,21 @@ class AppTheme {
           return const TextStyle(
             fontSize: fontXs,
             fontWeight: FontWeight.w600,
-            color: manaViolet,
+            color: brass500,
           );
         }
         return const TextStyle(fontSize: fontXs, color: textSecondary);
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const IconThemeData(color: manaViolet, size: 22);
+          return const IconThemeData(color: brass500, size: 22);
         }
         return const IconThemeData(color: textSecondary, size: 22);
       }),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: surfaceSlate,
-      selectedColor: manaViolet.withValues(alpha: 0.15),
+      selectedColor: frost400.withValues(alpha: 0.18),
       labelStyle: const TextStyle(fontSize: fontSm, color: textPrimary),
       side: const BorderSide(color: outlineMuted, width: 0.5),
       shape: RoundedRectangleBorder(

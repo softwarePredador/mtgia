@@ -84,9 +84,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.transparent,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: AppTheme.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
           onPressed: _returnToLogin,
@@ -111,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
+                        color: AppTheme.backgroundAbyss.withValues(alpha: 0.18),
                         blurRadius: 16,
                         offset: const Offset(0, 10),
                       ),
@@ -323,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        AppTheme.backgroundAbyss,
                                       ),
                                     ),
                                   ),
@@ -348,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ],
                               ),
                               child: Material(
-                                color: Colors.transparent,
+                                color: AppTheme.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(
                                     AppTheme.radiusMd,
@@ -358,7 +358,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     child: Text(
                                       'Criar Conta',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppTheme.backgroundAbyss,
                                         fontSize: AppTheme.fontLg,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.3,

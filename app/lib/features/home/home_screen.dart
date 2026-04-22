@@ -58,9 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final username = auth.displayName ?? auth.username ?? 'Planeswalker';
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.transparent,
         elevation: 0,
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   (bounds) => AppTheme.primaryGradient.createShader(bounds),
               child: const Icon(
                 Icons.auto_awesome,
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 size: 22,
               ),
             ),
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(
                 'ManaLoom',
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
@@ -319,7 +319,7 @@ class _HeroBanner extends StatelessWidget {
             ),
             child: const Icon(
               Icons.auto_awesome,
-              color: Colors.white,
+              color: AppTheme.backgroundAbyss,
               size: 24,
             ),
           ),
@@ -398,22 +398,22 @@ class _GradientButton extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           onTap: onTap,
-          splashColor: Colors.white.withValues(alpha: 0.15),
+          splashColor: AppTheme.backgroundAbyss.withValues(alpha: 0.14),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 20),
+                Icon(icon, color: AppTheme.backgroundAbyss, size: 20),
                 const SizedBox(width: 10),
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.backgroundAbyss,
                     fontWeight: FontWeight.w700,
                     fontSize: AppTheme.fontLg,
                     letterSpacing: 0.2,
@@ -448,7 +448,7 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -528,7 +528,7 @@ class _RecentDeckTile extends StatelessWidget {
         border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           onTap: () => context.go('/decks/${deck.id}'),
