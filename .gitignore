@@ -25,7 +25,6 @@ server/cache/
 wget-log
 
 # Copilot/agent local configs
-.github/agents/
 
 # Local QA / visual proof artifacts (do not commit)
 app/doc/*proofs*/
