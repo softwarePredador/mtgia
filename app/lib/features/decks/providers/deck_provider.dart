@@ -212,7 +212,9 @@ class DeckProvider extends ChangeNotifier {
         cacheTimes: _deckDetailsCacheTime,
         deck: details,
       );
-      debugPrint('[DeckProvider] Deck "${details.name}" → colors: ${details.colorIdentity}');
+      debugPrint(
+        '[DeckProvider] Deck "${details.name}" → colors: ${details.colorIdentity}',
+      );
     }
 
     final enriched = applyResult.enrichedCount;
@@ -286,10 +288,7 @@ class DeckProvider extends ChangeNotifier {
 
         if (created != null) {
           // Update otimista: evita depender do GET /decks (que pode time-outar no emulador).
-          _decks = [
-            created,
-            ..._decks.where((deck) => deck.id != created.id),
-          ];
+          _decks = [created, ..._decks.where((deck) => deck.id != created.id)];
           notifyListeners();
         }
 
@@ -397,9 +396,8 @@ class DeckProvider extends ChangeNotifier {
   }
 
   /// Busca opções de otimização (arquétipos) para o deck
-  Future<List<Map<String, dynamic>>> fetchOptimizationOptions(
-    String deckId,
-  ) => fetchOptimizationOptionsRequest(_apiClient, deckId);
+  Future<List<Map<String, dynamic>>> fetchOptimizationOptions(String deckId) =>
+      fetchOptimizationOptionsRequest(_apiClient, deckId);
 
   /// Solicita sugestões de otimização para um arquétipo específico
   Future<Map<String, dynamic>> optimizeDeck(
@@ -723,10 +721,77 @@ class DeckProvider extends ChangeNotifier {
         '🃏 [DeckProvider] MainBoard entries: ${deck.mainBoard.length}',
       );
 
+      final normalizedFormat = deck.format.toLowerCase();
+      final isCommanderFormat =
+          normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+      var safeAdditionsDetailed = additionsDetailed;
+
+      if (isCommanderFormat && additionsDetailed.isNotEmpty) {
+        final commanderIdentity = getCommanderIdentitySet(deck);
+        final resolvedByName = <String, Map<String, dynamic>?>{};
+        final filteredAdditions = <Map<String, dynamic>>[];
+        final skippedNames = <String>[];
+        var canFilterByIdentity = true;
+
+        for (final addition in additionsDetailed) {
+          final rawName = addition['name']?.toString().trim() ?? '';
+          if (rawName.isEmpty) {
+            canFilterByIdentity = false;
+            break;
+          }
+
+          final lookupKey = rawName.toLowerCase();
+          if (!resolvedByName.containsKey(lookupKey)) {
+            resolvedByName[lookupKey] = await searchFirstCardByName(
+              _apiClient,
+              rawName,
+            );
+          }
+
+          final resolvedCard = resolvedByName[lookupKey];
+          if (resolvedCard == null) {
+            canFilterByIdentity = false;
+            break;
+          }
+
+          final normalizedCard = {
+            'color_identity':
+                (resolvedCard['color_identity'] as List?)
+                    ?.map((entry) => entry.toString())
+                    .toList() ??
+                const <String>[],
+          };
+
+          if (!isCardWithinCommanderIdentity(
+            normalizedCard,
+            commanderIdentity: commanderIdentity,
+          )) {
+            skippedNames.add(rawName);
+            continue;
+          }
+
+          filteredAdditions.add(addition);
+        }
+
+        if (canFilterByIdentity) {
+          for (final skippedName in skippedNames) {
+            AppLogger.debug(
+              '⛔️ [DeckProvider] Pulando fora da identidade do comandante: $skippedName',
+            );
+          }
+          if (filteredAdditions.isEmpty) {
+            throw Exception(
+              'Nenhuma mudança aplicável foi encontrada para este deck.',
+            );
+          }
+          safeAdditionsDetailed = filteredAdditions;
+        }
+      }
+
       final cardsPayload = buildOptimizedCardPayload(
         deck: deck,
         removalsDetailed: removalsDetailed,
-        additionsDetailed: additionsDetailed,
+        additionsDetailed: safeAdditionsDetailed,
       );
 
       // 5. Salvar no servidor

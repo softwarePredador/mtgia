@@ -71,6 +71,12 @@ class _FakeApiClient extends ApiClient {
 Map<String, dynamic> _buildDeckDetailsJson(
   Map<String, int> cardsById, {
   String deckId = 'deck-1',
+  List<String> deckColorIdentity = const ['U'],
+  List<String> commanderColors = const ['U'],
+  List<String> commanderColorIdentity = const ['U'],
+  String commanderName = 'Talrand, Sky Summoner',
+  String commanderManaCost = '{2}{U}{U}',
+  String commanderTypeLine = 'Legendary Creature — Merfolk Wizard',
 }) {
   Map<String, dynamic> card(
     String id,
@@ -106,20 +112,20 @@ Map<String, dynamic> _buildDeckDetailsJson(
     'description': 'Deck para smoke do fluxo core',
     'is_public': false,
     'created_at': '2026-03-23T00:00:00.000Z',
-    'color_identity': const ['U'],
+    'color_identity': deckColorIdentity,
     'stats': {
       'total_cards': cardsById.values.fold<int>(0, (sum, qty) => sum + qty),
     },
     'commander': [
       card(
         'cmd-1',
-        'Talrand, Sky Summoner',
+        commanderName,
         quantity: 1,
         isCommander: true,
-        colors: const ['U'],
-        colorIdentity: const ['U'],
-        typeLine: 'Legendary Creature — Merfolk Wizard',
-        manaCost: '{2}{U}{U}',
+        colors: commanderColors,
+        colorIdentity: commanderColorIdentity,
+        typeLine: commanderTypeLine,
+        manaCost: commanderManaCost,
       ),
     ],
     'main_board': {
@@ -412,6 +418,17 @@ void main() {
           getHandlers: {
             '/decks/deck-1':
                 () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/cards?name=Arcane+Signet&limit=1':
+                () => ApiResponse(200, {
+                  'data': const [
+                    {
+                      'id': 'add-1',
+                      'name': 'Arcane Signet',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                }),
           },
           postHandlers: {
             '/ai/optimize':
@@ -495,6 +512,111 @@ void main() {
         expect(apiClient.putCalls, contains('/decks/deck-1'));
       },
     );
+
+    test(
+      'applyOptimizationWithIds filters additions outside commander identity',
+      () async {
+        final currentCards = <String, int>{'remove-1': 1, 'land-1': 36};
+
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1':
+                () => ApiResponse(
+                  200,
+                  _buildDeckDetailsJson(
+                    currentCards,
+                    deckColorIdentity: const <String>[],
+                    commanderColors: const <String>[],
+                    commanderColorIdentity: const <String>[],
+                    commanderName: 'Kozilek, the Great Distortion',
+                    commanderManaCost: '{8}{C}{C}',
+                    commanderTypeLine: 'Legendary Creature — Eldrazi',
+                  ),
+                ),
+            '/cards?name=Sol%20Ring&limit=1':
+                () => ApiResponse(200, {
+                  'data': const [
+                    {
+                      'id': 'add-1',
+                      'name': 'Sol Ring',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                }),
+            '/cards?name=Sol+Ring&limit=1':
+                () => ApiResponse(200, {
+                  'data': const [
+                    {
+                      'id': 'add-1',
+                      'name': 'Sol Ring',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                }),
+            '/cards?name=Swan+Song&limit=1':
+                () => ApiResponse(200, {
+                  'data': const [
+                    {
+                      'id': 'illegal-1',
+                      'name': 'Swan Song',
+                      'type_line': 'Instant',
+                      'color_identity': <String>['U'],
+                    },
+                  ],
+                }),
+          },
+          putHandlers: {
+            '/decks/deck-1': (body) {
+              final cards =
+                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              expect(cards.any((entry) => entry['card_id'] == 'add-1'), isTrue);
+              expect(
+                cards.any((entry) => entry['card_id'] == 'illegal-1'),
+                isFalse,
+              );
+              expect(
+                cards.any((entry) => entry['card_id'] == 'remove-1'),
+                isFalse,
+              );
+
+              currentCards
+                ..remove('remove-1')
+                ..['add-1'] = 1;
+
+              return ApiResponse(200, {'ok': true});
+            },
+          },
+          postHandlers: {
+            '/decks/deck-1/validate':
+                (_) => ApiResponse(200, {
+                  'valid': true,
+                  'ok': true,
+                  'errors': const <String>[],
+                }),
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+
+        await provider.fetchDeckDetails('deck-1');
+
+        final applied = await provider.applyOptimizationWithIds(
+          deckId: 'deck-1',
+          removalsDetailed: const [
+            {'card_id': 'remove-1', 'name': 'Mind Stone'},
+          ],
+          additionsDetailed: const [
+            {'card_id': 'add-1', 'name': 'Sol Ring'},
+            {'card_id': 'illegal-1', 'name': 'Swan Song'},
+          ],
+        );
+
+        expect(applied, isTrue);
+        expect(apiClient.putCalls, contains('/decks/deck-1'));
+      },
+    );
   });
 
   group('DeckProvider incremental mutations', () {
@@ -539,39 +661,42 @@ void main() {
       },
     );
 
-    test('deleteDeck removes item from list and clears selected deck', () async {
-      final apiClient = _FakeApiClient(
-        getHandlers: {
-          '/decks': () => ApiResponse(200, [
-            {
-              'id': 'deck-1',
-              'name': 'Smoke Deck',
-              'format': 'commander',
-              'is_public': false,
-              'created_at': '2026-03-23T00:00:00.000Z',
-              'card_count': 37,
-            },
-          ]),
-          '/decks/deck-1': () => ApiResponse(
-            200,
-            _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
-          ),
-        },
-        deleteHandlers: {
-          '/decks/deck-1': () => ApiResponse(204, const {}),
-        },
-      );
+    test(
+      'deleteDeck removes item from list and clears selected deck',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks':
+                () => ApiResponse(200, [
+                  {
+                    'id': 'deck-1',
+                    'name': 'Smoke Deck',
+                    'format': 'commander',
+                    'is_public': false,
+                    'created_at': '2026-03-23T00:00:00.000Z',
+                    'card_count': 37,
+                  },
+                ]),
+            '/decks/deck-1':
+                () => ApiResponse(
+                  200,
+                  _buildDeckDetailsJson({'spell-1': 1, 'land-1': 36}),
+                ),
+          },
+          deleteHandlers: {'/decks/deck-1': () => ApiResponse(204, const {})},
+        );
 
-      final provider = DeckProvider(apiClient: apiClient);
-      await provider.fetchDecks();
-      await provider.fetchDeckDetails('deck-1');
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDecks();
+        await provider.fetchDeckDetails('deck-1');
 
-      final deleted = await provider.deleteDeck('deck-1');
+        final deleted = await provider.deleteDeck('deck-1');
 
-      expect(deleted, isTrue);
-      expect(provider.decks, isEmpty);
-      expect(provider.selectedDeck, isNull);
-    });
+        expect(deleted, isTrue);
+        expect(provider.decks, isEmpty);
+        expect(provider.selectedDeck, isNull);
+      },
+    );
 
     test('refreshAiAnalysis updates selected deck and list', () async {
       final apiClient = _FakeApiClient(
@@ -633,9 +758,10 @@ void main() {
           },
         },
         postHandlers: {
-          '/community/decks/public-1': (_) => ApiResponse(201, {
-            'deck': {'id': 'deck-copy'},
-          }),
+          '/community/decks/public-1':
+              (_) => ApiResponse(201, {
+                'deck': {'id': 'deck-copy'},
+              }),
         },
       );
 

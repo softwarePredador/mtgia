@@ -355,10 +355,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Comandante'), findsOneWidget);
-    expect(
-      find.byIcon(Icons.workspace_premium_rounded),
-      findsOneWidget,
-    );
+    expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
     expect(
       find.text('Carta que define identidade e regras do deck.'),
       findsNothing,
@@ -387,6 +384,17 @@ void main() {
                   name: 'Smoke Deck',
                 ),
               ),
+          '/cards?name=Arcane+Signet&limit=1':
+              () => ApiResponse(200, {
+                'data': const [
+                  {
+                    'id': 'add-1',
+                    'name': 'Arcane Signet',
+                    'type_line': 'Artifact',
+                    'color_identity': <String>[],
+                  },
+                ],
+              }),
         },
         postHandlers: {
           '/decks/deck-1/pricing':
