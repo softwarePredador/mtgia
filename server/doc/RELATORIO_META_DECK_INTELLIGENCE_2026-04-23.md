@@ -203,6 +203,26 @@ Leitura atualizada:
 - o gap de implementacao em `fetch_meta.dart` para parser, validacao segura e reparo de existentes foi fechado
 - o que continua pendente aqui ja nao e parser basico; e cobertura/frescura operacional, backfill da base antiga e expansao de fontes
 
+### Script operacional de backfill
+
+Para rodar reparo em lote dos registros antigos sem improvisar comando manual, o repositorio agora expõe:
+
+- `scripts/backfill_mtgtop8_meta_repairs.sh`
+
+Padrao:
+
+- `dry-run` por default
+- `--apply` para escrita real
+- aceita `--format` ou `--formats`
+- aceita limites curtos para saneamento progressivo
+
+Exemplos:
+
+```bash
+./scripts/backfill_mtgtop8_meta_repairs.sh --formats EDH,cEDH --limit-events 1 --limit-decks 10
+./scripts/backfill_mtgtop8_meta_repairs.sh --apply --formats EDH,cEDH --limit-events 3 --limit-decks 20
+```
+
 ## Cobertura real da base atual
 
 ### Por formato
