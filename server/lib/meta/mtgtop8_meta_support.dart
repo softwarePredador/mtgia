@@ -30,6 +30,29 @@ class MtgTop8EventDeckRow {
   final String deckId;
 }
 
+Map<String, MtgTop8EventDeckRow> extractMtgTop8EventDeckRowsByUrl(
+  Document document, {
+  String baseUrl = mtgTop8BaseUrl,
+  String? defaultFormatCode,
+  int? limit,
+}) {
+  final rows = document.querySelectorAll('div.hover_tr');
+  final selectedRows = limit == null ? rows : rows.take(limit);
+  final parsed = <String, MtgTop8EventDeckRow>{};
+
+  for (final row in selectedRows) {
+    final parsedRow = parseMtgTop8EventDeckRow(
+      row,
+      baseUrl: baseUrl,
+      defaultFormatCode: defaultFormatCode,
+    );
+    if (parsedRow == null) continue;
+    parsed[parsedRow.deckUrl] = parsedRow;
+  }
+
+  return parsed;
+}
+
 List<String> extractRecentMtgTop8EventPaths(
   Document document, {
   int limit = 6,
@@ -104,6 +127,20 @@ String extractMtgTop8Placement(Element row) {
 String resolveMtgTop8Url(String href, {String baseUrl = mtgTop8BaseUrl}) {
   final baseUri = Uri.parse('$baseUrl/');
   return baseUri.resolve(href).toString();
+}
+
+String? extractMtgTop8EventIdFromSourceUrl(String sourceUrl) {
+  final uri = Uri.tryParse(sourceUrl);
+  final eventId = uri?.queryParameters['e']?.trim();
+  if (eventId == null || eventId.isEmpty) return null;
+  return eventId;
+}
+
+String? extractMtgTop8FormatCodeFromSourceUrl(String sourceUrl) {
+  final uri = Uri.tryParse(sourceUrl);
+  final formatCode = uri?.queryParameters['f']?.trim();
+  if (formatCode == null || formatCode.isEmpty) return null;
+  return formatCode;
 }
 
 String? _normalizeEventPath(String href) {

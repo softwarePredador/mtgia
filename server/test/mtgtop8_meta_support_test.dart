@@ -93,6 +93,37 @@ void main() {
 
       expect(parsed, isNull);
     });
+
+    test('extrai mapa de deck rows por source url', () {
+      final document = html_parser.parse('''
+        <div class="hover_tr">
+          <div style="display:flex;align-items:center;">
+            <div class="S14">2</div>
+            <div><a href="?e=100&d=200&f=EDH"><img src="/a.jpg"></a></div>
+            <div><div class="S14"><a href="?e=100&d=200&f=EDH">Deck A</a></div></div>
+          </div>
+        </div>
+        <div class="hover_tr">
+          <div style="display:flex;align-items:center;">
+            <div class="S14">3</div>
+            <div><a href="?e=100&d=201&f=EDH"><img src="/b.jpg"></a></div>
+            <div><div class="S14"><a href="?e=100&d=201&f=EDH">Deck B</a></div></div>
+          </div>
+        </div>
+      ''');
+
+      final parsed = extractMtgTop8EventDeckRowsByUrl(document);
+
+      expect(parsed, hasLength(2));
+      expect(
+        parsed['https://www.mtgtop8.com/?e=100&d=200&f=EDH']?.archetype,
+        'Deck A',
+      );
+      expect(
+        parsed['https://www.mtgtop8.com/?e=100&d=201&f=EDH']?.placement,
+        '3',
+      );
+    });
   });
 
   group('extractMtgTop8Placement', () {
@@ -105,6 +136,15 @@ void main() {
 
       final row = document.querySelector('div.hover_tr')!;
       expect(extractMtgTop8Placement(row), 'Top 16');
+    });
+  });
+
+  group('source url helpers', () {
+    test('extrai event id e format code de source url', () {
+      const sourceUrl = 'https://www.mtgtop8.com/?e=76769&d=782421&f=EDH';
+
+      expect(extractMtgTop8EventIdFromSourceUrl(sourceUrl), '76769');
+      expect(extractMtgTop8FormatCodeFromSourceUrl(sourceUrl), 'EDH');
     });
   });
 }

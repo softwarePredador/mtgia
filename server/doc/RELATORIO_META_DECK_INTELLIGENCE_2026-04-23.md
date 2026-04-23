@@ -208,6 +208,7 @@ Leitura atualizada:
 Para rodar reparo em lote dos registros antigos sem improvisar comando manual, o repositorio agora expõe:
 
 - `scripts/backfill_mtgtop8_meta_repairs.sh`
+- `server/bin/repair_mtgtop8_meta_history.dart`
 
 Padrao:
 
@@ -221,7 +222,37 @@ Exemplos:
 ```bash
 ./scripts/backfill_mtgtop8_meta_repairs.sh --formats EDH,cEDH --limit-events 1 --limit-decks 10
 ./scripts/backfill_mtgtop8_meta_repairs.sh --apply --formats EDH,cEDH --limit-events 3 --limit-decks 20
+cd server && dart run bin/repair_mtgtop8_meta_history.dart --dry-run --formats EDH,cEDH --limit-events 20
+cd server && dart run bin/repair_mtgtop8_meta_history.dart --apply --formats EDH,cEDH --limit-events 50
 ```
+
+## Resultado apos backfill recente e reparo historico
+
+Rodadas executadas:
+
+- backfill recente `EDH,cEDH` com `fetch_meta.dart`
+- reparo historico por `source_url` com `repair_mtgtop8_meta_history.dart`
+
+Estado consolidado observado no banco:
+
+- `meta_decks` total: `641`
+- `EDH`: `162`
+- `cEDH`: `214`
+- `EDH + cEDH`: `376`
+- `blank archetype` total: `265`
+- `blank placement` total: `0`
+- `blank archetype` em `EDH + cEDH`: `0`
+- `blank placement` em `EDH + cEDH`: `0`
+
+Leitura final desta frente:
+
+- a ingestao recente esta funcional
+- o parser atual esta funcional
+- o reparo historico dos registros Commander quebrados foi concluido
+- o que continua aberto agora e principalmente:
+  - expandir fontes alem de `MTGTop8`
+  - melhorar cobertura de combinacoes Commander
+  - decidir se formatos nao Commander tambem precisam de reparo historico total
 
 ## Cobertura real da base atual
 
