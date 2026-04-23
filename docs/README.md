@@ -53,6 +53,11 @@ Este diretório concentra a documentação que ainda orienta decisão e execuç�
   - operacao do corpus estavel Commander
   - gate recorrente de release do fluxo optimize -> rebuild -> validate
 
+- [../server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-23.md](../server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-23.md)
+  - auditoria da ingestao de `meta_decks`
+  - cobertura real por formato e identidade de cor
+  - leitura estrategica do que os decks meta ensinam ao produto
+
 ## Documentos complementares
 
 Esses documentos continuam úteis, mas não definem a prioridade principal sozinhos:
