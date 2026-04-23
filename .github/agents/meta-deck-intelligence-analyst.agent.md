@@ -73,6 +73,7 @@ Read when relevant:
 - Never invent external conclusions; if web research is used, cite the real source category you used and mark anything uncertain as `not proven`.
 - If something is uncertain, mark it explicitly as `not proven`.
 - Do not treat the Commander resolution corpus as an automatic substitute for `meta_decks`.
+- Do not persist exploratory web lists directly into `meta_decks`; stage them in `external_commander_meta_candidates` first when persistence is required.
 - Prefer the smallest focused fix if a pipeline defect is confirmed.
 
 ## Required Outputs
@@ -116,5 +117,6 @@ There is already a reusable operational prompt and shell entrypoint:
 
 - `server/doc/META_DECK_INTELLIGENCE_AGENT_2026-04-23.md`
 - `scripts/run_meta_deck_intelligence_agent.sh`
+- `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
 
 Use those as the execution baseline unless the task explicitly requires a narrower scope.

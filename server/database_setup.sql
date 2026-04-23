@@ -193,6 +193,48 @@ CREATE TABLE IF NOT EXISTS meta_decks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 9.1. Tabela de candidatos externos Commander (pesquisa web controlada)
+-- Armazena listas pesquisadas por agentes/analistas antes de promover para meta_decks.
+-- Mantem status de validacao e payload bruto da pesquisa externa.
+CREATE TABLE IF NOT EXISTS external_commander_meta_candidates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_name TEXT NOT NULL,
+    source_host TEXT,
+    source_url TEXT UNIQUE NOT NULL,
+    deck_name TEXT NOT NULL,
+    commander_name TEXT,
+    partner_commander_name TEXT,
+    format TEXT NOT NULL DEFAULT 'commander',
+    subformat TEXT, -- 'edh' | 'cedh'
+    archetype TEXT,
+    card_list TEXT NOT NULL,
+    placement TEXT,
+    color_identity TEXT[] DEFAULT '{}',
+    is_commander_legal BOOLEAN,
+    validation_status TEXT NOT NULL DEFAULT 'candidate',
+    validation_notes TEXT,
+    research_payload JSONB NOT NULL DEFAULT '{}',
+    imported_by TEXT NOT NULL DEFAULT 'copilot_cli_web_agent',
+    promoted_to_meta_decks_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_external_commander_meta_status CHECK (
+        validation_status IN ('candidate', 'validated', 'rejected', 'promoted')
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_status
+ON external_commander_meta_candidates (validation_status);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_subformat
+ON external_commander_meta_candidates (subformat);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_commander
+ON external_commander_meta_candidates (commander_name);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_color_identity
+ON external_commander_meta_candidates USING GIN (color_identity);
+
 -- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
 -- Armazena as cartas mais populares de cada formato, atualizada semanalmente
 -- Para evitar hardcoded staples e manter dados sempre atualizados

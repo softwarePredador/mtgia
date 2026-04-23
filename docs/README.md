@@ -58,6 +58,10 @@ Este diretório concentra a documentação que ainda orienta decisão e execuç�
   - cobertura real por formato e identidade de cor
   - leitura estrategica do que os decks meta ensinam ao produto
 
+- [../server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md](../server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md)
+  - fluxo controlado para pesquisa web multi-fonte de Commander/cEDH
+  - persistencia intermediaria antes de promover para `meta_decks`
+
 ## Documentos complementares
 
 Esses documentos continuam úteis, mas não definem a prioridade principal sozinhos:

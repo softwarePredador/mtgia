@@ -85,6 +85,11 @@ Create or update a report in:
 
 - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_<date>.md`
 
+When the task requires persistence, stage researched lists in:
+
+- `external_commander_meta_candidates`
+- workflow: `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+
 The report must include:
 
 - web sources consulted

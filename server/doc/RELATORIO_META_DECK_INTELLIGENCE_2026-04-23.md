@@ -236,6 +236,20 @@ Portanto:
 
 - `meta_decks` hoje **nao** pode ser tratado como base completa de cobertura de cores/combinacoes
 
+## Decisao estrutural aplicada nesta rodada
+
+Para nao misturar pesquisa web exploratoria com o corpus principal do motor, o repositorio agora tem uma fila controlada separada:
+
+- tabela `external_commander_meta_candidates`
+- migration `server/bin/migrate_external_commander_meta_candidates.dart`
+- import controlado `server/bin/import_external_commander_meta_candidates.dart`
+- workflow `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+
+Regra nova:
+
+- pesquisa web multi-fonte entra primeiro em `external_commander_meta_candidates`
+- so candidatos `validated` podem ser promovidos para `meta_decks`
+
 ## O que os decks meta ensinam
 
 Mesmo com cobertura incompleta, a base ainda e util para aprender:
