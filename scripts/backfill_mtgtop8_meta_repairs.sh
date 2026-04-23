@@ -67,12 +67,17 @@ cd "$SERVER_DIR"
 
 for format in "${formats[@]}"; do
   echo "=== $format ==="
-  dart run bin/fetch_meta.dart "$format" \
-    --refresh-existing \
-    "${mode_args[@]}" \
-    --limit-events="$limit_events" \
-    --limit-decks="$limit_decks" \
-    --delay-event-ms="$delay_event_ms" \
+  cmd=(
+    dart run bin/fetch_meta.dart "$format"
+    --refresh-existing
+    --limit-events="$limit_events"
+    --limit-decks="$limit_decks"
+    --delay-event-ms="$delay_event_ms"
     --delay-deck-ms="$delay_deck_ms"
+  )
+  if [[ "$apply" -eq 0 ]]; then
+    cmd+=(--dry-run)
+  fi
+  "${cmd[@]}"
   echo
 done
