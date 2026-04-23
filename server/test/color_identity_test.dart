@@ -29,6 +29,18 @@ void main() {
       );
     });
 
+    test('infers colored identity from mana cost when db fields are empty', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          manaCost: '{U}',
+          oracleText: 'Counter target enchantment, instant, or sorcery spell.',
+        ),
+        equals({'U'}),
+      );
+    });
+
     test('treats {C} as colorless identity, not as a commander color', () {
       expect(
         resolveCardColorIdentity(
@@ -40,7 +52,8 @@ void main() {
       );
     });
 
-    test('ignores mana symbols that appear only inside inline reminder text', () {
+    test('ignores mana symbols that appear only inside inline reminder text',
+        () {
       expect(
         resolveCardColorIdentity(
           colorIdentity: const <String>[],

@@ -194,8 +194,11 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     if (isCmdr) {
       commanders.add(name);
       commanderColorIdentity.addAll(
-        normalizeColorIdentity(
-          colorIdentity.isNotEmpty ? colorIdentity : colors,
+        resolveCardColorIdentity(
+          colorIdentity: colorIdentity,
+          colors: colors,
+          manaCost: manaCost,
+          oracleText: oracleText,
         ),
       );
     } else {
@@ -216,18 +219,25 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     final inferredFromDeck = normalizeColorIdentity(deckColors.toList());
     if (inferredFromDeck.isNotEmpty) {
       commanderColorIdentity.addAll(inferredFromDeck);
-    } else {
+    } else if (commanders.isEmpty) {
       commanderColorIdentity.addAll(const {'W', 'U', 'B', 'R', 'G'});
+    } else {
+      Log.i(
+        'Commander color identity preservada como colorless. '
+        'commanders=${commanders.join(' | ')}',
+      );
     }
 
     final reason = commanders.isNotEmpty
         ? 'commander sem color_identity detectável'
         : 'deck sem is_commander marcado';
-    Log.w(
-      'Color identity fallback aplicado ($reason) para evitar complete degradado. '
-      'commanders=${commanders.join(' | ')} '
-      'identity=${commanderColorIdentity.join(',')}',
-    );
+    if (commanders.isEmpty) {
+      Log.w(
+        'Color identity fallback aplicado ($reason) para evitar complete degradado. '
+        'commanders=${commanders.join(' | ')} '
+        'identity=${commanderColorIdentity.join(',')}',
+      );
+    }
   }
 
   final themeProfileFuture = telemetry?.trackAsync(

@@ -20,16 +20,13 @@ Set<String> normalizeColorIdentity(Iterable<String> identity) {
 
 Set<String> extractColorIdentityFromText(String? text) {
   if (text == null || text.trim().isEmpty) return <String>{};
-  final sanitized = text
-      .split('\n')
-      .map((line) {
-        final trimmed = line.trim();
-        if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
-          return trimmed;
-        }
-        return line.replaceAll(RegExp(r'\([^)]*\)'), '');
-      })
-      .join('\n');
+  final sanitized = text.split('\n').map((line) {
+    final trimmed = line.trim();
+    if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
+      return trimmed;
+    }
+    return line.replaceAll(RegExp(r'\([^)]*\)'), '');
+  }).join('\n');
   final symbols = RegExp(r'\{([^}]+)\}')
       .allMatches(sanitized)
       .map((match) => match.group(1) ?? '')
@@ -41,10 +38,12 @@ Set<String> resolveCardColorIdentity({
   Iterable<String> colorIdentity = const <String>[],
   Iterable<String> colors = const <String>[],
   String? oracleText,
+  String? manaCost,
 }) {
   final resolved = <String>{};
   resolved.addAll(normalizeColorIdentity(colorIdentity));
   resolved.addAll(normalizeColorIdentity(colors));
+  resolved.addAll(extractColorIdentityFromText(manaCost));
   resolved.addAll(extractColorIdentityFromText(oracleText));
   return resolved;
 }

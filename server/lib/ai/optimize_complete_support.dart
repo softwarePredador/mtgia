@@ -95,8 +95,9 @@ Future<void> prepareCompleteCommanderSeed({
       extractRecommendedLandsFromProfile(commanderReferenceProfile);
 
   if (targetAdditionsForComplete >= 40) {
-    final recommended = (state.commanderRecommendedLands ?? 38).clamp(28, 42);
-    state.maxBasicAdditions = recommended + 6;
+    state.maxBasicAdditions = calculateCompleteMaxBasicAdditions(
+      state.commanderRecommendedLands,
+    );
   }
 
   final averageDeckSeedNames = extractAverageDeckSeedNamesFromProfile(
@@ -151,6 +152,194 @@ Future<void> prepareCompleteCommanderSeed({
     } catch (e) {
       Log.w('Falha ao carregar EDHREC live para fallback complete: $e');
     }
+  }
+}
+
+int calculateCompleteMaxBasicAdditions(int? commanderRecommendedLands) {
+  final recommended = (commanderRecommendedLands ?? 38).clamp(28, 42);
+  final buffered = recommended + 4;
+  return buffered > 40 ? 40 : buffered;
+}
+
+Map<String, int> _buildColorDemandMap({
+  required List<Map<String, dynamic>> currentDeck,
+  required Set<String> commanderColorIdentity,
+}) {
+  final demand = <String, int>{};
+  for (final color in commanderColorIdentity) {
+    demand[color] = 0;
+  }
+
+  for (final card in currentDeck) {
+    final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
+    if (typeLine.contains('land')) continue;
+
+    final quantity = (card['quantity'] as int?) ?? 1;
+    final manaCost = (card['mana_cost'] as String?) ?? '';
+    final explicitSymbols = <String, int>{};
+    for (final color in commanderColorIdentity) {
+      final symbolCount = RegExp(
+        '\\{${color.toLowerCase()}\\}',
+        caseSensitive: false,
+      ).allMatches(manaCost).length;
+      if (symbolCount > 0) {
+        explicitSymbols[color] = symbolCount * quantity;
+      }
+    }
+
+    if (explicitSymbols.isNotEmpty) {
+      for (final entry in explicitSymbols.entries) {
+        demand[entry.key] = (demand[entry.key] ?? 0) + entry.value;
+      }
+      continue;
+    }
+
+    final fallbackIdentity = resolvedCardIdentity(card)
+        .where(commanderColorIdentity.contains)
+        .toSet();
+    if (fallbackIdentity.isEmpty) continue;
+
+    final fallbackWeight =
+        fallbackIdentity.length == 1 ? 2 * quantity : quantity;
+    for (final color in fallbackIdentity) {
+      demand[color] = (demand[color] ?? 0) + fallbackWeight;
+    }
+  }
+
+  return demand;
+}
+
+List<String> buildWeightedBasicLandPlan({
+  required List<Map<String, dynamic>> currentDeck,
+  required Set<String> commanderColorIdentity,
+  required int slotsToAdd,
+}) {
+  if (slotsToAdd <= 0) return const [];
+  if (commanderColorIdentity.isEmpty) {
+    return List<String>.filled(slotsToAdd, 'Wastes');
+  }
+
+  final colors = commanderColorIdentity.toList()..sort();
+  final analyzer = DeckArchetypeAnalyzerCore(currentDeck, colors);
+  final manaBase = analyzer.analyzeManaBase();
+  final rawSymbols = _buildColorDemandMap(
+    currentDeck: currentDeck,
+    commanderColorIdentity: commanderColorIdentity,
+  );
+  final rawSources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+      const <String, int>{};
+  final projectedSources = <String, int>{};
+  for (final color in colors) {
+    projectedSources[color] = rawSources[color] ?? 0;
+  }
+  final anySource = rawSources['Any'] ?? 0;
+  final totalSymbols = colors.fold<int>(
+    0,
+    (sum, color) => sum + (rawSymbols[color] ?? 0),
+  );
+  final plan = <String>[];
+
+  for (var i = 0; i < slotsToAdd; i++) {
+    String? bestColor;
+    var bestScore = -1 << 30;
+
+    for (final color in colors) {
+      final symbolCount = rawSymbols[color] ?? 0;
+      final sourceCount = (projectedSources[color] ?? 0) + anySource;
+      final percent = totalSymbols > 0 ? symbolCount / totalSymbols : 0.0;
+      final targetSources = symbolCount <= 0
+          ? 6
+          : percent > 0.30
+              ? 15
+              : percent > 0.10
+                  ? 10
+                  : 8;
+      final deficit = targetSources - sourceCount;
+      final score = (deficit * 100) + (symbolCount * 3) - sourceCount;
+      if (bestColor == null || score > bestScore) {
+        bestColor = color;
+        bestScore = score;
+      }
+    }
+
+    final chosenColor = bestColor ?? colors.first;
+    plan.add(basicLandNameForColor(chosenColor));
+    projectedSources[chosenColor] = (projectedSources[chosenColor] ?? 0) + 1;
+  }
+
+  return plan;
+}
+
+Future<void> _addBasicLandPlanToVirtualDeck({
+  required Pool pool,
+  required CompleteBuildAccumulator state,
+  required List<String> basicPlan,
+}) async {
+  if (basicPlan.isEmpty) return;
+  final basicsWithIds =
+      await loadBasicLandIds(pool, basicPlan.toSet().toList());
+  if (basicsWithIds.isEmpty) return;
+
+  for (final name in basicPlan) {
+    final id = basicsWithIds[name];
+    if (id == null) continue;
+    _addCardToVirtualDeck(
+      state: state,
+      id: id,
+      name: name,
+      typeLine: 'Basic Land',
+      oracleText: '',
+      colors: const <String>[],
+      colorIdentity: const <String>[],
+      isBasic: true,
+    );
+  }
+}
+
+Future<void> _addIdentitySafeNonBasicLands({
+  required Pool pool,
+  required CompleteBuildAccumulator state,
+  required Set<String> commanderColorIdentity,
+  required String deckFormat,
+  required int limit,
+}) async {
+  if (limit <= 0) return;
+
+  final excludeNames = state.virtualDeck
+      .map((c) => ((c['name'] as String?) ?? '').trim().toLowerCase())
+      .where((name) => name.isNotEmpty)
+      .toSet();
+  final fillers = await loadIdentitySafeNonBasicLandFillers(
+    pool: pool,
+    commanderColorIdentity: commanderColorIdentity,
+    excludeNames: excludeNames,
+    limit: limit,
+  );
+
+  var added = 0;
+  for (final filler in fillers) {
+    if (added >= limit) break;
+    final id = filler['id'] as String;
+    final name = filler['name'] as String;
+    final lowerName = name.toLowerCase();
+    final maxCopies = maxCopiesForFormat(
+      deckFormat: deckFormat,
+      typeLine: filler['type_line'] as String? ?? '',
+      name: name,
+    );
+    if ((state.virtualCountsByName[lowerName] ?? 0) >= maxCopies) continue;
+
+    _addCardToVirtualDeck(
+      state: state,
+      id: id,
+      name: name,
+      typeLine: filler['type_line'] as String? ?? '',
+      oracleText: filler['oracle_text'] as String? ?? '',
+      colors: (filler['colors'] as List?)?.cast<String>() ?? const [],
+      colorIdentity:
+          (filler['color_identity'] as List?)?.cast<String>() ?? const [],
+    );
+    added += 1;
   }
 }
 
@@ -219,28 +408,26 @@ Future<void> runCompleteAiSuggestionLoop({
       state.virtualTotal < maxTotal) {
     state.iterations++;
     final missingNow = maxTotal - state.virtualTotal;
-    final requestedAdditions = isSparseInput &&
-            missingNow > sparseInputTargetAdditionsCap
-        ? sparseInputTargetAdditionsCap
-        : missingNow;
+    final requestedAdditions =
+        isSparseInput && missingNow > sparseInputTargetAdditionsCap
+            ? sparseInputTargetAdditionsCap
+            : missingNow;
 
     Map<String, dynamic> iterResponse;
     try {
-      iterResponse = await optimizer
-          .completeDeck(
-            deckData: {
-              'cards': state.virtualDeck,
-              'colors': deckColors.toList(),
-            },
-            commanders: commanders,
-            targetArchetype: targetArchetype,
-            targetAdditions: requestedAdditions,
-            bracket: bracket,
-            keepTheme: keepTheme,
-            detectedTheme: detectedTheme,
-            coreCards: coreCards,
-          )
-          .timeout(aiTimeout);
+      iterResponse = await optimizer.completeDeck(
+        deckData: {
+          'cards': state.virtualDeck,
+          'colors': deckColors.toList(),
+        },
+        commanders: commanders,
+        targetArchetype: targetArchetype,
+        targetAdditions: requestedAdditions,
+        bracket: bracket,
+        keepTheme: keepTheme,
+        detectedTheme: detectedTheme,
+        coreCards: coreCards,
+      ).timeout(aiTimeout);
     } catch (e) {
       Log.w(
         'Falha no completeDeck da IA; aplicando fallback determinístico. '
@@ -409,10 +596,10 @@ Future<int> _bootstrapSparseCompleteInput({
 
   void addUnique(Iterable<Map<String, dynamic>> items) {
     for (final item in items) {
-      final lowerName =
-          ((item['name'] as String?) ?? '').trim().toLowerCase();
+      final lowerName = ((item['name'] as String?) ?? '').trim().toLowerCase();
       if (lowerName.isEmpty) continue;
-      if (existingNames.contains(lowerName) || selectedNames.contains(lowerName)) {
+      if (existingNames.contains(lowerName) ||
+          selectedNames.contains(lowerName)) {
         continue;
       }
       selected.add(item);
@@ -683,7 +870,8 @@ Future<void> fillCompleteDeckRemainder({
       }
 
       if (selectedSpells.length < spellsNeeded) {
-        final foundationFallback = await loadArchetypeCommanderFoundationFillers(
+        final foundationFallback =
+            await loadArchetypeCommanderFoundationFillers(
           pool: pool,
           commanderColorIdentity: commanderColorIdentity,
           targetArchetype: targetArchetype,
@@ -793,28 +981,32 @@ Future<void> fillCompleteDeckRemainder({
         (idealLands - currentLands).clamp(0, maxTotal - state.virtualTotal);
     final remainingBasicBudget =
         (state.maxBasicAdditions - state.basicAddedDuringBuild).clamp(0, 999);
+    if (landsToAdd > 0) {
+      final nonBasicLimit = landsToAdd > 8 ? 8 : landsToAdd;
+      final beforeNonBasic = state.virtualTotal;
+      await _addIdentitySafeNonBasicLands(
+        pool: pool,
+        state: state,
+        commanderColorIdentity: commanderColorIdentity,
+        deckFormat: deckFormat,
+        limit: nonBasicLimit,
+      );
+      final addedNonBasicLands = state.virtualTotal - beforeNonBasic;
+      landsToAdd -= addedNonBasicLands;
+    }
+
     landsToAdd = landsToAdd.clamp(0, remainingBasicBudget);
-    final basicNames = basicLandNamesForIdentity(commanderColorIdentity);
-    final basicsWithIds = await loadBasicLandIds(pool, basicNames);
-    if (basicsWithIds.isNotEmpty) {
-      final keys = basicsWithIds.keys.toList();
-      var i = 0;
-      while (landsToAdd > 0) {
-        final name = keys[i % keys.length];
-        final id = basicsWithIds[name]!;
-        _addCardToVirtualDeck(
-          state: state,
-          id: id,
-          name: name,
-          typeLine: 'Basic Land',
-          oracleText: '',
-          colors: const <String>[],
-          colorIdentity: const <String>[],
-          isBasic: true,
-        );
-        landsToAdd--;
-        i++;
-      }
+    if (landsToAdd > 0) {
+      final basicPlan = buildWeightedBasicLandPlan(
+        currentDeck: state.virtualDeck,
+        commanderColorIdentity: commanderColorIdentity,
+        slotsToAdd: landsToAdd,
+      );
+      await _addBasicLandPlanToVirtualDeck(
+        pool: pool,
+        state: state,
+        basicPlan: basicPlan,
+      );
     }
   }
 
@@ -900,27 +1092,36 @@ Future<void> fillCompleteDeckRemainder({
   }
 
   if (state.virtualTotal < maxTotal) {
-    final basicNames = basicLandNamesForIdentity(commanderColorIdentity);
-    final basicsWithIds = await loadBasicLandIds(pool, basicNames);
-    if (basicsWithIds.isNotEmpty) {
-      state.guaranteedBasicsStageUsed = true;
-      final keys = basicsWithIds.keys.toList();
-      var i = 0;
-      while (state.virtualTotal < maxTotal &&
-          state.basicAddedDuringBuild < state.maxBasicAdditions) {
-        final name = keys[i % keys.length];
-        final id = basicsWithIds[name]!;
-        _addCardToVirtualDeck(
+    final remaining = maxTotal - state.virtualTotal;
+    await _addIdentitySafeNonBasicLands(
+      pool: pool,
+      state: state,
+      commanderColorIdentity: commanderColorIdentity,
+      deckFormat: deckFormat,
+      limit: remaining,
+    );
+  }
+
+  if (state.virtualTotal < maxTotal) {
+    final remainingBasicBudget =
+        (state.maxBasicAdditions - state.basicAddedDuringBuild).clamp(0, 999);
+    var slotsToAdd = maxTotal - state.virtualTotal;
+    if (slotsToAdd > remainingBasicBudget) {
+      slotsToAdd = remainingBasicBudget;
+    }
+    if (slotsToAdd > 0) {
+      final basicPlan = buildWeightedBasicLandPlan(
+        currentDeck: state.virtualDeck,
+        commanderColorIdentity: commanderColorIdentity,
+        slotsToAdd: slotsToAdd,
+      );
+      if (basicPlan.isNotEmpty) {
+        state.guaranteedBasicsStageUsed = true;
+        await _addBasicLandPlanToVirtualDeck(
+          pool: pool,
           state: state,
-          id: id,
-          name: name,
-          typeLine: 'Basic Land',
-          oracleText: '',
-          colors: const <String>[],
-          colorIdentity: const <String>[],
-          isBasic: true,
+          basicPlan: basicPlan,
         );
-        i++;
       }
     }
   }
@@ -1041,9 +1242,7 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'basic_added': basicAdded,
       'non_basic_added': nonBasicAdded,
     };
-  } else if (targetTotal >= 40 &&
-      basicAdded >
-          ((state.commanderRecommendedLands ?? 38).clamp(28, 42) + 6)) {
+  } else if (targetTotal >= 40 && basicAdded > state.maxBasicAdditions) {
     qualityError = {
       'code': 'COMPLETE_QUALITY_BASIC_OVERFLOW',
       'message':
