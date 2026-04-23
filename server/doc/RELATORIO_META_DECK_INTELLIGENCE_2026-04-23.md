@@ -159,6 +159,50 @@ Conclusao tecnica:
 - a rotina de busca funciona parcialmente
 - a rotina de persistencia semantica nao esta saudavel
 
+## Atualizacao apos hardening do crawler
+
+Nesta mesma data, o crawler foi endurecido em:
+
+- `server/lib/meta/mtgtop8_meta_support.dart`
+- `server/bin/fetch_meta.dart`
+- `server/routes/ai/commander-reference/index.dart`
+
+Melhorias aplicadas:
+
+- parser compartilhado para `event links`, `deck rows` e `placement`
+- `fetch_meta.dart` com `--dry-run`
+- `fetch_meta.dart` com `--refresh-existing`
+- `fetch_meta.dart` com `--limit-events` e `--limit-decks`
+- validacao live sem escrita obrigatoria em banco
+- eliminacao do drift entre o script de fetch e o refresh de `commander-reference`
+
+### Validacao do hardening
+
+Comandos rodados:
+
+```bash
+cd server && dart test test/mtgtop8_meta_support_test.dart
+cd server && dart analyze lib/meta/mtgtop8_meta_support.dart bin/fetch_meta.dart routes/ai/commander-reference/index.dart test/mtgtop8_meta_support_test.dart
+cd server && dart run bin/fetch_meta.dart EDH --dry-run --limit-events=1 --limit-decks=3 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/fetch_meta.dart EDH --limit-events=1 --limit-decks=1 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/fetch_meta.dart EDH --refresh-existing --limit-events=1 --limit-decks=1 --delay-event-ms=0 --delay-deck-ms=0
+```
+
+Prova observada:
+
+- `dry-run` validou `3` decks reais do evento `83905`
+- `placement` foi extraido como `2`, `3` e `4`
+- uma importacao real curta inseriu `Spider-man 2099`
+- um registro existente corrompido foi reparado com `--refresh-existing`
+- `meta_decks` passou para `326`
+- `max(created_at)` passou para `2026-04-23`
+
+Leitura atualizada:
+
+- a busca `MTGTop8 -> parser -> export -> insert` ficou comprovada ponta a ponta
+- o gap de implementacao em `fetch_meta.dart` para parser, validacao segura e reparo de existentes foi fechado
+- o que continua pendente aqui ja nao e parser basico; e cobertura/frescura operacional, backfill da base antiga e expansao de fontes
+
 ## Cobertura real da base atual
 
 ### Por formato

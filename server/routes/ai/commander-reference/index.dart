@@ -8,6 +8,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/meta/mtgtop8_meta_support.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -20,7 +21,8 @@ Future<Response> onRequest(RequestContext context) async {
     final limitRaw = uri.queryParameters['limit'];
     final limit = (int.tryParse(limitRaw ?? '') ?? 40).clamp(5, 200);
     final refresh = (uri.queryParameters['refresh'] ?? '').toLowerCase();
-    final shouldRefresh = refresh == '1' || refresh == 'true' || refresh == 'yes';
+    final shouldRefresh =
+        refresh == '1' || refresh == 'true' || refresh == 'yes';
 
     if (commander.isEmpty) {
       return badRequest('Query parameter commander is required.');
@@ -75,15 +77,16 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     if (decks.isEmpty) {
-      final needsCacheUpgrade =
-          cachedProfile != null && !_hasExtendedCommanderReferenceBase(cachedProfile);
+      final needsCacheUpgrade = cachedProfile != null &&
+          !_hasExtendedCommanderReferenceBase(cachedProfile);
 
-      final edhrecProfile = (shouldRefresh || cachedProfile == null || needsCacheUpgrade)
-          ? await _buildAndPersistEdhrecProfile(
-              pool: pool,
-              commander: commander,
-            )
-          : cachedProfile;
+      final edhrecProfile =
+          (shouldRefresh || cachedProfile == null || needsCacheUpgrade)
+              ? await _buildAndPersistEdhrecProfile(
+                  pool: pool,
+                  commander: commander,
+                )
+              : cachedProfile;
 
       if (edhrecProfile != null) {
         final edhrecCards = (edhrecProfile['top_cards'] as List?)
@@ -148,7 +151,8 @@ Future<Response> onRequest(RequestContext context) async {
           'meta_decks_found': 0,
           'reference_cards': <Map<String, dynamic>>[],
           'sample_decks': <Map<String, dynamic>>[],
-          'message': 'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
+          'message':
+              'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
           if (cachedProfile != null) 'commander_profile': cachedProfile,
         });
       }
@@ -306,7 +310,8 @@ Future<Map<String, dynamic>?> _loadCommanderProfileCache({
 
   if (result.isEmpty) return null;
   final payload = result.first[0];
-  if (payload is Map<String, dynamic>) return Map<String, dynamic>.from(payload);
+  if (payload is Map<String, dynamic>)
+    return Map<String, dynamic>.from(payload);
   if (payload is Map) return payload.cast<String, dynamic>();
   return null;
 }
@@ -327,7 +332,8 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
     final category = card.category;
     final inclusion = card.inclusion <= 0 ? 0.001 : card.inclusion;
     if (category != 'lands') {
-      nonLandCategories[category] = (nonLandCategories[category] ?? 0) + inclusion;
+      nonLandCategories[category] =
+          (nonLandCategories[category] ?? 0) + inclusion;
     }
     if (category == 'lands') continue;
     topCards.add({
@@ -360,14 +366,16 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
   final totalWeight = nonLandCategories.values.fold<double>(0, (a, b) => a + b);
   if (totalWeight > 0) {
     for (final entry in nonLandCategories.entries) {
-      categoryTargets[entry.key] = ((entry.value / totalWeight) * nonLandTarget).round();
+      categoryTargets[entry.key] =
+          ((entry.value / totalWeight) * nonLandTarget).round();
     }
   }
 
   var sumTargets = categoryTargets.values.fold<int>(0, (a, b) => a + b);
   if (sumTargets < nonLandTarget && categoryTargets.isNotEmpty) {
     final ordered = categoryTargets.entries.toList()
-      ..sort((a, b) => (nonLandCategories[b.key] ?? 0).compareTo(nonLandCategories[a.key] ?? 0));
+      ..sort((a, b) => (nonLandCategories[b.key] ?? 0)
+          .compareTo(nonLandCategories[a.key] ?? 0));
     var i = 0;
     while (sumTargets < nonLandTarget) {
       final key = ordered[i % ordered.length].key;
@@ -448,7 +456,10 @@ bool _hasExtendedCommanderReferenceBase(Map<String, dynamic> profile) {
   final hasCurve = profile['mana_curve'] is Map;
   final hasAverageDeckSeed = profile['average_deck_seed'] is List;
   final referenceBases = profile['reference_bases'];
-  if (!hasAverage || !hasCurve || !hasAverageDeckSeed || referenceBases is! Map) {
+  if (!hasAverage ||
+      !hasCurve ||
+      !hasAverageDeckSeed ||
+      referenceBases is! Map) {
     return false;
   }
   final category = referenceBases['category']?.toString().toLowerCase();
@@ -459,7 +470,6 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
   required Pool pool,
   required String commander,
 }) async {
-  const baseUrl = 'https://www.mtgtop8.com';
   const formats = ['EDH', 'cEDH'];
 
   final commanderToken = commander.split(',').first.trim().toLowerCase();
@@ -479,22 +489,16 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
   var matchedCommander = false;
 
   for (final formatCode in formats) {
-    final formatUrl = '$baseUrl/format?f=$formatCode';
+    final formatUrl = '$mtgTop8BaseUrl/format?f=$formatCode';
     final formatRes = await http.get(Uri.parse(formatUrl));
     if (formatRes.statusCode != 200) continue;
 
     final formatDoc = html_parser.parse(formatRes.body);
-    final eventLinks = formatDoc
-        .querySelectorAll('a[href*="event?e="]')
-        .map((e) => e.attributes['href'])
-        .whereType<String>()
-        .toSet()
-        .take(3)
-        .toList();
+    final eventLinks = extractRecentMtgTop8EventPaths(formatDoc, limit: 3);
 
     for (final eventPath in eventLinks) {
       scannedEvents += 1;
-      final eventUrl = '$baseUrl/$eventPath';
+      final eventUrl = resolveMtgTop8Url(eventPath);
       final eventRes = await http.get(Uri.parse(eventUrl));
       if (eventRes.statusCode != 200) continue;
 
@@ -502,13 +506,14 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
       final rows = eventDoc.querySelectorAll('div.hover_tr').take(10).toList();
 
       for (final row in rows) {
-        final link = row.querySelector('a');
-        if (link == null) continue;
-        final href = link.attributes['href'];
-        if (href == null || !href.contains('&d=')) continue;
+        final parsedRow = parseMtgTop8EventDeckRow(
+          row,
+          defaultFormatCode: formatCode,
+        );
+        if (parsedRow == null) continue;
 
         scannedDecks += 1;
-        final deckUrl = '$baseUrl/$href';
+        final deckUrl = parsedRow.deckUrl;
 
         final exists = await pool.execute(
           Sql.named('SELECT 1 FROM meta_decks WHERE source_url = @url LIMIT 1'),
@@ -516,11 +521,7 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
         );
         if (exists.isNotEmpty) continue;
 
-        final deckUri = Uri.parse(deckUrl);
-        final deckId = deckUri.queryParameters['d'];
-        if (deckId == null || deckId.isEmpty) continue;
-
-        final exportUrl = '$baseUrl/mtgo?d=$deckId';
+        final exportUrl = '$mtgTop8BaseUrl/mtgo?d=${parsedRow.deckId}';
         final exportRes = await http.get(Uri.parse(exportUrl));
         if (exportRes.statusCode != 200) continue;
 
@@ -530,9 +531,6 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
         }
 
         matchedCommander = true;
-        final placement = _extractPlacement(row);
-        final archetype = link.text.trim();
-
         await pool.execute(
           Sql.named('''
             INSERT INTO meta_decks (format, archetype, source_url, card_list, placement)
@@ -540,11 +538,11 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
             ON CONFLICT (source_url) DO NOTHING
           '''),
           parameters: {
-            'format': deckUri.queryParameters['f'] ?? formatCode,
-            'archetype': archetype,
+            'format': parsedRow.formatCode,
+            'archetype': parsedRow.archetype,
             'url': deckUrl,
             'list': cardList,
-            'placement': placement,
+            'placement': parsedRow.placement,
           },
         );
 
@@ -560,17 +558,6 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
     'scanned_decks': scannedDecks,
     'matched_commander': matchedCommander,
   };
-}
-
-String _extractPlacement(dynamic row) {
-  try {
-    final divs = row.querySelectorAll('div');
-    if (divs.isNotEmpty) {
-      final p = divs.first.text.trim();
-      if (p.isNotEmpty) return p;
-    }
-  } catch (_) {}
-  return '?';
 }
 
 bool _deckListContainsCommander(String cardList, String commanderToken) {
