@@ -187,11 +187,20 @@ CREATE TABLE IF NOT EXISTS meta_decks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     format TEXT NOT NULL, -- 'standard', 'commander', etc.
     archetype TEXT, -- Ex: 'Rakdos Midrange', 'Mono Red Aggro'
+    commander_name TEXT, -- Derivado para EDH/cEDH sem sobrescrever archetype legado
+    partner_commander_name TEXT, -- Segundo comandante quando houver partner/background
+    shell_label TEXT, -- Label canonico do shell de comandante
+    strategy_archetype TEXT, -- Heuristica separada do shell/rotulo bruto
     source_url TEXT UNIQUE NOT NULL, -- URL de origem para evitar duplicatas
     card_list TEXT NOT NULL, -- Lista de cartas em texto puro (formato de importação)
     placement TEXT, -- Posição no torneio (ex: '1', 'Top 8')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS commander_name TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS partner_commander_name TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS shell_label TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS strategy_archetype TEXT;
 
 -- 9.1. Tabela de candidatos externos Commander (pesquisa web controlada)
 -- Armazena listas pesquisadas por agentes/analistas antes de promover para meta_decks.

@@ -1,6 +1,63 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Extracao derivada de commander shell para `meta_decks` EDH/cEDH
+
+### O Porquê
+- A auditoria de `meta_decks` provou que, em `EDH` e `cEDH`, o campo `archetype` vindo do MTGTop8 e majoritariamente um rotulo de comandante/shell (`Kraum + Tymna`, `Spider-man 2099`, `Kinnan, Bonder Prodigy`) e nao uma taxonomia estrategica estavel.
+- Isso criava um problema de semantica em cadeia: `optimize`, `commander-reference`, `generate`, `extract_meta_insights` e os relatorios locais acabavam tratando label de shell como se fosse estrategia.
+- Era necessario separar shell de estrategia sem sobrescrever `archetype`, para preservar compatibilidade com o corpus legado e ao mesmo tempo expor sinais mais uteis para `optimize` e `generate`.
+
+### O Como
+- Foi criado `server/lib/meta/meta_deck_commander_shell_support.dart` com helper puro para derivar, apenas em `EDH/cEDH`:
+  - `commander_name`
+  - `partner_commander_name`
+  - `shell_label`
+  - `strategy_archetype`
+- A derivacao segue prioridade:
+  1. zona de comandante do export do MTGTop8 (`Sideboard` em Commander/cEDH);
+  2. fallback para o label cru (`archetype`) quando o export nao expõe o(s) comandante(s) de forma estruturada.
+- A mesma helper tambem passou a resolver fallback entre valores persistidos e derivados (`resolveCommanderShellMetadata`) e a decidir quando um row precisa de refresh (`metaDeckNeedsCommanderShellRefresh`).
+- `server/bin/migrate_meta_decks.dart` e `server/database_setup.sql` passaram a garantir as novas colunas e indices focados em `commander_name` / `partner_commander_name`.
+- `server/bin/fetch_meta.dart` agora persiste os campos derivados ao importar decks novos e tambem os repara em `--refresh-existing`, sem tocar no significado do `archetype`.
+- `server/bin/repair_mtgtop8_meta_history.dart` foi ampliado para backfill dos campos derivados em `EDH/cEDH`; na rodada aplicada hoje o script reparou `376` rows Commander sem `missing_matches`.
+- `server/bin/extract_meta_insights.dart` deixou de sobrescrever semanticamente `archetype` em Commander: ele preserva o rotulo bruto, carrega `shell_label`/`strategy_archetype` e usa `analytics_archetype` derivado para as agregacoes internas.
+- `server/lib/ai/optimize_runtime_support.dart` passou a consultar `commander_name`, `partner_commander_name` e `shell_label` antes de cair para busca por `card_list`/`archetype`, melhorando o seed competitivo de Commander.
+- `server/routes/ai/commander-reference/index.dart` agora busca e devolve `commander_name`, `partner_commander_name`, `shell_label` e `strategy_archetype` nos `sample_decks`.
+- `server/routes/ai/generate/index.dart` passou a puxar contexto de `meta_decks` usando `shell_label` e `strategy_archetype`, e o prompt enviado ao modelo agora explicita `Stored label` vs `Commander shell` vs `Strategy archetype`.
+- `server/bin/meta_report.dart`, `server/bin/meta_report.py` e `server/bin/meta_profile_report.dart` passaram a expor cobertura `shell vs strategy` nos relatórios operacionais.
+- `external_commander_meta_candidates` nao foi promovido nem alterado nessa rodada; a separacao de fontes externas continua preservada.
+
+### Arquivos alterados
+- `server/lib/meta/meta_deck_commander_shell_support.dart`
+- `server/test/meta_deck_commander_shell_support_test.dart`
+- `server/bin/migrate_meta_decks.dart`
+- `server/database_setup.sql`
+- `server/bin/fetch_meta.dart`
+- `server/bin/repair_mtgtop8_meta_history.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/bin/meta_report.dart`
+- `server/bin/meta_report.py`
+- `server/bin/meta_profile_report.dart`
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/routes/ai/commander-reference/index.dart`
+- `server/routes/ai/generate/index.dart`
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
+### Resultado prático
+- Cobertura derivada atual em banco, apos migracao + backfill:
+  - `cEDH`: `214/214` com `commander_name`, `214/214` com `shell_label`, `214/214` com `strategy_archetype`, `81/214` com parceiro.
+  - `EDH`: `162/162` com `commander_name`, `162/162` com `shell_label`, `162/162` com `strategy_archetype`, `5/162` com parceiro.
+- Diversidade exposta para analise:
+  - `cEDH`: `86` shells distintos, `6` estrategias distintas.
+  - `EDH`: `57` shells distintos, `7` estrategias distintas.
+- O crawler live passou a publicar no proprio dry-run o shell e a estrategia derivados, por exemplo:
+  - `EDH`: `Spider-Man 2099 -> shell=Spider-Man 2099, strategy=control`
+  - `cEDH`: `Kraum + Tymna -> shell=Kraum, Ludevic's Opus + Tymna the Weaver, strategy=combo`
+- O efeito semantico mais importante e que `archetype` permaneceu como label historico do corpus, enquanto `strategy_archetype` virou a camada analitica separada para Commander.
+
+---
+
 ## 2026-04-24 — Separacao formal de subformatos para `meta_decks` sem migracao de dados
 
 ### O Porquê

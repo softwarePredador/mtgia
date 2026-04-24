@@ -5,6 +5,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_commander_shell_support.dart';
 import '../lib/meta/mtgtop8_meta_support.dart';
 
 Future<void> main(List<String> args) async {
@@ -17,7 +18,16 @@ Future<void> main(List<String> args) async {
   try {
     final brokenRows = await conn.execute(
       Sql.named('''
-        SELECT source_url, format, archetype, placement
+        SELECT
+          source_url,
+          format,
+          archetype,
+          placement,
+          card_list,
+          commander_name,
+          partner_commander_name,
+          shell_label,
+          strategy_archetype
         FROM meta_decks
         WHERE source_url ILIKE 'https://www.mtgtop8.com/%'
           AND (@allFormats = TRUE OR format = ANY(@formats))
@@ -25,6 +35,14 @@ Future<void> main(List<String> args) async {
             COALESCE(TRIM(archetype), '') = ''
             OR COALESCE(TRIM(placement), '') = ''
             OR placement = '?'
+            OR (
+              format IN ('EDH', 'cEDH')
+              AND (
+                COALESCE(TRIM(commander_name), '') = ''
+                OR COALESCE(TRIM(shell_label), '') = ''
+                OR COALESCE(TRIM(strategy_archetype), '') = ''
+              )
+            )
           )
         ORDER BY created_at ASC
       '''),
@@ -81,9 +99,34 @@ Future<void> main(List<String> args) async {
           continue;
         }
 
+        final commanderShell = deriveCommanderShellMetadata(
+          format: parsed.formatCode,
+          cardList: broken['card_list']?.toString() ?? '',
+          rawArchetype: parsed.archetype,
+        );
+        final needsCommanderShellRefresh = metaDeckNeedsCommanderShellRefresh(
+          format: parsed.formatCode,
+          expected: commanderShell,
+          commanderName: broken['commander_name']?.toString(),
+          partnerCommanderName: broken['partner_commander_name']?.toString(),
+          shellLabel: broken['shell_label']?.toString(),
+          strategyArchetype: broken['strategy_archetype']?.toString(),
+        );
+        final needsLegacyRepair =
+            (broken['archetype']?.toString().trim().isEmpty ?? true) ||
+                (broken['placement']?.toString().trim().isEmpty ?? true) ||
+                broken['placement']?.toString().trim() == '?' ||
+                broken['placement']?.toString().trim() != parsed.placement;
+        if (!needsLegacyRepair && !needsCommanderShellRefresh) {
+          continue;
+        }
+
         if (config.dryRun) {
           stdout.writeln(
-            '   [DRY] ${parsed.archetype} (${parsed.placement}) <- $sourceUrl',
+            '   [DRY] ${parsed.archetype} '
+            'shell=${commanderShell.shellLabel ?? "-"} '
+            'strategy=${commanderShell.strategyArchetype ?? "-"} '
+            '(${parsed.placement}) <- $sourceUrl',
           );
         } else {
           await conn.execute(
@@ -91,18 +134,29 @@ Future<void> main(List<String> args) async {
               UPDATE meta_decks
               SET
                 archetype = @archetype,
-                placement = @placement
+                placement = @placement,
+                commander_name = @commander_name,
+                partner_commander_name = @partner_commander_name,
+                shell_label = @shell_label,
+                strategy_archetype = @strategy_archetype
               WHERE source_url = @url
             '''),
             parameters: {
               'archetype': parsed.archetype,
               'placement': parsed.placement,
+              'commander_name': commanderShell.commanderName,
+              'partner_commander_name': commanderShell.partnerCommanderName,
+              'shell_label': commanderShell.shellLabel,
+              'strategy_archetype': commanderShell.strategyArchetype,
               'url': sourceUrl,
             },
           );
           repaired++;
           stdout.writeln(
-            '   [FIX] ${parsed.archetype} (${parsed.placement}) <- $sourceUrl',
+            '   [FIX] ${parsed.archetype} '
+            'shell=${commanderShell.shellLabel ?? "-"} '
+            'strategy=${commanderShell.strategyArchetype ?? "-"} '
+            '(${parsed.placement}) <- $sourceUrl',
           );
         }
       }

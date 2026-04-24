@@ -709,3 +709,167 @@ cd server && dart run bin/meta_profile_report.dart
 - **Lacunas:** Commander multiplayer ainda nao esta coberto de forma provada; `external_commander_meta_candidates` esta vazia; `archetype` nao e taxonomia estrategica.
 - **Riscos:** confundir `Duel Commander` com Commander geral e usar `archetype` como taxonomia estrategica pronta.
 - **Proximo passo recomendado:** se o produto precisar persistir `subformat` no banco, fazer isso por script dedicado `dry-run/apply`, preservando compatibilidade com os codigos legados enquanto a migracao nao termina.
+
+## Implementacao aplicada em 2026-04-24 — shell de comandante derivado sem sobrescrever `archetype`
+
+### Objetivo fechado
+
+- **Fechado:** `meta_decks` agora separa formalmente `shell` de comandante e `strategy` heuristica para `EDH/cEDH`, sem reclassificar o `archetype` legado.
+
+### Mudanca aplicada
+
+Campos novos em `meta_decks`:
+
+- `commander_name`
+- `partner_commander_name`
+- `shell_label`
+- `strategy_archetype`
+
+Regra aplicada:
+
+1. `archetype` continua guardando o label bruto vindo da fonte (`Kraum + Tymna`, `Spider-man 2099`, etc.).
+2. `commander_name` / `partner_commander_name` sao derivados da zona de comandante do export do MTGTop8 (`Sideboard` em Commander/cEDH), com fallback para o rotulo cru quando necessario.
+3. `shell_label` guarda a forma canonica do shell (`Kraum, Ludevic's Opus + Tymna the Weaver`).
+4. `strategy_archetype` guarda a leitura estrategica separada (`combo`, `control`, `aggro`, `midrange`, `aristocrats`, `ramp_value`, etc.).
+
+### Arquivos alterados
+
+- `server/lib/meta/meta_deck_commander_shell_support.dart`
+- `server/test/meta_deck_commander_shell_support_test.dart`
+- `server/bin/migrate_meta_decks.dart`
+- `server/database_setup.sql`
+- `server/bin/fetch_meta.dart`
+- `server/bin/repair_mtgtop8_meta_history.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/bin/meta_report.dart`
+- `server/bin/meta_report.py`
+- `server/bin/meta_profile_report.dart`
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/routes/ai/commander-reference/index.dart`
+- `server/routes/ai/generate/index.dart`
+
+### Comandos rodados
+
+```bash
+cd server && dart analyze \
+  bin/fetch_meta.dart \
+  bin/repair_mtgtop8_meta_history.dart \
+  bin/migrate_meta_decks.dart \
+  bin/meta_report.dart \
+  bin/meta_profile_report.dart \
+  bin/extract_meta_insights.dart \
+  lib/meta/meta_deck_commander_shell_support.dart \
+  lib/ai/optimize_runtime_support.dart \
+  routes/ai/commander-reference/index.dart \
+  routes/ai/generate/index.dart \
+  test/meta_deck_commander_shell_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/mtgtop8_meta_support_test.dart \
+  test/meta_deck_format_support_test.dart \
+  test/optimize_runtime_support_test.dart
+```
+
+```bash
+cd server && dart test \
+  test/meta_deck_commander_shell_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/mtgtop8_meta_support_test.dart \
+  test/meta_deck_format_support_test.dart \
+  test/optimize_runtime_support_test.dart
+cd server && dart test
+```
+
+```bash
+cd server && dart run bin/migrate_meta_decks.dart
+cd server && dart run bin/repair_mtgtop8_meta_history.dart --dry-run --formats EDH,cEDH --limit-events 50 --limit-rows-per-event 100
+cd server && dart run bin/repair_mtgtop8_meta_history.dart --apply --formats EDH,cEDH --limit-events 50 --limit-rows-per-event 100
+cd server && dart run bin/fetch_meta.dart EDH --dry-run --limit-events=1 --limit-decks=2 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/fetch_meta.dart cEDH --dry-run --limit-events=1 --limit-decks=2 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/meta_report.dart
+cd server && dart run bin/meta_profile_report.dart
+```
+
+### Evidencia objetiva
+
+#### 1. Backfill aplicado de forma completa em Commander/cEDH
+
+`repair_mtgtop8_meta_history.dart --apply` terminou com:
+
+- `repaired=376`
+- `missing_matches=0`
+
+#### 2. Cobertura derivada atual em banco
+
+```text
+('cEDH', 214, 214, 81, 214, 214, 86, 6)
+('EDH', 162, 162, 5, 162, 162, 57, 7)
+```
+
+Leitura dos campos:
+
+```text
+(format, deck_count, with_commander_name, with_partner_commander_name,
+ with_shell_label, with_strategy_archetype, distinct_shells, distinct_strategies)
+```
+
+Isso prova:
+
+- `cEDH`: `214/214` com `commander_name`, `214/214` com `shell_label`, `214/214` com `strategy_archetype`
+- `EDH`: `162/162` com `commander_name`, `162/162` com `shell_label`, `162/162` com `strategy_archetype`
+
+#### 3. O crawler live agora expõe shell vs strategy no dry-run
+
+Exemplos provados:
+
+- `EDH`: `Spider-Man 2099 -> shell=Spider-Man 2099, strategy=control`
+- `EDH`: `Lumra, Bellow of the Woods -> shell=Lumra, Bellow of the Woods, strategy=midrange`
+- `cEDH`: `Terra, Magical Adept -> shell=Terra, Magical Adept, strategy=combo`
+- `cEDH`: `Kraum + Tymna -> shell=Kraum, Ludevic's Opus + Tymna the Weaver, strategy=combo`
+
+#### 4. Os relatórios locais agora expõem shell e strategy separadamente
+
+`meta_report.dart` passou a publicar:
+
+- `commander_shell_strategy_coverage`
+- `latest_samples[].commander_name`
+- `latest_samples[].partner_commander_name`
+- `latest_samples[].shell_label`
+- `latest_samples[].strategy_archetype`
+
+`meta_profile_report.dart` passou a publicar:
+
+- `commander_shell_strategy_summary`
+- `top_groups_format_color_shell`
+- `top_groups_format_color_strategy`
+
+Exemplo observado:
+
+- `competitive_commander`: `214` decks, `86` shells distintos, `6` estrategias distintas
+- `duel_commander`: `162` decks, `57` shells distintos, `7` estrategias distintas
+- top shell atual forte: `spider-man` em `EDH UR` (`27`)
+- top shell atual forte: `kinnan` em `cEDH UG` (`20`)
+- top strategy atual forte: `control` em `EDH UR` (`33`)
+- top strategy atual forte: `combo` em `cEDH BR` (`30`)
+
+### Impacto tecnico real
+
+- `optimize_runtime_support.dart` agora consegue priorizar Commander usando `commander_name` / `partner_commander_name` / `shell_label` antes de cair para busca textual no `card_list`.
+- `commander-reference` deixa de devolver apenas o label cru e passa a expor o shell canonico e a strategy derivada nos `sample_decks`.
+- `generate` passa a distinguir no prompt:
+  - `Stored label`
+  - `Commander shell`
+  - `Strategy archetype`
+
+Isso reduz o risco de o modelo ou o pipeline interpretarem `Kraum + Tymna` como se fosse um arquétipo textual autossuficiente, quando na pratica isso e um shell de comandante.
+
+### Gaps observados que continuam abertos
+
+1. `strategy_archetype` ainda e heuristica local; ela melhora muito a separacao semantica, mas **nao prova** taxonomia competitiva perfeita.
+2. Commander multiplayer amplo continua `nao comprovado`; a tabela principal ainda representa `Duel Commander` (`EDH`) e `Competitive Commander` (`cEDH`), nao `Commander geral`.
+3. Fontes externas continuam fora da tabela principal; `external_commander_meta_candidates` permanece o lugar correto para qualquer expansao multi-fonte.
+
+### Menores proximas acoes tecnicas
+
+1. Trocar consumidores restantes que ainda fazem fallback direto em `archetype ILIKE` por `shell_label` / `strategy_archetype` onde fizer sentido.
+2. Medir regressao de `strategy_archetype` por shell recorrente (`Kraum + Tymna`, `Kinnan`, `Spider-Man 2099`) para descobrir onde a heuristica ainda varia demais.
+3. Se o produto decidir endurecer a taxonomia, promover uma camada controlada de normalizacao de strategy por shell frequente, sem reescrever o `archetype` bruto vindo da fonte.

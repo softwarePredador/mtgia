@@ -5,6 +5,7 @@ import 'package:html/parser.dart' as parser;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_commander_shell_support.dart';
 import '../lib/meta/meta_deck_format_support.dart';
 import '../lib/meta/mtgtop8_meta_support.dart';
 
@@ -115,7 +116,14 @@ Future<void> _processEvent(
       if (!config.dryRun) {
         final exists = await conn.execute(
           Sql.named('''
-            SELECT archetype, placement
+            SELECT
+              archetype,
+              placement,
+              card_list,
+              commander_name,
+              partner_commander_name,
+              shell_label,
+              strategy_archetype
             FROM meta_decks
             WHERE source_url = @url
             LIMIT 1
@@ -128,28 +136,56 @@ Future<void> _processEvent(
       }
 
       if (existingRow != null) {
+        final existingCardList = existingRow['card_list']?.toString() ?? '';
+        final expectedCommanderShell = deriveCommanderShellMetadata(
+          format: parsedRow.formatCode,
+          cardList: existingCardList,
+          rawArchetype: parsedRow.archetype,
+        );
+        final needsCommanderShellRefresh = metaDeckNeedsCommanderShellRefresh(
+          format: parsedRow.formatCode,
+          expected: expectedCommanderShell,
+          commanderName: existingRow['commander_name']?.toString(),
+          partnerCommanderName:
+              existingRow['partner_commander_name']?.toString(),
+          shellLabel: existingRow['shell_label']?.toString(),
+          strategyArchetype: existingRow['strategy_archetype']?.toString(),
+        );
         if (config.refreshExisting &&
-            _shouldRepairExistingMetaDeck(
-              archetype: existingRow['archetype']?.toString(),
-              placement: existingRow['placement']?.toString(),
-              parsedRow: parsedRow,
-            )) {
+            (_shouldRepairExistingMetaDeck(
+                  archetype: existingRow['archetype']?.toString(),
+                  placement: existingRow['placement']?.toString(),
+                  parsedRow: parsedRow,
+                ) ||
+                needsCommanderShellRefresh)) {
           await conn.execute(
             Sql.named('''
               UPDATE meta_decks
               SET
                 archetype = @archetype,
-                placement = @placement
+                placement = @placement,
+                commander_name = @commander_name,
+                partner_commander_name = @partner_commander_name,
+                shell_label = @shell_label,
+                strategy_archetype = @strategy_archetype
               WHERE source_url = @url
             '''),
             parameters: {
               'archetype': parsedRow.archetype,
               'placement': parsedRow.placement,
+              'commander_name': expectedCommanderShell.commanderName,
+              'partner_commander_name':
+                  expectedCommanderShell.partnerCommanderName,
+              'shell_label': expectedCommanderShell.shellLabel,
+              'strategy_archetype': expectedCommanderShell.strategyArchetype,
               'url': parsedRow.deckUrl,
             },
           );
           print(
-            '     [FIX] Deck reparado: ${parsedRow.archetype} (${parsedRow.placement})',
+            '     [FIX] Deck reparado: ${parsedRow.archetype} '
+            'shell=${expectedCommanderShell.shellLabel ?? "-"} '
+            'strategy=${expectedCommanderShell.strategyArchetype ?? "-"} '
+            '(${parsedRow.placement})',
           );
         } else {
           print(
@@ -179,6 +215,12 @@ Future<void> _processEvent(
         continue;
       }
 
+      final commanderShell = deriveCommanderShellMetadata(
+        format: parsedRow.formatCode,
+        cardList: cardList,
+        rawArchetype: parsedRow.archetype,
+      );
+
       if (config.dryRun) {
         final cardCount =
             cardList.split('\n').where((line) => line.trim().isNotEmpty).length;
@@ -186,17 +228,43 @@ Future<void> _processEvent(
         print(
           '     [DRY] OK format=${parsedRow.formatCode} '
           'subformat=${descriptor.commanderSubformat ?? "-"} '
+          'shell=${commanderShell.shellLabel ?? "-"} '
+          'strategy=${commanderShell.strategyArchetype ?? "-"} '
           'placement=${parsedRow.placement} cards=$cardCount url=${parsedRow.deckUrl}',
         );
       } else {
         await conn.execute(
           Sql.named('''
-            INSERT INTO meta_decks (format, archetype, source_url, card_list, placement)
-            VALUES (@format, @archetype, @url, @list, @placement)
+            INSERT INTO meta_decks (
+              format,
+              archetype,
+              commander_name,
+              partner_commander_name,
+              shell_label,
+              strategy_archetype,
+              source_url,
+              card_list,
+              placement
+            )
+            VALUES (
+              @format,
+              @archetype,
+              @commander_name,
+              @partner_commander_name,
+              @shell_label,
+              @strategy_archetype,
+              @url,
+              @list,
+              @placement
+            )
           '''),
           parameters: {
             'format': parsedRow.formatCode,
             'archetype': parsedRow.archetype,
+            'commander_name': commanderShell.commanderName,
+            'partner_commander_name': commanderShell.partnerCommanderName,
+            'shell_label': commanderShell.shellLabel,
+            'strategy_archetype': commanderShell.strategyArchetype,
             'url': parsedRow.deckUrl,
             'list': cardList,
             'placement': parsedRow.placement,

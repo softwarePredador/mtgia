@@ -52,15 +52,31 @@ Future<Response> onRequest(RequestContext context) async {
 
     var decks = await pool.execute(
       Sql.named('''
-        SELECT id::text, format, archetype, source_url, placement, card_list
+        SELECT
+          id::text,
+          format,
+          archetype,
+          commander_name,
+          partner_commander_name,
+          shell_label,
+          strategy_archetype,
+          source_url,
+          placement,
+          card_list
         FROM meta_decks
         WHERE format = ANY(@formats)
-          AND card_list ILIKE @commanderPattern
+          AND (
+            LOWER(commander_name) = LOWER(@commanderExact)
+            OR LOWER(partner_commander_name) = LOWER(@commanderExact)
+            OR shell_label ILIKE @commanderPattern
+            OR card_list ILIKE @commanderPattern
+          )
         ORDER BY created_at DESC
         LIMIT 200
       '''),
       parameters: {
         'formats': TypedValue(Type.textArray, commanderFormats),
+        'commanderExact': commander.replaceAll('%', '').trim(),
         'commanderPattern': '%${commander.replaceAll('%', '')}%',
       },
     );
@@ -70,10 +86,23 @@ Future<Response> onRequest(RequestContext context) async {
       if (commanderToken.isNotEmpty) {
         decks = await pool.execute(
           Sql.named('''
-            SELECT id::text, format, archetype, source_url, placement, card_list
+            SELECT
+              id::text,
+              format,
+              archetype,
+              commander_name,
+              partner_commander_name,
+              shell_label,
+              strategy_archetype,
+              source_url,
+              placement,
+              card_list
             FROM meta_decks
             WHERE format = ANY(@formats)
-              AND archetype ILIKE @archetypePattern
+              AND (
+                shell_label ILIKE @archetypePattern
+                OR archetype ILIKE @archetypePattern
+              )
             ORDER BY created_at DESC
             LIMIT 200
           '''),
@@ -209,9 +238,13 @@ Future<Response> onRequest(RequestContext context) async {
       final deckId = row[0] as String;
       final storedFormat = (row[1] as String?) ?? '';
       final archetype = (row[2] as String?) ?? 'unknown';
-      final sourceUrl = (row[3] as String?) ?? '';
-      final placement = (row[4] as String?) ?? '';
-      final rawList = (row[5] as String?) ?? '';
+      final commanderName = (row[3] as String?) ?? '';
+      final partnerCommanderName = (row[4] as String?) ?? '';
+      final shellLabel = (row[5] as String?) ?? '';
+      final strategyArchetype = (row[6] as String?) ?? '';
+      final sourceUrl = (row[7] as String?) ?? '';
+      final placement = (row[8] as String?) ?? '';
+      final rawList = (row[9] as String?) ?? '';
       final formatDescriptor = describeMetaDeckFormat(storedFormat);
       final subformatKey =
           formatDescriptor.commanderSubformat ?? formatDescriptor.storedFormatCode;
@@ -225,6 +258,12 @@ Future<Response> onRequest(RequestContext context) async {
           'format_label': formatDescriptor.label,
           'subformat': formatDescriptor.commanderSubformat,
           'archetype': archetype,
+          'commander_name': commanderName.isEmpty ? null : commanderName,
+          'partner_commander_name':
+              partnerCommanderName.isEmpty ? null : partnerCommanderName,
+          'shell_label': shellLabel.isEmpty ? null : shellLabel,
+          'strategy_archetype':
+              strategyArchetype.isEmpty ? null : strategyArchetype,
           'source_url': sourceUrl,
           'placement': placement,
         });

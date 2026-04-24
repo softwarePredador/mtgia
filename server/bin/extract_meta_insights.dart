@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:postgres/postgres.dart';
 import '../lib/database.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
+import '../lib/meta/meta_deck_commander_shell_support.dart';
 import '../lib/meta/meta_deck_format_support.dart';
 
 /// Script de Extração de Insights dos Meta Decks
@@ -113,8 +114,20 @@ void main(List<String> args) async {
 
 /// Carrega meta decks do banco
 Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
-  final result = await conn.execute(
-      'SELECT id, format, archetype, card_list, placement FROM meta_decks ORDER BY created_at DESC');
+  final result = await conn.execute('''
+    SELECT
+      id,
+      format,
+      archetype,
+      commander_name,
+      partner_commander_name,
+      shell_label,
+      strategy_archetype,
+      card_list,
+      placement
+    FROM meta_decks
+    ORDER BY created_at DESC
+  ''');
 
   return result.map<Map<String, dynamic>>((row) {
     final map = row.toColumnMap();
@@ -122,6 +135,10 @@ Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
       'id': map['id']?.toString(),
       'format': map['format']?.toString() ?? 'unknown',
       'archetype': map['archetype']?.toString() ?? 'unknown',
+      'commander_name': map['commander_name']?.toString(),
+      'partner_commander_name': map['partner_commander_name']?.toString(),
+      'shell_label': map['shell_label']?.toString(),
+      'strategy_archetype': map['strategy_archetype']?.toString(),
       'card_list': map['card_list']?.toString() ?? '',
       'placement': map['placement']?.toString() ?? '',
     };
@@ -139,20 +156,36 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
   );
   final cards = parsedCardList.effectiveCards;
   final sideboardCards = parsedCardList.sideboard;
+  final rawArchetype = deck['archetype'] as String? ?? '';
+  final commanderShell = resolveCommanderShellMetadata(
+    format: formatCode,
+    rawArchetype: rawArchetype,
+    cardList: cardList,
+    commanderName: deck['commander_name'] as String?,
+    partnerCommanderName: deck['partner_commander_name'] as String?,
+    shellLabel: deck['shell_label'] as String?,
+    strategyArchetype: deck['strategy_archetype'] as String?,
+  );
 
-  // Inferir arquétipo se ausente ou genérico
-  var archetype = deck['archetype'] as String? ?? '';
-  if (archetype.isEmpty || archetype == 'unknown') {
-    archetype = _inferArchetypeFromCards(cards.keys.toList());
-  }
+  final inferredArchetype = _inferArchetypeFromCards(cards.keys.toList());
+  final analyticsArchetype = isCommanderMetaFormat(formatCode)
+      ? (commanderShell.strategyArchetype ?? inferredArchetype)
+      : ((rawArchetype.isEmpty || rawArchetype == 'unknown')
+          ? inferredArchetype
+          : rawArchetype);
 
   return {
-        ...deck,
-        'format': format,
-        'format_code': formatCode,
-        'archetype': archetype, // Sobrescreve com inferido
-        'parsed_cards': cards,
-        'sideboard': sideboardCards,
+    ...deck,
+    'format': format,
+    'format_code': formatCode,
+    'raw_archetype': rawArchetype,
+    'commander_name': commanderShell.commanderName,
+    'partner_commander_name': commanderShell.partnerCommanderName,
+    'shell_label': commanderShell.shellLabel,
+    'strategy_archetype': commanderShell.strategyArchetype,
+    'analytics_archetype': analyticsArchetype,
+    'parsed_cards': cards,
+    'sideboard': sideboardCards,
     'sideboard_as_commander_zone':
         parsedCardList.includesSideboardAsCommanderZone,
     'total_cards': parsedCardList.effectiveTotal,
@@ -388,7 +421,8 @@ Map<String, Map<String, dynamic>> _extractCardInsights(
     final deck = parsedDecks[i];
     final cards = deck['parsed_cards'] as Map<String, int>;
     final format = deck['format'] as String; // Agora pega do deck parseado
-    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
+    final archetype =
+        deck['analytics_archetype'] as String; // Usa estrategia em Commander
 
     for (final cardName in cards.keys) {
       insights.putIfAbsent(
@@ -499,7 +533,8 @@ List<Map<String, dynamic>> _detectSynergies(
   for (var i = 0; i < parsedDecks.length; i++) {
     final deck = parsedDecks[i];
     final cards = (deck['parsed_cards'] as Map<String, int>).keys.toList();
-    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
+    final archetype =
+        deck['analytics_archetype'] as String; // Usa estrategia em Commander
     final format = deck['format'] as String;
 
     // Pares de cartas
@@ -601,7 +636,8 @@ List<Map<String, dynamic>> _extractArchetypePatterns(
 
   for (var i = 0; i < parsedDecks.length; i++) {
     final deck = parsedDecks[i];
-    final archetype = deck['archetype'] as String; // Usa arquétipo inferido
+    final archetype =
+        deck['analytics_archetype'] as String; // Usa estrategia em Commander
     final format = deck['format'] as String;
     final key = '$archetype|$format';
 

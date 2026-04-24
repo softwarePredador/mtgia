@@ -3049,12 +3049,18 @@ Future<List<String>> loadCommanderCompetitivePriorities({
       SELECT card_list
       FROM meta_decks
       WHERE format = ANY(@formats)
-        AND card_list ILIKE @commanderPattern
+        AND (
+          LOWER(commander_name) = LOWER(@commanderExact)
+          OR LOWER(partner_commander_name) = LOWER(@commanderExact)
+          OR shell_label ILIKE @commanderPattern
+          OR card_list ILIKE @commanderPattern
+        )
       ORDER BY created_at DESC
       LIMIT 200
     '''),
     parameters: {
       'formats': TypedValue(Type.textArray, formatCodes),
+      'commanderExact': commanderName.replaceAll('%', '').trim(),
       'commanderPattern': '%${commanderName.replaceAll('%', '')}%',
     },
   );
@@ -3062,12 +3068,15 @@ Future<List<String>> loadCommanderCompetitivePriorities({
   if (result.isEmpty) {
     final commanderToken = commanderName.split(',').first.trim();
     if (commanderToken.isNotEmpty) {
-      result = await pool.execute(
-        Sql.named('''
+        result = await pool.execute(
+          Sql.named('''
           SELECT card_list
           FROM meta_decks
           WHERE format = ANY(@formats)
-            AND archetype ILIKE @archetypePattern
+            AND (
+              shell_label ILIKE @archetypePattern
+              OR archetype ILIKE @archetypePattern
+            )
           ORDER BY created_at DESC
           LIMIT 200
         '''),

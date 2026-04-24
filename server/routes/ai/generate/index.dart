@@ -71,13 +71,24 @@ Future<Response> onRequest(RequestContext context) async {
         commanderScope: commanderMetaScope ?? 'commander',
       );
 
-      if (metaKeywordPatterns.isNotEmpty && metaFormats.isNotEmpty) {
-        final metaResult = await pool.execute(
-          Sql.named('''
-            SELECT format, archetype, card_list
+        if (metaKeywordPatterns.isNotEmpty && metaFormats.isNotEmpty) {
+          final metaResult = await pool.execute(
+            Sql.named('''
+            SELECT
+              format,
+              archetype,
+              shell_label,
+              strategy_archetype,
+              card_list
             FROM meta_decks
             WHERE format = ANY(@formats)
-              AND archetype ILIKE ANY(@patterns)
+              AND (
+                archetype ILIKE ANY(@patterns)
+                OR shell_label ILIKE ANY(@patterns)
+                OR strategy_archetype ILIKE ANY(@patterns)
+                OR commander_name ILIKE ANY(@patterns)
+                OR partner_commander_name ILIKE ANY(@patterns)
+              )
             LIMIT 3
           '''),
           parameters: {
@@ -86,27 +97,34 @@ Future<Response> onRequest(RequestContext context) async {
           },
         );
 
-        if (metaResult.isNotEmpty) {
+          if (metaResult.isNotEmpty) {
           if (commanderMetaScope != null) {
             metaContext =
                 'Commander meta note: MTGTop8 EDH is Duel Commander and cEDH is Competitive Commander.\n'
                 'Requested commander meta scope: ${commanderMetaScopeLabel(commanderMetaScope)}.\n\n';
           }
-          metaContext += 'Here are some successful meta decks for inspiration:\n';
-          for (final row in metaResult) {
-            final descriptor = describeMetaDeckFormat(row[0] as String?);
-            final cardList = (row[2] as String?) ?? '';
-            final excerpt =
-                cardList.length > 200 ? cardList.substring(0, 200) : cardList;
-            final suffix = cardList.length > 200 ? '...' : '';
-            final scopeLabel = descriptor.commanderSubformat != null
-                ? '${descriptor.commanderSubformat} / ${descriptor.label}'
-                : descriptor.label;
-            metaContext +=
-                'Archetype: ${row[1]}\nMeta scope: $scopeLabel\nList: $excerpt$suffix\n\n';
+            metaContext += 'Here are some successful meta decks for inspiration:\n';
+            for (final row in metaResult) {
+              final descriptor = describeMetaDeckFormat(row[0] as String?);
+              final storedLabel = (row[1] as String?) ?? '';
+              final shellLabel = (row[2] as String?) ?? '';
+              final strategyArchetype = (row[3] as String?) ?? '';
+              final cardList = (row[4] as String?) ?? '';
+              final excerpt =
+                  cardList.length > 200 ? cardList.substring(0, 200) : cardList;
+              final suffix = cardList.length > 200 ? '...' : '';
+              final scopeLabel = descriptor.commanderSubformat != null
+                  ? '${descriptor.commanderSubformat} / ${descriptor.label}'
+                  : descriptor.label;
+              metaContext +=
+                  'Stored label: $storedLabel\n'
+                  '${shellLabel.isNotEmpty ? "Commander shell: $shellLabel\n" : ""}'
+                  '${strategyArchetype.isNotEmpty ? "Strategy archetype: $strategyArchetype\n" : ""}'
+                  'Meta scope: $scopeLabel\n'
+                  'List: $excerpt$suffix\n\n';
+            }
           }
         }
-      }
     } catch (error) {
       print('[ERROR] handler: $error');
       Log.w('Erro ao buscar contexto do meta: $error');
