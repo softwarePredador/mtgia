@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:postgres/postgres.dart';
 import '../lib/database.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 
 /// Script de Extração de Insights dos Meta Decks
 ///
@@ -130,10 +131,11 @@ Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
 /// Parseia uma deck list em texto para lista de cartas
 Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
   final cardList = deck['card_list'] as String;
-  final format = deck['format'] as String? ?? 'unknown';
+  final formatCode = deck['format'] as String? ?? 'unknown';
+  final format = metaDeckAnalyticsFormatKey(formatCode);
   final parsedCardList = parseMetaDeckCardList(
     cardList: cardList,
-    format: format,
+    format: formatCode,
   );
   final cards = parsedCardList.effectiveCards;
   final sideboardCards = parsedCardList.sideboard;
@@ -145,10 +147,12 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
   }
 
   return {
-    ...deck,
-    'archetype': archetype, // Sobrescreve com inferido
-    'parsed_cards': cards,
-    'sideboard': sideboardCards,
+        ...deck,
+        'format': format,
+        'format_code': formatCode,
+        'archetype': archetype, // Sobrescreve com inferido
+        'parsed_cards': cards,
+        'sideboard': sideboardCards,
     'sideboard_as_commander_zone':
         parsedCardList.includesSideboardAsCommanderZone,
     'total_cards': parsedCardList.effectiveTotal,

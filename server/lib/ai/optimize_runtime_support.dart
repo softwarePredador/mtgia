@@ -2,6 +2,8 @@ import 'package:postgres/postgres.dart';
 import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
+import '../meta/meta_deck_card_list_support.dart';
+import '../meta/meta_deck_format_support.dart';
 
 String normalizeOptimizeReasoning(dynamic value) {
   if (value == null) return '';
@@ -235,7 +237,6 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
 }) async {
   if (limit <= 0) return const [];
 
-  final identity = commanderColorIdentity.toList();
   final result = await pool.execute(
     Sql.named('''
       SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.colors, sub.color_identity, sub.pop_score
@@ -3037,19 +3038,23 @@ Future<List<String>> loadCommanderCompetitivePriorities({
   required Pool pool,
   required String commanderName,
   required int limit,
+  String metaScope = 'competitive_commander',
 }) async {
   if (commanderName.trim().isEmpty || limit <= 0) return const [];
+  final formatCodes = metaDeckFormatCodesForCommanderScope(metaScope);
+  if (formatCodes.isEmpty) return const [];
 
   var result = await pool.execute(
     Sql.named('''
       SELECT card_list
       FROM meta_decks
-      WHERE format IN ('EDH', 'cEDH')
+      WHERE format = ANY(@formats)
         AND card_list ILIKE @commanderPattern
       ORDER BY created_at DESC
       LIMIT 200
     '''),
     parameters: {
+      'formats': TypedValue(Type.textArray, formatCodes),
       'commanderPattern': '%${commanderName.replaceAll('%', '')}%',
     },
   );
@@ -3061,12 +3066,13 @@ Future<List<String>> loadCommanderCompetitivePriorities({
         Sql.named('''
           SELECT card_list
           FROM meta_decks
-          WHERE format IN ('EDH', 'cEDH')
+          WHERE format = ANY(@formats)
             AND archetype ILIKE @archetypePattern
           ORDER BY created_at DESC
           LIMIT 200
         '''),
         parameters: {
+          'formats': TypedValue(Type.textArray, formatCodes),
           'archetypePattern': '%${commanderToken.replaceAll('%', '')}%',
         },
       );
@@ -3109,31 +3115,16 @@ Future<List<String>> loadCommanderCompetitivePriorities({
     final raw = (row[0] as String?) ?? '';
     if (raw.trim().isEmpty) continue;
 
-    var inSideboard = false;
-    final lines = raw.split('\n');
-    for (final lineRaw in lines) {
-      final line = lineRaw.trim();
-      if (line.isEmpty) continue;
-      if (line.toLowerCase().contains('sideboard')) {
-        inSideboard = true;
-        continue;
-      }
-      if (inSideboard) continue;
+    final parsed = parseMetaDeckCardList(
+      cardList: raw,
+      format: legacyCompetitiveCommanderFormatCode,
+    );
 
-      final match = RegExp(r'^(\d+)x?\s+(.+)$').firstMatch(line);
-      if (match == null) continue;
-
-      final quantity = int.tryParse(match.group(1) ?? '1') ?? 1;
-      var cardName = (match.group(2) ?? '').trim();
-      if (cardName.isEmpty) continue;
-
-      cardName = cardName.replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '').trim();
-      if (cardName.isEmpty) continue;
-
+    for (final entry in parsed.mainboard.entries) {
+      final cardName = entry.key;
       final lower = cardName.toLowerCase();
       if (lower == commanderLower || _isBasicLandName(lower)) continue;
-
-      counts[cardName] = (counts[cardName] ?? 0) + quantity;
+      counts[cardName] = (counts[cardName] ?? 0) + entry.value;
     }
   }
 

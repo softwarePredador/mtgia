@@ -1,6 +1,101 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Separacao formal de subformatos para `meta_decks` sem migracao de dados
+
+### O Porquê
+- O repositório já sabia no crawler que `EDH` do MTGTop8 significava `Duel Commander` e `cEDH` significava `Competitive EDH`, mas vários consumidores ainda misturavam os dois como se fossem um único bucket de Commander multiplayer.
+- Esse colapso semântico vazava para `optimize`, `generate`, `commander-reference`, `analysis` e relatórios operacionais, gerando prioridade e leitura de cobertura erradas.
+- Era necessário corrigir isso sem quebrar compatibilidade e sem reescrever os dados existentes de `meta_decks`.
+
+### O Como
+- Foi criado `server/lib/meta/meta_deck_format_support.dart` como camada central de semântica derivada:
+  - `EDH` -> `duel_commander`
+  - `cEDH` -> `competitive_commander`
+  - `commander` amplo -> união explícita de `duel_commander + competitive_commander`
+- `server/lib/ai/optimize_runtime_support.dart` passou a aceitar escopo explícito no carregamento de prioridades de Commander. O default ficou `competitive_commander`, eliminando a mistura silenciosa de `EDH + cEDH` no seed competitivo.
+- `server/routes/ai/commander-reference/index.dart` passou a:
+  - aceitar `scope`/`subformat`;
+  - consultar `meta_decks` por array de formatos derivado;
+  - responder `meta_scope` e `meta_scope_breakdown`;
+  - incluir `format_code`, `format_label` e `subformat` nos `sample_decks`.
+- `server/routes/ai/generate/index.dart` passou a usar escopo derivado para Commander:
+  - prompts com `cEDH`/`competitive` filtram `competitive_commander`;
+  - prompts com `duel commander` filtram `duel_commander`;
+  - quando usa escopo amplo, o prompt enviado ao modelo informa explicitamente que `MTGTop8 EDH` = `Duel Commander`.
+- `server/routes/decks/[id]/analysis/index.dart` deixou de fazer o atalho `commander -> EDH` e passou a comparar contra o escopo Commander amplo, devolvendo o `subformat` do melhor match encontrado.
+- `server/bin/extract_meta_insights.dart` passou a normalizar formatos analíticos derivados (`duel_commander` / `competitive_commander`) para futuros rebuilds de `card_meta_insights`, `synergy_packages` e `archetype_patterns`.
+- `server/bin/meta_report.dart`, `server/bin/meta_report.py`, `server/bin/meta_profile_report.dart` e `server/bin/basic_land_audit.dart` passaram a expor labels e subformatos derivados, reduzindo ambiguidade operacional.
+- `server/lib/meta/external_commander_meta_candidate_support.dart` deixou de promover `commander` genérico para `EDH` legado. Promoção automática para `meta_decks` agora só acontece quando o candidato é explicitamente `duel_commander` ou `competitive_commander`.
+
+### Arquivos alterados
+- `server/lib/meta/meta_deck_format_support.dart`
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/routes/ai/commander-reference/index.dart`
+- `server/routes/ai/generate/index.dart`
+- `server/routes/decks/[id]/analysis/index.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/bin/fetch_meta.dart`
+- `server/bin/meta_report.dart`
+- `server/bin/meta_report.py`
+- `server/bin/meta_profile_report.dart`
+- `server/bin/basic_land_audit.dart`
+- `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `server/test/meta_deck_format_support_test.dart`
+- `server/test/external_commander_meta_candidate_support_test.dart`
+- `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
+### Resultado prático
+- O código agora distingue formalmente `duel_commander` de `competitive_commander` antes de consultar `meta_decks`.
+- A compatibilidade foi preservada:
+  - a tabela continua usando `EDH` / `cEDH`;
+  - endpoints existentes continuam aceitando chamadas antigas;
+  - a separação ficou numa camada derivada, pronta para uma migração posterior.
+- Nenhum dado existente foi alterado. Se o projeto decidir persistir `subformat` no banco, isso deve ser feito depois por script dedicado `dry-run/apply`.
+
+---
+
+## 2026-04-24 — Auditoria dos consumidores de `meta_decks` apos `21d0c4a`
+
+### O Porquê
+- Era necessario revisar o estado apos o commit `21d0c4a` e localizar onde o repositorio ainda corria risco de tratar `meta_decks.format = EDH` como Commander multiplayer geral.
+- O parser base ja estava corrigido, entao a pergunta certa deixou de ser "o crawler funciona?" e passou a ser "quais consumidores ainda colapsam `EDH` e `cEDH` em um unico conceito semantico?".
+
+### O Como
+- Foi feito um grep focado em todos os consumidores de `meta_decks` em `server/bin`, `server/lib` e `server/routes`, com leitura dirigida dos pontos que alimentam `optimize`, `generate`, `commander-reference`, `meta reports` e scripts de insights.
+- A validacao operacional confirmou novamente a base atual:
+  - `641` registros totais em `meta_decks`
+  - `214` em `cEDH`
+  - `162` em `EDH`
+  - `EDH` continua significando `Duel Commander`
+  - `cEDH` continua significando `Competitive EDH`
+- A auditoria encontrou risco residual principalmente em consumidores que:
+  - consultam `format IN ('EDH', 'cEDH')` e devolvem um unico pool para Commander;
+  - mapeiam `format=commander` diretamente para `EDH`;
+  - ou publicam reports com `EDH`/`cEDH` sem label humano de subformato.
+
+### Arquivos com risco destacado
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/lib/ai/optimize_complete_support.dart`
+- `server/routes/ai/commander-reference/index.dart`
+- `server/routes/ai/generate/index.dart`
+- `server/routes/decks/[id]/analysis/index.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/bin/meta_profile_report.dart`
+- `server/bin/meta_report.dart`
+- `server/bin/meta_report.py`
+
+### Artefatos
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
+### Impacto pratico
+- O risco principal atual nao e ingestao quebrada; e semantica errada no consumo.
+- `EDH` do MTGTop8 nao pode continuar sendo usado como proxy silencioso de Commander multiplayer.
+- `optimize`, `generate` e `commander-reference` precisam separar explicitamente `duel_commander` de `competitive_commander` antes de usar `meta_decks` como fonte de prioridade.
+
+---
+
 ## 2026-04-24 — Auditoria do pipeline `meta_decks` apos `9947a71`
 
 ### O Porquê

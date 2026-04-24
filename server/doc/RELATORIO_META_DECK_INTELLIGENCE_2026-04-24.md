@@ -8,6 +8,7 @@ Data: 2026-04-24
 - **A cobertura Commander do corpus atual nao e "Commander geral": o bucket `EDH` do pipeline e `Duel Commander`, enquanto `cEDH` e `Competitive EDH`.**
 - **A base esta fresca em 2026-04-23, mas a analise Commander/cEDH ainda tem um risco estrutural aberto: os exports do MTGTop8 colocam o(s) comandante(s) no `Sideboard`, e os relatorios locais que ignoram sideboard subcontam o deck final e podem distorcer identidade de cor.**
 - **Nao existe expansao multi-fonte validada hoje: `external_commander_meta_candidates` esta vazia.**
+- **Apos o commit `21d0c4a`, o risco residual principal nao esta no crawler; esta nos consumidores que ainda fundem `EDH` e `cEDH` como se ambos fossem `Commander multiplayer meta`.**
 
 ## Pipeline atual comprovado
 
@@ -80,6 +81,52 @@ SELECT COUNT(*)::int total,
 FROM meta_decks
 """)
 print(cur.fetchone())
+conn.close()
+PY
+```
+
+```bash
+git --no-pager rev-parse --short HEAD
+git --no-pager grep -n "meta_decks" -- server/bin server/lib server/routes docs scripts
+git --no-pager grep -n "format IN ('EDH', 'cEDH')\\|addAll(\\['EDH', 'cEDH'\\])\\|Duel Commander\\|Competitive EDH" -- server/bin server/lib server/routes
+cd server && dart run bin/meta_report.dart
+cd server && python3 - <<'PY'
+from pathlib import Path
+import psycopg2
+
+env = {}
+for line in Path('.env').read_text().splitlines():
+    line = line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    k, v = line.split('=', 1)
+    env[k.strip()] = v.strip()
+
+conn = psycopg2.connect(
+    host=env['DB_HOST'],
+    port=env['DB_PORT'],
+    dbname=env['DB_NAME'],
+    user=env['DB_USER'],
+    password=env['DB_PASS'],
+)
+cur = conn.cursor()
+cur.execute("""
+SELECT format, COUNT(*)::int, MIN(created_at)::text, MAX(created_at)::text
+FROM meta_decks
+GROUP BY format
+ORDER BY COUNT(*) DESC, format ASC
+""")
+print(cur.fetchall())
+cur.execute("""
+SELECT format,
+       COUNT(*) FILTER (WHERE card_list ILIKE '%Sideboard%')::int,
+       COUNT(*)::int
+FROM meta_decks
+WHERE format IN ('EDH','cEDH')
+GROUP BY format
+ORDER BY format
+""")
+print(cur.fetchall())
 conn.close()
 PY
 ```
@@ -524,9 +571,141 @@ Resultado observado apos a correcao:
    - por completude de `100` cartas
    - por `% labels commander-like` vs `% arquétipos normalizados`
 
+## Auditoria dos consumidores apos `21d0c4a`
+
+### Resumo
+
+O parser base ja separa corretamente:
+
+- `EDH` -> `Duel Commander`
+- `cEDH` -> `Competitive EDH`
+
+O risco residual esta nos consumidores que ainda colapsam esses buckets em um unico conceito de "Commander meta".
+
+### Matriz objetiva
+
+| arquivo | risco | evidencia objetiva | correcao recomendada |
+| --- | --- | --- | --- |
+| `server/lib/ai/optimize_runtime_support.dart` | **alto** | `loadCommanderCompetitivePriorities()` consulta `format IN ('EDH', 'cEDH')` e devolve um unico pool competitivo para Commander. Isso mistura `Duel Commander` com `Competitive EDH` antes do ranking do `optimize`. | Separar pools por subformato. Para Commander multiplayer, priorizar `cEDH` e/ou fonte explicitamente multiplayer; tratar `EDH` apenas como `duel_commander` opt-in. |
+| `server/lib/ai/optimize_complete_support.dart` | **alto** | `prepareCompleteCommanderSeed()` consome `loadCommanderCompetitivePriorities()`, entao o modo `complete` herda a mesma mistura `EDH+cEDH`. | Aplicar a mesma separacao no seed competitivo e expor `priority_source` por subformato. |
+| `server/routes/ai/commander-reference/index.dart` | **alto** | O endpoint busca `meta_decks` com `format IN ('EDH', 'cEDH')`, faz refresh nos dois buckets e responde `commander_competitive_reference` sem distinguir escopo. | Retornar contagens e samples por subformato, incluir `subformat_scope` no payload e nao importar `EDH` por default quando a intencao for Commander multiplayer. |
+| `server/routes/ai/generate/index.dart` | **alto** | Para `format=Commander/edh`, `metaFormats.addAll(['EDH', 'cEDH'])` e o prompt chama isso de `successful meta decks for inspiration`. | Em `generate`, nao fundir `EDH` e `cEDH` silenciosamente. Usar `cEDH`/`commander_reference` para multiplayer e exigir `subformat` explicito para incluir `Duel Commander`. |
+| `server/routes/decks/[id]/analysis/index.dart` | **alto** | A tela de analise converte `format=commander` para `EDH` apenas, ou seja, usa `Duel Commander` como proxy de meta Commander e ainda ignora `cEDH`. | Parar de mapear `commander -> EDH`. Ou exige `subformat`, ou compara separadamente `duel_commander` e `competitive_commander`. |
+| `server/bin/extract_meta_insights.dart` | **medio-alto** | O extrator consome todo `meta_decks` e persiste `common_formats`/`supported_formats` com os codigos crus. Como `EDH` aqui e `Duel Commander`, o conhecimento derivado pode ser lido depois como Commander geral. | Normalizar o subformato na extracao (`duel_commander`, `competitive_commander`) e nao tratar `archetype` de `EDH/cEDH` como taxonomia estrategica sem classificacao adicional. |
+| `server/bin/meta_profile_report.dart` | **medio** | O report agora esta correto em total/cores por causa do parse Commander-aware, mas ainda publica `format: EDH/cEDH` sem label humano. Isso facilita leitura errada de cobertura como "Commander geral". | Incluir `format_label` e `subformat_scope` no JSON final. |
+| `server/bin/meta_report.dart` | **medio** | O resumo de cobertura mostra apenas `EDH`/`cEDH` em `by_format` e `latest_samples`, sem deixar explicito que `EDH` = `Duel Commander`. | Enriquecer o report com label canonico por formato. |
+| `server/bin/meta_report.py` | **medio** | Replica a mesma ambiguidade do report Dart. | Aplicar o mesmo mapeamento de labels ou descontinuar o script duplicado. |
+
+### Consumidores sem risco semantico novo relevante
+
+- `server/lib/meta/mtgtop8_meta_support.dart`: **seguro**; mapeamento explicito `EDH -> Duel Commander` e `cEDH -> Competitive EDH`.
+- `server/lib/meta/meta_deck_card_list_support.dart`: **seguro**; corrige a leitura Commander-aware do `Sideboard` sem redefinir significado de formato.
+- `server/routes/ai/ml-status/index.dart`: **baixo / neutro**; apenas conta registros em `meta_decks`.
+
+## Implementacao aplicada em 2026-04-24
+
+### Resumo da mudanca
+
+Foi implementada uma camada formal e derivada de subformatos sem alterar os dados existentes em `meta_decks`.
+
+Regra canonica agora aplicada em codigo:
+
+- `meta_decks.format = EDH` -> `duel_commander`
+- `meta_decks.format = cEDH` -> `competitive_commander`
+- `commander` amplo -> uniao explicita de `duel_commander + competitive_commander`
+
+### Arquivos alterados
+
+- `server/lib/meta/meta_deck_format_support.dart`
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/routes/ai/commander-reference/index.dart`
+- `server/routes/ai/generate/index.dart`
+- `server/routes/decks/[id]/analysis/index.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/bin/fetch_meta.dart`
+- `server/bin/meta_report.dart`
+- `server/bin/meta_report.py`
+- `server/bin/meta_profile_report.dart`
+- `server/bin/basic_land_audit.dart`
+- `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `server/test/meta_deck_format_support_test.dart`
+- `server/test/external_commander_meta_candidate_support_test.dart`
+- `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+
+### Comandos rodados nesta implementacao
+
+```bash
+cd server && dart analyze \
+  lib/meta/meta_deck_format_support.dart \
+  lib/meta/external_commander_meta_candidate_support.dart \
+  lib/ai/optimize_runtime_support.dart \
+  bin/fetch_meta.dart \
+  bin/extract_meta_insights.dart \
+  bin/meta_report.dart \
+  bin/meta_profile_report.dart \
+  bin/basic_land_audit.dart \
+  routes/ai/commander-reference/index.dart \
+  routes/ai/generate/index.dart \
+  routes/decks/[id]/analysis/index.dart \
+  test/meta_deck_format_support_test.dart \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/mtgtop8_meta_support_test.dart \
+  test/optimize_runtime_support_test.dart
+```
+
+```bash
+cd server && dart test \
+  test/meta_deck_format_support_test.dart \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/mtgtop8_meta_support_test.dart \
+  test/optimize_runtime_support_test.dart
+cd server && dart test
+```
+
+```bash
+cd server && dart run bin/fetch_meta.dart EDH --dry-run --limit-events=1 --limit-decks=2 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/fetch_meta.dart cEDH --dry-run --limit-events=1 --limit-decks=2 --delay-event-ms=0 --delay-deck-ms=0
+cd server && dart run bin/meta_report.dart
+cd server && dart run bin/meta_profile_report.dart
+```
+
+### Evidencia objetiva
+
+1. **Fonte e parser continuam vivos**
+   - `EDH` dry-run: `Spider-man 2099`, `Lumra, Bellow Of The Woods`
+   - `cEDH` dry-run: `Terra, Magical Adept`, `Kraum + Tymna`
+2. **O log operacional agora publica o subformato derivado**
+   - `format=EDH subformat=duel_commander`
+   - `format=cEDH subformat=competitive_commander`
+3. **A suite atual do servidor permaneceu verde**
+   - `dart test`: `All other tests passed!` com `164 skipped tests`
+4. **Cobertura atual continua igual, mas agora exposta sem ambiguidade**
+
+| bucket | decks |
+| --- | ---: |
+| `competitive_commander` | 214 |
+| `duel_commander` | 162 |
+
+5. **Nao houve migracao nem rewrite de dados**
+   - nenhuma coluna nova foi exigida
+   - nenhum row existente em `meta_decks` foi alterado
+   - `commander` generico pesquisado externamente permanece em staging e nao e promovido automaticamente para `EDH`
+
+### Impacto tecnico por consumidor
+
+- `optimize_runtime_support.dart`: `loadCommanderCompetitivePriorities()` agora consulta por escopo derivado; default = `competitive_commander`, sem misturar `EDH` por padrao.
+- `commander-reference`: aceita `scope`/`subformat`, continua compativel com chamadas antigas e passa a responder `meta_scope` + `meta_scope_breakdown`.
+- `generate`: continua aceitando `Commander`, mas o contexto de meta agora explicita quando a inspiracao veio de `duel_commander` ou `competitive_commander`; prompts com `cEDH`/`competitive` passam a filtrar para `competitive_commander`.
+- `decks/[id]/analysis`: parou de mapear silenciosamente `commander -> EDH`; a comparacao agora usa escopo Commander amplo e devolve `format_label/subformat` do melhor match.
+- `extract_meta_insights.dart`: futuros rebuilds vao persistir `duel_commander` / `competitive_commander` em `common_formats` e padroes analiticos, em vez de reespalhar o legado cru.
+- `meta_report*` e `meta_profile_report.dart`: passam a expor `format_label` e `subformat`.
+- `external_commander_meta_candidate_support.dart`: `commander` generico nao vira mais `EDH` legado por default; promocao automatica ficou restrita a `duel_commander` e `competitive_commander`.
+
 ## Conclusao
 
 - **Estado atual:** ingestao MTGTop8 funcional e base fresca.
 - **Lacunas:** Commander multiplayer ainda nao esta coberto de forma provada; `external_commander_meta_candidates` esta vazia; `archetype` nao e taxonomia estrategica.
 - **Riscos:** confundir `Duel Commander` com Commander geral e usar `archetype` como taxonomia estrategica pronta.
-- **Proximo passo recomendado:** separar formalmente subformatos e iniciar staging controlado por `TopDeck.gg` + `EDHTop16`, sem promover nada para `meta_decks` antes de validacao.
+- **Proximo passo recomendado:** se o produto precisar persistir `subformat` no banco, fazer isso por script dedicado `dry-run/apply`, preservando compatibilidade com os codigos legados enquanto a migracao nao termina.

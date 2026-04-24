@@ -8,6 +8,8 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/meta/meta_deck_card_list_support.dart';
+import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/mtgtop8_meta_support.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -23,6 +25,11 @@ Future<Response> onRequest(RequestContext context) async {
     final refresh = (uri.queryParameters['refresh'] ?? '').toLowerCase();
     final shouldRefresh =
         refresh == '1' || refresh == 'true' || refresh == 'yes';
+    final requestedMetaScope = normalizeCommanderMetaScope(
+      uri.queryParameters['subformat'] ?? uri.queryParameters['scope'],
+    );
+    final commanderFormats =
+        metaDeckFormatCodesForCommanderScope(requestedMetaScope);
 
     if (commander.isEmpty) {
       return badRequest('Query parameter commander is required.');
@@ -45,14 +52,15 @@ Future<Response> onRequest(RequestContext context) async {
 
     var decks = await pool.execute(
       Sql.named('''
-        SELECT id::text, archetype, source_url, placement, card_list
+        SELECT id::text, format, archetype, source_url, placement, card_list
         FROM meta_decks
-        WHERE format IN ('EDH', 'cEDH')
+        WHERE format = ANY(@formats)
           AND card_list ILIKE @commanderPattern
         ORDER BY created_at DESC
         LIMIT 200
       '''),
       parameters: {
+        'formats': TypedValue(Type.textArray, commanderFormats),
         'commanderPattern': '%${commander.replaceAll('%', '')}%',
       },
     );
@@ -62,14 +70,15 @@ Future<Response> onRequest(RequestContext context) async {
       if (commanderToken.isNotEmpty) {
         decks = await pool.execute(
           Sql.named('''
-            SELECT id::text, archetype, source_url, placement, card_list
+            SELECT id::text, format, archetype, source_url, placement, card_list
             FROM meta_decks
-            WHERE format IN ('EDH', 'cEDH')
+            WHERE format = ANY(@formats)
               AND archetype ILIKE @archetypePattern
             ORDER BY created_at DESC
             LIMIT 200
           '''),
           parameters: {
+            'formats': TypedValue(Type.textArray, commanderFormats),
             'archetypePattern': '%${commanderToken.replaceAll('%', '')}%',
           },
         );
@@ -115,12 +124,14 @@ Future<Response> onRequest(RequestContext context) async {
             'source': 'edhrec',
             'generated_from_meta_decks': 0,
             'generated_from_edhrec': true,
+            'meta_scope': requestedMetaScope,
             'top_non_basic_cards': edhrecCards
                 .map((e) => e['name'])
                 .whereType<String>()
                 .take(limit)
                 .toList(),
           },
+          'meta_scope': _buildMetaScopePayload(requestedMetaScope),
           'commander_profile': edhrecProfile,
           if (refreshSummary != null) 'refresh': refreshSummary,
         });
@@ -153,6 +164,7 @@ Future<Response> onRequest(RequestContext context) async {
           'sample_decks': <Map<String, dynamic>>[],
           'message':
               'Nenhum deck competitivo encontrado para esse comandante no acervo atual.',
+          'meta_scope': _buildMetaScopePayload(requestedMetaScope),
           if (cachedProfile != null) 'commander_profile': cachedProfile,
         });
       }
@@ -178,8 +190,10 @@ Future<Response> onRequest(RequestContext context) async {
           'type': 'commander_competitive_reference',
           'generated_from_meta_decks': 0,
           'generated_from_card_meta_insights': true,
+          'meta_scope': requestedMetaScope,
           'top_non_basic_cards': cards.map((e) => e['name']).toList(),
         },
+        'meta_scope': _buildMetaScopePayload(requestedMetaScope),
         if (cachedProfile != null) 'commander_profile': cachedProfile,
         if (refreshSummary != null) 'refresh': refreshSummary,
       });
@@ -189,17 +203,27 @@ Future<Response> onRequest(RequestContext context) async {
     final counts = <String, int>{};
     final deckAppearances = <String, int>{};
     final sampleDecks = <Map<String, dynamic>>[];
+    final metaScopeBreakdown = <String, int>{};
 
     for (final row in decks) {
       final deckId = row[0] as String;
-      final archetype = (row[1] as String?) ?? 'unknown';
-      final sourceUrl = (row[2] as String?) ?? '';
-      final placement = (row[3] as String?) ?? '';
-      final rawList = (row[4] as String?) ?? '';
+      final storedFormat = (row[1] as String?) ?? '';
+      final archetype = (row[2] as String?) ?? 'unknown';
+      final sourceUrl = (row[3] as String?) ?? '';
+      final placement = (row[4] as String?) ?? '';
+      final rawList = (row[5] as String?) ?? '';
+      final formatDescriptor = describeMetaDeckFormat(storedFormat);
+      final subformatKey =
+          formatDescriptor.commanderSubformat ?? formatDescriptor.storedFormatCode;
+      metaScopeBreakdown[subformatKey] =
+          (metaScopeBreakdown[subformatKey] ?? 0) + 1;
 
       if (sampleDecks.length < 10) {
         sampleDecks.add({
           'id': deckId,
+          'format_code': formatDescriptor.storedFormatCode,
+          'format_label': formatDescriptor.label,
+          'subformat': formatDescriptor.commanderSubformat,
           'archetype': archetype,
           'source_url': sourceUrl,
           'placement': placement,
@@ -207,31 +231,17 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       final seenInDeck = <String>{};
-      var inSideboard = false;
+      final parsedDeck = parseMetaDeckCardList(
+        cardList: rawList,
+        format: storedFormat,
+      );
 
-      for (final rawLine in rawList.split('\n')) {
-        final line = rawLine.trim();
-        if (line.isEmpty) continue;
-        if (line.toLowerCase().contains('sideboard')) {
-          inSideboard = true;
-          continue;
-        }
-        if (inSideboard) continue;
-
-        final match = RegExp(r'^(\d+)x?\s+(.+)$').firstMatch(line);
-        if (match == null) continue;
-
-        final qty = int.tryParse(match.group(1) ?? '1') ?? 1;
-        var name = (match.group(2) ?? '').trim();
-        if (name.isEmpty) continue;
-
-        name = name.replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '').trim();
-        if (name.isEmpty) continue;
-
+      for (final entry in parsedDeck.mainboard.entries) {
+        final name = entry.key;
         final lower = name.toLowerCase();
         if (lower == commanderLower || _isBasicLandName(lower)) continue;
 
-        counts[name] = (counts[name] ?? 0) + qty;
+        counts[name] = (counts[name] ?? 0) + entry.value;
         if (!seenInDeck.contains(lower)) {
           deckAppearances[name] = (deckAppearances[name] ?? 0) + 1;
           seenInDeck.add(lower);
@@ -266,8 +276,11 @@ Future<Response> onRequest(RequestContext context) async {
       'model': {
         'type': 'commander_competitive_reference',
         'generated_from_meta_decks': totalDecks,
+        'meta_scope': requestedMetaScope,
         'top_non_basic_cards': references.map((e) => e['name']).toList(),
       },
+      'meta_scope': _buildMetaScopePayload(requestedMetaScope),
+      'meta_scope_breakdown': metaScopeBreakdown,
       if (cachedProfile != null) 'commander_profile': cachedProfile,
       if (refreshSummary != null) 'refresh': refreshSummary,
     });
@@ -470,7 +483,7 @@ Future<Map<String, dynamic>> _refreshCommanderFromMtgTop8({
   required Pool pool,
   required String commander,
 }) async {
-  const formats = ['EDH', 'cEDH'];
+  final formats = metaDeckFormatCodesForCommanderScope('commander');
 
   final commanderToken = commander.split(',').first.trim().toLowerCase();
   if (commanderToken.isEmpty) {
@@ -574,4 +587,15 @@ bool _isBasicLandName(String name) {
       n == 'mountain' ||
       n == 'forest' ||
       n == 'wastes';
+}
+
+Map<String, dynamic> _buildMetaScopePayload(String requestedMetaScope) {
+  return {
+    'requested': requestedMetaScope,
+    'label': commanderMetaScopeLabel(requestedMetaScope),
+    'format_codes': metaDeckFormatCodesForCommanderScope(requestedMetaScope),
+    'subformats': commanderSubformatsForScope(requestedMetaScope),
+    'compatibility_note':
+        'MTGTop8 EDH representa Duel Commander; cEDH representa Competitive Commander.',
+  };
 }

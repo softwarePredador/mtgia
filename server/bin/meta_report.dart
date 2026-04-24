@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 
 Future<void> main() async {
   final db = Database();
@@ -29,17 +30,39 @@ Future<void> main() async {
   final payload = {
     'total_meta_decks': total,
     'by_format': byFormatResult
-        .map((r) => {'format': r[0], 'count': r[1]})
+        .map((r) {
+          final descriptor = describeMetaDeckFormat(r[0] as String?);
+          return {
+            'format': descriptor.storedFormatCode,
+            'count': r[1],
+            'format_family': descriptor.formatFamily,
+            'format_label': descriptor.label,
+            'subformat': descriptor.commanderSubformat,
+          };
+        })
         .toList(),
+    'by_commander_subformat': byFormatResult
+        .where((r) => describeMetaDeckFormat(r[0] as String?).commanderSubformat != null)
+        .fold<Map<String, int>>(<String, int>{}, (acc, r) {
+          final descriptor = describeMetaDeckFormat(r[0] as String?);
+          acc[descriptor.commanderSubformat!] =
+              (acc[descriptor.commanderSubformat!] ?? 0) + ((r[1] as num?)?.toInt() ?? 0);
+          return acc;
+        }),
     'mtgtop8_count': top8Count,
     'latest_samples': latestResult
-        .map((r) => {
-              'format': r[0],
-              'archetype': r[1],
-              'placement': r[2],
-              'source_url': r[3],
-              'created_at': r[4].toString(),
-            })
+        .map((r) {
+          final descriptor = describeMetaDeckFormat(r[0] as String?);
+          return {
+            'format': descriptor.storedFormatCode,
+            'format_label': descriptor.label,
+            'subformat': descriptor.commanderSubformat,
+            'archetype': r[1],
+            'placement': r[2],
+            'source_url': r[3],
+            'created_at': r[4].toString(),
+          };
+        })
         .toList(),
   };
 

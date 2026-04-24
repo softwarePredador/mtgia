@@ -29,7 +29,7 @@ void main() {
       expect(candidate.deckName, 'Atraxa Infect');
       expect(candidate.cardList, '1 Sol Ring\n1 Mana Crypt');
       expect(candidate.colorIdentity, equals(<String>{'G', 'W', 'U', 'B'}));
-      expect(candidate.normalizedSubformat, 'cedh');
+      expect(candidate.normalizedSubformat, 'competitive_commander');
       expect(candidate.metaDeckFormatCode, 'cEDH');
       expect(candidate.isPromotionEligible, isTrue);
       expect(candidate.researchPayload['web_sources'], isNotEmpty);
@@ -49,9 +49,27 @@ void main() {
 
       expect(candidate.sourceName, 'Archidekt');
       expect(candidate.persistedFormat, 'commander');
-      expect(candidate.normalizedSubformat, 'edh');
-      expect(candidate.metaDeckFormatCode, 'EDH');
+      expect(candidate.normalizedSubformat, 'commander');
+      expect(candidate.metaDeckFormatCode, isNull);
+      expect(candidate.isPromotionEligible, isFalse);
       expect(candidate.validationStatus, 'candidate');
+    });
+
+    test('so promove duel commander quando o subformato e explicito', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'MTGTop8',
+          'source_url': 'https://www.mtgtop8.com/event?e=1&d=2&f=EDH',
+          'deck_name': 'Raffine Duel',
+          'subformat': 'duel_commander',
+          'card_list': '1 Swords to Plowshares',
+          'validation_status': 'validated',
+        },
+      );
+
+      expect(candidate.normalizedSubformat, 'duel_commander');
+      expect(candidate.metaDeckFormatCode, 'EDH');
+      expect(candidate.isPromotionEligible, isTrue);
     });
 
     test('mantem status rejeitado fora da promocao', () {
@@ -97,7 +115,7 @@ void main() {
       );
 
       expect(candidates, hasLength(2));
-      expect(candidates.first.metaDeckFormatCode, 'EDH');
+      expect(candidates.first.metaDeckFormatCode, isNull);
       expect(candidates.last.metaDeckFormatCode, 'cEDH');
     });
 

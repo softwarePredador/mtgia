@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 
 Future<void> main() async {
   final db = Database();
@@ -52,9 +53,12 @@ Future<void> main() async {
     final url = (r[2] as String?) ?? '';
     final list = (r[3] as String?) ?? '';
     final count = basicCount(list);
+    final descriptor = describeMetaDeckFormat(format);
     return {
       'id': id,
-      'format': format,
+      'format': descriptor.storedFormatCode,
+      'format_label': descriptor.label,
+      'subformat': descriptor.commanderSubformat,
       'url': url,
       'basic_count': count,
     };
@@ -72,6 +76,16 @@ Future<void> main() async {
     return result;
   }
 
+  Map<String, int> bySubformat(List<Map<String, dynamic>> list) {
+    final result = <String, int>{};
+    for (final d in list) {
+      final subformat = d['subformat'] as String?;
+      if (subformat == null || subformat.isEmpty) continue;
+      result[subformat] = (result[subformat] ?? 0) + 1;
+    }
+    return result;
+  }
+
   final over40 = overThreshold(40);
   final over50 = overThreshold(50);
   final over60 = decks.where((d) => (d['basic_count'] as int) > 60).toList();
@@ -84,6 +98,9 @@ Future<void> main() async {
     'by_format_over40': byFormat(over40),
     'by_format_over50': byFormat(over50),
     'by_format_over60': byFormat(over60),
+    'by_subformat_over40': bySubformat(over40),
+    'by_subformat_over50': bySubformat(over50),
+    'by_subformat_over60': bySubformat(over60),
     'sample_over40': over40.take(10).toList(),
     'sample_over50': over50.take(10).toList(),
     'sample_over60': over60.take(10).toList(),

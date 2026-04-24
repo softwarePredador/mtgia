@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/meta/meta_deck_card_list_support.dart';
+import '../../../../lib/meta/meta_deck_format_support.dart';
+
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.get) {
     return _analyzeDeck(context, deckId);
@@ -265,35 +268,48 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     Map<String, dynamic>? metaAnalysis;
     
     try {
-      // Busca os últimos 50 decks do meta desse formato
-      final metaDecksResult = await pool.execute(
-        Sql.named('SELECT archetype, card_list, source_url FROM meta_decks WHERE format = @format ORDER BY created_at DESC LIMIT 50'),
-        parameters: {'format': format.toLowerCase() == 'commander' ? 'EDH' : (format == 'standard' ? 'ST' : format)},
-      );
+      final metaFormats = metaDeckFormatCodesForDeckFormat(format);
+      final metaScope = format.toLowerCase() == 'commander'
+          ? 'commander'
+          : null;
+      final metaDecksResult = metaFormats.isEmpty
+          ? const <dynamic>[]
+          : await pool.execute(
+              Sql.named('''
+                SELECT format, archetype, card_list, source_url
+                FROM meta_decks
+                WHERE format = ANY(@formats)
+                ORDER BY created_at DESC
+                LIMIT 50
+              '''),
+              parameters: {
+                'formats': TypedValue(Type.textArray, metaFormats),
+              },
+            );
 
       if (metaDecksResult.isNotEmpty) {
         var bestMatchArchetype = '';
         var bestMatchScore = 0.0;
         var bestMatchMissingCards = <String>[];
+        String? bestMatchFormatCode;
+        String? bestMatchSubformat;
+        String? bestMatchFormatLabel;
         
         // Cria um Set com os nomes das cartas do usuário para comparação rápida
         final userCardNames = cards.map((c) => (c['name'] as String).toLowerCase()).toSet();
 
         for (final row in metaDecksResult) {
-          final archetype = row[0] as String;
-          final cardListRaw = row[1] as String;
+          final storedFormat = (row[0] as String?) ?? '';
+          final archetype = row[1] as String;
+          final cardListRaw = row[2] as String;
+          final formatDescriptor = describeMetaDeckFormat(storedFormat);
           
-          // Parse simples da lista do meta (ex: "4 Sheoldred, the Apocalypse")
-          final metaCards = <String>{};
-          final lines = cardListRaw.split('\n');
-          for (final line in lines) {
-            final parts = line.trim().split(' ');
-            if (parts.length > 1) {
-              // Remove a quantidade (primeira parte) e junta o resto
-              final name = parts.sublist(1).join(' ').toLowerCase();
-              metaCards.add(name);
-            }
-          }
+          final parsedDeck = parseMetaDeckCardList(
+            cardList: cardListRaw,
+            format: storedFormat,
+          );
+          final metaCards =
+              parsedDeck.mainboard.keys.map((name) => name.toLowerCase()).toSet();
           
           // Calcula similaridade (Jaccard Index simplificado: Interseção / União)
           final intersection = userCardNames.intersection(metaCards).length;
@@ -303,6 +319,9 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           if (score > bestMatchScore) {
             bestMatchScore = score;
             bestMatchArchetype = archetype;
+            bestMatchFormatCode = formatDescriptor.storedFormatCode;
+            bestMatchSubformat = formatDescriptor.commanderSubformat;
+            bestMatchFormatLabel = formatDescriptor.label;
             // Identifica cartas que o meta tem e o usuário não (Staples potenciais)
             bestMatchMissingCards = metaCards.difference(userCardNames).take(5).toList(); // Sugere top 5
           }
@@ -313,6 +332,15 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           metaAnalysis = {
             'archetype': bestMatchArchetype,
             'similarity': double.parse((bestMatchScore * 100).toStringAsFixed(1)),
+            'format_code': bestMatchFormatCode,
+            'format_label': bestMatchFormatLabel,
+            'subformat': bestMatchSubformat,
+            if (metaScope != null)
+              'meta_scope': {
+                'requested': metaScope,
+                'label': commanderMetaScopeLabel(metaScope),
+                'format_codes': metaFormats,
+              },
             'suggested_adds': bestMatchMissingCards,
             'message': 'Your deck is ${(bestMatchScore * 100).toStringAsFixed(0)}% similar to "$bestMatchArchetype". Consider adding these cards used in the meta.',
           };

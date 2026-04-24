@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../color_identity.dart';
+import 'meta_deck_format_support.dart';
 
 const externalCommanderMetaValidationStatuses = <String>{
   'candidate',
@@ -53,11 +54,7 @@ class ExternalCommanderMetaCandidate {
       normalizeCommanderMetaSubformat(subformat ?? format);
 
   String? get metaDeckFormatCode {
-    return switch (normalizedSubformat) {
-      'cedh' => 'cEDH',
-      'edh' || 'commander' => 'EDH',
-      _ => null,
-    };
+    return legacyMetaDeckFormatCodeForCommanderSubformat(normalizedSubformat);
   }
 
   bool get isPromotionEligible =>
@@ -213,9 +210,17 @@ String? normalizeCommanderMetaSubformat(String? raw) {
   if (normalized == null || normalized.isEmpty) return null;
 
   return switch (normalized) {
-    'commander' => 'edh',
-    'edh' || 'duel commander' || 'casual commander' => 'edh',
-    'cedh' || 'competitive edh' || 'competitive commander' => 'cedh',
+    'duel_commander' || 'duel commander' || 'mtgtop8 edh' => 'duel_commander',
+    'cedh' ||
+    'competitive edh' ||
+    'competitive commander' ||
+    'competitive_commander' =>
+      'competitive_commander',
+    'commander' ||
+    'edh' ||
+    'multiplayer commander' ||
+    'casual commander' =>
+      'commander',
     _ => normalized,
   };
 }

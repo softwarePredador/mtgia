@@ -3,6 +3,42 @@ import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+FORMAT_LABELS = {
+    'ST': 'Standard',
+    'PI': 'Pioneer',
+    'MO': 'Modern',
+    'LE': 'Legacy',
+    'VI': 'Vintage',
+    'EDH': 'Duel Commander (MTGTop8 EDH)',
+    'cEDH': 'Competitive Commander (MTGTop8 cEDH)',
+    'PAU': 'Pauper',
+    'PREM': 'Premodern',
+}
+
+
+def format_descriptor(format_code):
+    code = (format_code or '').strip() or 'unknown'
+    if code == 'EDH':
+        return {
+            'format': code,
+            'format_family': 'commander',
+            'format_label': FORMAT_LABELS[code],
+            'subformat': 'duel_commander',
+        }
+    if code == 'cEDH':
+        return {
+            'format': code,
+            'format_family': 'commander',
+            'format_label': FORMAT_LABELS[code],
+            'subformat': 'competitive_commander',
+        }
+    return {
+        'format': code,
+        'format_family': code.lower(),
+        'format_label': FORMAT_LABELS.get(code, code),
+        'subformat': None,
+    }
+
 conn = psycopg2.connect(
     host=os.getenv('DB_HOST', '143.198.230.247'),
     port=int(os.getenv('DB_PORT', '5433')),
@@ -29,11 +65,34 @@ LIMIT 12
 ''')
 latest = cur.fetchall()
 
+by_commander_subformat = {}
+normalized_by_format = []
+for row in by_format:
+    descriptor = format_descriptor(row['format'])
+    normalized_by_format.append({
+        **descriptor,
+        'count': row['c'],
+    })
+    if descriptor['subformat']:
+        by_commander_subformat[descriptor['subformat']] = row['c']
+
+normalized_latest = []
+for row in latest:
+    descriptor = format_descriptor(row['format'])
+    normalized_latest.append({
+        **descriptor,
+        'archetype': row['archetype'],
+        'placement': row['placement'],
+        'source_url': row['source_url'],
+        'created_at': row['created_at'],
+    })
+
 print(json.dumps({
     'total_meta_decks': total,
-    'by_format': by_format,
+    'by_format': normalized_by_format,
+    'by_commander_subformat': by_commander_subformat,
     'mtgtop8_count': mtgtop8_count,
-    'latest_samples': latest,
+    'latest_samples': normalized_latest,
 }, ensure_ascii=False, default=str, indent=2))
 
 cur.close()

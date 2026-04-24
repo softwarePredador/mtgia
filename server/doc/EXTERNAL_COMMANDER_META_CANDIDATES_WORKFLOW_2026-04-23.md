@@ -40,7 +40,7 @@ Campos recomendados:
 
 - `commander_name`
 - `partner_commander_name`
-- `subformat`: `EDH` ou `cEDH`
+- `subformat`: `commander`, `duel_commander` ou `competitive_commander`
 - `archetype`
 - `placement`
 - `color_identity`
@@ -59,7 +59,7 @@ Campos recomendados:
       "source_url": "https://www.moxfield.com/decks/example",
       "deck_name": "Atraxa Fast Infect",
       "commander_name": "Atraxa, Praetors' Voice",
-      "subformat": "cEDH",
+      "subformat": "competitive_commander",
       "archetype": "Combo-Control",
       "color_identity": ["W", "U", "B", "G"],
       "is_commander_legal": true,
@@ -113,8 +113,14 @@ dart run bin/import_external_commander_meta_candidates.dart ../candidates.json -
 Hoje o import so promove para `meta_decks` quando:
 
 - `validation_status == validated`
-- `subformat` normaliza para `EDH` ou `cEDH`
+- `subformat` normaliza para `duel_commander` ou `competitive_commander`
 - `card_list` existe
+
+Regra de seguranca adicional:
+
+- `commander` generico continua estagiado em `external_commander_meta_candidates`
+- ele **nao** e promovido automaticamente para `meta_decks` enquanto a tabela principal ainda usar os codigos legados `EDH`/`cEDH`
+- isso evita reclassificar Commander multiplayer amplo como `EDH` legado do MTGTop8, que no pipeline atual significa `Duel Commander`
 
 Ao promover:
 

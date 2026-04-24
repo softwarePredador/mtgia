@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../lib/database.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 
 class CardInfo {
   CardInfo({required this.typeLine, required this.colorIdentity});
@@ -79,8 +80,12 @@ Future<void> main() async {
 
   final formatReport = byFormat.entries.map((e) {
     final p = e.value;
+    final descriptor = describeMetaDeckFormat(e.key);
     return {
-      'format': e.key,
+      'format': descriptor.storedFormatCode,
+      'format_family': descriptor.formatFamily,
+      'format_label': descriptor.label,
+      'subformat': descriptor.commanderSubformat,
       'deck_count': p.deckCount,
       'avg_total_cards': _avg(p.totalCards, p.deckCount),
       'avg_lands': _avg(p.lands, p.deckCount),
@@ -100,8 +105,12 @@ Future<void> main() async {
       .map((e) {
         final p = e.value;
         final parts = e.key.split('|');
+        final descriptor = describeMetaDeckFormat(parts[0]);
         return {
-          'format': parts[0],
+          'format': descriptor.storedFormatCode,
+          'format_family': descriptor.formatFamily,
+          'format_label': descriptor.label,
+          'subformat': descriptor.commanderSubformat,
           'colors': parts[1],
           'theme': parts[2],
           'deck_count': p.deckCount,

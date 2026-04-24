@@ -9,6 +9,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
+import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -61,37 +62,19 @@ Future<Response> onRequest(RequestContext context) async {
           .toList();
 
       final normalizedFormat = format.trim().toLowerCase();
-      final metaFormats = <String>[];
-
-      switch (normalizedFormat) {
-        case 'commander':
-        case 'edh':
-          metaFormats.addAll(['EDH', 'cEDH']);
-          break;
-        case 'standard':
-          metaFormats.add('ST');
-          break;
-        case 'pioneer':
-          metaFormats.add('PI');
-          break;
-        case 'modern':
-          metaFormats.add('MO');
-          break;
-        case 'legacy':
-          metaFormats.add('LE');
-          break;
-        case 'vintage':
-          metaFormats.add('VI');
-          break;
-        case 'pauper':
-          metaFormats.add('PAU');
-          break;
-      }
+      final commanderMetaScope = normalizedFormat == 'commander' ||
+              normalizedFormat == 'edh'
+          ? _resolveCommanderMetaScopeFromPrompt(prompt)
+          : null;
+      final metaFormats = metaDeckFormatCodesForDeckFormat(
+        format,
+        commanderScope: commanderMetaScope ?? 'commander',
+      );
 
       if (metaKeywordPatterns.isNotEmpty && metaFormats.isNotEmpty) {
         final metaResult = await pool.execute(
           Sql.named('''
-            SELECT archetype, card_list
+            SELECT format, archetype, card_list
             FROM meta_decks
             WHERE format = ANY(@formats)
               AND archetype ILIKE ANY(@patterns)
@@ -104,14 +87,23 @@ Future<Response> onRequest(RequestContext context) async {
         );
 
         if (metaResult.isNotEmpty) {
-          metaContext =
-              'Here are some successful meta decks for inspiration:\n';
+          if (commanderMetaScope != null) {
+            metaContext =
+                'Commander meta note: MTGTop8 EDH is Duel Commander and cEDH is Competitive Commander.\n'
+                'Requested commander meta scope: ${commanderMetaScopeLabel(commanderMetaScope)}.\n\n';
+          }
+          metaContext += 'Here are some successful meta decks for inspiration:\n';
           for (final row in metaResult) {
-            final cardList = (row[1] as String?) ?? '';
+            final descriptor = describeMetaDeckFormat(row[0] as String?);
+            final cardList = (row[2] as String?) ?? '';
             final excerpt =
                 cardList.length > 200 ? cardList.substring(0, 200) : cardList;
             final suffix = cardList.length > 200 ? '...' : '';
-            metaContext += 'Archetype: ${row[0]}\nList: $excerpt$suffix\n\n';
+            final scopeLabel = descriptor.commanderSubformat != null
+                ? '${descriptor.commanderSubformat} / ${descriptor.label}'
+                : descriptor.label;
+            metaContext +=
+                'Archetype: ${row[1]}\nMeta scope: $scopeLabel\nList: $excerpt$suffix\n\n';
           }
         }
       }
@@ -329,6 +321,19 @@ $metaContext
     print('[ERROR] Failed to generate deck: $error');
     return internalServerError('Failed to generate deck');
   }
+}
+
+String _resolveCommanderMetaScopeFromPrompt(String prompt) {
+  final normalized = prompt.toLowerCase();
+  if (normalized.contains('duel commander')) {
+    return 'duel_commander';
+  }
+  if (normalized.contains('cedh') ||
+      normalized.contains('competitive edh') ||
+      normalized.contains('competitive commander')) {
+    return 'competitive_commander';
+  }
+  return 'commander';
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

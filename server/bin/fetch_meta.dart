@@ -5,6 +5,7 @@ import 'package:html/parser.dart' as parser;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 import '../lib/meta/mtgtop8_meta_support.dart';
 
 // Script para buscar decks do Meta (MTGTop8)
@@ -34,9 +35,16 @@ Future<void> main(List<String> args) async {
         continue;
       }
 
+      final formatDescriptor = describeMetaDeckFormat(formatCode);
+
       print(
-        '\n=== Iniciando crawler para ${mtgTop8SupportedFormats[formatCode]} ($formatCode) ===',
+        '\n=== Iniciando crawler para ${formatDescriptor.label} ($formatCode) ===',
       );
+      if (formatDescriptor.commanderSubformat != null) {
+        print(
+          'Subformato derivado: ${formatDescriptor.commanderSubformat}',
+        );
+      }
       if (config.dryRun) {
         print('Modo dry-run ativo: nenhuma escrita em banco sera feita.');
       }
@@ -174,8 +182,10 @@ Future<void> _processEvent(
       if (config.dryRun) {
         final cardCount =
             cardList.split('\n').where((line) => line.trim().isNotEmpty).length;
+        final descriptor = describeMetaDeckFormat(parsedRow.formatCode);
         print(
           '     [DRY] OK format=${parsedRow.formatCode} '
+          'subformat=${descriptor.commanderSubformat ?? "-"} '
           'placement=${parsedRow.placement} cards=$cardCount url=${parsedRow.deckUrl}',
         );
       } else {
