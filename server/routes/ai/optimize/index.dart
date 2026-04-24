@@ -625,10 +625,10 @@ Future<Response> onRequest(RequestContext context) async {
       try {
         final commanderName = commanders.first.trim();
         if (commanderName.isNotEmpty) {
-          final commanderMetaScope =
-              deckFormat == 'commander' && (bracket ?? 0) >= 3
-                  ? 'competitive_commander'
-                  : 'competitive_commander';
+          final commanderMetaScope = resolveCommanderOptimizeMetaScope(
+            deckFormat: deckFormat,
+            bracket: bracket,
+          );
           final commanderReferenceFuture = telemetry.trackAsync(
             'request.commander_reference_cache',
             () => loadCommanderReferenceProfileFromCache(
@@ -636,17 +636,23 @@ Future<Response> onRequest(RequestContext context) async {
               commanderName: commanderName,
             ),
           );
-          final metaSelectionFuture = telemetry.trackAsync(
-            'request.commander_priority_query',
-            () => loadCommanderMetaReferenceSelection(
-              pool: pool,
-              commanderNames: commanders,
-              limitDecks: 4,
-              priorityCardLimit: 120,
-              metaScope: commanderMetaScope,
-              preferExternalCompetitive: (bracket ?? 0) >= 3,
-            ),
-          );
+          final metaSelectionFuture = commanderMetaScope == null
+              ? Future.value(
+                  emptyCommanderMetaReferenceSelection(
+                    commanderScope: commanderMetaScope,
+                  ),
+                )
+              : telemetry.trackAsync(
+                  'request.commander_priority_query',
+                  () => loadCommanderMetaReferenceSelection(
+                    pool: pool,
+                    commanderNames: commanders,
+                    limitDecks: 4,
+                    priorityCardLimit: 120,
+                    metaScope: commanderMetaScope,
+                    preferExternalCompetitive: true,
+                  ),
+                );
           final results = await Future.wait<dynamic>([
             commanderReferenceFuture,
             metaSelectionFuture,
@@ -2715,6 +2721,7 @@ Future<void> _processCompleteModeAsync({
         maxTotal: maxTotal,
         currentTotalCards: currentTotalCards,
         state: state,
+        bracket: bracket,
       ),
     );
 

@@ -549,139 +549,104 @@ Importante:
 
 ### Objetivo
 
-Fechar o ultimo gap entre o stage externo/promovido e o motor de IA:
+Fechar o uso real das referencias Commander/cEDH externas no motor de IA sem copiar lista cegamente:
 
-- fazer `generate` e `optimize` consumirem o novo corpus externo competitivo;
-- priorizar `competitive_commander` para contexto de bracket alto/competitivo;
-- parar de misturar `MTGTop8 EDH` (Duel Commander) com Commander multiplayer;
-- explicar `source_chain` e evidência meta no prompt sem despejar payload bruto.
+- manter `competitive_commander` restrito a contexto competitivo real;
+- impedir que Commander casual consuma prioridade competitiva por default;
+- preservar `source_chain` apenas como evidência estratégica auditavel;
+- manter `generate` e `optimize` separados de promoção automática.
 
-### Arquivos alterados
+### Arquivos alterados nesta etapa
 
-- `server/lib/meta/meta_deck_reference_support.dart`
 - `server/lib/ai/optimize_runtime_support.dart`
 - `server/lib/ai/optimize_complete_support.dart`
-- `server/lib/ai/otimizacao.dart`
-- `server/routes/ai/generate/index.dart`
 - `server/routes/ai/optimize/index.dart`
-- `server/test/meta_deck_reference_support_test.dart`
+- `server/test/optimize_runtime_support_test.dart`
 
 ### Comandos rodados
 
 ```bash
-cd server && dart analyze \
-  lib/meta/meta_deck_reference_support.dart \
-  lib/ai/optimize_runtime_support.dart \
-  lib/ai/optimize_complete_support.dart \
-  lib/ai/otimizacao.dart \
-  routes/ai/generate/index.dart \
-  routes/ai/optimize/index.dart \
-  test/meta_deck_reference_support_test.dart
+cd server && dart analyze lib/meta lib/ai bin routes test
 
 cd server && dart test -r compact \
   test/meta_deck_reference_support_test.dart \
-  test/meta_deck_analytics_support_test.dart \
-  test/meta_deck_card_list_support_test.dart \
-  test/meta_deck_commander_shell_support_test.dart \
-  test/meta_deck_format_support_test.dart \
-  test/optimize_learning_pipeline_test.dart \
-  test/mtgtop8_meta_support_test.dart \
-  test/external_commander_meta_* \
+  test/optimize_runtime_support_test.dart \
   test/commander_reference_atraxa_test.dart \
+  test/optimize_learning_pipeline_test.dart \
   test/ai_generate_create_optimize_flow_test.dart
-
-cd .. && ./scripts/quality_gate.sh quick
 ```
 
-### Evidencia tecnica
+### Fatos provados por codigo
 
-#### 1. A selecao agora reaproveita o stage externo promovido
+#### 1. `generate` ja estava commander-aware
 
-Novo helper compartilhado:
+Leitura comprovada antes do patch:
 
-- consulta `meta_decks`
-- faz `LEFT JOIN` com `external_commander_meta_candidates` por `source_url`
-- recupera `source_name` e `research_payload.source_chain`
+- `routes/ai/generate/index.dart` ja resolvia `commanderMetaScope` apenas quando o prompt indicava `competitive_commander` ou `duel_commander`
+- nenhum ajuste adicional foi necessario em `generate` nesta etapa
 
-Leitura:
+#### 2. `optimize` estava forçando `competitive_commander` em todo Commander
 
-- `generate` e `optimize` passam a enxergar a proveniencia dos decks promovidos sem mudar o schema de `meta_decks`
-- isso atende o pedido de integrar o acervo externo com a menor mudanca possivel
+Problema comprovado no codigo anterior:
 
-#### 2. Bracket alto/competitivo agora puxa shell competitivo real
+- `routes/ai/optimize/index.dart` resolvia `commanderMetaScope` para `competitive_commander` nos dois ramos do ternario
+- `prepareCompleteCommanderSeed(...)` carregava referencias com `metaScope: 'competitive_commander'` de forma fixa
 
-Prova de codigo:
+Impacto:
 
-- `optimize` passou a carregar referencias usando a lista completa de `commanders`
-- o ranking considera:
-  - `commander_name`
-  - `partner_commander_name`
-  - `shell_label`
-  - preferencia por fonte externa competitiva quando o contexto pede isso
+- Commander casual podia receber prioridade competitiva externa sem prova de intenção high power/cEDH
 
-Leitura:
+#### 3. `optimize` e `complete` agora so usam referencias competitivas em bracket `>= 3`
 
-- shells como `Kraum, Ludevic's Opus + Tymna the Weaver` deixam de cair em match frouxo por nome parcial
-- o `priorityPool` agora nasce de uma selecao comprovadamente mais alinhada ao shell real
+Patch aplicado:
 
-#### 3. Commander multiplayer nao reaproveita mais `MTGTop8 EDH` genericamente
+- novo helper `resolveCommanderOptimizeMetaScope(...)`
+- retorno `competitive_commander` apenas quando:
+  - `deckFormat == 'commander'`
+  - `bracket >= 3`
+- retorno `null` para Commander casual e formatos nao-Commander
 
-Prova de comportamento:
+Efeito comprovado:
 
-- `routes/ai/generate/index.dart` agora so injeta meta Commander quando o prompt comprova:
-  - `duel_commander`
-  - ou `competitive_commander`
-- prompt Commander generico nao usa mais o escopo amplo anterior
+- `routes/ai/optimize/index.dart` passa a pular a query de meta competitiva quando o escopo retorna `null`
+- `server/lib/ai/optimize_complete_support.dart` so carrega `loadCommanderMetaReferenceSelection(...)` e `loadCommanderCompetitivePriorities(...)` quando o escopo e competitivo
+- fora disso, o seed continua apoiado em `commanderReferenceProfile` / fallback casual ja existente
 
-Leitura:
+#### 4. O bloqueio fora da identidade de cor continua preservado
 
-- o motor deixa de tratar Duel Commander como se fosse Commander multiplayer por default
-- isso reduz contaminação de `generate` com sinais errados de `1v1`
+Cobertura mantida:
 
-#### 4. `source_chain` entra como evidência, nao como ruído
+- `shouldKeepCommanderFillerCandidate(...)` continua barrando sugestoes fora da identidade do comandante
+- nenhum relaxamento foi introduzido nesta etapa
 
-Novo contexto resumido inclui:
+#### 5. Evidência meta continua sendo sinal estratégico, nao copia cega
 
-- escopo meta
-- razao da selecao
-- mix de fontes
-- cartas repetidas nas referencias
-- snapshots de shell / estrategia / placement
-- nota explicita de que `source_chain` e apenas proveniencia
+Estado comprovado:
 
-Formato humanizado observado nos testes:
+- `meta_deck_reference_support.dart` segue resumindo `source_chain` em texto humanizado
+- o texto de evidência nao expõe URL bruta nem despeja `research_payload` completo no prompt
+- as referencias continuam entrando como pool/prioridade, nao como import direto da decklist externa
 
-- `EDHTop16 standings -> TopDeck deck page`
-- `MTGTop8 format page -> MTGTop8 event page -> MTGTop8 deck page`
-
-Importante:
-
-- URLs brutas nao entram no texto de evidência
-- payload bruto de `research_payload` nao e despejado no prompt
-
-### Teste novo de selecao de referencia
-
-Arquivo:
-
-- `server/test/meta_deck_reference_support_test.dart`
+### Testes focados desta etapa
 
 Casos comprovados:
 
-1. prioriza shell competitivo externo com `partner_commander_name` exato
-2. bloqueia `duel_commander` quando o escopo pedido e `competitive_commander`
-3. builder de evidência humaniza `source_chain` e nao vaza URL
+1. `resolveCommanderOptimizeMetaScope(...)` usa `competitive_commander` apenas para bracket `3+`
+2. Commander casual (`bracket=2`) nao entra no escopo competitivo
+3. `meta_deck_reference_support_test.dart` continua provando selecao por shell competitivo exato e bloqueio de `duel_commander` fora de escopo
+4. `optimize_runtime_support_test.dart` continua cobrindo bloqueio de carta fora da identidade de cor
+
+### Interpretacao
+
+- o uso de referencias competitivas externas ficou alinhado com intenção/poder, nao com o simples fato do formato ser `commander`
+- isso reduz risco de contaminar `optimize`/`complete` casual com staples cEDH sem contexto
+- a promoção continua separada: sem `stage --apply` e sem `promotion --apply`, nao existe corpus externo live novo em `meta_decks`
 
 ### Gaps ainda abertos
 
-1. a cobertura live de `external` dentro de `meta_decks` continua dependente da primeira promocao real aprovada no gate
-2. `generate` ainda depende de palavra-chave no prompt para inferir quando o usuario quer `competitive_commander`; isso cobre cEDH/high power, mas nao "adivinha" multiplayer competitivo se o prompt vier vago
-3. ainda nao ha telemetria dedicada no output da API para expor ao cliente qual referencia meta foi usada; a evidencia hoje entra no prompt/logica interna
-
-### Menores proximas acoes tecnicas
-
-1. promover o primeiro candidato externo validado e rerodar esta auditoria para comprovar `source=external` live no caminho `query -> select -> prompt`
-2. adicionar telemetria compacta opcional no payload de `optimize`/`generate` so se for necessario debug de producao
-3. se surgirem novos shells partner/background, ampliar a suite do seletor antes de relaxar heuristica de match
+1. cobertura live de `external` dentro de `meta_decks` continua **not proven** ate existir promoção real aprovada
+2. inferência de intenção competitiva em `generate` ainda depende do texto do prompt; prompts vagos continuam sendo tratados de forma conservadora
+3. telemetria explicita no payload final sobre qual referencia externa foi usada continua ausente e **not proven** como necessidade de produto
 
 ## Atualizacao E2E runtime do fluxo final
 

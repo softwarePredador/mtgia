@@ -418,6 +418,31 @@ Regra:
 - exige `commander_name` presente
 - exige `research_payload.source_chain` presente
 - mapeia a promocao para `meta_decks.format='cEDH'`
+
+### 5. Consumo por `optimize` e `generate`
+
+Regra operacional:
+
+- `generate` continua podendo usar referencias Commander meta apenas quando o prompt comprova o escopo:
+  - `competitive_commander`
+  - `duel_commander`
+- `optimize` e `complete` agora resolvem `competitive_commander` apenas quando:
+  - `deckFormat == 'commander'`
+  - `bracket >= 3`
+- Commander casual (`bracket < 3`) nao deve consultar prioridade competitiva externa por default
+
+Leitura:
+
+- referencias externas competitivas entram como sinal estrategico para high power/cEDH
+- Commander casual continua priorizando perfil/reference cache casual em vez de staples competitivos
+- isso evita copiar a pressao de cEDH para listas multiplayer genericas
+
+Garantias mantidas:
+
+- nenhuma promocao automatica para `meta_decks`
+- nenhuma escrita real sem `--apply`
+- `source_chain` segue auditavel e resumido, sem despejar `research_payload` bruto no prompt
+- filtros de identidade de cor do comandante continuam ativos no pipeline de sugestao
 - ao aplicar, marca o staging como `validation_status='promoted'`
 
 Aplicacao real:

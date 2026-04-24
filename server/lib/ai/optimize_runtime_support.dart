@@ -3136,6 +3136,31 @@ Future<MetaDeckReferenceSelectionResult> loadCommanderMetaReferenceSelection({
   );
 }
 
+MetaDeckReferenceSelectionResult emptyCommanderMetaReferenceSelection({
+  String? commanderScope,
+}) {
+  return MetaDeckReferenceSelectionResult(
+    commanderScope: commanderScope,
+    selectionReason: 'no_match',
+    references: const <MetaDeckReferenceCandidate>[],
+    priorityCardNames: const <String>[],
+    sourceBreakdown: const <String, int>{},
+  );
+}
+
+String? resolveCommanderOptimizeMetaScope({
+  required String deckFormat,
+  int? bracket,
+}) {
+  if (deckFormat.trim().toLowerCase() != 'commander') {
+    return null;
+  }
+  if ((bracket ?? 0) >= 3) {
+    return 'competitive_commander';
+  }
+  return null;
+}
+
 List<String> _buildCommanderSearchKeywords(List<String> commanderNames) {
   final keywords = <String>{};
   for (final rawCommander in commanderNames) {

@@ -81,6 +81,7 @@ Future<void> prepareCompleteCommanderSeed({
   required int maxTotal,
   required int currentTotalCards,
   required CompleteBuildAccumulator state,
+  int? bracket,
 }) async {
   final targetAdditionsForComplete = maxTotal - currentTotalCards;
   if (commanders.isEmpty) return;
@@ -112,39 +113,49 @@ Future<void> prepareCompleteCommanderSeed({
         .addAll(averageDeckSeedNames.map((e) => e.toLowerCase()));
   }
 
-  final metaReferenceSelection = await loadCommanderMetaReferenceSelection(
-    pool: pool,
-    commanderNames: commanders,
-    limitDecks: 4,
-    priorityCardLimit: 120,
-    metaScope: 'competitive_commander',
-    preferExternalCompetitive: true,
+  final commanderMetaScope = resolveCommanderOptimizeMetaScope(
+    deckFormat: 'commander',
+    bracket: bracket,
   );
-  if (metaReferenceSelection.hasReferences) {
-    state.commanderMetaEvidenceText = buildMetaDeckEvidenceText(
-      metaReferenceSelection,
-      maxPriorityCards: 14,
-      maxReferences: 3,
+  if (commanderMetaScope != null) {
+    final metaReferenceSelection = await loadCommanderMetaReferenceSelection(
+      pool: pool,
+      commanderNames: commanders,
+      limitDecks: 4,
+      priorityCardLimit: 120,
+      metaScope: commanderMetaScope,
+      preferExternalCompetitive: true,
     );
+    if (metaReferenceSelection.hasReferences) {
+      state.commanderMetaEvidenceText = buildMetaDeckEvidenceText(
+        metaReferenceSelection,
+        maxPriorityCards: 14,
+        maxReferences: 3,
+      );
+    }
+    final priorityNames = metaReferenceSelection.priorityCardNames.isNotEmpty
+        ? const <String>[]
+        : await loadCommanderCompetitivePriorities(
+            pool: pool,
+            commanderName: commanderName,
+            commanderNames: commanders.skip(1).toList(growable: false),
+            limit: 120,
+            metaScope: commanderMetaScope,
+            preferExternalCompetitive: true,
+          );
+    final competitivePriorityNames =
+        metaReferenceSelection.priorityCardNames.isNotEmpty
+            ? metaReferenceSelection.priorityCardNames
+            : priorityNames;
+    if (competitivePriorityNames.isNotEmpty) {
+      state.competitiveModelStageUsed = true;
+      state.commanderMetaPriorityNames.addAll(competitivePriorityNames);
+      state.aiSuggestedNames
+          .addAll(competitivePriorityNames.map((e) => e.toLowerCase()));
+    }
   }
-  final priorityNames = metaReferenceSelection.priorityCardNames.isNotEmpty
-      ? const <String>[]
-      : await loadCommanderCompetitivePriorities(
-          pool: pool,
-          commanderName: commanderName,
-          commanderNames: commanders.skip(1).toList(growable: false),
-          limit: 120,
-        );
-  final competitivePriorityNames =
-      metaReferenceSelection.priorityCardNames.isNotEmpty
-          ? metaReferenceSelection.priorityCardNames
-          : priorityNames;
-  if (competitivePriorityNames.isNotEmpty) {
-    state.competitiveModelStageUsed = true;
-    state.commanderMetaPriorityNames.addAll(competitivePriorityNames);
-    state.aiSuggestedNames
-        .addAll(competitivePriorityNames.map((e) => e.toLowerCase()));
-  } else {
+
+  if (state.aiSuggestedNames.isEmpty) {
     final profileTopNames = extractTopCardNamesFromProfile(
       commanderReferenceProfile,
       limit: 80,

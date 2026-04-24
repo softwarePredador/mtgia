@@ -70,4 +70,40 @@ void main() {
       );
     });
   });
+
+  group('resolveCommanderOptimizeMetaScope', () {
+    test('uses competitive commander references only for bracket 3+', () {
+      expect(
+        resolveCommanderOptimizeMetaScope(
+          deckFormat: 'commander',
+          bracket: 3,
+        ),
+        equals('competitive_commander'),
+      );
+      expect(
+        resolveCommanderOptimizeMetaScope(
+          deckFormat: 'commander',
+          bracket: 4,
+        ),
+        equals('competitive_commander'),
+      );
+    });
+
+    test('keeps casual commander out of competitive commander meta', () {
+      expect(
+        resolveCommanderOptimizeMetaScope(
+          deckFormat: 'commander',
+          bracket: 2,
+        ),
+        isNull,
+      );
+      expect(
+        resolveCommanderOptimizeMetaScope(
+          deckFormat: 'modern',
+          bracket: 4,
+        ),
+        isNull,
+      );
+    });
+  });
 }
