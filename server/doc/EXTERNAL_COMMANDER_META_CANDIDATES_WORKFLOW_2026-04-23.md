@@ -25,7 +25,7 @@ Nao gravar pesquisa web crua direto em `meta_decks`.
 - `candidate`
 - `validated`
 - `rejected`
-- `promoted`
+- `promoted` (legado/inativo neste fluxo)
 
 ## Contrato minimo do candidato
 
@@ -167,7 +167,6 @@ dart run bin/import_external_commander_meta_candidates.dart \
 
 Regra operacional do profile `topdeck_edhtop16_stage2`:
 
-- exige `--dry-run`
 - bloqueia `--promote-validated`
 - exige que o candidato passe no `topdeck_edhtop16_stage1`
 - quando `cards`/`card_legalities` estiverem disponiveis, resolve os nomes contra o banco
@@ -191,6 +190,9 @@ Regra operacional do profile `topdeck_edhtop16_stage2`:
 - rejeita `is_commander_legal=false`
 - `unresolved_cards` continua como warning em `--dry-run`
 - `illegal_cards` ou `is_commander_legal=false` bloqueiam o candidato
+- persistencia real e permitida **somente** com este profile
+- a escrita real acontece **somente** em `external_commander_meta_candidates`
+- a escrita real reutiliza o aceite do stage 2 para staging seguro; `meta_decks` continua intocado
 
 Resultado da rodada base:
 
@@ -204,39 +206,30 @@ Resultado da rodada base:
   - `Scion of the Ur-Dragon` com `unresolved_cards=["Prismari, the Inspiration"]`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
 
-### 3. Persistir candidatos
+### 3. Persistir candidatos aprovados no stage 2
 
 ```bash
 cd server
-dart run bin/import_external_commander_meta_candidates.dart ../candidates.json
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --imported-by=meta_deck_intelligence_2026_04_24
 ```
 
-### 4. Promover somente os `validated`
+Comportamento comprovado:
 
-```bash
-cd server
-dart run bin/import_external_commander_meta_candidates.dart ../candidates.json --promote-validated
-```
-
-## Regra de promocao
-
-Hoje o import so promove para `meta_decks` quando:
-
-- `validation_status == validated`
-- `subformat` normaliza para `duel_commander` ou `competitive_commander`
-- `card_list` existe
+- bloqueia qualquer `rejected`
+- deduplica por `source_url` antes do `upsert`
+- preserva `research_payload` completo em `JSONB`
+- mantem `validation_status` recebido do payload
+- nao escreve em `meta_decks`
+- rejeita explicitamente `--promote-validated`
 
 Regra de seguranca adicional:
 
 - `commander` generico continua estagiado em `external_commander_meta_candidates`
 - ele **nao** e promovido automaticamente para `meta_decks` enquanto a tabela principal ainda usar os codigos legados `EDH`/`cEDH`
 - isso evita reclassificar Commander multiplayer amplo como `EDH` legado do MTGTop8, que no pipeline atual significa `Duel Commander`
-
-Ao promover:
-
-- faz `upsert` em `meta_decks` por `source_url`
-- marca o candidato como `promoted`
-- grava `promoted_to_meta_decks_at`
 
 ## Por que isso existe
 

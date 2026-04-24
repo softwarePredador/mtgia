@@ -5,9 +5,10 @@ import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
 import '../lib/meta/external_commander_meta_candidate_support.dart';
+import '../lib/meta/external_commander_meta_import_support.dart';
 
 Future<void> main(List<String> args) async {
-  final config = _ImportConfig.parse(args);
+  final config = ExternalCommanderMetaImportConfig.parse(args);
   final rawPayload = await _readPayload(config);
   final candidates = parseExternalCommanderMetaCandidates(
     rawPayload,
@@ -15,7 +16,7 @@ Future<void> main(List<String> args) async {
   );
   Database? db;
   dynamic conn;
-  if (!config.dryRun || _requiresCommanderLegalityValidation(config)) {
+  if (!config.dryRun || config.requiresCommanderLegalityValidation) {
     db = Database();
     await db.connect();
     if (db.isConnected) {
@@ -39,7 +40,7 @@ Future<void> main(List<String> args) async {
   final validationResults = validateExternalCommanderMetaCandidates(
     candidates,
     profile: config.validationProfile,
-    dryRun: config.dryRun,
+    dryRun: config.usesDryRunValidationSemantics,
     legalityBySourceUrl: legalityBySourceUrl,
   );
   final acceptedCount =
@@ -115,25 +116,24 @@ Future<void> main(List<String> args) async {
   }
 
   try {
+    final persistencePlan = buildExternalCommanderMetaPersistencePlan(
+      validationResults,
+      validationProfile: config.validationProfile,
+    );
+
     var importedCount = 0;
-    for (final candidate in candidates) {
+    for (final candidate in persistencePlan.candidatesToPersist) {
       await _upsertCandidate(conn, candidate);
       importedCount++;
     }
 
-    var promotedCount = 0;
-    if (config.promoteValidated) {
-      for (final candidate in candidates.where((c) => c.isPromotionEligible)) {
-        await _promoteCandidateToMetaDecks(conn, candidate);
-        promotedCount++;
-      }
-    }
-
-    stdout.writeln(
-        'Importacao concluida: $importedCount candidatos persistidos.');
-    if (config.promoteValidated) {
+    stdout.writeln('Importacao concluida: $importedCount candidatos '
+        'persistidos em external_commander_meta_candidates.');
+    if (persistencePlan.duplicateCount > 0) {
       stdout.writeln(
-          'Promocao concluida: $promotedCount candidatos promovidos/atualizados.');
+        'Deduplicacao por source_url aplicada: ${persistencePlan.duplicateCount} '
+        'URL(s) consolidada(s).',
+      );
     }
   } finally {
     await db?.close();
@@ -227,54 +227,7 @@ Future<void> _upsertCandidate(
   );
 }
 
-bool _requiresCommanderLegalityValidation(_ImportConfig config) {
-  return config.validationProfile == topDeckEdhTop16Stage2ValidationProfile;
-}
-
-Future<void> _promoteCandidateToMetaDecks(
-  dynamic conn,
-  ExternalCommanderMetaCandidate candidate,
-) async {
-  final formatCode = candidate.metaDeckFormatCode;
-  if (formatCode == null) return;
-
-  final archetype = candidate.archetype?.trim().isNotEmpty == true
-      ? candidate.archetype!.trim()
-      : candidate.deckName;
-
-  await conn.execute(
-    Sql.named('''
-      INSERT INTO meta_decks (format, archetype, source_url, card_list, placement)
-      VALUES (@format, @archetype, @source_url, @card_list, @placement)
-      ON CONFLICT (source_url) DO UPDATE SET
-        format = EXCLUDED.format,
-        archetype = EXCLUDED.archetype,
-        card_list = EXCLUDED.card_list,
-        placement = EXCLUDED.placement
-    '''),
-    parameters: <String, dynamic>{
-      'format': formatCode,
-      'archetype': archetype,
-      'source_url': candidate.sourceUrl,
-      'card_list': candidate.cardList,
-      'placement': candidate.placement,
-    },
-  );
-
-  await conn.execute(
-    Sql.named('''
-      UPDATE external_commander_meta_candidates
-      SET
-        validation_status = 'promoted',
-        promoted_to_meta_decks_at = COALESCE(promoted_to_meta_decks_at, CURRENT_TIMESTAMP),
-        updated_at = CURRENT_TIMESTAMP
-      WHERE source_url = @source_url
-    '''),
-    parameters: <String, dynamic>{'source_url': candidate.sourceUrl},
-  );
-}
-
-Future<String> _readPayload(_ImportConfig config) async {
+Future<String> _readPayload(ExternalCommanderMetaImportConfig config) async {
   if (config.stdinMode) {
     return stdin.transform(utf8.decoder).join();
   }
@@ -284,96 +237,4 @@ Future<String> _readPayload(_ImportConfig config) async {
     );
   }
   return File(config.inputPath!).readAsString();
-}
-
-class _ImportConfig {
-  _ImportConfig({
-    required this.promoteValidated,
-    required this.dryRun,
-    required this.stdinMode,
-    required this.importedBy,
-    required this.validationProfile,
-    this.validationJsonOut,
-    this.inputPath,
-  });
-
-  final bool promoteValidated;
-  final bool dryRun;
-  final bool stdinMode;
-  final String importedBy;
-  final String validationProfile;
-  final String? validationJsonOut;
-  final String? inputPath;
-
-  factory _ImportConfig.parse(List<String> args) {
-    var promoteValidated = false;
-    var dryRun = false;
-    var stdinMode = false;
-    var importedBy = 'copilot_cli_web_agent';
-    var validationProfile = genericExternalCommanderMetaValidationProfile;
-    String? validationJsonOut;
-    String? inputPath;
-
-    for (final arg in args) {
-      if (arg == '--promote-validated') {
-        promoteValidated = true;
-        continue;
-      }
-      if (arg == '--dry-run') {
-        dryRun = true;
-        continue;
-      }
-      if (arg == '--stdin') {
-        stdinMode = true;
-        continue;
-      }
-      if (arg.startsWith('--imported-by=')) {
-        importedBy = arg.substring('--imported-by='.length).trim();
-        continue;
-      }
-      if (arg.startsWith('--validation-profile=')) {
-        validationProfile =
-            arg.substring('--validation-profile='.length).trim();
-        continue;
-      }
-      if (arg.startsWith('--validation-json-out=')) {
-        validationJsonOut =
-            arg.substring('--validation-json-out='.length).trim();
-        continue;
-      }
-      if (!arg.startsWith('--') && inputPath == null) {
-        inputPath = arg;
-      }
-    }
-
-    if (_isDryRunOnlyValidationProfile(validationProfile)) {
-      if (!dryRun) {
-        throw ArgumentError(
-          '$validationProfile exige --dry-run. '
-          'Nesta fase nao ha escrita em banco.',
-        );
-      }
-      if (promoteValidated) {
-        throw ArgumentError(
-          '$validationProfile nao permite '
-          '--promote-validated.',
-        );
-      }
-    }
-
-    return _ImportConfig(
-      promoteValidated: promoteValidated,
-      dryRun: dryRun,
-      stdinMode: stdinMode,
-      importedBy: importedBy,
-      validationProfile: validationProfile,
-      validationJsonOut: validationJsonOut,
-      inputPath: inputPath,
-    );
-  }
-}
-
-bool _isDryRunOnlyValidationProfile(String profile) {
-  return profile == topDeckEdhTop16Stage1ValidationProfile ||
-      profile == topDeckEdhTop16Stage2ValidationProfile;
 }

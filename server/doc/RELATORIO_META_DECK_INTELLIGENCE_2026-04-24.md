@@ -4,7 +4,7 @@ Data: 2026-04-24
 
 ## Escopo desta rodada
 
-Implementar e provar a validacao de `color_identity` e legalidade Commander para candidatos `stage2` de `external_commander_meta_candidates`, sem escrita em banco.
+Habilitar e provar persistencia segura do `stage2` em `external_commander_meta_candidates`, com validacao real, sem promocao para `meta_decks`.
 
 ## Resumo do pipeline validado
 
@@ -13,26 +13,23 @@ Pipeline auditado nesta task:
 1. `EDHTop16 /tournament/<slug>`
 2. `server/bin/expand_external_commander_meta_candidates.dart`
 3. artefato local `topdeck_edhtop16_expansion_dry_run_latest.json`
-4. `server/bin/import_external_commander_meta_candidates.dart --dry-run --validation-profile=topdeck_edhtop16_stage2`
-5. resolucao read-only em `cards`
-6. legalidade read-only em `card_legalities`
-7. artefato final `topdeck_edhtop16_expansion_dry_run_latest.validation.json`
+4. `server/bin/import_external_commander_meta_candidates.dart --validation-profile=topdeck_edhtop16_stage2`
+5. resolucao em `cards`
+6. legalidade em `card_legalities`
+7. persistencia deduplicada em `external_commander_meta_candidates`
+8. validacao de imutabilidade de `meta_decks`
 
-O stage 2 agora nao para mais em schema/source validation: ele tenta provar identidade de cor e legalidade Commander com dados do banco quando possivel.
+O stage 2 agora nao para mais em schema/source validation: ele valida contra o banco, bloqueia rejeitados, persiste apenas na fila externa e deixa `meta_decks` fora do caminho.
 
 ## Comandos executados
 
 ```bash
-cd server && dart analyze lib/meta/external_commander_meta_candidate_support.dart bin/import_external_commander_meta_candidates.dart test/external_commander_meta_candidate_support_test.dart
-cd server && dart test test/external_commander_meta_candidate_support_test.dart
+cd server && dart analyze
 cd server && dart test
-cd server && dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --dry-run --validation-profile=topdeck_edhtop16_stage2 --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
-cd server && set -a && source .env >/dev/null 2>&1 && python3 - <<'PY'
-# query de frescor e cobertura por formato/identidade em meta_decks
-PY
-python3 - <<'PY'
-# resumo do artifact stage2 regenerado
-PY
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart
+cd server && dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --validation-profile=topdeck_edhtop16_stage2 --imported-by=meta_deck_intelligence_2026_04_24
+cd server && set -a && source .env >/dev/null 2>&1 && set +a && psql "$DATABASE_URL" -Atqc "SELECT COUNT(*)::text || '|' || md5(COALESCE(string_agg(source_url || '|' || format || '|' || COALESCE(archetype,'') || '|' || COALESCE(card_list,'') || '|' || COALESCE(placement,''), '||' ORDER BY source_url), '')) FROM meta_decks"
+cd server && dart run bin/meta_profile_report.dart > /tmp/meta_profile_report_2026-04-24.json
 ```
 
 ## Evidencia da validacao stage 2
@@ -69,11 +66,52 @@ Estado por deck no artifact regenerado:
 
 Leitura:
 
-- o stage 2 agora prova identidade dos commanders para `3/4` decks expandidos
+- o stage 2 prova identidade dos commanders para `3/4` decks expandidos
 - existe `1` caso `not_proven`, nao `illegal`
 - nenhum deck resolveu para `illegal_cards`
-- `unresolved_cards` ficou corretamente nao fatal em `--dry-run`
+- o aceite do stage 2 continua suficiente para staging seguro na fila externa
 - `is_commander_legal=false` continua bloqueante por regra de validacao
+
+## Evidencia da persistencia segura stage 2
+
+Resultado observado no import real:
+
+| Medida | Valor |
+| --- | --- |
+| `accepted_count` | `4` |
+| `rejected_count` | `0` |
+| `external_commander_meta_candidates` persistidos para o torneio | `4` |
+| `meta_decks` antes | `641|a7ce915e5f489cb6282856238ddab088` |
+| `meta_decks` depois | `641|a7ce915e5f489cb6282856238ddab088` |
+
+Provas adicionais:
+
+- o importador rejeita `--promote-validated` em qualquer profile
+- a deduplicacao por `source_url` ficou coberta por teste unitario dedicado
+- um candidato persistido manteve `research_payload` com as chaves:
+  - `collection_method`
+  - `commander_count`
+  - `mainboard_count`
+  - `player_name`
+  - `source_chain`
+  - `source_context`
+  - `standing`
+  - `topdeck_deck_url`
+  - `topdeck_imported_from`
+  - `total_cards`
+  - `tournament_id`
+  - `tournament_url`
+- sample persistido:
+  - `validation_status=candidate`
+  - `imported_by=meta_deck_intelligence_2026_04_24`
+  - `collection_method=edhtop16_graphql_topdeck_deck_page_dry_run`
+  - `source_context=edhtop16_tournament_entry`
+
+Leitura:
+
+- `meta_decks` nao foi alterado nem por count nem por hash agregado
+- a persistencia ficou confinada a `external_commander_meta_candidates`
+- a fila externa preserva o payload de pesquisa completo, sem promocao automatica
 
 ## Frescor da base atual
 
@@ -90,6 +128,7 @@ Leitura:
 
 - a base principal continua fresca para Commander/cEDH ate `2026-04-23`
 - formatos nao Commander permanecem concentrados em fevereiro
+- a fila `external_commander_meta_candidates` ficou fresca em `2026-04-24`, mas ainda com apenas `4` rows `competitive_commander`
 
 ## Cobertura real por formato
 
@@ -170,10 +209,11 @@ Leitura:
 - cobertura de Commander competitivo existe em mono, bi, tri, four-color e five-color
 - isso **nao prova** cobertura completa de todas as shells Commander
 - o bucket `COLORLESS_OR_UNRESOLVED` ainda mistura casos realmente incolores com mapeamentos nao resolvidos
+- na fila externa stage 2 persistida, `color_identity` continua vazia em `4/4`; a identidade comprovada ainda mora no artifact/legality evidence
 
 ## Gaps observados
 
-1. O campo persistido `candidate.color_identity` continua vazio nos expandidos; a prova real agora fica no artifact de validacao.
+1. O campo persistido `color_identity` continua vazio nos stage2 expandidos; a prova real segue no artifact/legality evidence.
 2. `Prismari, the Inspiration` nao resolveu em `cards`, deixando `Scion of the Ur-Dragon` como `not_proven`.
 3. O bucket `COLORLESS_OR_UNRESOLVED` ainda precisa ser separado para medir colorless real vs. falha de resolucao.
 4. A base principal `meta_decks` continua fresca para Commander/cEDH, mas os formatos nao Commander estao congelados em fevereiro.
@@ -212,5 +252,5 @@ Nao provado nesta rodada:
 ## Menores proximas acoes tecnicas
 
 1. Adicionar alias/resolution targeted para `Prismari, the Inspiration` e revalidar o artifact.
-2. Separar `COLORLESS` de `UNRESOLVED` nos relatórios de cobertura Commander.
-3. Se a validacao stage 2 continuar estavel, considerar promover `legal_status` para o payload operacional de futuras rodadas multi-fonte antes de qualquer escrita em banco.
+2. Persistir `commander_color_identity` derivada na fila externa para parar de depender so do artifact.
+3. Separar `COLORLESS` de `UNRESOLVED` nos relatórios de cobertura Commander.

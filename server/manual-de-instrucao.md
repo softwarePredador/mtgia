@@ -1,6 +1,44 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Persistencia segura stage 2 em `external_commander_meta_candidates`
+
+### O Porquê
+- O stage 2 de `external_commander_meta_candidates` ja estava bom para validacao estrutural e de legalidade, mas ainda faltava o passo operacional pedido nesta rodada: persistir somente na fila externa, sem tocar em `meta_decks`.
+- Tambem era necessario fechar dois riscos de governanca:
+  - `--promote-validated` nao podia continuar abrindo caminho para a tabela principal;
+  - payloads com `source_url` repetida precisavam consolidar antes do `upsert`.
+
+### O Como
+- Foi criado `server/lib/meta/external_commander_meta_import_support.dart` para tirar a regra de seguranca do `bin/` e deixá-la testavel.
+- Esse suporte novo passou a centralizar:
+  - parse de argumentos do importador;
+  - bloqueio global de `--promote-validated`;
+  - exigencia de `--validation-profile=topdeck_edhtop16_stage2` para escrita real;
+  - manutencao do `topdeck_edhtop16_stage1` como `dry-run only`;
+  - plano de persistencia com deduplicacao por `source_url`.
+- `server/bin/import_external_commander_meta_candidates.dart` passou a:
+  - validar com a semantica do stage 2 antes da escrita real;
+  - persistir apenas em `external_commander_meta_candidates`;
+  - logar a deduplicacao aplicada;
+  - deixar de ter qualquer caminho de escrita para `meta_decks`.
+- O `upsert` continua usando `ON CONFLICT (source_url)` no banco, mas agora o lote ja chega deduplicado e com `research_payload` completo preservado no `jsonEncode(...)`.
+
+### Testes e evidencia
+- Foi criado `server/test/external_commander_meta_import_support_test.dart` cobrindo:
+  - bloqueio de `--promote-validated`;
+  - exigencia de stage 2 para escrita real;
+  - deduplicacao por `source_url`;
+  - preservacao integral do `research_payload`.
+- Validacao live executada:
+  - `dart run bin/migrate_external_commander_meta_candidates.dart`
+  - `dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --validation-profile=topdeck_edhtop16_stage2 --imported-by=meta_deck_intelligence_2026_04_24`
+  - snapshot de `meta_decks` antes/depois com o mesmo hash agregado: `641|a7ce915e5f489cb6282856238ddab088`
+- Resultado prático:
+  - `4` candidatos do torneio foram persistidos em `external_commander_meta_candidates`
+  - `meta_decks` permaneceu inalterado
+  - sample persistido manteve as chaves completas de `research_payload`, incluindo `source_chain`, `topdeck_deck_url` e `topdeck_imported_from`
+
 ## 2026-04-24 — Validacao de color identity e legalidade Commander para candidatos stage 2
 
 ### O Porquê
