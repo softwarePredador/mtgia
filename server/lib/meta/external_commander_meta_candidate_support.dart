@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:postgres/postgres.dart';
+
 import '../color_identity.dart';
+import '../import_card_lookup_service.dart';
 import 'meta_deck_format_support.dart';
 
 const externalCommanderMetaValidationStatuses = <String>{
@@ -13,6 +16,69 @@ const externalCommanderMetaValidationStatuses = <String>{
 const genericExternalCommanderMetaValidationProfile = 'generic';
 const topDeckEdhTop16Stage1ValidationProfile = 'topdeck_edhtop16_stage1';
 const topDeckEdhTop16Stage2ValidationProfile = 'topdeck_edhtop16_stage2';
+
+const externalCommanderMetaLegalStatusLegal = 'legal';
+const externalCommanderMetaLegalStatusIllegal = 'illegal';
+const externalCommanderMetaLegalStatusNotProven = 'not_proven';
+
+abstract class ExternalCommanderMetaCandidateLegalityRepository {
+  Future<Map<String, Map<String, dynamic>>> resolveCardNames(
+      List<String> names);
+
+  Future<Map<String, String>> lookupCommanderLegalities(Set<String> cardIds);
+}
+
+class PostgresExternalCommanderMetaCandidateLegalityRepository
+    implements ExternalCommanderMetaCandidateLegalityRepository {
+  PostgresExternalCommanderMetaCandidateLegalityRepository(this._pool);
+
+  final Pool _pool;
+
+  @override
+  Future<Map<String, Map<String, dynamic>>> resolveCardNames(
+    List<String> names,
+  ) async {
+    if (names.isEmpty) return const <String, Map<String, dynamic>>{};
+    return resolveImportCardNames(
+      _pool,
+      [
+        for (final name in names) <String, dynamic>{'name': name},
+      ],
+    );
+  }
+
+  @override
+  Future<Map<String, String>> lookupCommanderLegalities(
+      Set<String> cardIds) async {
+    if (cardIds.isEmpty) return const <String, String>{};
+
+    final result = await _pool.execute(
+      Sql.named('''
+        SELECT card_id::text, status
+        FROM card_legalities
+        WHERE format = 'commander'
+          AND card_id::text = ANY(@card_ids)
+      '''),
+      parameters: <String, dynamic>{
+        'card_ids': TypedValue(Type.textArray, cardIds.toList(growable: false)),
+      },
+    );
+
+    final legalities = <String, String>{};
+    for (final row in result) {
+      final cardId = row[0] as String?;
+      final status = row[1]?.toString().trim().toLowerCase();
+      if (cardId == null ||
+          cardId.isEmpty ||
+          status == null ||
+          status.isEmpty) {
+        continue;
+      }
+      legalities[cardId] = status;
+    }
+    return legalities;
+  }
+}
 
 class ExternalCommanderMetaControlledSourcePolicy {
   const ExternalCommanderMetaControlledSourcePolicy({
@@ -68,25 +134,107 @@ class ExternalCommanderMetaValidationIssue {
   }
 }
 
+class ExternalCommanderMetaCandidateUnresolvedCard {
+  const ExternalCommanderMetaCandidateUnresolvedCard({
+    required this.name,
+    required this.quantity,
+    required this.role,
+  });
+
+  final String name;
+  final int quantity;
+  final String role;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'quantity': quantity,
+      'role': role,
+    };
+  }
+}
+
+class ExternalCommanderMetaCandidateIllegalCard {
+  const ExternalCommanderMetaCandidateIllegalCard({
+    required this.name,
+    required this.quantity,
+    required this.role,
+    required this.resolvedName,
+    required this.cardColorIdentity,
+    required this.reasons,
+    this.commanderLegalStatus,
+  });
+
+  final String name;
+  final int quantity;
+  final String role;
+  final String resolvedName;
+  final Set<String> cardColorIdentity;
+  final List<String> reasons;
+  final String? commanderLegalStatus;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'quantity': quantity,
+      'role': role,
+      'resolved_name': resolvedName,
+      'card_color_identity': cardColorIdentity.toList()..sort(),
+      'reasons': reasons,
+      'commander_legal_status': commanderLegalStatus,
+    };
+  }
+}
+
+class ExternalCommanderMetaCandidateLegalityEvidence {
+  const ExternalCommanderMetaCandidateLegalityEvidence({
+    required this.commanderColorIdentity,
+    required this.unresolvedCards,
+    required this.illegalCards,
+    required this.legalStatus,
+  });
+
+  final Set<String> commanderColorIdentity;
+  final List<ExternalCommanderMetaCandidateUnresolvedCard> unresolvedCards;
+  final List<ExternalCommanderMetaCandidateIllegalCard> illegalCards;
+  final String legalStatus;
+}
+
 class ExternalCommanderMetaCandidateValidationResult {
   const ExternalCommanderMetaCandidateValidationResult({
     required this.candidate,
     required this.profile,
     required this.issues,
+    this.legalityEvidence,
   });
 
   final ExternalCommanderMetaCandidate candidate;
   final String profile;
   final List<ExternalCommanderMetaValidationIssue> issues;
+  final ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence;
 
   bool get accepted => !issues.any((issue) => issue.severity == 'error');
 
+  ExternalCommanderMetaCandidateLegalityEvidence
+      get effectiveLegalityEvidence =>
+          _effectiveCandidateLegalityEvidence(candidate, legalityEvidence);
+
   Map<String, dynamic> toJson() {
+    final evidence = effectiveLegalityEvidence;
     return <String, dynamic>{
       'accepted': accepted,
       'profile': profile,
       'candidate': candidate.toJson(),
       'card_count': candidate.cardCount,
+      'commander_color_identity': evidence.commanderColorIdentity.toList()
+        ..sort(),
+      'unresolved_cards': evidence.unresolvedCards
+          .map((card) => card.toJson())
+          .toList(growable: false),
+      'illegal_cards': evidence.illegalCards
+          .map((card) => card.toJson())
+          .toList(growable: false),
+      'legal_status': evidence.legalStatus,
       'issues': issues.map((issue) => issue.toJson()).toList(growable: false),
     };
   }
@@ -146,6 +294,28 @@ class ExternalCommanderMetaCandidate {
 
   String? get metaDeckFormatCode {
     return legacyMetaDeckFormatCodeForCommanderSubformat(normalizedSubformat);
+  }
+
+  List<String> get commanderNames {
+    final names = <String>[];
+    final seen = <String>{};
+
+    void addName(String? raw) {
+      final normalized = raw?.trim();
+      if (normalized == null || normalized.isEmpty) return;
+      final key = normalized.toLowerCase();
+      if (seen.add(key)) {
+        names.add(normalized);
+      }
+    }
+
+    addName(commanderName);
+    for (final name
+        in (partnerCommanderName ?? '').split(RegExp(r'\s*\+\s*'))) {
+      addName(name);
+    }
+
+    return names;
   }
 
   bool get isPromotionEligible =>
@@ -354,21 +524,190 @@ List<ExternalCommanderMetaCandidateValidationResult>
     validateExternalCommanderMetaCandidates(
   List<ExternalCommanderMetaCandidate> candidates, {
   String profile = genericExternalCommanderMetaValidationProfile,
+  bool dryRun = false,
+  Map<String, ExternalCommanderMetaCandidateLegalityEvidence> legalityBySourceUrl =
+      const <String, ExternalCommanderMetaCandidateLegalityEvidence>{},
 }) {
   return candidates
       .map(
         (candidate) => validateExternalCommanderMetaCandidate(
           candidate,
           profile: profile,
+          dryRun: dryRun,
+          legalityEvidence: legalityBySourceUrl[candidate.sourceUrl],
         ),
       )
       .toList(growable: false);
+}
+
+Future<Map<String, ExternalCommanderMetaCandidateLegalityEvidence>>
+    evaluateExternalCommanderMetaCandidatesLegality(
+  List<ExternalCommanderMetaCandidate> candidates, {
+  required ExternalCommanderMetaCandidateLegalityRepository repository,
+}) async {
+  final results = <String, ExternalCommanderMetaCandidateLegalityEvidence>{};
+  for (final candidate in candidates) {
+    results[candidate.sourceUrl] =
+        await evaluateExternalCommanderMetaCandidateLegality(
+      candidate,
+      repository: repository,
+    );
+  }
+  return results;
+}
+
+Future<ExternalCommanderMetaCandidateLegalityEvidence>
+    evaluateExternalCommanderMetaCandidateLegality(
+  ExternalCommanderMetaCandidate candidate, {
+  required ExternalCommanderMetaCandidateLegalityRepository repository,
+}) async {
+  final deckEntries = _parseCandidateCardList(candidate.cardList);
+  final explicitDeckNames = deckEntries
+      .map((entry) => entry.name.trim().toLowerCase())
+      .where((name) => name.isNotEmpty)
+      .toSet();
+  final syntheticCommanderEntries = [
+    for (final commanderName in candidate.commanderNames)
+      if (!explicitDeckNames.contains(commanderName.trim().toLowerCase()))
+        _ExternalCommanderMetaParsedCardEntry(
+          name: commanderName,
+          quantity: 1,
+          role: 'commander',
+        ),
+  ];
+
+  final lookupNames = <String>{
+    for (final entry in deckEntries) entry.name,
+    for (final entry in candidate.commanderNames) entry,
+    for (final entry in syntheticCommanderEntries) entry.name,
+  }.where((name) => name.trim().isNotEmpty).toList(growable: false);
+
+  final resolvedCards = lookupNames.isEmpty
+      ? const <String, Map<String, dynamic>>{}
+      : await repository.resolveCardNames(lookupNames);
+
+  final unresolvedByKey = <String, _ExternalCommanderMetaParsedCardEntry>{};
+  final commanderColorIdentity = <String>{};
+  var resolvedCommanderCount = 0;
+
+  for (final commanderName in candidate.commanderNames) {
+    final resolvedCard = _resolvedCardForName(commanderName, resolvedCards);
+    if (resolvedCard == null) {
+      _registerUnresolvedCard(
+        unresolvedByKey,
+        _ExternalCommanderMetaParsedCardEntry(
+          name: commanderName,
+          quantity: 1,
+          role: 'commander',
+        ),
+      );
+      continue;
+    }
+
+    resolvedCommanderCount++;
+    commanderColorIdentity.addAll(_resolveIdentityFromCardRecord(resolvedCard));
+  }
+
+  if (commanderColorIdentity.isEmpty && candidate.colorIdentity.isNotEmpty) {
+    commanderColorIdentity.addAll(candidate.colorIdentity);
+  }
+
+  final entriesToValidate = <_ExternalCommanderMetaParsedCardEntry>[
+    ...deckEntries,
+    ...syntheticCommanderEntries,
+  ];
+  final resolvedEntries = <_ResolvedExternalCommanderMetaCardEntry>[];
+  final resolvedCardIds = <String>{};
+
+  for (final entry in entriesToValidate) {
+    final resolvedCard = _resolvedCardForName(entry.name, resolvedCards);
+    if (resolvedCard == null) {
+      _registerUnresolvedCard(unresolvedByKey, entry);
+      continue;
+    }
+
+    final cardId = resolvedCard['id']?.toString();
+    if (cardId != null && cardId.isNotEmpty) {
+      resolvedCardIds.add(cardId);
+    }
+    resolvedEntries.add(
+      _ResolvedExternalCommanderMetaCardEntry(entry: entry, card: resolvedCard),
+    );
+  }
+
+  final legalities =
+      await repository.lookupCommanderLegalities(resolvedCardIds);
+  final illegalCards = <ExternalCommanderMetaCandidateIllegalCard>[];
+
+  for (final resolvedEntry in resolvedEntries) {
+    final card = resolvedEntry.card;
+    final cardId = card['id']?.toString();
+    final cardIdentity = _resolveIdentityFromCardRecord(card);
+    final reasons = <String>[];
+
+    if (commanderColorIdentity.isNotEmpty &&
+        !isWithinCommanderIdentity(
+          cardIdentity: cardIdentity,
+          commanderIdentity: commanderColorIdentity,
+        )) {
+      reasons.add('outside_commander_identity');
+    }
+
+    final commanderLegalStatus =
+        cardId == null ? null : legalities[cardId]?.trim().toLowerCase();
+    if (!_isCommanderLegalStatusAllowed(commanderLegalStatus)) {
+      reasons.add('not_legal_in_commander');
+    }
+
+    if (reasons.isEmpty) continue;
+
+    illegalCards.add(
+      ExternalCommanderMetaCandidateIllegalCard(
+        name: resolvedEntry.entry.name,
+        quantity: resolvedEntry.entry.quantity,
+        role: resolvedEntry.entry.role,
+        resolvedName: card['name']?.toString() ?? resolvedEntry.entry.name,
+        cardColorIdentity: cardIdentity,
+        reasons: reasons,
+        commanderLegalStatus: commanderLegalStatus ?? 'missing',
+      ),
+    );
+  }
+
+  final unresolvedCards = unresolvedByKey.values
+      .map(
+        (entry) => ExternalCommanderMetaCandidateUnresolvedCard(
+          name: entry.name,
+          quantity: entry.quantity,
+          role: entry.role,
+        ),
+      )
+      .toList(growable: false);
+
+  final legalStatus =
+      candidate.isCommanderLegal == false || illegalCards.isNotEmpty
+          ? externalCommanderMetaLegalStatusIllegal
+          : unresolvedCards.isNotEmpty ||
+                  (candidate.commanderNames.isNotEmpty &&
+                      resolvedCommanderCount == 0 &&
+                      candidate.colorIdentity.isEmpty)
+              ? externalCommanderMetaLegalStatusNotProven
+              : externalCommanderMetaLegalStatusLegal;
+
+  return ExternalCommanderMetaCandidateLegalityEvidence(
+    commanderColorIdentity: commanderColorIdentity,
+    unresolvedCards: unresolvedCards,
+    illegalCards: illegalCards,
+    legalStatus: legalStatus,
+  );
 }
 
 ExternalCommanderMetaCandidateValidationResult
     validateExternalCommanderMetaCandidate(
   ExternalCommanderMetaCandidate candidate, {
   String profile = genericExternalCommanderMetaValidationProfile,
+  bool dryRun = false,
+  ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence,
 }) {
   final issues = <ExternalCommanderMetaValidationIssue>[];
 
@@ -399,10 +738,18 @@ ExternalCommanderMetaCandidateValidationResult
     _applyTopDeckEdhTop16Stage2Validation(candidate, issues);
   }
 
+  _applyCommanderLegalityEvidence(
+    candidate,
+    issues,
+    dryRun: dryRun,
+    legalityEvidence: legalityEvidence,
+  );
+
   return ExternalCommanderMetaCandidateValidationResult(
     candidate: candidate,
     profile: profile,
     issues: issues,
+    legalityEvidence: legalityEvidence,
   );
 }
 
@@ -740,4 +1087,187 @@ int? _readResearchPayloadInt(Map<String, dynamic> payload, String key) {
   if (raw is int) return raw;
   if (raw is num) return raw.toInt();
   return int.tryParse(raw?.toString().trim() ?? '');
+}
+
+ExternalCommanderMetaCandidateLegalityEvidence
+    _effectiveCandidateLegalityEvidence(
+  ExternalCommanderMetaCandidate candidate,
+  ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence,
+) {
+  if (legalityEvidence != null) return legalityEvidence;
+
+  final fallbackStatus = switch (candidate.isCommanderLegal) {
+    true => externalCommanderMetaLegalStatusLegal,
+    false => externalCommanderMetaLegalStatusIllegal,
+    null => externalCommanderMetaLegalStatusNotProven,
+  };
+
+  return ExternalCommanderMetaCandidateLegalityEvidence(
+    commanderColorIdentity: candidate.colorIdentity,
+    unresolvedCards: const <ExternalCommanderMetaCandidateUnresolvedCard>[],
+    illegalCards: const <ExternalCommanderMetaCandidateIllegalCard>[],
+    legalStatus: fallbackStatus,
+  );
+}
+
+void _applyCommanderLegalityEvidence(
+  ExternalCommanderMetaCandidate candidate,
+  List<ExternalCommanderMetaValidationIssue> issues, {
+  required bool dryRun,
+  ExternalCommanderMetaCandidateLegalityEvidence? legalityEvidence,
+}) {
+  final evidence =
+      _effectiveCandidateLegalityEvidence(candidate, legalityEvidence);
+
+  if (candidate.isCommanderLegal == false &&
+      !_hasValidationIssueCode(issues, 'commander_illegal')) {
+    issues.add(
+      const ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'commander_illegal',
+        message:
+            'Candidate marcado explicitamente como commander-ilegal foi bloqueado.',
+      ),
+    );
+  }
+
+  if (evidence.illegalCards.isNotEmpty &&
+      !_hasValidationIssueCode(issues, 'illegal_cards')) {
+    final sample = evidence.illegalCards
+        .take(3)
+        .map((card) => card.resolvedName)
+        .join(', ');
+    issues.add(
+      ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'illegal_cards',
+        message:
+            'Cartas resolvidas fora da identidade/legalidade Commander: $sample'
+            '${evidence.illegalCards.length > 3 ? '...' : ''}.',
+      ),
+    );
+  }
+
+  if (evidence.unresolvedCards.isNotEmpty &&
+      !_hasValidationIssueCode(issues, 'unresolved_cards')) {
+    final sample =
+        evidence.unresolvedCards.take(3).map((card) => card.name).join(', ');
+    issues.add(
+      ExternalCommanderMetaValidationIssue(
+        severity: dryRun ? 'warning' : 'error',
+        code: 'unresolved_cards',
+        message:
+            'Nao foi possivel resolver ${evidence.unresolvedCards.length} carta(s) '
+            'em cards: $sample${evidence.unresolvedCards.length > 3 ? '...' : ''}.',
+      ),
+    );
+  }
+}
+
+bool _hasValidationIssueCode(
+  List<ExternalCommanderMetaValidationIssue> issues,
+  String code,
+) {
+  return issues.any((issue) => issue.code == code);
+}
+
+List<_ExternalCommanderMetaParsedCardEntry> _parseCandidateCardList(
+  String cardList,
+) {
+  final entries = <_ExternalCommanderMetaParsedCardEntry>[];
+
+  for (final rawLine in cardList.split('\n')) {
+    final line = rawLine.trim();
+    if (line.isEmpty) continue;
+
+    final match = RegExp(r'^(\d+)\s+(.+)$').firstMatch(line);
+    final quantity = int.tryParse(match?.group(1) ?? '') ?? 1;
+    final name = (match?.group(2) ?? line).trim();
+    if (name.isEmpty || quantity <= 0) continue;
+
+    entries.add(
+      _ExternalCommanderMetaParsedCardEntry(
+        name: name,
+        quantity: quantity,
+        role: 'deck',
+      ),
+    );
+  }
+
+  return entries;
+}
+
+Map<String, dynamic>? _resolvedCardForName(
+  String name,
+  Map<String, Map<String, dynamic>> foundCardsMap,
+) {
+  final originalKey = name.trim().toLowerCase();
+  final cleanedKey = cleanImportLookupKey(originalKey);
+  if (foundCardsMap.containsKey(originalKey)) {
+    return foundCardsMap[originalKey];
+  }
+  return foundCardsMap[cleanedKey];
+}
+
+Set<String> _resolveIdentityFromCardRecord(Map<String, dynamic> card) {
+  return resolveCardColorIdentity(
+    colorIdentity: _iterableOfStrings(card['color_identity']),
+    colors: _iterableOfStrings(card['colors']),
+    oracleText: card['oracle_text']?.toString(),
+  );
+}
+
+Iterable<String> _iterableOfStrings(dynamic raw) {
+  if (raw == null) return const <String>[];
+  if (raw is Iterable) {
+    return raw.map((value) => value.toString());
+  }
+  return <String>[raw.toString()];
+}
+
+bool _isCommanderLegalStatusAllowed(String? status) {
+  if (status == null || status.isEmpty || status == 'missing') {
+    return true;
+  }
+  return status == 'legal' || status == 'restricted';
+}
+
+void _registerUnresolvedCard(
+  Map<String, _ExternalCommanderMetaParsedCardEntry> unresolvedByKey,
+  _ExternalCommanderMetaParsedCardEntry entry,
+) {
+  final key = '${entry.role}:${entry.name.toLowerCase()}';
+  final existing = unresolvedByKey[key];
+  if (existing == null) {
+    unresolvedByKey[key] = entry;
+    return;
+  }
+
+  unresolvedByKey[key] = _ExternalCommanderMetaParsedCardEntry(
+    name: existing.name,
+    quantity: existing.quantity + entry.quantity,
+    role: existing.role,
+  );
+}
+
+class _ExternalCommanderMetaParsedCardEntry {
+  const _ExternalCommanderMetaParsedCardEntry({
+    required this.name,
+    required this.quantity,
+    required this.role,
+  });
+
+  final String name;
+  final int quantity;
+  final String role;
+}
+
+class _ResolvedExternalCommanderMetaCardEntry {
+  const _ResolvedExternalCommanderMetaCardEntry({
+    required this.entry,
+    required this.card,
+  });
+
+  final _ExternalCommanderMetaParsedCardEntry entry;
+  final Map<String, dynamic> card;
 }

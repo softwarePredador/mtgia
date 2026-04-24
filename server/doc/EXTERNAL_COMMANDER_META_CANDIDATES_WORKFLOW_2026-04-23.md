@@ -170,6 +170,15 @@ Regra operacional do profile `topdeck_edhtop16_stage2`:
 - exige `--dry-run`
 - bloqueia `--promote-validated`
 - exige que o candidato passe no `topdeck_edhtop16_stage1`
+- quando `cards`/`card_legalities` estiverem disponiveis, resolve os nomes contra o banco
+- calcula `commander_color_identity` a partir dos commanders resolvidos
+- valida que cada carta resolvida respeita a identidade dos commanders
+- valida legalidade em `card_legalities` para o formato `commander`
+- grava no artefato:
+  - `commander_color_identity`
+  - `unresolved_cards`
+  - `illegal_cards`
+  - `legal_status` (`legal`, `illegal`, `not_proven`)
 - exige `card_count >= 98`
 - exige `commander_name`
 - exige `card_list`
@@ -180,11 +189,19 @@ Regra operacional do profile `topdeck_edhtop16_stage2`:
 - exige `research_payload.total_cards=100` quando o campo existe
 - rejeita `validation_status=promoted`
 - rejeita `is_commander_legal=false`
+- `unresolved_cards` continua como warning em `--dry-run`
+- `illegal_cards` ou `is_commander_legal=false` bloqueiam o candidato
 
 Resultado da rodada base:
 
 - expansao: `expanded_count=4`, `rejected_count=4`
 - validação stage 2 sobre os expandidos: `accepted_count=4`, `rejected_count=0`
+- legalidade resolvida contra `cards`:
+  - `legal=3`
+  - `not_proven=1`
+  - `illegal=0`
+- caso `not_proven` atual:
+  - `Scion of the Ur-Dragon` com `unresolved_cards=["Prismari, the Inspiration"]`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
 
 ### 3. Persistir candidatos

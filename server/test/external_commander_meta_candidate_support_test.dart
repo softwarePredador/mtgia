@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
@@ -372,5 +373,236 @@ void main() {
         }),
       );
     });
+
+    test('stage 2 marca illegal_cards quando carta resolvida sai da identidade',
+        () async {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url':
+              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10',
+          'deck_name': 'Atraxa Offcolor Fixture',
+          'commander_name': 'Atraxa, Praetors\' Voice',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list': [
+            '1 Atraxa, Praetors\' Voice',
+            '1 Sol Ring',
+            '1 Lightning Bolt',
+          ].join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 100,
+          },
+        },
+      );
+
+      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+        candidate,
+        repository: _FakeLegalityRepository(
+          resolvedByName: <String, Map<String, dynamic>>{
+            'atraxa, praetors\' voice': _cardRecord(
+              id: 'cmd-1',
+              name: 'Atraxa, Praetors\' Voice',
+              colorIdentity: <String>['W', 'U', 'B', 'G'],
+              colors: <String>['W', 'U', 'B', 'G'],
+            ),
+            'sol ring': _cardRecord(
+              id: 'deck-1',
+              name: 'Sol Ring',
+            ),
+            'lightning bolt': _cardRecord(
+              id: 'deck-2',
+              name: 'Lightning Bolt',
+              colorIdentity: <String>['R'],
+              colors: <String>['R'],
+            ),
+          },
+          commanderLegalityById: const <String, String>{
+            'cmd-1': 'legal',
+            'deck-1': 'legal',
+            'deck-2': 'legal',
+          },
+        ),
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage2ValidationProfile,
+        dryRun: true,
+        legalityEvidence: evidence,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(evidence.commanderColorIdentity, <String>{'W', 'U', 'B', 'G'});
+      expect(evidence.legalStatus, externalCommanderMetaLegalStatusIllegal);
+      expect(evidence.illegalCards, hasLength(1));
+      expect(evidence.illegalCards.single.name, 'Lightning Bolt');
+      expect(
+        evidence.illegalCards.single.reasons,
+        contains('outside_commander_identity'),
+      );
+      expect(
+          result.issues.map((issue) => issue.code), contains('illegal_cards'));
+    });
+
+    test('stage 2 mantem unresolved_cards como warning em dry-run', () async {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url':
+              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-11',
+          'deck_name': 'Kraum Tymna With Gap',
+          'commander_name': 'Kraum, Ludevic\'s Opus',
+          'partner_commander_name': 'Tymna the Weaver',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list': [
+            '1 Kraum, Ludevic\'s Opus',
+            '1 Tymna the Weaver',
+            '1 Sol Ring',
+            '1 Missing Card',
+            ...List<String>.generate(94, (index) => '1 Island ${index + 1}'),
+          ].join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 100,
+          },
+        },
+      );
+
+      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+        candidate,
+        repository: _FakeLegalityRepository(
+          resolvedByName: <String, Map<String, dynamic>>{
+            'kraum, ludevic\'s opus': _cardRecord(
+              id: 'cmd-kraum',
+              name: 'Kraum, Ludevic\'s Opus',
+              colorIdentity: <String>['U', 'R'],
+              colors: <String>['U', 'R'],
+            ),
+            'tymna the weaver': _cardRecord(
+              id: 'cmd-tymna',
+              name: 'Tymna the Weaver',
+              colorIdentity: <String>['W', 'B'],
+              colors: <String>['W', 'B'],
+            ),
+            'sol ring': _cardRecord(id: 'deck-sol', name: 'Sol Ring'),
+            'island': _cardRecord(
+              id: 'deck-island',
+              name: 'Island',
+              typeLine: 'Basic Land — Island',
+            ),
+          },
+          commanderLegalityById: const <String, String>{
+            'cmd-kraum': 'legal',
+            'cmd-tymna': 'legal',
+            'deck-sol': 'legal',
+            'deck-island': 'legal',
+          },
+        ),
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage2ValidationProfile,
+        dryRun: true,
+        legalityEvidence: evidence,
+      );
+
+      expect(result.accepted, isTrue);
+      expect(evidence.commanderColorIdentity, <String>{'W', 'U', 'B', 'R'});
+      expect(evidence.legalStatus, externalCommanderMetaLegalStatusNotProven);
+      expect(evidence.unresolvedCards, hasLength(1));
+      expect(evidence.unresolvedCards.single.name, 'Missing Card');
+      expect(
+        result.issues
+            .where((issue) => issue.code == 'unresolved_cards')
+            .single
+            .severity,
+        'warning',
+      );
+      expect(result.toJson()['legal_status'],
+          externalCommanderMetaLegalStatusNotProven);
+    });
+
+    test(
+        'artifact de validacao stage 2 expoe commander_color_identity e status',
+        () {
+      final raw = File(
+        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
+      ).readAsStringSync();
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final results =
+          (decoded['results'] as List<dynamic>).cast<Map<String, dynamic>>();
+
+      expect(results, isNotEmpty);
+      for (final result in results) {
+        expect(result, contains('commander_color_identity'));
+        expect(result, contains('unresolved_cards'));
+        expect(result, contains('illegal_cards'));
+        expect(result, contains('legal_status'));
+      }
+    });
   });
+}
+
+class _FakeLegalityRepository
+    implements ExternalCommanderMetaCandidateLegalityRepository {
+  _FakeLegalityRepository({
+    required this.resolvedByName,
+    this.commanderLegalityById = const <String, String>{},
+  });
+
+  final Map<String, Map<String, dynamic>> resolvedByName;
+  final Map<String, String> commanderLegalityById;
+
+  @override
+  Future<Map<String, String>> lookupCommanderLegalities(
+      Set<String> cardIds) async {
+    return Map<String, String>.fromEntries(
+      commanderLegalityById.entries
+          .where((entry) => cardIds.contains(entry.key)),
+    );
+  }
+
+  @override
+  Future<Map<String, Map<String, dynamic>>> resolveCardNames(
+    List<String> names,
+  ) async {
+    final resolved = <String, Map<String, dynamic>>{};
+    for (final name in names) {
+      final originalKey = name.toLowerCase();
+      final cleanKey = _cleanLookupKey(originalKey);
+      final card = resolvedByName[originalKey] ?? resolvedByName[cleanKey];
+      if (card != null) {
+        resolved[originalKey] = card;
+        resolved[cleanKey] = card;
+      }
+    }
+    return resolved;
+  }
+}
+
+String _cleanLookupKey(String value) =>
+    value.replaceAll(RegExp(r'\s+\d+$'), '');
+
+Map<String, dynamic> _cardRecord({
+  required String id,
+  required String name,
+  List<String> colorIdentity = const <String>[],
+  List<String> colors = const <String>[],
+  String typeLine = 'Artifact',
+  String? oracleText,
+}) {
+  return <String, dynamic>{
+    'id': id,
+    'name': name,
+    'type_line': typeLine,
+    'color_identity': colorIdentity,
+    'colors': colors,
+    'oracle_text': oracleText,
+  };
 }

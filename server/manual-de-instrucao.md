@@ -1,6 +1,59 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Validacao de color identity e legalidade Commander para candidatos stage 2
+
+### O Porquê
+- O stage 2 de `external_commander_meta_candidates` ja garantia fonte, subformato e decklist quase completa, mas ainda nao provava se a lista expandida respeitava de fato a identidade de cor do comandante.
+- Tambem faltava uma camada real de legalidade Commander usando `cards` e `card_legalities`, sem transformar `dry-run` em escrita de banco.
+- O objetivo desta rodada foi endurecer a validacao sem fechar a porta para listas ainda incompletamente resolvidas: `unresolved_cards` deveriam ser observados e reportados, mas nao matar o `dry-run`; cartas ilegais precisavam bloquear.
+
+### O Como
+- `server/lib/meta/external_commander_meta_candidate_support.dart` ganhou:
+  - repositório de legalidade reutilizavel para resolver nomes em `cards` e status em `card_legalities`;
+  - avaliador `evaluateExternalCommanderMetaCandidateLegality(...)`;
+  - artifact enriquecido com:
+    - `commander_color_identity`
+    - `unresolved_cards`
+    - `illegal_cards`
+    - `legal_status`
+  - reaproveito dos helpers existentes:
+    - `resolveImportCardNames(...)`
+    - `resolveCardColorIdentity(...)`
+    - `isWithinCommanderIdentity(...)`
+- A estrategia aplicada foi:
+  1. resolver commanders e decklist no banco quando possivel;
+  2. montar a identidade combinada dos commanders;
+  3. verificar cada carta resolvida contra essa identidade;
+  4. consultar `card_legalities` para o formato `commander`;
+  5. classificar o candidato como:
+     - `legal`
+     - `illegal`
+     - `not_proven`
+- `server/bin/import_external_commander_meta_candidates.dart` passou a:
+  - abrir conexao somente-leitura no `dry-run` stage 2 quando a base estiver disponivel;
+  - enriquecer o output terminal com `legal`, `unresolved` e `illegal`;
+  - manter `dry-run` sem qualquer escrita em banco;
+  - continuar bloqueando importacao real quando existirem erros de validacao.
+- Regras novas do comportamento:
+  - `is_commander_legal=false` continua erro fatal;
+  - `illegal_cards` vira erro fatal;
+  - `unresolved_cards` vira apenas warning em `--dry-run`.
+
+### Testes e evidencia
+- `server/test/external_commander_meta_candidate_support_test.dart` ganhou cobertura para:
+  - carta resolvida fora da identidade do comandante;
+  - `unresolved_cards` como warning em `dry-run`;
+  - contrato estrutural do artifact stage 2 com os novos campos.
+- O artifact `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json` foi regenerado com a validacao nova.
+- Resultado observado na rodada:
+  - `accepted_count=4`
+  - `rejected_count=0`
+  - `legal=3`
+  - `not_proven=1`
+  - `illegal=0`
+  - unico `unresolved_cards` atual: `Prismari, the Inspiration` no deck `Scion of the Ur-Dragon`
+
 ## 2026-04-24 — Auditoria do caminho de expansao para decklists completas em TopDeck.gg + EDHTop16
 
 ### O Porquê

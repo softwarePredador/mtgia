@@ -13,9 +13,34 @@ Future<void> main(List<String> args) async {
     rawPayload,
     importedBy: config.importedBy,
   );
+  Database? db;
+  dynamic conn;
+  if (!config.dryRun || _requiresCommanderLegalityValidation(config)) {
+    db = Database();
+    await db.connect();
+    if (db.isConnected) {
+      conn = db.connection;
+    } else if (!config.dryRun) {
+      throw StateError('Falha ao conectar ao banco para importacao.');
+    } else {
+      stdout.writeln(
+        'Aviso: banco indisponivel; validacao de legalidade Commander ficou not_proven.',
+      );
+    }
+  }
+
+  final legalityBySourceUrl = conn == null
+      ? const <String, ExternalCommanderMetaCandidateLegalityEvidence>{}
+      : await evaluateExternalCommanderMetaCandidatesLegality(
+          candidates,
+          repository:
+              PostgresExternalCommanderMetaCandidateLegalityRepository(conn),
+        );
   final validationResults = validateExternalCommanderMetaCandidates(
     candidates,
     profile: config.validationProfile,
+    dryRun: config.dryRun,
+    legalityBySourceUrl: legalityBySourceUrl,
   );
   final acceptedCount =
       validationResults.where((result) => result.accepted).length;
@@ -62,26 +87,32 @@ Future<void> main(List<String> args) async {
         '${candidate.normalizedSourceName} | '
         '${candidate.normalizedSubformat ?? '-'} | '
         'cards=${candidate.cardCount} | '
+        'legal=${result.effectiveLegalityEvidence.legalStatus} | '
+        'unresolved=${result.effectiveLegalityEvidence.unresolvedCards.length} | '
+        'illegal=${result.effectiveLegalityEvidence.illegalCards.length} | '
         '${issues.isEmpty ? 'sem_issues' : issues} | '
         '${candidate.sourceUrl}',
       );
     }
     stdout.writeln('Dry-run finalizado sem gravar no banco.');
+    await db?.close();
     return;
   }
 
   final rejected =
       validationResults.where((result) => !result.accepted).toList();
   if (rejected.isNotEmpty) {
+    await db?.close();
     throw StateError(
       'Importacao bloqueada: ${rejected.length} candidato(s) rejeitado(s) '
       'pela validacao ${config.validationProfile}.',
     );
   }
 
-  final db = Database();
-  await db.connect();
-  final conn = db.connection;
+  if (conn == null) {
+    await db?.close();
+    throw StateError('Conexao com o banco indisponivel para importacao real.');
+  }
 
   try {
     var importedCount = 0;
@@ -105,7 +136,7 @@ Future<void> main(List<String> args) async {
           'Promocao concluida: $promotedCount candidatos promovidos/atualizados.');
     }
   } finally {
-    await conn.close();
+    await db?.close();
   }
 }
 
@@ -194,6 +225,10 @@ Future<void> _upsertCandidate(
       'imported_by': candidate.importedBy,
     },
   );
+}
+
+bool _requiresCommanderLegalityValidation(_ImportConfig config) {
+  return config.validationProfile == topDeckEdhTop16Stage2ValidationProfile;
 }
 
 Future<void> _promoteCandidateToMetaDecks(

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T14:50:01.904619Z",
+  "generated_at": "2026-04-24T15:12:36.891414Z",
   "mode": "dry_run",
   "validation_profile": "topdeck_edhtop16_stage2",
   "accepted_count": 4,
@@ -44,11 +44,32 @@
         "imported_by": "copilot_cli_web_agent"
       },
       "card_count": 100,
+      "commander_color_identity": [
+        "B",
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "unresolved_cards": [
+        {
+          "name": "Prismari, the Inspiration",
+          "quantity": 1,
+          "role": "deck"
+        }
+      ],
+      "illegal_cards": [],
+      "legal_status": "not_proven",
       "issues": [
         {
           "severity": "warning",
           "code": "missing_color_identity",
           "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
+        },
+        {
+          "severity": "warning",
+          "code": "unresolved_cards",
+          "message": "Nao foi possivel resolver 1 carta(s) em cards: Prismari, the Inspiration."
         }
       ]
     },
@@ -91,6 +112,14 @@
         "imported_by": "copilot_cli_web_agent"
       },
       "card_count": 100,
+      "commander_color_identity": [
+        "B",
+        "R",
+        "U"
+      ],
+      "unresolved_cards": [],
+      "illegal_cards": [],
+      "legal_status": "legal",
       "issues": [
         {
           "severity": "warning",
@@ -138,6 +167,14 @@
         "imported_by": "copilot_cli_web_agent"
       },
       "card_count": 100,
+      "commander_color_identity": [
+        "B",
+        "R",
+        "U"
+      ],
+      "unresolved_cards": [],
+      "illegal_cards": [],
+      "legal_status": "legal",
       "issues": [
         {
           "severity": "warning",
@@ -185,6 +222,15 @@
         "imported_by": "copilot_cli_web_agent"
       },
       "card_count": 100,
+      "commander_color_identity": [
+        "B",
+        "R",
+        "U",
+        "W"
+      ],
+      "unresolved_cards": [],
+      "illegal_cards": [],
+      "legal_status": "legal",
       "issues": [
         {
           "severity": "warning",
