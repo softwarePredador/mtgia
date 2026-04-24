@@ -13,6 +13,46 @@ Regra operacional:
 
 Nao gravar pesquisa web crua direto em `meta_decks`.
 
+## Politica de fontes auditada em 2026-04-24
+
+Classificacao operacional para `external_commander_meta_candidates`:
+
+| Fonte | Classificacao | Status operacional atual | Leitura |
+| --- | --- | --- | --- |
+| EDHTop16 | accept-with-validation | ativo | fonte de standings/evento competitiva; entra somente com decklist completa, `competitive_commander`, legalidade Commander e `source_context` explicito |
+| TopDeck.gg | accept-with-validation | ativo como elo da expansao; staging direto ainda nao provado | pagina de deck consegue expor lista completa; usar com validacao estrutural e nunca como promocao automatica |
+| cEDH Decklist Database | enrichment-only | fora do staging | bom para shell/archetype/primer; nao e tratado como lista primaria de evento |
+| EDHREC | enrichment-only | fora do staging | agregado e heuristico; nao representa deck competitivo canonico por `source_url` |
+| Commander Spellbook | enrichment-only | fora do staging | referencia de combo; nao e host de decklist Commander de 100 cartas |
+| Archidekt | accept-with-validation | policy-approved, ainda nao implementado | deck host publico util, mas precisa prova de contexto competitivo e adapter explicito antes de qualquer escrita |
+| Moxfield | accept-with-validation | policy-approved, fetch live direto ainda nao provado | deck host publico relevante, mas neste ambiente houve `403` no sample auditado; so pode entrar com adapter/source proof explicitos |
+
+Regras:
+
+1. Nenhuma fonte esta classificada como `accept` hoje.
+2. `accept-with-validation` nao autoriza escrita direta; apenas habilita staging com gate estrutural + commander-aware + `--apply` explicito.
+3. `enrichment-only` nunca deve virar `source_url/source_name` canonico em `external_commander_meta_candidates`; entra apenas em `research_payload` ou em interpretacao humana.
+4. `reject` permanece vazio nesta rodada porque nao houve evidencia suficiente para banimento total de host; isso **nao** significa aprovacao para staging.
+
+### Fatos provados por codigo/local
+
+No codigo atual, a allowlist controlada implementada continua menor do que a politica auditada:
+
+- `EDHTop16` -> hosts `edhtop16.com` / path `/tournament/`
+- `TopDeck.gg` -> hosts `topdeck.gg` / path `/event/`
+
+Prova local:
+
+- `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json`
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json`
+
+Leitura:
+
+- `EDHTop16 -> TopDeck deck page -> 100 cartas` esta provado para o fluxo atual
+- `Archidekt` e `Moxfield` ficam apenas como policy-approved; nao entram ate existir adapter/source proof dedicados
+- `cEDH Decklist Database`, `EDHREC` e `Commander Spellbook` permanecem fora da fila de staging
+
 ## Novos artefatos
 
 - tabela: `external_commander_meta_candidates`

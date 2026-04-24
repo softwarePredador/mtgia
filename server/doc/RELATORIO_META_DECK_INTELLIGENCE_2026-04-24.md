@@ -13,6 +13,125 @@ Atualizar a leitura operacional de `meta_decks` depois do gate de promocao exter
 
 Sem destruir dados.
 
+## Etapa 1/5 - auditoria final das fontes externas
+
+### Resultado
+
+Politica auditada para `external_commander_meta_candidates`:
+
+| Fonte | Classificacao | Fato provado | Status operacional |
+| --- | --- | --- | --- |
+| EDHTop16 | accept-with-validation | `200` em URL real de torneio + artefato local prova `EDHTop16 -> TopDeck deck page -> 100 cartas` | ativo |
+| TopDeck.gg | accept-with-validation | `200` em URL real de deck + HTML da pagina de deck | ativo como elo da expansao; staging direto por `source_url=/deck/...` ainda nao provado |
+| cEDH Decklist Database | enrichment-only | `200` no host + descricao publica de base curada | fora do staging |
+| EDHREC | enrichment-only | `200` no host + natureza agregada provada por pagina publica | fora do staging |
+| Commander Spellbook | enrichment-only | `200` no host + natureza de referencia de combos | fora do staging |
+| Archidekt | accept-with-validation | `200` no host; deck host publico e suportado apenas por pesquisa web nesta rodada | policy-approved, ainda nao implementado |
+| Moxfield | accept-with-validation | papel de deck host corroborado por pesquisa web; sample real no ambiente retornou `403` | policy-approved, fetch live direto ainda nao provado |
+
+Veredito:
+
+- `accept`: nenhum
+- `accept-with-validation`: `EDHTop16`, `TopDeck.gg`, `Archidekt`, `Moxfield`
+- `enrichment-only`: `cEDH Decklist Database`, `EDHREC`, `Commander Spellbook`
+- `reject`: nenhum host banido nesta rodada
+
+### Fatos provados por codigo e artefatos locais
+
+1. A policy implementada hoje em codigo ainda e menor do que a policy auditada:
+   - `EDHTop16` com path `/tournament/`
+   - `TopDeck.gg` com path `/event/`
+2. O fluxo real atualmente provado no repositorio e:
+   - `EDHTop16 tournament` -> `TopDeck deck page` -> `card_list` de `100` cartas -> validacao stage 2
+3. O artefato `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json` prova:
+   - `expanded_count=4`
+   - `rejected_count=4`
+   - `collection_method=edhtop16_graphql_topdeck_deck_page_dry_run`
+4. O artefato `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json` prova:
+   - `validation_profile=topdeck_edhtop16_stage2`
+   - `accepted_count=4`
+   - `rejected_count=0`
+   - `legal_status=legal` em `3` casos e `not_proven` em `1`
+
+Leitura:
+
+- `EDHTop16` e `TopDeck.gg` estao comprovados como cadeia operacional do sprint
+- `Archidekt` e `Moxfield` ainda nao estao comprovados no codigo do repositorio
+- `cEDH Decklist Database`, `EDHREC` e `Commander Spellbook` nao entram como `source_url/source_name` canonicos
+
+### Fatos provados por fetch live
+
+Com `curl -L -sS --max-time 20` em `2026-04-24`:
+
+| Fonte | URL auditada | Resultado |
+| --- | --- | --- |
+| EDHTop16 | `https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57` | `200 text/html` |
+| TopDeck.gg | `https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1` | `200 text/html` |
+| cEDH Decklist Database | `https://cedh-decklist-database.com/` | `200 text/html` |
+| EDHREC | `https://edhrec.com/` | `200 text/html` |
+| Commander Spellbook | `https://commanderspellbook.com/` | `200 text/html` |
+| Archidekt | `https://www.archidekt.com/` | `200 text/html` |
+| Moxfield | `https://moxfield.com/decks/eecRYCKd8kqSIdjq0YOtzA` | `403 text/html` |
+
+Leitura:
+
+- `EDHTop16` e `TopDeck.gg` continuam alcancaveis no ambiente atual
+- `Moxfield` como host competitivo relevante foi corroborado por pesquisa web, mas o fetch direto deste ambiente permanece **not proven** por causa do `403`
+- `Archidekt` respondeu no host, mas a extraçao de deck competitivo/cEDH real permanece **not proven** nesta rodada
+
+### Pesquisa web separada de fatos locais
+
+Pesquisa externa resumida via `Commander Meta Web Research Analyst`:
+
+- `EDHTop16`: standings competitivos reais; decklist completa depende do encadeamento para `TopDeck.gg`
+- `TopDeck.gg`: deck host competitivo forte com deck pages publicas
+- `cEDH Decklist Database`: curadoria secundaria, melhor como enrichment
+- `EDHREC`: agregado heuristico, nao deck canonico de torneio
+- `Commander Spellbook`: referencia de combo, nao deck host
+- `Archidekt`: deck host publico, mas contexto competitivo precisa validacao explicita
+- `Moxfield`: deck host publico forte no ecossistema Commander/cEDH, mas scraping direto neste ambiente ficou **not proven**
+
+### Comandos rodados nesta etapa
+
+```bash
+cd server && python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json')
+obj=json.loads(p.read_text())
+for item in obj.get('candidates', [])[:4]:
+    print(item.get('source_url'))
+    rp=item.get('research_payload', {})
+    print(rp.get('collection_method'))
+    print(rp.get('source_context'))
+    print(rp.get('source_chain'))
+PY
+
+python3 - <<'PY'
+import subprocess, shlex
+urls = [
+  ('EDHTop16 tournament', 'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57'),
+  ('TopDeck deck', 'https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1'),
+  ('cEDH Decklist Database root', 'https://cedh-decklist-database.com/'),
+  ('EDHREC root', 'https://edhrec.com/'),
+  ('Commander Spellbook root', 'https://commanderspellbook.com/'),
+  ('Archidekt root', 'https://www.archidekt.com/'),
+  ('Moxfield deck', 'https://moxfield.com/decks/eecRYCKd8kqSIdjq0YOtzA'),
+]
+for label, url in urls:
+    cmd = f"curl -L -sS --max-time 20 -o /tmp/meta_source_audit_body.html -w '%{{http_code}}|%{{url_effective}}|%{{content_type}}' {shlex.quote(url)}"
+    proc = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+    print(label, proc.stdout.strip())
+PY
+```
+
+### Menores proximas acoes tecnicas apos a auditoria
+
+1. manter o allowlist implementado focado em `EDHTop16` + cadeia `TopDeck` na Etapa 2
+2. persistir apenas candidatos `accepted` do profile `topdeck_edhtop16_stage2`
+3. manter `cEDH Decklist Database`, `EDHREC` e `Commander Spellbook` fora do staging
+4. nao ativar `Archidekt` ou `Moxfield` ate existir adapter dedicado e fetch/source proof adicionais
+
 ## Resumo do pipeline
 
 ### Fonte primaria comprovada
