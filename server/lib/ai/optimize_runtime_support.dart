@@ -2,7 +2,7 @@ import 'package:postgres/postgres.dart';
 import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
-import '../meta/meta_deck_card_list_support.dart';
+import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 
 String normalizeOptimizeReasoning(dynamic value) {
@@ -3039,112 +3039,113 @@ Future<List<String>> loadCommanderCompetitivePriorities({
   required String commanderName,
   required int limit,
   String metaScope = 'competitive_commander',
+  List<String> commanderNames = const <String>[],
+  bool preferExternalCompetitive = true,
 }) async {
   if (commanderName.trim().isEmpty || limit <= 0) return const [];
-  final formatCodes = metaDeckFormatCodesForCommanderScope(metaScope);
-  if (formatCodes.isEmpty) return const [];
+  final normalizedCommanderNames = <String>{
+    commanderName.trim(),
+    ...commanderNames
+        .map((name) => name.trim())
+        .where((name) => name.isNotEmpty),
+  }.toList(growable: false);
 
-  var result = await pool.execute(
-    Sql.named('''
-      SELECT card_list
-      FROM meta_decks
-      WHERE format = ANY(@formats)
-        AND (
-          LOWER(commander_name) = LOWER(@commanderExact)
-          OR LOWER(partner_commander_name) = LOWER(@commanderExact)
-          OR shell_label ILIKE @commanderPattern
-          OR card_list ILIKE @commanderPattern
-        )
-      ORDER BY created_at DESC
-      LIMIT 200
-    '''),
-    parameters: {
-      'formats': TypedValue(Type.textArray, formatCodes),
-      'commanderExact': commanderName.replaceAll('%', '').trim(),
-      'commanderPattern': '%${commanderName.replaceAll('%', '')}%',
-    },
+  final referenceSelection = await loadCommanderMetaReferenceSelection(
+    pool: pool,
+    commanderNames: normalizedCommanderNames,
+    limitDecks: 6,
+    priorityCardLimit: limit,
+    metaScope: metaScope,
+    preferExternalCompetitive: preferExternalCompetitive,
+  );
+  if (referenceSelection.priorityCardNames.isNotEmpty) {
+    return referenceSelection.priorityCardNames
+        .take(limit)
+        .toList(growable: false);
+  }
+
+  List<dynamic> fallback = const [];
+  try {
+    fallback = await pool.execute(
+      Sql.named('''
+        SELECT card_name, usage_count, meta_deck_count
+        FROM card_meta_insights
+        WHERE @commander = ANY(common_commanders)
+        ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
+        LIMIT @limit
+      '''),
+      parameters: {
+        'commander': commanderName,
+        'limit': limit,
+      },
+    );
+  } catch (_) {
+    fallback = const [];
+  }
+
+  if (fallback.isEmpty) return const [];
+
+  return fallback
+      .map((row) => (row[0] as String?) ?? '')
+      .where((name) => name.trim().isNotEmpty)
+      .take(limit)
+      .toList();
+}
+
+Future<MetaDeckReferenceSelectionResult> loadCommanderMetaReferenceSelection({
+  required Pool pool,
+  required List<String> commanderNames,
+  required int limitDecks,
+  required int priorityCardLimit,
+  String metaScope = 'competitive_commander',
+  bool preferExternalCompetitive = true,
+}) async {
+  final normalizedCommanderNames = commanderNames
+      .map((name) => name.trim())
+      .where((name) => name.isNotEmpty)
+      .toSet()
+      .toList(growable: false);
+  if (normalizedCommanderNames.isEmpty ||
+      limitDecks <= 0 ||
+      priorityCardLimit <= 0) {
+    return MetaDeckReferenceSelectionResult(
+      commanderScope: metaScope,
+      selectionReason: 'no_match',
+      references: const <MetaDeckReferenceCandidate>[],
+      priorityCardNames: const <String>[],
+      sourceBreakdown: const <String, int>{},
+    );
+  }
+
+  final candidates = await queryMetaDeckReferenceCandidates(
+    pool: pool,
+    formatCodes: metaDeckFormatCodesForCommanderScope(metaScope),
+    commanderNames: normalizedCommanderNames,
+    keywordPatterns: _buildCommanderSearchKeywords(normalizedCommanderNames),
+    limit: 240,
   );
 
-  if (result.isEmpty) {
-    final commanderToken = commanderName.split(',').first.trim();
-    if (commanderToken.isNotEmpty) {
-        result = await pool.execute(
-          Sql.named('''
-          SELECT card_list
-          FROM meta_decks
-          WHERE format = ANY(@formats)
-            AND (
-              shell_label ILIKE @archetypePattern
-              OR archetype ILIKE @archetypePattern
-            )
-          ORDER BY created_at DESC
-          LIMIT 200
-        '''),
-        parameters: {
-          'formats': TypedValue(Type.textArray, formatCodes),
-          'archetypePattern': '%${commanderToken.replaceAll('%', '')}%',
-        },
-      );
-    }
+  return selectMetaDeckReferenceCandidates(
+    candidates: candidates,
+    commanderNames: normalizedCommanderNames,
+    keywordPatterns: _buildCommanderSearchKeywords(normalizedCommanderNames),
+    commanderScope: metaScope,
+    deckLimit: limitDecks,
+    priorityCardLimit: priorityCardLimit,
+    preferExternalCompetitive: preferExternalCompetitive,
+  );
+}
+
+List<String> _buildCommanderSearchKeywords(List<String> commanderNames) {
+  final keywords = <String>{};
+  for (final rawCommander in commanderNames) {
+    final trimmed = rawCommander.trim();
+    if (trimmed.isEmpty) continue;
+    keywords.add(trimmed);
+    final token = trimmed.split(',').first.trim();
+    if (token.isNotEmpty) keywords.add(token);
   }
-
-  if (result.isEmpty) {
-    List<dynamic> fallback = const [];
-    try {
-      fallback = await pool.execute(
-        Sql.named('''
-          SELECT card_name, usage_count, meta_deck_count
-          FROM card_meta_insights
-          WHERE @commander = ANY(common_commanders)
-          ORDER BY meta_deck_count DESC, usage_count DESC, card_name ASC
-          LIMIT @limit
-        '''),
-        parameters: {
-          'commander': commanderName,
-          'limit': limit,
-        },
-      );
-    } catch (_) {
-      fallback = const [];
-    }
-
-    if (fallback.isEmpty) return const [];
-
-    return fallback
-        .map((row) => (row[0] as String?) ?? '')
-        .where((name) => name.trim().isNotEmpty)
-        .take(limit)
-        .toList();
-  }
-
-  final commanderLower = commanderName.trim().toLowerCase();
-  final counts = <String, int>{};
-
-  for (final row in result) {
-    final raw = (row[0] as String?) ?? '';
-    if (raw.trim().isEmpty) continue;
-
-    final parsed = parseMetaDeckCardList(
-      cardList: raw,
-      format: legacyCompetitiveCommanderFormatCode,
-    );
-
-    for (final entry in parsed.mainboard.entries) {
-      final cardName = entry.key;
-      final lower = cardName.toLowerCase();
-      if (lower == commanderLower || _isBasicLandName(lower)) continue;
-      counts[cardName] = (counts[cardName] ?? 0) + entry.value;
-    }
-  }
-
-  final sorted = counts.entries.toList()
-    ..sort((a, b) {
-      final byCount = b.value.compareTo(a.value);
-      if (byCount != 0) return byCount;
-      return a.key.compareTo(b.key);
-    });
-
-  return sorted.take(limit).map((e) => e.key).toList();
+  return keywords.toList(growable: false);
 }
 
 Future<Map<String, dynamic>?> loadCommanderReferenceProfileFromCache({

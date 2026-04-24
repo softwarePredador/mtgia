@@ -21,6 +21,7 @@ import '../../../lib/ai/optimize_job.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
+import '../../../lib/meta/meta_deck_reference_support.dart';
 
 int _optimizeRequestCount = 0;
 int _emptySuggestionFallbackTriggeredCount = 0;
@@ -506,6 +507,7 @@ Future<Response> onRequest(RequestContext context) async {
         commanders.isNotEmpty ? commanders.first.trim() : 'unknown';
     var optimizeCommanderPrioritySource = 'none';
     final optimizeCommanderPriorityNames = <String>[];
+    String? optimizeMetaEvidenceContext;
     final deterministicSwapCandidates = <Map<String, dynamic>>[];
 
     Future<Response> respondWithOptimizeTelemetry({
@@ -623,6 +625,10 @@ Future<Response> onRequest(RequestContext context) async {
       try {
         final commanderName = commanders.first.trim();
         if (commanderName.isNotEmpty) {
+          final commanderMetaScope =
+              deckFormat == 'commander' && (bracket ?? 0) >= 3
+                  ? 'competitive_commander'
+                  : 'competitive_commander';
           final commanderReferenceFuture = telemetry.trackAsync(
             'request.commander_reference_cache',
             () => loadCommanderReferenceProfileFromCache(
@@ -630,24 +636,36 @@ Future<Response> onRequest(RequestContext context) async {
               commanderName: commanderName,
             ),
           );
-          final priorityNamesFuture = telemetry.trackAsync(
+          final metaSelectionFuture = telemetry.trackAsync(
             'request.commander_priority_query',
-            () => loadCommanderCompetitivePriorities(
+            () => loadCommanderMetaReferenceSelection(
               pool: pool,
-              commanderName: commanderName,
-              limit: 120,
+              commanderNames: commanders,
+              limitDecks: 4,
+              priorityCardLimit: 120,
+              metaScope: commanderMetaScope,
+              preferExternalCompetitive: (bracket ?? 0) >= 3,
             ),
           );
           final results = await Future.wait<dynamic>([
             commanderReferenceFuture,
-            priorityNamesFuture,
+            metaSelectionFuture,
           ]);
           final commanderReferenceProfile = results[0] as Map<String, dynamic>?;
-          final priorityNames = (results[1] as List).cast<String>();
+          final metaSelection = results[1] as MetaDeckReferenceSelectionResult;
 
-          if (priorityNames.isNotEmpty) {
-            optimizeCommanderPrioritySource = 'competitive_meta';
-            optimizeCommanderPriorityNames.addAll(priorityNames);
+          if (metaSelection.priorityCardNames.isNotEmpty) {
+            optimizeCommanderPrioritySource =
+                metaSelection.optimizePrioritySource;
+            optimizeCommanderPriorityNames
+                .addAll(metaSelection.priorityCardNames);
+          }
+          if (metaSelection.hasReferences) {
+            optimizeMetaEvidenceContext = buildMetaDeckEvidenceText(
+              metaSelection,
+              maxPriorityCards: 14,
+              maxReferences: 3,
+            );
           }
           final averageDeckSeedNames = extractAverageDeckSeedNamesFromProfile(
             commanderReferenceProfile,
@@ -797,7 +815,8 @@ Future<Response> onRequest(RequestContext context) async {
             hasKeepThemeOverride: hasKeepThemeOverride,
           ),
           (error, stackTrace) {
-            Log.e('Background optimize job $jobId crashed: $error\n$stackTrace');
+            Log.e(
+                'Background optimize job $jobId crashed: $error\n$stackTrace');
             unawaited(
               OptimizeJobStore.fail(pool, jobId, error: error.toString()),
             );
@@ -842,8 +861,8 @@ Future<Response> onRequest(RequestContext context) async {
 
     final optimizer = deckOptimizer;
 
-    final deterministicFirstEnabled = effectiveMode == 'optimize' &&
-        deterministicSwapCandidates.isNotEmpty;
+    final deterministicFirstEnabled =
+        effectiveMode == 'optimize' && deterministicSwapCandidates.isNotEmpty;
     var optimizeFallbackAttempted = false;
 
     Future<Map<String, dynamic>?> runAiOptimizeAttempt({
@@ -862,6 +881,7 @@ Future<Response> onRequest(RequestContext context) async {
             keepTheme: keepTheme,
             detectedTheme: themeProfile.theme,
             coreCards: themeProfile.coreCards,
+            metaEvidenceContext: optimizeMetaEvidenceContext,
           ),
         );
         aiResponse['mode'] ??= 'optimize';
@@ -2047,16 +2067,17 @@ Future<Response> onRequest(RequestContext context) async {
             ? buildOptimizationRejectionReasons(
                 validationReport: optimizationValidationReport,
                 archetype: effectiveOptimizeArchetype,
-                preCurve: double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ??
-                    0.0,
+                preCurve:
+                    double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ??
+                        0.0,
                 postCurve: double.tryParse(
                       '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
                     ) ??
                     0.0,
                 preManaAssessment:
                     deckAnalysis['mana_base_assessment']?.toString() ?? '',
-                postManaAssessment: (postAnalysis?['mana_base_assessment']?.toString()) ??
-                    '',
+                postManaAssessment:
+                    (postAnalysis?['mana_base_assessment']?.toString()) ?? '',
               )
             : const <String>[];
 

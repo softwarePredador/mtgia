@@ -10,6 +10,7 @@ import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
+import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -46,12 +47,6 @@ Future<Response> onRequest(RequestContext context) async {
     var metaContext = '';
 
     try {
-      final _ = prompt
-          .split(' ')
-          .where((word) => word.length > 3)
-          .map((word) => "'%${word.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')}%'")
-          .join(' OR archetype ILIKE ');
-
       final metaKeywordPatterns = prompt
           .split(' ')
           .where((word) => word.length > 3)
@@ -62,69 +57,45 @@ Future<Response> onRequest(RequestContext context) async {
           .toList();
 
       final normalizedFormat = format.trim().toLowerCase();
-      final commanderMetaScope = normalizedFormat == 'commander' ||
-              normalizedFormat == 'edh'
+      final isCommanderFormat =
+          normalizedFormat == 'commander' || normalizedFormat == 'edh';
+      final commanderMetaScope = isCommanderFormat
           ? _resolveCommanderMetaScopeFromPrompt(prompt)
           : null;
-      final metaFormats = metaDeckFormatCodesForDeckFormat(
-        format,
-        commanderScope: commanderMetaScope ?? 'commander',
-      );
-
-        if (metaKeywordPatterns.isNotEmpty && metaFormats.isNotEmpty) {
-          final metaResult = await pool.execute(
-            Sql.named('''
-            SELECT
+      final shouldUseMeta = metaKeywordPatterns.isNotEmpty &&
+          (!isCommanderFormat || commanderMetaScope != null);
+      final metaFormats = shouldUseMeta
+          ? metaDeckFormatCodesForDeckFormat(
               format,
-              archetype,
-              shell_label,
-              strategy_archetype,
-              card_list
-            FROM meta_decks
-            WHERE format = ANY(@formats)
-              AND (
-                archetype ILIKE ANY(@patterns)
-                OR shell_label ILIKE ANY(@patterns)
-                OR strategy_archetype ILIKE ANY(@patterns)
-                OR commander_name ILIKE ANY(@patterns)
-                OR partner_commander_name ILIKE ANY(@patterns)
-              )
-            LIMIT 3
-          '''),
-          parameters: {
-            'formats': TypedValue(Type.textArray, metaFormats),
-            'patterns': TypedValue(Type.textArray, metaKeywordPatterns),
-          },
+              commanderScope: commanderMetaScope ?? 'competitive_commander',
+            )
+          : const <String>[];
+
+      if (metaFormats.isNotEmpty) {
+        final metaCandidates = await queryMetaDeckReferenceCandidates(
+          pool: pool,
+          formatCodes: metaFormats,
+          keywordPatterns: metaKeywordPatterns,
+          limit: 200,
+        );
+        final metaSelection = selectMetaDeckReferenceCandidates(
+          candidates: metaCandidates,
+          keywordPatterns: metaKeywordPatterns,
+          commanderScope: commanderMetaScope,
+          deckLimit: 3,
+          priorityCardLimit: 14,
+          preferExternalCompetitive:
+              commanderMetaScope == 'competitive_commander',
         );
 
-          if (metaResult.isNotEmpty) {
-          if (commanderMetaScope != null) {
-            metaContext =
-                'Commander meta note: MTGTop8 EDH is Duel Commander and cEDH is Competitive Commander.\n'
-                'Requested commander meta scope: ${commanderMetaScopeLabel(commanderMetaScope)}.\n\n';
-          }
-            metaContext += 'Here are some successful meta decks for inspiration:\n';
-            for (final row in metaResult) {
-              final descriptor = describeMetaDeckFormat(row[0] as String?);
-              final storedLabel = (row[1] as String?) ?? '';
-              final shellLabel = (row[2] as String?) ?? '';
-              final strategyArchetype = (row[3] as String?) ?? '';
-              final cardList = (row[4] as String?) ?? '';
-              final excerpt =
-                  cardList.length > 200 ? cardList.substring(0, 200) : cardList;
-              final suffix = cardList.length > 200 ? '...' : '';
-              final scopeLabel = descriptor.commanderSubformat != null
-                  ? '${descriptor.commanderSubformat} / ${descriptor.label}'
-                  : descriptor.label;
-              metaContext +=
-                  'Stored label: $storedLabel\n'
-                  '${shellLabel.isNotEmpty ? "Commander shell: $shellLabel\n" : ""}'
-                  '${strategyArchetype.isNotEmpty ? "Strategy archetype: $strategyArchetype\n" : ""}'
-                  'Meta scope: $scopeLabel\n'
-                  'List: $excerpt$suffix\n\n';
-            }
-          }
+        if (metaSelection.hasReferences) {
+          metaContext = buildMetaDeckEvidenceText(
+            metaSelection,
+            maxPriorityCards: 12,
+            maxReferences: 3,
+          );
         }
+      }
     } catch (error) {
       print('[ERROR] handler: $error');
       Log.w('Erro ao buscar contexto do meta: $error');
@@ -341,17 +312,21 @@ $metaContext
   }
 }
 
-String _resolveCommanderMetaScopeFromPrompt(String prompt) {
+String? _resolveCommanderMetaScopeFromPrompt(String prompt) {
   final normalized = prompt.toLowerCase();
   if (normalized.contains('duel commander')) {
     return 'duel_commander';
   }
   if (normalized.contains('cedh') ||
       normalized.contains('competitive edh') ||
-      normalized.contains('competitive commander')) {
+      normalized.contains('competitive commander') ||
+      normalized.contains('high power') ||
+      normalized.contains('high-power') ||
+      normalized.contains('bracket 3') ||
+      normalized.contains('bracket 4')) {
     return 'competitive_commander';
   }
-  return 'commander';
+  return null;
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

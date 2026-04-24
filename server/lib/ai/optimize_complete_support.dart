@@ -4,6 +4,7 @@ import '../color_identity.dart';
 import '../card_validation_service.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
+import '../meta/meta_deck_reference_support.dart';
 import 'edhrec_service.dart';
 import 'optimize_deck_support.dart';
 import 'optimize_runtime_support.dart';
@@ -20,6 +21,7 @@ class CompleteBuildAccumulator {
   final List<String> invalidAll;
   final Set<String> aiSuggestedNames;
   final Set<String> commanderMetaPriorityNames;
+  String? commanderMetaEvidenceText;
   int virtualTotal;
   int maxBasicAdditions = 999;
   int? commanderRecommendedLands;
@@ -110,15 +112,38 @@ Future<void> prepareCompleteCommanderSeed({
         .addAll(averageDeckSeedNames.map((e) => e.toLowerCase()));
   }
 
-  final priorityNames = await loadCommanderCompetitivePriorities(
+  final metaReferenceSelection = await loadCommanderMetaReferenceSelection(
     pool: pool,
-    commanderName: commanderName,
-    limit: 120,
+    commanderNames: commanders,
+    limitDecks: 4,
+    priorityCardLimit: 120,
+    metaScope: 'competitive_commander',
+    preferExternalCompetitive: true,
   );
-  if (priorityNames.isNotEmpty) {
+  if (metaReferenceSelection.hasReferences) {
+    state.commanderMetaEvidenceText = buildMetaDeckEvidenceText(
+      metaReferenceSelection,
+      maxPriorityCards: 14,
+      maxReferences: 3,
+    );
+  }
+  final priorityNames = metaReferenceSelection.priorityCardNames.isNotEmpty
+      ? const <String>[]
+      : await loadCommanderCompetitivePriorities(
+          pool: pool,
+          commanderName: commanderName,
+          commanderNames: commanders.skip(1).toList(growable: false),
+          limit: 120,
+        );
+  final competitivePriorityNames =
+      metaReferenceSelection.priorityCardNames.isNotEmpty
+          ? metaReferenceSelection.priorityCardNames
+          : priorityNames;
+  if (competitivePriorityNames.isNotEmpty) {
     state.competitiveModelStageUsed = true;
-    state.commanderMetaPriorityNames.addAll(priorityNames);
-    state.aiSuggestedNames.addAll(priorityNames.map((e) => e.toLowerCase()));
+    state.commanderMetaPriorityNames.addAll(competitivePriorityNames);
+    state.aiSuggestedNames
+        .addAll(competitivePriorityNames.map((e) => e.toLowerCase()));
   } else {
     final profileTopNames = extractTopCardNamesFromProfile(
       commanderReferenceProfile,
@@ -427,6 +452,7 @@ Future<void> runCompleteAiSuggestionLoop({
         keepTheme: keepTheme,
         detectedTheme: detectedTheme,
         coreCards: coreCards,
+        metaEvidenceContext: state.commanderMetaEvidenceText,
       ).timeout(aiTimeout);
     } catch (e) {
       Log.w(

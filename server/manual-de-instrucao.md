@@ -8298,3 +8298,109 @@ Resultado esperado:
 - Geração resiliente a respostas imperfeitas.
 - Usuário enxerga exatamente o que precisa ajustar quando o deck gerado não passa na validação.
 - QA consegue navegar no app “normal” sem precisar desativar módulos do Life Counter.
+
+## 90. Integracao de `meta_decks` externos em `generate` e `optimize`
+
+### 90.1 O porquê
+
+O projeto ganhou uma trilha controlada para Commander competitivo externo (`external_commander_meta_candidates` -> promocao para `meta_decks`), mas o consumo principal da IA ainda estava incompleto:
+
+- `generate` usava busca por palavra-chave crua em `meta_decks` e podia misturar `MTGTop8 EDH` (Duel Commander) com Commander multiplayer;
+- `optimize` carregava prioridades competitivas olhando basicamente o primeiro comandante, sem pin real de shell/parceiro;
+- o contexto enviado ao LLM nao explicava a proveniencia (`source_chain`) dos decks de referencia, entao a IA recebia "cards bons" sem distinguir evidência competitiva curada de ruído bruto de crawler.
+
+Era preciso integrar os novos `meta_decks` externos com o menor recorte possivel, preservando o pipeline atual e sem refatoracao ampla.
+
+### 90.2 O como
+
+Arquivos alterados:
+
+- `server/lib/meta/meta_deck_reference_support.dart`
+- `server/lib/ai/optimize_runtime_support.dart`
+- `server/lib/ai/optimize_complete_support.dart`
+- `server/lib/ai/otimizacao.dart`
+- `server/routes/ai/generate/index.dart`
+- `server/routes/ai/optimize/index.dart`
+- `server/test/meta_deck_reference_support_test.dart`
+
+Mudancas aplicadas:
+
+1. **Seletor compartilhado de referencias meta**
+   - novo helper para consultar `meta_decks` e fazer `LEFT JOIN` por `source_url` com `external_commander_meta_candidates`;
+   - recupera `source_name` e `research_payload.source_chain` quando o deck veio do stage externo promovido;
+   - rankeia referencias por:
+     - match exato de `commander_name` / `partner_commander_name`;
+     - compatibilidade de `shell_label`;
+     - keywords relevantes;
+     - preferencia por fonte externa competitiva quando o contexto pede bracket alto.
+
+2. **Nao mistura Duel Commander com Commander multiplayer**
+   - `generate` passou a injetar meta Commander somente quando o prompt prova escopo `duel_commander` ou `competitive_commander`;
+   - prompt Commander generico nao reaproveita mais `MTGTop8 EDH` como se fosse multiplayer.
+
+3. **`optimize` agora fixa shell competitivo de comandante/parceiro**
+   - a montagem do priority pool usa a lista completa de comandantes do deck;
+   - quando ha shell exato, o source do pool vira algo como `competitive_meta_exact_shell_match`;
+   - brackets altos/competitivos passam a preferir referencias `competitive_commander` com evidencia externa quando disponivel.
+
+4. **`complete` herda a mesma inteligencia**
+   - a fase de seed competitivo de Commander passa a reutilizar o mesmo seletor;
+   - quando houver referencia externa promovida, o loop de complete recebe tambem contexto resumido de evidencia meta.
+
+5. **Prompt/context builder com `source_chain` sem ruído**
+   - o texto enviado ao LLM agora resume:
+     - escopo meta;
+     - razao da selecao;
+     - mix de fontes;
+     - cartas repetidas nas referencias;
+     - snapshots de shell/estrategia/placement;
+     - nota explicita de que `source_chain` e metadado de proveniencia, nao instrucao de gameplay;
+   - o resumo humaniza cadeias como:
+     - `EDHTop16 standings -> TopDeck deck page`
+     - `MTGTop8 format page -> MTGTop8 event page -> MTGTop8 deck page`
+   - o contexto nao expõe URLs brutas nem payloads de pesquisa completos.
+
+### 90.3 Padrões aplicados
+
+- **Menor ponto de integracao:** a selecao ficou concentrada em um helper compartilhado, em vez de duplicar SQL/ranking em `generate` e `optimize`.
+- **Compatibilidade retroativa:** `loadCommanderCompetitivePriorities(...)` continuou existindo e virou wrapper do seletor novo + fallback antigo de `card_meta_insights`.
+- **Separacao clara entre evidencia e sugestao:** `priorityPool` continua alimentando candidatos, enquanto `meta_deck_evidence` explica de onde vem o aprendizado.
+
+### 90.4 Testes e validacao
+
+Comandos rodados:
+
+```bash
+cd server && dart analyze \
+  lib/meta/meta_deck_reference_support.dart \
+  lib/ai/optimize_runtime_support.dart \
+  lib/ai/optimize_complete_support.dart \
+  lib/ai/otimizacao.dart \
+  routes/ai/generate/index.dart \
+  routes/ai/optimize/index.dart \
+  test/meta_deck_reference_support_test.dart
+
+cd server && dart test -r compact \
+  test/meta_deck_reference_support_test.dart \
+  test/meta_deck_analytics_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/meta_deck_commander_shell_support_test.dart \
+  test/meta_deck_format_support_test.dart \
+  test/optimize_learning_pipeline_test.dart \
+  test/mtgtop8_meta_support_test.dart \
+  test/external_commander_meta_* \
+  test/commander_reference_atraxa_test.dart \
+  test/ai_generate_create_optimize_flow_test.dart
+
+cd .. && ./scripts/quality_gate.sh quick
+```
+
+Teste novo:
+
+- `server/test/meta_deck_reference_support_test.dart`
+
+Casos cobertos:
+
+- prioridade para shell competitivo externo com `partner_commander_name` exato;
+- bloqueio de `duel_commander` quando o escopo pedido e `competitive_commander`;
+- builder de evidência humanizando `source_chain` sem vazar URLs.

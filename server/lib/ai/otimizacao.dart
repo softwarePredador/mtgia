@@ -40,6 +40,7 @@ class DeckOptimizerService {
     bool keepTheme = true,
     String? detectedTheme,
     List<String>? coreCards,
+    String? metaEvidenceContext,
     String? userId,
     String? deckId,
   }) async {
@@ -210,6 +211,7 @@ class DeckOptimizerService {
       keepTheme: keepTheme,
       detectedTheme: detectedTheme,
       coreCards: coreCards,
+      metaEvidenceContext: metaEvidenceContext,
       userId: userId,
       deckId: deckId,
       mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
@@ -228,6 +230,7 @@ class DeckOptimizerService {
     bool keepTheme = true,
     String? detectedTheme,
     List<String>? coreCards,
+    String? metaEvidenceContext,
     String? userId,
     String? deckId,
   }) async {
@@ -354,6 +357,7 @@ class DeckOptimizerService {
       keepTheme: keepTheme,
       detectedTheme: detectedTheme,
       coreCards: coreCards,
+      metaEvidenceContext: metaEvidenceContext,
       userId: userId,
       deckId: deckId,
       mlContext: combinedMlContext.isNotEmpty ? combinedMlContext : null,
@@ -648,6 +652,7 @@ class DeckOptimizerService {
     required bool keepTheme,
     String? detectedTheme,
     List<String>? coreCards,
+    String? metaEvidenceContext,
     String? userId,
     String? deckId,
     String? mlContext,
@@ -702,6 +707,8 @@ class DeckOptimizerService {
         "commander_priority_options": priorityPool,
         "deterministic_swap_candidates": deterministicSwapCandidates,
         "format_staples": staplesPool,
+        if (metaEvidenceContext != null)
+          "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList
@@ -817,6 +824,7 @@ class DeckOptimizerService {
     required bool keepTheme,
     String? detectedTheme,
     List<String>? coreCards,
+    String? metaEvidenceContext,
     String? userId,
     String? deckId,
     String? mlContext,
@@ -854,6 +862,8 @@ class DeckOptimizerService {
       "context": {
         "high_synergy_options": synergyPool,
         "format_staples": staplesPool,
+        if (metaEvidenceContext != null)
+          "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList
