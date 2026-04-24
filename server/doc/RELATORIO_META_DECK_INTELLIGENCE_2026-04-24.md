@@ -1026,3 +1026,480 @@ Resumo do artefato `.validation.json`:
 2. Provar um caminho reprodutivel de decklist expansion por candidato antes de qualquer persistencia em `external_commander_meta_candidates`.
 3. So depois habilitar `persist candidate` como fase separada.
 4. Manter promocao para `meta_decks` desligada ate existir prova consistente de decklist completa + Commander legality + subformat correto.
+
+---
+
+## 2026-04-24 — Expansao automatica para decklists completas em TopDeck.gg + EDHTop16
+
+## Veredito objetivo
+
+- **EDHTop16 tem um caminho live provado e reprodutivel ate `deck URL`: `POST /api/graphql -> tournament(TID) -> entries[].decklist`.**
+- **A deck URL publica do TopDeck.gg tem um caminho live provado e reprodutivel ate `card_list` completa: o HTML embute `const deckObj = {...}` com `Commanders` + `Mainboard`, fechando `100` cartas.**
+- **TopDeck.gg, como fonte primaria de evento, nao entregou standings/deck URLs no HTML publico testado; o caminho oficial documentado existe via API v2, mas requer API key.**
+- **O endpoint publico `/api/deck/{TID}/{playerId}/export` existe, mas hoje devolve PNG de deck image, nao texto exportavel.**
+
+## Objetivo desta rodada
+
+Responder se existe um caminho reprodutivel e automatizavel para sair de:
+
+- metadata de evento/torneio
+- para jogador / deck URL
+- para `card_list` completa de `100` cartas
+
+sem gravar nada em banco.
+
+## Fontes testadas
+
+### TopDeck.gg
+
+- `https://topdeck.gg/event/the-quest-part-1`
+- `https://topdeck.gg/event/cedh-arcanum-sanctorum-57`
+- `https://topdeck.gg/event/wednesday-night-cedh-58`
+- `https://topdeck.gg/docs/tournaments-v2`
+- `https://topdeck.gg/api/v2/tournaments/{...}` sem chave
+- `https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1`
+- `https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13`
+- `https://topdeck.gg/api/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1/export`
+
+### EDHTop16
+
+- `https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57`
+- `https://edhtop16.com/api/graphql`
+- `https://edhtop16.com/assets/page-BfSrg3Ta.js`
+- `https://edhtop16.com/assets/standings-B4iuQp5F.js`
+- `https://edhtop16.com/assets/tournament_entry_card-Bvrmuve6.js`
+- `https://cedhtop16.com/api/req`
+
+## Comandos rodados
+
+```bash
+python3 - <<'PY'
+import requests
+for url in [
+  'https://topdeck.gg/event/cedh-arcanum-sanctorum-57',
+  'https://topdeck.gg/docs/tournaments-v2',
+  'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57',
+  'https://edhtop16.com/api/graphql',
+]:
+    r = requests.get(url, timeout=20)
+    print(url, r.status_code, r.headers.get('content-type'))
+PY
+```
+
+```bash
+python3 - <<'PY'
+import requests
+query = '''
+query($tid: String!) {
+  tournament(TID: $tid) {
+    TID
+    name
+    size
+    bracketUrl
+    entries(maxStanding: 4) {
+      standing
+      decklist
+      player { name }
+      commander { name }
+    }
+  }
+}
+'''
+r = requests.post(
+  'https://edhtop16.com/api/graphql',
+  json={'query': query, 'variables': {'tid': 'cedh-arcanum-sanctorum-57'}},
+  timeout=20,
+)
+print(r.json())
+PY
+```
+
+```bash
+python3 - <<'PY'
+import requests, re, json
+url = 'https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1'
+html = requests.get(url, timeout=20).text
+raw = re.search(r'const deckObj = (\\{.*?\\});\\s*const playerName =', html, re.S).group(1)
+deck = json.loads(raw)
+print(deck['metadata']['importedFrom'])
+print(sum(card.get('count',1) for card in deck['Commanders']))
+print(sum(card.get('count',1) for card in deck['Mainboard']))
+PY
+```
+
+```bash
+python3 - <<'PY'
+import requests
+for url in [
+  'https://topdeck.gg/api/v2/tournaments/info',
+  'https://topdeck.gg/api/v2/tournaments/standings',
+  'https://topdeck.gg/api/v2/tournaments/player',
+]:
+    r = requests.get(url, timeout=20)
+    print(url, r.status_code, r.text[:120])
+PY
+```
+
+```bash
+python3 - <<'PY'
+import requests
+r = requests.post(
+  'https://cedhtop16.com/api/req',
+  json={'standing': {'$lte': 2}},
+  headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+  timeout=20,
+)
+print(r.status_code, r.headers.get('content-type'))
+print(r.text[:160])
+PY
+```
+
+## Evidencia tecnica encontrada
+
+### 1. EDHTop16 atual carrega dados por GraphQL
+
+**Provado.**
+
+O bundle `standings-B4iuQp5F.js` expõe a query Relay:
+
+- `standings_TournamentStandingsQuery`
+- `tournament(TID: $tid)`
+- `entries { standing, wins, losses, draws, decklist, player { name }, commander { name, breakdownUrl } }`
+
+O bundle `tournament_entry_card-Bvrmuve6.js` confirma:
+
+- o campo `entry.decklist` vira `<a href={p.decklist}>`
+- o site assume decklist externa/publica por entry
+
+Teste live:
+
+- `POST https://edhtop16.com/api/graphql`
+- `query tournament(TID: "cedh-arcanum-sanctorum-57")`
+- retornou `entries[].decklist`
+
+Amostra observada:
+
+- standing `1` -> `https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1`
+- standing `8` -> `https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13`
+
+Conclusao:
+
+- **EDHTop16 -> GraphQL -> deck URL** esta provado.
+
+### 2. O slug de torneio do EDHTop16 funciona como `TID`
+
+**Provado.**
+
+Teste:
+
+- `tournament(TID: "cedh-arcanum-sanctorum-57")` -> retornou torneio valido
+- `tournament(TID: "Arcanum")` -> `no result`
+
+Conclusao:
+
+- para o path `/tournament/<slug>`, o `<slug>` atual e o `TID` reutilizavel na query GraphQL
+
+### 3. TopDeck public deck page embute deck completo em `deckObj`
+
+**Provado.**
+
+Nas paginas publicas de deck testadas, o HTML contém:
+
+- `const deckObj = {...};`
+- `const playerName = ...`
+- `metadata.importedFrom = https://moxfield.com/decks/...`
+
+Amostras provadas:
+
+1. `Scion of the Ur-Dragon`
+   - `Commanders = 1`
+   - `Mainboard = 99`
+   - total = `100`
+
+2. `Kraum, Ludevic's Opus / Tymna the Weaver`
+   - `Commanders = 2`
+   - `Mainboard = 98`
+   - total = `100`
+
+Conclusao:
+
+- **TopDeck deck URL -> `deckObj` -> `card_list 100`** esta provado.
+- Isso fecha o funil completo para EDHTop16 quando a entry aponta para TopDeck.
+
+### 4. TopDeck export endpoint atual nao entrega texto
+
+**Provado.**
+
+Teste live:
+
+- `GET /api/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1/export`
+- respondeu `200`
+- `content-type: image/png`
+- `content-disposition: attachment; filename="ThePapaSquats__deck.png"`
+
+Mesmo com variantes testadas:
+
+- `?format=mtgo`
+- `?format=txt`
+- `?format=arena`
+- `?type=mtgo`
+
+o retorno continuou PNG.
+
+Conclusao:
+
+- esse endpoint hoje serve para imagem exportavel, nao para `card_list`
+
+### 5. TopDeck direct event HTML nao entrega deck URLs no HTML testado
+
+**Provado.**
+
+Nos eventos testados:
+
+- `cedh-arcanum-sanctorum-57`
+- `the-quest-part-1`
+- `wednesday-night-cedh-58`
+
+o HTML entregou:
+
+- nome do evento
+- `View Bracket`
+- `GetTID()`
+
+mas **nao** entregou:
+
+- links `topdeck.gg/deck/...`
+- standings estruturados
+- deck URLs embedadas
+
+Conclusao:
+
+- **evento publico TopDeck -> deck URL** nao ficou provado via HTML puro
+
+### 6. TopDeck official API path existe, mas depende de API key
+
+**Provado.**
+
+Na documentacao oficial `docs/tournaments-v2`, os paths aparecem:
+
+- `/v2/tournaments/{TID}/info`
+- `/v2/tournaments/{TID}/standings`
+- `/v2/tournaments/{TID}/players/{ID}`
+
+E a documentacao menciona:
+
+- standings com `columns`
+- `decklist`
+- retorno de `deckObj` quando existir dado estruturado
+
+Teste live sem chave:
+
+- `GET https://topdeck.gg/api/v2/tournaments/info` -> `401 {"error":"API key is required"}`
+- `GET https://topdeck.gg/api/v2/tournaments/standings` -> `401 {"error":"API key is required"}`
+- `GET https://topdeck.gg/api/v2/tournaments/player` -> `401 {"error":"API key is required"}`
+
+Conclusao:
+
+- o caminho oficial existe
+- **sem API key, nao e reproduzivel nesta rodada**
+- com API key, ele parece ser o melhor caminho para TopDeck direto
+
+### 7. API legada `cedhtop16.com/api/req` continua nao comprovada como fonte atual
+
+**Nao provado.**
+
+Teste live:
+
+- `POST https://cedhtop16.com/api/req`
+- respondeu `200`
+- `content-type: text/html`
+- retornou HTML do site, nao JSON
+
+Conclusao:
+
+- para o estado atual, a fonte provada do EDHTop16 e `POST /api/graphql`, nao a API legada
+
+## Caminhos reprodutiveis confirmados
+
+### Caminho A — EDHTop16 -> TopDeck deck page -> card_list
+
+**Provado ponta a ponta.**
+
+1. ler `https://edhtop16.com/tournament/<slug>`
+2. usar `<slug>` como `TID`
+3. chamar `POST https://edhtop16.com/api/graphql`
+4. query:
+   - `tournament(TID: $tid) { entries { standing decklist player { name } commander { name } } }`
+5. para cada `entries[].decklist` em `topdeck.gg/deck/...`
+6. baixar o HTML publico da deck page
+7. extrair `const deckObj = {...}`
+8. normalizar:
+   - `Commanders`
+   - `Mainboard`
+9. gerar `card_list` final de `100` cartas
+
+### Caminho B — TopDeck API v2 -> deckObj/decklistUrl
+
+**Parcialmente provado.**
+
+1. ler `https://topdeck.gg/event/<tid>` ou receber `tid` por outra fonte
+2. chamar API oficial:
+   - `/api/v2/tournaments/{TID}/info`
+   - `/api/v2/tournaments/{TID}/standings`
+3. pedir `columns=["name","decklist",...]`
+4. receber:
+   - `deckObj` estruturado quando houver
+   - ou `decklistUrl`
+5. se vier `deckObj`, normalizar direto
+6. se vier `decklistUrl`, cair no parser da deck page publica
+
+Limite:
+
+- nesta rodada, o passo `2` ficou bloqueado por falta de API key
+
+## Limitacoes observadas
+
+1. **TopDeck direto sem API key**
+   - evento HTML nao deu standings nem deck URLs
+   - API oficial devolve `401`
+
+2. **Export endpoint do TopDeck**
+   - nao serve para `card_list`
+   - devolve PNG
+
+3. **Dependencia cruzada de origem**
+   - no caso do EDHTop16, o deck URL real observado aponta para TopDeck
+   - isso funciona bem para ingestao controlada, mas precisa ficar explicitado no pipeline
+
+4. **Commander legality**
+   - o deck page `deckObj` fecha contagem de `100`, mas a legalidade Commander ainda precisa de validacao posterior no pipeline
+
+## Plano de implementacao dry-run
+
+### Fase 1 — EDHTop16 expansion dry-run
+
+Escopo:
+
+- sem banco
+- so artefato local JSON
+
+Passos:
+
+1. input: `source_url = https://edhtop16.com/tournament/<slug>`
+2. derivar `tid = <slug>`
+3. chamar `POST /api/graphql`
+4. coletar `entries[].decklist`
+5. para cada deck URL TopDeck:
+   - baixar HTML
+   - extrair `deckObj`
+   - converter para `card_list`
+6. validar:
+   - total `100`
+   - comandante(s) presentes
+   - `source_chain = ["edhtop16_tournament", "topdeck_deck_page"]`
+7. salvar artefato:
+   - `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_<date>.json`
+
+### Fase 2 — TopDeck direct dry-run
+
+Precondicao:
+
+- `TOPDECK_API_KEY` disponivel
+
+Passos:
+
+1. input: `source_url = https://topdeck.gg/event/<tid>`
+2. chamar `/api/v2/tournaments/{TID}/standings`
+3. pedir `decklist` nas colunas
+4. se vier `deckObj`:
+   - converter direto
+5. se vier `decklistUrl`:
+   - baixar page publica
+   - extrair `deckObj`
+6. validar `100` cartas
+7. salvar artefato local JSON
+
+### Shape minimo recomendado do artefato dry-run
+
+```json
+{
+  "source_name": "EDHTop16",
+  "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+  "expansion_status": "expanded",
+  "expansion_path": [
+    "edhtop16_graphql",
+    "topdeck_deck_page"
+  ],
+  "event_tid": "cedh-arcanum-sanctorum-57",
+  "player_name": "ThePapaSquats",
+  "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1",
+  "commanders": ["Scion of the Ur-Dragon"],
+  "mainboard_count": 99,
+  "commander_count": 1,
+  "total_cards": 100,
+  "card_list": "1 Scion of the Ur-Dragon\n1 Ad Nauseam\n..."
+}
+```
+
+## Implementacao do dry-run em 2026-04-24
+
+O menor proximo passo foi implementado sem escrita em banco.
+
+Arquivos adicionados:
+
+- `server/bin/expand_external_commander_meta_candidates.dart`
+- `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `server/test/external_commander_deck_expansion_support_test.dart`
+
+Artefatos gerados:
+
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json`
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json`
+
+Comando de expansao executado:
+
+```bash
+cd server
+dart run bin/expand_external_commander_meta_candidates.dart \
+  --limit=8 \
+  --output=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json
+```
+
+Resultado observado:
+
+- `expanded_count = 4`
+- `rejected_count = 4`
+- todos os expandidos fecharam `total_cards = 100`
+- rejeicoes ficaram com motivo objetivo `topdeck_deckobj_missing`
+
+Comando de validacao dos candidatos extraidos:
+
+```bash
+cd server
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
+```
+
+Resultado observado:
+
+- `accepted_count = 4`
+- `rejected_count = 0`
+- todos os candidatos aceitos continuam em dry-run, sem persistencia em `external_commander_meta_candidates`
+- nenhum candidato foi promovido para `meta_decks`
+
+Validacao de codigo:
+
+```bash
+cd server
+dart analyze lib/meta/external_commander_deck_expansion_support.dart bin/expand_external_commander_meta_candidates.dart test/external_commander_deck_expansion_support_test.dart
+dart test test/external_commander_deck_expansion_support_test.dart
+```
+
+Estado final desta frente:
+
+- **provado e implementado:** `EDHTop16 -> GraphQL -> TopDeck deck page -> deckObj -> card_list 100`
+- **ainda nao implementado:** TopDeck direto via API v2, porque depende de `TOPDECK_API_KEY`
+- **ainda pendente:** stage 2 de validacao de decklist completa com legalidade Commander e `color_identity`

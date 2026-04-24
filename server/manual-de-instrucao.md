@@ -1,6 +1,92 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Auditoria do caminho de expansao para decklists completas em TopDeck.gg + EDHTop16
+
+### O Porquê
+- Depois de fechar o stage 1 de `dry-run + schema validation` para `external_commander_meta_candidates`, ainda faltava provar o passo mais importante: se existe um caminho reprodutível de `event/tournament metadata -> player/deck URL -> card_list 100 cartas`.
+- Essa resposta era necessária antes de qualquer futura persistência de candidatos externos, para evitar staging de links que não conseguem ser expandidos para decklists completas.
+
+### O Como
+- Foi feita investigação live sem escrita em banco sobre as duas fontes:
+  - `EDHTop16`
+  - `TopDeck.gg`
+- `EDHTop16` atual foi provado via `POST /api/graphql`:
+  - o bundle `standings-B4iuQp5F.js` expõe `standings_TournamentStandingsQuery`
+  - a query usa `tournament(TID: $tid) { entries { decklist ... } }`
+  - o slug `/tournament/<slug>` funciona como `TID` na query
+- `TopDeck.gg` foi provado em duas camadas:
+  1. **API oficial v2 documentada**, com paths como:
+     - `/v2/tournaments/{TID}/info`
+     - `/v2/tournaments/{TID}/standings`
+     - `/v2/tournaments/{TID}/players/{ID}`
+     Essa camada respondeu `401` sem chave, então o caminho direto via API ficou condicionado a `TOPDECK_API_KEY`.
+  2. **deck page pública**:
+     - URLs `topdeck.gg/deck/<TID>/<playerId>` embutem `const deckObj = {...}` no HTML
+     - o `deckObj` fecha corretamente `Commanders + Mainboard = 100` cartas
+     - a página também expõe `metadata.importedFrom`, apontando para a origem original quando houver (ex.: `Moxfield`)
+- O endpoint `/api/deck/{TID}/{playerId}/export` também foi testado:
+  - existe
+  - responde `200`
+  - hoje devolve PNG da deck image, não texto exportável
+
+### Resultado prático
+- O caminho **provado ponta a ponta** hoje é:
+  - `EDHTop16 tournament page/slug`
+  - `POST /api/graphql`
+  - `entries[].decklist`
+  - `TopDeck public deck page`
+  - `deckObj`
+  - `card_list` de `100` cartas
+- O caminho **parcialmente provado** para `TopDeck` direto é:
+  - `TopDeck event`
+  - `TopDeck API v2`
+  - `deckObj` ou `decklistUrl`
+  - mas ele depende de `TOPDECK_API_KEY`
+- Isso define a ordem segura para futura automação:
+  1. implementar primeiro `EDHTop16 -> GraphQL -> TopDeck deck page -> deckObj`
+  2. implementar `TopDeck` direto apenas como caminho autenticado opcional
+
+### Artefato documental
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
+---
+
+## 2026-04-24 — Dry-run de expansao EDHTop16 para decklists completas
+
+### O Porquê
+- A auditoria provou o caminho, mas ainda faltava transformar a descoberta em ferramenta reprodutivel.
+- O objetivo era gerar decklists completas em artefato local, sem banco e sem promocao, para depois conectar ao stage `external_commander_meta_candidates`.
+
+### O Como
+- Foi criado `server/bin/expand_external_commander_meta_candidates.dart`.
+- O script:
+  - recebe uma URL `https://edhtop16.com/tournament/<slug>`
+  - usa `<slug>` como `TID`
+  - chama `POST https://edhtop16.com/api/graphql`
+  - coleta `entries[].decklist`
+  - abre cada pagina publica `topdeck.gg/deck/...`
+  - extrai `const deckObj = {...}`
+  - normaliza `Commanders + Mainboard` em `card_list`
+  - salva apenas artefato JSON local
+- Foi criado `server/lib/meta/external_commander_deck_expansion_support.dart` para deixar o parse testavel sem rede.
+
+### Resultado
+- Rodada com `--limit=8` gerou:
+  - `expanded_count=4`
+  - `rejected_count=4`
+  - todos os expandidos com `total_cards=100`
+  - rejeicoes com `topdeck_deckobj_missing`
+- O artefato de expansao foi validado pelo importador em `--dry-run` com:
+  - `accepted_count=4`
+  - `rejected_count=0`
+  - sem escrita em banco
+  - sem promocao para `meta_decks`
+
+### Artefatos
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json`
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json`
+
 ## 2026-04-24 — Stage 1 controlado para TopDeck.gg + EDHTop16 em `external_commander_meta_candidates`
 
 ### O Porquê

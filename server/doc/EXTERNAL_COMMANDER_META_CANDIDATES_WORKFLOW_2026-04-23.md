@@ -132,6 +132,45 @@ Saida esperada:
 - linhas `[ACCEPT]` / `[REJECT]` no terminal
 - artefato JSON com candidatos normalizados e lista de issues
 
+### 2.2 Expansao dry-run EDHTop16 -> TopDeck deck page
+
+Objetivo:
+
+- sair de `EDHTop16 /tournament/<slug>`
+- buscar `entries[].decklist` via GraphQL
+- abrir paginas `topdeck.gg/deck/...`
+- extrair `const deckObj = {...}`
+- gerar candidatos com `card_list` completa de `100` cartas
+- **sem** escrever em banco
+- **sem** promover nada para `meta_decks`
+
+Comando recomendado:
+
+```bash
+cd server
+dart run bin/expand_external_commander_meta_candidates.dart \
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57 \
+  --limit=8 \
+  --output=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json
+```
+
+Validar o artefato gerado no stage 1:
+
+```bash
+cd server
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
+```
+
+Resultado da rodada base:
+
+- expansao: `expanded_count=4`, `rejected_count=4`
+- validação stage 1 sobre os expandidos: `accepted_count=4`, `rejected_count=0`
+- rejeicoes de expansao observadas: `topdeck_deckobj_missing`
+
 ### 3. Persistir candidatos
 
 ```bash
