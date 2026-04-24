@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_analytics_support.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
-import '../lib/meta/meta_deck_commander_shell_support.dart';
 import '../lib/meta/meta_deck_format_support.dart';
 
 class CardInfo {
@@ -63,23 +63,28 @@ Future<void> main() async {
       partner_commander_name,
       shell_label,
       strategy_archetype,
-      card_list
+      card_list,
+      source_url
     FROM meta_decks
-    WHERE source_url ILIKE 'https://www.mtgtop8.com/%'
   ''');
 
+  final bySource = <String, MutableProfile>{};
   final byFormat = <String, MutableProfile>{};
+  final bySourceFormat = <String, MutableProfile>{};
   final byFormatColorShell = <String, MutableProfile>{};
   final byFormatColorStrategy = <String, MutableProfile>{};
+  final bySourceFormatColorShell = <String, MutableProfile>{};
+  final bySourceFormatColorStrategy = <String, MutableProfile>{};
   final commanderSummaryByFormat = <String, CommanderShellSummary>{};
+  final commanderSummaryBySourceFormat = <String, CommanderShellSummary>{};
 
   for (final row in deckRows) {
     final format = ((row[1] as String?) ?? 'unknown').trim();
     final rawArchetype = ((row[2] as String?) ?? 'unknown').trim();
     final cardList = (row[7] as String?) ?? '';
-    final descriptor = describeMetaDeckFormat(format);
-    final commanderShell = resolveCommanderShellMetadata(
+    final context = resolveMetaDeckAnalyticsContext(
       format: format,
+      sourceUrl: row[8] as String?,
       rawArchetype: rawArchetype,
       cardList: cardList,
       commanderName: row[3] as String?,
@@ -87,6 +92,8 @@ Future<void> main() async {
       shellLabel: row[5] as String?,
       strategyArchetype: row[6] as String?,
     );
+    final descriptor = context.formatDescriptor;
+    final commanderShell = context.commanderShell;
 
     final parsed = _parseDeck(
       cardList: cardList,
@@ -95,6 +102,7 @@ Future<void> main() async {
     );
     if (parsed.totalCards == 0) continue;
 
+    final sourceKey = context.source;
     final formatKey = format.isEmpty ? 'unknown' : format;
     final colorsList = parsed.colors.toList()..sort(_compareManaColors);
     final colorsJoined = colorsList.isEmpty ? 'C' : colorsList.join('');
@@ -106,7 +114,18 @@ Future<void> main() async {
         : _normalizeTheme(rawArchetype);
 
     _accumulate(
+      bySource.putIfAbsent(sourceKey, () => MutableProfile()),
+      parsed,
+    );
+    _accumulate(
       byFormat.putIfAbsent(formatKey, () => MutableProfile()),
+      parsed,
+    );
+    _accumulate(
+      bySourceFormat.putIfAbsent(
+        '$sourceKey|$formatKey',
+        () => MutableProfile(),
+      ),
       parsed,
     );
     _accumulate(
@@ -119,6 +138,20 @@ Future<void> main() async {
     _accumulate(
       byFormatColorStrategy.putIfAbsent(
         '$formatKey|$colorsJoined|$strategyTheme',
+        () => MutableProfile(),
+      ),
+      parsed,
+    );
+    _accumulate(
+      bySourceFormatColorShell.putIfAbsent(
+        '$sourceKey|$formatKey|$colorsJoined|$shellTheme',
+        () => MutableProfile(),
+      ),
+      parsed,
+    );
+    _accumulate(
+      bySourceFormatColorStrategy.putIfAbsent(
+        '$sourceKey|$formatKey|$colorsJoined|$strategyTheme',
         () => MutableProfile(),
       ),
       parsed,
@@ -146,8 +179,50 @@ Future<void> main() async {
           commanderShell.strategyArchetype!.trim(),
         );
       }
+
+      final sourceSummary = commanderSummaryBySourceFormat.putIfAbsent(
+        '$sourceKey|$formatKey',
+        () => CommanderShellSummary(),
+      );
+      sourceSummary.deckCount += 1;
+      if (commanderShell.commanderName?.trim().isNotEmpty == true) {
+        sourceSummary.withCommanderName += 1;
+      }
+      if (commanderShell.partnerCommanderName?.trim().isNotEmpty == true) {
+        sourceSummary.withPartnerCommanderName += 1;
+      }
+      if (commanderShell.shellLabel?.trim().isNotEmpty == true) {
+        sourceSummary.withShellLabel += 1;
+        sourceSummary.shellLabels.add(commanderShell.shellLabel!.trim());
+      }
+      if (commanderShell.strategyArchetype?.trim().isNotEmpty == true) {
+        sourceSummary.withStrategyArchetype += 1;
+        sourceSummary.strategyArchetypes.add(
+          commanderShell.strategyArchetype!.trim(),
+        );
+      }
     }
   }
+
+  final sourceReport = bySource.entries.map((entry) {
+    final profile = entry.value;
+    return {
+      'source': entry.key,
+      'deck_count': profile.deckCount,
+      'avg_total_cards': _avg(profile.totalCards, profile.deckCount),
+      'avg_lands': _avg(profile.lands, profile.deckCount),
+      'avg_basic_lands': _avg(profile.basicLands, profile.deckCount),
+      'avg_creatures': _avg(profile.creatures, profile.deckCount),
+      'avg_instants': _avg(profile.instants, profile.deckCount),
+      'avg_sorceries': _avg(profile.sorceries, profile.deckCount),
+      'avg_enchantments': _avg(profile.enchantments, profile.deckCount),
+      'avg_artifacts': _avg(profile.artifacts, profile.deckCount),
+      'avg_planeswalkers': _avg(profile.planeswalkers, profile.deckCount),
+    };
+  }).toList()
+    ..sort(
+      (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
+    );
 
   final formatReport = byFormat.entries.map((entry) {
     final profile = entry.value;
@@ -173,41 +248,105 @@ Future<void> main() async {
       (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
     );
 
-  final commanderShellStrategySummary = commanderSummaryByFormat.entries
-      .map((entry) {
-        final descriptor = describeMetaDeckFormat(entry.key);
-        final summary = entry.value;
-        return {
-          'format': descriptor.storedFormatCode,
-          'format_label': descriptor.label,
-          'subformat': descriptor.commanderSubformat,
-          'deck_count': summary.deckCount,
-          'with_commander_name': summary.withCommanderName,
-          'with_partner_commander_name': summary.withPartnerCommanderName,
-          'with_shell_label': summary.withShellLabel,
-          'with_strategy_archetype': summary.withStrategyArchetype,
-          'distinct_shell_labels': summary.shellLabels.length,
-          'distinct_strategy_archetypes': summary.strategyArchetypes.length,
-        };
-      })
-      .toList()
+  final sourceFormatReport = bySourceFormat.entries.map((entry) {
+    final profile = entry.value;
+    final parts = entry.key.split('|');
+    final descriptor = describeMetaDeckFormat(parts[1]);
+    return {
+      'source': parts[0],
+      'format': descriptor.storedFormatCode,
+      'format_family': descriptor.formatFamily,
+      'format_label': descriptor.label,
+      'subformat': descriptor.commanderSubformat,
+      'deck_count': profile.deckCount,
+      'avg_total_cards': _avg(profile.totalCards, profile.deckCount),
+      'avg_lands': _avg(profile.lands, profile.deckCount),
+      'avg_basic_lands': _avg(profile.basicLands, profile.deckCount),
+      'avg_creatures': _avg(profile.creatures, profile.deckCount),
+      'avg_instants': _avg(profile.instants, profile.deckCount),
+      'avg_sorceries': _avg(profile.sorceries, profile.deckCount),
+      'avg_enchantments': _avg(profile.enchantments, profile.deckCount),
+      'avg_artifacts': _avg(profile.artifacts, profile.deckCount),
+      'avg_planeswalkers': _avg(profile.planeswalkers, profile.deckCount),
+    };
+  }).toList()
     ..sort(
       (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
     );
 
-  final shellReport = _buildGroupedReport(byFormatColorShell, fieldName: 'shell');
+  final commanderShellStrategySummary =
+      commanderSummaryByFormat.entries.map((entry) {
+    final descriptor = describeMetaDeckFormat(entry.key);
+    final summary = entry.value;
+    return {
+      'format': descriptor.storedFormatCode,
+      'format_label': descriptor.label,
+      'subformat': descriptor.commanderSubformat,
+      'deck_count': summary.deckCount,
+      'with_commander_name': summary.withCommanderName,
+      'with_partner_commander_name': summary.withPartnerCommanderName,
+      'with_shell_label': summary.withShellLabel,
+      'with_strategy_archetype': summary.withStrategyArchetype,
+      'distinct_shell_labels': summary.shellLabels.length,
+      'distinct_strategy_archetypes': summary.strategyArchetypes.length,
+    };
+  }).toList()
+        ..sort(
+          (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
+        );
+
+  final commanderShellStrategySummaryBySource =
+      commanderSummaryBySourceFormat.entries.map((entry) {
+    final parts = entry.key.split('|');
+    final descriptor = describeMetaDeckFormat(parts[1]);
+    final summary = entry.value;
+    return {
+      'source': parts[0],
+      'format': descriptor.storedFormatCode,
+      'format_label': descriptor.label,
+      'subformat': descriptor.commanderSubformat,
+      'deck_count': summary.deckCount,
+      'with_commander_name': summary.withCommanderName,
+      'with_partner_commander_name': summary.withPartnerCommanderName,
+      'with_shell_label': summary.withShellLabel,
+      'with_strategy_archetype': summary.withStrategyArchetype,
+      'distinct_shell_labels': summary.shellLabels.length,
+      'distinct_strategy_archetypes': summary.strategyArchetypes.length,
+    };
+  }).toList()
+        ..sort(
+          (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
+        );
+
+  final shellReport =
+      _buildGroupedReport(byFormatColorShell, fieldName: 'shell');
   final strategyReport = _buildGroupedReport(
     byFormatColorStrategy,
+    fieldName: 'strategy',
+  );
+  final sourceShellReport = _buildSourceGroupedReport(
+    bySourceFormatColorShell,
+    fieldName: 'shell',
+  );
+  final sourceStrategyReport = _buildSourceGroupedReport(
+    bySourceFormatColorStrategy,
     fieldName: 'strategy',
   );
 
   final payload = {
     'total_competitive_decks': deckRows.length,
+    'sources': sourceReport,
     'formats': formatReport,
+    'source_formats': sourceFormatReport,
     'commander_shell_strategy_summary': commanderShellStrategySummary,
+    'commander_shell_strategy_summary_by_source':
+        commanderShellStrategySummaryBySource,
     'top_groups_format_color_theme': strategyReport.take(40).toList(),
     'top_groups_format_color_shell': shellReport.take(40).toList(),
     'top_groups_format_color_strategy': strategyReport.take(40).toList(),
+    'top_groups_source_format_color_shell': sourceShellReport.take(40).toList(),
+    'top_groups_source_format_color_strategy':
+        sourceStrategyReport.take(40).toList(),
   };
 
   print(const JsonEncoder.withIndent('  ').convert(payload));
@@ -344,6 +483,41 @@ List<Map<String, dynamic>> _buildGroupedReport(
           'subformat': descriptor.commanderSubformat,
           'colors': parts[1],
           fieldName: parts[2],
+          'deck_count': profile.deckCount,
+          'avg_lands': _avg(profile.lands, profile.deckCount),
+          'avg_basic_lands': _avg(profile.basicLands, profile.deckCount),
+          'avg_creatures': _avg(profile.creatures, profile.deckCount),
+          'avg_instants': _avg(profile.instants, profile.deckCount),
+          'avg_sorceries': _avg(profile.sorceries, profile.deckCount),
+          'avg_enchantments': _avg(profile.enchantments, profile.deckCount),
+          'avg_artifacts': _avg(profile.artifacts, profile.deckCount),
+          'avg_planeswalkers': _avg(profile.planeswalkers, profile.deckCount),
+        };
+      })
+      .where((entry) => (entry['deck_count'] as int) >= 2)
+      .toList()
+    ..sort(
+      (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int),
+    );
+}
+
+List<Map<String, dynamic>> _buildSourceGroupedReport(
+  Map<String, MutableProfile> source, {
+  required String fieldName,
+}) {
+  return source.entries
+      .map((entry) {
+        final profile = entry.value;
+        final parts = entry.key.split('|');
+        final descriptor = describeMetaDeckFormat(parts[1]);
+        return {
+          'source': parts[0],
+          'format': descriptor.storedFormatCode,
+          'format_family': descriptor.formatFamily,
+          'format_label': descriptor.label,
+          'subformat': descriptor.commanderSubformat,
+          'colors': parts[2],
+          fieldName: parts[3],
           'deck_count': profile.deckCount,
           'avg_lands': _avg(profile.lands, profile.deckCount),
           'avg_basic_lands': _avg(profile.basicLands, profile.deckCount),

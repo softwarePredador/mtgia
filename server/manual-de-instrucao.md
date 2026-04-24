@@ -1,6 +1,46 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Relatorios source-aware para `meta_decks`
+
+### O Porquê
+- Depois do gate separado de promocao externa, o consumo de `meta_decks` ainda tratava o corpus como se tudo fosse `MTGTop8`.
+- Isso escondia dois fatos operacionais importantes:
+  - a origem real (`mtgtop8` vs `external`);
+  - a necessidade de separar `subformat`, `shell_label` e `strategy_archetype` ao auditar Commander/cEDH.
+- Tambem faltava um caminho nao destrutivo para inspecionar o extrator sem regravar `card_meta_insights`, `synergy_packages` e `archetype_patterns`.
+
+### O Como
+- Foi criado `server/lib/meta/meta_deck_analytics_support.dart` para centralizar:
+  - classificacao de origem (`classifyMetaDeckSource`);
+  - contexto comum de analytics (`resolveMetaDeckAnalyticsContext`);
+  - reaproveito do parser commander-aware e da resolucao de shell.
+- `server/bin/extract_meta_insights.dart` passou a:
+  - carregar `source_url`;
+  - derivar `source` e `subformat` no parse;
+  - aceitar `--report-only`;
+  - imprimir resumo por `source`, `source+format`, `source+subformat`, `shell_label` e `strategy_archetype` antes de qualquer escrita.
+- `server/bin/meta_profile_report.dart` passou a:
+  - ler todo `meta_decks`, nao apenas rows `MTGTop8`;
+  - expor `sources`, `source_formats`, `commander_shell_strategy_summary_by_source`,
+    `top_groups_source_format_color_shell` e `top_groups_source_format_color_strategy`.
+
+### Testes e evidencia
+- Foi criado `server/test/meta_deck_analytics_support_test.dart` cobrindo:
+  - classificacao de `source`;
+  - `EDH` commander-aware via sideboard;
+  - `cEDH` partner commander-aware via sideboard;
+  - lista externa `cEDH` no mainboard tratada como commander-aware.
+- Validacao executada:
+  - `dart analyze bin/extract_meta_insights.dart bin/meta_profile_report.dart lib/meta/meta_deck_analytics_support.dart test/meta_deck_analytics_support_test.dart`
+  - `dart test test/meta_deck_analytics_support_test.dart test/meta_deck_card_list_support_test.dart test/meta_deck_commander_shell_support_test.dart test/meta_deck_format_support_test.dart test/external_commander_meta_promotion_support_test.dart`
+  - `dart run bin/extract_meta_insights.dart --report-only`
+  - `dart run bin/meta_profile_report.dart`
+- Estado observado nesta rodada:
+  - `meta_decks`: `641` rows, todas `source=mtgtop8`
+  - `external_commander_meta_candidates`: `4` rows, todas `validation_status=candidate`
+  - cobertura live de `external` em `meta_decks`: **nao comprovada**
+
 ## 2026-04-24 — Gate separado de promocao `external_commander_meta_candidates -> meta_decks`
 
 ### O Porquê

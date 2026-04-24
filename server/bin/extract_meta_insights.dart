@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:postgres/postgres.dart';
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_analytics_support.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
-import '../lib/meta/meta_deck_commander_shell_support.dart';
 import '../lib/meta/meta_deck_format_support.dart';
 
 /// Script de Extração de Insights dos Meta Decks
@@ -16,15 +16,21 @@ import '../lib/meta/meta_deck_format_support.dart';
 /// 4. Extrai padrões por arquétipo
 /// 5. Popula as tabelas de conhecimento ML
 ///
-/// Uso: dart run bin/extract_meta_insights.dart [--full | --incremental]
+/// Uso:
+///   dart run bin/extract_meta_insights.dart [--full | --incremental]
+///   dart run bin/extract_meta_insights.dart --report-only
 
 void main(List<String> args) async {
   final isFullRebuild = args.contains('--full');
+  final reportOnly = args.contains('--report-only');
   final startTime = DateTime.now();
 
   print('═══════════════════════════════════════════════════════════════');
   print('  META INSIGHTS EXTRACTOR - Imitation Learning Pipeline');
-  print('  Modo: ${isFullRebuild ? "FULL REBUILD" : "INCREMENTAL"}');
+  final modeLabel = reportOnly
+      ? 'REPORT ONLY'
+      : (isFullRebuild ? 'FULL REBUILD' : 'INCREMENTAL');
+  print('  Modo: $modeLabel');
   print('  Data: ${startTime.toIso8601String()}');
   print('═══════════════════════════════════════════════════════════════\n');
 
@@ -48,6 +54,16 @@ void main(List<String> args) async {
     print('🔄 Processando deck lists...');
     final parsedDecks = metaDecks.map(_parseDeckList).toList();
     print('   ${parsedDecks.length} decks parseados\n');
+
+    print('🧭 Resumo source/subformat/shell...');
+    final coverageSummary = _buildCoverageSummary(parsedDecks);
+    print(const JsonEncoder.withIndent('  ').convert(coverageSummary));
+    print('');
+
+    if (reportOnly) {
+      print('📝 Modo report-only: nenhuma escrita em banco foi realizada.');
+      return;
+    }
 
     // 3. Extrair insights de cartas individuais
     print('📊 Extraindo insights de cartas...');
@@ -123,6 +139,7 @@ Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
       partner_commander_name,
       shell_label,
       strategy_archetype,
+      source_url,
       card_list,
       placement
     FROM meta_decks
@@ -139,6 +156,7 @@ Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
       'partner_commander_name': map['partner_commander_name']?.toString(),
       'shell_label': map['shell_label']?.toString(),
       'strategy_archetype': map['strategy_archetype']?.toString(),
+      'source_url': map['source_url']?.toString() ?? '',
       'card_list': map['card_list']?.toString() ?? '',
       'placement': map['placement']?.toString() ?? '',
     };
@@ -149,16 +167,10 @@ Future<List<Map<String, dynamic>>> _loadMetaDecks(dynamic conn) async {
 Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
   final cardList = deck['card_list'] as String;
   final formatCode = deck['format'] as String? ?? 'unknown';
-  final format = metaDeckAnalyticsFormatKey(formatCode);
-  final parsedCardList = parseMetaDeckCardList(
-    cardList: cardList,
-    format: formatCode,
-  );
-  final cards = parsedCardList.effectiveCards;
-  final sideboardCards = parsedCardList.sideboard;
   final rawArchetype = deck['archetype'] as String? ?? '';
-  final commanderShell = resolveCommanderShellMetadata(
+  final context = resolveMetaDeckAnalyticsContext(
     format: formatCode,
+    sourceUrl: deck['source_url'] as String?,
     rawArchetype: rawArchetype,
     cardList: cardList,
     commanderName: deck['commander_name'] as String?,
@@ -166,6 +178,10 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
     shellLabel: deck['shell_label'] as String?,
     strategyArchetype: deck['strategy_archetype'] as String?,
   );
+  final format = metaDeckAnalyticsFormatKey(formatCode);
+  final cards = context.parsedCardList.effectiveCards;
+  final sideboardCards = context.parsedCardList.sideboard;
+  final commanderShell = context.commanderShell;
 
   final inferredArchetype = _inferArchetypeFromCards(cards.keys.toList());
   final analyticsArchetype = isCommanderMetaFormat(formatCode)
@@ -176,8 +192,10 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
 
   return {
     ...deck,
+    'source': context.source,
     'format': format,
     'format_code': formatCode,
+    'subformat': context.commanderSubformat,
     'raw_archetype': rawArchetype,
     'commander_name': commanderShell.commanderName,
     'partner_commander_name': commanderShell.partnerCommanderName,
@@ -187,9 +205,92 @@ Map<String, dynamic> _parseDeckList(Map<String, dynamic> deck) {
     'parsed_cards': cards,
     'sideboard': sideboardCards,
     'sideboard_as_commander_zone':
-        parsedCardList.includesSideboardAsCommanderZone,
-    'total_cards': parsedCardList.effectiveTotal,
+        context.parsedCardList.includesSideboardAsCommanderZone,
+    'total_cards': context.totalCards,
   };
+}
+
+Map<String, dynamic> _buildCoverageSummary(
+    List<Map<String, dynamic>> parsedDecks) {
+  final bySource = <String, int>{};
+  final bySourceFormat = <String, int>{};
+  final bySourceCommanderSubformat = <String, int>{};
+  final byCommanderShell = <String, int>{};
+  final byCommanderStrategy = <String, int>{};
+
+  for (final deck in parsedDecks) {
+    final source = deck['source'] as String? ?? metaDeckSourceExternal;
+    final format = deck['format'] as String? ?? 'unknown';
+    final subformat = deck['subformat'] as String?;
+    final shellLabel = (deck['shell_label'] as String?)?.trim();
+    final strategyArchetype = (deck['strategy_archetype'] as String?)?.trim();
+
+    bySource[source] = (bySource[source] ?? 0) + 1;
+    final sourceFormatKey = '$source|$format';
+    bySourceFormat[sourceFormatKey] =
+        (bySourceFormat[sourceFormatKey] ?? 0) + 1;
+
+    if (subformat == null || subformat.isEmpty) continue;
+
+    final sourceSubformatKey = '$source|$subformat';
+    bySourceCommanderSubformat[sourceSubformatKey] =
+        (bySourceCommanderSubformat[sourceSubformatKey] ?? 0) + 1;
+
+    final commanderShellKey =
+        '$source|$subformat|${shellLabel?.isNotEmpty == true ? shellLabel : "unknown"}';
+    byCommanderShell[commanderShellKey] =
+        (byCommanderShell[commanderShellKey] ?? 0) + 1;
+
+    final commanderStrategyKey =
+        '$source|$subformat|${strategyArchetype?.isNotEmpty == true ? strategyArchetype : "unknown"}';
+    byCommanderStrategy[commanderStrategyKey] =
+        (byCommanderStrategy[commanderStrategyKey] ?? 0) + 1;
+  }
+
+  return {
+    'total_decks': parsedDecks.length,
+    'by_source': _sortedCountEntries(bySource, fields: const ['source']),
+    'by_source_format':
+        _sortedCountEntries(bySourceFormat, fields: const ['source', 'format']),
+    'by_source_subformat': _sortedCountEntries(
+      bySourceCommanderSubformat,
+      fields: const ['source', 'subformat'],
+    ),
+    'top_commander_shells': _sortedCountEntries(
+      byCommanderShell,
+      fields: const ['source', 'subformat', 'shell_label'],
+      limit: 20,
+    ),
+    'top_commander_strategies': _sortedCountEntries(
+      byCommanderStrategy,
+      fields: const ['source', 'subformat', 'strategy_archetype'],
+      limit: 20,
+    ),
+  };
+}
+
+List<Map<String, dynamic>> _sortedCountEntries(
+  Map<String, int> source, {
+  required List<String> fields,
+  int? limit,
+}) {
+  final entries = source.entries.toList()
+    ..sort((a, b) {
+      final byCount = b.value.compareTo(a.value);
+      if (byCount != 0) return byCount;
+      return a.key.compareTo(b.key);
+    });
+
+  final selected = limit == null ? entries : entries.take(limit);
+  return selected.map((entry) {
+    final parts = entry.key.split('|');
+    final payload = <String, dynamic>{};
+    for (var i = 0; i < fields.length; i++) {
+      payload[fields[i]] = i < parts.length ? parts[i] : '';
+    }
+    payload['deck_count'] = entry.value;
+    return payload;
+  }).toList(growable: false);
 }
 
 /// Infere o arquétipo do deck baseado nas cartas

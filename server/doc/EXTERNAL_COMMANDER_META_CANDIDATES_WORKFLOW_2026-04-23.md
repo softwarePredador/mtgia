@@ -258,6 +258,35 @@ Regras do gate:
 - promove **somente** `validation_status=validated`
 - promove **somente** `subformat=competitive_commander`
 - exige `card_count >= 98`
+
+### 4.1 Auditoria source-aware apos o gate
+
+Depois de qualquer dry-run ou promocao real, usar os relatórios source-aware:
+
+```bash
+cd server
+dart run bin/extract_meta_insights.dart --report-only
+dart run bin/meta_profile_report.dart
+```
+
+Leitura esperada:
+
+- `extract_meta_insights.dart --report-only` expõe:
+  - `by_source`
+  - `by_source_format`
+  - `by_source_subformat`
+  - `top_commander_shells`
+  - `top_commander_strategies`
+- `meta_profile_report.dart` expõe:
+  - `sources`
+  - `source_formats`
+  - `commander_shell_strategy_summary_by_source`
+  - `top_groups_source_format_color_shell`
+  - `top_groups_source_format_color_strategy`
+
+Regra:
+
+- se `source=external` ainda nao aparecer em `meta_profile_report.dart`, a cobertura live de externos em `meta_decks` segue **nao comprovada**
 - exige `legal_status` em `valid` ou `warning_reviewed`
 - exige `source_url` unico no staging e ausente em `meta_decks`
 - exige `commander_name` presente
