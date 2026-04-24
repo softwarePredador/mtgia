@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS external_commander_meta_candidates (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_external_commander_meta_status CHECK (
-        validation_status IN ('candidate', 'validated', 'rejected', 'promoted')
+        validation_status IN ('candidate', 'staged', 'validated', 'rejected', 'promoted')
     )
 );
 

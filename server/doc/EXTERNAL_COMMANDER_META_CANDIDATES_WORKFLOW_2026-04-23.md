@@ -59,10 +59,13 @@ Leitura:
 - migration: `server/bin/migrate_external_commander_meta_candidates.dart`
 - suporte: `server/lib/meta/external_commander_meta_candidate_support.dart`
 - import: `server/bin/import_external_commander_meta_candidates.dart`
+- staging seguro: `server/bin/stage_external_commander_meta_candidates.dart`
+- suporte de staging: `server/lib/meta/external_commander_meta_staging_support.dart`
 
 ## Status aceitos
 
 - `candidate`
+- `staged`
 - `validated`
 - `rejected`
 - `promoted` (legado/inativo neste fluxo)
@@ -248,21 +251,65 @@ Resultado da rodada base:
   - `Scion of the Ur-Dragon` com `unresolved_cards=["Prismari, the Inspiration"]`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
 
-### 3. Persistencia continua bloqueada no stage 2
+### 3. Persistencia segura do stage 2 em `external_commander_meta_candidates`
 
 ```bash
 cd server
-dart run bin/import_external_commander_meta_candidates.dart \
-  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
-  --validation-profile=topdeck_edhtop16_stage2 \
+dart run bin/stage_external_commander_meta_candidates.dart \
+  --expansion-artifact=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --validation-artifact=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json \
+  --report-json-out=test/artifacts/external_commander_meta_stage2_staging_dry_run_2026-04-24.json
+```
+
+Aplicacao real:
+
+```bash
+cd server
+dart run bin/stage_external_commander_meta_candidates.dart \
+  --apply \
+  --expansion-artifact=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --validation-artifact=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json \
   --imported-by=meta_deck_intelligence_2026_04_24
 ```
 
 Comportamento comprovado:
 
-- falha antes de qualquer escrita por exigir `--dry-run`
-- continua rejeitando explicitamente `--promote-validated`
-- mantem stage 2 como gate de validacao estrutural + commander-aware apenas em artefato local
+- modo padrao continua sendo `dry-run`
+- escrita real exige `--apply`
+- persistencia ocorre **somente** em `external_commander_meta_candidates`
+- nao escreve em `meta_decks`
+- bloqueia se `validation_profile != topdeck_edhtop16_stage2`
+- bloqueia se `validation.rejected_count > 0`
+- bloqueia se faltar `card_list` ou `cards/card_entries`
+- bloqueia se faltar `research_payload.collection_method`
+- bloqueia se faltar `research_payload.source_context`
+- bloqueia se `source_name/source_url` forem invalidos
+- bloqueia se `is_commander_legal=false`
+- faz dedupe por `source_url`
+- preserva `research_payload` completo e adiciona `research_payload.staging_audit`
+- marca `validation_status='staged'`
+- converte `legal_status` do stage 2 para staging:
+  - `legal` -> `valid`
+  - `not_proven` -> `warning_pending`
+  - `illegal` -> `rejected`
+
+Resultado do dry-run base:
+
+- `accepted_count=4`
+- `validation_rejected_count=0`
+- `expansion_rejected_count=4`
+- `to_persist_count=4`
+- `duplicate_source_url_count=0`
+- distribuicao de `legal_status` no staging planejado:
+  - `valid=3`
+  - `warning_pending=1`
+
+Snapshot observado:
+
+- `Scion of the Ur-Dragon` -> `validation_status=staged`, `legal_status=warning_pending`
+- `Norman Osborn // Green Goblin` -> `validation_status=staged`, `legal_status=valid`
+- `Malcolm + Vial Smasher` -> `validation_status=staged`, `legal_status=valid`
+- `Kraum + Tymna` -> `validation_status=staged`, `legal_status=valid`
 
 Regra de seguranca adicional:
 

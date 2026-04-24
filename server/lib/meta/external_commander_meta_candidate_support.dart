@@ -8,6 +8,7 @@ import 'meta_deck_format_support.dart';
 
 const externalCommanderMetaValidationStatuses = <String>{
   'candidate',
+  'staged',
   'validated',
   'rejected',
   'promoted',

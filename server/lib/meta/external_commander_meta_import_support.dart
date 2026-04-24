@@ -1,4 +1,7 @@
 import 'dart:collection';
+import 'dart:convert';
+
+import 'package:postgres/postgres.dart';
 
 import 'external_commander_meta_candidate_support.dart';
 
@@ -154,5 +157,96 @@ ExternalCommanderMetaPersistencePlan buildExternalCommanderMetaPersistencePlan(
     candidatesToPersist: dedupedBySourceUrl.values.toList(growable: false),
     duplicateSourceUrls: duplicateSourceUrls.toList(growable: false)..sort(),
     rejectedCount: rejected.length,
+  );
+}
+
+Future<void> upsertExternalCommanderMetaCandidate(
+  dynamic conn,
+  ExternalCommanderMetaCandidate candidate,
+) async {
+  await conn.execute(
+    Sql.named('''
+      INSERT INTO external_commander_meta_candidates (
+        source_name,
+        source_host,
+        source_url,
+        deck_name,
+        commander_name,
+        partner_commander_name,
+        format,
+        subformat,
+        archetype,
+        card_list,
+        placement,
+        color_identity,
+        is_commander_legal,
+        validation_status,
+        legal_status,
+        validation_notes,
+        research_payload,
+        imported_by,
+        updated_at
+      )
+      VALUES (
+        @source_name,
+        @source_host,
+        @source_url,
+        @deck_name,
+        @commander_name,
+        @partner_commander_name,
+        @format,
+        @subformat,
+        @archetype,
+        @card_list,
+        @placement,
+        @color_identity,
+        @is_commander_legal,
+        @validation_status,
+        @legal_status,
+        @validation_notes,
+        CAST(@research_payload AS jsonb),
+        @imported_by,
+        CURRENT_TIMESTAMP
+      )
+      ON CONFLICT (source_url) DO UPDATE SET
+        source_name = EXCLUDED.source_name,
+        source_host = EXCLUDED.source_host,
+        deck_name = EXCLUDED.deck_name,
+        commander_name = EXCLUDED.commander_name,
+        partner_commander_name = EXCLUDED.partner_commander_name,
+        format = EXCLUDED.format,
+        subformat = EXCLUDED.subformat,
+        archetype = EXCLUDED.archetype,
+        card_list = EXCLUDED.card_list,
+        placement = EXCLUDED.placement,
+        color_identity = EXCLUDED.color_identity,
+        is_commander_legal = EXCLUDED.is_commander_legal,
+        validation_status = EXCLUDED.validation_status,
+        legal_status = EXCLUDED.legal_status,
+        validation_notes = EXCLUDED.validation_notes,
+        research_payload = EXCLUDED.research_payload,
+        imported_by = EXCLUDED.imported_by,
+        updated_at = CURRENT_TIMESTAMP
+    '''),
+    parameters: <String, dynamic>{
+      'source_name': candidate.normalizedSourceName,
+      'source_host': candidate.sourceHost,
+      'source_url': candidate.sourceUrl,
+      'deck_name': candidate.deckName,
+      'commander_name': candidate.commanderName,
+      'partner_commander_name': candidate.partnerCommanderName,
+      'format': candidate.persistedFormat,
+      'subformat': candidate.normalizedSubformat,
+      'archetype': candidate.archetype,
+      'card_list': candidate.cardList,
+      'placement': candidate.placement,
+      'color_identity': candidate.colorIdentity.toList()..sort(),
+      'is_commander_legal': candidate.isCommanderLegal,
+      'validation_status': candidate.validationStatus,
+      'legal_status': candidate.legalStatus,
+      'validation_notes': candidate.validationNotes,
+      'research_payload': jsonEncode(candidate.researchPayload),
+      'imported_by': candidate.importedBy,
+    },
   );
 }

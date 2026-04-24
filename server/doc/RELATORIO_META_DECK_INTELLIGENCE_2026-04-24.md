@@ -132,6 +132,93 @@ PY
 3. manter `cEDH Decklist Database`, `EDHREC` e `Commander Spellbook` fora do staging
 4. nao ativar `Archidekt` ou `Moxfield` ate existir adapter dedicado e fetch/source proof adicionais
 
+## Etapa 2/5 - persistencia segura dos candidatos aprovados
+
+### Resultado
+
+Foi criado um gate separado de staging:
+
+- script: `server/bin/stage_external_commander_meta_candidates.dart`
+- suporte: `server/lib/meta/external_commander_meta_staging_support.dart`
+- artefato dry-run: `server/test/artifacts/external_commander_meta_stage2_staging_dry_run_2026-04-24.json`
+
+Mudanca de contrato:
+
+- `external_commander_meta_candidates.validation_status` agora aceita `staged`
+- o importador stage 2 continua dry-run only
+- a escrita real para staging ficou separada e continua exigindo `--apply`
+
+### Comandos rodados nesta etapa
+
+```bash
+cd server && dart analyze lib/meta bin test
+
+cd server && dart test -r compact \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/external_commander_meta_import_support_test.dart \
+  test/external_commander_meta_promotion_support_test.dart \
+  test/external_commander_meta_staging_support_test.dart
+
+cd server && dart run bin/stage_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_stage2_staging_dry_run_2026-04-24.json
+```
+
+### Evidencia validada
+
+Dry-run do novo gate:
+
+- `mode=dry_run`
+- `profile=topdeck_edhtop16_stage2`
+- `accepted=4`
+- `to_persist=4`
+- `duplicates=0`
+- `validation_rejected=0`
+- `expansion_rejected=4`
+
+Distribuicao do staging planejado:
+
+| validation_status | legal_status | decks |
+| --- | --- | ---: |
+| staged | valid | 3 |
+| staged | warning_pending | 1 |
+
+Decks preparados:
+
+| source_url | deck | legal_status | observacao |
+| --- | --- | --- | --- |
+| `...#standing-1` | `Scion of the Ur-Dragon` | `warning_pending` | `unresolved_cards=1` (`Prismari, the Inspiration`) |
+| `...#standing-4` | `Norman Osborn // Green Goblin` | `valid` | sem illegal cards |
+| `...#standing-5` | `Malcolm + Vial Smasher` | `valid` | sem illegal cards |
+| `...#standing-8` | `Kraum + Tymna` | `valid` | sem illegal cards |
+
+Fatos provados por codigo:
+
+1. o comando novo e `dry-run` por default
+2. a escrita real exige `--apply`
+3. a escrita vai apenas para `external_commander_meta_candidates`
+4. o gate bloqueia:
+   - `validation_profile` fora de `topdeck_edhtop16_stage2`
+   - `validation.rejected_count > 0`
+   - `card_list/cards/card_entries` ausente
+   - `collection_method` ausente
+   - `source_context` ausente
+   - `source_name/source_url` invalidos
+   - `is_commander_legal=false`
+5. o gate preserva `research_payload` e adiciona `research_payload.staging_audit`
+6. o gate deduplica por `source_url`
+
+Leitura:
+
+- o stage 2 deixou de ser um beco sem saida
+- ele continua nao destrutivo por default
+- a fila pronta para promocao futura passa a carregar audit trail suficiente para bloquear unresolved/illegal na Etapa 3
+
+### Menores proximas acoes tecnicas apos a persistencia segura
+
+1. promover apenas candidatos `staged` no gate da Etapa 3
+2. impedir que `warning_pending` com unresolved bloqueante entre em `meta_decks`
+3. manter `meta_decks` intocado ate a promocao separada estar guardada por `--apply`
+
 ## Resumo do pipeline
 
 ### Fonte primaria comprovada

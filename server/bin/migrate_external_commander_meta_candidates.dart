@@ -32,13 +32,25 @@ Future<void> main() async {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT chk_external_commander_meta_status CHECK (
-          validation_status IN ('candidate', 'validated', 'rejected', 'promoted')
+          validation_status IN ('candidate', 'staged', 'validated', 'rejected', 'promoted')
         )
       )
     ''');
     await conn.execute('''
       ALTER TABLE external_commander_meta_candidates
       ADD COLUMN IF NOT EXISTS legal_status TEXT
+    ''');
+
+    await conn.execute('''
+      ALTER TABLE external_commander_meta_candidates
+      DROP CONSTRAINT IF EXISTS chk_external_commander_meta_status
+    ''');
+
+    await conn.execute('''
+      ALTER TABLE external_commander_meta_candidates
+      ADD CONSTRAINT chk_external_commander_meta_status CHECK (
+        validation_status IN ('candidate', 'staged', 'validated', 'rejected', 'promoted')
+      )
     ''');
 
     await conn.execute('''
