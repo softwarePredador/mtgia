@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/meta/external_commander_meta_candidate_support.dart';
@@ -129,6 +131,188 @@ void main() {
           },
         ),
         throwsFormatException,
+      );
+    });
+  });
+
+  group('validateExternalCommanderMetaCandidate', () {
+    test('aceita candidato controlado TopDeck.gg no stage 1', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'TopDeck',
+          'source_url': 'https://topdeck.gg/event/the-quest-part-1#pilot-1',
+          'deck_name': 'Quest RogSilas',
+          'commander_name': 'Rograkh, Son of Rohgahh',
+          'partner_commander_name': 'Silas Renn, Seeker Adept',
+          'subformat': 'cEDH',
+          'color_identity': <String>['u', 'b', 'r'],
+          'card_entries': <Map<String, dynamic>>[
+            <String, dynamic>{'quantity': 1, 'name': 'Rograkh, Son of Rohgahh'},
+            <String, dynamic>{
+              'quantity': 1,
+              'name': 'Silas Renn, Seeker Adept',
+            },
+            <String, dynamic>{'quantity': 1, 'name': 'Mana Crypt'},
+          ],
+          'research_payload': <String, dynamic>{
+            'collection_method': 'manual_web_review',
+            'source_context': 'topdeck_event_page',
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(candidate.normalizedSourceName, 'TopDeck.gg');
+      expect(result.accepted, isTrue);
+      expect(
+        result.issues.where((issue) => issue.severity == 'error'),
+        isEmpty,
+      );
+    });
+
+    test('rejeita source fora do path controlado no stage 1', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url': 'https://edhtop16.com/about#bad-fixture',
+          'deck_name': 'Bad Fixture',
+          'subformat': 'competitive_commander',
+          'card_list':
+              '1 Kraum, Ludevic\'s Opus\n1 Tymna the Weaver\n1 Mana Crypt',
+          'research_payload': <String, dynamic>{
+            'collection_method': 'manual_web_review',
+            'source_context': 'about_page_fixture',
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        contains('invalid_source_path'),
+      );
+    });
+
+    test('rejeita subformato commander amplo no stage 1', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'TopDeck.gg',
+          'source_url': 'https://topdeck.gg/event/the-quest-part-1#pilot-2',
+          'deck_name': 'Broad Commander Example',
+          'subformat': 'commander',
+          'card_list':
+              '1 Kenrith, the Returned King\\n1 Sol Ring\\n1 Command Tower',
+          'research_payload': <String, dynamic>{
+            'collection_method': 'manual_web_review',
+            'source_context': 'topdeck_event_page',
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        contains('invalid_subformat'),
+      );
+    });
+
+    test('rejeita source fora da allowlist no stage 1', () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'Moxfield',
+          'source_url': 'https://moxfield.com/decks/not-stage-1',
+          'deck_name': 'Unsupported Source',
+          'subformat': 'competitive_commander',
+          'card_list':
+              '1 Kraum, Ludevic\'s Opus\n1 Tymna the Weaver\n1 Mana Crypt',
+          'research_payload': <String, dynamic>{
+            'collection_method': 'manual_web_review',
+            'source_context': 'moxfield_page',
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        contains('unsupported_source'),
+      );
+    });
+
+    test('rejeita promoted, commander ilegal e research payload incompleto',
+        () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'TopDeck.gg',
+          'source_url': 'https://topdeck.gg/event/the-quest-part-1#bad-status',
+          'deck_name': 'Rejected Status Example',
+          'subformat': 'competitive_commander',
+          'card_list':
+              '1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Mana Crypt',
+          'validation_status': 'promoted',
+          'is_commander_legal': false,
+          'research_payload': <String, dynamic>{},
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        containsAll(<String>{
+          'promotion_disabled',
+          'commander_illegal',
+          'missing_collection_method',
+          'missing_source_context',
+        }),
+      );
+    });
+
+    test('fixture stage 1 mantem contrato 2 accepted e 2 rejected', () {
+      final raw = File(
+        'test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json',
+      ).readAsStringSync();
+      final candidates = parseExternalCommanderMetaCandidates(raw);
+
+      final results = validateExternalCommanderMetaCandidates(
+        candidates,
+        profile: topDeckEdhTop16Stage1ValidationProfile,
+      );
+
+      expect(results.where((result) => result.accepted), hasLength(2));
+      expect(results.where((result) => !result.accepted), hasLength(2));
+      expect(
+        results.where((result) => result.accepted).map(
+              (result) => result.candidate.normalizedSourceName,
+            ),
+        everyElement(anyOf('TopDeck.gg', 'EDHTop16')),
+      );
+      expect(
+        results.expand((result) => result.issues).map((issue) => issue.code),
+        containsAll(<String>{'invalid_subformat', 'invalid_source_path'}),
       );
     });
   });

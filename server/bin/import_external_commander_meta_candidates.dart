@@ -13,21 +13,70 @@ Future<void> main(List<String> args) async {
     rawPayload,
     importedBy: config.importedBy,
   );
+  final validationResults = validateExternalCommanderMetaCandidates(
+    candidates,
+    profile: config.validationProfile,
+  );
+  final acceptedCount =
+      validationResults.where((result) => result.accepted).length;
+  final rejectedCount = validationResults.length - acceptedCount;
 
   stdout.writeln(
     'Candidates carregados: ${candidates.length} '
     '(validated: ${candidates.where((c) => c.validationStatus == 'validated').length})',
   );
+  stdout.writeln(
+    'Validation profile: ${config.validationProfile} | '
+    'accepted: $acceptedCount | rejected: $rejectedCount',
+  );
+
+  if (config.validationJsonOut != null) {
+    final outputFile = File(config.validationJsonOut!);
+    await outputFile.parent.create(recursive: true);
+    await outputFile.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(
+        <String, dynamic>{
+          'generated_at': DateTime.now().toUtc().toIso8601String(),
+          'mode': config.dryRun ? 'dry_run' : 'import',
+          'validation_profile': config.validationProfile,
+          'accepted_count': acceptedCount,
+          'rejected_count': rejectedCount,
+          'results': validationResults
+              .map((result) => result.toJson())
+              .toList(growable: false),
+        },
+      ),
+    );
+    stdout.writeln('Validation JSON salvo em: ${outputFile.path}');
+  }
 
   if (config.dryRun) {
-    for (final candidate in candidates) {
+    for (final result in validationResults) {
+      final candidate = result.candidate;
+      final issues = result.issues
+          .map((issue) => '${issue.severity}:${issue.code}')
+          .join(', ');
       stdout.writeln(
-        '- ${candidate.deckName} | ${candidate.validationStatus} | '
-        '${candidate.metaDeckFormatCode ?? 'sem_promocao'} | ${candidate.sourceUrl}',
+        '${result.accepted ? '[ACCEPT]' : '[REJECT]'} '
+        '${candidate.deckName} | '
+        '${candidate.normalizedSourceName} | '
+        '${candidate.normalizedSubformat ?? '-'} | '
+        'cards=${candidate.cardCount} | '
+        '${issues.isEmpty ? 'sem_issues' : issues} | '
+        '${candidate.sourceUrl}',
       );
     }
     stdout.writeln('Dry-run finalizado sem gravar no banco.');
     return;
+  }
+
+  final rejected =
+      validationResults.where((result) => !result.accepted).toList();
+  if (rejected.isNotEmpty) {
+    throw StateError(
+      'Importacao bloqueada: ${rejected.length} candidato(s) rejeitado(s) '
+      'pela validacao ${config.validationProfile}.',
+    );
   }
 
   final db = Database();
@@ -126,7 +175,7 @@ Future<void> _upsertCandidate(
         updated_at = CURRENT_TIMESTAMP
     '''),
     parameters: <String, dynamic>{
-      'source_name': candidate.sourceName,
+      'source_name': candidate.normalizedSourceName,
       'source_host': candidate.sourceHost,
       'source_url': candidate.sourceUrl,
       'deck_name': candidate.deckName,
@@ -208,6 +257,8 @@ class _ImportConfig {
     required this.dryRun,
     required this.stdinMode,
     required this.importedBy,
+    required this.validationProfile,
+    this.validationJsonOut,
     this.inputPath,
   });
 
@@ -215,6 +266,8 @@ class _ImportConfig {
   final bool dryRun;
   final bool stdinMode;
   final String importedBy;
+  final String validationProfile;
+  final String? validationJsonOut;
   final String? inputPath;
 
   factory _ImportConfig.parse(List<String> args) {
@@ -222,6 +275,8 @@ class _ImportConfig {
     var dryRun = false;
     var stdinMode = false;
     var importedBy = 'copilot_cli_web_agent';
+    var validationProfile = genericExternalCommanderMetaValidationProfile;
+    String? validationJsonOut;
     String? inputPath;
 
     for (final arg in args) {
@@ -241,8 +296,33 @@ class _ImportConfig {
         importedBy = arg.substring('--imported-by='.length).trim();
         continue;
       }
+      if (arg.startsWith('--validation-profile=')) {
+        validationProfile =
+            arg.substring('--validation-profile='.length).trim();
+        continue;
+      }
+      if (arg.startsWith('--validation-json-out=')) {
+        validationJsonOut =
+            arg.substring('--validation-json-out='.length).trim();
+        continue;
+      }
       if (!arg.startsWith('--') && inputPath == null) {
         inputPath = arg;
+      }
+    }
+
+    if (validationProfile == topDeckEdhTop16Stage1ValidationProfile) {
+      if (!dryRun) {
+        throw ArgumentError(
+          '$topDeckEdhTop16Stage1ValidationProfile exige --dry-run. '
+          'Nesta fase nao ha escrita em banco.',
+        );
+      }
+      if (promoteValidated) {
+        throw ArgumentError(
+          '$topDeckEdhTop16Stage1ValidationProfile nao permite '
+          '--promote-validated.',
+        );
       }
     }
 
@@ -251,6 +331,8 @@ class _ImportConfig {
       dryRun: dryRun,
       stdinMode: stdinMode,
       importedBy: importedBy,
+      validationProfile: validationProfile,
+      validationJsonOut: validationJsonOut,
       inputPath: inputPath,
     );
   }

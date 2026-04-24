@@ -1,0 +1,161 @@
+{
+  "generated_at": "2026-04-24T13:53:47.775631Z",
+  "mode": "dry_run",
+  "validation_profile": "topdeck_edhtop16_stage1",
+  "accepted_count": 2,
+  "rejected_count": 2,
+  "results": [
+    {
+      "accepted": true,
+      "profile": "topdeck_edhtop16_stage1",
+      "candidate": {
+        "source_name": "TopDeck.gg",
+        "source_host": "topdeck.gg",
+        "source_url": "https://topdeck.gg/event/the-quest-part-1#pilot-rograkh-silas",
+        "deck_name": "Quest Dry-Run Rograkh Silas",
+        "commander_name": "Rograkh, Son of Rohgahh",
+        "partner_commander_name": "Silas Renn, Seeker Adept",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Turbo Naus",
+        "card_list": "1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Mana Crypt\n1 Underworld Breach\n1 Ad Nauseam",
+        "placement": "Top 16",
+        "color_identity": [
+          "B",
+          "R",
+          "U"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "candidate",
+        "validation_notes": "Stage 1 dry-run fixture. Event metadata proven; full decklist expansion still pending.",
+        "research_payload": {
+          "collection_method": "manual_web_review",
+          "source_context": "topdeck_event_page",
+          "source_category": "official event page",
+          "event_url": "https://topdeck.gg/event/the-quest-part-1",
+          "note": "Event page text proves cEDH event metadata only."
+        },
+        "imported_by": "copilot_cli_web_agent"
+      },
+      "card_count": 5,
+      "issues": []
+    },
+    {
+      "accepted": true,
+      "profile": "topdeck_edhtop16_stage1",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_host": "edhtop16.com",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#pilot-kraum-tymna",
+        "deck_name": "Arcanum Dry-Run Kraum Tymna",
+        "commander_name": "Kraum, Ludevic's Opus",
+        "partner_commander_name": "Tymna the Weaver",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Blue Farm",
+        "card_list": "1 Kraum, Ludevic's Opus\n1 Tymna the Weaver\n1 Mana Crypt\n1 Esper Sentinel\n1 Fierce Guardianship",
+        "placement": "Top 16",
+        "color_identity": [
+          "B",
+          "R",
+          "U",
+          "W"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "candidate",
+        "validation_notes": "Stage 1 dry-run fixture. Tournament page proven; full decklist fetch not yet automated.",
+        "research_payload": {
+          "collection_method": "manual_web_review",
+          "source_context": "edhtop16_tournament_page",
+          "source_category": "official tournament page",
+          "event_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "note": "Tournament page proves cEDH standings context."
+        },
+        "imported_by": "copilot_cli_web_agent"
+      },
+      "card_count": 5,
+      "issues": []
+    },
+    {
+      "accepted": false,
+      "profile": "topdeck_edhtop16_stage1",
+      "candidate": {
+        "source_name": "TopDeck.gg",
+        "source_host": "topdeck.gg",
+        "source_url": "https://topdeck.gg/event/the-quest-part-1#broad-commander-example",
+        "deck_name": "Reject Broad Commander Example",
+        "commander_name": "Kenrith, the Returned King",
+        "partner_commander_name": null,
+        "format": "commander",
+        "subformat": "commander",
+        "archetype": "Commander Broad",
+        "card_list": "1 Kenrith, the Returned King\n1 Command Tower\n1 Sol Ring",
+        "placement": "Not Proven",
+        "color_identity": [
+          "B",
+          "G",
+          "R",
+          "U",
+          "W"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "candidate",
+        "validation_notes": "Expected reject in stage 1 because subformat is broad commander.",
+        "research_payload": {
+          "collection_method": "manual_web_review",
+          "source_context": "topdeck_event_page",
+          "source_category": "official event page"
+        },
+        "imported_by": "copilot_cli_web_agent"
+      },
+      "card_count": 3,
+      "issues": [
+        {
+          "severity": "error",
+          "code": "invalid_subformat",
+          "message": "Subformato deve normalizar para competitive_commander no stage 1."
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "profile": "topdeck_edhtop16_stage1",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_host": "edhtop16.com",
+        "source_url": "https://edhtop16.com/about#bad-fixture",
+        "deck_name": "Reject Bad Path Example",
+        "commander_name": "Tymna the Weaver",
+        "partner_commander_name": "Thrasios, Triton Hero",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Midrange",
+        "card_list": "1 Tymna the Weaver\n1 Thrasios, Triton Hero\n1 Mana Crypt",
+        "placement": "Not Proven",
+        "color_identity": [
+          "B",
+          "G",
+          "U",
+          "W"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "candidate",
+        "validation_notes": "Expected reject in stage 1 because source_url is not a tournament path.",
+        "research_payload": {
+          "collection_method": "manual_web_review",
+          "source_context": "about_page_fixture",
+          "source_category": "official about page"
+        },
+        "imported_by": "copilot_cli_web_agent"
+      },
+      "card_count": 3,
+      "issues": [
+        {
+          "severity": "error",
+          "code": "invalid_source_path",
+          "message": "Source URL deve apontar para /tournament/ em EDHTop16."
+        }
+      ]
+    }
+  ]
+}

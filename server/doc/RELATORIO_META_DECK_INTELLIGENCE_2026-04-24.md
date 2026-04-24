@@ -873,3 +873,156 @@ Isso reduz o risco de o modelo ou o pipeline interpretarem `Kraum + Tymna` como 
 1. Trocar consumidores restantes que ainda fazem fallback direto em `archetype ILIKE` por `shell_label` / `strategy_archetype` onde fizer sentido.
 2. Medir regressao de `strategy_archetype` por shell recorrente (`Kraum + Tymna`, `Kinnan`, `Spider-Man 2099`) para descobrir onde a heuristica ainda varia demais.
 3. Se o produto decidir endurecer a taxonomia, promover uma camada controlada de normalizacao de strategy por shell frequente, sem reescrever o `archetype` bruto vindo da fonte.
+
+---
+
+## 2026-04-24 — Plano de ingestao controlada Stage 1 para TopDeck.gg + EDHTop16
+
+## Veredito desta rodada
+
+- **O stage 1 foi implementado como `dry-run + schema validation`, sem qualquer promocao para `meta_decks`.**
+- **O importador agora aceita um profile controlado `topdeck_edhtop16_stage1` e produz saida objetiva de `accept/reject` por candidato.**
+- **Foi gerado um artefato JSON de candidatos e um artefato JSON de validacao em `server/test/artifacts/`.**
+- **TopDeck.gg ficou provado como fonte de metadata publica de evento cEDH.**
+- **EDHTop16 ficou provado como fonte de pagina de torneio cEDH, mas o endpoint legado `cedhtop16.com/api/req` nao devolveu JSON nesta rodada; API live atual permanece `not proven`.**
+
+## Pipeline resumido desta fase
+
+1. montar payload controlado em JSON
+2. rodar `import_external_commander_meta_candidates.dart` em `--dry-run`
+3. aplicar validacao de schema + politica de origem
+4. salvar artefato `.validation.json`
+5. encerrar sem gravar em `external_commander_meta_candidates`
+6. encerrar sem promover nada para `meta_decks`
+
+## Artefatos
+
+- payload de candidatos:
+  - `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json`
+- resultado do dry-run:
+  - `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json`
+
+## Comandos rodados
+
+```bash
+curl -L --max-time 20 -s 'https://topdeck.gg/event/the-quest-part-1'
+curl -L --max-time 20 -s 'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57'
+curl -L --max-time 20 -s 'https://edhtop16.com/about'
+python3 - <<'PY'
+import requests
+resp = requests.post(
+    'https://cedhtop16.com/api/req',
+    json={'standing': {'$lte': 2}},
+    headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+    timeout=20,
+)
+print(resp.status_code)
+print(resp.headers.get('content-type'))
+print(resp.text[:200])
+PY
+```
+
+```bash
+cd server
+dart analyze bin/import_external_commander_meta_candidates.dart \
+  lib/meta/external_commander_meta_candidate_support.dart \
+  test/external_commander_meta_candidate_support_test.dart
+
+dart test test/external_commander_meta_candidate_support_test.dart
+
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-json-out=test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json
+```
+
+## Evidencia objetiva observada
+
+### 1. TopDeck.gg expõe metadata publica de evento
+
+**Provado.**
+
+Leitura direta da pagina `https://topdeck.gg/event/the-quest-part-1` mostrou:
+
+- titulo do evento: `The Quest for a Cause - $10k cEDH Charity Main Event`
+- texto explicito de `charity cEDH event`
+- secao de `About this event`
+
+Conclusao:
+
+- TopDeck.gg serve como fonte valida de `event metadata` para staging inicial
+- expansao automatica de decklist individual a partir dessa pagina ainda e `not proven`
+
+### 2. EDHTop16 expõe pagina publica de torneio cEDH
+
+**Provado.**
+
+Leitura direta da pagina `https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57` mostrou:
+
+- nome do torneio: `cEDH @ Arcanum Sanctorum!`
+- secao `Players`
+- secao `Standings`
+- referencia visivel a `TopDeck.gg`
+
+Conclusao:
+
+- EDHTop16 serve como fonte valida de `tournament metadata` para staging inicial
+- decklist fetch automatizado a partir dessa pagina ainda e `not proven`
+
+### 3. API legada do EDHTop16 nao ficou provada como fonte live atual
+
+**Nao provado.**
+
+Observacao executada:
+
+- `POST https://cedhtop16.com/api/req` respondeu `200`
+- `content-type: text/html`
+- corpo retornou HTML do site, nao JSON de API
+
+Conclusao:
+
+- a documentacao historica existe
+- mas a disponibilidade live do endpoint legado nao foi comprovada nesta rodada
+- para stage 1, a fonte considerada valida e a pagina publica `edhtop16.com/tournament/...`, nao a API
+
+## Regra de accept/reject implementada
+
+O profile `topdeck_edhtop16_stage1` aceita um candidato somente quando:
+
+1. `source_name` normaliza para `TopDeck.gg` ou `EDHTop16`
+2. `source_url` bate com a fonte esperada
+   - `TopDeck.gg` -> host `topdeck.gg` e path `/event/...`
+   - `EDHTop16` -> host `edhtop16.com` e path `/tournament/...`
+3. `format` persiste como `commander`
+4. `subformat` normaliza para `competitive_commander`
+5. `card_list` ou `card_entries` existe
+6. `research_payload.collection_method` existe
+7. `research_payload.source_context` existe
+8. `validation_status != promoted`
+9. `is_commander_legal != false`
+
+Rejeita quando qualquer uma dessas regras falha.
+
+## Resultado do dry-run controlado
+
+| deck | source | decisao | evidencia |
+| --- | --- | --- | --- |
+| `Quest Dry-Run Rograkh Silas` | `TopDeck.gg` | `ACCEPT` | host/path corretos + `competitive_commander` + schema completo |
+| `Arcanum Dry-Run Kraum Tymna` | `EDHTop16` | `ACCEPT` | host/path corretos + `competitive_commander` + schema completo |
+| `Reject Broad Commander Example` | `TopDeck.gg` | `REJECT` | `invalid_subformat` |
+| `Reject Bad Path Example` | `EDHTop16` | `REJECT` | `invalid_source_path` |
+
+Resumo do artefato `.validation.json`:
+
+- `accepted_count = 2`
+- `rejected_count = 2`
+- nenhuma escrita em banco
+- nenhuma promocao para `meta_decks`
+
+## Menores proximas acoes tecnicas
+
+1. Automatizar descoberta de candidatos TopDeck.gg e EDHTop16 para preencher o payload JSON sem montagem manual.
+2. Provar um caminho reprodutivel de decklist expansion por candidato antes de qualquer persistencia em `external_commander_meta_candidates`.
+3. So depois habilitar `persist candidate` como fase separada.
+4. Manter promocao para `meta_decks` desligada ate existir prova consistente de decklist completa + Commander legality + subformat correto.

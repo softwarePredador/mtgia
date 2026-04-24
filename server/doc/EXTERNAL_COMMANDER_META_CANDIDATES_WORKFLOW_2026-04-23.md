@@ -94,6 +94,44 @@ cd server
 dart run bin/import_external_commander_meta_candidates.dart ../candidates.json --dry-run
 ```
 
+### 2.1 Stage 1 controlado para TopDeck.gg + EDHTop16
+
+Objetivo:
+
+- validar schema
+- validar politica de origem
+- gerar relatorio `accept/reject`
+- **sem** escrever em banco
+- **sem** promover nada para `meta_decks`
+
+Comando recomendado:
+
+```bash
+cd server
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-json-out=test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json
+```
+
+Regra operacional do profile `topdeck_edhtop16_stage1`:
+
+- exige `--dry-run`
+- bloqueia `--promote-validated`
+- rejeita qualquer source fora de `TopDeck.gg` e `EDHTop16`
+- aceita apenas `competitive_commander`
+- exige `research_payload.collection_method`
+- exige `research_payload.source_context`
+- exige URL de evento coerente com a fonte:
+  - `TopDeck.gg` -> `/event/...`
+  - `EDHTop16` -> `/tournament/...`
+
+Saida esperada:
+
+- linhas `[ACCEPT]` / `[REJECT]` no terminal
+- artefato JSON com candidatos normalizados e lista de issues
+
 ### 3. Persistir candidatos
 
 ```bash
@@ -139,6 +177,6 @@ Misturar as duas coisas direto em `meta_decks` enfraquece o controle de qualidad
 
 ## Menor proximo passo
 
-- adicionar `--dry-run` e parser mais forte em `fetch_meta.dart`
+- automatizar descoberta de candidatos por fonte, ainda escrevendo primeiro em artefato JSON e nao em banco
 - decidir se `external_commander_meta_candidates` vai aceitar mais de uma fonte por `source_url` canonicalizada
 - criar relatorio de cobertura por `subformat` e identidade de cor nessa nova tabela

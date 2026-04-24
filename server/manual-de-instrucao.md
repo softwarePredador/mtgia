@@ -1,6 +1,66 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Stage 1 controlado para TopDeck.gg + EDHTop16 em `external_commander_meta_candidates`
+
+### O Porquê
+- O repositório já tinha tabela e importador para `external_commander_meta_candidates`, mas ainda faltava um modo realmente controlado para iniciar expansão multi-fonte sem correr o risco de poluir `meta_decks`.
+- O pedido desta rodada era explícito: começar por `dry-run` e validação de schema para `TopDeck.gg` e `EDHTop16`, sem persistir nada e sem promover nada para a tabela principal.
+- Também era necessário separar o que está provado em código/web nesta fase do que ainda continua `not proven`, principalmente no fetch de decklists individuais fora do MTGTop8.
+
+### O Como
+- `server/lib/meta/external_commander_meta_candidate_support.dart` ganhou:
+  - profile de validação `topdeck_edhtop16_stage1`
+  - políticas controladas de origem para `TopDeck.gg` e `EDHTop16`
+  - canonicalização de `source_name`
+  - resultado estruturado de validação com `accepted`, `issues`, `severity`, `code`
+- O profile `topdeck_edhtop16_stage1` aceita apenas:
+  - `TopDeck.gg` com `source_url` em `/event/...`
+  - `EDHTop16` com `source_url` em `/tournament/...`
+  - `format=commander`
+  - `subformat=competitive_commander`
+  - `card_list`/`card_entries`
+  - `research_payload.collection_method`
+  - `research_payload.source_context`
+- O mesmo profile rejeita:
+  - `validation_status=promoted`
+  - sources fora da allowlist
+  - host/path incompatíveis
+  - `commander` amplo em vez de `competitive_commander`
+  - candidato marcado explicitamente como `is_commander_legal=false`
+- `server/bin/import_external_commander_meta_candidates.dart` passou a:
+  - aceitar `--validation-profile=...`
+  - aceitar `--validation-json-out=...`
+  - emitir `ACCEPT/REJECT` por candidato em `--dry-run`
+  - bloquear importação real quando existirem rejeições
+  - obrigar `--dry-run` e bloquear `--promote-validated` no profile `topdeck_edhtop16_stage1`
+- Foram adicionados dois artefatos de apoio:
+  - payload controlado de candidatos: `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json`
+  - resultado do dry-run: `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json`
+- Os testes focados em `server/test/external_commander_meta_candidate_support_test.dart` passaram a cobrir:
+  - aceite de candidato TopDeck válido
+  - rejeição por path inválido em EDHTop16
+  - rejeição por subformato amplo `commander`
+
+### Resultado prático
+- O repositório agora tem um stage 1 real para abrir o funil multi-fonte sem tocar em `meta_decks`.
+- A saída do comando já funciona como gate objetivo de schema/origem, com JSON persistível em artefato.
+- Nesta fase:
+  - há `dry-run`
+  - há schema validation
+  - há criteria `accept/reject`
+  - não há escrita em banco
+  - não há promoção para `meta_decks`
+
+### Arquivos alterados
+- `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `server/bin/import_external_commander_meta_candidates.dart`
+- `server/test/external_commander_meta_candidate_support_test.dart`
+- `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json`
+- `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json`
+- `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
 ## 2026-04-24 — Extracao derivada de commander shell para `meta_decks` EDH/cEDH
 
 ### O Porquê
