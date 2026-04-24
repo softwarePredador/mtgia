@@ -380,3 +380,385 @@ Casos comprovados:
 1. promover o primeiro candidato externo validado e rerodar esta auditoria para comprovar `source=external` live no caminho `query -> select -> prompt`
 2. adicionar telemetria compacta opcional no payload de `optimize`/`generate` so se for necessario debug de producao
 3. se surgirem novos shells partner/background, ampliar a suite do seletor antes de relaxar heuristica de match
+
+## Atualizacao E2E runtime do fluxo final
+
+### Escopo desta rodada
+
+Validacao pedida:
+
+1. expandir `EDHTop16` em dry-run
+2. validar no stage 2
+3. persistir em `external_commander_meta_candidates`
+4. rodar promocao em dry-run
+5. gerar relatorios de base/cobertura
+6. provar consumo de referencia competitiva por `generate/optimize` sem `apply` destrutivo
+
+### Comandos exatos rodados
+
+```bash
+cd server && dart analyze \
+  bin/expand_external_commander_meta_candidates.dart \
+  bin/import_external_commander_meta_candidates.dart \
+  bin/promote_external_commander_meta_candidates.dart \
+  bin/meta_report.dart \
+  bin/meta_profile_report.dart \
+  lib/meta/external_commander_deck_expansion_support.dart \
+  lib/meta/external_commander_meta_candidate_support.dart \
+  lib/meta/external_commander_meta_import_support.dart \
+  lib/meta/external_commander_meta_promotion_support.dart \
+  lib/meta/meta_deck_reference_support.dart \
+  lib/ai/optimize_complete_support.dart \
+  lib/ai/optimize_runtime_support.dart \
+  routes/ai/generate/index.dart \
+  routes/ai/optimize/index.dart \
+  routes/ai/commander-reference/index.dart
+
+cd server && dart test -r compact \
+  test/meta_deck_reference_support_test.dart \
+  test/meta_deck_analytics_support_test.dart \
+  test/meta_deck_card_list_support_test.dart \
+  test/meta_deck_commander_shell_support_test.dart \
+  test/meta_deck_format_support_test.dart \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/external_commander_meta_import_support_test.dart \
+  test/external_commander_meta_promotion_support_test.dart
+
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart
+
+cd server && dart run bin/expand_external_commander_meta_candidates.dart \
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57 \
+  --limit=8 \
+  --output=test/artifacts/meta_e2e_runtime_2026-04-24.expansion.json
+
+cd server && dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/meta_e2e_runtime_2026-04-24.expansion.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --validation-json-out=test/artifacts/meta_e2e_runtime_2026-04-24.stage2.validation.json
+
+cd server && dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/meta_e2e_runtime_2026-04-24.expansion.json \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --imported-by=meta_deck_intelligence_2026_04_24_runtime_e2e
+
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/meta_e2e_runtime_2026-04-24.promotion_dry_run.json
+
+cd server && dart run bin/meta_report.dart \
+  > test/artifacts/meta_e2e_runtime_2026-04-24.meta_report.json
+
+cd server && dart run bin/extract_meta_insights.dart --report-only \
+  > test/artifacts/meta_e2e_runtime_2026-04-24.extract_report_only.txt
+
+cd server && dart run bin/meta_profile_report.dart \
+  > test/artifacts/meta_e2e_runtime_2026-04-24.meta_profile_report.json
+```
+
+Chamadas runtime HTTP:
+
+```bash
+# server local validado em http://127.0.0.1:18092/health
+
+POST /auth/register
+POST /auth/login
+GET  /ai/commander-reference?commander=Kinnan%2C%20Bonder%20Prodigy&subformat=competitive_commander&limit=10
+POST /ai/generate
+  body: {
+    "prompt": "Build a competitive commander cEDH Kinnan, Bonder Prodigy deck with fast mana and compact combo lines",
+    "format": "Commander"
+  }
+POST /decks
+  body: {
+    "name": "Meta Runtime Kinnan E2E",
+    "format": "commander",
+    "description": "Runtime E2E deck for competitive reference validation",
+    "cards": [{"name":"Kinnan, Bonder Prodigy","quantity":1,"is_commander":true}]
+  }
+POST /ai/optimize
+  body: {
+    "deck_id": "<deck criado>",
+    "archetype": "combo",
+    "bracket": 4,
+    "keep_theme": true
+  }
+```
+
+### Evidencia E2E do stage externo
+
+#### 1. Expansao `EDHTop16` continua viva, mas com drift parcial
+
+Resultado do dry-run:
+
+- `expanded_count=4`
+- `rejected_count=4`
+
+Rejeicoes observadas:
+
+- `topdeck_deckobj_missing=4`
+
+Leitura:
+
+- `EDHTop16 GraphQL` respondeu
+- as entradas do torneio continuam acessiveis
+- metade das paginas `TopDeck deck page` ainda expuseram `const deckObj = {...}`
+- a outra metade ja mostra drift real de parser na pagina expandida
+
+#### 2. Stage 2 validou os 4 decks expandidos
+
+Resultado:
+
+- `accepted_count=4`
+- `rejected_count=0`
+
+Legalidade resolvida no stage 2:
+
+- `legal=3`
+- `not_proven=1`
+- `illegal=0`
+
+Caso `not_proven` observado:
+
+- `Scion of the Ur-Dragon`
+- `unresolved_cards=["Prismari, the Inspiration"]`
+
+Warnings recorrentes:
+
+- `missing_color_identity` em todos os 4 candidatos
+
+#### 3. Persistencia em staging aconteceu, mas sem promover estado validado
+
+Persistencia real:
+
+- `imported_by=meta_deck_intelligence_2026_04_24_runtime_e2e`
+- `4` rows em `external_commander_meta_candidates`
+
+Estado observado apos persistir:
+
+- `validation_status=candidate`
+- `legal_status=NULL`
+
+Leitura:
+
+- a escrita segura em staging funcionou
+- o importador gravou o candidato cru
+- o resultado efetivo do stage 2 **nao** foi materializado na linha persistida
+
+#### 4. Dry-run de promocao bloqueou corretamente
+
+Resultado:
+
+- `total=4`
+- `promotable=0`
+- `blocked=4`
+
+Bloqueios em todos os casos:
+
+- `validation_status_not_validated`
+- `missing_or_invalid_legal_status`
+
+Conclusao:
+
+- o gate de promocao continua seguro
+- nao houve escrita em `meta_decks`
+- o bloqueio nao e ruido; ele reflete um desacoplamento estrutural real entre validacao stage 2 e persistencia
+
+### Problema estrutural confirmado
+
+O fluxo final hoje tem um gap entre validacao e staging:
+
+1. o stage 2 calcula `legal_status` operacional como `legal` / `not_proven` / `illegal`
+2. o importador persiste `candidate.validation_status` e `candidate.legal_status` originais
+3. o gate de promocao exige `validation_status=validated`
+4. o gate de promocao exige `legal_status in {valid, warning_reviewed}`
+
+Resultado pratico:
+
+- um candidato pode passar no stage 2
+- ser persistido com sucesso
+- e ainda assim ficar estruturalmente impossivel de promover no gate seguinte
+
+Status desta afirmacao:
+
+- **comprovado**
+
+### Frescor atual da base
+
+`meta_decks`:
+
+| source | decks | min(created_at) | max(created_at) |
+| --- | ---: | --- | --- |
+| mtgtop8 | 641 | 2025-11-22 14:14:20+00 | 2026-04-23 20:02:52+00 |
+
+`external` em `meta_decks`:
+
+- **0 observado**
+
+`external_commander_meta_candidates` apos a rodada:
+
+- `candidate/<null>=4`
+
+Leitura:
+
+- frescor live continua comprovado apenas para `mtgtop8`
+- presenca live de externo promovido em `meta_decks`: **nao comprovado**
+
+### Cobertura real por formato e subformato
+
+`meta_report.dart` e `meta_profile_report.dart` confirmaram:
+
+| format | subformat | deck_count |
+| --- | --- | ---: |
+| cEDH | competitive_commander | 214 |
+| EDH | duel_commander | 162 |
+| ST | - | 46 |
+| PI | - | 46 |
+| VI | - | 44 |
+| MO | - | 41 |
+| PAU | - | 40 |
+| LE | - | 40 |
+| PREM | - | 8 |
+
+Commander coverage derivada:
+
+| format | subformat | with_commander_name | with_partner_commander_name | with_shell_label | with_strategy_archetype |
+| --- | --- | ---: | ---: | ---: | ---: |
+| cEDH | competitive_commander | 214 | 81 | 214 | 214 |
+| EDH | duel_commander | 162 | 5 | 162 | 162 |
+
+### Cobertura real por identidade de cor
+
+Top grupos `source+format+color+shell`:
+
+| source | format | subformat | colors | shell | deck_count |
+| --- | --- | --- | --- | --- | ---: |
+| mtgtop8 | EDH | duel_commander | UR | spider-man | 27 |
+| mtgtop8 | cEDH | competitive_commander | UG | kinnan | 20 |
+| mtgtop8 | cEDH | competitive_commander | BR | kraum | 18 |
+| mtgtop8 | cEDH | competitive_commander | WG | sisay | 8 |
+
+Top grupos `source+format+color+strategy`:
+
+| source | format | subformat | colors | strategy | deck_count |
+| --- | --- | --- | --- | --- | ---: |
+| mtgtop8 | EDH | duel_commander | UR | control | 33 |
+| mtgtop8 | cEDH | competitive_commander | BR | combo | 30 |
+| mtgtop8 | cEDH | competitive_commander | BRG | combo | 17 |
+| mtgtop8 | EDH | duel_commander | RG | aggro | 15 |
+| mtgtop8 | EDH | duel_commander | UB | control | 15 |
+
+Cobertura externa promovida por cor:
+
+- **nao comprovada**
+
+### Prova runtime de referencia competitiva
+
+#### `GET /ai/commander-reference`
+
+Comandante consultado:
+
+- `Kinnan, Bonder Prodigy`
+- `subformat=competitive_commander`
+
+Resultado:
+
+- `status=200`
+- `meta_decks_found=49`
+- `model.type=commander_competitive_reference`
+- `model.meta_scope=competitive_commander`
+- `meta_scope_breakdown={"competitive_commander":49}`
+
+Top cartas retornadas:
+
+- `Command Tower`
+- `Gemstone Caverns`
+- `Mana Vault`
+- `Sol Ring`
+- `Birds of Paradise`
+
+Shells de amostra:
+
+- `Thrasios, Triton Hero + Tymna the Weaver` (`control`)
+- `Kinnan, Bonder Prodigy` (`combo`)
+- `Akiri, Line-Slinger + Thrasios, Triton Hero` (`combo`)
+
+Leitura:
+
+- o motor de referencia competitiva respondeu com corpus real
+- o corte foi explicitamente `competitive_commander`
+
+#### `POST /ai/optimize`
+
+Deck runtime criado:
+
+- `Meta Runtime Kinnan E2E`
+- somente `Kinnan, Bonder Prodigy` como comandante
+
+Resultado:
+
+- `status=200`
+- `mode=complete`
+- `additions_count=78`
+- `removals_count=0`
+
+Evidencia mais forte de consumo competitivo observada no log do servidor:
+
+- `Optimize commander priority pool carregado: 120 cartas (competitive_meta_exact_shell_match)`
+
+Status desta afirmacao:
+
+- **comprovado**
+
+Leitura:
+
+- `optimize` usou referencia competitiva real para montar o `priority pool`
+- o match foi forte o bastante para cair em `exact_shell_match`
+
+#### `POST /ai/generate`
+
+Prompt runtime:
+
+- `Build a competitive commander cEDH Kinnan, Bonder Prodigy deck with fast mana and compact combo lines`
+
+Resultado:
+
+- `status=422`
+- `error="Generated deck failed validation"`
+- `meta_context_used=false`
+
+Status desta afirmacao:
+
+- uso de referencia competitiva por `generate` nesta rodada: **nao comprovado**
+
+Leitura:
+
+- o endpoint nao expôs uso de meta nessa chamada
+- isso pode ser problema de selecao de contexto por keyword, de resposta do modelo, ou de falha de validacao antes de a evidencia ficar observavel
+- o comportamento precisa de prova dedicada antes de ser tratado como fluxo validado
+
+### Interpretacao estrategica absorvivel por `optimize` e `generate`
+
+1. `competitive_commander` continua comprimido em shells de combo com mana base curta, muitos artefatos e interacao instant-speed alta
+2. `Kinnan` aparece como shell `UG` muito concentrado em mana explosiva + artefatos + aceleracao de criatura
+3. `Kraum/Tymna` continua sendo shell `BR`/multicolor de alta densidade de interacao, tutor e linha compacta
+4. `duel_commander` segue mais pesado em `control` e `aggro`, com land count muito acima de `cEDH`
+
+Implicacoes praticas:
+
+- `optimize` deve manter priorizacao de `competitive_commander` para `bracket >= 3`
+- `generate` nao deve reaproveitar `duel_commander` como se fosse Commander multiplayer amplo
+- decks cEDH incompletos continuam se beneficiando mais de `priority pool` por shell do que de staples genericos
+
+### Menores proximas acoes tecnicas
+
+1. no import real do stage 2, persistir o estado efetivo da validacao e nao o payload cru:
+   - `validation_status=validated` quando `accepted=true`
+   - mapear `legal -> valid`, `not_proven -> warning_pending`, `illegal -> rejected`
+2. manter o gate de promocao em `dry-run` ate esse mapeamento existir e ser revalidado
+3. criar uma prova runtime dedicada para `generate` que exponha se `meta_context_used` veio de `competitive_commander` ou nao
+
+### Proximos riscos
+
+1. `topdeck_deckobj_missing=4/8` mostra drift real do parser de expansao
+2. `generate` ainda nao tem prova runtime consistente de uso de referencia competitiva
+3. cobertura externa em `meta_decks` segue `nao comprovada` porque nenhuma row foi promovida nesta rodada
