@@ -3,16 +3,17 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/meta/meta_deck_card_list_support.dart';
 
 /// Endpoint para simular matchup entre dois decks
-/// 
+///
 /// POST /ai/simulate-matchup
-/// Body: { 
-///   "my_deck_id": "uuid", 
+/// Body: {
+///   "my_deck_id": "uuid",
 ///   "opponent_deck_id": "uuid",  // Pode ser de meta_decks ou decks
 ///   "simulations": 100           // Opcional, default 50
 /// }
-/// 
+///
 /// Retorna análise de matchup com win rate estimado e recomendações
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -65,7 +66,6 @@ Future<Response> onRequest(RequestContext context) async {
       simulationCount: simulationCount,
       isMetaDeck: false,
     );
-
   } catch (e, stack) {
     print('Erro em simulate-matchup: $e\n$stack');
     return internalServerError('Failed to simulate matchup');
@@ -146,8 +146,11 @@ Future<Map<String, dynamic>?> _getDeckData(Pool pool, String deckId) async {
       }
 
       if (typeLineLower.contains('creature')) creatureCount += quantity;
-      if (oracleText.contains('add {') || oracleText.contains('search your library for a') && oracleText.contains('land')) rampCount += quantity;
-      if (oracleText.contains('destroy target') || oracleText.contains('exile target')) removalCount += quantity;
+      if (oracleText.contains('add {') ||
+          oracleText.contains('search your library for a') &&
+              oracleText.contains('land')) rampCount += quantity;
+      if (oracleText.contains('destroy target') ||
+          oracleText.contains('exile target')) removalCount += quantity;
       if (oracleText.contains('counter target')) counterspellCount += quantity;
     }
 
@@ -175,25 +178,31 @@ Future<Map<String, dynamic>?> _getDeckData(Pool pool, String deckId) async {
 }
 
 /// Busca dados de um meta deck
-Future<Map<String, dynamic>?> _getMetaDeckData(Pool pool, String metaDeckId) async {
+Future<Map<String, dynamic>?> _getMetaDeckData(
+    Pool pool, String metaDeckId) async {
   try {
     final result = await pool.execute(
-      Sql.named('SELECT id, format, archetype, card_list, placement FROM meta_decks WHERE id = @id'),
+      Sql.named(
+          'SELECT id, format, archetype, card_list, placement FROM meta_decks WHERE id = @id'),
       parameters: {'id': metaDeckId},
     );
 
     if (result.isEmpty) return null;
 
+    final format = result.first[1] as String;
     final cardList = result.first[3] as String;
-    final lines = cardList.split('\n').where((l) => l.trim().isNotEmpty).toList();
+    final parsedCardList = parseMetaDeckCardList(
+      cardList: cardList,
+      format: format,
+    );
 
     return {
       'id': result.first[0] as String,
       'name': '${result.first[2]} (Meta)',
-      'format': result.first[1] as String,
+      'format': format,
       'archetype': result.first[2] as String,
       'placement': result.first[4] as String?,
-      'card_count': lines.length,
+      'card_count': parsedCardList.effectiveTotal,
       'is_meta_deck': true,
     };
   } catch (e) {
@@ -213,16 +222,20 @@ Future<Response> _analyzeMatchup({
   required bool isMetaDeck,
 }) async {
   // Detectar arquétipos
-  final myCards = (myDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-  final myArchetypeData = await countersService.detectDeckArchetype(cards: myCards);
+  final myCards =
+      (myDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+  final myArchetypeData =
+      await countersService.detectDeckArchetype(cards: myCards);
   final myArchetype = myArchetypeData['archetype'] as String;
 
   String opponentArchetype;
   if (isMetaDeck) {
     opponentArchetype = opponentDeck['archetype'] as String? ?? 'unknown';
   } else {
-    final oppCards = (opponentDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final oppArchetypeData = await countersService.detectDeckArchetype(cards: oppCards);
+    final oppCards =
+        (opponentDeck['cards'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final oppArchetypeData =
+        await countersService.detectDeckArchetype(cards: oppCards);
     opponentArchetype = oppArchetypeData['archetype'] as String;
   }
 
@@ -270,7 +283,8 @@ Future<Response> _analyzeMatchup({
   final oppCMC = (oppStats['average_cmc'] as num?)?.toDouble() ?? 3.0;
   if (myCMC < oppCMC - 0.5) {
     myScore += 7;
-    advantages.add('Curva de mana mais baixa (${myCMC.toStringAsFixed(1)} vs ${oppCMC.toStringAsFixed(1)})');
+    advantages.add(
+        'Curva de mana mais baixa (${myCMC.toStringAsFixed(1)} vs ${oppCMC.toStringAsFixed(1)})');
   } else if (myCMC > oppCMC + 0.5) {
     myScore -= 5;
     disadvantages.add('Curva de mana mais alta');
@@ -291,23 +305,27 @@ Future<Response> _analyzeMatchup({
       hateCardCount++;
     }
   }
-  
+
   if (hateCardCount > 0) {
     myScore += hateCardCount * 3;
     advantages.add('Tem $hateCardCount hate cards contra $opponentArchetype');
   } else if (hateCardsForOpponent.isNotEmpty) {
     myScore -= 5;
     disadvantages.add('Sem hate cards contra $opponentArchetype');
-    recommendations.addAll(hateCardsForOpponent.take(3).map((c) => 'Considerar adicionar: $c'));
+    recommendations.addAll(
+        hateCardsForOpponent.take(3).map((c) => 'Considerar adicionar: $c'));
   }
 
   // Matchup arquétipo vs arquétipo
-  final matchupModifier = _getArchetypeMatchupModifier(myArchetype, opponentArchetype);
+  final matchupModifier =
+      _getArchetypeMatchupModifier(myArchetype, opponentArchetype);
   myScore += matchupModifier;
   if (matchupModifier > 0) {
-    advantages.add('$myArchetype geralmente tem vantagem contra $opponentArchetype');
+    advantages
+        .add('$myArchetype geralmente tem vantagem contra $opponentArchetype');
   } else if (matchupModifier < 0) {
-    disadvantages.add('$opponentArchetype geralmente tem vantagem contra $myArchetype');
+    disadvantages
+        .add('$opponentArchetype geralmente tem vantagem contra $myArchetype');
   }
 
   // Simular partidas (Monte Carlo simplificado)
@@ -318,11 +336,11 @@ Future<Response> _analyzeMatchup({
   for (int i = 0; i < simulationCount; i++) {
     // Simular uma partida baseada nas estatísticas
     final roll = random.nextDouble() * 100;
-    
+
     // Adicionar variância
     final variance = (random.nextDouble() - 0.5) * 20;
     final effectiveWinChance = myScore + variance;
-    
+
     if (roll < effectiveWinChance) {
       wins++;
       // Estimar turnos para vitória baseado na curva

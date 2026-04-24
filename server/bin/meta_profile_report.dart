@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/meta/meta_deck_card_list_support.dart';
 
 class CardInfo {
   CardInfo({required this.typeLine, required this.colorIdentity});
@@ -57,6 +58,7 @@ Future<void> main() async {
 
     final parsed = _parseDeck(
       cardList: cardList,
+      format: format,
       cardMap: cardMap,
     );
 
@@ -64,12 +66,15 @@ Future<void> main() async {
 
     final formatKey = format.isEmpty ? 'unknown' : format;
     final themeKey = _normalizeTheme(archetype);
-    final colorsList = parsed.colors.toList()..sort();
+    final colorsList = parsed.colors.toList()..sort(_compareManaColors);
     final colorsJoined = colorsList.isEmpty ? 'C' : colorsList.join('');
     final groupKey = '$formatKey|$colorsJoined|$themeKey';
 
-    _accumulate(byFormat.putIfAbsent(formatKey, () => MutableProfile()), parsed);
-    _accumulate(byFormatColorTheme.putIfAbsent(groupKey, () => MutableProfile()), parsed);
+    _accumulate(
+        byFormat.putIfAbsent(formatKey, () => MutableProfile()), parsed);
+    _accumulate(
+        byFormatColorTheme.putIfAbsent(groupKey, () => MutableProfile()),
+        parsed);
   }
 
   final formatReport = byFormat.entries.map((e) {
@@ -88,7 +93,8 @@ Future<void> main() async {
       'avg_planeswalkers': _avg(p.planeswalkers, p.deckCount),
     };
   }).toList()
-    ..sort((a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int));
+    ..sort(
+        (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int));
 
   final groupedReport = byFormatColorTheme.entries
       .map((e) {
@@ -111,7 +117,8 @@ Future<void> main() async {
       })
       .where((e) => (e['deck_count'] as int) >= 2)
       .toList()
-    ..sort((a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int));
+    ..sort(
+        (a, b) => (b['deck_count'] as int).compareTo(a['deck_count'] as int));
 
   final payload = {
     'total_competitive_decks': deckRows.length,
@@ -151,12 +158,19 @@ class ParsedDeck {
 
 ParsedDeck _parseDeck({
   required String cardList,
+  required String format,
   required Map<String, CardInfo> cardMap,
 }) {
-  final basicNames = {'plains', 'island', 'swamp', 'mountain', 'forest', 'wastes'};
+  final basicNames = {
+    'plains',
+    'island',
+    'swamp',
+    'mountain',
+    'forest',
+    'wastes'
+  };
   final colors = <String>{};
 
-  var inSideboard = false;
   var totalCards = 0;
   var lands = 0;
   var basicLands = 0;
@@ -167,26 +181,14 @@ ParsedDeck _parseDeck({
   var artifacts = 0;
   var planeswalkers = 0;
 
-  for (final rawLine in cardList.split('\n')) {
-    final line = rawLine.trim();
-    if (line.isEmpty) continue;
+  final parsedCardList = parseMetaDeckCardList(
+    cardList: cardList,
+    format: format,
+  );
 
-    if (line.toLowerCase().contains('sideboard')) {
-      inSideboard = true;
-      continue;
-    }
-    if (inSideboard) continue;
-
-    final match = RegExp(r'^(\d+)x?\s+(.+)$').firstMatch(line);
-    if (match == null) continue;
-
-    final qty = int.tryParse(match.group(1) ?? '0') ?? 0;
-    if (qty <= 0) continue;
-
-    var name = (match.group(2) ?? '').trim();
-    if (name.isEmpty) continue;
-    name = name.replaceAll(RegExp(r'\s*\([^)]+\)\s*$'), '').trim().toLowerCase();
-
+  for (final entry in parsedCardList.effectiveCards.entries) {
+    final qty = entry.value;
+    final name = entry.key.toLowerCase();
     totalCards += qty;
 
     if (basicNames.contains(name)) {
@@ -247,17 +249,37 @@ double _avg(int total, int count) {
   return double.parse((total / count).toStringAsFixed(2));
 }
 
+int _compareManaColors(String a, String b) {
+  const order = 'WUBRGC';
+  return order.indexOf(a).compareTo(order.indexOf(b));
+}
+
 String _normalizeTheme(String archetype) {
   final value = archetype.toLowerCase().trim();
   if (value.isEmpty) return 'unknown';
 
-  final cleaned = value.replaceAll(RegExp(r'[^a-z0-9\s\-+]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+  final cleaned = value
+      .replaceAll(RegExp(r'[^a-z0-9\s\-+]'), ' ')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
   if (cleaned.isEmpty) return 'unknown';
 
   final tokens = cleaned.split(' ');
   final stop = {
-    'the', 'and', 'of', 'deck', 'commander', 'cedh', 'edh', 'duel',
-    'mono', 'with', 'for', 'to', 'a', 'an'
+    'the',
+    'and',
+    'of',
+    'deck',
+    'commander',
+    'cedh',
+    'edh',
+    'duel',
+    'mono',
+    'with',
+    'for',
+    'to',
+    'a',
+    'an'
   };
   for (final token in tokens) {
     if (token.length < 3) continue;

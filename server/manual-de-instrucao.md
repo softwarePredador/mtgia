@@ -25,6 +25,32 @@
 
 ---
 
+## 2026-04-24 — Correcao Commander-aware para `Sideboard` em `meta_decks`
+
+### O Porquê
+- A auditoria anterior comprovou que os exports `EDH` e `cEDH` do MTGTop8 guardam o(s) comandante(s) no bloco `Sideboard`.
+- `meta_profile_report.dart` e `extract_meta_insights.dart` ignoravam esse bloco, causando decks `EDH/cEDH` com `98/99` cartas efetivas e distorcendo identidade de cor e contagens de tipo.
+
+### O Como
+- Foi criado `server/lib/meta/meta_deck_card_list_support.dart` para centralizar o parse de decklists de `meta_decks`.
+- Regra aplicada:
+  - `EDH` e `cEDH`: `Sideboard` entra na lista efetiva como zona do comandante.
+  - demais formatos: `Sideboard` continua fora da lista efetiva.
+- `server/bin/meta_profile_report.dart`, `server/bin/extract_meta_insights.dart` e `server/routes/ai/simulate-matchup/index.dart` passaram a usar essa regra comum.
+- Cores em `meta_profile_report.dart` passaram a ser canonicalizadas em ordem `WUBRG`.
+
+### Validação
+- `dart analyze lib/meta/meta_deck_card_list_support.dart bin/meta_profile_report.dart bin/extract_meta_insights.dart routes/ai/simulate-matchup/index.dart test/meta_deck_card_list_support_test.dart`
+- `dart test test/meta_deck_card_list_support_test.dart test/mtgtop8_meta_support_test.dart`
+- `dart run bin/meta_profile_report.dart`
+
+### Resultado
+- `cEDH`: `214` decks, `avg_total_cards=100.0`
+- `EDH`: `162` decks, `avg_total_cards=100.0`
+- formatos nao Commander preservam comportamento normal de sideboard excluido da lista principal.
+
+---
+
 ## 2026-03-12 — Arquitetura async job para modo complete (otimização pesada)
 
 ### O Porquê

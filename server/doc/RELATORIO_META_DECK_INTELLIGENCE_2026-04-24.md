@@ -457,44 +457,68 @@ Uso recomendado:
    - `EDH` no pipeline e `Duel Commander`
    - tratar isso como Commander multiplayer generalista cria vies de geracao e optimize
 
-2. **Risco de relatorio/insight incompleto**
-   - `extract_meta_insights.dart` e `meta_profile_report.dart` ignoram sideboard
-   - em Commander/cEDH isso exclui o(s) comandante(s) da analise
-
-3. **Risco de arquetipo falso**
+2. **Risco de arquetipo falso**
    - o campo `archetype` nao e taxonomia competitiva; e principalmente label de comandante
 
-4. **Risco de cobertura ilusoria**
+3. **Risco de cobertura ilusoria**
    - o reparo do MTGTop8 esta fechado
    - mas a cobertura Commander multiplayer continua incompleta e sem segunda fonte validada
 
-5. **Risco operacional de dependencia unica**
+4. **Risco operacional de dependencia unica**
    - `external_commander_meta_candidates` esta vazia
    - hoje nao ha pipeline validado alem do MTGTop8
 
+## Correcao aplicada em 2026-04-24
+
+O risco de relatorio/insight incompleto por ignorar `Sideboard` em Commander foi corrigido no codigo.
+
+Arquivos alterados:
+
+- `server/lib/meta/meta_deck_card_list_support.dart`
+- `server/bin/meta_profile_report.dart`
+- `server/bin/extract_meta_insights.dart`
+- `server/routes/ai/simulate-matchup/index.dart`
+- `server/test/meta_deck_card_list_support_test.dart`
+
+Regra implementada:
+
+- em `EDH` e `cEDH`, `Sideboard` e tratado como zona do(s) comandante(s) e entra na lista efetiva
+- nos demais formatos, `Sideboard` continua excluido da lista efetiva
+- nomes com sufixo de set, como `Sol Ring (CMM)`, sao normalizados antes da agregacao
+
+Validacao:
+
+```bash
+cd server && dart analyze lib/meta/meta_deck_card_list_support.dart bin/meta_profile_report.dart bin/extract_meta_insights.dart routes/ai/simulate-matchup/index.dart test/meta_deck_card_list_support_test.dart
+cd server && dart test test/meta_deck_card_list_support_test.dart test/mtgtop8_meta_support_test.dart
+cd server && dart run bin/meta_profile_report.dart
+```
+
+Resultado observado apos a correcao:
+
+- `cEDH`: `214` decks, `avg_total_cards=100.0`
+- `EDH`: `162` decks, `avg_total_cards=100.0`
+- grupos por cor passaram a usar ordem canonica `WUBRG`
+
 ## Menores proximas acoes tecnicas
 
-1. **Corrigir leitura Commander-aware em `meta_profile_report.dart` e nos consumidores de `meta_decks`**
-   - para `EDH` e `cEDH`, incluir sideboard na contagem final e na identidade de cor
-   - tratar `Sideboard` como zona do comandante, nao como sideboard competitivo normal
-
-2. **Separar formalmente os buckets**
+1. **Separar formalmente os buckets**
    - `EDH` do MTGTop8 -> `duel_commander`
    - `cEDH` -> `competitive_commander`
    - nao chamar o bucket `EDH` atual de Commander geral
 
-3. **Introduzir campos derivados de shell**
+2. **Introduzir campos derivados de shell**
    - `commander_name`
    - `partner_commander_name`
    - `shell_label`
    - deixar `archetype` estrategico para classificacao separada
 
-4. **Abrir o funil multi-fonte sem promocao automatica**
+3. **Abrir o funil multi-fonte sem promocao automatica**
    - primeiro `TopDeck.gg` e `EDHTop16`
    - depois `cEDH Decklist Database` como referencia curada
    - `Moxfield` / `Archidekt` apenas quando cruzados com evento ou curadoria
 
-5. **Gerar um relatorio recorrente de cobertura**
+4. **Gerar um relatorio recorrente de cobertura**
    - por `subformat`
    - por identidade de cor
    - por completude de `100` cartas
@@ -504,5 +528,5 @@ Uso recomendado:
 
 - **Estado atual:** ingestao MTGTop8 funcional e base fresca.
 - **Lacunas:** Commander multiplayer ainda nao esta coberto de forma provada; `external_commander_meta_candidates` esta vazia; `archetype` nao e taxonomia estrategica.
-- **Riscos:** confundir `Duel Commander` com Commander geral e continuar rodando analise Commander ignorando o(s) comandante(s) no sideboard.
-- **Proximo passo recomendado:** corrigir os consumidores Commander-aware e iniciar staging controlado por `TopDeck.gg` + `EDHTop16`, sem promover nada para `meta_decks` antes de validacao.
+- **Riscos:** confundir `Duel Commander` com Commander geral e usar `archetype` como taxonomia estrategica pronta.
+- **Proximo passo recomendado:** separar formalmente subformatos e iniciar staging controlado por `TopDeck.gg` + `EDHTop16`, sem promover nada para `meta_decks` antes de validacao.
