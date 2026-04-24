@@ -8402,3 +8402,54 @@ Casos cobertos:
 - prioridade para shell competitivo externo com `partner_commander_name` exato;
 - bloqueio de `duel_commander` quando o escopo pedido e `competitive_commander`;
 - builder de evidência humanizando `source_chain` sem vazar URLs.
+
+## 91. Fechamento do sprint Commander/cEDH Meta Pipeline
+
+### 91.1 O que mudou
+
+- `bin/migrate_external_commander_meta_candidates.dart` deixou de escrever no banco por default
+- a migration agora exige `--apply`
+- isso alinhou a correcao de schema com a regra do sprint: toda escrita real precisa de flag explicita
+
+### 91.2 Por que foi necessario
+
+Durante a validacao E2E final, o primeiro `stage_external_commander_meta_candidates.dart --apply` falhou no banco live com:
+
+- `chk_external_commander_meta_status`
+- motivo: a constraint antiga ainda nao aceitava `validation_status='staged'`
+
+O codigo ja estava preparado para `staged`, mas o schema live ainda nao.
+
+### 91.3 Como ficou o fluxo seguro
+
+1. expansion continua dry-run only
+2. `import_external_commander_meta_candidates.dart` com `topdeck_edhtop16_stage2` continua dry-run only
+3. staging real continua separado e exige `--apply`
+4. migration de schema agora tambem exige `--apply`
+5. promotion para `meta_decks` continua dry-run por default e separado
+
+### 91.4 Evidencia operacional obtida
+
+Comandos relevantes:
+
+```bash
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart --apply
+cd server && dart run bin/stage_external_commander_meta_candidates.dart --apply \
+  --report-json-out=test/artifacts/external_commander_meta_stage2_staging_apply_2026-04-24.e2e.json
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.e2e.json
+```
+
+Resultado comprovado:
+
+- staging live passou a funcionar
+- `external_commander_meta_candidates` ficou com `1` row `staged/valid` e `1` row `staged/warning_pending`
+- promotion dry-run encontrou `1` candidato promotable e `3` bloqueados
+- `meta_decks` continuou sem rows `external` promovidas nesta rodada
+
+### 91.5 Limites que continuam ativos
+
+- promocao live para `meta_decks`: **not proven**
+- cobertura externa live em analytics de `meta_decks`: **not proven**
+- runtime fresco `ManaLoom Deck Runtime E2E`: **not proven**, pois nao ha script executavel com esse nome e o comando `run_commander_only_optimization_validation.dart` escreve via API sem `--apply`

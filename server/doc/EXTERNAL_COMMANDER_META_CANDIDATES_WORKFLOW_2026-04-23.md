@@ -130,7 +130,13 @@ Campos recomendados:
 ```bash
 cd server
 dart run bin/migrate_external_commander_meta_candidates.dart
+dart run bin/migrate_external_commander_meta_candidates.dart --apply
 ```
+
+Regra:
+
+- sem `--apply`, a migration e apenas dry-run
+- qualquer alteracao real de schema para `external_commander_meta_candidates` deve usar `--apply`
 
 ### 2. Validar payload sem gravar
 

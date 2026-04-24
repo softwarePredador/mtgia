@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-04-24T19:42:10.796774Z",
+  "generated_at": "2026-04-24T20:24:27.178735Z",
   "mode": "dry_run",
   "validation_profile": "topdeck_edhtop16_stage2",
-  "accepted_count": 4,
+  "accepted_count": 2,
   "rejected_count": 0,
   "results": [
     {
@@ -118,119 +118,6 @@
         "B",
         "R",
         "U"
-      ],
-      "unresolved_cards": [],
-      "illegal_cards": [],
-      "legal_status": "legal",
-      "issues": [
-        {
-          "severity": "warning",
-          "code": "missing_color_identity",
-          "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
-        }
-      ]
-    },
-    {
-      "accepted": true,
-      "profile": "topdeck_edhtop16_stage2",
-      "candidate": {
-        "source_name": "EDHTop16",
-        "source_host": "edhtop16.com",
-        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
-        "deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
-        "commander_name": "Malcolm, Keen-Eyed Navigator",
-        "partner_commander_name": "Vial Smasher the Fierce",
-        "format": "commander",
-        "subformat": "competitive_commander",
-        "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
-        "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
-        "placement": "5",
-        "color_identity": [],
-        "is_commander_legal": null,
-        "validation_status": "candidate",
-        "legal_status": null,
-        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
-        "research_payload": {
-          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
-          "source_context": "edhtop16_tournament_entry",
-          "source_chain": [
-            "edhtop16_graphql",
-            "topdeck_deck_page"
-          ],
-          "tournament_id": "cedh-arcanum-sanctorum-57",
-          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
-          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/DAH3KmzYuBe9S2mCrT1FppYzVgS2",
-          "player_name": "Joseph Gilmore",
-          "standing": 5,
-          "topdeck_imported_from": "https://moxfield.com/decks/BVNBHdPxhEWuDwAd35Ls5g",
-          "commander_count": 2,
-          "mainboard_count": 98,
-          "total_cards": 100
-        },
-        "imported_by": "copilot_cli_web_agent"
-      },
-      "card_count": 100,
-      "commander_color_identity": [
-        "B",
-        "R",
-        "U"
-      ],
-      "unresolved_cards": [],
-      "illegal_cards": [],
-      "legal_status": "legal",
-      "issues": [
-        {
-          "severity": "warning",
-          "code": "missing_color_identity",
-          "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
-        }
-      ]
-    },
-    {
-      "accepted": true,
-      "profile": "topdeck_edhtop16_stage2",
-      "candidate": {
-        "source_name": "EDHTop16",
-        "source_host": "edhtop16.com",
-        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
-        "deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
-        "commander_name": "Kraum, Ludevic's Opus",
-        "partner_commander_name": "Tymna the Weaver",
-        "format": "commander",
-        "subformat": "competitive_commander",
-        "archetype": "Kraum, Ludevic's Opus + Tymna the Weaver",
-        "card_list": "1 Kraum, Ludevic's Opus\n1 Tymna the Weaver\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Beseech the Mirror\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Culling the Weak\n1 Dark Ritual\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Gitaxian Probe\n1 Grand Abolisher\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Memnite\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Plateau\n1 Polluted Delta\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Ranger-Captain of Eos\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Rhystic Study\n1 Rite of Flame\n1 Rograkh, Son of Rohgahh\n1 Scalding Tarn\n1 Scrubland\n1 Sevinne's Reclamation\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Swan Song\n1 Tainted Pact\n1 Tarnished Citadel\n1 Tataru Taru\n1 Thassa's Oracle\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Voice of Victory\n1 Volcanic Island\n1 Wheel of Fortune\n1 Windswept Heath\n1 Wishclaw Talisman",
-        "placement": "8",
-        "color_identity": [],
-        "is_commander_legal": null,
-        "validation_status": "candidate",
-        "legal_status": null,
-        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
-        "research_payload": {
-          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
-          "source_context": "edhtop16_tournament_entry",
-          "source_chain": [
-            "edhtop16_graphql",
-            "topdeck_deck_page"
-          ],
-          "tournament_id": "cedh-arcanum-sanctorum-57",
-          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
-          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13",
-          "player_name": "Zach J Gable",
-          "standing": 8,
-          "topdeck_imported_from": "https://moxfield.com/decks/b8RZsIyaK0y0Ju6j3UyJYg",
-          "commander_count": 2,
-          "mainboard_count": 98,
-          "total_cards": 100
-        },
-        "imported_by": "copilot_cli_web_agent"
-      },
-      "card_count": 100,
-      "commander_color_identity": [
-        "B",
-        "R",
-        "U",
-        "W"
       ],
       "unresolved_cards": [],
       "illegal_cards": [],

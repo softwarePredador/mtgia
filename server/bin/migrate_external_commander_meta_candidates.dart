@@ -1,6 +1,70 @@
 import '../lib/database.dart';
 
-Future<void> main() async {
+class ExternalCommanderMetaMigrationConfig {
+  const ExternalCommanderMetaMigrationConfig({
+    required this.apply,
+    required this.showHelp,
+  });
+
+  final bool apply;
+  final bool showHelp;
+
+  bool get dryRun => !apply;
+
+  static ExternalCommanderMetaMigrationConfig parse(List<String> args) {
+    var apply = false;
+    var dryRun = false;
+    var showHelp = false;
+
+    for (final arg in args) {
+      if (arg == '--apply') {
+        apply = true;
+        continue;
+      }
+      if (arg == '--dry-run') {
+        dryRun = true;
+        continue;
+      }
+      if (arg == '--help' || arg == '-h') {
+        showHelp = true;
+      }
+    }
+
+    if (apply && dryRun) {
+      throw ArgumentError('Use apenas um modo: --apply ou --dry-run.');
+    }
+
+    return ExternalCommanderMetaMigrationConfig(
+      apply: apply,
+      showHelp: showHelp,
+    );
+  }
+}
+
+void _printUsage() {
+  print('Uso: dart run bin/migrate_external_commander_meta_candidates.dart [--apply]');
+  print('');
+  print('Sem --apply o comando roda em dry-run e nao altera o banco.');
+}
+
+Future<void> main(List<String> args) async {
+  final config = ExternalCommanderMetaMigrationConfig.parse(args);
+  if (config.showHelp) {
+    _printUsage();
+    return;
+  }
+
+  if (config.dryRun) {
+    print('Migration dry-run only.');
+    print('Plano:');
+    print('- garantir tabela external_commander_meta_candidates');
+    print('- garantir coluna legal_status');
+    print('- recriar chk_external_commander_meta_status com valor staged');
+    print('- garantir indices de suporte');
+    print('Nenhuma alteracao foi aplicada. Use --apply para escrever no banco.');
+    return;
+  }
+
   final db = Database();
   await db.connect();
   final conn = db.connection;

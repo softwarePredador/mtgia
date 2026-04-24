@@ -1034,3 +1034,185 @@ cd server && dart run bin/import_external_commander_meta_candidates.dart \
 - o profile `topdeck_edhtop16_stage2` voltou a cumprir o contrato pedido
 - a validacao commander-aware continua ativa em artefato local
 - a base armazenada e a cobertura real do corpus nao mudaram nesta correcao
+
+## Fechamento final da sprint — Etapa 5/5
+
+> Esta secao e a referencia mais recente para o fechamento E2E do sprint.
+
+### Comandos executados
+
+```bash
+cd server && dart analyze lib/meta lib/ai bin routes test
+
+cd server && dart test -r compact \
+  test/meta_deck_reference_support_test.dart \
+  test/optimize_runtime_support_test.dart \
+  test/commander_reference_atraxa_test.dart \
+  test/optimize_learning_pipeline_test.dart \
+  test/ai_generate_create_optimize_flow_test.dart \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/external_commander_meta_import_support_test.dart \
+  test/external_commander_meta_staging_support_test.dart \
+  test/external_commander_meta_promotion_support_test.dart
+
+cd server && dart run bin/expand_external_commander_meta_candidates.dart \
+  --output=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json
+
+cd server && dart run bin/import_external_commander_meta_candidates.dart \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
+
+cd server && dart run bin/stage_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_stage2_staging_dry_run_2026-04-24.e2e.json
+
+# primeira tentativa de apply falhou por schema live desatualizado
+
+cd server && dart analyze bin/migrate_external_commander_meta_candidates.dart
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart
+cd server && dart run bin/migrate_external_commander_meta_candidates.dart --apply
+
+cd server && dart run bin/stage_external_commander_meta_candidates.dart \
+  --apply \
+  --report-json-out=test/artifacts/external_commander_meta_stage2_staging_apply_2026-04-24.e2e.json
+
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.e2e.json
+
+cd server && dart run bin/extract_meta_insights.dart --report-only
+cd server && dart run bin/meta_profile_report.dart
+```
+
+### Fatos provados por comandos e banco
+
+#### 1. Expansion/validation live continuam com drift parcial do TopDeck
+
+- expansion `expanded=2`
+- expansion `rejected=2`
+- rejeicoes: `topdeck_deckobj_missing`
+- stage2 validation `accepted=2`
+- stage2 validation `rejected=0`
+
+Leitura:
+
+- o torneio `EDHTop16` continua acessivel
+- apenas 2 paginas `TopDeck deck page` expuseram decklist completa nesta rodada
+- paginas sem `deckObj` foram rejeitadas antes de qualquer persistencia
+
+#### 2. O primeiro `stage --apply` encontrou um bloqueio real de schema
+
+Erro observado:
+
+- constraint live `chk_external_commander_meta_status`
+- banco ainda nao aceitava `validation_status='staged'`
+
+Correcao aplicada:
+
+- `bin/migrate_external_commander_meta_candidates.dart` agora e dry-run por default
+- escrita real de schema passou a exigir `--apply`
+- migration dry-run executado primeiro
+- migration live executada depois com `--apply`
+
+#### 3. O staging real ficou funcional apos a migracao
+
+- `stage --apply`: `accepted=2`, `to_persist=2`
+- persistidos em `external_commander_meta_candidates`: `2`
+
+Estado live confirmado por query:
+
+- `candidate/- = 2`
+- `staged/valid = 1`
+- `staged/warning_pending = 1`
+
+Rows `EDHTop16` observadas:
+
+- `Norman Osborn // Green Goblin` -> `staged`, `valid`, `is_commander_legal=true`
+- `Scion of the Ur-Dragon` -> `staged`, `warning_pending`, `is_commander_legal=null`
+- `Malcolm + Vial Smasher` -> `candidate`
+- `Kraum + Tymna` -> `candidate`
+
+#### 4. O gate de promocao continuou bloqueado por padrao
+
+- `total=4`
+- `promotable=1`
+- `blocked=3`
+
+Promotable:
+
+- `Norman Osborn // Green Goblin`
+
+Bloqueados:
+
+- `Scion of the Ur-Dragon`
+  - `legal_status_not_promotable`
+  - `commander_legality_not_confirmed`
+  - `unresolved_cards_blocking`
+- `Malcolm + Vial Smasher`
+  - `validation_status_not_staged`
+  - `missing_or_invalid_legal_status`
+  - `missing_staging_audit`
+- `Kraum + Tymna`
+  - `validation_status_not_staged`
+  - `missing_or_invalid_legal_status`
+  - `missing_staging_audit`
+
+Leitura:
+
+- a promocao controlada esta funcionando
+- nenhum row foi promovido para `meta_decks`
+- promocao live externa continua **not proven** porque nao houve `promotion --apply`
+
+#### 5. Os relatorios source-aware continuam mostrando somente `mtgtop8` em `meta_decks`
+
+- `extract_meta_insights.dart --report-only`: `by_source = mtgtop8: 641`
+- `meta_profile_report.dart`: `sources = mtgtop8: 641`
+- query direta em `meta_decks` para `source_url` do torneio: `0`
+
+Leitura:
+
+- nao ha cobertura externa live em `meta_decks`
+- isso esta alinhado com a regra do sprint: nenhum promotion apply foi executado
+
+#### 6. ManaLoom Deck Runtime E2E continua **not proven**
+
+Fato observado:
+
+- nao foi encontrado comando/script executavel chamado `ManaLoom Deck Runtime E2E`
+- existem apenas handoffs/documentacao em `app/doc/runtime_flow_handoffs/`
+
+Observacao adicional:
+
+- existe `bin/run_commander_only_optimization_validation.dart`
+- ele cria dados reais via API sem exigir `--apply`
+- por regra do sprint, esse runtime nao foi executado nesta rodada
+
+### Fatos provados por testes
+
+1. `generate`/`optimize` continuam verdes na suite focada
+2. Commander competitivo usa referencias cEDH so quando o escopo pede isso
+3. Commander casual continua fora do escopo competitivo por default
+4. o pipeline externo mantem:
+   - stage2 dry-run only
+   - staging separado
+   - promotion gate bloqueando candidatos incompletos/pendentes
+
+### Interpretacao
+
+- o pipeline esta operacional e seguro mesmo com drift parcial do TopDeck
+- a falha no primeiro `stage --apply` expos um gap real entre codigo e schema live
+- apos endurecer a migration com `--apply`, o fluxo voltou a obedecer a politica de seguranca ponta a ponta
+
+### O que ficou pronto
+
+1. politica de fontes auditada
+2. persistencia segura separada em `external_commander_meta_candidates`
+3. promocao controlada dry-run para `meta_decks`
+4. integracao de referencias competitivas em `optimize/complete`
+5. validacao E2E com staging live seguro e analytics source-aware
+
+### O que continua **not proven**
+
+1. promocao live de externos para `meta_decks`
+2. cobertura externa live por cor/shell/strategy dentro de `meta_decks`
+3. handoff runtime fresco completo de ManaLoom com login -> gerar/criar -> details -> optimize -> apply
