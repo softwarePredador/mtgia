@@ -1,6 +1,30 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Auditoria do pipeline `meta_decks` apos `9947a71`
+
+### O Porquê
+- Era necessario provar se o reparo documentado no commit `9947a71` realmente mantinha a ingestao viva e medir cobertura real de Commander/cEDH sem assumir que `EDH` significava Commander multiplayer geral.
+- A auditoria tambem precisava verificar se os consumidores locais de `meta_decks` continuavam semanticamente corretos para Commander.
+
+### O Como
+- O fluxo `server/bin/fetch_meta.dart` foi revalidado em live dry-run para `EDH` e `cEDH`, confirmando acesso ao MTGTop8, descoberta de eventos, parse de `hover_tr`, export de decklists e coerencia de `placement`.
+- A auditoria confirmou que o mapeamento local continua sendo:
+  - `EDH` -> `Duel Commander`
+  - `cEDH` -> `Competitive EDH`
+- A auditoria tambem confirmou que todos os exports Commander do MTGTop8 carregam o(s) comandante(s) no bloco `Sideboard`. Portanto, qualquer relatorio local que ignore sideboard em `EDH`/`cEDH` subconta o deck final e pode distorcer identidade de cor.
+- Em Commander/cEDH, o campo `archetype` persistido pelo crawler e majoritariamente rotulo de comandante / partner shell, nao taxonomia estrategica normalizada.
+
+### Artefatos
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+
+### Impacto pratico
+- O pipeline MTGTop8 segue operacional, mas a camada analitica precisa ser Commander-aware.
+- `meta_profile_report.dart` e consumidores equivalentes nao devem ignorar sideboard quando o formato for `EDH` ou `cEDH`.
+- `meta_decks.format = EDH` nao deve ser tratado como Commander multiplayer generico em `optimize`/`generate`.
+
+---
+
 ## 2026-03-12 — Arquitetura async job para modo complete (otimização pesada)
 
 ### O Porquê
