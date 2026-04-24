@@ -226,110 +226,56 @@ cd server && dart run bin/repair_mtgtop8_meta_history.dart --dry-run --formats E
 cd server && dart run bin/repair_mtgtop8_meta_history.dart --apply --formats EDH,cEDH --limit-events 50
 ```
 
-## Resultado apos backfill recente e reparo historico
+## Resultado consolidado apos backfill e reparo historico
+
+Atualizado em: 2026-04-24
 
 Rodadas executadas:
 
 - backfill recente `EDH,cEDH` com `fetch_meta.dart`
-- reparo historico por `source_url` com `repair_mtgtop8_meta_history.dart`
+- reparo historico Commander por `source_url` com `repair_mtgtop8_meta_history.dart`
+- reparo historico completo dos formatos nao Commander com `repair_mtgtop8_meta_history.dart --apply --limit-events 100 --limit-rows-per-event 100`
 
 Estado consolidado observado no banco:
 
 - `meta_decks` total: `641`
-- `EDH`: `162`
-- `cEDH`: `214`
-- `EDH + cEDH`: `376`
-- `blank archetype` total: `265`
+- `mtgtop8_count`: `641`
+- `blank archetype` total: `0`
 - `blank placement` total: `0`
-- `blank archetype` em `EDH + cEDH`: `0`
-- `blank placement` em `EDH + cEDH`: `0`
+- `missing_matches` no reparo final: `0`
+
+Estado por formato:
+
+- `cEDH`: `214`, `blank_archetype=0`, `bad_placement=0`
+- `EDH`: `162`, `blank_archetype=0`, `bad_placement=0`
+- `ST`: `46`, `blank_archetype=0`, `bad_placement=0`
+- `PI`: `46`, `blank_archetype=0`, `bad_placement=0`
+- `VI`: `44`, `blank_archetype=0`, `bad_placement=0`
+- `MO`: `41`, `blank_archetype=0`, `bad_placement=0`
+- `PAU`: `40`, `blank_archetype=0`, `bad_placement=0`
+- `LE`: `40`, `blank_archetype=0`, `bad_placement=0`
+- `PREM`: `8`, `blank_archetype=0`, `bad_placement=0`
+
+Validacao executada apos o reparo final:
+
+```bash
+cd server && dart test test/mtgtop8_meta_support_test.dart
+cd server && dart analyze lib/meta/mtgtop8_meta_support.dart bin/repair_mtgtop8_meta_history.dart test/mtgtop8_meta_support_test.dart
+cd server && dart run bin/meta_profile_report.dart
+```
+
+Resultados:
+
+- `mtgtop8_meta_support_test.dart`: todos os testes passaram
+- `dart analyze`: sem issues
+- `meta_profile_report.dart`: confirmou `641` decks competitivos e `376` decks `EDH + cEDH`
 
 Leitura final desta frente:
 
 - a ingestao recente esta funcional
 - o parser atual esta funcional
-- o reparo historico dos registros Commander quebrados foi concluido
-- o que continua aberto agora e principalmente:
-  - expandir fontes alem de `MTGTop8`
-  - melhorar cobertura de combinacoes Commander
-  - decidir se formatos nao Commander tambem precisam de reparo historico total
-
-## Cobertura real da base atual
-
-### Por formato
-
-Base atual:
-
-- `PI`: `46`
-- `ST`: `46`
-- `VI`: `44`
-- `MO`: `41`
-- `PAU`: `40`
-- `LE`: `40`
-- `EDH`: `33`
-- `cEDH`: `27`
-- `PREM`: `8`
-
-Leitura:
-
-- a base e ampla em formatos
-- mas a fatia Commander, que mais importa para nosso carro-chefe, ainda e relativamente pequena: `60` decks somando `EDH + cEDH`
-
-### Por identidade de cor em `EDH`
-
-Comprovado hoje:
-
-- `BGR`: `5`
-- `BGU`: `1`
-- `BR`: `3`
-- `BU`: `2`
-- `C`: `4`
-- `G`: `2`
-- `GRW`: `1`
-- `GU`: `1`
-- `R`: `1`
-- `RU`: `6`
-- `RUW`: `2`
-- `U`: `3`
-- `UW`: `1`
-- `W`: `1`
-
-### Por identidade de cor em `cEDH`
-
-Comprovado hoje:
-
-- `B`: `2`
-- `BG`: `2`
-- `BGR`: `2`
-- `BGW`: `1`
-- `BR`: `3`
-- `BU`: `3`
-- `BW`: `1`
-- `G`: `1`
-- `GU`: `5`
-- `GW`: `6`
-- `R`: `1`
-
-### Leitura da cobertura de cores
-
-Conclusao objetiva:
-
-- a base atual **nao** cobre todas as combinacoes possiveis
-- faltam varias shells Commander relevantes
-- em `cEDH`, nao ha prova atual de:
-  - `U`
-  - `W`
-  - `UR`
-  - `UGW`
-  - `WUB`
-  - `WUBR`
-  - `WUBRG`
-  - `colorless`
-- em `EDH`, tambem ha ausencia de muitas combinacoes bi, tri, four-color e five-color
-
-Portanto:
-
-- `meta_decks` hoje **nao** pode ser tratado como base completa de cobertura de cores/combinacoes
+- o reparo historico de `archetype` e `placement` foi concluido para todos os formatos importados do MTGTop8
+- nao ficou pendencia conhecida de implementacao no pipeline `MTGTop8 -> parser -> meta_decks`
 
 ## Decisao estrutural aplicada nesta rodada
 
@@ -347,7 +293,7 @@ Regra nova:
 
 ## O que os decks meta ensinam
 
-Mesmo com cobertura incompleta, a base ainda e util para aprender:
+A base agora e util para aprender sinais competitivos com campos semanticos confiaveis:
 
 ### 1. Intencao do jogador competitivo
 
@@ -359,14 +305,7 @@ Essas listas tendem a maximizar:
 - pacotes pequenos de sinergia real
 - slots com papel claro
 
-Em geral, o jogador nao esta “enchendo tema”.
-
-Ele esta tentando:
-
-- aumentar velocidade
-- reduzir draw morto
-- concentrar engine
-- evitar cartas de valor bonito mas pouco convergente
+Em geral, o jogador nao esta enchendo tema. Ele esta tentando aumentar velocidade, reduzir draw morto, concentrar engine e evitar cartas de valor bonito mas pouco convergente.
 
 ### 2. Malicia competitiva aproveitavel
 
@@ -380,7 +319,7 @@ Os sinais mais valiosos para nos:
 Isso deve influenciar:
 
 - `optimize`: priorizar pacotes mais coesos e nao apenas staples soltas
-- `generate`: evitar listas “tematicas demais” e pouco funcionais
+- `generate`: evitar listas tematicas demais e pouco funcionais
 
 ### 3. O que nao pode ser importado cegamente
 
@@ -395,56 +334,43 @@ Traducao correta:
 - usar meta deck como sinal
 - nao como molde final automatico
 
-## Problemas encontrados
+## Problemas fechados
 
 ### Problema 1 - ingestao parcial
 
 Status:
 
-- comprovado
+- fechado
 
-Sintoma:
+Evidencia:
 
-- fonte responde
-- eventos aparecem
-- base existe
-- mas `archetype` veio vazio em `325/325`
+- `fetch_meta.dart` ganhou parser compartilhado, `--dry-run`, `--refresh-existing` e limites operacionais
+- importacao real curta inseriu deck novo com `archetype` e `placement` limpos
+- reparo historico zerou `blank_archetype` e `bad_placement`
 
-Impacto:
-
-- empobrece `extract_meta_insights`
-- dificulta aprendizado por arquétipo
-- prejudica leitura estrategica do dado
-
-### Problema 2 - cobertura Commander incompleta
+### Problema 2 - base desatualizada para Commander
 
 Status:
 
-- comprovado
+- mitigado
 
-Sintoma:
+Evidencia:
 
-- apenas `33` decks `EDH`
-- apenas `27` decks `cEDH`
-- varias combinacoes de cor ausentes
+- `EDH` subiu para `162`
+- `cEDH` subiu para `214`
+- `max(created_at)` passou para 2026-04-23 na rodada de backfill recente
 
-Impacto:
-
-- base insuficiente para dizer que “puxa de todas as cores e combinacoes”
-
-### Problema 3 - base desatualizada
+### Problema 3 - registros historicos corrompidos
 
 Status:
 
-- comprovado
+- fechado
 
-Sintoma:
+Evidencia:
 
-- ultimo `created_at` em `2026-02-27`
-
-Impacto:
-
-- mesmo que o crawler continue tecnicamente funcional, a operacao hoje nao esta mantendo a base viva
+- `265` registros nao Commander restantes foram reparados
+- `missing_matches=0` no reparo final
+- todos os formatos ficaram com `blank_archetype=0` e `bad_placement=0`
 
 ## Veredito
 
@@ -452,53 +378,38 @@ Impacto:
 
 Resposta curta:
 
-- **parcialmente**
+- **sim, para MTGTop8**
 
-O que esta funcionando:
+O que esta comprovado:
 
 - acesso a fonte
 - descoberta de eventos
-- existencia de base carregada
-
-O que nao esta saudavel:
-
-- frescor da base
-- parse de `archetype`
-- parse limpo de `placement`
-- cobertura Commander por cores/combinacoes
+- parse de decks por evento
+- export de listas por `deckId`
+- persistencia em `meta_decks`
+- reparo de registros existentes
+- saneamento historico por `source_url`
 
 ### A base puxa de todas as cores e combinacoes possiveis?
 
-- **nao**
+- **nao da para afirmar ainda**
 
-O banco atual nao comprova isso.
+O banco agora esta semanticamente limpo, mas cobertura completa de todas as identidades Commander e uma meta de corpus, nao uma garantia do MTGTop8. O caminho correto e continuar alimentando `external_commander_meta_candidates` com pesquisa web multi-fonte e promover somente candidatos validados.
 
 ## Proximas acoes pequenas
 
-1. endurecer `fetch_meta.dart` para extrair `archetype` e `placement` com parse mais robusto do HTML atual
-2. adicionar um modo `--dry-run` no crawler para validacao sem escrita
-3. gerar um relatorio automatico de cobertura Commander por identidade de cor apos cada ingestao
-4. definir criterio minimo de cobertura:
-   - mono
-   - bi
-   - tri
-   - four-color
-   - five-color
-   - colorless
-5. rodar refresh controlado da base Commander e cEDH
+1. gerar um relatorio automatico de cobertura Commander por identidade de cor apos cada ingestao
+2. definir criterio minimo de cobertura Commander por mono, bi, tri, four-color, five-color e colorless
+3. rodar o agente `meta-deck-intelligence-analyst` para pesquisar fontes externas e salvar candidatos em `external_commander_meta_candidates`
+4. promover candidatos validados para `meta_decks` somente quando houver decklist verificavel e formato Commander/cEDH confirmado
+5. usar `meta_profile_report.dart` como medicao recorrente depois de cada rodada de ingestao
 
 ## Menor proxima acao tecnica recomendada
 
-Implementar primeiro:
+Rodar um ciclo multi-fonte controlado:
 
-- `fetch_meta.dart --dry-run --format EDH`
+```bash
+cd server && dart run bin/import_external_commander_meta_candidates.dart candidates.json --dry-run
+```
 
-com saida contendo:
-
-- eventos encontrados
-- decks encontrados
-- exemplo de `archetype`
-- exemplo de `placement`
-- quantidade que seria inserida
-
-Isso fecha rapidamente a duvida operacional sem escrever no banco.
+Depois, validar amostras e aplicar apenas candidatos confiaveis.
