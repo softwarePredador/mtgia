@@ -13,6 +13,7 @@ const externalCommanderMetaValidationStatuses = <String>{
   'rejected',
   'promoted',
 };
+const externalCommanderMetaStagedValidationStatus = 'staged';
 
 const genericExternalCommanderMetaValidationProfile = 'generic';
 const topDeckEdhTop16Stage1ValidationProfile = 'topdeck_edhtop16_stage1';

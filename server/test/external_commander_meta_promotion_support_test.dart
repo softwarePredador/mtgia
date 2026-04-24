@@ -41,27 +41,30 @@ void main() {
   });
 
   group('buildExternalCommanderMetaPromotionPlan', () {
-    test('aceita candidate validado com warning_reviewed', () {
+    test('aceita candidate staged com source allowlisted e fingerprint unico',
+        () {
       final plan = buildExternalCommanderMetaPromotionPlan(
         <ExternalCommanderMetaPromotionSnapshot>[
           _snapshot(
             sourceUrl: 'https://edhtop16.com/tournament/sample#standing-1',
-            legalStatus: 'warning_reviewed',
+            legalStatus: 'valid',
           ),
         ],
       );
 
       expect(plan.acceptedCount, 1);
       expect(plan.blockedCount, 0);
-      expect(plan.acceptedResults.single.insertPlan?.format,
-          legacyCompetitiveCommanderFormatCode);
+      expect(
+        plan.acceptedResults.single.insertPlan?.format,
+        legacyCompetitiveCommanderFormatCode,
+      );
       expect(
         plan.acceptedResults.single.insertPlan?.shellLabel,
         'Atraxa, Praetors\' Voice',
       );
     });
 
-    test('bloqueia candidate sem validation_status=validated', () {
+    test('bloqueia candidate sem validation_status=staged', () {
       final plan = buildExternalCommanderMetaPromotionPlan(
         <ExternalCommanderMetaPromotionSnapshot>[
           _snapshot(
@@ -74,7 +77,7 @@ void main() {
       expect(plan.acceptedCount, 0);
       expect(
         plan.results.single.issues.map((issue) => issue.code),
-        contains('validation_status_not_validated'),
+        contains('validation_status_not_staged'),
       );
     });
 
@@ -95,7 +98,7 @@ void main() {
     });
 
     test(
-        'bloqueia legal_status ausente, commander ausente e source_chain ausente',
+        'bloqueia legal_status ausente, commander ausente, source_chain ausente e staging_audit ausente',
         () {
       final plan = buildExternalCommanderMetaPromotionPlan(
         <ExternalCommanderMetaPromotionSnapshot>[
@@ -104,6 +107,7 @@ void main() {
             commanderName: '',
             legalStatus: null,
             researchPayload: const <String, dynamic>{},
+            isCommanderLegal: null,
           ),
         ],
       );
@@ -115,11 +119,13 @@ void main() {
           'missing_or_invalid_legal_status',
           'missing_commander_name',
           'missing_source_chain',
+          'commander_legality_not_confirmed',
+          'missing_staging_audit',
         }),
       );
     });
 
-    test('bloqueia subformato amplo e lista curta', () {
+    test('bloqueia subformato amplo e deck sem 100 cartas', () {
       final plan = buildExternalCommanderMetaPromotionPlan(
         <ExternalCommanderMetaPromotionSnapshot>[
           _snapshot(
@@ -135,8 +141,84 @@ void main() {
         plan.results.single.issues.map((issue) => issue.code),
         containsAll(<String>{
           'invalid_subformat',
-          'card_count_below_minimum',
+          'deck_total_not_100',
           'invalid_target_meta_deck_format',
+        }),
+      );
+    });
+
+    test('bloqueia unresolved_cards e warning_pending do staging', () {
+      final plan = buildExternalCommanderMetaPromotionPlan(
+        <ExternalCommanderMetaPromotionSnapshot>[
+          _snapshot(
+            sourceUrl: 'https://edhtop16.com/tournament/sample#standing-1',
+            legalStatus: 'warning_pending',
+            isCommanderLegal: null,
+            researchPayload: const <String, dynamic>{
+              'source_chain': <String>['edhtop16', 'topdeck'],
+              'source_context': 'fixture',
+              'staging_audit': <String, dynamic>{
+                'validation_legal_status': 'not_proven',
+                'unresolved_cards': <Map<String, dynamic>>[
+                  <String, dynamic>{'name': 'Mystery Card'},
+                ],
+                'illegal_cards': <Map<String, dynamic>>[],
+              },
+            },
+          ),
+        ],
+      );
+
+      expect(plan.acceptedCount, 0);
+      expect(
+        plan.results.single.issues.map((issue) => issue.code),
+        containsAll(<String>{
+          'legal_status_not_promotable',
+          'commander_legality_not_confirmed',
+          'unresolved_cards_blocking',
+        }),
+      );
+    });
+
+    test('bloqueia source fora da allowlist', () {
+      final plan = buildExternalCommanderMetaPromotionPlan(
+        <ExternalCommanderMetaPromotionSnapshot>[
+          _snapshot(
+            sourceUrl: 'https://moxfield.com/decks/not-allowlisted-yet',
+            sourceName: 'Moxfield',
+          ),
+        ],
+      );
+
+      expect(plan.acceptedCount, 0);
+      expect(
+        plan.results.single.issues.map((issue) => issue.code),
+        contains('source_not_allowlisted'),
+      );
+    });
+
+    test('bloqueia fingerprint duplicado no stage e em meta_decks', () {
+      final snapshot = _snapshot(
+        sourceUrl: 'https://edhtop16.com/tournament/sample#standing-1',
+      );
+      final duplicate = _snapshot(
+        sourceUrl: 'https://edhtop16.com/tournament/sample#standing-2',
+      );
+      final fingerprint = buildMetaDeckCardListFingerprint(
+        format: legacyCompetitiveCommanderFormatCode,
+        cardList: snapshot.candidate.cardList,
+      );
+      final plan = buildExternalCommanderMetaPromotionPlan(
+        <ExternalCommanderMetaPromotionSnapshot>[snapshot, duplicate],
+        deckFingerprintsAlreadyInMetaDecks: <String>{fingerprint},
+      );
+
+      expect(plan.acceptedCount, 0);
+      expect(
+        plan.results.first.issues.map((issue) => issue.code),
+        containsAll(<String>{
+          'duplicate_deck_fingerprint_in_stage',
+          'deck_fingerprint_already_present_in_meta_decks',
         }),
       );
     });
@@ -145,20 +227,27 @@ void main() {
 
 ExternalCommanderMetaPromotionSnapshot _snapshot({
   required String sourceUrl,
-  String validationStatus = 'validated',
+  String sourceName = 'EDHTop16',
+  String validationStatus = 'staged',
   String? legalStatus = 'valid',
   String subformat = 'competitive_commander',
   String commanderName = 'Atraxa, Praetors\' Voice',
   String cardList = _defaultCardList,
+  bool? isCommanderLegal = true,
   Map<String, dynamic> researchPayload = const <String, dynamic>{
     'source_chain': <String>['edhtop16', 'topdeck'],
     'source_context': 'fixture',
+    'staging_audit': <String, dynamic>{
+      'validation_legal_status': 'legal',
+      'unresolved_cards': <Map<String, dynamic>>[],
+      'illegal_cards': <Map<String, dynamic>>[],
+    },
   },
 }) {
   return ExternalCommanderMetaPromotionSnapshot(
     candidate: ExternalCommanderMetaCandidate.fromJson(
       <String, dynamic>{
-        'source_name': 'EDHTop16',
+        'source_name': sourceName,
         'source_url': sourceUrl,
         'deck_name': 'Fixture Deck',
         'commander_name': commanderName,
@@ -167,6 +256,7 @@ ExternalCommanderMetaPromotionSnapshot _snapshot({
         'card_list': cardList,
         'validation_status': validationStatus,
         'legal_status': legalStatus,
+        'is_commander_legal': isCommanderLegal,
         'research_payload': researchPayload,
       },
     ),
@@ -274,6 +364,4 @@ const _defaultCardList = '''
 1 Tundra
 1 Bayou
 1 Savannah
-1 Command Beacon
-1 City of Traitors
 ''';

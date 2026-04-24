@@ -1,5 +1,6 @@
 import 'external_commander_meta_candidate_support.dart';
 import 'meta_deck_commander_shell_support.dart';
+import 'meta_deck_card_list_support.dart';
 import 'meta_deck_format_support.dart';
 
 class ExternalCommanderMetaPromotionConfig {
@@ -175,12 +176,20 @@ class ExternalCommanderMetaPromotionPlan {
 ExternalCommanderMetaPromotionPlan buildExternalCommanderMetaPromotionPlan(
   List<ExternalCommanderMetaPromotionSnapshot> snapshots, {
   Set<String> sourceUrlsAlreadyInMetaDecks = const <String>{},
+  Set<String> deckFingerprintsAlreadyInMetaDecks = const <String>{},
 }) {
   final occurrencesBySourceUrl = <String, int>{};
+  final occurrencesByDeckFingerprint = <String, int>{};
   for (final snapshot in snapshots) {
     final sourceUrl = snapshot.candidate.sourceUrl;
     occurrencesBySourceUrl[sourceUrl] =
         (occurrencesBySourceUrl[sourceUrl] ?? 0) + 1;
+    final deckFingerprint = buildMetaDeckCardListFingerprint(
+      format: legacyCompetitiveCommanderFormatCode,
+      cardList: snapshot.candidate.cardList,
+    );
+    occurrencesByDeckFingerprint[deckFingerprint] =
+        (occurrencesByDeckFingerprint[deckFingerprint] ?? 0) + 1;
   }
 
   return ExternalCommanderMetaPromotionPlan(
@@ -190,8 +199,21 @@ ExternalCommanderMetaPromotionPlan buildExternalCommanderMetaPromotionPlan(
             snapshot,
             sourceUrlOccurrencesInStage:
                 occurrencesBySourceUrl[snapshot.candidate.sourceUrl] ?? 0,
+            deckFingerprintOccurrencesInStage: occurrencesByDeckFingerprint[
+                    buildMetaDeckCardListFingerprint(
+                      format: legacyCompetitiveCommanderFormatCode,
+                      cardList: snapshot.candidate.cardList,
+                    )] ??
+                0,
             sourceUrlAlreadyInMetaDecks: sourceUrlsAlreadyInMetaDecks
                 .contains(snapshot.candidate.sourceUrl),
+            deckFingerprintAlreadyInMetaDecks:
+                deckFingerprintsAlreadyInMetaDecks.contains(
+              buildMetaDeckCardListFingerprint(
+                format: legacyCompetitiveCommanderFormatCode,
+                cardList: snapshot.candidate.cardList,
+              ),
+            ),
           ),
         )
         .toList(growable: false),
@@ -202,10 +224,13 @@ ExternalCommanderMetaPromotionResult
     evaluateExternalCommanderMetaPromotionSnapshot(
   ExternalCommanderMetaPromotionSnapshot snapshot, {
   required int sourceUrlOccurrencesInStage,
+  required int deckFingerprintOccurrencesInStage,
   required bool sourceUrlAlreadyInMetaDecks,
+  required bool deckFingerprintAlreadyInMetaDecks,
 }) {
   final candidate = snapshot.candidate;
   final issues = <ExternalCommanderMetaPromotionIssue>[];
+  final promotionDeckProfile = _buildPromotionDeckProfile(candidate);
 
   if (snapshot.promotedToMetaDecksAt != null ||
       candidate.validationStatus == 'promoted') {
@@ -217,12 +242,12 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
-  if (candidate.validationStatus != 'validated') {
+  if (candidate.validationStatus != externalCommanderMetaStagedValidationStatus) {
     issues.add(
       ExternalCommanderMetaPromotionIssue(
-        code: 'validation_status_not_validated',
+        code: 'validation_status_not_staged',
         message:
-            'Candidate precisa ter validation_status=validated. Valor atual: ${candidate.validationStatus}.',
+            'Candidate precisa ter validation_status=staged. Valor atual: ${candidate.validationStatus}.',
       ),
     );
   }
@@ -237,12 +262,12 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
-  if (candidate.cardCount < 98) {
+  if (promotionDeckProfile.totalCards != 100) {
     issues.add(
       ExternalCommanderMetaPromotionIssue(
-        code: 'card_count_below_minimum',
+        code: 'deck_total_not_100',
         message:
-            'Promocao exige card_count >= 98. Valor atual: ${candidate.cardCount}.',
+            'Promocao exige decklist completa de 100 cartas. Valor atual: ${promotionDeckProfile.totalCards}.',
       ),
     );
   }
@@ -269,6 +294,16 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
+  if (candidate.isCommanderLegal != true) {
+    issues.add(
+      ExternalCommanderMetaPromotionIssue(
+        code: 'commander_legality_not_confirmed',
+        message:
+            'Promocao exige is_commander_legal=true. Valor atual: ${candidate.isCommanderLegal}.',
+      ),
+    );
+  }
+
   if ((candidate.commanderName ?? '').trim().isEmpty) {
     issues.add(
       const ExternalCommanderMetaPromotionIssue(
@@ -278,11 +313,61 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
+  if (!_isSourceAllowlisted(candidate)) {
+    issues.add(
+      ExternalCommanderMetaPromotionIssue(
+        code: 'source_not_allowlisted',
+        message:
+            'Promocao exige source allowlisted. Source atual: ${candidate.normalizedSourceName} ${candidate.sourceUrl}',
+      ),
+    );
+  }
+
   if (!_hasResearchSourceChain(candidate.researchPayload)) {
     issues.add(
       const ExternalCommanderMetaPromotionIssue(
         code: 'missing_source_chain',
         message: 'Promocao exige research_payload.source_chain presente.',
+      ),
+    );
+  }
+
+  if (!promotionDeckProfile.hasStagingAudit) {
+    issues.add(
+      const ExternalCommanderMetaPromotionIssue(
+        code: 'missing_staging_audit',
+        message:
+            'Promocao exige research_payload.staging_audit para auditoria do stage 2.',
+      ),
+    );
+  }
+
+  if (promotionDeckProfile.unresolvedCards.isNotEmpty) {
+    issues.add(
+      ExternalCommanderMetaPromotionIssue(
+        code: 'unresolved_cards_blocking',
+        message:
+            'Promocao bloqueada por unresolved_cards no staging_audit: ${promotionDeckProfile.unresolvedCards.length}.',
+      ),
+    );
+  }
+
+  if (promotionDeckProfile.illegalCards.isNotEmpty) {
+    issues.add(
+      ExternalCommanderMetaPromotionIssue(
+        code: 'illegal_cards_blocking',
+        message:
+            'Promocao bloqueada por illegal_cards no staging_audit: ${promotionDeckProfile.illegalCards.length}.',
+      ),
+    );
+  }
+
+  if (promotionDeckProfile.validationLegalStatus == 'illegal') {
+    issues.add(
+      const ExternalCommanderMetaPromotionIssue(
+        code: 'validation_legal_status_illegal',
+        message:
+            'Promocao exige staging_audit.validation_legal_status diferente de illegal.',
       ),
     );
   }
@@ -297,12 +382,32 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
+  if (deckFingerprintOccurrencesInStage != 1) {
+    issues.add(
+      ExternalCommanderMetaPromotionIssue(
+        code: 'duplicate_deck_fingerprint_in_stage',
+        message:
+            'Promocao exige fingerprint unico no staging. Ocorrencias atuais: $deckFingerprintOccurrencesInStage.',
+      ),
+    );
+  }
+
   if (sourceUrlAlreadyInMetaDecks) {
     issues.add(
       const ExternalCommanderMetaPromotionIssue(
         code: 'source_url_already_present_in_meta_decks',
         message:
             'Promocao exige source_url unico; esta URL ja existe em meta_decks.',
+      ),
+    );
+  }
+
+  if (deckFingerprintAlreadyInMetaDecks) {
+    issues.add(
+      const ExternalCommanderMetaPromotionIssue(
+        code: 'deck_fingerprint_already_present_in_meta_decks',
+        message:
+            'Promocao exige fingerprint unico; esta decklist ja existe em meta_decks.',
       ),
     );
   }
@@ -392,4 +497,94 @@ String? _buildCommanderShellLabel({
   if (primary == null || primary.isEmpty) return null;
   if (partner == null || partner.isEmpty) return primary;
   return '$primary + $partner';
+}
+
+String buildMetaDeckCardListFingerprint({
+  required String format,
+  required String cardList,
+}) {
+  final parsed = parseMetaDeckCardList(format: format, cardList: cardList);
+  final entries = parsed.effectiveCards.entries.toList(growable: false)
+    ..sort(
+      (a, b) => normalizeMetaDeckCardName(a.key)
+          .toLowerCase()
+          .compareTo(normalizeMetaDeckCardName(b.key).toLowerCase()),
+    );
+  return entries
+      .map(
+        (entry) =>
+            '${entry.value} ${normalizeMetaDeckCardName(entry.key).toLowerCase()}',
+      )
+      .join('|');
+}
+
+class _PromotionDeckProfile {
+  const _PromotionDeckProfile({
+    required this.totalCards,
+    required this.unresolvedCards,
+    required this.illegalCards,
+    required this.validationLegalStatus,
+    required this.hasStagingAudit,
+  });
+
+  final int totalCards;
+  final List<dynamic> unresolvedCards;
+  final List<dynamic> illegalCards;
+  final String? validationLegalStatus;
+  final bool hasStagingAudit;
+}
+
+_PromotionDeckProfile _buildPromotionDeckProfile(
+  ExternalCommanderMetaCandidate candidate,
+) {
+  final parsed = parseMetaDeckCardList(
+    format: legacyCompetitiveCommanderFormatCode,
+    cardList: candidate.cardList,
+  );
+  final stagingAudit = candidate.researchPayload['staging_audit'];
+  if (stagingAudit is! Map<String, dynamic>) {
+    return _PromotionDeckProfile(
+      totalCards: parsed.effectiveTotal,
+      unresolvedCards: const <dynamic>[],
+      illegalCards: const <dynamic>[],
+      validationLegalStatus: null,
+      hasStagingAudit: false,
+    );
+  }
+
+  return _PromotionDeckProfile(
+    totalCards: parsed.effectiveTotal,
+    unresolvedCards: _readAuditList(stagingAudit['unresolved_cards']),
+    illegalCards: _readAuditList(stagingAudit['illegal_cards']),
+    validationLegalStatus:
+        stagingAudit['validation_legal_status']?.toString().trim().toLowerCase(),
+    hasStagingAudit: true,
+  );
+}
+
+List<dynamic> _readAuditList(dynamic raw) {
+  if (raw is List) {
+    return raw;
+  }
+  return const <dynamic>[];
+}
+
+bool _isSourceAllowlisted(ExternalCommanderMetaCandidate candidate) {
+  final sourceUri = Uri.tryParse(candidate.sourceUrl);
+  final sourceHost =
+      sourceUri?.host.toLowerCase().replaceFirst('www.', '') ?? '';
+  final sourcePath = sourceUri?.path.toLowerCase() ?? '';
+  final normalizedName = candidate.normalizedSourceName.toLowerCase();
+
+  for (final policy in externalCommanderMetaControlledSourcePolicies) {
+    final matchesName = policy.canonicalSourceName.toLowerCase() ==
+            normalizedName ||
+        policy.aliases.contains(normalizedName);
+    final matchesHost = policy.allowedHosts.contains(sourceHost);
+    if ((matchesName || matchesHost) &&
+        sourcePath.startsWith(policy.requiredPathPrefix)) {
+      return true;
+    }
+  }
+  return false;
 }

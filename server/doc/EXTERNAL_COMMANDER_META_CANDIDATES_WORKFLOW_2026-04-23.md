@@ -339,9 +339,51 @@ dart run bin/promote_external_commander_meta_candidates.dart \
 Regras do gate:
 
 - seleciona candidatos direto de `external_commander_meta_candidates`
-- promove **somente** `validation_status=validated`
+- promove **somente** `validation_status=staged`
 - promove **somente** `subformat=competitive_commander`
-- exige `card_count >= 98`
+- exige decklist completa de `100` cartas
+- exige `is_commander_legal=true`
+- exige source allowlisted
+- exige `research_payload.source_chain`
+- exige `research_payload.staging_audit`
+- bloqueia `unresolved_cards`
+- bloqueia `illegal_cards`
+- bloqueia `warning_pending`
+- bloqueia duplicidade por `source_url`
+- bloqueia duplicidade por deck fingerprint
+- preserva auditabilidade por `source_url`, mantendo `source_name` e `research_payload` no staging para `JOIN` posterior
+
+Resultado do dry-run live atual:
+
+- `total=4`
+- `promotable=0`
+- `blocked=4`
+- bloqueios observados:
+  - `validation_status_not_staged`
+  - `missing_or_invalid_legal_status`
+  - `commander_legality_not_confirmed`
+  - `missing_staging_audit`
+
+Leitura:
+
+- o gate de promocao ficou pronto
+- a base live ainda nao mostra promocao possivel porque o staging real ainda nao recebeu `stage --apply`
+- isso mantem `meta_decks` protegido por default
+
+Rollback operacional de uma promocao real:
+
+```bash
+psql $DATABASE_URL -c "
+DELETE FROM meta_decks
+WHERE source_url = '<source_url_promovida>';
+
+UPDATE external_commander_meta_candidates
+SET validation_status = 'staged',
+    promoted_to_meta_decks_at = NULL,
+    updated_at = CURRENT_TIMESTAMP
+WHERE source_url = '<source_url_promovida>';
+"
+```
 
 ### 4.1 Auditoria source-aware apos o gate
 

@@ -5,7 +5,6 @@ import '../color_identity.dart';
 import 'external_commander_meta_candidate_support.dart';
 import 'external_commander_meta_import_support.dart';
 
-const externalCommanderMetaStagedValidationStatus = 'staged';
 const externalCommanderMetaStage2DefaultExpansionArtifactPath =
     'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json';
 const externalCommanderMetaStage2DefaultValidationArtifactPath =

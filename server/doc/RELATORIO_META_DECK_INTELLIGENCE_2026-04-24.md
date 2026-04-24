@@ -219,6 +219,102 @@ Leitura:
 2. impedir que `warning_pending` com unresolved bloqueante entre em `meta_decks`
 3. manter `meta_decks` intocado ate a promocao separada estar guardada por `--apply`
 
+## Etapa 3/5 - promocao controlada para `meta_decks`
+
+### Resultado
+
+O gate de promocao foi endurecido para o contrato da Etapa 2:
+
+- aceita apenas `validation_status=staged`
+- exige decklist completa de `100` cartas
+- exige `is_commander_legal=true`
+- exige source allowlisted
+- exige `research_payload.source_chain`
+- exige `research_payload.staging_audit`
+- bloqueia `unresolved_cards`
+- bloqueia `illegal_cards`
+- bloqueia `warning_pending`
+- bloqueia duplicidade por `source_url`
+- bloqueia duplicidade por deck fingerprint
+
+Importante:
+
+- `meta_decks` continua sem escrita nesta rodada
+- `source_name` e `research_payload` auditavel permanecem authoritative em `external_commander_meta_candidates`
+- a integracao futura continua usando `JOIN` por `source_url`
+
+### Comandos rodados nesta etapa
+
+```bash
+cd server && dart analyze lib/meta bin test
+
+cd server && dart test -r compact \
+  test/external_commander_meta_candidate_support_test.dart \
+  test/external_commander_meta_import_support_test.dart \
+  test/external_commander_meta_staging_support_test.dart \
+  test/external_commander_meta_promotion_support_test.dart
+
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.current.json
+```
+
+### Evidencia validada
+
+#### Regras provadas em teste
+
+Casos cobertos em `server/test/external_commander_meta_promotion_support_test.dart`:
+
+1. aceita candidato `staged` allowlisted com fingerprint unico
+2. bloqueia `validation_status` fora de `staged`
+3. bloqueia `source_url` ja presente em `meta_decks`
+4. bloqueia ausencia de `source_chain` e `staging_audit`
+5. bloqueia deck sem `100` cartas
+6. bloqueia `warning_pending` com `unresolved_cards`
+7. bloqueia source fora da allowlist
+8. bloqueia fingerprint duplicado no stage e em `meta_decks`
+
+#### Dry-run live atual
+
+Resultado do gate real sobre a base atual:
+
+- `total=4`
+- `promotable=0`
+- `blocked=4`
+
+Bloqueios observados em todos os 4 rows atuais do banco:
+
+- `validation_status_not_staged`
+- `missing_or_invalid_legal_status`
+- `commander_legality_not_confirmed`
+- `missing_staging_audit`
+
+Leitura:
+
+- o gate novo esta funcional
+- a ausencia de promocao live agora e explicada por falta de `stage --apply` previo, nao por permissividade do gate
+- cobertura live de `external` em `meta_decks` continua **not proven**
+
+### Rollback operacional documentado
+
+```bash
+psql $DATABASE_URL -c "
+DELETE FROM meta_decks
+WHERE source_url = '<source_url_promovida>';
+
+UPDATE external_commander_meta_candidates
+SET validation_status = 'staged',
+    promoted_to_meta_decks_at = NULL,
+    updated_at = CURRENT_TIMESTAMP
+WHERE source_url = '<source_url_promovida>';
+"
+```
+
+### Menores proximas acoes tecnicas apos a promocao guardada
+
+1. aplicar o stage real apenas quando for seguro usar `--apply` no staging
+2. so depois rerodar o promotion gate para observar `promotable > 0`
+3. integrar o consumo competitivo em `optimize/generate` sem depender de escrita live em `meta_decks`
+
 ## Resumo do pipeline
 
 ### Fonte primaria comprovada

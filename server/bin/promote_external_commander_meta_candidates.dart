@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 import '../lib/database.dart';
 import '../lib/meta/external_commander_meta_candidate_support.dart';
 import '../lib/meta/external_commander_meta_promotion_support.dart';
+import '../lib/meta/meta_deck_format_support.dart';
 
 Future<void> main(List<String> args) async {
   final config = ExternalCommanderMetaPromotionConfig.parse(args);
@@ -24,9 +25,12 @@ Future<void> main(List<String> args) async {
         .toSet();
     final sourceUrlsAlreadyInMetaDecks =
         await _loadExistingMetaDeckSourceUrls(conn, sourceUrls);
+    final deckFingerprintsAlreadyInMetaDecks =
+        await _loadExistingMetaDeckFingerprints(conn);
     final plan = buildExternalCommanderMetaPromotionPlan(
       snapshots,
       sourceUrlsAlreadyInMetaDecks: sourceUrlsAlreadyInMetaDecks,
+      deckFingerprintsAlreadyInMetaDecks: deckFingerprintsAlreadyInMetaDecks,
     );
 
     stdout.writeln(
@@ -61,16 +65,19 @@ Future<void> main(List<String> args) async {
               'limit': config.limit,
             },
             'rules': const <String, dynamic>{
-              'validation_status': 'validated',
+              'validation_status': 'staged',
               'subformat': 'competitive_commander',
-              'card_count_minimum': 98,
+              'deck_total_exact': 100,
               'legal_status_allowed': <String>[
                 'valid',
                 'warning_reviewed',
               ],
               'requires_commander_name': true,
               'requires_unique_source_url': true,
+              'requires_unique_deck_fingerprint': true,
+              'requires_source_allowlist': true,
               'requires_research_payload_source_chain': true,
+              'requires_research_payload_staging_audit': true,
             },
             'summary': <String, dynamic>{
               'total': plan.totalCount,
@@ -103,10 +110,29 @@ Future<void> main(List<String> args) async {
             .map((result) => result.candidate.sourceUrl)
             .toSet(),
       );
+      final recheckedDeckFingerprints =
+          await _loadExistingMetaDeckFingerprints(session);
       if (recheckedSourceUrls.isNotEmpty) {
         throw StateError(
           'Promocao bloqueada: source_url ja presente em meta_decks: '
           '${recheckedSourceUrls.toList(growable: false)..sort()}',
+        );
+      }
+      final conflictingFingerprints = plan.acceptedResults
+          .map(
+            (result) => buildMetaDeckCardListFingerprint(
+              format: legacyCompetitiveCommanderFormatCode,
+              cardList: result.candidate.cardList,
+            ),
+          )
+          .where(recheckedDeckFingerprints.contains)
+          .toSet()
+          .toList(growable: false)
+        ..sort();
+      if (conflictingFingerprints.isNotEmpty) {
+        throw StateError(
+          'Promocao bloqueada: fingerprint ja presente em meta_decks: '
+          '$conflictingFingerprints',
         );
       }
 
@@ -221,6 +247,28 @@ Future<Set<String>> _loadExistingMetaDeckSourceUrls(
   return {
     for (final row in result)
       if ((row[0] as String?)?.trim().isNotEmpty ?? false) row[0] as String,
+  };
+}
+
+Future<Set<String>> _loadExistingMetaDeckFingerprints(dynamic executor) async {
+  final result = await executor.execute(
+    Sql.named('''
+      SELECT format, card_list
+      FROM meta_decks
+      WHERE format = @format
+    '''),
+    parameters: <String, dynamic>{
+      'format': legacyCompetitiveCommanderFormatCode,
+    },
+  );
+
+  return {
+    for (final row in result)
+      if ((row[1] as String?)?.trim().isNotEmpty ?? false)
+        buildMetaDeckCardListFingerprint(
+          format: (row[0] as String?) ?? legacyCompetitiveCommanderFormatCode,
+          cardList: row[1] as String,
+        ),
   };
 }
 
