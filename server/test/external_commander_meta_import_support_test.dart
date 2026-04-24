@@ -20,33 +20,51 @@ void main() {
       );
     });
 
-    test('real import exige stage2', () {
+    test('stage2 exige dry-run', () {
       expect(
-        () => ExternalCommanderMetaImportConfig.parse(<String>['payload.json']),
+        () => ExternalCommanderMetaImportConfig.parse(
+          <String>[
+            'payload.json',
+            '--validation-profile=$topDeckEdhTop16Stage2ValidationProfile',
+          ],
+        ),
         throwsA(
           isA<ArgumentError>().having(
             (error) => error.message.toString(),
             'message',
-            contains(
-              '--validation-profile=$externalCommanderMetaSafePersistenceProfile',
-            ),
+            contains('$topDeckEdhTop16Stage2ValidationProfile exige --dry-run'),
           ),
         ),
       );
     });
 
-    test('stage2 permite escrita real com semantica de validacao dry-run', () {
+    test('stage2 em dry-run continua com validacao commander-aware', () {
       final config = ExternalCommanderMetaImportConfig.parse(
         <String>[
           'payload.json',
+          '--dry-run',
           '--validation-profile=$topDeckEdhTop16Stage2ValidationProfile',
         ],
       );
 
-      expect(config.dryRun, isFalse);
+      expect(config.dryRun, isTrue);
       expect(config.validationProfile, topDeckEdhTop16Stage2ValidationProfile);
       expect(config.requiresCommanderLegalityValidation, isTrue);
       expect(config.usesDryRunValidationSemantics, isTrue);
+    });
+
+    test('generic continua sendo o unico profile com escrita real', () {
+      final config = ExternalCommanderMetaImportConfig.parse(
+        <String>['payload.json'],
+      );
+
+      expect(config.dryRun, isFalse);
+      expect(
+        config.validationProfile,
+        externalCommanderMetaSafePersistenceProfile,
+      );
+      expect(config.requiresCommanderLegalityValidation, isFalse);
+      expect(config.usesDryRunValidationSemantics, isFalse);
     });
   });
 
@@ -66,7 +84,7 @@ void main() {
       expect(
         () => buildExternalCommanderMetaPersistencePlan(
           <ExternalCommanderMetaCandidateValidationResult>[accepted, rejected],
-          validationProfile: topDeckEdhTop16Stage2ValidationProfile,
+          validationProfile: externalCommanderMetaSafePersistenceProfile,
         ),
         throwsA(
           isA<StateError>().having(
@@ -114,7 +132,7 @@ void main() {
           _result(duplicate),
           _result(other),
         ],
-        validationProfile: topDeckEdhTop16Stage2ValidationProfile,
+        validationProfile: externalCommanderMetaSafePersistenceProfile,
       );
 
       expect(plan.candidatesToPersist, hasLength(2));
@@ -164,7 +182,7 @@ ExternalCommanderMetaCandidateValidationResult _result(
 }) {
   return ExternalCommanderMetaCandidateValidationResult(
     candidate: candidate,
-    profile: topDeckEdhTop16Stage2ValidationProfile,
+    profile: externalCommanderMetaSafePersistenceProfile,
     issues: accepted
         ? const <ExternalCommanderMetaValidationIssue>[]
         : const <ExternalCommanderMetaValidationIssue>[

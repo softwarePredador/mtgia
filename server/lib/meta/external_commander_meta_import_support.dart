@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'external_commander_meta_candidate_support.dart';
 
 const externalCommanderMetaSafePersistenceProfile =
-    topDeckEdhTop16Stage2ValidationProfile;
+    genericExternalCommanderMetaValidationProfile;
 
 class ExternalCommanderMetaImportConfig {
   ExternalCommanderMetaImportConfig({
@@ -25,9 +25,7 @@ class ExternalCommanderMetaImportConfig {
   bool get requiresCommanderLegalityValidation =>
       validationProfile == topDeckEdhTop16Stage2ValidationProfile;
 
-  bool get usesDryRunValidationSemantics =>
-      dryRun ||
-      validationProfile == externalCommanderMetaSafePersistenceProfile;
+  bool get usesDryRunValidationSemantics => dryRun;
 
   factory ExternalCommanderMetaImportConfig.parse(List<String> args) {
     var promoteValidated = false;
@@ -77,7 +75,8 @@ class ExternalCommanderMetaImportConfig {
       );
     }
 
-    if (validationProfile == topDeckEdhTop16Stage1ValidationProfile &&
+    if ((validationProfile == topDeckEdhTop16Stage1ValidationProfile ||
+            validationProfile == topDeckEdhTop16Stage2ValidationProfile) &&
         !dryRun) {
       throw ArgumentError(
         '$validationProfile exige --dry-run. '

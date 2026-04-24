@@ -339,6 +339,39 @@ void main() {
       );
     });
 
+    test('stage 2 reaplica stage 1 e rejeita source fora do path controlado',
+        () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url': 'https://edhtop16.com/about#standing-1',
+          'deck_name': 'Wrong Stage 2 Source',
+          'commander_name': 'Tymna the Weaver',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list':
+              List<String>.generate(100, (index) => '1 Card ${index + 1}')
+                  .join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 100,
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage2ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        contains('invalid_source_path'),
+      );
+    });
+
     test('stage 2 rejeita decklist curta, sem commander e total_cards invalido',
         () {
       final candidate = ExternalCommanderMetaCandidate.fromJson(

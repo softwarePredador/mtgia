@@ -192,9 +192,9 @@ Regra operacional do profile `topdeck_edhtop16_stage2`:
 - rejeita `is_commander_legal=false`
 - `unresolved_cards` continua como warning em `--dry-run`
 - `illegal_cards` ou `is_commander_legal=false` bloqueiam o candidato
-- persistencia real e permitida **somente** com este profile
-- a escrita real acontece **somente** em `external_commander_meta_candidates`
-- a escrita real reutiliza o aceite do stage 2 para staging seguro; `meta_decks` continua intocado
+- continua **dry-run only**
+- nao escreve em `external_commander_meta_candidates`
+- nao promove nada para `meta_decks`
 
 Resultado da rodada base:
 
@@ -208,7 +208,7 @@ Resultado da rodada base:
   - `Scion of the Ur-Dragon` com `unresolved_cards=["Prismari, the Inspiration"]`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
 
-### 3. Persistir candidatos aprovados no stage 2
+### 3. Persistencia continua bloqueada no stage 2
 
 ```bash
 cd server
@@ -220,12 +220,9 @@ dart run bin/import_external_commander_meta_candidates.dart \
 
 Comportamento comprovado:
 
-- bloqueia qualquer `rejected`
-- deduplica por `source_url` antes do `upsert`
-- preserva `research_payload` completo em `JSONB`
-- mantem `validation_status` recebido do payload
-- nao escreve em `meta_decks`
-- rejeita explicitamente `--promote-validated`
+- falha antes de qualquer escrita por exigir `--dry-run`
+- continua rejeitando explicitamente `--promote-validated`
+- mantem stage 2 como gate de validacao estrutural + commander-aware apenas em artefato local
 
 Regra de seguranca adicional:
 

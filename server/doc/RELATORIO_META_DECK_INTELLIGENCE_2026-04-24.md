@@ -389,7 +389,7 @@ Validacao pedida:
 
 1. expandir `EDHTop16` em dry-run
 2. validar no stage 2
-3. persistir em `external_commander_meta_candidates`
+3. provar que o stage 2 continua bloqueando importacao real
 4. rodar promocao em dry-run
 5. gerar relatorios de base/cobertura
 6. provar consumo de referencia competitiva por `generate/optimize` sem `apply` destrutivo
@@ -526,23 +526,18 @@ Warnings recorrentes:
 
 - `missing_color_identity` em todos os 4 candidatos
 
-#### 3. Persistencia em staging aconteceu, mas sem promover estado validado
+#### 3. Stage 2 bloqueou importacao real como esperado
 
-Persistencia real:
+Resultado:
 
-- `imported_by=meta_deck_intelligence_2026_04_24_runtime_e2e`
-- `4` rows em `external_commander_meta_candidates`
-
-Estado observado apos persistir:
-
-- `validation_status=candidate`
-- `legal_status=NULL`
+- falha imediata por `topdeck_edhtop16_stage2 exige --dry-run`
+- `0` rows novas em `external_commander_meta_candidates` nesta etapa
 
 Leitura:
 
-- a escrita segura em staging funcionou
-- o importador gravou o candidato cru
-- o resultado efetivo do stage 2 **nao** foi materializado na linha persistida
+- o profile voltou ao contrato correto de validacao somente em artefato local
+- o importador nao materializa mais nenhum staging a partir do stage 2
+- a promocao continua separada e depende apenas de rows previamente validadas por outro gate
 
 #### 4. Dry-run de promocao bloqueou corretamente
 
@@ -561,26 +556,7 @@ Conclusao:
 
 - o gate de promocao continua seguro
 - nao houve escrita em `meta_decks`
-- o bloqueio nao e ruido; ele reflete um desacoplamento estrutural real entre validacao stage 2 e persistencia
-
-### Problema estrutural confirmado
-
-O fluxo final hoje tem um gap entre validacao e staging:
-
-1. o stage 2 calcula `legal_status` operacional como `legal` / `not_proven` / `illegal`
-2. o importador persiste `candidate.validation_status` e `candidate.legal_status` originais
-3. o gate de promocao exige `validation_status=validated`
-4. o gate de promocao exige `legal_status in {valid, warning_reviewed}`
-
-Resultado pratico:
-
-- um candidato pode passar no stage 2
-- ser persistido com sucesso
-- e ainda assim ficar estruturalmente impossivel de promover no gate seguinte
-
-Status desta afirmacao:
-
-- **comprovado**
+- o bloqueio agora e intencional: stage 2 nao deve mais servir como atalho de persistencia
 
 ### Frescor atual da base
 
@@ -751,10 +727,8 @@ Implicacoes praticas:
 
 ### Menores proximas acoes tecnicas
 
-1. no import real do stage 2, persistir o estado efetivo da validacao e nao o payload cru:
-   - `validation_status=validated` quando `accepted=true`
-   - mapear `legal -> valid`, `not_proven -> warning_pending`, `illegal -> rejected`
-2. manter o gate de promocao em `dry-run` ate esse mapeamento existir e ser revalidado
+1. manter `topdeck_edhtop16_stage2` como gate exclusivamente de validacao e artefato local
+2. se staging real voltar a ser necessario, criar um passo separado e explicito depois do aceite stage 2
 3. criar uma prova runtime dedicada para `generate` que exponha se `meta_context_used` veio de `competitive_commander` ou nao
 
 ### Proximos riscos
@@ -762,3 +736,34 @@ Implicacoes praticas:
 1. `topdeck_deckobj_missing=4/8` mostra drift real do parser de expansao
 2. `generate` ainda nao tem prova runtime consistente de uso de referencia competitiva
 3. cobertura externa em `meta_decks` segue `nao comprovada` porque nenhuma row foi promovida nesta rodada
+
+## Atualizacao do profile stage2 — dry-run only
+
+### Comandos desta correcao
+
+```bash
+cd server && dart analyze
+cd server && dart test
+cd server && dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
+cd server && dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --imported-by=meta_deck_intelligence_2026_04_24_stage2_fix
+```
+
+### Evidencia
+
+- `dart analyze`: sem issues
+- `dart test`: `All other tests passed!`
+- stage 2 em `--dry-run`: `accepted_count=4`, `rejected_count=0`
+- tentativa sem `--dry-run`: bloqueada no parse com `topdeck_edhtop16_stage2 exige --dry-run`
+
+### Leitura
+
+- o profile `topdeck_edhtop16_stage2` voltou a cumprir o contrato pedido
+- a validacao commander-aware continua ativa em artefato local
+- a base armazenada e a cobertura real do corpus nao mudaram nesta correcao

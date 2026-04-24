@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T15:12:36.891414Z",
+  "generated_at": "2026-04-24T19:42:10.796774Z",
   "mode": "dry_run",
   "validation_profile": "topdeck_edhtop16_stage2",
   "accepted_count": 4,
@@ -23,6 +23,7 @@
         "color_identity": [],
         "is_commander_legal": null,
         "validation_status": "candidate",
+        "legal_status": null,
         "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
         "research_payload": {
           "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
@@ -91,6 +92,7 @@
         "color_identity": [],
         "is_commander_legal": null,
         "validation_status": "candidate",
+        "legal_status": null,
         "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
         "research_payload": {
           "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
@@ -146,6 +148,7 @@
         "color_identity": [],
         "is_commander_legal": null,
         "validation_status": "candidate",
+        "legal_status": null,
         "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
         "research_payload": {
           "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
@@ -201,6 +204,7 @@
         "color_identity": [],
         "is_commander_legal": null,
         "validation_status": "candidate",
+        "legal_status": null,
         "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
         "research_payload": {
           "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",

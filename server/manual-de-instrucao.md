@@ -93,43 +93,41 @@
     - `validation_status_not_validated`
     - `missing_or_invalid_legal_status`
 
-## 2026-04-24 — Persistencia segura stage 2 em `external_commander_meta_candidates`
+## 2026-04-24 — Correcao do stage 2 para manter `dry-run only`
 
 ### O Porquê
-- O stage 2 de `external_commander_meta_candidates` ja estava bom para validacao estrutural e de legalidade, mas ainda faltava o passo operacional pedido nesta rodada: persistir somente na fila externa, sem tocar em `meta_decks`.
-- Tambem era necessario fechar dois riscos de governanca:
-  - `--promote-validated` nao podia continuar abrindo caminho para a tabela principal;
-  - payloads com `source_url` repetida precisavam consolidar antes do `upsert`.
+- O contrato correto do profile `topdeck_edhtop16_stage2` e validar candidatos externos com decklist quase completa, nao persisti-los.
+- Uma regressao recente voltou a tratar o stage 2 como profile de escrita real em `external_commander_meta_candidates`, o que contrariava a regra operacional do fluxo controlado.
+- O ajuste precisava recolocar o stage 2 no papel original: `dry-run only`, sem escrita em banco e sem qualquer promocao.
 
 ### O Como
 - Foi criado `server/lib/meta/external_commander_meta_import_support.dart` para tirar a regra de seguranca do `bin/` e deixá-la testavel.
 - Esse suporte novo passou a centralizar:
   - parse de argumentos do importador;
   - bloqueio global de `--promote-validated`;
-  - exigencia de `--validation-profile=topdeck_edhtop16_stage2` para escrita real;
-  - manutencao do `topdeck_edhtop16_stage1` como `dry-run only`;
-  - plano de persistencia com deduplicacao por `source_url`.
-- `server/bin/import_external_commander_meta_candidates.dart` passou a:
-  - validar com a semantica do stage 2 antes da escrita real;
-  - persistir apenas em `external_commander_meta_candidates`;
-  - logar a deduplicacao aplicada;
-  - deixar de ter qualquer caminho de escrita para `meta_decks`.
-- O `upsert` continua usando `ON CONFLICT (source_url)` no banco, mas agora o lote ja chega deduplicado e com `research_payload` completo preservado no `jsonEncode(...)`.
+  - exigencia de `--dry-run` tanto para `topdeck_edhtop16_stage1` quanto para `topdeck_edhtop16_stage2`;
+  - manutencao do profile `generic` como unico caminho restante de escrita real pelo importador.
+- `usesDryRunValidationSemantics` voltou a refletir apenas o modo real de execucao:
+  - `true` em `--dry-run`
+  - `false` em importacao real
+- O stage 2 continua fazendo validacao commander-aware com banco quando disponivel, mas somente para enriquecer o artefato local de validacao.
 
 ### Testes e evidencia
 - Foi criado `server/test/external_commander_meta_import_support_test.dart` cobrindo:
   - bloqueio de `--promote-validated`;
-  - exigencia de stage 2 para escrita real;
+  - exigencia de `--dry-run` no stage 2;
+  - permanencia do profile `generic` como unico caminho de escrita real;
   - deduplicacao por `source_url`;
   - preservacao integral do `research_payload`.
-- Validacao live executada:
-  - `dart run bin/migrate_external_commander_meta_candidates.dart`
-  - `dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --validation-profile=topdeck_edhtop16_stage2 --imported-by=meta_deck_intelligence_2026_04_24`
-  - snapshot de `meta_decks` antes/depois com o mesmo hash agregado: `641|a7ce915e5f489cb6282856238ddab088`
+- Validacao executada:
+  - `dart analyze`
+  - `dart test`
+  - `dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --dry-run --validation-profile=topdeck_edhtop16_stage2 --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json`
 - Resultado prático:
-  - `4` candidatos do torneio foram persistidos em `external_commander_meta_candidates`
-  - `meta_decks` permaneceu inalterado
-  - sample persistido manteve as chaves completas de `research_payload`, incluindo `source_chain`, `topdeck_deck_url` e `topdeck_imported_from`
+  - o stage 2 voltou a falhar imediatamente sem `--dry-run`
+  - o artefato de validacao continua sendo gerado com `accepted_count=4` e `rejected_count=0`
+  - nao houve escrita em `external_commander_meta_candidates`
+  - nao houve promocao para `meta_decks`
 
 ## 2026-04-24 — Validacao de color identity e legalidade Commander para candidatos stage 2
 
