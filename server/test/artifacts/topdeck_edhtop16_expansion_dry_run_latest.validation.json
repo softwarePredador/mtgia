@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-04-24T14:12:10.178222Z",
+  "generated_at": "2026-04-24T14:50:01.904619Z",
   "mode": "dry_run",
-  "validation_profile": "topdeck_edhtop16_stage1",
+  "validation_profile": "topdeck_edhtop16_stage2",
   "accepted_count": 4,
   "rejected_count": 0,
   "results": [
     {
       "accepted": true,
-      "profile": "topdeck_edhtop16_stage1",
+      "profile": "topdeck_edhtop16_stage2",
       "candidate": {
         "source_name": "EDHTop16",
         "source_host": "edhtop16.com",
@@ -54,7 +54,7 @@
     },
     {
       "accepted": true,
-      "profile": "topdeck_edhtop16_stage1",
+      "profile": "topdeck_edhtop16_stage2",
       "candidate": {
         "source_name": "EDHTop16",
         "source_host": "edhtop16.com",
@@ -101,7 +101,7 @@
     },
     {
       "accepted": true,
-      "profile": "topdeck_edhtop16_stage1",
+      "profile": "topdeck_edhtop16_stage2",
       "candidate": {
         "source_name": "EDHTop16",
         "source_host": "edhtop16.com",
@@ -148,7 +148,7 @@
     },
     {
       "accepted": true,
-      "profile": "topdeck_edhtop16_stage1",
+      "profile": "topdeck_edhtop16_stage2",
       "candidate": {
         "source_name": "EDHTop16",
         "source_host": "edhtop16.com",

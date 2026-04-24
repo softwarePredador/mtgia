@@ -315,5 +315,62 @@ void main() {
         containsAll(<String>{'invalid_subformat', 'invalid_source_path'}),
       );
     });
+
+    test('stage 2 aceita fixture expandida com decklists completas', () {
+      final raw = File(
+        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
+      ).readAsStringSync();
+      final candidates = parseExternalCommanderMetaCandidates(raw);
+
+      final results = validateExternalCommanderMetaCandidates(
+        candidates,
+        profile: topDeckEdhTop16Stage2ValidationProfile,
+      );
+
+      expect(results, hasLength(4));
+      expect(results.where((result) => result.accepted), hasLength(4));
+      expect(results.where((result) => !result.accepted), isEmpty);
+      expect(
+        results.expand((result) => result.issues).map((issue) => issue.code),
+        isNot(contains('card_count_below_stage2_minimum')),
+      );
+    });
+
+    test('stage 2 rejeita decklist curta, sem commander e total_cards invalido',
+        () {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url':
+              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9',
+          'deck_name': 'Broken Expansion',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list':
+              List<String>.generate(97, (index) => '1 Card ${index + 1}')
+                  .join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 99,
+          },
+        },
+      );
+
+      final result = validateExternalCommanderMetaCandidate(
+        candidate,
+        profile: topDeckEdhTop16Stage2ValidationProfile,
+      );
+
+      expect(result.accepted, isFalse);
+      expect(
+        result.issues.map((issue) => issue.code),
+        containsAll(<String>{
+          'card_count_below_stage2_minimum',
+          'invalid_total_cards',
+          'missing_commander_name',
+        }),
+      );
+    });
   });
 }

@@ -154,21 +154,37 @@ dart run bin/expand_external_commander_meta_candidates.dart \
   --output=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json
 ```
 
-Validar o artefato gerado no stage 1:
+Validar o artefato gerado no stage 2:
 
 ```bash
 cd server
 dart run bin/import_external_commander_meta_candidates.dart \
   test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
   --dry-run \
-  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-profile=topdeck_edhtop16_stage2 \
   --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
 ```
+
+Regra operacional do profile `topdeck_edhtop16_stage2`:
+
+- exige `--dry-run`
+- bloqueia `--promote-validated`
+- exige que o candidato passe no `topdeck_edhtop16_stage1`
+- exige `card_count >= 98`
+- exige `commander_name`
+- exige `card_list`
+- exige `format=commander`
+- exige `subformat=competitive_commander`
+- exige `research_payload.collection_method`
+- exige `research_payload.source_context`
+- exige `research_payload.total_cards=100` quando o campo existe
+- rejeita `validation_status=promoted`
+- rejeita `is_commander_legal=false`
 
 Resultado da rodada base:
 
 - expansao: `expanded_count=4`, `rejected_count=4`
-- validação stage 1 sobre os expandidos: `accepted_count=4`, `rejected_count=0`
+- validação stage 2 sobre os expandidos: `accepted_count=4`, `rejected_count=0`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
 
 ### 3. Persistir candidatos

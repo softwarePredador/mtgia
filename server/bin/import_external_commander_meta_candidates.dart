@@ -311,16 +311,16 @@ class _ImportConfig {
       }
     }
 
-    if (validationProfile == topDeckEdhTop16Stage1ValidationProfile) {
+    if (_isDryRunOnlyValidationProfile(validationProfile)) {
       if (!dryRun) {
         throw ArgumentError(
-          '$topDeckEdhTop16Stage1ValidationProfile exige --dry-run. '
+          '$validationProfile exige --dry-run. '
           'Nesta fase nao ha escrita em banco.',
         );
       }
       if (promoteValidated) {
         throw ArgumentError(
-          '$topDeckEdhTop16Stage1ValidationProfile nao permite '
+          '$validationProfile nao permite '
           '--promote-validated.',
         );
       }
@@ -336,4 +336,9 @@ class _ImportConfig {
       inputPath: inputPath,
     );
   }
+}
+
+bool _isDryRunOnlyValidationProfile(String profile) {
+  return profile == topDeckEdhTop16Stage1ValidationProfile ||
+      profile == topDeckEdhTop16Stage2ValidationProfile;
 }

@@ -1479,7 +1479,7 @@ cd server
 dart run bin/import_external_commander_meta_candidates.dart \
   test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
   --dry-run \
-  --validation-profile=topdeck_edhtop16_stage1 \
+  --validation-profile=topdeck_edhtop16_stage2 \
   --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
 ```
 
@@ -1502,4 +1502,117 @@ Estado final desta frente:
 
 - **provado e implementado:** `EDHTop16 -> GraphQL -> TopDeck deck page -> deckObj -> card_list 100`
 - **ainda nao implementado:** TopDeck direto via API v2, porque depende de `TOPDECK_API_KEY`
-- **ainda pendente:** stage 2 de validacao de decklist completa com legalidade Commander e `color_identity`
+- **ainda pendente:** enriquecer `color_identity` e prova independente de legalidade Commander sem tirar o fluxo de dry-run
+
+## 2026-04-24 - Stage 2 de validacao para candidatos externos com decklist completa
+
+## Veredito objetivo
+
+- **O profile `topdeck_edhtop16_stage2` foi implementado e reaproveita integralmente o gate do stage 1 antes de validar decklist completa.**
+- **O stage 2 continua `dry-run only`: sem escrita em banco e sem qualquer promocao para `meta_decks`.**
+- **A fixture expandida atual passou com `accepted_count=4` e `rejected_count=0`, mantendo apenas warning de `missing_color_identity`.**
+
+## Pipeline resumido desta fase
+
+1. receber candidato expandido com `card_list` quase completa
+2. reaplicar o gate `topdeck_edhtop16_stage1`
+3. exigir `card_count >= 98`
+4. exigir `commander_name`
+5. exigir `format=commander`
+6. exigir `subformat=competitive_commander`
+7. exigir `research_payload.collection_method` e `research_payload.source_context`
+8. exigir `research_payload.total_cards=100` quando o campo existe
+9. encerrar em `dry-run`, sem escrita e sem promocao
+
+## Comandos rodados
+
+```bash
+cd server
+dart analyze
+dart test
+
+dart test test/external_commander_meta_candidate_support_test.dart
+
+dart run bin/import_external_commander_meta_candidates.dart \
+  test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json \
+  --dry-run \
+  --validation-profile=topdeck_edhtop16_stage2 \
+  --validation-json-out=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json
+```
+
+## Evidencia objetiva observada
+
+### 1. Stage 2 herda a politica controlada do stage 1
+
+**Provado em codigo.**
+
+O profile `topdeck_edhtop16_stage2`:
+
+- reaplica `topdeck_edhtop16_stage1`
+- continua rejeitando:
+  - source fora de `TopDeck.gg` / `EDHTop16`
+  - path invalido
+  - `validation_status=promoted`
+  - `is_commander_legal=false`
+
+Conclusao:
+
+- decklist completa nao abre excecao de origem; primeiro o candidato precisa continuar seguro no stage 1.
+
+### 2. Stage 2 exige decklist quase completa
+
+**Provado em codigo e teste.**
+
+Regras implementadas:
+
+- `card_count >= 98`
+- `commander_name` obrigatorio
+- `research_payload.total_cards=100` quando o campo existe
+
+Teste dedicado cobre rejeicao por:
+
+- `card_count_below_stage2_minimum`
+- `invalid_total_cards`
+- `missing_commander_name`
+
+### 3. O artefato expandido atual passa no stage 2
+
+**Provado.**
+
+Resultado observado no dry-run:
+
+- `accepted_count = 4`
+- `rejected_count = 0`
+- todos os candidatos continuaram com:
+  - `format=commander`
+  - `subformat=competitive_commander`
+  - `card_count = 100`
+  - `research_payload.total_cards = 100`
+
+Warning remanescente:
+
+- `missing_color_identity`
+
+Conclusao:
+
+- o stage 2 fecha a validacao estrutural da decklist completa, mas ainda nao prova `color_identity` nem legalidade Commander por verificacao independente.
+
+### 4. Validacao do pacote permaneceu verde
+
+**Provado.**
+
+Comandos finais executados:
+
+- `cd server && dart analyze`
+- `cd server && dart test`
+
+Resultado observado:
+
+- `dart analyze`: `No issues found!`
+- `dart test`: suite completa concluida com sucesso
+
+## Menores proximas acoes tecnicas
+
+1. adicionar enriquecimento/derivacao automatica de `color_identity` no artefato expandido, sem abrir escrita em banco
+2. decidir se a proxima prova de legalidade Commander vira check local por `cards`/`card_legalities` ou enriquecimento separado em `research_payload`
+3. manter qualquer futura persistencia atras do mesmo fluxo `stage1 -> stage2 -> dry-run evidence`

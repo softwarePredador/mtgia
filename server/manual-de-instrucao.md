@@ -119,7 +119,7 @@
   - aceitar `--validation-json-out=...`
   - emitir `ACCEPT/REJECT` por candidato em `--dry-run`
   - bloquear importação real quando existirem rejeições
-  - obrigar `--dry-run` e bloquear `--promote-validated` no profile `topdeck_edhtop16_stage1`
+  - obrigar `--dry-run` e bloquear `--promote-validated` nos profiles `topdeck_edhtop16_stage1` e `topdeck_edhtop16_stage2`
 - Foram adicionados dois artefatos de apoio:
   - payload controlado de candidatos: `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json`
   - resultado do dry-run: `server/test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.validation.json`
@@ -127,6 +127,51 @@
   - aceite de candidato TopDeck válido
   - rejeição por path inválido em EDHTop16
   - rejeição por subformato amplo `commander`
+
+## 2026-04-24 - Stage 2 para candidatos externos com decklist completa
+
+### O Porquê
+- O stage 1 já protegia origem, subformato e contrato mínimo, mas ainda não distinguia candidato exploratório de candidato com decklist praticamente completa.
+- A expansão `EDHTop16 -> TopDeck deck page` passou a produzir `card_list` de `100` cartas; faltava um gate próprio para esse material antes de qualquer futuro passo de persistência.
+- O pedido desta rodada exigiu manter o fluxo **dry-run only**, sem escrita em banco e sem promoção, mesmo quando a decklist completa estivesse presente.
+
+### O Como
+- `server/lib/meta/external_commander_meta_candidate_support.dart` ganhou o profile `topdeck_edhtop16_stage2`.
+- O stage 2 reaproveita integralmente o `topdeck_edhtop16_stage1` e adiciona validações de decklist completa:
+  - `card_count >= 98`
+  - `commander_name` obrigatório
+  - `card_list` obrigatório
+  - `format=commander`
+  - `subformat=competitive_commander`
+  - `research_payload.collection_method` obrigatório
+  - `research_payload.source_context` obrigatório
+  - `research_payload.total_cards=100` quando o campo existir
+  - rejeição de `validation_status=promoted`
+  - rejeição de `is_commander_legal=false`
+- `server/bin/import_external_commander_meta_candidates.dart` passou a tratar o stage 2 como profile dry-run only, bloqueando escrita e `--promote-validated` do mesmo jeito que o stage 1.
+- `server/test/external_commander_meta_candidate_support_test.dart` foi ampliado para:
+  - aceitar a fixture expandida com decklists completas no stage 2
+  - rejeitar card list curta, `commander_name` ausente e `research_payload.total_cards` inválido
+- O artefato `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json` foi regenerado com `validation_profile=topdeck_edhtop16_stage2`.
+- `server/analysis_options.yaml` passou a excluir `build/**` do analyzer, removendo o bloqueio causado por artefatos locais gerados fora do escopo versionado do pacote.
+
+### Resultado prático
+- O repositório agora separa explicitamente:
+  - `stage1` = origem + schema mínimo
+  - `stage2` = origem validada + decklist quase completa
+- A rodada validada continuou 100% não destrutiva:
+  - sem escrita em `external_commander_meta_candidates`
+  - sem promoção para `meta_decks`
+- A fixture expandida atual ficou com `accepted_count=4` e `rejected_count=0` no stage 2.
+
+### Arquivos alterados
+- `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `server/bin/import_external_commander_meta_candidates.dart`
+- `server/test/external_commander_meta_candidate_support_test.dart`
+- `server/test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json`
+- `server/doc/EXTERNAL_COMMANDER_META_CANDIDATES_WORKFLOW_2026-04-23.md`
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+- `server/analysis_options.yaml`
 
 ### Resultado prático
 - O repositório agora tem um stage 1 real para abrir o funil multi-fonte sem tocar em `meta_decks`.

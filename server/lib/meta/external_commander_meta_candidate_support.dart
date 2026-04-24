@@ -12,6 +12,7 @@ const externalCommanderMetaValidationStatuses = <String>{
 
 const genericExternalCommanderMetaValidationProfile = 'generic';
 const topDeckEdhTop16Stage1ValidationProfile = 'topdeck_edhtop16_stage1';
+const topDeckEdhTop16Stage2ValidationProfile = 'topdeck_edhtop16_stage2';
 
 class ExternalCommanderMetaControlledSourcePolicy {
   const ExternalCommanderMetaControlledSourcePolicy({
@@ -394,6 +395,8 @@ ExternalCommanderMetaCandidateValidationResult
 
   if (profile == topDeckEdhTop16Stage1ValidationProfile) {
     _applyTopDeckEdhTop16Stage1Validation(candidate, issues);
+  } else if (profile == topDeckEdhTop16Stage2ValidationProfile) {
+    _applyTopDeckEdhTop16Stage2Validation(candidate, issues);
   }
 
   return ExternalCommanderMetaCandidateValidationResult(
@@ -522,6 +525,68 @@ void _applyTopDeckEdhTop16Stage1Validation(
         code: 'missing_color_identity',
         message:
             'Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto.',
+      ),
+    );
+  }
+}
+
+void _applyTopDeckEdhTop16Stage2Validation(
+  ExternalCommanderMetaCandidate candidate,
+  List<ExternalCommanderMetaValidationIssue> issues,
+) {
+  _applyTopDeckEdhTop16Stage1Validation(candidate, issues);
+
+  if (candidate.cardCount < 98) {
+    issues.add(
+      ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'card_count_below_stage2_minimum',
+        message:
+            'Stage 2 exige decklist quase completa: card_count=${candidate.cardCount}, minimo=98.',
+      ),
+    );
+  }
+
+  final totalCards =
+      _readResearchPayloadInt(candidate.researchPayload, 'total_cards');
+  if (candidate.researchPayload.containsKey('total_cards') &&
+      totalCards != 100) {
+    issues.add(
+      ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'invalid_total_cards',
+        message:
+            'Stage 2 exige research_payload.total_cards=100 quando o campo existe. Valor atual: ${candidate.researchPayload['total_cards']}.',
+      ),
+    );
+  }
+
+  if ((candidate.commanderName ?? '').trim().isEmpty) {
+    issues.add(
+      const ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'missing_commander_name',
+        message: 'Stage 2 exige commander_name presente.',
+      ),
+    );
+  }
+
+  if (candidate.persistedFormat != 'commander') {
+    issues.add(
+      const ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'invalid_stage2_format',
+        message: 'Stage 2 exige format=commander.',
+      ),
+    );
+  }
+
+  if (candidate.normalizedSubformat != 'competitive_commander') {
+    issues.add(
+      const ExternalCommanderMetaValidationIssue(
+        severity: 'error',
+        code: 'invalid_stage2_subformat',
+        message: 'Stage 2 exige subformat=competitive_commander.',
       ),
     );
   }
@@ -668,4 +733,11 @@ bool _hasResearchPayloadValue(Map<String, dynamic> payload, String key) {
   if (raw is String) return raw.trim().isNotEmpty;
   if (raw is Iterable) return raw.isNotEmpty;
   return true;
+}
+
+int? _readResearchPayloadInt(Map<String, dynamic> payload, String key) {
+  final raw = payload[key];
+  if (raw is int) return raw;
+  if (raw is num) return raw.toInt();
+  return int.tryParse(raw?.toString().trim() ?? '');
 }
