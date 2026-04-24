@@ -20,6 +20,15 @@ const topDeckEdhTop16Stage2ValidationProfile = 'topdeck_edhtop16_stage2';
 const externalCommanderMetaLegalStatusLegal = 'legal';
 const externalCommanderMetaLegalStatusIllegal = 'illegal';
 const externalCommanderMetaLegalStatusNotProven = 'not_proven';
+const externalCommanderMetaPromotionLegalStatusValid = 'valid';
+const externalCommanderMetaPromotionLegalStatusWarningReviewed =
+    'warning_reviewed';
+const externalCommanderMetaPromotionLegalStatuses = <String>{
+  externalCommanderMetaPromotionLegalStatusValid,
+  externalCommanderMetaPromotionLegalStatusWarningReviewed,
+  'warning_pending',
+  'rejected',
+};
 
 abstract class ExternalCommanderMetaCandidateLegalityRepository {
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
@@ -257,6 +266,7 @@ class ExternalCommanderMetaCandidate {
     Set<String>? colorIdentity,
     this.isCommanderLegal,
     this.validationStatus = 'candidate',
+    this.legalStatus,
     this.validationNotes,
     Map<String, dynamic>? researchPayload,
   })  : colorIdentity = colorIdentity ?? <String>{},
@@ -276,6 +286,7 @@ class ExternalCommanderMetaCandidate {
   final Set<String> colorIdentity;
   final bool? isCommanderLegal;
   final String validationStatus;
+  final String? legalStatus;
   final String? validationNotes;
   final Map<String, dynamic> researchPayload;
   final String importedBy;
@@ -349,6 +360,7 @@ class ExternalCommanderMetaCandidate {
       'color_identity': colorIdentity.toList()..sort(),
       'is_commander_legal': isCommanderLegal,
       'validation_status': validationStatus,
+      'legal_status': legalStatus,
       'validation_notes': validationNotes,
       'research_payload': researchPayload,
       'imported_by': importedBy,
@@ -390,6 +402,7 @@ class ExternalCommanderMetaCandidate {
           const ['subformat', 'queue', 'meta_format'],
         ) ??
         rawFormat;
+    final researchPayload = _normalizeResearchPayload(json);
 
     return ExternalCommanderMetaCandidate(
       sourceName: sourceName,
@@ -421,11 +434,21 @@ class ExternalCommanderMetaCandidate {
             ) ??
             'candidate',
       ),
+      legalStatus: normalizeExternalCommanderMetaPromotionLegalStatus(
+        _firstNonEmptyString(
+              json,
+              const ['legal_status', 'promotion_legal_status'],
+            ) ??
+            _firstNonEmptyString(
+              researchPayload,
+              const ['legal_status', 'promotion_legal_status'],
+            ),
+      ),
       validationNotes: _firstNonEmptyString(
         json,
         const ['validation_notes', 'notes'],
       ),
-      researchPayload: _normalizeResearchPayload(json),
+      researchPayload: researchPayload,
       importedBy: importedBy,
     );
   }
@@ -492,6 +515,28 @@ String normalizeExternalCommanderMetaValidationStatus(String raw) {
     return normalized;
   }
   return 'candidate';
+}
+
+String? normalizeExternalCommanderMetaPromotionLegalStatus(String? raw) {
+  final normalized = raw?.trim().toLowerCase();
+  if (normalized == null || normalized.isEmpty) return null;
+
+  return switch (normalized) {
+    'valid' || 'validated' => externalCommanderMetaPromotionLegalStatusValid,
+    'warning_reviewed' ||
+    'warning reviewed' ||
+    'reviewed_warning' =>
+      externalCommanderMetaPromotionLegalStatusWarningReviewed,
+    'warning_pending' ||
+    'warning pending' ||
+    'warning' ||
+    'review_needed' =>
+      'warning_pending',
+    'rejected' || 'invalid' => 'rejected',
+    _ => externalCommanderMetaPromotionLegalStatuses.contains(normalized)
+        ? normalized
+        : null,
+  };
 }
 
 String canonicalizeExternalCommanderMetaSourceName(

@@ -46,6 +46,7 @@ Campos recomendados:
 - `color_identity`
 - `is_commander_legal`
 - `validation_status`
+- `legal_status`: `valid`, `warning_reviewed`, `warning_pending` ou `rejected`
 - `validation_notes`
 - `research_payload`
 
@@ -64,6 +65,7 @@ Campos recomendados:
       "color_identity": ["W", "U", "B", "G"],
       "is_commander_legal": true,
       "validation_status": "validated",
+      "legal_status": "valid",
       "validation_notes": "Lista marcada como cEDH e coerente com shell competitiva.",
       "cards": [
         { "quantity": 1, "name": "Sol Ring" },
@@ -230,6 +232,59 @@ Regra de seguranca adicional:
 - `commander` generico continua estagiado em `external_commander_meta_candidates`
 - ele **nao** e promovido automaticamente para `meta_decks` enquanto a tabela principal ainda usar os codigos legados `EDH`/`cEDH`
 - isso evita reclassificar Commander multiplayer amplo como `EDH` legado do MTGTop8, que no pipeline atual significa `Duel Commander`
+
+### 4. Promover para `meta_decks` com gate separado
+
+O fluxo de promocao **nao** reutiliza `--promote-validated` do importador antigo.
+
+Existe agora um gate proprio:
+
+- script: `server/bin/promote_external_commander_meta_candidates.dart`
+- suporte: `server/lib/meta/external_commander_meta_promotion_support.dart`
+- modo padrao: `dry-run`
+- escrita real: somente com `--apply`
+
+Comando recomendado para auditoria nao destrutiva:
+
+```bash
+cd server
+dart run bin/promote_external_commander_meta_candidates.dart \
+  --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.json
+```
+
+Regras do gate:
+
+- seleciona candidatos direto de `external_commander_meta_candidates`
+- promove **somente** `validation_status=validated`
+- promove **somente** `subformat=competitive_commander`
+- exige `card_count >= 98`
+- exige `legal_status` em `valid` ou `warning_reviewed`
+- exige `source_url` unico no staging e ausente em `meta_decks`
+- exige `commander_name` presente
+- exige `research_payload.source_chain` presente
+- mapeia a promocao para `meta_decks.format='cEDH'`
+- ao aplicar, marca o staging como `validation_status='promoted'`
+
+Aplicacao real:
+
+```bash
+cd server
+dart run bin/promote_external_commander_meta_candidates.dart --apply
+```
+
+Resultado comprovado no dry-run base desta rodada:
+
+- `total=4`
+- `promotable=0`
+- `blocked=4`
+- todos os `4` rows foram bloqueados por:
+  - `validation_status_not_validated`
+  - `missing_or_invalid_legal_status`
+
+Leitura:
+
+- a fila externa atual continua segura: nada entra em `meta_decks` sem revisao explicita
+- o proximo passo operacional e revisar candidatos e atualizar `validation_status` + `legal_status` antes de qualquer `--apply`
 
 ## Por que isso existe
 

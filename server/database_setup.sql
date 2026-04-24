@@ -221,6 +221,7 @@ CREATE TABLE IF NOT EXISTS external_commander_meta_candidates (
     color_identity TEXT[] DEFAULT '{}',
     is_commander_legal BOOLEAN,
     validation_status TEXT NOT NULL DEFAULT 'candidate',
+    legal_status TEXT,
     validation_notes TEXT,
     research_payload JSONB NOT NULL DEFAULT '{}',
     imported_by TEXT NOT NULL DEFAULT 'copilot_cli_web_agent',

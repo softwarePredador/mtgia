@@ -4,7 +4,7 @@ Data: 2026-04-24
 
 ## Escopo desta rodada
 
-Habilitar e provar persistencia segura do `stage2` em `external_commander_meta_candidates`, com validacao real, sem promocao para `meta_decks`.
+Habilitar e provar persistencia segura do `stage2` em `external_commander_meta_candidates`, e separar um gate explicito de promocao `external_commander_meta_candidates -> meta_decks` com `dry-run` por padrao.
 
 ## Resumo do pipeline validado
 
@@ -17,7 +17,8 @@ Pipeline auditado nesta task:
 5. resolucao em `cards`
 6. legalidade em `card_legalities`
 7. persistencia deduplicada em `external_commander_meta_candidates`
-8. validacao de imutabilidade de `meta_decks`
+8. `server/bin/promote_external_commander_meta_candidates.dart`
+9. validacao de imutabilidade de `meta_decks`
 
 O stage 2 agora nao para mais em schema/source validation: ele valida contra o banco, bloqueia rejeitados, persiste apenas na fila externa e deixa `meta_decks` fora do caminho.
 
@@ -28,6 +29,7 @@ cd server && dart analyze
 cd server && dart test
 cd server && dart run bin/migrate_external_commander_meta_candidates.dart
 cd server && dart run bin/import_external_commander_meta_candidates.dart test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json --validation-profile=topdeck_edhtop16_stage2 --imported-by=meta_deck_intelligence_2026_04_24
+cd server && dart run bin/promote_external_commander_meta_candidates.dart --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.json
 cd server && set -a && source .env >/dev/null 2>&1 && set +a && psql "$DATABASE_URL" -Atqc "SELECT COUNT(*)::text || '|' || md5(COALESCE(string_agg(source_url || '|' || format || '|' || COALESCE(archetype,'') || '|' || COALESCE(card_list,'') || '|' || COALESCE(placement,''), '||' ORDER BY source_url), '')) FROM meta_decks"
 cd server && dart run bin/meta_profile_report.dart > /tmp/meta_profile_report_2026-04-24.json
 ```
@@ -112,6 +114,33 @@ Leitura:
 - `meta_decks` nao foi alterado nem por count nem por hash agregado
 - a persistencia ficou confinada a `external_commander_meta_candidates`
 - a fila externa preserva o payload de pesquisa completo, sem promocao automatica
+
+## Evidencia do gate separado de promocao
+
+Artifact gerado:
+
+- `server/test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.json`
+
+Resultado observado no dry-run:
+
+| Medida | Valor |
+| --- | --- |
+| total | `4` |
+| promotable | `0` |
+| blocked | `4` |
+
+Bloqueios observados em `4/4` rows:
+
+- `validation_status_not_validated`
+- `missing_or_invalid_legal_status`
+
+Leitura:
+
+- o gate novo usa somente a fila `external_commander_meta_candidates`
+- ele **nao** reutiliza `--promote-validated` do importador antigo
+- ele so aceitaria `validation_status=validated` e `legal_status` em `valid|warning_reviewed`
+- o banco atual ainda nao tem nenhum row apto para promocao, entao o dry-run prova que o corte ficou conservador
+- `meta_decks` continuou intocado
 
 ## Frescor da base atual
 
@@ -217,6 +246,7 @@ Leitura:
 2. `Prismari, the Inspiration` nao resolveu em `cards`, deixando `Scion of the Ur-Dragon` como `not_proven`.
 3. O bucket `COLORLESS_OR_UNRESOLVED` ainda precisa ser separado para medir colorless real vs. falha de resolucao.
 4. A base principal `meta_decks` continua fresca para Commander/cEDH, mas os formatos nao Commander estao congelados em fevereiro.
+5. Os candidatos externos atuais continuam com `validation_status=candidate` e `legal_status` ausente; logo, a promocao real segue `not proven` ate revisao operacional.
 
 ## Interpretacao estrategica util para `optimize` e `generate`
 
@@ -252,5 +282,6 @@ Nao provado nesta rodada:
 ## Menores proximas acoes tecnicas
 
 1. Adicionar alias/resolution targeted para `Prismari, the Inspiration` e revalidar o artifact.
-2. Persistir `commander_color_identity` derivada na fila externa para parar de depender so do artifact.
-3. Separar `COLORLESS` de `UNRESOLVED` nos relatórios de cobertura Commander.
+2. Definir revisao operacional da fila externa para preencher `validation_status=validated` e `legal_status=valid|warning_reviewed` antes de qualquer `--apply`.
+3. Persistir `commander_color_identity` derivada na fila externa para parar de depender so do artifact.
+4. Separar `COLORLESS` de `UNRESOLVED` nos relatórios de cobertura Commander.

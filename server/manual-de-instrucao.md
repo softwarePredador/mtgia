@@ -1,6 +1,58 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-24 — Gate separado de promocao `external_commander_meta_candidates -> meta_decks`
+
+### O Porquê
+- A fila `external_commander_meta_candidates` ja servia como staging seguro, mas ainda faltava um gate proprio para promover apenas decks realmente revisados para `meta_decks`.
+- O requisito desta rodada exigiu dois pontos duros:
+  - `dry-run` por padrao e `--apply` explicito;
+  - nenhum reaproveito de `--promote-validated` do importador antigo nesse caminho.
+- Tambem havia um gap de governanca no schema: a fila externa ainda nao tinha um campo proprio para registrar o parecer de promocao (`legal_status`) que o gate precisava respeitar.
+
+### O Como
+- Foi criado `server/lib/meta/external_commander_meta_promotion_support.dart` para concentrar:
+  - parse de argumentos do gate;
+  - regras de aceite/bloqueio da promocao;
+  - plano do insert em `meta_decks`;
+  - `shell_label` e `strategy_archetype` derivados para a linha promovida.
+- Foi criado `server/bin/promote_external_commander_meta_candidates.dart` com:
+  - `dry-run` por default;
+  - `--apply` como unico modo de escrita;
+  - `--report-json-out=...` para gerar artifact da rodada;
+  - leitura direta de `external_commander_meta_candidates`;
+  - rechecagem de `source_url` em `meta_decks` antes de aplicar;
+  - marcação de staging como `validation_status='promoted'` e `promoted_to_meta_decks_at=CURRENT_TIMESTAMP` quando a promocao realmente acontece.
+- O gate aceita **somente** rows que cumpram simultaneamente:
+  - `validation_status=validated`
+  - `subformat=competitive_commander`
+  - `card_count >= 98`
+  - `legal_status in ('valid', 'warning_reviewed')`
+  - `commander_name` presente
+  - `research_payload.source_chain` presente
+  - `source_url` unica e ainda ausente em `meta_decks`
+- `server/lib/meta/external_commander_meta_candidate_support.dart`, `server/bin/import_external_commander_meta_candidates.dart`, `server/bin/migrate_external_commander_meta_candidates.dart` e `server/database_setup.sql` passaram a suportar o novo campo `legal_status` na fila externa.
+
+### Testes e evidencia
+- Foi criado `server/test/external_commander_meta_promotion_support_test.dart` cobrindo:
+  - `dry-run` por padrao;
+  - `--apply` explicito;
+  - bloqueio de combinacao `--apply + --dry-run`;
+  - aceite de `warning_reviewed`;
+  - bloqueios por `validation_status`, `legal_status`, `source_url`, `commander_name`, `source_chain`, `subformat` e `card_count`.
+- Validacao executada:
+  - `dart analyze`
+  - `dart test`
+  - `dart run bin/migrate_external_commander_meta_candidates.dart`
+  - `dart run bin/promote_external_commander_meta_candidates.dart --report-json-out=test/artifacts/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-24.json`
+- Resultado observado no dry-run real:
+  - `total=4`
+  - `promotable=0`
+  - `blocked=4`
+  - todos os bloqueios atuais vieram de:
+    - `validation_status_not_validated`
+    - `missing_or_invalid_legal_status`
+
 ## 2026-04-24 — Persistencia segura stage 2 em `external_commander_meta_candidates`
 
 ### O Porquê

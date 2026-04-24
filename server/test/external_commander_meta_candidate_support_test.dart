@@ -22,6 +22,7 @@ void main() {
           ],
           'color_identity': <String>['g', 'w', 'u', 'b'],
           'validation_status': 'validated',
+          'legal_status': 'warning reviewed',
           'is_commander_legal': true,
           'research_payload': <String, dynamic>{
             'web_sources': <String>['moxfield', 'edhrec'],
@@ -35,6 +36,7 @@ void main() {
       expect(candidate.normalizedSubformat, 'competitive_commander');
       expect(candidate.metaDeckFormatCode, 'cEDH');
       expect(candidate.isPromotionEligible, isTrue);
+      expect(candidate.legalStatus, 'warning_reviewed');
       expect(candidate.researchPayload['web_sources'], isNotEmpty);
     });
 
