@@ -1,0 +1,406 @@
+{
+  "effective_deck_color_coverage": [
+    {
+      "source": "external",
+      "format": "cEDH",
+      "effective_deck_colors": "BRU",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "RU",
+      "deck_count": 30
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BGU",
+      "deck_count": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "G",
+      "deck_count": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "unknown",
+      "deck_count": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BGR",
+      "deck_count": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BR",
+      "deck_count": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BU",
+      "deck_count": 9
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "RW",
+      "deck_count": 9
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "GR",
+      "deck_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "U",
+      "deck_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BG",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BUW",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "RUW",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "W",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "R",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BGUW",
+      "deck_count": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BRUW",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BRW",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "UW",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "BW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "GRU",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "GRW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "effective_deck_colors": "GU",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BR",
+      "deck_count": 30
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GU",
+      "deck_count": 29
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGR",
+      "deck_count": 19
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BRU",
+      "deck_count": 16
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GW",
+      "deck_count": 15
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BU",
+      "deck_count": 11
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "R",
+      "deck_count": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "RU",
+      "deck_count": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BG",
+      "deck_count": 9
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GUW",
+      "deck_count": 8
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "U",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BUW",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GR",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GRU",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "B",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BRW",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "RW",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGU",
+      "deck_count": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGW",
+      "deck_count": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "G",
+      "deck_count": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "RUW",
+      "deck_count": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGRU",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BRUW",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BW",
+      "deck_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGRUW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "BGUW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GRUW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "GRW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "UW",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "effective_deck_colors": "unknown",
+      "deck_count": 1
+    }
+  ],
+  "commander_lookup_gaps_top": [
+    {
+      "commander_name": "Kefka, Court Mage",
+      "deck_count": 4
+    },
+    {
+      "commander_name": "Ral, Monsoon Mage",
+      "deck_count": 4
+    },
+    {
+      "commander_name": "Terra, Magical Adept",
+      "deck_count": 4
+    },
+    {
+      "commander_name": "Brigid, Clachan's Heart",
+      "deck_count": 3
+    },
+    {
+      "commander_name": "Etali, Primal Conqueror",
+      "deck_count": 3
+    },
+    {
+      "commander_name": "Aang, at the Crossroads",
+      "deck_count": 2
+    },
+    {
+      "commander_name": "Krark, the Thumbless",
+      "deck_count": 2
+    },
+    {
+      "commander_name": "Prismari, the Inspiration",
+      "deck_count": 2
+    },
+    {
+      "commander_name": "Aang, Swift Savior",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Avatar Aang",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Birgi, God of Storytelling",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Cecil, Dark Knight",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Emet-Selch, Unsundered",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Esika, God of the Tree",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Gwen Stacy",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Peter Parker",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Sakashima of a Thousand Faces",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "The Emperor of Palamecia",
+      "deck_count": 1
+    },
+    {
+      "commander_name": "Witherbloom, the Balancer",
+      "deck_count": 1
+    }
+  ]
+}

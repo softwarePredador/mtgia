@@ -1,6 +1,106 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Promocao externa controlada para `meta_decks` sem novo apply e prova source-aware fresca
+
+### O Porquê
+- Depois do follow-up `7265edb`, ainda faltava fechar a prova operacional pedida para o pipeline meta externo:
+  - rodar dry-run atual do gate;
+  - aplicar **somente** se os guards estivessem realmente verdes;
+  - confirmar em `meta_profile_report` que fontes externas aparecem em `meta_decks`;
+  - provar de novo que `competitive_commander` nao mistura `duel_commander` ou Commander casual no consumo por `optimize/generate`.
+- Tambem era importante nao maquiar dois riscos que ja apareciam no material anterior:
+  - drift parcial do `TopDeck`;
+  - cobertura fraca por identidade de cor do comandante no catalogo local.
+
+### O Como
+- Foram lidos antes da rodada:
+  - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+  - `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_2026-04-27.md`
+  - `server/manual-de-instrucao.md`
+- Dry-runs executados:
+  - `cd server && dart run bin/fetch_meta.dart cEDH --dry-run --limit-events=1 --limit-decks=2`
+  - `cd server && dart run bin/expand_external_commander_meta_candidates.dart --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57 --limit=4 --output=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.json`
+  - `cd server && dart run bin/import_external_commander_meta_candidates.dart test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.json --dry-run --validation-profile=topdeck_edhtop16_stage2 --validation-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.validation.json`
+  - `cd server && dart run bin/promote_external_commander_meta_candidates.dart --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-27.json`
+- Relatorios e probes:
+  - `cd server && dart run bin/extract_meta_insights.dart --report-only > test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_2026-04-27.json`
+  - `cd server && dart run bin/meta_profile_report.dart > test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_2026-04-27.json`
+  - probes Python para:
+    - `meta_decks` por source/frescor;
+    - status da fila `external_commander_meta_candidates`;
+    - cobertura por cor efetiva da lista;
+    - lacunas de `commander_name -> cards.color_identity`.
+- Validacao focada de codigo:
+  - `dart analyze` em `lib/meta`, `lib/ai`, rotas `generate/optimize`, bins e testes focados
+  - `dart test` em:
+    - `test/meta_deck_reference_support_test.dart`
+    - `test/meta_deck_analytics_support_test.dart`
+    - `test/external_commander_meta_promotion_support_test.dart`
+    - `test/optimize_runtime_support_test.dart`
+    - `test/external_commander_meta_staging_support_test.dart`
+    - `test/mtgtop8_meta_support_test.dart`
+
+### Resultado
+- `fetch_meta.dart` para `cEDH` continua operacional:
+  - `format?f=cEDH` respondeu;
+  - o evento `83812` expôs `115` rows;
+  - o parser voltou a ler decks reais (`Terra, Magical Adept`; `Kraum + Tymna`).
+- A cadeia externa continua viva, mas com drift parcial:
+  - expansao `EDHTop16 -> TopDeck`: `expanded=2`, `rejected=2`
+  - rejeicoes: `topdeck_deckobj_missing`
+  - validacao stage 2: `accepted=2`, `rejected=0`
+  - `Scion of the Ur-Dragon` ficou `legal_status=not_proven` por `Prismari, the Inspiration`
+  - `Norman Osborn // Green Goblin` ficou `legal_status=legal`
+- O gate de promocao live foi mantido travado de forma correta:
+  - `total=4`, `promotable=0`, `blocked=4`
+  - `Norman` ja estava promovido e duplicado em `meta_decks`
+  - `Scion` segue bloqueado por `warning_pending`, `commander_legality_not_confirmed` e `unresolved_cards_blocking`
+  - `Kraum + Tymna` e `Malcolm + Vial Smasher` seguem sem `staging_audit`
+  - **nao houve novo apply**
+- A base atual ficou assim:
+  - `meta_decks`: `642` rows
+    - `mtgtop8=641`
+    - `external=1`
+  - `external_commander_meta_candidates`:
+    - `promoted/valid=1`
+    - `staged/warning_pending=1`
+    - `candidate/(null)=2`
+- `meta_profile_report` e `extract_meta_insights --report-only` passaram a comprovar de novo:
+  - `external / competitive_commander = 1`
+  - `external / duel_commander = 0`
+- O isolamento entre buckets continua correto no consumo:
+  - `generate` so injeta meta Commander quando o prompt prova `duel_commander` ou `competitive_commander`
+  - `optimize` e `complete` so resolvem `competitive_commander` para `deckFormat=commander` com `bracket >= 3`
+  - `selectMetaDeckReferenceCandidates(...)` descarta rows cujo `candidate.commanderSubformat` nao bate com o `commanderScope`
+
+### Observações operacionais
+- A cobertura por **cor efetiva da lista** foi medida com sucesso e mostrou buckets coerentes:
+  - `cEDH`: `BR=30`, `GU=29`, `BGR=19`, `BRU=16`, `GW=15`
+  - `external cEDH`: `BRU=1`
+- A cobertura por **identidade canonica do comandante** continua incompleta:
+  - muitos rows Commander caem em `unknown` ao tentar resolver `commander_name -> cards.color_identity`
+  - gaps frequentes: `Kefka, Court Mage`, `Ral, Monsoon Mage`, `Terra, Magical Adept`, `Brigid, Clachan's Heart`, `Etali, Primal Conqueror`
+  - isso deve ser tratado como **not proven**, nao como cobertura total.
+- O row externo promovido (`Norman Osborn // Green Goblin`) reforca o tipo certo de sinal para high power/cEDH:
+  - fast mana denso;
+  - pacote `Oracle / Tainted Pact / Breach`;
+  - interacao barata/gratis;
+  - wheels/filter para acelerar kills compactas.
+
+### Artefatos
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-27.md`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/fetch_meta_cedh_dry_run.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-27.log`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/effective_deck_color_coverage_2026-04-27.json`
+
 ## 2026-04-27 — Continuacao da auditoria Commander optimize com apply probe maior, cache de `/ai/archetypes` e rerun iPhone 15
 
 ### O Porquê

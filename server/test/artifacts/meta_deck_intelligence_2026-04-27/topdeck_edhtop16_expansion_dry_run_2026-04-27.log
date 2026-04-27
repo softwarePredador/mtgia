@@ -1,0 +1,17 @@
+Expansion dry-run: https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57
+Limit: 4
+Output: test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.json
+[EXPANDED] total=100 | https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1
+[REJECTED] topdeck_deckobj_missing | https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/08zOUub7ojOb3ijto8jZuSKWHfG3
+[REJECTED] topdeck_deckobj_missing | https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/JJTMzhm4EdbQ1229zeD9dXMNEY63
+[EXPANDED] total=100 | https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/o7B1hWuOEOWme03PYZcejbDKhcG2
+Expansion dry-run finalizado: expanded=2 rejected=2
+🔌 Conectando ao banco: 143.198.230.247:5433/halder (env: development)
+✅ Pool de conexões inicializado (SSL: disable).
+Candidates carregados: 2 (validated: 0)
+Validation profile: topdeck_edhtop16_stage2 | accepted: 2 | rejected: 0
+Validation JSON salvo em: test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_2026-04-27.validation.json
+[ACCEPT] Scion of the Ur-Dragon | EDHTop16 | competitive_commander | cards=100 | legal=not_proven | unresolved=1 | illegal=0 | warning:missing_color_identity, warning:unresolved_cards | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1
+[ACCEPT] Norman Osborn // Green Goblin | EDHTop16 | competitive_commander | cards=100 | legal=legal | unresolved=0 | illegal=0 | warning:missing_color_identity | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4
+Dry-run finalizado sem gravar no banco.
+Conexão com o PostgreSQL fechada.

@@ -1,0 +1,44 @@
+[
+  {
+    "source": "external",
+    "format": "cEDH",
+    "color_identity": "unknown",
+    "deck_count": 1
+  },
+  {
+    "source": "mtgtop8",
+    "format": "cEDH",
+    "color_identity": "unknown",
+    "deck_count": 212
+  },
+  {
+    "source": "mtgtop8",
+    "format": "cEDH",
+    "color_identity": "BGRUW",
+    "deck_count": 1
+  },
+  {
+    "source": "mtgtop8",
+    "format": "cEDH",
+    "color_identity": "BW",
+    "deck_count": 1
+  },
+  {
+    "source": "mtgtop8",
+    "format": "EDH",
+    "color_identity": "unknown",
+    "deck_count": 155
+  },
+  {
+    "source": "mtgtop8",
+    "format": "EDH",
+    "color_identity": "RW",
+    "deck_count": 5
+  },
+  {
+    "source": "mtgtop8",
+    "format": "EDH",
+    "color_identity": "GR",
+    "deck_count": 2
+  }
+]

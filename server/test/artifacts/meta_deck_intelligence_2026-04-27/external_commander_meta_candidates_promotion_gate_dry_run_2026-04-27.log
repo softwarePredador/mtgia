@@ -1,0 +1,10 @@
+🔌 Conectando ao banco: 143.198.230.247:5433/halder (env: development)
+✅ Pool de conexões inicializado (SSL: disable).
+Promotion gate | mode=dry_run | scope=all | total=4 | promotable=0 | blocked=4
+[BLOCK] Norman Osborn // Green Goblin | status=promoted | legal=valid | cards=100 | already_promoted, validation_status_not_staged, source_url_already_present_in_meta_decks, deck_fingerprint_already_present_in_meta_decks | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4
+[BLOCK] Scion of the Ur-Dragon | status=staged | legal=warning_pending | cards=100 | legal_status_not_promotable, commander_legality_not_confirmed, unresolved_cards_blocking | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1
+[BLOCK] Kraum, Ludevic's Opus + Tymna the Weaver | status=candidate | legal=- | cards=100 | validation_status_not_staged, missing_or_invalid_legal_status, commander_legality_not_confirmed, missing_staging_audit | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8
+[BLOCK] Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce | status=candidate | legal=- | cards=100 | validation_status_not_staged, missing_or_invalid_legal_status, commander_legality_not_confirmed, missing_staging_audit | https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5
+Promotion report salvo em: test/artifacts/meta_deck_intelligence_2026-04-27/external_commander_meta_candidates_promotion_gate_dry_run_2026-04-27.json
+Dry-run finalizado sem gravar em meta_decks.
+Conexão com o PostgreSQL fechada.

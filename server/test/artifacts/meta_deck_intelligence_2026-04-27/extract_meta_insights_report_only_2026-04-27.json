@@ -1,0 +1,307 @@
+═══════════════════════════════════════════════════════════════
+  META INSIGHTS EXTRACTOR - Imitation Learning Pipeline
+  Modo: REPORT ONLY
+  Data: 2026-04-27T15:27:22.508806
+═══════════════════════════════════════════════════════════════
+
+🔌 Conectando ao banco: 143.198.230.247:5433/halder (env: development)
+✅ Pool de conexões inicializado (SSL: disable).
+📥 Carregando meta decks do banco...
+   Encontrados 642 decks
+
+🔄 Processando deck lists...
+   642 decks parseados
+
+🧭 Resumo source/subformat/shell...
+{
+  "total_decks": 642,
+  "by_source": [
+    {
+      "source": "mtgtop8",
+      "deck_count": 641
+    },
+    {
+      "source": "external",
+      "deck_count": 1
+    }
+  ],
+  "by_source_format": [
+    {
+      "source": "mtgtop8",
+      "format": "competitive_commander",
+      "deck_count": 214
+    },
+    {
+      "source": "mtgtop8",
+      "format": "duel_commander",
+      "deck_count": 162
+    },
+    {
+      "source": "mtgtop8",
+      "format": "PI",
+      "deck_count": 46
+    },
+    {
+      "source": "mtgtop8",
+      "format": "ST",
+      "deck_count": 46
+    },
+    {
+      "source": "mtgtop8",
+      "format": "VI",
+      "deck_count": 44
+    },
+    {
+      "source": "mtgtop8",
+      "format": "MO",
+      "deck_count": 41
+    },
+    {
+      "source": "mtgtop8",
+      "format": "LE",
+      "deck_count": 40
+    },
+    {
+      "source": "mtgtop8",
+      "format": "PAU",
+      "deck_count": 40
+    },
+    {
+      "source": "mtgtop8",
+      "format": "PREM",
+      "deck_count": 8
+    },
+    {
+      "source": "external",
+      "format": "competitive_commander",
+      "deck_count": 1
+    }
+  ],
+  "by_source_subformat": [
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "deck_count": 214
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "deck_count": 162
+    },
+    {
+      "source": "external",
+      "subformat": "competitive_commander",
+      "deck_count": 1
+    }
+  ],
+  "top_commander_shells": [
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Spider-Man 2099",
+      "deck_count": 29
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "deck_count": 21
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Kinnan, Bonder Prodigy",
+      "deck_count": 20
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Thrasios, Triton Hero + Tymna the Weaver",
+      "deck_count": 15
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "deck_count": 12
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Sisay, Weatherlight Captain",
+      "deck_count": 11
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Tasigur, the Golden Fang",
+      "deck_count": 9
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Cloud, Midgar Mercenary",
+      "deck_count": 8
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Slimefoot and Squee",
+      "deck_count": 8
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Deadpool, Trading Card",
+      "deck_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Tifa Lockhart",
+      "deck_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Magda, Brazen Outlaw",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Rograkh, Son of Rohgahh + Thrasios, Triton Hero",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Lumra, Bellow of the Woods",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Tivit, Seller of Secrets",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Aragorn, King of Gondor",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Phelia, Exuberant Shepherd",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "shell_label": "Quintorius, History Chaser",
+      "deck_count": 5
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Kefka, Court Mage",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "shell_label": "Ral, Monsoon Mage",
+      "deck_count": 4
+    }
+  ],
+  "top_commander_strategies": [
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "combo",
+      "deck_count": 126
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "control",
+      "deck_count": 75
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "aggro",
+      "deck_count": 45
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "control",
+      "deck_count": 38
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "aggro",
+      "deck_count": 24
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "tribal",
+      "deck_count": 19
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "ramp_value",
+      "deck_count": 17
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "midrange",
+      "deck_count": 12
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "aristocrats",
+      "deck_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "combo",
+      "deck_count": 6
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "ramp_value",
+      "deck_count": 4
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "tribal",
+      "deck_count": 2
+    },
+    {
+      "source": "external",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "combo",
+      "deck_count": 1
+    },
+    {
+      "source": "mtgtop8",
+      "subformat": "duel_commander",
+      "strategy_archetype": "aristocrats",
+      "deck_count": 1
+    }
+  ]
+}
+
+📝 Modo report-only: nenhuma escrita em banco foi realizada.

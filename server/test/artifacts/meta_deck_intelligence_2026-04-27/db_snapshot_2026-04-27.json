@@ -1,0 +1,101 @@
+{
+  "meta_source_freshness": [
+    [
+      "external",
+      1,
+      "2026-04-27 12:04:17.032793+00",
+      "2026-04-27 12:04:17.032793+00"
+    ],
+    [
+      "mtgtop8",
+      641,
+      "2025-11-22 14:14:20.522291+00",
+      "2026-04-23 20:02:52.000285+00"
+    ]
+  ],
+  "external_stage_status": [
+    [
+      "candidate",
+      "(null)",
+      2
+    ],
+    [
+      "promoted",
+      "valid",
+      1
+    ],
+    [
+      "staged",
+      "warning_pending",
+      1
+    ]
+  ],
+  "external_stage_rows": [
+    [
+      "EDHTop16",
+      "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "Norman Osborn // Green Goblin",
+      "promoted",
+      "valid",
+      "competitive_commander",
+      "true",
+      "2026-04-27 12:04:17.032793+00"
+    ],
+    [
+      "EDHTop16",
+      "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1",
+      "Scion of the Ur-Dragon",
+      "staged",
+      "warning_pending",
+      "competitive_commander",
+      "(null)",
+      "(null)"
+    ],
+    [
+      "EDHTop16",
+      "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "candidate",
+      "(null)",
+      "competitive_commander",
+      "(null)",
+      "(null)"
+    ],
+    [
+      "EDHTop16",
+      "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "candidate",
+      "(null)",
+      "competitive_commander",
+      "(null)",
+      "(null)"
+    ]
+  ],
+  "external_meta_rows": [
+    [
+      "cEDH",
+      "Norman Osborn // Green Goblin",
+      "Norman Osborn // Green Goblin",
+      null,
+      "Norman Osborn // Green Goblin",
+      "combo",
+      "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "2026-04-27 12:04:17.032793+00"
+    ]
+  ],
+  "cedh_commander_mix_guard": [
+    [
+      "cEDH",
+      1,
+      1,
+      0
+    ],
+    [
+      "EDH",
+      0,
+      0,
+      0
+    ]
+  ]
+}
