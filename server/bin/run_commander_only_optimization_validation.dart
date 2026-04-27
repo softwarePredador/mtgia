@@ -16,21 +16,31 @@ const _defaultArtifactDir =
     'test/artifacts/commander_only_optimization_validation';
 const _defaultSummaryJsonPath =
     'test/artifacts/commander_only_optimization_validation/latest_summary.json';
+const _defaultDryRunSummaryJsonPath =
+    'test/artifacts/commander_only_optimization_validation/latest_dry_run_summary.json';
 const _defaultSummaryMdPath =
     'doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md';
+const _defaultDryRunSummaryMdPath =
+    'doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_DRY_RUN_2026-04-27.md';
 
 class RuntimeValidationConfig {
   RuntimeValidationConfig({
     required this.apply,
+    this.skipHealthCheck = false,
+    this.proveCacheHit = false,
   });
 
   final bool apply;
+  final bool skipHealthCheck;
+  final bool proveCacheHit;
 
   bool get dryRun => !apply;
 
   factory RuntimeValidationConfig.parse(List<String> args) {
     var apply = false;
     var explicitDryRun = false;
+    var skipHealthCheck = false;
+    var proveCacheHit = false;
 
     for (final arg in args) {
       if (arg == '--apply') {
@@ -39,6 +49,14 @@ class RuntimeValidationConfig {
       }
       if (arg == '--dry-run') {
         explicitDryRun = true;
+        continue;
+      }
+      if (arg == '--skip-health-check') {
+        skipHealthCheck = true;
+        continue;
+      }
+      if (arg == '--prove-cache-hit') {
+        proveCacheHit = true;
         continue;
       }
       if (arg == '--help' || arg == '-h') {
@@ -50,8 +68,18 @@ class RuntimeValidationConfig {
     if (apply && explicitDryRun) {
       throw ArgumentError('Use apenas um modo: --apply ou --dry-run.');
     }
+    if (apply && skipHealthCheck) {
+      throw ArgumentError('--skip-health-check so pode ser usado com dry-run.');
+    }
+    if (!apply && proveCacheHit) {
+      throw ArgumentError('--prove-cache-hit exige --apply.');
+    }
 
-    return RuntimeValidationConfig(apply: apply);
+    return RuntimeValidationConfig(
+      apply: apply,
+      skipHealthCheck: skipHealthCheck,
+      proveCacheHit: proveCacheHit,
+    );
   }
 }
 
@@ -163,10 +191,10 @@ Future<void> main(List<String> args) async {
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
   final artifactDirPath = env['VALIDATION_ARTIFACT_DIR'] ?? _defaultArtifactDir;
-  final summaryJsonPath =
-      env['VALIDATION_SUMMARY_JSON_PATH'] ?? _defaultSummaryJsonPath;
-  final summaryMdPath =
-      env['VALIDATION_SUMMARY_MD_PATH'] ?? _defaultSummaryMdPath;
+  final summaryJsonPath = env['VALIDATION_SUMMARY_JSON_PATH'] ??
+      (config.dryRun ? _defaultDryRunSummaryJsonPath : _defaultSummaryJsonPath);
+  final summaryMdPath = env['VALIDATION_SUMMARY_MD_PATH'] ??
+      (config.dryRun ? _defaultDryRunSummaryMdPath : _defaultSummaryMdPath);
   final corpusPath = env['VALIDATION_CORPUS_PATH'] ?? _defaultCorpusPath;
   final validationLimit = int.tryParse(env['VALIDATION_LIMIT'] ?? '') ?? 19;
   final maxAllowedTotalMs =
@@ -177,11 +205,13 @@ Future<void> main(List<String> args) async {
     artifactsDir.createSync(recursive: true);
   }
 
-  final apiReadinessError = await _validateApiBaseUrl(apiBaseUrl);
-  if (apiReadinessError != null) {
-    stderr.writeln(apiReadinessError);
-    exitCode = 1;
-    return;
+  if (!config.skipHealthCheck) {
+    final apiReadinessError = await _validateApiBaseUrl(apiBaseUrl);
+    if (apiReadinessError != null) {
+      stderr.writeln(apiReadinessError);
+      exitCode = 1;
+      return;
+    }
   }
 
   final db = Database();
@@ -217,6 +247,7 @@ Future<void> main(List<String> args) async {
         validationLimit: validationLimit,
         maxAllowedTotalMs: maxAllowedTotalMs,
         runStartedAt: runStartedAt,
+        apiHealthCheckSkipped: config.skipHealthCheck,
         candidates: candidates,
       );
       await _writeSummaryFiles(
@@ -246,6 +277,7 @@ Future<void> main(List<String> args) async {
         candidate: candidate,
         artifactDirPath: artifactDirPath,
         maxAllowedTotalMs: maxAllowedTotalMs,
+        proveCacheHit: config.proveCacheHit,
       );
       results.add(result);
       print(
@@ -270,6 +302,7 @@ Future<void> main(List<String> args) async {
       'completed': results.where((r) => r.resultKind == 'completed').length,
       'protected_rejections':
           results.where((r) => r.resultKind == 'protected_rejection').length,
+      'cache_hit_probe_enabled': config.proveCacheHit,
       'results': results.map((r) => r.toJson()).toList(),
     };
 
@@ -297,10 +330,16 @@ Uso: dart run bin/run_commander_only_optimization_validation.dart [--dry-run|--a
 
 Modo padrao:
   --dry-run   Planeja o runtime E2E sem autenticar, criar deck ou chamar optimize.
+  --skip-health-check
+              No dry-run, pula GET /health e POST /auth/login vazio. Use para
+              planejamento estrutural/offline quando a API local nao esta viva.
 
 Escrita real:
   --apply     Executa o runtime antigo completo: login/register, cria deck seed,
               chama /ai/optimize, aplica bulk cards e valida o deck.
+  --prove-cache-hit
+              Com --apply, repete o mesmo /ai/optimize antes do apply para
+              provar cache.hit=true no runtime vivo.
 
 Variaveis de ambiente mantidas:
   TEST_API_BASE_URL
@@ -320,6 +359,7 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
   required SourceDeckCandidate candidate,
   required String artifactDirPath,
   required int maxAllowedTotalMs,
+  required bool proveCacheHit,
 }) async {
   final seedDeckId = await _createCommanderOnlySeedDeck(
     apiBaseUrl: apiBaseUrl,
@@ -400,6 +440,17 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
   }
 
   final mode = optimizeBody['mode']?.toString() ?? '';
+  http.Response? cacheProbeResponse;
+  Map<String, dynamic>? cacheProbeBody;
+  if (proveCacheHit) {
+    cacheProbeResponse = await _optimizeWithPolling(
+      apiBaseUrl: apiBaseUrl,
+      token: token,
+      payload: optimizePayload,
+    );
+    cacheProbeBody = _decodeJson(cacheProbeResponse);
+  }
+
   final additionsDetailed = (optimizeBody['additions_detailed'] as List?)
           ?.whereType<Map>()
           .map((e) => e.cast<String, dynamic>())
@@ -453,6 +504,8 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
           const <String, dynamic>{};
   final timingSummary = _extractTimingSummary(optimizeBody);
   final totalMs = (timingSummary['total_ms'] as int?) ?? 0;
+  final cacheProbeHit =
+      ((cacheProbeBody?['cache'] as Map?)?['hit'] as bool?) == true;
 
   final expectedChecks = <String>[];
   final failedChecks = <String>[];
@@ -488,6 +541,12 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
     'guaranteed basics stage nao precisou fechar o deck',
     consistencySlo['guaranteed_basics_stage_used'] != true,
   );
+  if (proveCacheHit) {
+    expectCheck(
+      'segunda chamada de optimize confirmou cache.hit=true',
+      cacheProbeResponse?.statusCode == 200 && cacheProbeHit,
+    );
+  }
 
   final artifactPath = await _writeArtifact(
     artifactDirPath: artifactDirPath,
@@ -500,6 +559,8 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
       'optimize_response': optimizeBody,
       'bulk_status': bulkResponse.statusCode,
       'validate_status': validateResponse.statusCode,
+      if (proveCacheHit) 'cache_probe_status': cacheProbeResponse?.statusCode,
+      if (proveCacheHit) 'cache_probe_response': cacheProbeBody,
       'saved_cards': savedCards,
     },
   );
@@ -525,6 +586,8 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
         'bulk save falhou: ${bulkResponse.body}',
       if (validateResponse.statusCode != 200)
         'validate falhou: ${validateResponse.body}',
+      if (proveCacheHit && !cacheProbeHit)
+        'cache hit nao confirmado na segunda chamada de optimize',
     ],
     summary: {
       'mode': mode,
@@ -535,6 +598,12 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
       'mana_base_assessment': manaAssessment,
       'average_cmc': postAnalysis['average_cmc'],
       'consistency_slo': consistencySlo,
+      if (proveCacheHit)
+        'cache_probe': {
+          'status': cacheProbeResponse?.statusCode,
+          'hit': cacheProbeHit,
+          'cache_key': (cacheProbeBody?['cache'] as Map?)?['cache_key'],
+        },
     },
   );
 }
@@ -546,6 +615,7 @@ Map<String, dynamic> _buildDryRunSummary({
   required int validationLimit,
   required int maxAllowedTotalMs,
   required String runStartedAt,
+  required bool apiHealthCheckSkipped,
   required List<SourceDeckCandidate> candidates,
 }) {
   return {
@@ -562,6 +632,7 @@ Map<String, dynamic> _buildDryRunSummary({
     'failed': 0,
     'completed': 0,
     'protected_rejections': 0,
+    'api_health_check_skipped': apiHealthCheckSkipped,
     'writes_blocked_by_default': true,
     'requires_apply_for_writes': true,
     'blocked_operations': const [
@@ -1016,8 +1087,15 @@ Future<void> _writeSummaryFiles({
 }
 
 String _buildMarkdownReport(Map<String, dynamic> summary) {
+  final isDryRun = summary['mode'] == 'dry_run';
+  final isCacheHitProbe = summary['cache_hit_probe_enabled'] == true;
+  final title = isDryRun
+      ? '# Dry-run Commander-Only Optimization - 2026-04-27'
+      : isCacheHitProbe
+          ? '# Commander-Only Cache Hit Probe - 2026-04-27'
+          : '# Validacao Commander-Only - 2026-04-21';
   final buffer = StringBuffer()
-    ..writeln('# Validacao Commander-Only - 2026-04-21')
+    ..writeln(title)
     ..writeln()
     ..writeln('- Mode: `${summary['mode'] ?? 'apply'}`')
     ..writeln('- API base: `${summary['api_base_url']}`')
@@ -1029,11 +1107,13 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
     ..writeln('- Protected rejections: `${summary['protected_rejections']}`')
     ..writeln();
 
-  if (summary['mode'] == 'dry_run') {
+  if (isDryRun) {
     buffer
       ..writeln(
           '> Dry-run: nenhuma autenticacao, criacao de deck, optimize, bulk save ou validate foi executado.')
       ..writeln('> Use `--apply` para executar o runtime E2E com escrita real.')
+      ..writeln(
+          '> Health check pulado: `${summary['api_health_check_skipped'] == true}`.')
       ..writeln();
   }
 
@@ -1050,6 +1130,18 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
       ..writeln('- Seed deck: `${result['seed_deck_id']}`')
       ..writeln('- Archetype: `${result['archetype']}`')
       ..writeln('- Timings: `${jsonEncode(result['timings'])}`');
+
+    final resultSummary = result['summary'] is Map
+        ? (result['summary'] as Map).cast<dynamic, dynamic>()
+        : const <dynamic, dynamic>{};
+    final cacheProbe = resultSummary['cache_probe'] is Map
+        ? (resultSummary['cache_probe'] as Map).cast<dynamic, dynamic>()
+        : null;
+    if (cacheProbe != null) {
+      buffer
+        ..writeln(
+            '- Cache probe: `status=${cacheProbe['status']}, hit=${cacheProbe['hit']}, cache_key=${cacheProbe['cache_key']}`');
+    }
 
     final failedChecks =
         (result['failed_checks'] as List?)?.map((e) => '- $e').join('\n') ?? '';

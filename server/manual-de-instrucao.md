@@ -43,6 +43,22 @@
   - nao foi necessario patch de codigo;
   - a documentacao operacional foi alinhada para registrar TTL real de cache em `6h`.
 
+### Follow-up operacional
+- O dry-run Commander-only nao deve mais sobrescrever a prova `apply` principal:
+  - apply/latest: `server/test/artifacts/commander_only_optimization_validation/latest_summary.json`
+  - apply/report: `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md`
+  - dry-run/latest: `server/test/artifacts/commander_only_optimization_validation/latest_dry_run_summary.json`
+  - dry-run/report: `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_DRY_RUN_2026-04-27.md`
+- Para planejar sem API viva:
+  - `cd server && dart run bin/run_commander_only_optimization_validation.dart --dry-run --skip-health-check`
+- Para provar cache live com escrita real e apenas 1 candidato:
+  - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 VALIDATION_LIMIT=1 dart run bin/run_commander_only_optimization_validation.dart --apply --prove-cache-hit`
+- A prova live curta em `8082` identificou que `complete_async` lia cache mas nao persistia o resultado do job; o backend foi corrigido para salvar o payload final em `ai_optimize_cache`.
+- Evidencia corrigida:
+  - `server/test/artifacts/commander_only_optimization_cache_probe/latest_summary.json`
+  - `server/doc/RELATORIO_COMMANDER_ONLY_CACHE_HIT_PROBE_2026-04-27.md`
+  - Resultado: `passed=1`, `failed=0`, `cache_probe.hit=true`.
+
 ### Artefatos
 - `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_2026-04-27.md`
 - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`

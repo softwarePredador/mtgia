@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-04-27T14:27:21.183401",
+  "run_started_at": "2026-04-27T14:26:38.578939",
+  "mode": "apply",
+  "api_base_url": "http://127.0.0.1:8082",
+  "artifact_dir": "test/artifacts/commander_only_optimization_cache_probe",
+  "corpus_path": "test/fixtures/optimization_resolution_corpus.json",
+  "validation_limit": 1,
+  "max_allowed_total_ms": 90000,
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "completed": 1,
+  "protected_rejections": 0,
+  "cache_hit_probe_enabled": true,
+  "results": [
+    {
+      "commander_label": "Auntie Ool, Cursewretch",
+      "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
+      "source_deck_name": "goblins",
+      "seed_deck_id": "6d8f9732-92de-4320-998e-eca3483f1164",
+      "archetype": "aggro",
+      "bracket": 4,
+      "result_kind": "completed",
+      "optimize_status": 200,
+      "timings": {
+        "total_ms": 12239,
+        "stages_ms": {
+          "complete.fill_remainder": 3599,
+          "complete.ai_suggestion_loop": 2815,
+          "complete.build_final_response": 1355,
+          "complete.prepare_commander_seed": 1351,
+          "complete.rebalance_land_deficit": 0,
+          "complete.build_intermediate_payload": 33
+        }
+      },
+      "saved_artifact_path": "test/artifacts/commander_only_optimization_cache_probe/auntie_ool_cursewretch.json",
+      "expected_checks": [
+        "optimize retornou mode=complete",
+        "complete retornou additions_detailed utilizavel",
+        "POST /decks/:id/cards/bulk retornou sucesso",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final mantem 100 cartas",
+        "deck final preserva a quantidade correta de comandantes",
+        "land count final ficou em faixa segura",
+        "basic lands nao inflaram acima do toleravel",
+        "pipeline terminou abaixo do budget de tempo",
+        "mana base final nao ficou com alerta forte",
+        "guaranteed basics stage nao precisou fechar o deck",
+        "segunda chamada de optimize confirmou cache.hit=true"
+      ],
+      "failed_checks": [],
+      "warnings": [],
+      "summary": {
+        "mode": "complete",
+        "final_card_count": 100,
+        "final_commander_count": 1,
+        "land_count": 32,
+        "basic_count": 23,
+        "mana_base_assessment": "Base de mana equilibrada",
+        "average_cmc": "1.76",
+        "consistency_slo": {
+          "added_total": 99,
+          "basic_added": 23,
+          "target_total": 99,
+          "ai_stage_used": false,
+          "non_basic_added": 76,
+          "completed_target": true,
+          "deterministic_stage_used": true,
+          "average_deck_seed_stage_used": false,
+          "competitive_model_stage_used": true,
+          "guaranteed_basics_stage_used": false
+        },
+        "cache_probe": {
+          "status": 200,
+          "hit": true,
+          "cache_key": "v6:9d8303a9"
+        }
+      },
+      "passed": true
+    }
+  ]
+}

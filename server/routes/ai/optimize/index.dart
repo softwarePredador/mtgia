@@ -816,6 +816,7 @@ Future<Response> onRequest(RequestContext context) async {
             keepTheme: keepTheme,
             deckAnalysis: deckAnalysis,
             userId: userId,
+            deckSignature: deckSignature,
             cacheKey: cacheKey,
             userPreferences: userPreferences,
             hasBracketOverride: hasBracketOverride,
@@ -2700,6 +2701,7 @@ Future<void> _processCompleteModeAsync({
   required bool keepTheme,
   required Map<String, dynamic> deckAnalysis,
   required String? userId,
+  required String deckSignature,
   required String? cacheKey,
   required Map<String, dynamic> userPreferences,
   required bool hasBracketOverride,
@@ -2829,13 +2831,50 @@ Future<void> _processCompleteModeAsync({
           jsonResponse: jsonResponse,
         ),
       );
+      if (cacheKey != null && cacheKey.isNotEmpty) {
+        responseBody['cache'] = {
+          'hit': false,
+          'cache_key': cacheKey,
+        };
+        responseBody['preferences'] = {
+          'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
+          'keep_theme': keepTheme,
+          'preferred_bracket': userPreferences['preferred_bracket'],
+        };
+      }
       responseBody['timings'] = telemetry.snapshot();
       telemetry.logSummary();
+      if (cacheKey != null && cacheKey.isNotEmpty) {
+        await saveOptimizeCache(
+          pool: pool,
+          cacheKey: cacheKey,
+          userId: userId,
+          deckId: deckId,
+          deckSignature: deckSignature,
+          payload: responseBody,
+        );
+      }
       await OptimizeJobStore.complete(pool, jobId, result: responseBody);
     } else {
       // Fallback: se por algum motivo não veio como complete
+      if (cacheKey != null && cacheKey.isNotEmpty) {
+        jsonResponse['cache'] = {
+          'hit': false,
+          'cache_key': cacheKey,
+        };
+      }
       jsonResponse['timings'] = telemetry.snapshot();
       telemetry.logSummary();
+      if (cacheKey != null && cacheKey.isNotEmpty) {
+        await saveOptimizeCache(
+          pool: pool,
+          cacheKey: cacheKey,
+          userId: userId,
+          deckId: deckId,
+          deckSignature: deckSignature,
+          payload: jsonResponse,
+        );
+      }
       await OptimizeJobStore.complete(pool, jobId, result: jsonResponse);
     }
   } catch (e, stackTrace) {

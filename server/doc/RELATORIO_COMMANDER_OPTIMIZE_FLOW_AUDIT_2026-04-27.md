@@ -171,3 +171,29 @@ Leitura: a experiencia live bate com o desenho do pipeline - a requisicao inicia
 1. Adicionar um passo de runtime que repita o mesmo `POST /ai/optimize` para gravar `cache.hit=true` como evidencia live.
 2. Considerar um `--offline-plan-only` ou `--skip-health-check` no runner commander-only para dry-run puramente estrutural.
 3. Continuar monitorando `request.deck_context` e `complete.fill_remainder`, que seguem como maiores consumidores de tempo.
+
+## Follow-up 2026-04-27
+
+### Ajustes implementados
+
+- `run_commander_only_optimization_validation.dart --dry-run` passou a gravar, por padrao, em `test/artifacts/commander_only_optimization_validation/latest_dry_run_summary.json` e `doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_DRY_RUN_2026-04-27.md`.
+- A prova `apply` versionada em `latest_summary.json` e `RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md` foi preservada para nao ser sobrescrita por dry-run.
+- Foi adicionado `--skip-health-check` para dry-run estrutural/offline sem depender de `GET /health` ou probe de `/auth/login`.
+- Foi adicionado `--prove-cache-hit` para `--apply`, repetindo o mesmo `/ai/optimize` antes do apply e registrando `cache.hit=true` no artifact quando o backend vivo confirmar o cache.
+- A primeira prova live de cache expôs um bug real: `complete_async` lia cache, mas nao salvava o resultado no `ai_optimize_cache`.
+- O job async de complete passou a persistir o payload final com `cache.hit=false`; a segunda chamada agora retorna `cache.hit=true`.
+
+### Comandos validados
+
+```bash
+cd server && dart analyze bin/run_commander_only_optimization_validation.dart test/commander_only_runtime_validation_config_test.dart
+cd server && dart test test/commander_only_runtime_validation_config_test.dart
+cd server && dart run bin/run_commander_only_optimization_validation.dart --dry-run --skip-health-check
+cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 VALIDATION_LIMIT=1 VALIDATION_ARTIFACT_DIR=test/artifacts/commander_only_optimization_cache_probe VALIDATION_SUMMARY_JSON_PATH=test/artifacts/commander_only_optimization_cache_probe/latest_summary.json VALIDATION_SUMMARY_MD_PATH=doc/RELATORIO_COMMANDER_ONLY_CACHE_HIT_PROBE_2026-04-27.md dart run bin/run_commander_only_optimization_validation.dart --apply --prove-cache-hit
+```
+
+### Evidencia live de cache
+
+- `server/test/artifacts/commander_only_optimization_cache_probe/latest_summary.json`
+- `server/doc/RELATORIO_COMMANDER_ONLY_CACHE_HIT_PROBE_2026-04-27.md`
+- Resultado: `passed=1`, `failed=0`, `cache_probe.hit=true`, `cache_probe.cache_key=v6:9d8303a9`.
