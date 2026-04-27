@@ -1,0 +1,1332 @@
+{
+  "generated_at": "2026-04-27T20:11:07.842236Z",
+  "promoted_external_decks": [
+    {
+      "commander_name": "Norman Osborn // Green Goblin",
+      "partner_commander_name": null,
+      "shell_label": "Norman Osborn // Green Goblin",
+      "strategy_archetype": "combo",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "placement": "4",
+      "created_at": "2026-04-27T12:04:17.032793Z"
+    },
+    {
+      "commander_name": "Malcolm, Keen-Eyed Navigator",
+      "partner_commander_name": "Vial Smasher the Fierce",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "strategy_archetype": "combo",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "placement": "5",
+      "created_at": "2026-04-27T19:32:47.822387Z"
+    },
+    {
+      "commander_name": "Kraum, Ludevic's Opus",
+      "partner_commander_name": "Tymna the Weaver",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "strategy_archetype": "combo",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "placement": "8",
+      "created_at": "2026-04-27T19:32:47.975640Z"
+    },
+    {
+      "commander_name": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "partner_commander_name": null,
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "strategy_archetype": "combo",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "placement": "9",
+      "created_at": "2026-04-27T19:49:55.718886Z"
+    },
+    {
+      "commander_name": "Thrasios, Triton Hero",
+      "partner_commander_name": "Yoshimaru, Ever Faithful",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "strategy_archetype": "control",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "placement": "10",
+      "created_at": "2026-04-27T19:50:11.386911Z"
+    }
+  ],
+  "summary": {
+    "promoted_external_count": 5,
+    "optimize_competitive_external_match_count": 5,
+    "optimize_casual_guard_ok_count": 5,
+    "generate_competitive_external_match_count": 5,
+    "generate_casual_guard_ok_count": 5,
+    "generate_duel_guard_ok_count": 5
+  },
+  "optimize_probes": [
+    {
+      "label": "optimize_competitive",
+      "shell_label": "Norman Osborn // Green Goblin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "bracket": 4,
+      "meta_scope": "competitive_commander",
+      "priority_source": "competitive_meta_exact_shell_match",
+      "has_references": true,
+      "selection_reason": "exact_shell_match",
+      "source_breakdown": {
+        "external": 1
+      },
+      "priority_cards": [
+        "Ad Nauseam",
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Attunement",
+        "Badlands",
+        "Beseech the Mirror",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Breakthrough",
+        "Cabal Ritual"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Norman Osborn // Green Goblin",
+          "strategy_archetype": "combo",
+          "placement": "4",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "optimize_casual_guard",
+      "shell_label": "Norman Osborn // Green Goblin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "bracket": 2,
+      "meta_scope": null,
+      "priority_source": "none",
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "optimize_competitive",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "bracket": 4,
+      "meta_scope": "competitive_commander",
+      "priority_source": "competitive_meta_exact_shell_match",
+      "has_references": true,
+      "selection_reason": "exact_shell_match",
+      "source_breakdown": {
+        "external": 1,
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Arid Mesa",
+        "Chrome Mox",
+        "City of Brass",
+        "Command Tower",
+        "Dark Ritual",
+        "Demonic Consultation",
+        "Demonic Tutor",
+        "Diabolic Intent",
+        "Fellwar Stone",
+        "Fierce Guardianship",
+        "Flooded Strand"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Tymna the Weaver + Malcolm, Keen-Eyed Navigator",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83908&d=837440&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Tymna the Weaver + Malcolm, Keen-Eyed Navigator",
+          "strategy_archetype": "control",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83908&d=837445&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Tymna the Weaver + Malcolm, Keen-Eyed Navigator",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83908&d=837444&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "optimize_casual_guard",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "bracket": 2,
+      "meta_scope": null,
+      "priority_source": "none",
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "optimize_competitive",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "bracket": 4,
+      "meta_scope": "competitive_commander",
+      "priority_source": "competitive_meta_exact_shell_match",
+      "has_references": true,
+      "selection_reason": "exact_shell_match",
+      "source_breakdown": {
+        "external": 1,
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Arid Mesa",
+        "Badlands",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Cavern of Souls",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "8",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83867&d=837115&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "2",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83755&d=836155&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83878&d=837201&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "optimize_casual_guard",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "bracket": 2,
+      "meta_scope": null,
+      "priority_source": "none",
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "optimize_competitive",
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "bracket": 4,
+      "meta_scope": "competitive_commander",
+      "priority_source": "competitive_meta_exact_shell_match",
+      "has_references": true,
+      "selection_reason": "exact_shell_match",
+      "source_breakdown": {
+        "external": 1,
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Arid Mesa",
+        "Badlands",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+          "strategy_archetype": "combo",
+          "placement": "9",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kefka, Court Mage",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83881&d=837227&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kefka, Court Mage",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83882&d=837242&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kefka, Court Mage",
+          "strategy_archetype": "combo",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83457&d=834020&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "optimize_casual_guard",
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "bracket": 2,
+      "meta_scope": null,
+      "priority_source": "none",
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "optimize_competitive",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "bracket": 4,
+      "meta_scope": "competitive_commander",
+      "priority_source": "competitive_meta_exact_shell_match",
+      "has_references": true,
+      "selection_reason": "exact_shell_match",
+      "source_breakdown": {
+        "external": 1,
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "Ancient Tomb",
+        "Avacyn's Pilgrim",
+        "Badgermole Cub",
+        "Birds of Paradise",
+        "Boseiju, Who Endures",
+        "Breeding Pool",
+        "Chord of Calling",
+        "Chrome Mox",
+        "City of Brass",
+        "Command Tower",
+        "Crop Rotation",
+        "Emergence Zone",
+        "Esper Sentinel",
+        "Faerie Mastermind"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "10",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83869&d=837125&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "2",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83877&d=837198&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Thrasios, Triton Hero + Tymna the Weaver",
+          "strategy_archetype": "control",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83755&d=836157&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "optimize_casual_guard",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "bracket": 2,
+      "meta_scope": null,
+      "priority_source": "none",
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    }
+  ],
+  "generate_probes": [
+    {
+      "label": "generate_competitive",
+      "shell_label": "Norman Osborn // Green Goblin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "prompt": "Build a cEDH bracket 4 Norman Osborn // Green Goblin deck with a combo plan.",
+      "format": "Commander",
+      "commander_scope": "competitive_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "cEDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "external": 3
+      },
+      "priority_cards": [
+        "Ad Nauseam",
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Badlands",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Command Tower"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Norman Osborn // Green Goblin",
+          "strategy_archetype": "combo",
+          "placement": "4",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "8",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_casual_guard",
+      "shell_label": "Norman Osborn // Green Goblin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "prompt": "Build a casual commander Norman Osborn // Green Goblin deck with fun table play.",
+      "format": "Commander",
+      "commander_scope": null,
+      "should_use_meta": false,
+      "meta_formats": [],
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "generate_duel_guard",
+      "shell_label": "Norman Osborn // Green Goblin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "prompt": "Build a duel commander Norman Osborn // Green Goblin deck.",
+      "format": "Commander",
+      "commander_scope": "duel_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "EDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "mtgtop8": 1
+      },
+      "priority_cards": [
+        "Ardoz, Cobbler of War",
+        "Arena of Glory",
+        "Arid Mesa",
+        "Barbarian Ring",
+        "Bloodstained Mire",
+        "Breeches, Eager Pillager",
+        "Brightstone Ritual",
+        "Broadside Bombardiers",
+        "Cactus Preserve",
+        "Castle Embereth",
+        "Changeling Berserker",
+        "Command Beacon",
+        "Conspicuous Snoop",
+        "Crystal Vein"
+      ],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": [
+        {
+          "shell_label": "Muxus, Goblin Grandee",
+          "strategy_archetype": "aggro",
+          "placement": "9",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83779&d=836361&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_competitive",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "prompt": "Build a cEDH bracket 4 Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce deck with a combo plan.",
+      "format": "Commander",
+      "commander_scope": "competitive_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "cEDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "external": 3
+      },
+      "priority_cards": [
+        "Ad Nauseam",
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Badlands",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Command Tower"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Norman Osborn // Green Goblin",
+          "strategy_archetype": "combo",
+          "placement": "4",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "8",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_casual_guard",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "prompt": "Build a casual commander Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce deck with fun table play.",
+      "format": "Commander",
+      "commander_scope": null,
+      "should_use_meta": false,
+      "meta_formats": [],
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "generate_duel_guard",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "prompt": "Build a duel commander Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce deck.",
+      "format": "Commander",
+      "commander_scope": "duel_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "EDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "Archmage's Charm",
+        "Brainstorm",
+        "Brazen Borrower",
+        "Counterspell",
+        "Cryptic Command",
+        "Daze",
+        "Enduring Curiosity",
+        "Faerie Mastermind",
+        "Flare of Denial",
+        "Flooded Strand",
+        "Force Spike",
+        "Force of Negation",
+        "Harbinger of the Seas",
+        "Lose Focus"
+      ],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": [
+        {
+          "shell_label": "Malcolm, Alluring Scoundrel",
+          "strategy_archetype": "control",
+          "placement": "3",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=76818&d=782775&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Malcolm, Alluring Scoundrel",
+          "strategy_archetype": "control",
+          "placement": "5",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83719&d=835831&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Malcolm, Alluring Scoundrel",
+          "strategy_archetype": "control",
+          "placement": "9",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83775&d=836326&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_competitive",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "prompt": "Build a cEDH bracket 4 Kraum, Ludevic's Opus + Tymna the Weaver deck with a combo plan.",
+      "format": "Commander",
+      "commander_scope": "competitive_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "cEDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "external": 3
+      },
+      "priority_cards": [
+        "Ad Nauseam",
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Badlands",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Command Tower"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "strategy_archetype": "combo",
+          "placement": "8",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Norman Osborn // Green Goblin",
+          "strategy_archetype": "combo",
+          "placement": "4",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_casual_guard",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "prompt": "Build a casual commander Kraum, Ludevic's Opus + Tymna the Weaver deck with fun table play.",
+      "format": "Commander",
+      "commander_scope": null,
+      "should_use_meta": false,
+      "meta_formats": [],
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "generate_duel_guard",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "prompt": "Build a duel commander Kraum, Ludevic's Opus + Tymna the Weaver deck.",
+      "format": "Commander",
+      "commander_scope": "duel_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "EDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "mtgtop8": 2
+      },
+      "priority_cards": [
+        "Adeline, Resplendent Cathar",
+        "Ajani, Nacatl Pariah",
+        "Anim Pakal, Thousandth Moon",
+        "Araña, Heart of the Spider",
+        "Arbaaz Mir",
+        "Arid Mesa",
+        "Baird, Argivian Recruiter",
+        "Bloodstained Mire",
+        "Broadside Bombardiers",
+        "Cloud, Midgar Mercenary",
+        "Command Tower",
+        "Detective's Phoenix",
+        "Drannith Magistrate",
+        "Eiganjo Castle"
+      ],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": [
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "aggro",
+          "placement": "3",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=76929&d=783718&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Yoshimaru, Ever Faithful + Kraum, Ludevic's Opus",
+          "strategy_archetype": "aggro",
+          "placement": "13",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83735&d=836019&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_competitive",
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "prompt": "Build a cEDH bracket 4 Kefka, Court Mage // Kefka, Ruler of Ruin deck with a combo plan.",
+      "format": "Commander",
+      "commander_scope": "competitive_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "cEDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "external": 3
+      },
+      "priority_cards": [
+        "An Offer You Can't Refuse",
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Badlands",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Cabal Ritual",
+        "Chain of Vapor",
+        "Chrome Mox",
+        "City of Brass",
+        "City of Traitors",
+        "Command Tower"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+          "strategy_archetype": "combo",
+          "placement": "9",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Norman Osborn // Green Goblin",
+          "strategy_archetype": "combo",
+          "placement": "4",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "strategy_archetype": "combo",
+          "placement": "5",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_casual_guard",
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "prompt": "Build a casual commander Kefka, Court Mage // Kefka, Ruler of Ruin deck with fun table play.",
+      "format": "Commander",
+      "commander_scope": null,
+      "should_use_meta": false,
+      "meta_formats": [],
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "generate_duel_guard",
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "prompt": "Build a duel commander Kefka, Court Mage // Kefka, Ruler of Ruin deck.",
+      "format": "Commander",
+      "commander_scope": "duel_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "EDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "mtgtop8": 1
+      },
+      "priority_cards": [
+        "Arcum's Astrolabe",
+        "Basalt Monolith",
+        "Boomerang",
+        "Brainstorm",
+        "Brainsurge",
+        "Candelabra of Tawnos",
+        "City of Traitors",
+        "Codex Shredder",
+        "Consider",
+        "Consult the Star Charts",
+        "Counterspell",
+        "Cryptic Command",
+        "Daze",
+        "Dizzy Spell"
+      ],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": [
+        {
+          "shell_label": "Teferi, Temporal Archmage",
+          "strategy_archetype": "control",
+          "placement": "5",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83779&d=836357&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_competitive",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "prompt": "Build a cEDH bracket 4 Thrasios, Triton Hero + Yoshimaru, Ever Faithful deck with a control plan.",
+      "format": "Commander",
+      "commander_scope": "competitive_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "cEDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "external": 1,
+        "mtgtop8": 2
+      },
+      "priority_cards": [
+        "Ancient Tomb",
+        "Arid Mesa",
+        "Avacyn's Pilgrim",
+        "Badgermole Cub",
+        "Biomancer's Familiar",
+        "Birds of Paradise",
+        "Boseiju, Who Endures",
+        "Breeding Pool",
+        "Chord of Calling",
+        "Chrome Mox",
+        "City of Brass",
+        "Cloud of Faeries",
+        "Command Tower",
+        "Crop Rotation"
+      ],
+      "matched_external_reference": true,
+      "matched_external_reference_rank": 1,
+      "references": [
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "10",
+          "meta_scope": "competitive_commander",
+          "source": "EDHTop16",
+          "source_kind": "external",
+          "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "3",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83869&d=837125&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "2",
+          "meta_scope": "competitive_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83877&d=837198&f=cEDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "generate_casual_guard",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "prompt": "Build a casual commander Thrasios, Triton Hero + Yoshimaru, Ever Faithful deck with fun table play.",
+      "format": "Commander",
+      "commander_scope": null,
+      "should_use_meta": false,
+      "meta_formats": [],
+      "has_references": false,
+      "selection_reason": "no_match",
+      "source_breakdown": {},
+      "priority_cards": [],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": []
+    },
+    {
+      "label": "generate_duel_guard",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "target_source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "prompt": "Build a duel commander Thrasios, Triton Hero + Yoshimaru, Ever Faithful deck.",
+      "format": "Commander",
+      "commander_scope": "duel_commander",
+      "should_use_meta": true,
+      "meta_formats": [
+        "EDH"
+      ],
+      "has_references": true,
+      "selection_reason": "keyword_meta_match",
+      "source_breakdown": {
+        "mtgtop8": 3
+      },
+      "priority_cards": [
+        "Arid Mesa",
+        "Bloodstained Mire",
+        "Cathar Commando",
+        "Command Tower",
+        "Eiganjo Castle",
+        "Eiganjo, Seat of the Empire",
+        "Flagstones of Trokair",
+        "Flooded Strand",
+        "Flowering of the White Tree",
+        "Marsh Flats",
+        "Minas Tirith",
+        "Mother of Runes",
+        "Parallax Wave",
+        "Phelia, Exuberant Shepherd"
+      ],
+      "matched_external_reference": false,
+      "matched_external_reference_rank": null,
+      "references": [
+        {
+          "shell_label": "Silas Renn, Seeker Adept + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "control",
+          "placement": "2",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83777&d=836340&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Kraum, Ludevic's Opus + Yoshimaru, Ever Faithful",
+          "strategy_archetype": "aggro",
+          "placement": "3",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=76929&d=783718&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        {
+          "shell_label": "Yoshimaru, Ever Faithful + Bruse Tarl, Boorish Herder",
+          "strategy_archetype": "aggro",
+          "placement": "12",
+          "meta_scope": "duel_commander",
+          "source": "MTGTop8",
+          "source_kind": "mtgtop8",
+          "source_url": "https://www.mtgtop8.com/?e=83735&d=836018&f=EDH",
+          "source_chain": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,88 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Prova viva de consumo externo, fix no caminho keyword-only de `generate` e segunda promocao pequena
+
+### O Porquê
+- O trabalho anterior ja tinha endurecido o scan-through do expansor externo, mas ainda faltavam tres provas operacionais:
+  - mostrar que os externos promovidos realmente entravam como referencia em `optimize/generate`;
+  - confirmar que o bucket competitivo nao vazava para Commander casual ou `duel_commander`;
+  - repetir o fluxo completo em outro evento publico `EDHTop16`, sem depender so do `cedh-arcanum-sanctorum-57`.
+- Durante essa validacao live apareceu um defeito real:
+  - o caminho keyword-only de `generate` quebrava no Postgres porque a query de `meta_decks` enviava placeholders de commander mesmo quando a SQL usava so `keyword_patterns`.
+
+### O Como
+- `server/lib/meta/meta_deck_reference_support.dart`
+  - ganhou `buildMetaDeckReferenceQueryParts(...)`
+  - `queryMetaDeckReferenceCandidates(...)` passou a enviar apenas os parametros realmente usados pela SQL
+  - isso corrigiu o erro live:
+    - `Contains superfluous variables: commander_names, commander_like_patterns`
+- `server/test/meta_deck_reference_support_test.dart`
+  - ganhou cobertura direta para o caso keyword-only, que e exatamente o caminho de `generate`
+- `server/bin/meta_reference_probe.dart`
+  - novo bin de auditoria que usa os mesmos helpers reais de `optimize/generate`
+  - grava:
+    - `selection_reason`
+    - `source_breakdown`
+    - `priority_cards`
+    - `references`
+    - match/rank da referencia externa alvo
+    - guards casual/duel
+- `server/bin/meta_commander_color_identity_report.dart`
+  - novo bin deterministico para medir cobertura de identidade dos commanders
+  - usa a heuristica real do projeto:
+    - `color_identity`
+    - `colors`
+    - `mana_cost`
+    - `oracle_text`
+  - preserva, por nome, a melhor identidade encontrada entre printings duplicados
+- Rodada adicional de scan-through aplicada em:
+  - `https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton`
+  - `--target-valid=3 --max-standing=12`
+  - resultado:
+    - `attempted_count=5`
+    - `expanded_count=3`
+    - `rejected_count=2`
+    - `goal_reached=true`
+- Stage 2 do evento novo:
+  - aceitos:
+    - `Kinnan, Bonder Prodigy`
+    - `Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept`
+  - rejeitado corretamente:
+    - `Vivi Ornitier` (`card_count_below_stage2_minimum`, `unresolved_cards=2`)
+- Promocao pequena aplicada com guard rails individuais:
+  - `standing-2` (`Kinnan`)
+  - `standing-3` (`Rograkh + Silas`)
+
+### Resultado
+- Prova viva dos externos anteriores:
+  - os `5` externos promovidos ate entao entraram como `rank 1` em:
+    - `optimize` competitivo
+    - `generate` competitivo
+  - os mesmos `5` ficaram fora de:
+    - `optimize` casual (`bracket <= 2`)
+    - `generate` casual
+    - `generate` `duel commander`
+- Prova viva apos a nova promocao:
+  - `promoted_external_count=7`
+  - `optimize_competitive_external_match_count=7`
+  - `generate_competitive_external_match_count=7`
+  - guards casual/duel `7/7` verdes
+- Estado final da base:
+  - `meta_decks=648`
+    - `mtgtop8=641`
+    - `external=7`
+  - `external_commander_meta_candidates`
+    - `promoted/valid=7`
+    - `staged/warning_pending=1`
+- Cobertura real de identidade apos a rodada:
+  - `external cEDH`: `7/7` resolvidos
+  - `mtgtop8 cEDH`: `187/214` resolvidos
+  - `mtgtop8 EDH`: `155/162` resolvidos
+- Sinais estrategicos novos e ja observaveis no probe:
+  - `Kinnan` -> `Basalt Monolith`, `Birds of Paradise`, `Chord of Calling`, `Chrome Mox`
+  - `Rograkh + Silas` -> `Ad Nauseam`, `Beseech the Mirror`, `Brain Freeze`, `Underworld Breach`
+
 ## 2026-04-27 — Scan-through no expansor externo e validacao final de consumo seguro em `optimize/generate`
 
 ### O Porquê

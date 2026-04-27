@@ -1,0 +1,14 @@
+
+=== Iniciando crawler para Competitive Commander (MTGTop8 cEDH) (cEDH) ===
+Subformato derivado: competitive_commander
+Modo dry-run ativo: nenhuma escrita em banco sera feita.
+Acessando https://www.mtgtop8.com/format?f=cEDH...
+Encontrados 1 eventos recentes.
+  -> Processando evento: https://www.mtgtop8.com/event?e=83812
+     Encontrados 115 linhas de decks neste evento.
+     [NEW] Validando deck: Terra, Magical Adept (2)...
+     [DRY] OK format=cEDH subformat=competitive_commander shell=Terra, Magical Adept strategy=combo placement=2 cards=101 url=https://www.mtgtop8.com/?e=83812&d=836709&f=cEDH
+     [NEW] Validando deck: Kraum + Tymna (3)...
+     [DRY] OK format=cEDH subformat=competitive_commander shell=Kraum, Ludevic's Opus + Tymna the Weaver strategy=combo placement=3 cards=101 url=https://www.mtgtop8.com/?e=83812&d=836710&f=cEDH
+
+Crawler finalizado com sucesso!

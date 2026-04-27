@@ -280,6 +280,28 @@ Resultado da rodada scan-through em `2026-04-27`:
   - `standing-9` `Kefka, Court Mage // Kefka, Ruler of Ruin`
   - `standing-10` `Thrasios, Triton Hero + Yoshimaru, Ever Faithful`
 
+Exemplo adicional reaproveitado na mesma data:
+
+```bash
+cd server
+dart run bin/expand_external_commander_meta_candidates.dart \
+  --source-url=https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton \
+  --target-valid=3 \
+  --max-standing=12 \
+  --output=test/artifacts/meta_deck_intelligence_2026-04-27/jokers_edhtop16_expansion_target3_max12_2026-04-27.json
+```
+
+Resultado observado:
+
+- `entries_available=10`
+- `attempted_count=5`
+- `expanded_count=3`
+- `rejected_count=2`
+- `goal_reached=true`
+- rejeicoes:
+  - `standing-1` -> `topdeck_deckobj_missing`
+  - `standing-4` -> `topdeck_deckobj_missing`
+
 ### 3. Persistencia segura do stage 2 em `external_commander_meta_candidates`
 
 ```bash
@@ -448,6 +470,67 @@ Regra:
 - exige `research_payload.source_chain` presente
 - mapeia a promocao para `meta_decks.format='cEDH'`
 
+### 4.2 Provar consumo real em `optimize` e `generate`
+
+Depois de qualquer promocao pequena, rodar:
+
+```bash
+cd server
+dart run bin/meta_reference_probe.dart \
+  --output=test/artifacts/meta_deck_intelligence_2026-04-27/meta_reference_probe_latest.json
+```
+
+Esse probe usa os mesmos helpers reais do runtime e grava:
+
+- quando a referencia externa entra em `optimize`
+- quando ela entra em `generate`
+- `selection_reason`
+- `source_breakdown`
+- `priority_cards`
+- se houve ou nao vazamento para casual/duel
+
+Fatos confirmados em `2026-04-27`:
+
+- antes do segundo evento:
+  - os `5` externos promovidos entravam como `rank 1` em `optimize` competitivo e `generate` competitivo
+  - casual/duel ficaram `5/5` verdes
+- apos a promocao pequena de `Jokers`:
+  - `promoted_external_count=7`
+  - `optimize_competitive_external_match_count=7`
+  - `generate_competitive_external_match_count=7`
+  - guards casual/duel `7/7` verdes
+
+Observacao obrigatoria:
+
+- esse passo encontrou um bug real no caminho keyword-only de `generate`
+- o fix ficou em `server/lib/meta/meta_deck_reference_support.dart`
+- nao remover esse probe do workflow
+
+### 4.3 Medir cobertura real de identidade de cor
+
+Para medir cobertura por identidade de cor sem depender de probes SQL frageis:
+
+```bash
+cd server
+dart run bin/meta_commander_color_identity_report.dart \
+  --output=test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_latest.json
+```
+
+Esse report usa a heuristica real do projeto:
+
+- `color_identity`
+- `colors`
+- `mana_cost`
+- `oracle_text`
+
+E preserva, por nome, a melhor identidade encontrada entre printings duplicados.
+
+Estado medido em `2026-04-27` apos `Jokers`:
+
+- `external cEDH`: `7/7` resolvidos
+- `mtgtop8 cEDH`: `187/214` resolvidos
+- `mtgtop8 EDH`: `155/162` resolvidos
+
 ### 5. Consumo por `optimize` e `generate`
 
 Regra operacional:
@@ -494,6 +577,14 @@ Leitura:
 
 - a fila externa atual continua segura: nada entra em `meta_decks` sem revisao explicita
 - o proximo passo operacional e revisar candidatos e atualizar `validation_status` + `legal_status` antes de qualquer `--apply`
+
+Resultado comprovado apos `stage --apply` + promocao pequena em `2026-04-27`:
+
+- `Kinnan, Bonder Prodigy` -> `promoted/valid`
+- `Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept` -> `promoted/valid`
+- estado final da fila:
+  - `promoted/valid=7`
+  - `staged/warning_pending=1`
 
 ## Por que isso existe
 

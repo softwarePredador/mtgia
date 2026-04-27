@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-04-27T20:12:41.801833Z",
+  "mode": "dry_run",
+  "scope": {
+    "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+    "limit": null
+  },
+  "rules": {
+    "validation_status": "staged",
+    "subformat": "competitive_commander",
+    "deck_total_exact": 100,
+    "legal_status_allowed": [
+      "valid",
+      "warning_reviewed"
+    ],
+    "requires_commander_name": true,
+    "requires_unique_source_url": true,
+    "requires_unique_deck_fingerprint": true,
+    "requires_source_allowlist": true,
+    "requires_research_payload_source_chain": true,
+    "requires_research_payload_staging_audit": true
+  },
+  "summary": {
+    "total": 1,
+    "promotable": 1,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "accepted": true,
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_host": "edhtop16.com",
+        "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+        "deck_name": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+        "commander_name": "Rograkh, Son of Rohgahh",
+        "partner_commander_name": "Silas Renn, Seeker Adept",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+        "card_list": "1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Ad Nauseam\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Artist's Talent\n1 Ashling, Flame Dancer\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Clever Impersonator\n1 Command Tower\n1 Copy Enchantment\n1 Culling the Weak\n1 Dark Ritual\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Emergence Zone\n1 Faerie Mastermind\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flare of Duplication\n1 Flash Photography\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Grinding Station\n1 Hexing Squelcher\n1 Imperial Seal\n1 Imposter Mech\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mirrormade\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Opposition Agent\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Paradise Mantle\n1 Polluted Delta\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Relic of Legends\n1 Reliquary Tower\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Sink into Stupor // Soporific Springs\n1 Snapback\n1 Sol Ring\n1 Springleaf Drum\n1 Steam Vents\n1 Storm-Kiln Artist\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Dominance\n1 Thassa's Oracle\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Volcanic Island\n1 Watery Grave\n1 Wooded Foothills",
+        "placement": "3",
+        "color_identity": [
+          "B",
+          "R",
+          "U"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "staged",
+        "legal_status": "valid",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+        "research_payload": {
+          "standing": 3,
+          "player_name": "Breezy [TYRNT]",
+          "total_cards": 100,
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "stage_status": "staged",
+          "staging_audit": {
+            "issues": [
+              {
+                "code": "missing_color_identity",
+                "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto.",
+                "severity": "warning"
+              }
+            ],
+            "accepted": true,
+            "illegal_cards": [],
+            "unresolved_cards": [],
+            "validation_profile": "topdeck_edhtop16_stage2",
+            "expansion_generated_at": "2026-04-27T20:11:34.956056Z",
+            "validation_generated_at": "2026-04-27T20:11:51.122450Z",
+            "validation_legal_status": "legal",
+            "commander_color_identity": [
+              "B",
+              "R",
+              "U"
+            ],
+            "expansion_rejected_count": 2,
+            "validation_rejected_count": 0
+          },
+          "tournament_id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+          "source_context": "edhtop16_tournament_entry",
+          "tournament_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+          "commander_count": 2,
+          "mainboard_count": 98,
+          "topdeck_deck_url": "https://topdeck.gg/deck/jokers-are-wild-monthly-1k-hosted-by-trenton/NAnEj55NfLa0CLXI7R4wWIZIQ2F2",
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "topdeck_imported_from": "https://moxfield.com/decks/13MX2fZGcEuUhTPt62d6BA"
+        },
+        "imported_by": "meta_deck_intelligence_2026_04_27_jokers_scan_through"
+      },
+      "card_count": 100,
+      "promoted_to_meta_decks_at": null,
+      "issues": [],
+      "planned_meta_deck": {
+        "format": "cEDH",
+        "archetype": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+        "commander_name": "Rograkh, Son of Rohgahh",
+        "partner_commander_name": "Silas Renn, Seeker Adept",
+        "shell_label": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+        "strategy_archetype": "combo",
+        "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+        "card_list": "1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Ad Nauseam\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Artist's Talent\n1 Ashling, Flame Dancer\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Clever Impersonator\n1 Command Tower\n1 Copy Enchantment\n1 Culling the Weak\n1 Dark Ritual\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Emergence Zone\n1 Faerie Mastermind\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flare of Duplication\n1 Flash Photography\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Grinding Station\n1 Hexing Squelcher\n1 Imperial Seal\n1 Imposter Mech\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mirrormade\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Opposition Agent\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Paradise Mantle\n1 Polluted Delta\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Relic of Legends\n1 Reliquary Tower\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Sink into Stupor // Soporific Springs\n1 Snapback\n1 Sol Ring\n1 Springleaf Drum\n1 Steam Vents\n1 Storm-Kiln Artist\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Dominance\n1 Thassa's Oracle\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Volcanic Island\n1 Watery Grave\n1 Wooded Foothills",
+        "placement": "3"
+      }
+    }
+  ]
+}

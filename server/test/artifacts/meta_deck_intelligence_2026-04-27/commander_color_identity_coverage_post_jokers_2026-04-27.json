@@ -1,0 +1,473 @@
+{
+  "summary_by_source_format": [
+    {
+      "source": "external",
+      "format": "cEDH",
+      "deck_count": 7,
+      "resolved_identity_count": 7,
+      "unknown_identity_count": 0
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "deck_count": 162,
+      "resolved_identity_count": 155,
+      "unknown_identity_count": 7
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "deck_count": 214,
+      "resolved_identity_count": 187,
+      "unknown_identity_count": 27
+    }
+  ],
+  "top_resolved_identities": [
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "RU",
+      "decks": 30
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BRUW",
+      "decks": 22
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GU",
+      "decks": 21
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGRUW",
+      "decks": 20
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BRU",
+      "decks": 17
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGUW",
+      "decks": 15
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGU",
+      "decks": 14
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "G",
+      "decks": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "W",
+      "decks": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BUW",
+      "decks": 13
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGR",
+      "decks": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BR",
+      "decks": 10
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "RUW",
+      "decks": 8
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "RW",
+      "decks": 8
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "U",
+      "decks": 8
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GRU",
+      "decks": 8
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BRW",
+      "decks": 7
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGRUW",
+      "decks": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BU",
+      "decks": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "GR",
+      "decks": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "R",
+      "decks": 6
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "B",
+      "decks": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BUW",
+      "decks": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGW",
+      "decks": 5
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GUW",
+      "decks": 5
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "commander_color_identity": "BRU",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BG",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGR",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGRU",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BU",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "RU",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "RW",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "U",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BG",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "B",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BR",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "RUW",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BRW",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "GRW",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "R",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "G",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GRUW",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GW",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "UW",
+      "decks": 2
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "commander_color_identity": "BRUW",
+      "decks": 1
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "commander_color_identity": "GU",
+      "decks": 1
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "commander_color_identity": "GUW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGUW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BRUW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "GRU",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "UW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGU",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GR",
+      "decks": 1
+    }
+  ],
+  "unknown_commander_labels": [
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Aang, Swift Savior",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Cecil, Dark Knight",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Emet-Selch, Unsundered",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Peter Parker",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Terra, Magical Adept",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Witherbloom, the Balancer",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Aang, at the Crossroads",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Avatar Aang",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Birgi, God of Storytelling",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Brigid, Clachan's Heart",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Esika, God of the Tree",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Etali, Primal Conqueror",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Gwen Stacy",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Kefka, Court Mage",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Krark, the Thumbless + Sakashima of a Thousand Faces",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Prismari, the Inspiration",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Ral, Monsoon Mage",
+      "decks": 4
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Terra, Magical Adept",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "The Emperor of Palamecia",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Zhulodok, Void Gorger",
+      "decks": 1
+    }
+  ]
+}

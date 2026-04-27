@@ -3,6 +3,38 @@ import 'package:test/test.dart';
 import '../lib/meta/meta_deck_reference_support.dart';
 
 void main() {
+  group('buildMetaDeckReferenceQueryParts', () {
+    test('omits commander placeholders for keyword-only generate lookups', () {
+      final parts = buildMetaDeckReferenceQueryParts(
+        formatCodes: const ['cEDH'],
+        keywordPatterns: const ['%kraum%', '%tymna%'],
+        limit: 20,
+      );
+
+      expect(parts.hasFilters, isTrue);
+      expect(parts.parameters.containsKey('formats'), isTrue);
+      expect(parts.parameters.containsKey('limit'), isTrue);
+      expect(parts.parameters.containsKey('keyword_patterns'), isTrue);
+      expect(parts.parameters.containsKey('commander_names'), isFalse);
+      expect(parts.parameters.containsKey('commander_like_patterns'), isFalse);
+    });
+
+    test('includes commander placeholders when optimize lookup has commanders',
+        () {
+      final parts = buildMetaDeckReferenceQueryParts(
+        formatCodes: const ['cEDH'],
+        commanderNames: const ['Kraum, Ludevic\'s Opus', 'Tymna the Weaver'],
+        keywordPatterns: const ['%kraum%'],
+        limit: 20,
+      );
+
+      expect(parts.hasFilters, isTrue);
+      expect(parts.parameters.containsKey('commander_names'), isTrue);
+      expect(parts.parameters.containsKey('commander_like_patterns'), isTrue);
+      expect(parts.parameters.containsKey('keyword_patterns'), isTrue);
+    });
+  });
+
   group('selectMetaDeckReferenceCandidates', () {
     test(
         'prefers external competitive commander shell with exact partner match',

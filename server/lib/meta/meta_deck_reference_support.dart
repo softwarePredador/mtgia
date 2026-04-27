@@ -135,15 +135,30 @@ class MetaDeckReferenceSelectionResult {
   }
 }
 
-Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
-  required Pool pool,
+class MetaDeckReferenceQueryParts {
+  const MetaDeckReferenceQueryParts({
+    required this.filters,
+    required this.parameters,
+  });
+
+  final List<String> filters;
+  final Map<String, dynamic> parameters;
+
+  bool get hasFilters => filters.isNotEmpty;
+}
+
+MetaDeckReferenceQueryParts buildMetaDeckReferenceQueryParts({
   required List<String> formatCodes,
   List<String> commanderNames = const <String>[],
   List<String> keywordPatterns = const <String>[],
-  int limit = 250,
-}) async {
-  if (formatCodes.isEmpty || limit <= 0)
-    return const <MetaDeckReferenceCandidate>[];
+  required int limit,
+}) {
+  if (formatCodes.isEmpty || limit <= 0) {
+    return const MetaDeckReferenceQueryParts(
+      filters: <String>[],
+      parameters: <String, dynamic>{},
+    );
+  }
 
   final normalizedCommanders = commanderNames
       .map((name) => name.trim().toLowerCase())
@@ -161,6 +176,11 @@ Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
       .toList(growable: false);
 
   final filters = <String>[];
+  final parameters = <String, dynamic>{
+    'formats': TypedValue(Type.textArray, formatCodes),
+    'limit': limit,
+  };
+
   if (normalizedCommanders.isNotEmpty) {
     filters.addAll(const <String>[
       'LOWER(COALESCE(md.commander_name, \'\')) = ANY(@commander_names)',
@@ -168,7 +188,12 @@ Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
       'LOWER(COALESCE(md.shell_label, \'\')) LIKE ANY(@commander_like_patterns)',
       'LOWER(COALESCE(md.card_list, \'\')) LIKE ANY(@commander_like_patterns)',
     ]);
+    parameters['commander_names'] =
+        TypedValue(Type.textArray, normalizedCommanders);
+    parameters['commander_like_patterns'] =
+        TypedValue(Type.textArray, commanderLikePatterns);
   }
+
   if (normalizedKeywordPatterns.isNotEmpty) {
     filters.addAll(const <String>[
       'LOWER(COALESCE(md.archetype, \'\')) LIKE ANY(@keyword_patterns)',
@@ -177,8 +202,30 @@ Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
       'LOWER(COALESCE(md.commander_name, \'\')) LIKE ANY(@keyword_patterns)',
       'LOWER(COALESCE(md.partner_commander_name, \'\')) LIKE ANY(@keyword_patterns)',
     ]);
+    parameters['keyword_patterns'] =
+        TypedValue(Type.textArray, normalizedKeywordPatterns);
   }
-  if (filters.isEmpty) return const <MetaDeckReferenceCandidate>[];
+
+  return MetaDeckReferenceQueryParts(
+    filters: filters,
+    parameters: parameters,
+  );
+}
+
+Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
+  required Pool pool,
+  required List<String> formatCodes,
+  List<String> commanderNames = const <String>[],
+  List<String> keywordPatterns = const <String>[],
+  int limit = 250,
+}) async {
+  final queryParts = buildMetaDeckReferenceQueryParts(
+    formatCodes: formatCodes,
+    commanderNames: commanderNames,
+    keywordPatterns: keywordPatterns,
+    limit: limit,
+  );
+  if (!queryParts.hasFilters) return const <MetaDeckReferenceCandidate>[];
 
   final rows = await pool.execute(
     Sql.named('''
@@ -206,18 +253,11 @@ Future<List<MetaDeckReferenceCandidate>> queryMetaDeckReferenceCandidates({
       LEFT JOIN external_commander_meta_candidates ecmc
         ON ecmc.source_url = md.source_url
       WHERE md.format = ANY(@formats)
-        AND (${filters.join(' OR ')})
+        AND (${queryParts.filters.join(' OR ')})
       ORDER BY md.created_at DESC NULLS LAST, md.source_url ASC
       LIMIT @limit
     '''),
-    parameters: <String, dynamic>{
-      'formats': TypedValue(Type.textArray, formatCodes),
-      'commander_names': TypedValue(Type.textArray, normalizedCommanders),
-      'commander_like_patterns':
-          TypedValue(Type.textArray, commanderLikePatterns),
-      'keyword_patterns': TypedValue(Type.textArray, normalizedKeywordPatterns),
-      'limit': limit,
-    },
+    parameters: queryParts.parameters,
   );
 
   return rows
