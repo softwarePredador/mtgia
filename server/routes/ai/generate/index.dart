@@ -11,6 +11,7 @@ import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
+import '../../../lib/observability.dart';
 import '../../../lib/openai_runtime_config.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -306,8 +307,14 @@ $metaContext
     }
 
     return Response.json(body: responseBody);
-  } catch (error) {
+  } catch (error, stackTrace) {
     print('[ERROR] Failed to generate deck: $error');
+    await captureRouteException(
+      context,
+      error,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_generate'},
+    );
     return internalServerError('Failed to generate deck');
   }
 }

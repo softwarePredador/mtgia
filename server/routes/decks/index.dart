@@ -5,6 +5,7 @@ import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 import '../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -248,6 +249,12 @@ Future<Response> _listDecks(RequestContext context) async {
   } catch (e, stackTrace) {
     Log.e('❌ Erro crítico em _listDecks: $e');
     Log.e('Stack trace: $stackTrace');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'decks_list'},
+    );
     return internalServerError('Failed to list decks');
   }
 }
@@ -388,8 +395,15 @@ Future<Response> _createDeck(RequestContext context) async {
   } on DeckRulesException catch (e) {
     print('[ERROR] Failed to create deck: $e');
     return badRequest(e.message);
-  } catch (e) {
+  } catch (e, stackTrace) {
     print('[ERROR] Failed to create deck: $e');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'decks_create'},
+      extras: {'format': format, 'cards_count': cards.length},
+    );
     return internalServerError('Failed to create deck');
   }
 }

@@ -1,6 +1,6 @@
 ---
 name: Mobile Runtime Device QA
-description: Compila e valida o app ManaLoom em Android fisico, com foco no device M2006, backend local acessivel pela LAN, integration tests, logs, screenshots e handoff de runtime app/UI contra backend real.
+description: Compila e valida o app ManaLoom no iPhone 15 Simulator como alvo principal, com backend local real, integration tests, logs, screenshots e handoff de runtime app/UI contra API viva.
 user-invocable: true
 disable-model-invocation: false
 model: gpt-5.4
@@ -25,7 +25,7 @@ Do not reuse assumptions from booster_new, revendas, carMatch, or any other repo
 
 ## Mission
 
-Prove ManaLoom app runtime on a real Android device, especially the M2006 device, using the live local backend when required.
+Prove ManaLoom app runtime on the iPhone 15 Simulator using the live local backend when required.
 
 Primary target flow:
 
@@ -62,18 +62,17 @@ Read before running device validation:
 - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
 - `server/manual-de-instrucao.md`
 
-## Mandatory Device Rules
+## Mandatory Simulator Rules
 
-- Never claim physical-device proof without showing the concrete device id from `flutter devices` or `adb devices`.
-- Prefer M2006 when available.
-- If M2006 is not visible, record it as `not proven` and include the exact device discovery output.
-- Do not use `127.0.0.1` from the physical device for backend access.
-- For Android physical device, use the Mac LAN IP, for example `http://192.168.x.x:8081`.
+- Never claim simulator proof without showing the concrete iPhone 15 simulator id from `flutter devices` and/or `xcrun simctl list devices available`.
+- Prefer `iPhone 15` as the primary automated target.
+- If `iPhone 15` is not available, create or boot an equivalent iOS simulator only when the installed Xcode runtime supports it; otherwise record `not proven` with the exact discovery output.
+- Use `http://127.0.0.1:8081` or `http://localhost:8081` for iOS Simulator backend access.
+- M2006/Android physical-device proof is optional fallback only, never the blocking primary target for this agent.
 - Start backend with `PORT=8081 dart run .dart_frog/server.dart` unless the task explicitly requires a different port.
-- Verify backend from the Mac with `curl http://<mac-lan-ip>:8081/health`.
-- If possible, verify from the device with `adb shell curl` or another available network probe; if not available, document as `not proven`.
+- Verify backend from the Mac with `curl http://127.0.0.1:8081/health`.
 - Capture logs with `flutter test -d <deviceId> ... --reporter expanded` or `flutter run -d <deviceId> ...` output.
-- If screenshots are requested or possible, save them under `app/doc/runtime_flow_proofs_<date>_m2006/`.
+- If screenshots are requested or possible, save them under `app/doc/runtime_flow_proofs_<date>_iphone15_simulator/`.
 
 ## Required Runtime Command Shape
 
@@ -83,8 +82,7 @@ Use this sequence as the baseline:
 cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
 git status --short
 flutter devices
-adb devices -l
-ipconfig getifaddr en0 || ipconfig getifaddr en1
+xcrun simctl list devices available | grep -E "iPhone 15|Booted"
 ```
 
 Start backend:
@@ -97,7 +95,7 @@ PORT=8081 dart run .dart_frog/server.dart
 Validate backend:
 
 ```bash
-curl -sS http://<MAC_LAN_IP>:8081/health
+curl -sS http://127.0.0.1:8081/health
 ```
 
 Run app/device proof:
@@ -105,9 +103,9 @@ Run app/device proof:
 ```bash
 cd app
 flutter test integration_test/<deck_runtime_test>.dart \
-  -d <M2006_DEVICE_ID> \
-  --dart-define=API_BASE_URL=http://<MAC_LAN_IP>:8081 \
-  --dart-define=PUBLIC_API_BASE_URL=http://<MAC_LAN_IP>:8081 \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8081 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8081 \
   --reporter expanded \
   --no-version-check
 ```
@@ -118,12 +116,12 @@ If no integration test exists yet for the deck runtime, implement the smallest v
 
 Create or update:
 
-- `app/doc/runtime_flow_handoffs/deck_runtime_m2006_<date>.md`
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_<date>.md`
 
 The handoff must include:
 
 - date/time
-- device id and model
+- simulator id and runtime
 - `flutter devices` output summary
 - backend URL used by the app
 - backend health result
@@ -145,7 +143,7 @@ flutter test test/features/decks/screens/deck_runtime_widget_flow_test.dart
 flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart
 ```
 
-If device/integration test was created or changed, run that test on the M2006 or document why it could not run.
+If device/integration test was created or changed, run that test on iPhone 15 Simulator or document why it could not run.
 
 ## Commit Policy
 

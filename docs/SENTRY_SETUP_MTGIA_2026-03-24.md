@@ -9,6 +9,14 @@
 
 - `Sentry` inicializado sob demanda em `server/lib/observability.dart`
 - captura de exceções não tratadas no middleware global em `server/routes/_middleware.dart`
+- helper `captureRouteException(...)` para rotas que capturam erro e retornam resposta própria sem deixar o middleware global enxergar a exceção
+- cobertura explícita nos fluxos críticos:
+  - `POST /auth/login`
+  - `POST /auth/register`
+  - `GET /decks`
+  - `POST /decks`
+  - `POST /ai/generate`
+  - `POST /ai/optimize`
 - `x-request-id` propagado no backend:
   - reutiliza header inbound quando existir
   - gera um novo quando não existir
@@ -19,6 +27,7 @@
 ### App
 
 - `Sentry` inicializado em `app/lib/core/observability/app_observability.dart`
+- helper `captureProviderException(...)` para providers que tratam erro localmente e não deixam o handler global capturar
 - captura global de:
   - `FlutterError`
   - `PlatformDispatcher.onError`
@@ -27,6 +36,10 @@
 - `AppLogger.error(...)` passa a encaminhar erro real para observabilidade quando houver exceção associada
 - observer de navegação adiciona tag básica de rota
 - contexto de usuário autenticado passa a ser sincronizado no Sentry
+- cobertura explícita em providers críticos:
+  - `AuthProvider`: initialize, login, register, updateProfile
+  - `DeckProvider`: listagem, detalhes, criação, exclusão, adição de cartas, import, apply optimize, toggle public
+  - `NotificationProvider`: polling/lista/marcação de notificações
 
 ## Fontes de credenciais
 

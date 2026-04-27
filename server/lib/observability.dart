@@ -12,17 +12,17 @@ final DotEnv _observabilityEnv =
 
 Future<void>? _observabilityInit;
 
-String get _sentryDsn =>
-    (_observabilityEnv['SENTRY_DSN'] ?? Platform.environment['SENTRY_DSN'] ?? '')
-        .trim();
+String get _sentryDsn => (_observabilityEnv['SENTRY_DSN'] ??
+        Platform.environment['SENTRY_DSN'] ??
+        '')
+    .trim();
 
-String get _sentryEnvironment =>
-    (_observabilityEnv['SENTRY_ENVIRONMENT'] ??
-            Platform.environment['SENTRY_ENVIRONMENT'] ??
-            _observabilityEnv['ENVIRONMENT'] ??
-            Platform.environment['ENVIRONMENT'] ??
-            'development')
-        .trim();
+String get _sentryEnvironment => (_observabilityEnv['SENTRY_ENVIRONMENT'] ??
+        Platform.environment['SENTRY_ENVIRONMENT'] ??
+        _observabilityEnv['ENVIRONMENT'] ??
+        Platform.environment['ENVIRONMENT'] ??
+        'development')
+    .trim();
 
 String? get _sentryRelease {
   final value = (_observabilityEnv['SENTRY_RELEASE'] ??
@@ -156,5 +156,42 @@ Future<void> captureObservedException(
         scope.setContexts('extras', extras);
       }
     },
+  );
+}
+
+Future<void> captureRouteException(
+  RequestContext context,
+  Object error, {
+  StackTrace? stackTrace,
+  String source = 'route_handler',
+  Map<String, String>? tags,
+  Map<String, Object?>? extras,
+}) async {
+  RequestTrace? trace;
+  String? userId;
+
+  try {
+    trace = context.read<RequestTrace>();
+  } catch (_) {
+    trace = null;
+  }
+
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = null;
+  }
+
+  await captureObservedException(
+    error,
+    stackTrace: stackTrace,
+    request: context.request,
+    trace: trace,
+    userId: userId,
+    tags: {
+      'source': source,
+      if (tags != null) ...tags,
+    },
+    extras: extras,
   );
 }

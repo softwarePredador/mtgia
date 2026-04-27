@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
 
 // ─── Model ───────────────────────────────────────────────────
 
@@ -88,6 +89,13 @@ class NotificationProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('[NotificationProvider] fetchUnreadCount error: $e');
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'notification_unread_count_failed',
+          category: 'notifications',
+          data: {'operation': 'fetchUnreadCount', 'error': '$e'},
+        ),
+      );
     }
   }
 
@@ -103,17 +111,25 @@ class NotificationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final query = 'page=$page&limit=$limit${unreadOnly ? '&unread_only=true' : ''}';
+      final query =
+          'page=$page&limit=$limit${unreadOnly ? '&unread_only=true' : ''}';
       final resp = await _api.get('/notifications?$query');
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _notifications = list
-            .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
-            .toList();
+        _notifications =
+            list
+                .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
+                .toList();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[NotificationProvider] fetchNotifications error: $e');
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'fetchNotifications',
+        extras: {'page': page, 'limit': limit, 'unread_only': unreadOnly},
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -142,8 +158,14 @@ class NotificationProvider extends ChangeNotifier {
         _unreadCount = (_unreadCount - 1).clamp(0, 999);
         notifyListeners();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[NotificationProvider] markAsRead error: $e');
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'markAsRead',
+        extras: {'notification_id': notificationId},
+      );
     }
   }
 
@@ -179,8 +201,13 @@ class NotificationProvider extends ChangeNotifier {
       if (changed) {
         notifyListeners();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[NotificationProvider] markAllAsRead error: $e');
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'markAllAsRead',
+      );
     }
   }
 
@@ -196,5 +223,22 @@ class NotificationProvider extends ChangeNotifier {
     _unreadCount = 0;
     _isLoading = false;
     notifyListeners();
+  }
+
+  void _captureProviderException(
+    Object error, {
+    required StackTrace stackTrace,
+    required String operation,
+    Map<String, Object?>? extras,
+  }) {
+    unawaited(
+      AppObservability.instance.captureProviderException(
+        error,
+        stackTrace: stackTrace,
+        provider: 'NotificationProvider',
+        operation: operation,
+        extras: extras,
+      ),
+    );
   }
 }

@@ -1,6 +1,38 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Sentry ampliado para erros tratados e QA mobile no iPhone 15 Simulator
+
+### O Porquê
+- O Sentry já estava inicializado no app e no backend, mas parte importante das falhas críticas era capturada por `catch` local e convertida em resposta/estado de tela.
+- Nesses casos, o handler global do Flutter ou o middleware global do Dart Frog não recebia a exceção.
+- A prova runtime app/UI também precisava trocar o alvo principal: em vez de depender do Android físico M2006, o caminho automatizável passa a ser o iPhone 15 Simulator.
+
+### O Como
+- `app/lib/core/observability/app_observability.dart` ganhou `captureProviderException(...)` com tags padronizadas `source=provider`, `provider` e `operation`.
+- Foram instrumentados providers críticos:
+  - `AuthProvider`: initialize, login, register, updateProfile.
+  - `DeckProvider`: listagem, detalhes, criação, exclusão, adição de carta, import, apply optimize e toggle public.
+  - `NotificationProvider`: polling/lista/marcação de notificações.
+- `server/lib/observability.dart` ganhou `captureRouteException(...)`, reaproveitando request, `RequestTrace` e user id quando disponíveis.
+- `server/lib/import_list_service.dart` passou a remover marcadores de commander (`[Commander]`, `[cmdr]`, `*CMDR*`, `!commander`) do nome resolvido da carta sem perder o flag de comandante.
+- Foram instrumentadas rotas críticas que fazem `catch` próprio:
+  - `POST /auth/login`
+  - `POST /auth/register`
+  - `GET /decks`
+  - `POST /decks`
+  - `POST /ai/generate`
+  - `POST /ai/optimize`
+- `.github/agents/mobile-runtime-device-qa.agent.md` agora usa iPhone 15 Simulator como alvo primário e deixa M2006 como fallback explícito.
+- Foi criado `app/doc/runtime_flow_handoffs/IPHONE15_SIMULATOR_RUNTIME_RUNBOOK.md`.
+- Foi registrado o handoff fresco `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`.
+
+### Observações operacionais
+- Erros esperados de negócio, como credencial inválida ou validação de formulário, continuam sem captura como exceção Sentry para evitar ruído.
+- Para iOS Simulator, o backend deve ser acessado via `http://127.0.0.1:8081`.
+- O M2006 físico continua documentado, mas não bloqueia mais a prova principal do agente mobile.
+- A execução real no iPhone 15 Simulator compilou e abriu o app, mas ainda ficou bloqueada no harness de integração: o teste legado `deck_runtime_m2006_test.dart` procura especificamente `ElevatedButton('Novo Deck')` e precisa ser adaptado para o caminho iPhone 15/FAB/lista carregada antes da prova 100%.
+
 ## 2026-04-24 — Relatorios source-aware para `meta_decks`
 
 ### O Porquê

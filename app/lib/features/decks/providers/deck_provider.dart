@@ -3,6 +3,7 @@ import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
 import '../../../core/services/activation_funnel_service.dart';
 import '../../../core/utils/logger.dart';
 import '../models/deck.dart';
@@ -181,8 +182,14 @@ class DeckProvider extends ChangeNotifier {
           state.selectedDeck!.colorIdentity,
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _detailsErrorMessage = 'Erro de conexão: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'fetchDeckDetails',
+        extras: {'deck_id': deckId},
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -249,8 +256,13 @@ class DeckProvider extends ChangeNotifier {
       } else {
         _errorMessage = state.errorMessage;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro de conexão: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'fetchDecks',
+      );
       // Não limpa _decks para permitir cache visual em caso de erro
     } finally {
       _isLoading = false;
@@ -315,8 +327,14 @@ class DeckProvider extends ChangeNotifier {
       _errorMessage = result.errorMessage;
       notifyListeners();
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro ao criar deck: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'createDeck',
+        extras: {'format': format},
+      );
       notifyListeners();
       return false;
     }
@@ -341,8 +359,14 @@ class DeckProvider extends ChangeNotifier {
       _errorMessage = result.errorMessage;
       notifyListeners();
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro ao deletar deck: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'deleteDeck',
+        extras: {'deck_id': deckId},
+      );
       notifyListeners();
       return false;
     }
@@ -388,8 +412,18 @@ class DeckProvider extends ChangeNotifier {
       _errorMessage = result.errorMessage;
       notifyListeners();
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro ao adicionar carta: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'addCardToDeck',
+        extras: {
+          'deck_id': deckId,
+          'card_id': card.id,
+          'is_commander': isCommander,
+        },
+      );
       notifyListeners();
       return false;
     }
@@ -691,8 +725,18 @@ class DeckProvider extends ChangeNotifier {
         deckId: deckId,
         cardsPayload: payloadResult.cardsPayload,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro fatal na otimização', e);
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'applyOptimization',
+        extras: {
+          'deck_id': deckId,
+          'removals_count': cardsToRemove.length,
+          'additions_count': cardsToAdd.length,
+        },
+      );
       rethrow;
     }
   }
@@ -811,8 +855,18 @@ class DeckProvider extends ChangeNotifier {
         deckId: deckId,
         cardsPayload: cardsPayload,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] Erro na otimização rápida', e);
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'applyOptimizationWithIds',
+        extras: {
+          'deck_id': deckId,
+          'removals_count': removalsDetailed.length,
+          'additions_count': additionsDetailed.length,
+        },
+      );
       rethrow;
     }
   }
@@ -873,9 +927,15 @@ class DeckProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return result;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _isLoading = false;
       _errorMessage = 'Erro de conexão: $e';
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'importDeckFromList',
+        extras: {'format': format},
+      );
       notifyListeners();
       return buildConnectionFailureResult(e);
     }
@@ -951,8 +1011,14 @@ class DeckProvider extends ChangeNotifier {
         return true;
       }
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] togglePublic error: $e');
+      _captureProviderException(
+        e,
+        stackTrace: stackTrace,
+        operation: 'togglePublic',
+        extras: {'deck_id': deckId, 'is_public': isPublic},
+      );
       return false;
     }
   }
@@ -988,5 +1054,22 @@ class DeckProvider extends ChangeNotifier {
     _deckDetailsCache.clear();
     _deckDetailsCacheTime.clear();
     notifyListeners();
+  }
+
+  void _captureProviderException(
+    Object error, {
+    required StackTrace stackTrace,
+    required String operation,
+    Map<String, Object?>? extras,
+  }) {
+    unawaited(
+      AppObservability.instance.captureProviderException(
+        error,
+        stackTrace: stackTrace,
+        provider: 'DeckProvider',
+        operation: operation,
+        extras: extras,
+      ),
+    );
   }
 }

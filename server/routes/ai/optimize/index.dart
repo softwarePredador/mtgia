@@ -22,6 +22,7 @@ import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
+import '../../../lib/observability.dart';
 
 int _optimizeRequestCount = 0;
 int _emptySuggestionFallbackTriggeredCount = 0;
@@ -2614,6 +2615,12 @@ Future<Response> onRequest(RequestContext context) async {
     }
   } catch (e, stackTrace) {
     Log.e('handler: $e\nStack trace:\n$stackTrace');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'ai_optimize'},
+    );
     return internalServerError('Failed to optimize deck', details: e);
   }
 }

@@ -1,14 +1,16 @@
+import 'dart:async' show unawaited;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
 import '../models/user.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
 class AuthProvider extends ChangeNotifier {
   final ApiClient _apiClient;
-  
+
   User? _user;
   String? _token;
   AuthStatus _status = AuthStatus.initial;
@@ -32,7 +34,9 @@ class AuthProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final savedToken = prefs.getString('auth_token');
       final savedUserJson = prefs.getString('user_data');
-      debugPrint('[🔑 Auth] savedToken exists: ${savedToken != null}, savedUser exists: ${savedUserJson != null}');
+      debugPrint(
+        '[🔑 Auth] savedToken exists: ${savedToken != null}, savedUser exists: ${savedUserJson != null}',
+      );
 
       if (savedToken != null && savedUserJson != null) {
         _token = savedToken;
@@ -41,7 +45,8 @@ class AuthProvider extends ChangeNotifier {
         debugPrint('[🔑 Auth] validando token com backend...');
         final isValid = await _validateTokenWithBackend();
         debugPrint('[🔑 Auth] token válido: $isValid');
-        _status = isValid ? AuthStatus.authenticated : AuthStatus.unauthenticated;
+        _status =
+            isValid ? AuthStatus.authenticated : AuthStatus.unauthenticated;
         if (!isValid) {
           await prefs.remove('auth_token');
           await prefs.remove('user_data');
@@ -52,11 +57,19 @@ class AuthProvider extends ChangeNotifier {
       } else {
         _status = AuthStatus.unauthenticated;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[❌ Auth] initialize() erro: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'initialize',
+        ),
+      );
       _status = AuthStatus.unauthenticated;
     }
-    
+
     debugPrint('[🔑 Auth] initialize() concluído → $_status');
     notifyListeners();
   }
@@ -74,28 +87,33 @@ class AuthProvider extends ChangeNotifier {
         'email': email,
         'password': password,
       });
-      debugPrint('[🔑 Auth] resposta recebida: statusCode=${response.statusCode}');
+      debugPrint(
+        '[🔑 Auth] resposta recebida: statusCode=${response.statusCode}',
+      );
       debugPrint('[🔑 Auth] resposta body: ${response.data}');
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         _token = data['token'] as String?;
         ApiClient.setToken(_token);
-        debugPrint('[🔑 Auth] token recebido: ${_token != null ? "sim (${_token!.substring(0, 20)}...)" : "NÃO"}');
+        debugPrint(
+          '[🔑 Auth] token recebido: ${_token != null ? "sim (${_token!.substring(0, 20)}...)" : "NÃO"}',
+        );
         _user = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint('[🔑 Auth] user parsed: ${_user?.username}');
-        
+
         // Salvar credenciais
         await _saveCredentials();
         debugPrint('[🔑 Auth] credenciais salvas');
-        
+
         _status = AuthStatus.authenticated;
         debugPrint('[🔑 Auth] status → authenticated ✅');
         notifyListeners();
         return true;
       } else {
         if (response.statusCode >= 500) {
-          _errorMessage = 'Servidor indisponível. Tente novamente em instantes.';
+          _errorMessage =
+              'Servidor indisponível. Tente novamente em instantes.';
         } else if (response.data is Map && response.data['message'] != null) {
           _errorMessage = response.data['message'].toString();
         } else {
@@ -106,9 +124,18 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro de conexão: $e';
       debugPrint('[❌ Auth] login() EXCEPTION: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'login',
+          extras: {'email_domain': _safeEmailDomain(email)},
+        ),
+      );
       _status = AuthStatus.unauthenticated;
       notifyListeners();
       return false;
@@ -137,15 +164,16 @@ class AuthProvider extends ChangeNotifier {
         _token = data['token'] as String?;
         _user = User.fromJson(data['user'] as Map<String, dynamic>);
         ApiClient.setToken(_token);
-        
+
         await _saveCredentials();
-        
+
         _status = AuthStatus.authenticated;
         notifyListeners();
         return true;
       } else {
         if (response.statusCode >= 500) {
-          _errorMessage = 'Servidor indisponível. Tente novamente em instantes.';
+          _errorMessage =
+              'Servidor indisponível. Tente novamente em instantes.';
         } else if (response.data is Map && response.data['message'] != null) {
           _errorMessage = response.data['message'].toString();
         } else {
@@ -155,8 +183,17 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro de conexão: $e';
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'register',
+          extras: {'email_domain': _safeEmailDomain(email)},
+        ),
+      );
       _status = AuthStatus.unauthenticated;
       notifyListeners();
       return false;
@@ -168,7 +205,7 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     await prefs.remove('user_data');
-    
+
     _token = null;
     _user = null;
     ApiClient.setToken(null);
@@ -258,10 +295,26 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
       }
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _errorMessage = 'Erro de conexão: $e';
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'updateProfile',
+        ),
+      );
       notifyListeners();
       return false;
     }
+  }
+
+  String _safeEmailDomain(String email) {
+    final parts = email.trim().split('@');
+    if (parts.length != 2 || parts.last.trim().isEmpty) {
+      return 'unknown';
+    }
+    return parts.last.trim().toLowerCase();
   }
 }

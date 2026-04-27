@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_service.dart';
+import '../../lib/observability.dart';
 
 /// Login com autenticação real no banco de dados
 ///
@@ -71,9 +72,15 @@ Future<Response> onRequest(RequestContext context) async {
       statusCode: HttpStatus.badRequest,
       body: {'message': message},
     );
-  } catch (e) {
+  } catch (e, stackTrace) {
     print('[ERROR] handler: $e');
     print('Erro ao fazer login: $e');
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: stackTrace,
+      tags: const {'route': 'auth_login'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'message': 'Erro ao fazer login'},

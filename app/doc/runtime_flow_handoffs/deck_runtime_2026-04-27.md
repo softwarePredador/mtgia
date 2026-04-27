@@ -65,14 +65,13 @@ Launch command: `cd app && flutter test test/features/decks/screens/deck_runtime
 ### Not proven
 
 - live backend connectivity from app runtime
-- emulator taps
-- physical device taps
+- iPhone 15 Simulator taps
 - shell/home tab navigation before entering `/decks`
 
-Physical Android follow-up is now owned by `Mobile Runtime Device QA` using:
+iPhone 15 Simulator follow-up is now owned by `Mobile Runtime Device QA` using:
 
-- `app/doc/runtime_flow_handoffs/M2006_DEVICE_RUNTIME_RUNBOOK.md`
-- target output: `app/doc/runtime_flow_handoffs/deck_runtime_m2006_YYYY-MM-DD.md`
+- `app/doc/runtime_flow_handoffs/IPHONE15_SIMULATOR_RUNTIME_RUNBOOK.md`
+- target output: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_YYYY-MM-DD.md`
 
 ## Navigation Path
 
@@ -102,7 +101,7 @@ Fresh evidence captured this round: `yes`
 
 The app now has a reusable widget runtime harness covering the ManaLoom Commander journey through real screens instead of direct HTTP only. In the fresh run, the harness registered a user, reached the empty deck state, opened the generator, saved a Commander deck, opened deck details, requested optimize suggestions, previewed the result, applied the change set, and hit deck validation successfully.
 
-This closes the previous gap for app-side flow proof at widget level. The remaining runtime gap is manual or integration execution against a live backend on emulator or physical device; that is still `not proven`.
+This closes the previous gap for app-side flow proof at widget level. The remaining runtime gap is integration execution against a live backend on iPhone 15 Simulator; that is still `not proven`.
 
 ## Commands Run
 

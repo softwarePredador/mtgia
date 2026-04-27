@@ -18,15 +18,25 @@ The purpose here is:
 ## Primary owner
 
 - QA/runtime owner: `ManaLoom Deck Runtime E2E`
-- Physical Android owner: `Mobile Runtime Device QA`
+- iPhone 15 Simulator owner: `Mobile Runtime Device QA`
 
-## Physical M2006 runbook
+## iPhone 15 Simulator runbook
 
-Use this runbook for Android physical-device proof:
+Use this runbook for the primary simulator proof:
+
+- `app/doc/runtime_flow_handoffs/IPHONE15_SIMULATOR_RUNTIME_RUNBOOK.md`
+
+The iPhone 15 Simulator proof is not complete unless the handoff includes the simulator id from `flutter devices` or `xcrun simctl list devices available`, backend URL `http://127.0.0.1:8081`, backend health proof, exact Flutter command, and logs/artifacts.
+
+Latest iPhone 15 Simulator attempt:
+
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+
+## Physical M2006 fallback runbook
+
+Use this only when explicit physical Android proof is requested:
 
 - `app/doc/runtime_flow_handoffs/M2006_DEVICE_RUNTIME_RUNBOOK.md`
-
-The M2006 proof is not complete unless the handoff includes the device id from `flutter devices` or `adb devices -l`, backend LAN URL, backend health proof, exact Flutter command, and logs/artifacts.
 
 ## Safe backend runner
 

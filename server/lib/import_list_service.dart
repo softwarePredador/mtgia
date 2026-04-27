@@ -53,7 +53,7 @@ ImportListParseResult parseImportLines(List<String> lines) {
     }
 
     final quantity = int.parse(match.group(1)!);
-    final cardName = match.group(2)!.trim();
+    final cardName = _stripCommanderMarkers(match.group(2)!.trim());
     final lineLower = line.toLowerCase();
     final isCommanderTag = lineLower.contains('[commander') ||
         lineLower.contains('*cmdr*') ||
@@ -71,4 +71,13 @@ ImportListParseResult parseImportLines(List<String> lines) {
     parsedItems: parsedItems,
     invalidLines: invalidLines,
   );
+}
+
+String _stripCommanderMarkers(String value) {
+  return value
+      .replaceAll(
+          RegExp(r'\s*\[(?:commander|cmdr)\]\s*$', caseSensitive: false), '')
+      .replaceAll(RegExp(r'\s*\*cmdr\*\s*$', caseSensitive: false), '')
+      .replaceAll(RegExp(r'\s*!commander\s*$', caseSensitive: false), '')
+      .trim();
 }

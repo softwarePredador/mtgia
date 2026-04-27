@@ -1,5 +1,7 @@
 # M2006 Device Runtime Runbook
 
+This is now a fallback runbook. The primary automated app/runtime target is the iPhone 15 Simulator in `app/doc/runtime_flow_handoffs/IPHONE15_SIMULATOR_RUNTIME_RUNBOOK.md`.
+
 ## Objective
 
 Prove the ManaLoom deck runtime on the physical Android M2006 device using a real local backend.

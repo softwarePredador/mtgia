@@ -11,12 +11,18 @@ class AppObservability {
 
   static final AppObservability instance = AppObservability._();
 
-  static const String _dsn =
-      String.fromEnvironment('SENTRY_DSN', defaultValue: '');
-  static const String _environment =
-      String.fromEnvironment('SENTRY_ENVIRONMENT', defaultValue: '');
-  static const String _release =
-      String.fromEnvironment('SENTRY_RELEASE', defaultValue: '');
+  static const String _dsn = String.fromEnvironment(
+    'SENTRY_DSN',
+    defaultValue: '',
+  );
+  static const String _environment = String.fromEnvironment(
+    'SENTRY_ENVIRONMENT',
+    defaultValue: '',
+  );
+  static const String _release = String.fromEnvironment(
+    'SENTRY_RELEASE',
+    defaultValue: '',
+  );
   static const String _tracesSampleRateRaw = String.fromEnvironment(
     'SENTRY_TRACES_SAMPLE_RATE',
     defaultValue: '0',
@@ -42,9 +48,10 @@ class AppObservability {
     await SentryFlutter.init(
       (options) {
         options.dsn = _dsn.trim();
-        options.environment = _environment.trim().isNotEmpty
-            ? _environment.trim()
-            : (kReleaseMode ? 'production' : 'development');
+        options.environment =
+            _environment.trim().isNotEmpty
+                ? _environment.trim()
+                : (kReleaseMode ? 'production' : 'development');
         if (_release.trim().isNotEmpty) {
           options.release = _release.trim();
         }
@@ -109,9 +116,10 @@ class AppObservability {
       scope.setUser(
         SentryUser(
           id: user.id,
-          username: user.displayName?.trim().isNotEmpty == true
-              ? user.displayName
-              : user.username,
+          username:
+              user.displayName?.trim().isNotEmpty == true
+                  ? user.displayName
+                  : user.username,
           email: user.email,
         ),
       );
@@ -176,6 +184,27 @@ class AppObservability {
       },
     );
   }
+
+  Future<SentryId?> captureProviderException(
+    Object error, {
+    StackTrace? stackTrace,
+    required String provider,
+    required String operation,
+    Map<String, Object?>? extras,
+    SentryLevel level = SentryLevel.error,
+  }) {
+    return captureException(
+      error,
+      stackTrace: stackTrace,
+      level: level,
+      tags: {
+        'source': 'provider',
+        'provider': provider,
+        'operation': operation,
+      },
+      extras: extras,
+    );
+  }
 }
 
 class AppObservabilityNavigatorObserver extends NavigatorObserver {
@@ -186,7 +215,9 @@ class AppObservabilityNavigatorObserver extends NavigatorObserver {
 
     final routeName = route.settings.name?.trim();
     final resolvedName =
-        routeName != null && routeName.isNotEmpty ? routeName : route.toString();
+        routeName != null && routeName.isNotEmpty
+            ? routeName
+            : route.toString();
     unawaited(AppObservability.instance.setCurrentRoute(resolvedName));
   }
 
