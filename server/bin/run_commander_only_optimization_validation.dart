@@ -19,6 +19,42 @@ const _defaultSummaryJsonPath =
 const _defaultSummaryMdPath =
     'doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md';
 
+class RuntimeValidationConfig {
+  RuntimeValidationConfig({
+    required this.apply,
+  });
+
+  final bool apply;
+
+  bool get dryRun => !apply;
+
+  factory RuntimeValidationConfig.parse(List<String> args) {
+    var apply = false;
+    var explicitDryRun = false;
+
+    for (final arg in args) {
+      if (arg == '--apply') {
+        apply = true;
+        continue;
+      }
+      if (arg == '--dry-run') {
+        explicitDryRun = true;
+        continue;
+      }
+      if (arg == '--help' || arg == '-h') {
+        _printUsage();
+        exit(0);
+      }
+    }
+
+    if (apply && explicitDryRun) {
+      throw ArgumentError('Use apenas um modo: --apply ou --dry-run.');
+    }
+
+    return RuntimeValidationConfig(apply: apply);
+  }
+}
+
 class ValidationCorpusEntry {
   ValidationCorpusEntry({
     required this.deckId,
@@ -122,11 +158,11 @@ class CommanderOnlyRunResult {
       };
 }
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
+  final config = RuntimeValidationConfig.parse(args);
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final apiBaseUrl = env['TEST_API_BASE_URL'] ?? _defaultApiBaseUrl;
-  final artifactDirPath =
-      env['VALIDATION_ARTIFACT_DIR'] ?? _defaultArtifactDir;
+  final artifactDirPath = env['VALIDATION_ARTIFACT_DIR'] ?? _defaultArtifactDir;
   final summaryJsonPath =
       env['VALIDATION_SUMMARY_JSON_PATH'] ?? _defaultSummaryJsonPath;
   final summaryMdPath =
@@ -158,7 +194,6 @@ Future<void> main() async {
   final pool = db.connection;
 
   try {
-    final token = await _getOrCreateAuthToken(apiBaseUrl);
     final corpusEntries = _loadCorpusEntries(corpusPath);
     final candidates = await _loadCandidatesFromCorpus(
       pool: pool,
@@ -173,6 +208,31 @@ Future<void> main() async {
     }
 
     final runStartedAt = DateTime.now().toIso8601String();
+    if (config.dryRun) {
+      final summary = _buildDryRunSummary(
+        apiBaseUrl: apiBaseUrl,
+        artifactDirPath: artifactDirPath,
+        corpusPath: corpusPath,
+        validationLimit: validationLimit,
+        maxAllowedTotalMs: maxAllowedTotalMs,
+        runStartedAt: runStartedAt,
+        candidates: candidates,
+      );
+      await _writeSummaryFiles(
+        summary: summary,
+        summaryJsonPath: summaryJsonPath,
+        summaryMdPath: summaryMdPath,
+      );
+      print(
+        'Dry-run finalizado: ${candidates.length} candidato(s) seriam validados. '
+        'Nenhuma autenticacao, deck, optimize, bulk save ou validate foi executado.',
+      );
+      print('Resumo salvo em $summaryJsonPath');
+      print('Relatorio salvo em $summaryMdPath');
+      return;
+    }
+
+    final token = await _getOrCreateAuthToken(apiBaseUrl);
     final results = <CommanderOnlyRunResult>[];
 
     for (final candidate in candidates) {
@@ -197,6 +257,7 @@ Future<void> main() async {
     final summary = {
       'generated_at': DateTime.now().toIso8601String(),
       'run_started_at': runStartedAt,
+      'mode': 'apply',
       'api_base_url': apiBaseUrl,
       'artifact_dir': artifactDirPath,
       'corpus_path': corpusPath,
@@ -211,10 +272,11 @@ Future<void> main() async {
       'results': results.map((r) => r.toJson()).toList(),
     };
 
-    await File(summaryJsonPath).writeAsString(
-      const JsonEncoder.withIndent('  ').convert(summary),
+    await _writeSummaryFiles(
+      summary: summary,
+      summaryJsonPath: summaryJsonPath,
+      summaryMdPath: summaryMdPath,
     );
-    await File(summaryMdPath).writeAsString(_buildMarkdownReport(summary));
 
     print('');
     print('Resumo salvo em $summaryJsonPath');
@@ -226,6 +288,28 @@ Future<void> main() async {
   } finally {
     await db.close();
   }
+}
+
+void _printUsage() {
+  print('''
+Uso: dart run bin/run_commander_only_optimization_validation.dart [--dry-run|--apply]
+
+Modo padrao:
+  --dry-run   Planeja o runtime E2E sem autenticar, criar deck ou chamar optimize.
+
+Escrita real:
+  --apply     Executa o runtime antigo completo: login/register, cria deck seed,
+              chama /ai/optimize, aplica bulk cards e valida o deck.
+
+Variaveis de ambiente mantidas:
+  TEST_API_BASE_URL
+  VALIDATION_ARTIFACT_DIR
+  VALIDATION_SUMMARY_JSON_PATH
+  VALIDATION_SUMMARY_MD_PATH
+  VALIDATION_CORPUS_PATH
+  VALIDATION_LIMIT
+  COMMANDER_ONLY_MAX_TOTAL_MS
+''');
 }
 
 Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
@@ -436,7 +520,8 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
       if (basicCount > 36) 'basic lands altos: $basicCount',
       ...((optimizeBody['validation_warnings'] as List?)?.map((e) => '$e') ??
           const Iterable<String>.empty()),
-      if (bulkResponse.statusCode != 200) 'bulk save falhou: ${bulkResponse.body}',
+      if (bulkResponse.statusCode != 200)
+        'bulk save falhou: ${bulkResponse.body}',
       if (validateResponse.statusCode != 200)
         'validate falhou: ${validateResponse.body}',
     ],
@@ -451,6 +536,79 @@ Future<CommanderOnlyRunResult> _runCommanderOnlyValidation({
       'consistency_slo': consistencySlo,
     },
   );
+}
+
+Map<String, dynamic> _buildDryRunSummary({
+  required String apiBaseUrl,
+  required String artifactDirPath,
+  required String corpusPath,
+  required int validationLimit,
+  required int maxAllowedTotalMs,
+  required String runStartedAt,
+  required List<SourceDeckCandidate> candidates,
+}) {
+  return {
+    'generated_at': DateTime.now().toIso8601String(),
+    'run_started_at': runStartedAt,
+    'mode': 'dry_run',
+    'api_base_url': apiBaseUrl,
+    'artifact_dir': artifactDirPath,
+    'corpus_path': corpusPath,
+    'validation_limit': validationLimit,
+    'max_allowed_total_ms': maxAllowedTotalMs,
+    'total': candidates.length,
+    'passed': 0,
+    'failed': 0,
+    'completed': 0,
+    'protected_rejections': 0,
+    'writes_blocked_by_default': true,
+    'requires_apply_for_writes': true,
+    'blocked_operations': const [
+      'auth login/register',
+      'POST /decks',
+      'POST /ai/optimize',
+      'POST /decks/:id/cards/bulk',
+      'POST /decks/:id/validate',
+    ],
+    'results': candidates
+        .map(
+          (candidate) => {
+            'commander_label': candidate.commanderLabel,
+            'source_deck_id': candidate.deckId,
+            'source_deck_name': candidate.deckName,
+            'seed_deck_id': null,
+            'archetype': candidate.archetype,
+            'bracket': candidate.bracket,
+            'result_kind': 'dry_run_planned',
+            'optimize_status': null,
+            'timings': const <String, dynamic>{},
+            'saved_artifact_path': null,
+            'expected_checks': const [
+              'runtime E2E planejado sem escrita real',
+              'usar --apply para autenticar, criar deck seed, otimizar e validar',
+            ],
+            'failed_checks': const <String>[],
+            'warnings': const [
+              'dry-run nao prova optimize/apply runtime; apenas prova candidatos e guardrail de escrita',
+            ],
+            'summary': {
+              'mode': 'dry_run',
+              'would_create_seed_deck': true,
+              'would_optimize': true,
+              'would_bulk_apply': true,
+              'would_validate_deck': true,
+              'commander_count': candidate.commanderCount,
+              'commander_colors': candidate.commanderColors.toList()..sort(),
+              'source_card_count': candidate.cards.fold<int>(
+                0,
+                (sum, card) => sum + ((card['quantity'] as int?) ?? 0),
+              ),
+            },
+            'passed': true,
+          },
+        )
+        .toList(),
+  };
 }
 
 Future<List<SourceDeckCandidate>> _loadCandidatesFromCorpus({
@@ -489,7 +647,8 @@ Future<List<SourceDeckCandidate>> _loadCandidatesFromCorpus({
         .toList();
     final commanderColors = <String>{};
     for (final card in commanderCards) {
-      final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
+      final colors =
+          (card['colors'] as List?)?.cast<String>() ?? const <String>[];
       commanderColors.addAll(colors.map((color) => color.toUpperCase()));
     }
 
@@ -511,7 +670,8 @@ Future<List<SourceDeckCandidate>> _loadCandidatesFromCorpus({
   return candidates;
 }
 
-Future<List<Map<String, dynamic>>> _loadDeckCards(Pool pool, String deckId) async {
+Future<List<Map<String, dynamic>>> _loadDeckCards(
+    Pool pool, String deckId) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT
@@ -574,14 +734,16 @@ Future<String> _createCommanderOnlySeedDeck({
       'name':
           'Commander Only Validation - ${candidate.commanderLabel} - ${DateTime.now().millisecondsSinceEpoch}',
       'format': 'commander',
-      'description': 'Seed minima com apenas comandante(s) para validacao commander-only',
+      'description':
+          'Seed minima com apenas comandante(s) para validacao commander-only',
       'is_public': false,
       'cards': candidate.commanderOnlyCards,
     }),
   );
 
   if (response.statusCode != 200 && response.statusCode != 201) {
-    throw Exception('Falha ao criar deck seed commander-only: ${response.body}');
+    throw Exception(
+        'Falha ao criar deck seed commander-only: ${response.body}');
   }
 
   final body = _decodeJson(response);
@@ -736,9 +898,8 @@ Map<String, dynamic> _extractTimingSummary(Map<String, dynamic> body) {
       const <String, dynamic>{};
   return {
     'total_ms': (timings['total_ms'] as num?)?.toInt() ?? 0,
-    'stages_ms':
-        (timings['stages_ms'] as Map?)?.cast<String, dynamic>() ??
-            const <String, dynamic>{},
+    'stages_ms': (timings['stages_ms'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{},
   };
 }
 
@@ -786,10 +947,24 @@ Future<String> _writeArtifact({
   return file.path;
 }
 
+Future<void> _writeSummaryFiles({
+  required Map<String, dynamic> summary,
+  required String summaryJsonPath,
+  required String summaryMdPath,
+}) async {
+  await File(summaryJsonPath).parent.create(recursive: true);
+  await File(summaryJsonPath).writeAsString(
+    const JsonEncoder.withIndent('  ').convert(summary),
+  );
+  await File(summaryMdPath).parent.create(recursive: true);
+  await File(summaryMdPath).writeAsString(_buildMarkdownReport(summary));
+}
+
 String _buildMarkdownReport(Map<String, dynamic> summary) {
   final buffer = StringBuffer()
     ..writeln('# Validacao Commander-Only - 2026-04-21')
     ..writeln()
+    ..writeln('- Mode: `${summary['mode'] ?? 'apply'}`')
     ..writeln('- API base: `${summary['api_base_url']}`')
     ..writeln('- Corpus: `${summary['corpus_path']}`')
     ..writeln('- Total: `${summary['total']}`')
@@ -799,7 +974,16 @@ String _buildMarkdownReport(Map<String, dynamic> summary) {
     ..writeln('- Protected rejections: `${summary['protected_rejections']}`')
     ..writeln();
 
-  final results = (summary['results'] as List?)?.whereType<Map>().toList() ?? const [];
+  if (summary['mode'] == 'dry_run') {
+    buffer
+      ..writeln(
+          '> Dry-run: nenhuma autenticacao, criacao de deck, optimize, bulk save ou validate foi executado.')
+      ..writeln('> Use `--apply` para executar o runtime E2E com escrita real.')
+      ..writeln();
+  }
+
+  final results =
+      (summary['results'] as List?)?.whereType<Map>().toList() ?? const [];
   for (final raw in results) {
     final result = raw.cast<dynamic, dynamic>();
     buffer

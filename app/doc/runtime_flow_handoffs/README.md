@@ -19,6 +19,24 @@ The purpose here is:
 
 - QA/runtime owner: `ManaLoom Deck Runtime E2E`
 
+## Safe backend runner
+
+The repository now has a safe CLI entrypoint for the backend Commander runtime:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --dry-run
+```
+
+`--dry-run` is the default and does not authenticate, create decks, call optimize, apply cards, or validate decks.
+
+Use explicit apply only when real backend writes are intended:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
 ## Typical fix owners
 
 - app/runtime/navigation/auth/UI issue:

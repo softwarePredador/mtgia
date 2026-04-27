@@ -1257,3 +1257,57 @@ Relatorios source-aware apos o apply:
 ### Ajuste de teste
 
 O artifact live mais recente passou de `4` para `2` candidatos expandidos por drift parcial do TopDeck (`topdeck_deckobj_missing`). Os testes foram ajustados para validar o contrato declarado no proprio artifact (`expanded_count`, `accepted_count`, `rejected_count`) em vez de depender da contagem fixa antiga.
+
+## Atualizacao 2026-04-27 - ManaLoom Deck Runtime E2E seguro
+
+### O que mudou
+
+Foi criado um entrypoint executavel para o runtime:
+
+- `server/bin/mana_loom_deck_runtime_e2e.dart`
+
+E o script existente passou a exigir `--apply` para escrita real:
+
+- `server/bin/run_commander_only_optimization_validation.dart`
+
+Modo padrao:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --dry-run
+```
+
+Escrita real:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+### Evidencia dry-run
+
+O dry-run foi executado em 2026-04-27 e gerou:
+
+- `mode=dry_run`
+- `total=19`
+- `writes_blocked_by_default=true`
+- `blocked_operations=5`
+
+Operacoes bloqueadas por default:
+
+- `auth login/register`
+- `POST /decks`
+- `POST /ai/optimize`
+- `POST /decks/:id/cards/bulk`
+- `POST /decks/:id/validate`
+
+Artifacts atualizados:
+
+- `server/test/artifacts/commander_only_optimization_validation/latest_summary.json`
+- `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md`
+
+### Leitura atualizada
+
+- runtime executavel `ManaLoom Deck Runtime E2E`: **proved**
+- guardrail sem escrita por default: **proved**
+- runtime completo `login/register -> create deck -> optimize -> apply -> validate`: continua dependente de `--apply`

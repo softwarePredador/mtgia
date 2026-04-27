@@ -8493,3 +8493,69 @@ dart format test/external_commander_meta_candidate_support_test.dart test/extern
 dart analyze lib/meta lib/ai bin test
 dart test test/external_commander_meta_candidate_support_test.dart test/external_commander_meta_import_support_test.dart test/external_commander_meta_promotion_support_test.dart test/external_commander_deck_expansion_support_test.dart test/external_commander_meta_staging_support_test.dart test/optimize_runtime_support_test.dart
 ```
+
+## 93. Runtime E2E Commander seguro por default
+
+### 93.1 O que mudou em 2026-04-27
+
+O runtime Commander-only deixou de escrever via API por default.
+
+Scripts:
+
+- `server/bin/run_commander_only_optimization_validation.dart`
+- `server/bin/mana_loom_deck_runtime_e2e.dart`
+
+Modo padrao:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart
+```
+
+ou explicitamente:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --dry-run
+```
+
+Esse modo:
+
+- valida conectividade e corpus
+- carrega candidatos Commander do banco
+- grava summary/report
+- nao faz login/register
+- nao cria deck seed
+- nao chama `/ai/optimize`
+- nao aplica bulk cards
+- nao chama `/decks/:id/validate`
+
+Escrita real:
+
+```bash
+cd server
+dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+### 93.2 Evidencia
+
+Dry-run executado:
+
+- `mode=dry_run`
+- `total=19`
+- `writes_blocked_by_default=true`
+- `blocked_operations=5`
+
+Artifacts atualizados:
+
+- `server/test/artifacts/commander_only_optimization_validation/latest_summary.json`
+- `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md`
+
+### 93.3 Validacao
+
+```bash
+cd server
+dart format bin/run_commander_only_optimization_validation.dart bin/mana_loom_deck_runtime_e2e.dart test/commander_only_runtime_validation_config_test.dart
+dart analyze bin/run_commander_only_optimization_validation.dart bin/mana_loom_deck_runtime_e2e.dart test/commander_only_runtime_validation_config_test.dart
+dart test test/commander_only_runtime_validation_config_test.dart
+```
