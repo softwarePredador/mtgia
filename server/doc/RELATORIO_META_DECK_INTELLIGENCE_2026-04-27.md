@@ -3,396 +3,468 @@
 ## Escopo
 
 - repositorio: `softwarePredador/mtgia`
-- foco: pipeline externo `EDHTop16 -> TopDeck -> external_commander_meta_candidates -> meta_decks`
-- objetivo adicional: confirmar cobertura real apos promocao pequena e validar consumo seguro em `optimize` e `generate`
+- foco: `MTGTop8 -> meta_decks` e `EDHTop16 -> TopDeck -> external_commander_meta_candidates -> meta_decks`
+- delta desta rodada:
+  - validar consumo pos-promocao dos externos em `optimize/generate`
+  - impedir vazamento de `competitive_commander` para casual/duel
+  - implementar scan-through no expansor para coletar `N` decks validos mesmo com standings sem decklist utilizavel
+  - promover apenas lote pequeno com `legal` + `unresolved=0` + guards verdes
 
 ## Veredito
 
-**O pipeline externo ficou operacional em lote pequeno, com `2` novas promocoes seguras para `meta_decks`, mas o blocker estrutural do TopDeck ainda existe em parte do evento.**
+**O pipeline externo continua operacional e agora ficou mais util em producao local: o expansor conseguiu coletar `6` decks validos ao tentar `10` standings, e `2` novos decks externos foram promovidos com seguranca.**
 
-- `MTGTop8 -> meta_decks` continua vivo em dry-run para `cEDH`
-- `EDHTop16 -> TopDeck` continua vivo, mas **nao completamente**:
-  - standings `1`, `4`, `5`, `8` expandidos com decklist completa
-  - standings `2`, `3`, `6`, `7` continuam sem dados de deck utilizaveis no HTML atual
-- o lote pequeno filtrado (`standing-5`, `standing-8`) passou por:
-  - `expand`
-  - `stage2 validation`
-  - `staging apply`
-  - `promotion dry-run`
-  - `promotion apply`
-- `meta_decks` agora tem `644` rows:
+- `MTGTop8` continua vivo em dry-run para `cEDH`
+- `EDHTop16 -> TopDeck` continua parcialmente vivo, mas o scan-through evitou desperdiçar o alvo em standings sem decklist
+- `meta_decks` agora tem `646` rows:
   - `mtgtop8=641`
-  - `external=3`
-- a cobertura de identidade de cor do comandante deixou de ficar majoritariamente em `unknown`:
-  - `mtgtop8 cEDH`: `212/214` resolvidos
-  - `mtgtop8 EDH`: `161/162` resolvidos
-  - `external cEDH`: `3/3` resolvidos
+  - `external=5`
+- os `5` externos promovidos continuam todos em `format=cEDH`
+- o consumo continua seguro:
+  - `optimize/complete` so entra em `competitive_commander` para `Commander` com `bracket >= 3`
+  - `generate` so entra em `competitive_commander` quando o prompt prova `cEDH/high power/bracket 3+/competitive commander`
+  - `duel_commander` continua isolado de `competitive_commander`
+
+## Resumo do pipeline
+
+1. `bin/fetch_meta.dart` consome `MTGTop8` e grava direto em `meta_decks`
+2. `bin/expand_external_commander_meta_candidates.dart` agora aceita:
+   - `--target-valid=<n>`
+   - `--max-standing=<n>`
+   e continua tentando standings ate bater o alvo de decks validos ou esgotar o teto
+3. `bin/import_external_commander_meta_candidates.dart --dry-run --validation-profile=topdeck_edhtop16_stage2` valida:
+   - total de cartas
+   - subformato `competitive_commander`
+   - legalidade Commander
+   - `unresolved_cards`
+   - identidade de cor dos commanders
+4. `bin/stage_external_commander_meta_candidates.dart --apply` persiste apenas em `external_commander_meta_candidates`
+5. `bin/promote_external_commander_meta_candidates.dart --apply` sobe para `meta_decks` somente rows `staged`, `valid`, `100 cartas`, `source_url` unico e `fingerprint` unico
+6. `optimize` e `generate` consomem `meta_decks` via:
+   - `server/lib/meta/meta_deck_reference_support.dart`
+   - `server/lib/ai/optimize_runtime_support.dart`
+   - `server/routes/ai/generate/index.dart`
 
 ## Mudancas tecnicas aplicadas
 
-### 1. Parser TopDeck endurecido
+### 1. Scan-through no expansor EDHTop16/TopDeck
 
 Arquivos:
 
-- `server/lib/meta/external_commander_deck_expansion_support.dart`
-- `server/test/external_commander_deck_expansion_support_test.dart`
+- `server/bin/expand_external_commander_meta_candidates.dart`
 
 Mudanca:
 
-- `parseTopDeckDeckObjectFromHtml(...)` deixou de depender so de `const deckObj = ...`
-- agora tenta, nesta ordem:
-  1. `deckObj`
-  2. template `copyDecklist() / decklistContent`
-  3. DOM renderizado (`commanders-sidebar` + `text-list-item`)
+- `--limit` passou a funcionar como alias de `--target-valid`
+- novo `--max-standing` define quantos standings pedir ao GraphQL
+- o loop agora continua escaneando standings ate:
+  - coletar `N` decks expandidos validos, ou
+  - esgotar os standings retornados
+- o artefato agora registra:
+  - `target_valid_count`
+  - `max_standing_scanned`
+  - `entries_available`
+  - `attempted_count`
+  - `goal_reached`
+  - `stop_reason`
 
 Leitura:
 
-- isso reduz drift para variacoes de pagina TopDeck que ainda entregam decklist, mas nao no mesmo marcador JS
-- **nao ficou provado** que o fallback resolve os standings `2/3/6/7` deste evento; nesses casos a resposta live continua vindo sem decklist usavel
+- isso fecha o defeito operacional confirmado na rodada anterior: perder o alvo de expansao quando parte do TopDeck devolve HTML sem decklist utilizavel
 
-### 2. Lookup de identidade de cor do comandante ampliado
+### 2. Gating compartilhado e testavel para `generate`
 
 Arquivos:
 
-- `server/lib/import_card_lookup_service.dart`
-- `server/lib/meta/external_commander_meta_candidate_support.dart`
-- `server/test/external_commander_meta_candidate_support_test.dart`
-- `server/bin/meta_profile_report.dart`
+- `server/lib/meta/meta_deck_format_support.dart`
+- `server/routes/ai/generate/index.dart`
 
 Mudanca:
 
-- lookup passou a carregar tambem `mana_cost`
-- a identidade agora deriva de:
-  - `color_identity`
-  - `colors`
-  - `mana_cost`
-  - `oracle_text`
-- labels de parceiros no formato `A / B` agora sao separados com seguranca quando `partner_commander_name` nao existe
-- `meta_profile_report` passou a usar a mesma resolucao expandida, em vez de ler apenas `cards.color_identity`
+- a decisao de escopo do prompt saiu da rota e virou helper compartilhado:
+  - `resolveCommanderMetaScopeFromPromptText(...)`
 
 Leitura:
 
-- isso fecha o gap dos commanders que existem no catalogo mas chegam com `color_identity` nulo
-- casos como `Norman Osborn // Green Goblin`, `Scion of the Ur-Dragon`, `Kraum`, `Tymna`, `Malcolm`, `Vial Smasher`, `Kefka`, `Brigid`, `Etali` deixam de depender exclusivamente da coluna quebrada/incompleta
+- isso deixou o gating de `generate` testavel sem depender da rota inteira
+- o contrato ficou explicito:
+  - `duel commander` -> `duel_commander`
+  - `cedh / competitive commander / high power / bracket 3-4` -> `competitive_commander`
+  - prompt casual/amplo -> `null`
 
-## Pipeline comprovado
+### 3. Testes focados de isolamento competitivo
 
-1. `bin/fetch_meta.dart` consome `MTGTop8` e grava direto em `meta_decks`
-2. `bin/expand_external_commander_meta_candidates.dart` busca standings em `EDHTop16` e tenta expandir deck pages do `TopDeck`
-3. `bin/import_external_commander_meta_candidates.dart --dry-run --validation-profile=topdeck_edhtop16_stage2` valida:
-   - card count
-   - legalidade Commander
-   - identidade de cor
-   - unresolved/illegal cards
-4. `bin/stage_external_commander_meta_candidates.dart --apply` persiste somente em `external_commander_meta_candidates`
-5. `bin/promote_external_commander_meta_candidates.dart --apply` sobe apenas candidates `staged` e `valid`
-6. `bin/meta_profile_report.dart` e `bin/extract_meta_insights.dart --report-only` confirmam o consumo source-aware
+Arquivos:
+
+- `server/test/meta_deck_format_support_test.dart`
+- `server/test/meta_deck_reference_support_test.dart`
+
+Cobertura nova:
+
+- prompt casual nao sobe `competitive_commander`
+- prompt `duel commander` continua isolado
+- referencia `competitive_commander` nao vaza para `duel_commander`
+- preferencia externa competitiva continua funcionando quando o escopo certo e provado
 
 ## Comandos executados
 
 ```bash
 cd server && dart format \
-  lib/meta/external_commander_deck_expansion_support.dart \
-  lib/import_card_lookup_service.dart \
-  lib/meta/external_commander_meta_candidate_support.dart \
-  bin/meta_profile_report.dart \
-  test/external_commander_deck_expansion_support_test.dart \
-  test/external_commander_meta_candidate_support_test.dart
+  lib/meta/meta_deck_format_support.dart \
+  routes/ai/generate/index.dart \
+  bin/expand_external_commander_meta_candidates.dart \
+  test/meta_deck_format_support_test.dart \
+  test/meta_deck_reference_support_test.dart
 
 cd server && dart analyze \
-  lib/meta/external_commander_deck_expansion_support.dart \
-  lib/import_card_lookup_service.dart \
-  lib/meta/external_commander_meta_candidate_support.dart \
-  bin/meta_profile_report.dart \
-  test/external_commander_deck_expansion_support_test.dart \
-  test/external_commander_meta_candidate_support_test.dart
+  lib/meta/meta_deck_format_support.dart \
+  routes/ai/generate/index.dart \
+  bin/expand_external_commander_meta_candidates.dart \
+  test/meta_deck_format_support_test.dart \
+  test/meta_deck_reference_support_test.dart
 
 cd server && dart test -r compact \
+  test/meta_deck_format_support_test.dart \
+  test/meta_deck_reference_support_test.dart \
+  test/optimize_runtime_support_test.dart \
   test/external_commander_deck_expansion_support_test.dart \
   test/external_commander_meta_candidate_support_test.dart \
-  test/external_commander_meta_staging_support_test.dart \
-  test/external_commander_meta_promotion_support_test.dart \
-  test/meta_deck_reference_support_test.dart \
-  test/meta_deck_analytics_support_test.dart \
-  test/mtgtop8_meta_support_test.dart \
-  test/optimize_runtime_support_test.dart
-
-cd server && dart run bin/fetch_meta.dart cEDH --dry-run --limit-events=1 --limit-decks=2 --delay-event-ms=0
+  test/external_commander_meta_promotion_support_test.dart
 
 cd server && dart run bin/expand_external_commander_meta_candidates.dart \
   --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57 \
-  --limit=8 \
-  --output=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.json
+  --target-valid=6 \
+  --max-standing=24 \
+  --output=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.json
 
 cd server && dart run bin/import_external_commander_meta_candidates.dart \
-  test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.json \
+  test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.json \
   --dry-run \
   --validation-profile=topdeck_edhtop16_stage2 \
-  --validation-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.validation.json
+  --validation-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.validation.json
+
+cd server && python3 <inline filter> \
+  # gera:
+  # - topdeck_edhtop16_new_promotable_batch_2026-04-27.json
+  # - topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json
 
 cd server && dart run bin/stage_external_commander_meta_candidates.dart \
   --dry-run \
-  --expansion-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.json \
-  --validation-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.validation.json \
-  --imported-by=meta_deck_intelligence_2026_04_27 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_dry_run_2026-04-27.json
+  --expansion-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.json \
+  --validation-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json \
+  --imported-by=meta_deck_intelligence_2026_04_27_scan_through \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_dry_run_2026-04-27.json
 
 cd server && dart run bin/stage_external_commander_meta_candidates.dart \
   --apply \
-  --expansion-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.json \
-  --validation-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.validation.json \
-  --imported-by=meta_deck_intelligence_2026_04_27 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_apply_2026-04-27.json
+  --expansion-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.json \
+  --validation-artifact=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json \
+  --imported-by=meta_deck_intelligence_2026_04_27_scan_through \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_apply_2026-04-27.json
 
 cd server && dart run bin/promote_external_commander_meta_candidates.dart \
-  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_dry_run_2026-04-27.json
-
-cd server && dart run bin/promote_external_commander_meta_candidates.dart \
-  --apply \
-  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_apply_2026-04-27.json
-
-cd server && dart run bin/promote_external_commander_meta_candidates.dart \
-  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_dry_run_2026-04-27.json
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9 \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_dry_run_2026-04-27.json
 
 cd server && dart run bin/promote_external_commander_meta_candidates.dart \
   --apply \
-  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8 \
-  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_apply_2026-04-27.json
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9 \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_apply_2026-04-27.json
+
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10 \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_dry_run_2026-04-27.json
+
+cd server && dart run bin/promote_external_commander_meta_candidates.dart \
+  --apply \
+  --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10 \
+  --report-json-out=test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_apply_2026-04-27.json
+
+cd server && dart run bin/fetch_meta.dart cEDH \
+  --dry-run \
+  --limit-events=1 \
+  --limit-decks=2 \
+  --delay-event-ms=0
+
+cd server && dart test -r compact \
+  test/meta_deck_format_support_test.dart \
+  test/meta_deck_reference_support_test.dart \
+  test/optimize_runtime_support_test.dart
 
 cd server && dart run bin/meta_profile_report.dart \
-  > test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_2026-04-27.json
+  > test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_post_scan_through_2026-04-27.json
 
 cd server && dart run bin/extract_meta_insights.dart --report-only \
-  > test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_2026-04-27.json
+  > test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_post_scan_through_2026-04-27.json
+
+cd server && python3 <inline db snapshot probe>
+cd server && dart run <temporary in-package coverage probe> \
+  test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_post_scan_through_2026-04-27.json
 ```
 
 ## Evidencia validada
 
-### 1. `MTGTop8` segue vivo
+### 1. `MTGTop8` continua vivo
 
-Artifact:
+Artefato:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/fetch_meta_cedh_dry_run_2026-04-27.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/fetch_meta_cedh_dry_run_post_scan_through_2026-04-27.txt`
 
 Fatos provados:
 
 - `https://www.mtgtop8.com/format?f=cEDH` respondeu
-- o evento `https://www.mtgtop8.com/event?e=83812` expôs `115` rows
-- o parser leu:
+- a pagina de formato retornou evento recente
+- `event?e=83812` expôs `115` rows
+- o parser continua lendo estruturas reais:
   - `Terra, Magical Adept`
   - `Kraum + Tymna`
 
-### 2. `EDHTop16 -> TopDeck` segue parcialmente vivo
+### 2. O scan-through do externo funcionou
 
-Artifacts:
+Artefatos:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.validation.json`
 
-Resultado:
+Fatos provados:
 
-- `expanded_count=4`
+- `entries_available=14`
+- `attempted_count=10`
+- `expanded_count=6`
 - `rejected_count=4`
-- expandidos:
-  - `standing-1` `Scion of the Ur-Dragon`
-  - `standing-4` `Norman Osborn // Green Goblin`
-  - `standing-5` `Malcolm + Vial Smasher`
-  - `standing-8` `Kraum + Tymna`
-- rejeitados:
-  - `standing-2`
-  - `standing-3`
-  - `standing-6`
-  - `standing-7`
-- motivo em todos os rejeitados:
-  - `topdeck_deckobj_missing`
+- `goal_reached=true`
+- novos decks validos encontrados alem do lote anterior:
+  - `standing-9` `Kefka, Court Mage // Kefka, Ruler of Ruin`
+  - `standing-10` `Thrasios, Triton Hero + Yoshimaru, Ever Faithful`
+
+Rejeicoes persistentes:
+
+- `standing-2`
+- `standing-3`
+- `standing-6`
+- `standing-7`
+
+Motivo observado:
+
+- `topdeck_deckobj_missing`
 
 Leitura:
 
-- o parser cobre mais de um formato de deck page agora
-- **nao ficou provado** que o restante do erro e apenas parser drift
-- o HTML live dos rejeitados continua sem decklist utilizavel; logo o blocker restante parece upstream/data-availability do `TopDeck`, nao so seletor local
+- o pipeline nao depende mais de os primeiros `N` standings serem todos bons
+- o problema remanescente continua parecendo upstream/data-availability do `TopDeck`, nao falha local nova
 
-### 3. Stage 2 ficou verde para o lote novo
+### 3. Stage 2 ficou verde no lote ampliado e no recorte promovivel
 
-Artifacts:
+Artefatos:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.validation.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_dry_run_2026-04-27.json`
+- `topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.validation.json`
+- `topdeck_edhtop16_new_promotable_batch_2026-04-27.json`
+- `topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json`
 
 Fatos provados:
 
-- batch pequeno filtrado:
-  - `standing-5`
-  - `standing-8`
-- `accepted=2`
-- `rejected=0`
+- `accepted=6`, `rejected=0` no lote ampliado
+- recorte novo promovivel:
+  - `standing-9`
+  - `standing-10`
 - ambos com:
   - `legal_status=legal`
-  - `unresolved=0`
-  - `illegal=0`
+  - `unresolved_cards=0`
+  - `illegal_cards=0`
 
-### 4. Staging e promotion apply ocorreram com guards verdes
+### 4. `stage/promote` apply ocorreu sem romper os guards
 
-Artifacts:
+Artefatos:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_apply_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_dry_run_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_apply_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_dry_run_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_apply_2026-04-27.json`
+- `topdeck_edhtop16_new_promotable_batch_stage_dry_run_2026-04-27.json`
+- `topdeck_edhtop16_new_promotable_batch_stage_apply_2026-04-27.json`
+- `promote_standing9_dry_run_2026-04-27.json`
+- `promote_standing9_apply_2026-04-27.json`
+- `promote_standing10_dry_run_2026-04-27.json`
+- `promote_standing10_apply_2026-04-27.json`
 
 Fatos provados:
 
-- `standing-5` promotable em dry-run e promovido em apply
-- `standing-8` promotable em dry-run e promovido em apply
+- `standing-9` passou em `dry-run` e foi promovido
+- `standing-10` passou em `dry-run` e foi promovido
 - nenhum dos dois bateu em:
-  - `duplicate_source_url_in_stage`
   - `source_url_already_present_in_meta_decks`
-  - `duplicate_deck_fingerprint_in_stage`
   - `deck_fingerprint_already_present_in_meta_decks`
+  - `duplicate_deck_fingerprint_in_stage`
+
+### 5. Consumo pos-promocao em `optimize/generate` continua seguro
+
+Artefatos:
+
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/optimize_generate_scope_tests_2026-04-27.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_post_scan_through_2026-04-27.json`
+
+Fatos provados por codigo/teste:
+
+- `generate`:
+  - `high power / cEDH / bracket 3+` -> `competitive_commander`
+  - `duel commander` -> `duel_commander`
+  - prompt casual/amplo -> `null`
+- `optimize/complete`:
+  - `Commander + bracket >= 3` -> `competitive_commander`
+  - `Commander + bracket <= 2` -> fora do bucket competitivo
+  - formatos nao-Commander -> fora do bucket competitivo
+- `meta_deck_reference_support` continua descartando `competitive_commander` quando o escopo pedido e `duel_commander`
+
+Fatos provados por banco:
+
+- apos a promocao, todos os externos em `meta_decks` continuam em `format=cEDH`
+- `external / duel_commander = 0`
+- `external / casual commander = not proven` como corpus separado; nao houve escrita fora de `cEDH`
 
 ## Frescor real da base
 
-Artifact:
+Artefato:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_post_scan_through_2026-04-27.json`
 
-`meta_decks_by_source`:
+| source | format | decks | min(created_at) | max(created_at) |
+| --- | --- | ---: | --- | --- |
+| `external` | `cEDH` | 5 | `2026-04-27 12:04:17+00` | `2026-04-27 19:50:11+00` |
+| `mtgtop8` | `cEDH` | 214 | `2026-02-12 20:14:20+00` | `2026-04-23 20:02:52+00` |
+| `mtgtop8` | `EDH` | 162 | `2025-11-22 14:14:20+00` | `2026-04-23 19:58:16+00` |
 
-| source | decks | min(created_at) | max(created_at) |
-| --- | ---: | --- | --- |
-| `mtgtop8` | 641 | `2025-11-22T14:14:20+00:00` | `2026-04-23T20:02:52+00:00` |
-| `external` | 3 | `2026-04-27T12:04:17+00:00` | `2026-04-27T19:32:47+00:00` |
-
-`external_candidate_status`:
+Estado de `external_commander_meta_candidates`:
 
 | validation_status | legal_status | decks |
 | --- | --- | ---: |
-| `promoted` | `valid` | 3 |
+| `promoted` | `valid` | 5 |
 | `staged` | `warning_pending` | 1 |
 
 Leitura:
 
-- a fonte externa ja nao esta em `1` row isolada
-- o corpus externo continua pequeno, mas ja tem `3` listas competitivas promovidas com prova de guard verde
-- `Scion` permanece staged e **nao promovido**, como deveria
+- a base externa deixou de ser lote de `3` rows e passou para `5`
+- o candidato `Scion` continua corretamente fora da promocao
 
 ## Cobertura real por formato e identidade de cor
 
-Artifacts:
+Artefatos:
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_post_scan_through_2026-04-27.json`
 
-### Cobertura por fonte/subformato
-
-`extract_meta_insights_report_only_2026-04-27.json`:
+### Cobertura por source/subformat
 
 | source | subformat | decks |
 | --- | --- | ---: |
 | `mtgtop8` | `competitive_commander` | 214 |
 | `mtgtop8` | `duel_commander` | 162 |
-| `external` | `competitive_commander` | 3 |
+| `external` | `competitive_commander` | 5 |
 
 ### Cobertura por formato em `meta_profile_report`
 
-`meta_profile_report_2026-04-27.json`:
-
 | format | deck_count |
 | --- | ---: |
-| `cEDH` | 217 |
+| `cEDH` | 219 |
 | `EDH` | 162 |
 
-Leitura:
-
-- `cEDH` agora soma `214 mtgtop8 + 3 external`
-- `external / duel_commander = 0`
-
-### Cobertura por identidade do comandante
-
-`commander_color_identity_coverage_2026-04-27.json`:
+### Cobertura por identidade dos commanders
 
 | source | format | decks | resolved | unknown |
 | --- | --- | ---: | ---: | ---: |
-| `mtgtop8` | `cEDH` | 214 | 212 | 2 |
+| `external` | `cEDH` | 5 | 5 | 0 |
+| `mtgtop8` | `cEDH` | 214 | 211 | 3 |
 | `mtgtop8` | `EDH` | 162 | 161 | 1 |
-| `external` | `cEDH` | 3 | 3 | 0 |
 
-Top unknowns restantes:
+Top identities externas resolvidas:
+
+| source | format | commander_color_identity | decks |
+| --- | --- | --- | ---: |
+| `external` | `cEDH` | `BRU` | 3 |
+| `external` | `cEDH` | `BRUW` | 1 |
+| `external` | `cEDH` | `GUW` | 1 |
+
+Unknowns restantes:
 
 | source | format | commander_label | decks |
 | --- | --- | --- | ---: |
 | `mtgtop8` | `cEDH` | `Prismari, the Inspiration` | 2 |
 | `mtgtop8` | `EDH` | `Witherbloom, the Balancer` | 1 |
+| `mtgtop8` | `cEDH` | `Zhulodok, Void Gorger` | 1 |
 
 Leitura:
 
-- a cobertura por identidade do comandante saiu de um estado **not proven** amplo para um estado operacionalmente forte
-- o que resta em `unknown` ficou pequeno e localizavel
-- o lote externo promovido ficou `3/3` resolvido
+- a cobertura `external cEDH` ficou `5/5` resolvida
+- `duel_commander` continua vindo so de `MTGTop8`
+- a malha de cor residual esta pequena e localizada
 
 ## Gaps observados
 
-1. `TopDeck` ainda devolve paginas sem decklist utilizavel em parte do evento
-   - standings `2`, `3`, `6`, `7`
-   - o parser local agora cobre mais variantes, mas isso nao basta quando o upstream realmente nao entrega o deck
-2. `Scion of the Ur-Dragon` segue bloqueado por `Prismari, the Inspiration`
-   - status atual correto: `warning_pending`
-   - promocao segura continua bloqueada
-3. ainda existem poucos commanders residuais em `unknown`
+1. `TopDeck` continua devolvendo paginas sem decklist utilizavel em parte do evento
+   - `standing-2`, `3`, `6`, `7`
+2. `Scion of the Ur-Dragon` segue bloqueado por `unresolved_cards`
+   - status correto: `warning_pending`
+3. ainda existem poucos commanders residuais sem identidade resolvida
    - `Prismari, the Inspiration`
    - `Witherbloom, the Balancer`
+   - `Zhulodok, Void Gorger`
 
 ## Interpretacao estrategica
 
+**Web research nao foi usada nesta rodada.** A interpretacao abaixo e derivada apenas das decklists, do subformato persistido e do que o pipeline provou localmente.
+
 ### `Malcolm + Vial Smasher`
 
-Lista Grixis de tesouro/rituais com kill compacta.
+- shell Grixis turbo/combo
+- sinais fortes:
+  - fast mana muito denso
+  - wheels/loot
+  - `Underworld Breach`
+  - `Thassa's Oracle`
+  - interacao barata
 
-Sinais fortes:
+Uso seguro:
 
-- fast mana muito denso
-- wheels e loot para acelerar mao e cemitério
-- `Underworld Breach`
-- `Thassa's Oracle`
-- interacao gratis/barata
-
-Uso seguro no produto:
-
-- bom sinal para `competitive_commander`
-- ruim como referencia para Commander casual ou `duel_commander`
+- evidencia forte para `competitive_commander`
+- nao deve contaminar Commander casual ou `duel_commander`
 
 ### `Kraum + Tymna`
 
-Shell classico de Blue Farm / midrange-combo.
+- Blue Farm / midrange-combo
+- sinais fortes:
+  - parceiros com card advantage
+  - free interaction
+  - `Oracle / Consultation`
+  - mana base de quatro cores muito eficiente
 
-Sinais fortes:
+Uso seguro:
 
-- pares de parceiros que geram card advantage natural
-- free interaction e stack wars
-- plano de grind com consulta/oracle e linhas compactas de combo
-- mana base de quatro cores muito eficiente
+- referencia de alto valor para `optimize` em `Commander bracket >= 3`
+- nao deve entrar em prompt casual sem gatilho explicito
 
-Uso seguro no produto:
+### `Kefka, Court Mage // Kefka, Ruler of Ruin`
 
-- referencia de alto valor para `optimize` quando `deckFormat=commander` e `bracket >= 3`
-- nao deve vazar para prompts Commander amplos sem prova de escopo competitivo
+- shell Grixis combo/control com stack wars curtas
+- sinais fortes:
+  - `Oracle / Tainted Pact / Breach`
+  - fast mana alto
+  - interacao instant-speed barata
+  - baixo numero de terrenos
 
-### `Norman Osborn // Green Goblin`
+Uso seguro:
 
-Shell Grixis recente que confirma que o pipeline externo tambem captura commanders novos/UB quando a deck page do TopDeck esta completa.
+- bom reforco para `competitive_commander`
+- **nao comprovado** como referencia para Commander casual
 
-Sinais fortes:
+### `Thrasios + Yoshimaru`
 
-- pacote `Breach / Oracle / Tainted Pact`
-- wheels/filter
-- free interaction
-- baixa contagem de terrenos
+- shell Bant value-combo baseada em mana engine
+- sinais fortes:
+  - pacote de dorks/tutors
+  - `Training Grounds`, `Cryptolith Rite`, `Gaea's Cradle`
+  - linhas de untap/combo com `Palinchron`, `Peregrine Drake`, `Derevi`
+  - interacao branca/azul leve para abrir janela
+
+Uso seguro:
+
+- bom sinal para `generate` quando o prompt pedir cEDH/high power de valor-combo
+- **nao comprovado** para `duel_commander`
 
 ### O que absorver em `optimize` e `generate`
 
@@ -401,46 +473,31 @@ Sinais fortes:
    - free interaction
    - pacotes compactos `Oracle / Consultation / Tainted Pact`
    - `Underworld Breach` onde a shell suporta
-2. tratar `Malcolm/Vial`, `Kraum/Tymna`, `Norman` como **competitive-only evidence**
-3. continuar exibindo provenance/source chain, nunca como instrucao cega
-
-## Validacao de uso seguro em `optimize` e `generate`
-
-Estado comprovado por codigo e testes focados:
-
-- `generate` continua usando meta Commander apenas quando o prompt prova o escopo
-- `optimize`/`complete` continuam restringindo `competitive_commander` para `deckFormat=commander` com `bracket >= 3`
-- `meta_deck_reference_support` continua separando `competitive_commander` de `duel_commander`
-- testes focados continuam verdes:
-  - `test/meta_deck_reference_support_test.dart`
-  - `test/optimize_runtime_support_test.dart`
-
-Conclusao:
-
-- as `3` listas externas promovidas entram no corpus certo
-- o consumo continua source-aware e scope-aware
-- **nao houve prova de vazamento inseguro** para `duel_commander` ou Commander casual
+   - engines de mana/untap quando o shell indica `Thrasios`
+2. tratar `Malcolm/Vial`, `Kraum/Tymna`, `Norman`, `Kefka`, `Thrasios/Yoshimaru` como **competitive-only evidence**
+3. continuar expondo provenance (`source_chain`), nunca como instrucao cega
 
 ## Menores proximas acoes tecnicas
 
-1. adicionar modo de expansao que continue escaneando standings ate coletar `N` decks expandidos, para nao desperdiçar limite em paginas vazias do TopDeck
-2. corrigir/backfill do catalogo para os poucos commanders residuais ainda `unknown`
-3. manter promocao externa apenas por batch filtrado com `stage2 -> staging -> promotion dry-run -> apply`
+1. manter o scan-through como padrao do expansor e, se necessario, adicionar `--resume-from-standing` apenas se outro evento provar necessidade real
+2. resolver os poucos commanders residuais sem identidade (`Prismari`, `Witherbloom`, `Zhulodok`) no catalogo local
+3. seguir promovendo externo apenas por recorte filtrado com `stage2 -> staging -> promotion dry-run -> apply`
 
 ## Artefatos principais
 
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/fetch_meta_cedh_dry_run_2026-04-27.txt`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_dry_run_limit8_2026-04-27.validation.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_2026-04-27.validation.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_dry_run_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_promotable_batch_stage_apply_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_dry_run_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing5_apply_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_dry_run_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing8_apply_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_2026-04-27.json`
-- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/fetch_meta_cedh_dry_run_post_scan_through_2026-04-27.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/optimize_generate_scope_tests_2026-04-27.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_post_scan_through_2026-04-27.json`

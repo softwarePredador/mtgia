@@ -111,6 +111,46 @@ void main() {
       expect(selection.hasReferences, isFalse);
       expect(selection.priorityCardNames, isEmpty);
     });
+
+    test('does not leak competitive commander rows into duel commander scope',
+        () {
+      final selection = selectMetaDeckReferenceCandidates(
+        candidates: [
+          MetaDeckReferenceCandidate(
+            format: 'cEDH',
+            archetype: 'Blue Farm',
+            commanderName: 'Kraum, Ludevic\'s Opus',
+            partnerCommanderName: 'Tymna the Weaver',
+            shellLabel: 'Kraum, Ludevic\'s Opus + Tymna the Weaver',
+            strategyArchetype: 'combo',
+            sourceUrl: 'https://edhtop16.com/tournament/sample#standing-8',
+            cardList: '''
+1 Kraum, Ludevic's Opus
+1 Tymna the Weaver
+1 Thassa's Oracle
+97 Island
+''',
+            placement: '8',
+            createdAt: DateTime.utc(2026, 4, 27),
+            sourceName: 'EDHTop16',
+            sourceHost: 'edhtop16.com',
+            sourceChain: const ['edhtop16_graphql', 'topdeck_deck_page'],
+          ),
+        ],
+        commanderNames: const [
+          'Kraum, Ludevic\'s Opus',
+          'Tymna the Weaver',
+        ],
+        keywordPatterns: const ['blue farm'],
+        commanderScope: 'duel_commander',
+        deckLimit: 2,
+        priorityCardLimit: 8,
+        preferExternalCompetitive: true,
+      );
+
+      expect(selection.hasReferences, isFalse);
+      expect(selection.priorityCardNames, isEmpty);
+    });
   });
 
   group('buildMetaDeckEvidenceText', () {

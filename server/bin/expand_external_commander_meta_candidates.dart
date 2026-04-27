@@ -14,29 +14,36 @@ Future<void> main(List<String> args) async {
   final config = _ExpandConfig.parse(args);
 
   stdout.writeln('Expansion dry-run: ${config.sourceUrl}');
-  stdout.writeln('Limit: ${config.limit}');
+  stdout.writeln('Target valid decks: ${config.targetValid}');
+  stdout.writeln('Max standings to scan: ${config.maxStanding}');
   stdout.writeln('Output: ${config.outputPath}');
 
   final tournamentId = edhTop16TournamentIdFromUrl(config.sourceUrl);
   final graphqlPayload = await _fetchEdhTop16Tournament(
     tournamentId: tournamentId,
-    limit: config.limit,
+    limit: config.maxStanding,
   );
   final entries = parseEdhTop16TournamentEntries(graphqlPayload);
 
   final results = <Map<String, dynamic>>[];
-  for (final entry in entries.take(config.limit)) {
-    results.add(await _expandEntry(
+  var expandedCount = 0;
+  for (final entry in entries.take(config.maxStanding)) {
+    if (expandedCount >= config.targetValid) {
+      break;
+    }
+    final result = await _expandEntry(
       tournamentUrl: config.sourceUrl,
       tournamentId: tournamentId,
       entry: entry,
-    ));
+    );
+    results.add(result);
+    if (result['expansion_status'] == 'expanded') {
+      expandedCount++;
+    }
   }
 
-  final expandedCount = results
-      .where((result) => result['expansion_status'] == 'expanded')
-      .length;
   final rejectedCount = results.length - expandedCount;
+  final goalReached = expandedCount >= config.targetValid;
   final candidates = results
       .where((result) => result['expansion_status'] == 'expanded')
       .map((result) => result['candidate'])
@@ -49,6 +56,12 @@ Future<void> main(List<String> args) async {
     'source_url': config.sourceUrl,
     'event_tid': tournamentId,
     'expansion_path': <String>['edhtop16_graphql', 'topdeck_deck_page'],
+    'target_valid_count': config.targetValid,
+    'max_standing_scanned': config.maxStanding,
+    'entries_available': entries.length,
+    'attempted_count': results.length,
+    'goal_reached': goalReached,
+    'stop_reason': goalReached ? 'target_valid_reached' : 'entries_exhausted',
     'expanded_count': expandedCount,
     'rejected_count': rejectedCount,
     'candidates': candidates,
@@ -73,7 +86,9 @@ Future<void> main(List<String> args) async {
     );
   }
   stdout.writeln(
-    'Expansion dry-run finalizado: expanded=$expandedCount rejected=$rejectedCount',
+    'Expansion dry-run finalizado: '
+    'expanded=$expandedCount rejected=$rejectedCount '
+    'attempted=${results.length} goal_reached=$goalReached',
   );
 }
 
@@ -206,17 +221,20 @@ Map<String, dynamic> _rejectedEntry(
 class _ExpandConfig {
   const _ExpandConfig({
     required this.sourceUrl,
-    required this.limit,
+    required this.targetValid,
+    required this.maxStanding,
     required this.outputPath,
   });
 
   final String sourceUrl;
-  final int limit;
+  final int targetValid;
+  final int maxStanding;
   final String outputPath;
 
   factory _ExpandConfig.parse(List<String> args) {
     var sourceUrl = _defaultSourceUrl;
-    var limit = 4;
+    var targetValid = 4;
+    int? maxStanding;
     var outputPath = _defaultOutputPath;
 
     for (final arg in args) {
@@ -227,7 +245,9 @@ Usage:
 
 Options:
   --source-url=<url>  EDHTop16 tournament URL. Default: $_defaultSourceUrl
-  --limit=<n>         Max standings/decks to expand. Default: 4
+  --limit=<n>         Alias for --target-valid. Default: 4
+  --target-valid=<n>  Continue scanning standings until collecting N valid decks.
+  --max-standing=<n>  Upper bound of standings requested from EDHTop16 GraphQL.
   --output=<path>     Artifact JSON path. Default: $_defaultOutputPath
 
 This script is dry-run only. It never writes to the database.
@@ -239,7 +259,21 @@ This script is dry-run only. It never writes to the database.
         continue;
       }
       if (arg.startsWith('--limit=')) {
-        limit = int.tryParse(arg.substring('--limit='.length).trim()) ?? limit;
+        targetValid = int.tryParse(arg.substring('--limit='.length).trim()) ??
+            targetValid;
+        continue;
+      }
+      if (arg.startsWith('--target-valid=')) {
+        targetValid = int.tryParse(
+              arg.substring('--target-valid='.length).trim(),
+            ) ??
+            targetValid;
+        continue;
+      }
+      if (arg.startsWith('--max-standing=')) {
+        maxStanding =
+            int.tryParse(arg.substring('--max-standing='.length).trim()) ??
+                maxStanding;
         continue;
       }
       if (arg.startsWith('--output=')) {
@@ -248,14 +282,31 @@ This script is dry-run only. It never writes to the database.
       }
     }
 
-    if (limit <= 0) {
-      throw ArgumentError('--limit precisa ser maior que zero.');
+    if (targetValid <= 0) {
+      throw ArgumentError('--target-valid precisa ser maior que zero.');
+    }
+
+    final resolvedMaxStanding =
+        maxStanding ?? _defaultMaxStandingForTarget(targetValid);
+    if (resolvedMaxStanding <= 0) {
+      throw ArgumentError('--max-standing precisa ser maior que zero.');
+    }
+    if (resolvedMaxStanding < targetValid) {
+      throw ArgumentError(
+        '--max-standing precisa ser >= --target-valid para permitir scan-through.',
+      );
     }
 
     return _ExpandConfig(
       sourceUrl: sourceUrl,
-      limit: limit,
+      targetValid: targetValid,
+      maxStanding: resolvedMaxStanding,
       outputPath: outputPath,
     );
   }
+}
+
+int _defaultMaxStandingForTarget(int targetValid) {
+  final buffered = targetValid * 4;
+  return buffered < 12 ? 12 : buffered;
 }

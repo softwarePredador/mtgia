@@ -1,6 +1,110 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Scan-through no expansor externo e validacao final de consumo seguro em `optimize/generate`
+
+### O Porquê
+- Depois do commit `a11e80a`, ainda faltavam dois fechamentos operacionais na trilha de `meta_decks`:
+  - provar que os `external` promovidos ja entravam no corpus certo de `optimize/generate` sem vazar para casual/duel;
+  - remover o gargalo do expansor `EDHTop16 -> TopDeck`, que parava cedo demais quando parte dos standings vinha sem decklist utilizavel.
+- O risco era concreto:
+  - `competitive_commander` contaminando prompts Commander amplos ou decks `bracket <= 2`;
+  - o expansor continuar subutilizando eventos bons por depender demais de os primeiros standings serem todos parseaveis.
+
+### O Como
+- `server/bin/expand_external_commander_meta_candidates.dart` foi endurecido com scan-through:
+  - `--limit` virou alias de `--target-valid`;
+  - `--target-valid=<n>` passou a representar quantos decks validos queremos coletar;
+  - `--max-standing=<n>` define o teto de standings pedido ao GraphQL;
+  - o loop agora continua tentando standings ate atingir o alvo de decks expandidos ou esgotar o lote.
+- O artefato do expansor agora grava:
+  - `target_valid_count`
+  - `max_standing_scanned`
+  - `entries_available`
+  - `attempted_count`
+  - `goal_reached`
+  - `stop_reason`
+- O gating de `generate` foi extraido para helper compartilhado em `server/lib/meta/meta_deck_format_support.dart`:
+  - `resolveCommanderMetaScopeFromPromptText(...)`
+- `server/routes/ai/generate/index.dart` passou a reutilizar esse helper, deixando o comportamento testavel fora da rota.
+- Testes focados ampliados:
+  - `server/test/meta_deck_format_support_test.dart`
+  - `server/test/meta_deck_reference_support_test.dart`
+- Validacoes executadas:
+  - `dart analyze` dos arquivos alterados
+  - `dart test -r compact` em:
+    - `test/meta_deck_format_support_test.dart`
+    - `test/meta_deck_reference_support_test.dart`
+    - `test/optimize_runtime_support_test.dart`
+    - `test/external_commander_deck_expansion_support_test.dart`
+    - `test/external_commander_meta_candidate_support_test.dart`
+    - `test/external_commander_meta_promotion_support_test.dart`
+- Rodada live aplicada:
+  - expansao: `--target-valid=6 --max-standing=24`
+  - validation stage 2 do lote ampliado
+  - recorte automatico do batch novo legal com `unresolved=0`
+  - `staging dry-run/apply`
+  - `promotion dry-run/apply` para `#standing-9` e `#standing-10`
+  - rerun de:
+    - `fetch_meta.dart cEDH --dry-run`
+    - `meta_profile_report.dart`
+    - `extract_meta_insights.dart --report-only`
+    - snapshot do banco e cobertura de identidade do comandante
+
+### Resultado
+- O scan-through funcionou como esperado:
+  - `entries_available=14`
+  - `attempted_count=10`
+  - `expanded_count=6`
+  - `rejected_count=4`
+  - `goal_reached=true`
+- Novos decks validos encontrados alem do lote anterior:
+  - `Kefka, Court Mage // Kefka, Ruler of Ruin` (`standing-9`)
+  - `Thrasios, Triton Hero + Yoshimaru, Ever Faithful` (`standing-10`)
+- Os dois passaram com:
+  - `legal_status=legal`
+  - `unresolved_cards=0`
+  - `illegal_cards=0`
+- Os dois foram promovidos com guards verdes.
+- Estado final do banco apos a rodada:
+  - `meta_decks=646`
+    - `mtgtop8=641`
+    - `external=5`
+  - `external_commander_meta_candidates`
+    - `promoted/valid=5`
+    - `staged/warning_pending=1`
+- O candidato bloqueado continua sendo `Scion of the Ur-Dragon`, como deveria.
+
+### Observações operacionais
+- A prova de consumo seguro ficou explicita:
+  - `generate` so sobe `competitive_commander` para prompt `cEDH/high power/bracket 3+/competitive commander`
+  - prompt casual continua fora do bucket competitivo
+  - `duel commander` continua isolado
+  - `optimize/complete` continuam usando `competitive_commander` apenas para `Commander` com `bracket >= 3`
+- O corpus externo promovido continua inteiramente em `format=cEDH`; nao houve promocao para `EDH` amplo ou `duel_commander`.
+- A cobertura de identidade de cor apos a rodada ficou:
+  - `external cEDH`: `5/5` resolvidos
+  - `mtgtop8 cEDH`: `211/214` resolvidos
+  - `mtgtop8 EDH`: `161/162` resolvidos
+
+### Artefatos
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-27.md`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_expansion_scan_through_target6_max24_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_2026-04-27.validation.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/topdeck_edhtop16_new_promotable_batch_stage_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing9_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_dry_run_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/promote_standing10_apply_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/optimize_generate_scope_tests_2026-04-27.txt`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_profile_report_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/extract_meta_insights_report_only_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/db_snapshot_post_scan_through_2026-04-27.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/commander_color_identity_coverage_post_scan_through_2026-04-27.json`
+
 ## 2026-04-27 — Pipeline externo de `meta_decks` com hardening do parser TopDeck, lookup melhor de identidade de cor e promocao pequena aplicada
 
 ### O Porquê

@@ -61,7 +61,7 @@ Future<Response> onRequest(RequestContext context) async {
       final isCommanderFormat =
           normalizedFormat == 'commander' || normalizedFormat == 'edh';
       final commanderMetaScope = isCommanderFormat
-          ? _resolveCommanderMetaScopeFromPrompt(prompt)
+          ? resolveCommanderMetaScopeFromPromptText(prompt)
           : null;
       final shouldUseMeta = metaKeywordPatterns.isNotEmpty &&
           (!isCommanderFormat || commanderMetaScope != null);
@@ -317,23 +317,6 @@ $metaContext
     );
     return internalServerError('Failed to generate deck');
   }
-}
-
-String? _resolveCommanderMetaScopeFromPrompt(String prompt) {
-  final normalized = prompt.toLowerCase();
-  if (normalized.contains('duel commander')) {
-    return 'duel_commander';
-  }
-  if (normalized.contains('cedh') ||
-      normalized.contains('competitive edh') ||
-      normalized.contains('competitive commander') ||
-      normalized.contains('high power') ||
-      normalized.contains('high-power') ||
-      normalized.contains('bracket 3') ||
-      normalized.contains('bracket 4')) {
-    return 'competitive_commander';
-  }
-  return null;
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

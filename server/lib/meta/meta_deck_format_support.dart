@@ -80,11 +80,29 @@ String commanderMetaScopeLabel(String? rawScope) {
   };
 }
 
+String? resolveCommanderMetaScopeFromPromptText(String prompt) {
+  final normalized = prompt.toLowerCase();
+  if (normalized.contains('duel commander')) {
+    return 'duel_commander';
+  }
+  if (normalized.contains('cedh') ||
+      normalized.contains('competitive edh') ||
+      normalized.contains('competitive commander') ||
+      normalized.contains('high power') ||
+      normalized.contains('high-power') ||
+      normalized.contains('bracket 3') ||
+      normalized.contains('bracket 4')) {
+    return 'competitive_commander';
+  }
+  return null;
+}
+
 List<String> metaDeckFormatCodesForCommanderScope(String? rawScope) {
   return switch (normalizeCommanderMetaScope(rawScope)) {
     'duel_commander' => const <String>[legacyDuelCommanderFormatCode],
-    'competitive_commander' =>
-      const <String>[legacyCompetitiveCommanderFormatCode],
+    'competitive_commander' => const <String>[
+        legacyCompetitiveCommanderFormatCode
+      ],
     _ => const <String>[
         legacyDuelCommanderFormatCode,
         legacyCompetitiveCommanderFormatCode,

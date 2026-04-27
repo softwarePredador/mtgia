@@ -201,9 +201,20 @@ Comando recomendado:
 cd server
 dart run bin/expand_external_commander_meta_candidates.dart \
   --source-url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57 \
-  --limit=8 \
+  --target-valid=6 \
+  --max-standing=24 \
   --output=test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json
 ```
+
+Leitura operacional atual:
+
+- `--limit` continua aceito, mas agora e alias de `--target-valid`
+- `--target-valid=<n>` = quantidade de decks expandidos validos que queremos coletar
+- `--max-standing=<n>` = teto de standings pedidos ao GraphQL
+- o expansor continua tentando standings ate:
+  1. bater `target-valid`, ou
+  2. esgotar o lote retornado
+- standings rejeitados por `topdeck_deckobj_missing` nao encerram a rodada sozinhos
 
 Validar o artefato gerado no stage 2:
 
@@ -256,6 +267,18 @@ Resultado da rodada base:
 - caso `not_proven` atual:
   - `Scion of the Ur-Dragon` com `unresolved_cards=["Prismari, the Inspiration"]`
 - rejeicoes de expansao observadas: `topdeck_deckobj_missing`
+
+Resultado da rodada scan-through em `2026-04-27`:
+
+- comando: `--target-valid=6 --max-standing=24`
+- `entries_available=14`
+- `attempted_count=10`
+- `expanded_count=6`
+- `rejected_count=4`
+- `goal_reached=true`
+- novos decks validos alem do lote anterior:
+  - `standing-9` `Kefka, Court Mage // Kefka, Ruler of Ruin`
+  - `standing-10` `Thrasios, Triton Hero + Yoshimaru, Ever Faithful`
 
 ### 3. Persistencia segura do stage 2 em `external_commander_meta_candidates`
 

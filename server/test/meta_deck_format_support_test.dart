@@ -58,6 +58,28 @@ void main() {
       expect(metaDeckFormatCodesForDeckFormat('standard'), ['ST']);
       expect(metaDeckFormatCodesForDeckFormat('modern'), ['MO']);
     });
+
+    test('resolves commander prompt scopes without leaking cEDH into casual',
+        () {
+      expect(
+        resolveCommanderMetaScopeFromPromptText(
+          'Build me a high power Kraum and Tymna list for bracket 4',
+        ),
+        'competitive_commander',
+      );
+      expect(
+        resolveCommanderMetaScopeFromPromptText(
+          'Need a duel commander Talrand control deck',
+        ),
+        'duel_commander',
+      );
+      expect(
+        resolveCommanderMetaScopeFromPromptText(
+          'Build me a casual commander dragon deck',
+        ),
+        isNull,
+      );
+    });
   });
 
   group('analytics keys', () {

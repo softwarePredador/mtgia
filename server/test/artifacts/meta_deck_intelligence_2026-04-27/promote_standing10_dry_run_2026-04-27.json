@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-04-27T19:50:05.365472Z",
+  "mode": "dry_run",
+  "scope": {
+    "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+    "limit": null
+  },
+  "rules": {
+    "validation_status": "staged",
+    "subformat": "competitive_commander",
+    "deck_total_exact": 100,
+    "legal_status_allowed": [
+      "valid",
+      "warning_reviewed"
+    ],
+    "requires_commander_name": true,
+    "requires_unique_source_url": true,
+    "requires_unique_deck_fingerprint": true,
+    "requires_source_allowlist": true,
+    "requires_research_payload_source_chain": true,
+    "requires_research_payload_staging_audit": true
+  },
+  "summary": {
+    "total": 1,
+    "promotable": 1,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "accepted": true,
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_host": "edhtop16.com",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+        "deck_name": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+        "commander_name": "Thrasios, Triton Hero",
+        "partner_commander_name": "Yoshimaru, Ever Faithful",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+        "card_list": "1 Thrasios, Triton Hero\n1 Yoshimaru, Ever Faithful\n1 Allosaurus Shepherd\n1 Ancient Tomb\n1 Arid Mesa\n1 Avacyn's Pilgrim\n1 Badgermole Cub\n1 Biomancer's Familiar\n1 Birds of Paradise\n1 Boseiju, Who Endures\n1 Breeding Pool\n1 Candelabra of Tawnos\n1 Chord of Calling\n1 Chrome Mox\n1 City of Brass\n1 Cloud of Faeries\n1 Command Tower\n1 Crop Rotation\n1 Cryptolith Rite\n1 Derevi, Empyrial Tactician\n1 Deserted Temple\n1 Dryad Arbor\n1 Eldritch Evolution\n1 Elvish Spirit Guide\n1 Emerald Charm\n1 Emergence Zone\n1 Emiel the Blessed\n1 Endurance\n1 Enduring Vitality\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Eternal Witness\n1 Exotic Orchard\n1 Expedition Map\n1 Faerie Mastermind\n1 Fierce Guardianship\n1 Finale of Devastation\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Formidable Speaker\n1 Frantic Search\n1 Gaea's Cradle\n1 Ghostly Flicker\n1 Grand Abolisher\n1 Green Sun's Zenith\n1 Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun\n1 Hallowed Fountain\n1 Hidden Strings\n1 Invasion of Ikoria // Zilortha, Apex of Ikoria\n1 Kutzil, Malamet Exemplar\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Mental Misstep\n1 Minamo, School at Water's Edge\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mystic Remora\n1 Nature's Chosen\n1 Nature's Rhythm\n1 Noble Hierarch\n1 Oboro Breezecaller\n1 Orim's Chant\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Palinchron\n1 Peregrine Drake\n1 Phantasmal Image\n1 Polluted Delta\n1 Rhystic Study\n1 Savannah\n1 Scalding Tarn\n1 Seedborn Muse\n1 Silence\n1 Smothering Tithe\n1 Snap\n1 Sol Ring\n1 Sowing Mycospawn\n1 Spellseeker\n1 Starting Town\n1 Summoner's Pact\n1 Swan Song\n1 Sylvan Scrying\n1 Talon Gates of Madara\n1 Temple Garden\n1 Training Grounds\n1 Tropical Island\n1 Tundra\n1 Valley Floodcaller\n1 Veil of Summer\n1 Voice of Victory\n1 Volatile Stormdrake\n1 Wargate\n1 Windswept Heath\n1 Wooded Foothills\n1 Worldly Tutor",
+        "placement": "10",
+        "color_identity": [
+          "G",
+          "U",
+          "W"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "staged",
+        "legal_status": "valid",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+        "research_payload": {
+          "standing": 10,
+          "player_name": "Kenjamin",
+          "total_cards": 100,
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "stage_status": "staged",
+          "staging_audit": {
+            "issues": [
+              {
+                "code": "missing_color_identity",
+                "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto.",
+                "severity": "warning"
+              }
+            ],
+            "accepted": true,
+            "illegal_cards": [],
+            "unresolved_cards": [],
+            "validation_profile": "topdeck_edhtop16_stage2",
+            "expansion_generated_at": "2026-04-27T19:48:36.344456Z",
+            "validation_generated_at": "2026-04-27T19:48:49.264471Z",
+            "validation_legal_status": "legal",
+            "commander_color_identity": [
+              "G",
+              "U",
+              "W"
+            ],
+            "expansion_rejected_count": 0,
+            "validation_rejected_count": 0
+          },
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "source_context": "edhtop16_tournament_entry",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "commander_count": 2,
+          "mainboard_count": 98,
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/YNzEKQDqrDOzO1IGoBuYKQmbB1n2",
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "topdeck_imported_from": "https://moxfield.com/decks/AdDY88ZnGUyxfidYb4FSmA"
+        },
+        "imported_by": "meta_deck_intelligence_2026_04_27_scan_through"
+      },
+      "card_count": 100,
+      "promoted_to_meta_decks_at": null,
+      "issues": [],
+      "planned_meta_deck": {
+        "format": "cEDH",
+        "archetype": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+        "commander_name": "Thrasios, Triton Hero",
+        "partner_commander_name": "Yoshimaru, Ever Faithful",
+        "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+        "strategy_archetype": "control",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+        "card_list": "1 Thrasios, Triton Hero\n1 Yoshimaru, Ever Faithful\n1 Allosaurus Shepherd\n1 Ancient Tomb\n1 Arid Mesa\n1 Avacyn's Pilgrim\n1 Badgermole Cub\n1 Biomancer's Familiar\n1 Birds of Paradise\n1 Boseiju, Who Endures\n1 Breeding Pool\n1 Candelabra of Tawnos\n1 Chord of Calling\n1 Chrome Mox\n1 City of Brass\n1 Cloud of Faeries\n1 Command Tower\n1 Crop Rotation\n1 Cryptolith Rite\n1 Derevi, Empyrial Tactician\n1 Deserted Temple\n1 Dryad Arbor\n1 Eldritch Evolution\n1 Elvish Spirit Guide\n1 Emerald Charm\n1 Emergence Zone\n1 Emiel the Blessed\n1 Endurance\n1 Enduring Vitality\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Eternal Witness\n1 Exotic Orchard\n1 Expedition Map\n1 Faerie Mastermind\n1 Fierce Guardianship\n1 Finale of Devastation\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Formidable Speaker\n1 Frantic Search\n1 Gaea's Cradle\n1 Ghostly Flicker\n1 Grand Abolisher\n1 Green Sun's Zenith\n1 Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun\n1 Hallowed Fountain\n1 Hidden Strings\n1 Invasion of Ikoria // Zilortha, Apex of Ikoria\n1 Kutzil, Malamet Exemplar\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Mental Misstep\n1 Minamo, School at Water's Edge\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mystic Remora\n1 Nature's Chosen\n1 Nature's Rhythm\n1 Noble Hierarch\n1 Oboro Breezecaller\n1 Orim's Chant\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Palinchron\n1 Peregrine Drake\n1 Phantasmal Image\n1 Polluted Delta\n1 Rhystic Study\n1 Savannah\n1 Scalding Tarn\n1 Seedborn Muse\n1 Silence\n1 Smothering Tithe\n1 Snap\n1 Sol Ring\n1 Sowing Mycospawn\n1 Spellseeker\n1 Starting Town\n1 Summoner's Pact\n1 Swan Song\n1 Sylvan Scrying\n1 Talon Gates of Madara\n1 Temple Garden\n1 Training Grounds\n1 Tropical Island\n1 Tundra\n1 Valley Floodcaller\n1 Veil of Summer\n1 Voice of Victory\n1 Volatile Stormdrake\n1 Wargate\n1 Windswept Heath\n1 Wooded Foothills\n1 Worldly Tutor",
+        "placement": "10"
+      }
+    }
+  ]
+}
