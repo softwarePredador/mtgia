@@ -1,6 +1,52 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Auditoria end-to-end do fluxo Commander optimize
+
+### O Porque
+- Os commits `da4aa8d`, `c7b1b82`, `06ddb45`, `11d0fe2` e `210353a` mudaram runtime mobile, telemetria/Sentry, referencias Commander competitivas e os artifacts do runtime Commander-only.
+- Era necessario confirmar ponta a ponta o contrato novo `optimize -> preview/apply -> validate` sem assumir que os testes unitarios cobririam sozinhos os caminhos de `complete_async`, `needs_repair`, `rebuild_guided`, cache e polling.
+- A rodada tambem revelou um drift de documentacao: o TTL atual de `ai_optimize_cache` no codigo esta em `6h`, nao `24h`.
+
+### O Como
+- Foi lido o material de referencia pedido na auditoria:
+  - `.github/agents/commander-optimize-flow-auditor.agent.md`
+  - `server/doc/DECK_CREATION_VALIDATIONS.md`
+  - `server/doc/DECK_ENGINE_CONSISTENCY_FLOW.md`
+  - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
+  - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+- Foi auditado o fluxo backend/app nos pontos criticos:
+  - `server/routes/ai/optimize/index.dart`
+  - `server/lib/ai/optimize_runtime_support.dart`
+  - `server/lib/ai/optimize_complete_support.dart`
+  - `server/lib/ai/optimize_stage_telemetry.dart`
+  - `server/routes/ai/optimize/jobs/[id].dart`
+  - `app/lib/features/decks/providers/deck_provider.dart`
+  - `app/lib/features/decks/providers/deck_provider_support_ai.dart`
+  - `app/lib/features/decks/providers/deck_provider_support_mutation.dart`
+- Validacoes executadas:
+  - `cd server && dart analyze lib/ai routes/ai bin test`
+  - `cd server && dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart`
+  - `cd app && flutter analyze lib/features/decks test/features/decks`
+  - `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart`
+  - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`
+  - `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`
+- Evidencias da rodada:
+  - `POST /ai/archetypes -> 200 (8495ms)`
+  - `POST /ai/optimize -> 202 (5718ms)`
+  - polling do job async completo em `4` polls
+  - telemetria backend `[OPTIMIZE_TIMING] total_ms=10710`
+  - `SCREENSHOT_CHUNK 09_preview`
+  - `SCREENSHOT_CHUNK 10_complete_validated`
+- Conclusao da auditoria:
+  - nenhum bug funcional pequeno foi provado nesta rodada;
+  - nao foi necessario patch de codigo;
+  - a documentacao operacional foi alinhada para registrar TTL real de cache em `6h`.
+
+### Artefatos
+- `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_2026-04-27.md`
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+
 ## 2026-04-27 — Sentry ampliado para erros tratados e QA mobile no iPhone 15 Simulator
 
 ### O Porquê
@@ -8606,6 +8652,10 @@ Artifacts atualizados:
 
 - `server/test/artifacts/commander_only_optimization_validation/latest_summary.json`
 - `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md`
+
+Observacao operacional:
+
+- o runner em `--dry-run` continua exigindo API valida em `GET /health`; nesta auditoria, `127.0.0.1:8080` respondeu HTML/404 e o rerun com `TEST_API_BASE_URL=http://127.0.0.1:8082` confirmou o guardrail sem apontar defeito funcional no pipeline.
 
 ### 93.3 Validacao
 

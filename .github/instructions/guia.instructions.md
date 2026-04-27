@@ -227,12 +227,12 @@ Este repositório é **full-stack**:
 | **Deep link /decks/:id/search** | "Adicionar carta" pode falhar se deck não carregado | Garantir `fetchDeckDetails` antes |
 | **Rate limiting em auth** | Limites agressivos bloqueiam QA | Usar limites maiores em dev |
 | **IA (OpenAI)** | Sem `OPENAI_API_KEY` quebra UI | Manter fallback/mock em dev |
-| **Cache de Otimização** | Respostas cacheadas por 24h | Limpar cache após mudanças no código |
+| **Cache de Otimização** | Respostas cacheadas por 6h | Limpar cache após mudanças no código |
 | **Atualização de cartas** | Novas coleções MTG | Rodar `sync_cards.dart` |
 
 ### 🧹 Cache de Otimização (`ai_optimize_cache`)
 
-Respostas do `/ai/optimize` são cacheadas no banco por 24h. **Ao alterar código do `DeckArchetypeAnalyzer` ou lógica de análise, OBRIGATÓRIO limpar o cache:**
+Respostas do `/ai/optimize` são cacheadas no banco por 6h. **Ao alterar código do `DeckArchetypeAnalyzer` ou lógica de análise, OBRIGATÓRIO limpar o cache:**
 
 ```sql
 DELETE FROM ai_optimize_cache;
@@ -367,7 +367,7 @@ Para garantir consistência, consulte sempre as colunas existentes antes de cria
 | `deck_signature` | TEXT | Hash do conteúdo do deck |
 | `payload` | JSONB | Resposta completa cacheada |
 | `created_at` | TIMESTAMPTZ | Data de criação |
-| `expires_at` | TIMESTAMPTZ | Expira após 24h |
+| `expires_at` | TIMESTAMPTZ | Expira após 6h |
 
 ### Tabela: `card_meta_insights` (1,842 rows)
 | Coluna | Tipo | Descrição |
@@ -698,7 +698,7 @@ cd server && dart run .dart_frog/server.dart
 ### Otimização retorna dados antigos
 
 ```bash
-# Cache de 24h pode ter dados obsoletos
+# Cache de 6h pode ter dados obsoletos
 # SEMPRE limpar após mudanças no código:
 psql $DATABASE_URL -c "DELETE FROM ai_optimize_cache"
 ```

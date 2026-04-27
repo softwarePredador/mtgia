@@ -77,6 +77,20 @@ Final live flow proved in log:
 - `POST /decks/<deckId>/validate`
 - post-apply capture recorded as `10_complete_validated`
 
+Audit rerun on the same date against the same local backend also proved:
+
+- `POST /ai/archetypes -> 200 (8495ms)`
+- `POST /ai/optimize -> 202 (5718ms)`
+- job completed after `4` polls on `/ai/optimize/jobs/<jobId>` (roughly `1.2s` each)
+- backend telemetry for the same async completion reported:
+  - `total_ms=10710`
+  - `complete.fill_remainder=3457ms`
+  - `complete.ai_suggestion_loop=2438ms`
+  - `complete.build_final_response=1217ms`
+  - `complete.prepare_commander_seed=597ms`
+- preview remained captured as `09_preview`
+- final validated capture remained `10_complete_validated`
+
 ## Harness Changes Applied
 
 - `deck_runtime_m2006_test.dart` now waits for deck list readiness before trying to create a deck.
