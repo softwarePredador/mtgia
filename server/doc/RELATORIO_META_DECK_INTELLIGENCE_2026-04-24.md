@@ -1216,3 +1216,44 @@ Observacao adicional:
 1. promocao live de externos para `meta_decks`
 2. cobertura externa live por cor/shell/strategy dentro de `meta_decks`
 3. handoff runtime fresco completo de ManaLoom com login -> gerar/criar -> details -> optimize -> apply
+
+## Atualizacao 2026-04-27 - promocao live Norman
+
+### Contexto
+
+Depois do sprint, foi executada a promocao real focada do candidato:
+
+- `Norman Osborn // Green Goblin`
+- `source_url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4`
+
+Artifacts gerados:
+
+- `server/test/artifacts/external_commander_meta_candidates_promotion_norman_dry_run_2026-04-27.json`
+- `server/test/artifacts/external_commander_meta_candidates_promotion_norman_apply_2026-04-27.json`
+- `server/test/artifacts/external_commander_meta_candidates_promotion_norman_post_apply_dry_run_2026-04-27.json`
+
+### Evidencia apos o apply
+
+O dry-run posterior ao apply bloqueou o mesmo `source_url` por:
+
+- `already_promoted`
+- `validation_status_not_staged`
+- `source_url_already_present_in_meta_decks`
+- `deck_fingerprint_already_present_in_meta_decks`
+
+Relatorios source-aware apos o apply:
+
+- `extract_meta_insights.dart --report-only`: `mtgtop8=641`, `external=1`
+- `meta_profile_report.dart`: `mtgtop8=641`, `external=1`
+- `source_formats`: `external/competitive_commander=1`
+
+### Leitura atualizada
+
+- promocao live de externos para `meta_decks`: **proved**
+- cobertura externa live em analytics de `meta_decks`: **proved para 1 deck**
+- cobertura externa ampla por cor/shell/strategy: ainda limitada, pois existe apenas 1 row externo promovido
+- `ManaLoom Deck Runtime E2E`: continua **not proven**
+
+### Ajuste de teste
+
+O artifact live mais recente passou de `4` para `2` candidatos expandidos por drift parcial do TopDeck (`topdeck_deckobj_missing`). Os testes foram ajustados para validar o contrato declarado no proprio artifact (`expanded_count`, `accepted_count`, `rejected_count`) em vez de depender da contagem fixa antiga.

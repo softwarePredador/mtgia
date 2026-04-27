@@ -323,6 +323,7 @@ void main() {
       final raw = File(
         'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
       ).readAsStringSync();
+      final artifact = jsonDecode(raw) as Map<String, dynamic>;
       final candidates = parseExternalCommanderMetaCandidates(raw);
 
       final results = validateExternalCommanderMetaCandidates(
@@ -330,8 +331,11 @@ void main() {
         profile: topDeckEdhTop16Stage2ValidationProfile,
       );
 
-      expect(results, hasLength(4));
-      expect(results.where((result) => result.accepted), hasLength(4));
+      expect(results, hasLength(candidates.length));
+      expect(
+        results.where((result) => result.accepted),
+        hasLength(artifact['expanded_count'] as int),
+      );
       expect(results.where((result) => !result.accepted), isEmpty);
       expect(
         results.expand((result) => result.issues).map((issue) => issue.code),

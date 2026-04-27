@@ -8453,3 +8453,43 @@ Resultado comprovado:
 - promocao live para `meta_decks`: **not proven**
 - cobertura externa live em analytics de `meta_decks`: **not proven**
 - runtime fresco `ManaLoom Deck Runtime E2E`: **not proven**, pois nao ha script executavel com esse nome e o comando `run_commander_only_optimization_validation.dart` escreve via API sem `--apply`
+
+## 92. Promocao live externa Norman e ajuste dos testes stage2
+
+### 92.1 O que mudou em 2026-04-27
+
+Foi executada promocao real focada para:
+
+- `Norman Osborn // Green Goblin`
+- `source_url=https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4`
+
+Artifacts:
+
+```bash
+server/test/artifacts/external_commander_meta_candidates_promotion_norman_dry_run_2026-04-27.json
+server/test/artifacts/external_commander_meta_candidates_promotion_norman_apply_2026-04-27.json
+server/test/artifacts/external_commander_meta_candidates_promotion_norman_post_apply_dry_run_2026-04-27.json
+```
+
+### 92.2 Evidencia
+
+O dry-run posterior ao apply bloqueia o mesmo candidato por ja estar promovido e ja existir em `meta_decks`.
+
+Os relatorios source-aware passaram a mostrar:
+
+- `mtgtop8=641`
+- `external=1`
+- `external/competitive_commander=1`
+
+### 92.3 Ajuste de teste
+
+O artifact live atual de EDHTop16/TopDeck tem `expanded_count=2` e `rejected_count=2` por drift parcial do TopDeck. Os testes stage2 agora validam a contagem declarada no artifact em vez de exigir os `4` candidatos da rodada anterior.
+
+Validacao executada:
+
+```bash
+cd server
+dart format test/external_commander_meta_candidate_support_test.dart test/external_commander_meta_staging_support_test.dart
+dart analyze lib/meta lib/ai bin test
+dart test test/external_commander_meta_candidate_support_test.dart test/external_commander_meta_import_support_test.dart test/external_commander_meta_promotion_support_test.dart test/external_commander_deck_expansion_support_test.dart test/external_commander_meta_staging_support_test.dart test/optimize_runtime_support_test.dart
+```
