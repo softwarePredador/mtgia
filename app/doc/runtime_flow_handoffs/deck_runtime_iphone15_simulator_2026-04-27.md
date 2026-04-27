@@ -65,6 +65,7 @@ Artifacts:
 - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/simctl_devices.txt`
 - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/backend_health.json`
 - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output.txt`
+- `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output_backend_updated.txt`
 
 Final live flow proved in log:
 
@@ -90,6 +91,20 @@ Audit rerun on the same date against the same local backend also proved:
   - `complete.prepare_commander_seed=597ms`
 - preview remained captured as `09_preview`
 - final validated capture remained `10_complete_validated`
+
+Backend-updated rerun after the `/ai/archetypes` cache/telemetry patch also proved:
+
+- focused app checks still passed:
+  - `flutter analyze lib/features/decks test/features/decks`
+  - `flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart`
+- live iPhone 15 runtime still completed with:
+  - `GET /ai/optimize/jobs/<jobId> -> completed after 4 polls`
+  - `CAPTURE_TAKEN 09_preview bytes=271451`
+  - `CAPTURE_TAKEN 10_complete_validated bytes=244136`
+- direct latency probe against the same updated backend confirmed the new archetypes endpoint behavior:
+  - first `POST /ai/archetypes` -> `200`, `cache.hit=false`, `total_ms=11995`, `openai_call=10756`
+  - second `POST /ai/archetypes` -> `200`, `cache.hit=true`, `total_ms=1277`, `openai_call=0`
+- conclusion: the backend patch improved repeated archetype fetches without regressing the real `preview -> apply -> validate` runtime path on iPhone 15.
 
 ## Harness Changes Applied
 

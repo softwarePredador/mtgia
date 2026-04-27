@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-04-27T15:00:41.984097",
+  "run_started_at": "2026-04-27T14:58:16.793850",
+  "mode": "apply",
+  "api_base_url": "http://127.0.0.1:8082",
+  "artifact_dir": "test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27",
+  "corpus_path": "test/fixtures/optimization_resolution_corpus.json",
+  "validation_limit": 4,
+  "max_allowed_total_ms": 90000,
+  "total": 4,
+  "passed": 4,
+  "failed": 0,
+  "completed": 4,
+  "protected_rejections": 0,
+  "cache_hit_probe_enabled": true,
+  "results": [
+    {
+      "commander_label": "Auntie Ool, Cursewretch",
+      "source_deck_id": "8c22deb9-80bd-489f-8e87-1344eabac698",
+      "source_deck_name": "goblins",
+      "seed_deck_id": "d9773452-266d-4e20-a0d1-3524c5f19d0d",
+      "archetype": "aggro",
+      "bracket": 4,
+      "result_kind": "completed",
+      "optimize_status": 200,
+      "timings": {
+        "total_ms": 11201,
+        "stages_ms": {
+          "complete.fill_remainder": 3591,
+          "complete.ai_suggestion_loop": 2142,
+          "complete.build_final_response": 1210,
+          "complete.prepare_commander_seed": 1221,
+          "complete.rebalance_land_deficit": 0,
+          "complete.build_intermediate_payload": 3
+        }
+      },
+      "saved_artifact_path": "test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/auntie_ool_cursewretch.json",
+      "expected_checks": [
+        "optimize retornou mode=complete",
+        "complete retornou additions_detailed utilizavel",
+        "POST /decks/:id/cards/bulk retornou sucesso",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final mantem 100 cartas",
+        "deck final preserva a quantidade correta de comandantes",
+        "land count final ficou em faixa segura",
+        "basic lands nao inflaram acima do toleravel",
+        "pipeline terminou abaixo do budget de tempo",
+        "mana base final nao ficou com alerta forte",
+        "guaranteed basics stage nao precisou fechar o deck",
+        "segunda chamada de optimize confirmou cache.hit=true"
+      ],
+      "failed_checks": [],
+      "warnings": [],
+      "summary": {
+        "mode": "complete",
+        "final_card_count": 100,
+        "final_commander_count": 1,
+        "land_count": 32,
+        "basic_count": 23,
+        "mana_base_assessment": "Base de mana equilibrada",
+        "average_cmc": "1.76",
+        "consistency_slo": {
+          "added_total": 99,
+          "basic_added": 23,
+          "target_total": 99,
+          "ai_stage_used": false,
+          "non_basic_added": 76,
+          "completed_target": true,
+          "deterministic_stage_used": true,
+          "average_deck_seed_stage_used": false,
+          "competitive_model_stage_used": true,
+          "guaranteed_basics_stage_used": false
+        },
+        "cache_probe": {
+          "status": 200,
+          "hit": true,
+          "cache_key": "v6:39175df7"
+        }
+      },
+      "passed": true
+    },
+    {
+      "commander_label": "Jin-Gitaxias // The Great Synthesis",
+      "source_deck_id": "f2a2a34a-4561-4a77-886d-7067b672ac85",
+      "source_deck_name": "jin",
+      "seed_deck_id": "3443871f-4a9a-426e-a117-aad3e5b6f9ff",
+      "archetype": "rampagem eldrazi",
+      "bracket": 2,
+      "result_kind": "completed",
+      "optimize_status": 200,
+      "timings": {
+        "total_ms": 10335,
+        "stages_ms": {
+          "complete.fill_remainder": 3297,
+          "complete.ai_suggestion_loop": 2247,
+          "complete.build_final_response": 1205,
+          "complete.prepare_commander_seed": 597,
+          "complete.rebalance_land_deficit": 0,
+          "complete.build_intermediate_payload": 0
+        }
+      },
+      "saved_artifact_path": "test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/jin_gitaxias_the_great_synthesis.json",
+      "expected_checks": [
+        "optimize retornou mode=complete",
+        "complete retornou additions_detailed utilizavel",
+        "POST /decks/:id/cards/bulk retornou sucesso",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final mantem 100 cartas",
+        "deck final preserva a quantidade correta de comandantes",
+        "land count final ficou em faixa segura",
+        "basic lands nao inflaram acima do toleravel",
+        "pipeline terminou abaixo do budget de tempo",
+        "mana base final nao ficou com alerta forte",
+        "guaranteed basics stage nao precisou fechar o deck",
+        "segunda chamada de optimize confirmou cache.hit=true"
+      ],
+      "failed_checks": [],
+      "warnings": [],
+      "summary": {
+        "mode": "complete",
+        "final_card_count": 100,
+        "final_commander_count": 1,
+        "land_count": 32,
+        "basic_count": 23,
+        "mana_base_assessment": "Base de mana equilibrada",
+        "average_cmc": "2.56",
+        "consistency_slo": {
+          "added_total": 99,
+          "basic_added": 23,
+          "target_total": 99,
+          "ai_stage_used": false,
+          "non_basic_added": 76,
+          "completed_target": true,
+          "deterministic_stage_used": true,
+          "average_deck_seed_stage_used": true,
+          "competitive_model_stage_used": false,
+          "guaranteed_basics_stage_used": false
+        },
+        "cache_probe": {
+          "status": 200,
+          "hit": true,
+          "cache_key": "v6:46ee0600"
+        }
+      },
+      "passed": true
+    },
+    {
+      "commander_label": "Talrand, Sky Summoner",
+      "source_deck_id": "df780797-bcc4-47cb-82d6-08d01ae3b03b",
+      "source_deck_name": "Deck incremental",
+      "seed_deck_id": "4d0d245c-ce37-491a-8150-279086b3b419",
+      "archetype": "midrange",
+      "bracket": 2,
+      "result_kind": "completed",
+      "optimize_status": 200,
+      "timings": {
+        "total_ms": 10086,
+        "stages_ms": {
+          "complete.fill_remainder": 3306,
+          "complete.ai_suggestion_loop": 1997,
+          "complete.build_final_response": 1205,
+          "complete.prepare_commander_seed": 594,
+          "complete.rebalance_land_deficit": 0,
+          "complete.build_intermediate_payload": 0
+        }
+      },
+      "saved_artifact_path": "test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/talrand_sky_summoner.json",
+      "expected_checks": [
+        "optimize retornou mode=complete",
+        "complete retornou additions_detailed utilizavel",
+        "POST /decks/:id/cards/bulk retornou sucesso",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final mantem 100 cartas",
+        "deck final preserva a quantidade correta de comandantes",
+        "land count final ficou em faixa segura",
+        "basic lands nao inflaram acima do toleravel",
+        "pipeline terminou abaixo do budget de tempo",
+        "mana base final nao ficou com alerta forte",
+        "guaranteed basics stage nao precisou fechar o deck",
+        "segunda chamada de optimize confirmou cache.hit=true"
+      ],
+      "failed_checks": [],
+      "warnings": [],
+      "summary": {
+        "mode": "complete",
+        "final_card_count": 100,
+        "final_commander_count": 1,
+        "land_count": 32,
+        "basic_count": 23,
+        "mana_base_assessment": "Base de mana equilibrada",
+        "average_cmc": "2.04",
+        "consistency_slo": {
+          "added_total": 99,
+          "basic_added": 23,
+          "target_total": 99,
+          "ai_stage_used": false,
+          "non_basic_added": 76,
+          "completed_target": true,
+          "deterministic_stage_used": true,
+          "average_deck_seed_stage_used": true,
+          "competitive_model_stage_used": false,
+          "guaranteed_basics_stage_used": false
+        },
+        "cache_probe": {
+          "status": 200,
+          "hit": true,
+          "cache_key": "v6:ba3a3330"
+        }
+      },
+      "passed": true
+    },
+    {
+      "commander_label": "Atraxa, Praetors' Voice",
+      "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+      "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
+      "seed_deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+      "archetype": "midrange",
+      "bracket": 2,
+      "result_kind": "completed",
+      "optimize_status": 200,
+      "timings": {
+        "total_ms": 10237,
+        "stages_ms": {
+          "complete.fill_remainder": 3420,
+          "complete.ai_suggestion_loop": 1921,
+          "complete.build_final_response": 1281,
+          "complete.prepare_commander_seed": 605,
+          "complete.rebalance_land_deficit": 0,
+          "complete.build_intermediate_payload": 0
+        }
+      },
+      "saved_artifact_path": "test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/atraxa_praetors_voice.json",
+      "expected_checks": [
+        "optimize retornou mode=complete",
+        "complete retornou additions_detailed utilizavel",
+        "POST /decks/:id/cards/bulk retornou sucesso",
+        "POST /decks/:id/validate aprovou o deck final",
+        "deck final mantem 100 cartas",
+        "deck final preserva a quantidade correta de comandantes",
+        "land count final ficou em faixa segura",
+        "basic lands nao inflaram acima do toleravel",
+        "pipeline terminou abaixo do budget de tempo",
+        "mana base final nao ficou com alerta forte",
+        "guaranteed basics stage nao precisou fechar o deck",
+        "segunda chamada de optimize confirmou cache.hit=true"
+      ],
+      "failed_checks": [],
+      "warnings": [],
+      "summary": {
+        "mode": "complete",
+        "final_card_count": 100,
+        "final_commander_count": 1,
+        "land_count": 36,
+        "basic_count": 27,
+        "mana_base_assessment": "Base de mana equilibrada",
+        "average_cmc": "2.09",
+        "consistency_slo": {
+          "added_total": 99,
+          "basic_added": 27,
+          "target_total": 99,
+          "ai_stage_used": false,
+          "non_basic_added": 72,
+          "completed_target": true,
+          "deterministic_stage_used": true,
+          "average_deck_seed_stage_used": true,
+          "competitive_model_stage_used": false,
+          "guaranteed_basics_stage_used": false
+        },
+        "cache_probe": {
+          "status": 200,
+          "hit": true,
+          "cache_key": "v6:cee18e09"
+        }
+      },
+      "passed": true
+    }
+  ]
+}

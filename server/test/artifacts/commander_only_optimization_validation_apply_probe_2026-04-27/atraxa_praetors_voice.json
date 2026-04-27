@@ -1,0 +1,2236 @@
+{
+  "source_deck_id": "104cbd8c-6877-4551-9c4f-c0742f1760ad",
+  "source_deck_name": "Corpus Seed - Atraxa, Praetors' Voice",
+  "seed_deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+  "optimize_request": {
+    "deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+    "archetype": "midrange",
+    "bracket": 2,
+    "keep_theme": true
+  },
+  "optimize_response": {
+    "mode": "complete",
+    "cache": {
+      "hit": false,
+      "cache_key": "v6:cee18e09"
+    },
+    "theme": {
+      "theme": "counters",
+      "confidence": "alta",
+      "core_cards": [
+        "Atraxa, Praetors' Voice"
+      ],
+      "match_score": 1.55
+    },
+    "bracket": 2,
+    "timings": {
+      "job_id": "1cb26bf31eb5e21d1f79093c0b7609df",
+      "deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+      "total_ms": 10237,
+      "stages_ms": {
+        "complete.fill_remainder": 3420,
+        "complete.ai_suggestion_loop": 1921,
+        "complete.build_final_response": 1281,
+        "complete.prepare_commander_seed": 605,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
+    },
+    "removals": [],
+    "additions": [
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Arcane Denial",
+      "Arcane Signet",
+      "Beast Within",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cultivate",
+      "Cyclonic Rift",
+      "Sol Ring",
+      "Rhystic Study",
+      "Lightning Greaves",
+      "Swords to Plowshares",
+      "Birds of Paradise",
+      "Chromatic Lantern",
+      "Everflowing Chalice",
+      "Infectious Inquiry",
+      "Prologue to Phyresis",
+      "Tezzeret's Gambit",
+      "Cankerbloom",
+      "Contaminant Grafter",
+      "Ezuri, Stalker of Spheres",
+      "Tamiyo, Field Researcher",
+      "Teferi, Master of Time",
+      "Astral Cornucopia",
+      "Glistening Sphere",
+      "Path to Exile",
+      "Smothering Tithe",
+      "Evolution Sage",
+      "Oko, Thief of Crowns",
+      "Norn's Decree",
+      "Blightbelly Rat",
+      "Blighted Agent",
+      "Innkeeper's Talent",
+      "Metastatic Evangel",
+      "Plague Stinger",
+      "Thrummingbird",
+      "Venerated Rotpriest",
+      "Voidwing Hybrid",
+      "Ajani, Sleeper Agent",
+      "Bloated Contaminator",
+      "Brokers Ascendancy",
+      "Deepglow Skate",
+      "Lotus Petal",
+      "Thoughtseize",
+      "Chrome Mox",
+      "Llanowar Elves",
+      "Farseek",
+      "Ancestral Vision",
+      "Force of Will",
+      "Ponder",
+      "Fatal Push",
+      "Mental Misstep",
+      "Spell Snare",
+      "Authority of the Consuls",
+      "Avacyn's Pilgrim",
+      "Bone Shards",
+      "Careful Study",
+      "Cloudshift",
+      "Path of Ancestry",
+      "Starting Town",
+      "Cavern of Souls",
+      "Lazotep Quarry",
+      "Abandoned Outpost",
+      "Bog Wreckage",
+      "Talon Gates of Madara",
+      "Abstergo Entertainment",
+      "Island",
+      "Forest",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "preferences": {
+      "keep_theme": true,
+      "memory_applied": false,
+      "preferred_bracket": 2
+    },
+    "deck_analysis": {
+      "average_cmc": "4.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 10). Falta mana U (Tem 0 fontes, ideal > 10). Falta mana B (Tem 0 fontes, ideal > 10). Falta mana G (Tem 0 fontes, ideal > 10)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.09",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 36,
+        "battles": 0,
+        "instants": 15,
+        "artifacts": 12,
+        "creatures": 17,
+        "sorceries": 9,
+        "enchantments": 7,
+        "planeswalkers": 4
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 27,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 72,
+      "completed_target": true,
+      "deterministic_stage_used": true,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": false,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "3e5a77ae-f39d-42b7-ba53-0d11c337e5ce",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rhystic Study",
+        "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Birds of Paradise",
+        "card_id": "2189d83b-9165-4b59-9554-75ff4e85e8b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chromatic Lantern",
+        "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Everflowing Chalice",
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Infectious Inquiry",
+        "card_id": "6982cd96-f6fe-4491-85c8-5874f5c21cac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Prologue to Phyresis",
+        "card_id": "936c9e62-d9ae-4abd-8490-5b8c45697c4b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tezzeret's Gambit",
+        "card_id": "39ee4043-eedf-4e96-9a38-8a7208fe897c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cankerbloom",
+        "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contaminant Grafter",
+        "card_id": "fa954ae8-e4ff-412d-a36d-13b573bb9a9b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ezuri, Stalker of Spheres",
+        "card_id": "6c7ffcc4-265a-423c-8666-825e08c7481f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tamiyo, Field Researcher",
+        "card_id": "19ff21f3-f22a-42c2-b995-f24470d29021",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Teferi, Master of Time",
+        "card_id": "dca92b00-24c9-4167-ac95-d5f7dbbdef56",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Astral Cornucopia",
+        "card_id": "f8f29a09-fbf8-4015-b4a3-b1168219a422",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Glistening Sphere",
+        "card_id": "213f55c7-3191-400a-a1e5-77f6f6d1d621",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Smothering Tithe",
+        "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Evolution Sage",
+        "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Oko, Thief of Crowns",
+        "card_id": "6b43c3ee-712c-47e7-bd78-4e64d37f2c84",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Norn's Decree",
+        "card_id": "73a51fd0-94f3-482e-ab86-d88bb0caca35",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blightbelly Rat",
+        "card_id": "6ff3335b-6cef-490b-a133-92fb0de03b7e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blighted Agent",
+        "card_id": "3f7666e5-f540-4d76-8e02-d1a3f9dbd08e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Innkeeper's Talent",
+        "card_id": "3d55242d-26b0-4f23-b012-dd78f6437637",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Metastatic Evangel",
+        "card_id": "5525ec36-9f79-4434-8ea9-7765bb56cf0e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Plague Stinger",
+        "card_id": "bb244803-1c96-42d3-ad77-3c9e29f4e7ba",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thrummingbird",
+        "card_id": "05b4d7d5-b418-418d-b3e6-daeedac17aec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Venerated Rotpriest",
+        "card_id": "213bda7c-f40d-4197-891d-ab3ae4da475d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Voidwing Hybrid",
+        "card_id": "4860359b-d350-4118-8c82-af5af73bb77f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ajani, Sleeper Agent",
+        "card_id": "5f71759e-ef2b-4412-9594-b831cc09b655",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloated Contaminator",
+        "card_id": "f93ed0a7-2799-4f32-b61b-11cc685d7874",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brokers Ascendancy",
+        "card_id": "a90b8ca8-21b9-421e-8695-f69d77cd7352",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deepglow Skate",
+        "card_id": "e5d0d61c-7aaa-4763-b77c-4a915691c00a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lotus Petal",
+        "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thoughtseize",
+        "card_id": "8e15243c-509c-47cb-9bd5-a4b4b75b6a71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chrome Mox",
+        "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Llanowar Elves",
+        "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ancestral Vision",
+        "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Force of Will",
+        "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fatal Push",
+        "card_id": "a412a94e-6156-4fa1-bea4-8fe8d48567b8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mental Misstep",
+        "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Spell Snare",
+        "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Authority of the Consuls",
+        "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Avacyn's Pilgrim",
+        "card_id": "84eb6245-5b84-454b-9fb2-532fbc6828a1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bone Shards",
+        "card_id": "6c6ae2ea-13d4-4eec-98dc-e6a363961c99",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Careful Study",
+        "card_id": "07a9fef0-81ee-4940-b7f9-aa36f0f2936e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cloudshift",
+        "card_id": "d96b2edd-c3dc-4571-a09f-c23c67d0bbcb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path of Ancestry",
+        "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Starting Town",
+        "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cavern of Souls",
+        "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lazotep Quarry",
+        "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abandoned Outpost",
+        "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bog Wreckage",
+        "card_id": "e3dd19b2-446e-4ab4-b3ad-373dd29218c8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talon Gates of Madara",
+        "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abstergo Entertainment",
+        "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 11,
+        "is_basic_land": true
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 6,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 6,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 4,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "bulk_status": 200,
+  "validate_status": 200,
+  "cache_probe_status": 200,
+  "cache_probe_response": {
+    "mode": "complete",
+    "cache": {
+      "hit": true,
+      "cache_key": "v6:cee18e09"
+    },
+    "theme": {
+      "theme": "counters",
+      "confidence": "alta",
+      "core_cards": [
+        "Atraxa, Praetors' Voice"
+      ],
+      "match_score": 1.55
+    },
+    "bracket": 2,
+    "timings": {
+      "deck_id": "cc984556-d83b-43ec-9b38-ae7ba3e632e7",
+      "request_mode": "optimize",
+      "total_ms": 3154,
+      "stages_ms": {
+        "request.deck_context": 1918,
+        "deck_context.theme_profile": 708,
+        "request.user_preferences": 626,
+        "deck_context.deck_query": 608,
+        "request.cache_lookup": 601,
+        "deck_context.cards_query": 598,
+        "deck_context.analysis": 0,
+        "deck_context.state_assessment": 0,
+        "deck_context.resolve_archetype": 0
+      }
+    },
+    "removals": [],
+    "additions": [
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
+      "Arcane Denial",
+      "Arcane Signet",
+      "Beast Within",
+      "Brainstorm",
+      "Command Tower",
+      "Counterspell",
+      "Cultivate",
+      "Cyclonic Rift",
+      "Sol Ring",
+      "Rhystic Study",
+      "Lightning Greaves",
+      "Swords to Plowshares",
+      "Birds of Paradise",
+      "Chromatic Lantern",
+      "Everflowing Chalice",
+      "Infectious Inquiry",
+      "Prologue to Phyresis",
+      "Tezzeret's Gambit",
+      "Cankerbloom",
+      "Contaminant Grafter",
+      "Ezuri, Stalker of Spheres",
+      "Tamiyo, Field Researcher",
+      "Teferi, Master of Time",
+      "Astral Cornucopia",
+      "Glistening Sphere",
+      "Path to Exile",
+      "Smothering Tithe",
+      "Evolution Sage",
+      "Oko, Thief of Crowns",
+      "Norn's Decree",
+      "Blightbelly Rat",
+      "Blighted Agent",
+      "Innkeeper's Talent",
+      "Metastatic Evangel",
+      "Plague Stinger",
+      "Thrummingbird",
+      "Venerated Rotpriest",
+      "Voidwing Hybrid",
+      "Ajani, Sleeper Agent",
+      "Bloated Contaminator",
+      "Brokers Ascendancy",
+      "Deepglow Skate",
+      "Lotus Petal",
+      "Thoughtseize",
+      "Chrome Mox",
+      "Llanowar Elves",
+      "Farseek",
+      "Ancestral Vision",
+      "Force of Will",
+      "Ponder",
+      "Fatal Push",
+      "Mental Misstep",
+      "Spell Snare",
+      "Authority of the Consuls",
+      "Avacyn's Pilgrim",
+      "Bone Shards",
+      "Careful Study",
+      "Cloudshift",
+      "Path of Ancestry",
+      "Starting Town",
+      "Cavern of Souls",
+      "Lazotep Quarry",
+      "Abandoned Outpost",
+      "Bog Wreckage",
+      "Talon Gates of Madara",
+      "Abstergo Entertainment",
+      "Island",
+      "Forest",
+      "Plains",
+      "Swamp"
+    ],
+    "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+    "iterations": 0,
+    "constraints": {
+      "keep_theme": true
+    },
+    "preferences": {
+      "memory_applied": false,
+      "keep_theme": true,
+      "preferred_bracket": 2
+    },
+    "deck_analysis": {
+      "average_cmc": "4.00",
+      "total_cards": 1,
+      "type_distribution": {
+        "lands": 0,
+        "battles": 0,
+        "instants": 0,
+        "artifacts": 0,
+        "creatures": 1,
+        "sorceries": 0,
+        "enchantments": 0,
+        "planeswalkers": 0
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "baixa",
+      "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana W (Tem 0 fontes, ideal > 10). Falta mana U (Tem 0 fontes, ideal > 10). Falta mana B (Tem 0 fontes, ideal > 10). Falta mana G (Tem 0 fontes, ideal > 10)",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "post_analysis": {
+      "average_cmc": "2.09",
+      "total_cards": 100,
+      "type_distribution": {
+        "lands": 36,
+        "battles": 0,
+        "instants": 15,
+        "artifacts": 12,
+        "creatures": 17,
+        "sorceries": 9,
+        "enchantments": 7,
+        "planeswalkers": 4
+      },
+      "detected_archetype": "midrange",
+      "archetype_confidence": "média",
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
+    },
+    "consistency_slo": {
+      "added_total": 99,
+      "basic_added": 27,
+      "target_total": 99,
+      "ai_stage_used": false,
+      "non_basic_added": 72,
+      "completed_target": true,
+      "deterministic_stage_used": true,
+      "average_deck_seed_stage_used": true,
+      "competitive_model_stage_used": false,
+      "guaranteed_basics_stage_used": false
+    },
+    "target_additions": 99,
+    "removals_detailed": [],
+    "additions_detailed": [
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Denial",
+        "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Beast Within",
+        "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brainstorm",
+        "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Counterspell",
+        "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cultivate",
+        "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cyclonic Rift",
+        "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Sol Ring",
+        "card_id": "3e5a77ae-f39d-42b7-ba53-0d11c337e5ce",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Rhystic Study",
+        "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swords to Plowshares",
+        "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Birds of Paradise",
+        "card_id": "2189d83b-9165-4b59-9554-75ff4e85e8b0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chromatic Lantern",
+        "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Everflowing Chalice",
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Infectious Inquiry",
+        "card_id": "6982cd96-f6fe-4491-85c8-5874f5c21cac",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Prologue to Phyresis",
+        "card_id": "936c9e62-d9ae-4abd-8490-5b8c45697c4b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tezzeret's Gambit",
+        "card_id": "39ee4043-eedf-4e96-9a38-8a7208fe897c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cankerbloom",
+        "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Contaminant Grafter",
+        "card_id": "fa954ae8-e4ff-412d-a36d-13b573bb9a9b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ezuri, Stalker of Spheres",
+        "card_id": "6c7ffcc4-265a-423c-8666-825e08c7481f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Tamiyo, Field Researcher",
+        "card_id": "19ff21f3-f22a-42c2-b995-f24470d29021",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Teferi, Master of Time",
+        "card_id": "dca92b00-24c9-4167-ac95-d5f7dbbdef56",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Astral Cornucopia",
+        "card_id": "f8f29a09-fbf8-4015-b4a3-b1168219a422",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Glistening Sphere",
+        "card_id": "213f55c7-3191-400a-a1e5-77f6f6d1d621",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Smothering Tithe",
+        "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Evolution Sage",
+        "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Oko, Thief of Crowns",
+        "card_id": "6b43c3ee-712c-47e7-bd78-4e64d37f2c84",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Norn's Decree",
+        "card_id": "73a51fd0-94f3-482e-ab86-d88bb0caca35",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blightbelly Rat",
+        "card_id": "6ff3335b-6cef-490b-a133-92fb0de03b7e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Blighted Agent",
+        "card_id": "3f7666e5-f540-4d76-8e02-d1a3f9dbd08e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Innkeeper's Talent",
+        "card_id": "3d55242d-26b0-4f23-b012-dd78f6437637",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Metastatic Evangel",
+        "card_id": "5525ec36-9f79-4434-8ea9-7765bb56cf0e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Plague Stinger",
+        "card_id": "bb244803-1c96-42d3-ad77-3c9e29f4e7ba",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thrummingbird",
+        "card_id": "05b4d7d5-b418-418d-b3e6-daeedac17aec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Venerated Rotpriest",
+        "card_id": "213bda7c-f40d-4197-891d-ab3ae4da475d",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Voidwing Hybrid",
+        "card_id": "4860359b-d350-4118-8c82-af5af73bb77f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ajani, Sleeper Agent",
+        "card_id": "5f71759e-ef2b-4412-9594-b831cc09b655",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bloated Contaminator",
+        "card_id": "f93ed0a7-2799-4f32-b61b-11cc685d7874",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Brokers Ascendancy",
+        "card_id": "a90b8ca8-21b9-421e-8695-f69d77cd7352",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Deepglow Skate",
+        "card_id": "e5d0d61c-7aaa-4763-b77c-4a915691c00a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lotus Petal",
+        "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thoughtseize",
+        "card_id": "8e15243c-509c-47cb-9bd5-a4b4b75b6a71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chrome Mox",
+        "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Llanowar Elves",
+        "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ancestral Vision",
+        "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Force of Will",
+        "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fatal Push",
+        "card_id": "a412a94e-6156-4fa1-bea4-8fe8d48567b8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mental Misstep",
+        "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Spell Snare",
+        "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Authority of the Consuls",
+        "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Avacyn's Pilgrim",
+        "card_id": "84eb6245-5b84-454b-9fb2-532fbc6828a1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bone Shards",
+        "card_id": "6c6ae2ea-13d4-4eec-98dc-e6a363961c99",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Careful Study",
+        "card_id": "07a9fef0-81ee-4940-b7f9-aa36f0f2936e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cloudshift",
+        "card_id": "d96b2edd-c3dc-4571-a09f-c23c67d0bbcb",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path of Ancestry",
+        "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Starting Town",
+        "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cavern of Souls",
+        "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lazotep Quarry",
+        "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abandoned Outpost",
+        "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bog Wreckage",
+        "card_id": "e3dd19b2-446e-4ab4-b3ad-373dd29218c8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talon Gates of Madara",
+        "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abstergo Entertainment",
+        "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Island",
+        "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+        "quantity": 11,
+        "is_basic_land": true
+      },
+      {
+        "name": "Forest",
+        "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+        "quantity": 6,
+        "is_basic_land": true
+      },
+      {
+        "name": "Plains",
+        "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+        "quantity": 6,
+        "is_basic_land": true
+      },
+      {
+        "name": "Swamp",
+        "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+        "quantity": 4,
+        "is_basic_land": true
+      }
+    ],
+    "validation_warnings": []
+  },
+  "saved_cards": [
+    {
+      "card_id": "75f30f9b-b3b7-4f90-a33b-ae16bf0536e7",
+      "quantity": 1,
+      "is_commander": true,
+      "name": "Atraxa, Praetors' Voice",
+      "type_line": "Legendary Creature — Phyrexian Angel Horror",
+      "mana_cost": "{G}{W}{U}{B}",
+      "colors": [
+        "B",
+        "G",
+        "U",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Flying, vigilance, deathtouch, lifelink\nAt the beginning of your end step, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abandoned Outpost",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {W}.\n{T}, Sacrifice this land: Add one mana of any color."
+    },
+    {
+      "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abstergo Entertainment",
+      "type_line": "Legendary Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{3}, {T}, Exile Abstergo Entertainment: Return up to one target historic card from your graveyard to your hand, then exile all graveyards. (Artifacts, legendaries, and Sagas are historic.)"
+    },
+    {
+      "card_id": "5f71759e-ef2b-4412-9594-b831cc09b655",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ajani, Sleeper Agent",
+      "type_line": "Legendary Planeswalker — Ajani",
+      "mana_cost": "{1}{G}{G/W/P}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Compleated ({G/W/P} can be paid with {G}, {W}, or 2 life. If life was paid, this planeswalker enters with two fewer loyalty counters.)\n[+1]: Reveal the top card of your library. If it's a creature or planeswalker card, put it into your hand. Otherwise, you may put it on the bottom of your library.\n[−3]: Distribute three +1/+1 counters among up to three target creatures. They gain vigilance until end of turn.\n[−6]: You get an emblem with \"Whenever you cast a creature or planeswalker spell, target opponent gets two poison counters.\""
+    },
+    {
+      "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ancestral Vision",
+      "type_line": "Sorcery",
+      "mana_cost": "",
+      "colors": [
+        "U"
+      ],
+      "cmc": 0.0,
+      "oracle_text": "Suspend 4—{U} (Rather than cast this card from your hand, pay {U} and exile it with four time counters on it. At the beginning of your upkeep, remove a time counter. When the last is removed, you may cast it without paying its mana cost.)\nTarget player draws three cards."
+    },
+    {
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "An Offer You Can't Refuse",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target noncreature spell. Its controller creates two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Denial",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell. Its controller may draw up to two cards at the beginning of the next turn's upkeep.\nYou draw a card at the beginning of the next turn's upkeep."
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "f8f29a09-fbf8-4015-b4a3-b1168219a422",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Astral Cornucopia",
+      "type_line": "Artifact",
+      "mana_cost": "{X}{X}{X}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This artifact enters with X charge counters on it.\n{T}: Choose a color. Add one mana of that color for each charge counter on this artifact."
+    },
+    {
+      "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Authority of the Consuls",
+      "type_line": "Enchantment",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Creatures your opponents control enter tapped.\nWhenever a creature an opponent controls enters, you gain 1 life."
+    },
+    {
+      "card_id": "84eb6245-5b84-454b-9fb2-532fbc6828a1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Avacyn's Pilgrim",
+      "type_line": "Creature — Human Monk",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {W}."
+    },
+    {
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Beast Within",
+      "type_line": "Instant",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+    },
+    {
+      "card_id": "2189d83b-9165-4b59-9554-75ff4e85e8b0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Birds of Paradise",
+      "type_line": "Creature — Bird",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Flying\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "6ff3335b-6cef-490b-a133-92fb0de03b7e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blightbelly Rat",
+      "type_line": "Creature — Phyrexian Rat",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nWhen this creature dies, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "3f7666e5-f540-4d76-8e02-d1a3f9dbd08e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Blighted Agent",
+      "type_line": "Creature — Phyrexian Human Rogue",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Infect (This creature deals damage to creatures in the form of -1/-1 counters and to players in the form of poison counters.)\nThis creature can't be blocked."
+    },
+    {
+      "card_id": "f93ed0a7-2799-4f32-b61b-11cc685d7874",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bloated Contaminator",
+      "type_line": "Creature — Phyrexian Beast",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Trample\nToxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nWhenever this creature deals combat damage to a player, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "e3dd19b2-446e-4ab4-b3ad-373dd29218c8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bog Wreckage",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {B}.\n{T}, Sacrifice this land: Add one mana of any color."
+    },
+    {
+      "card_id": "6c6ae2ea-13d4-4eec-98dc-e6a363961c99",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bone Shards",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice a creature or discard a card.\nDestroy target creature or planeswalker."
+    },
+    {
+      "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brainstorm",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order."
+    },
+    {
+      "card_id": "a90b8ca8-21b9-421e-8695-f69d77cd7352",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Brokers Ascendancy",
+      "type_line": "Enchantment",
+      "mana_cost": "{G}{W}{U}",
+      "colors": [
+        "G",
+        "U",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "At the beginning of your end step, put a +1/+1 counter on each creature you control and a loyalty counter on each planeswalker you control."
+    },
+    {
+      "card_id": "f9108573-f7b1-4b5b-b7e6-7948eec3d084",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cankerbloom",
+      "type_line": "Creature — Phyrexian Fungus",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "{1}, Sacrifice this creature: Choose one —\n• Destroy target artifact.\n• Destroy target enchantment.\n• Proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "07a9fef0-81ee-4940-b7f9-aa36f0f2936e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Careful Study",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Draw two cards, then discard two cards."
+    },
+    {
+      "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cavern of Souls",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered."
+    },
+    {
+      "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chromatic Lantern",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "Lands you control have \"{T}: Add one mana of any color.\"\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chrome Mox",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.\n{T}: Add one mana of any of the exiled card's colors."
+    },
+    {
+      "card_id": "d96b2edd-c3dc-4571-a09f-c23c67d0bbcb",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cloudshift",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature you control, then return that card to the battlefield under your control."
+    },
+    {
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Command Tower",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+    },
+    {
+      "card_id": "fa954ae8-e4ff-412d-a36d-13b573bb9a9b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Contaminant Grafter",
+      "type_line": "Creature — Phyrexian Druid",
+      "mana_cost": "{4}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "Trample, toxic 1\nWhenever one or more creatures you control deal combat damage to one or more players, proliferate.\nCorrupted — At the beginning of your end step, if an opponent has three or more poison counters, draw a card, then you may put a land card from your hand onto the battlefield."
+    },
+    {
+      "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Counterspell",
+      "type_line": "Instant",
+      "mana_cost": "{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Counter target spell."
+    },
+    {
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cultivate",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+    },
+    {
+      "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cyclonic Rift",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    {
+      "card_id": "e5d0d61c-7aaa-4763-b77c-4a915691c00a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Deepglow Skate",
+      "type_line": "Creature — Fish",
+      "mana_cost": "{4}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "When this creature enters, double the number of each kind of counter on any number of target permanents."
+    },
+    {
+      "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Everflowing Chalice",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Multikicker {2} (You may pay an additional {2} any number of times as you cast this spell.)\nThis artifact enters with a charge counter on it for each time it was kicked.\n{T}: Add {C} for each charge counter on this artifact."
+    },
+    {
+      "card_id": "76fb88b7-f115-4b28-b00c-333dcc030e1c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Evolution Sage",
+      "type_line": "Creature — Elf Druid",
+      "mana_cost": "{2}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Landfall — Whenever a land you control enters, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "6c7ffcc4-265a-423c-8666-825e08c7481f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ezuri, Stalker of Spheres",
+      "type_line": "Legendary Creature — Phyrexian Elf Warrior",
+      "mana_cost": "{2}{G}{U}",
+      "colors": [
+        "G",
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "When Ezuri enters, you may pay {3}. If you do, proliferate twice.\nWhenever you proliferate, draw a card."
+    },
+    {
+      "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Farseek",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "a412a94e-6156-4fa1-bea4-8fe8d48567b8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fatal Push",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn."
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "type_line": "Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+    },
+    {
+      "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Force of Will",
+      "type_line": "Instant",
+      "mana_cost": "{3}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell."
+    },
+    {
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 6,
+      "is_commander": false,
+      "name": "Forest",
+      "type_line": "Basic Land — Forest",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {G}.)"
+    },
+    {
+      "card_id": "213f55c7-3191-400a-a1e5-77f6f6d1d621",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Glistening Sphere",
+      "type_line": "Artifact",
+      "mana_cost": "{3}",
+      "colors": [],
+      "cmc": 3.0,
+      "oracle_text": "This artifact enters tapped.\nWhen this artifact enters, proliferate.\n{T}: Add one mana of any color.\nCorrupted — {T}: Add three mana of any one color. Activate only if an opponent has three or more poison counters."
+    },
+    {
+      "card_id": "6982cd96-f6fe-4491-85c8-5874f5c21cac",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Infectious Inquiry",
+      "type_line": "Sorcery",
+      "mana_cost": "{2}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "You draw two cards and you lose 2 life. Each opponent gets a poison counter."
+    },
+    {
+      "card_id": "3d55242d-26b0-4f23-b012-dd78f6437637",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Innkeeper's Talent",
+      "type_line": "Enchantment — Class",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "(Gain the next level as a sorcery to add its ability.)\nAt the beginning of combat on your turn, put a +1/+1 counter on target creature you control.\n{G}: Level 2\nPermanents you control with counters on them have ward {1}.\n{3}{G}: Level 3\nIf you would put one or more counters on a permanent or player, put twice that many of each of those kinds of counters on that permanent or player instead."
+    },
+    {
+      "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+      "quantity": 11,
+      "is_commander": false,
+      "name": "Island",
+      "type_line": "Basic Land — Island",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {U}.)"
+    },
+    {
+      "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lazotep Quarry",
+      "type_line": "Land — Desert",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery."
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+    },
+    {
+      "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Llanowar Elves",
+      "type_line": "Creature — Elf Druid",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {G}."
+    },
+    {
+      "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lotus Petal",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color."
+    },
+    {
+      "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mental Misstep",
+      "type_line": "Instant",
+      "mana_cost": "{U/P}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "({U/P} can be paid with either {U} or 2 life.)\nCounter target spell with mana value 1."
+    },
+    {
+      "card_id": "5525ec36-9f79-4434-8ea9-7765bb56cf0e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Metastatic Evangel",
+      "type_line": "Creature — Phyrexian Human Cleric",
+      "mana_cost": "{1}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Whenever another nontoken creature you control enters, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mystic Remora",
+      "type_line": "Enchantment",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}."
+    },
+    {
+      "card_id": "73a51fd0-94f3-482e-ab86-d88bb0caca35",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Norn's Decree",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever one or more creatures an opponent controls deal combat damage to you, that opponent gets a poison counter.\nWhenever a player attacks, if one or more players being attacked are poisoned, the attacking player draws a card."
+    },
+    {
+      "card_id": "6b43c3ee-712c-47e7-bd78-4e64d37f2c84",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Oko, Thief of Crowns",
+      "type_line": "Legendary Planeswalker — Oko",
+      "mana_cost": "{1}{G}{U}",
+      "colors": [
+        "G",
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "[+2]: Create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\n[+1]: Target artifact or creature loses all abilities and becomes a green Elk creature with base power and toughness 3/3.\n[−5]: Exchange control of target artifact or creature you control and target creature an opponent controls with power 3 or less."
+    },
+    {
+      "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path of Ancestry",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add one mana of any color in your commander's color identity. When that mana is spent to cast a creature spell that shares a creature type with your commander, scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path to Exile",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+    },
+    {
+      "card_id": "bb244803-1c96-42d3-ad77-3c9e29f4e7ba",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Plague Stinger",
+      "type_line": "Creature — Phyrexian Insect Horror",
+      "mana_cost": "{1}{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying\nInfect (This creature deals damage to creatures in the form of -1/-1 counters and to players in the form of poison counters.)"
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "quantity": 6,
+      "is_commander": false,
+      "name": "Plains",
+      "type_line": "Basic Land — Plains",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {W}.)"
+    },
+    {
+      "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ponder",
+      "type_line": "Sorcery",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+    },
+    {
+      "card_id": "936c9e62-d9ae-4abd-8490-5b8c45697c4b",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Prologue to Phyresis",
+      "type_line": "Instant",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Each opponent gets a poison counter.\nDraw a card."
+    },
+    {
+      "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Rhystic Study",
+      "type_line": "Enchantment",
+      "mana_cost": "{2}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
+    },
+    {
+      "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Smothering Tithe",
+      "type_line": "Enchantment",
+      "mana_cost": "{3}{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+    },
+    {
+      "card_id": "3e5a77ae-f39d-42b7-ba53-0d11c337e5ce",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Sol Ring",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    {
+      "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Spell Snare",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target spell with mana value 2."
+    },
+    {
+      "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Starting Town",
+      "type_line": "Land — Town",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped unless it's your first, second, or third turn of the game.\n{T}: Add {C}.\n{T}, Pay 1 life: Add one mana of any color."
+    },
+    {
+      "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
+      "quantity": 4,
+      "is_commander": false,
+      "name": "Swamp",
+      "type_line": "Basic Land — Swamp",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "({T}: Add {B}.)"
+    },
+    {
+      "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swan Song",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target enchantment, instant, or sorcery spell. Its controller creates a 2/2 blue Bird creature token with flying."
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "type_line": "Instant",
+      "mana_cost": "{W}",
+      "colors": [
+        "W"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power."
+    },
+    {
+      "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talon Gates of Madara",
+      "type_line": "Land — Gate",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "When this land enters, up to one target creature phases out.\n{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{4}: Put this card from your hand onto the battlefield."
+    },
+    {
+      "card_id": "19ff21f3-f22a-42c2-b995-f24470d29021",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Tamiyo, Field Researcher",
+      "type_line": "Legendary Planeswalker — Tamiyo",
+      "mana_cost": "{1}{G}{W}{U}",
+      "colors": [
+        "G",
+        "U",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "[+1]: Choose up to two target creatures. Until your next turn, whenever either of those creatures deals combat damage, you draw a card.\n[−2]: Tap up to two target nonland permanents. They don't untap during their controller's next untap step.\n[−7]: Draw three cards. You get an emblem with \"You may cast spells from your hand without paying their mana costs.\""
+    },
+    {
+      "card_id": "dca92b00-24c9-4167-ac95-d5f7dbbdef56",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Teferi, Master of Time",
+      "type_line": "Legendary Planeswalker — Teferi",
+      "mana_cost": "{2}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "You may activate loyalty abilities of Teferi on any player's turn any time you could cast an instant.\n[+1]: Draw a card, then discard a card.\n[−3]: Target creature you don't control phases out. (Treat it and anything attached to it as though they don't exist until its controller's next turn.)\n[−10]: Take two extra turns after this one."
+    },
+    {
+      "card_id": "39ee4043-eedf-4e96-9a38-8a7208fe897c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Tezzeret's Gambit",
+      "type_line": "Sorcery",
+      "mana_cost": "{3}{U/P}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "({U/P} can be paid with either {U} or 2 life.)\nDraw two cards, then proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "The One Ring",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{4}",
+      "colors": [],
+      "cmc": 4.0,
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "8e15243c-509c-47cb-9bd5-a4b4b75b6a71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Thoughtseize",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life."
+    },
+    {
+      "card_id": "05b4d7d5-b418-418d-b3e6-daeedac17aec",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Thrummingbird",
+      "type_line": "Creature — Phyrexian Bird Horror",
+      "mana_cost": "{1}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying\nWhenever this creature deals combat damage to a player, proliferate. (Choose any number of permanents and/or players, then give each another counter of each kind already there.)"
+    },
+    {
+      "card_id": "213bda7c-f40d-4197-891d-ab3ae4da475d",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Venerated Rotpriest",
+      "type_line": "Creature — Phyrexian Druid",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nWhenever a creature you control becomes the target of a spell, target opponent gets a poison counter."
+    },
+    {
+      "card_id": "4860359b-d350-4118-8c82-af5af73bb77f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Voidwing Hybrid",
+      "type_line": "Creature — Phyrexian Bat",
+      "mana_cost": "{U}{B}",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Flying\nToxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nWhen you proliferate, return this card from your graveyard to your hand."
+    }
+  ]
+}

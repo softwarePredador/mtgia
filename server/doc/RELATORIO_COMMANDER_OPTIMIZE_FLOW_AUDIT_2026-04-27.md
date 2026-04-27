@@ -197,3 +197,104 @@ cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 VALIDATION_LIMIT=1 VALIDATI
 - `server/test/artifacts/commander_only_optimization_cache_probe/latest_summary.json`
 - `server/doc/RELATORIO_COMMANDER_ONLY_CACHE_HIT_PROBE_2026-04-27.md`
 - Resultado: `passed=1`, `failed=0`, `cache_probe.hit=true`, `cache_probe.cache_key=v6:9d8303a9`.
+
+### Continuacao da auditoria apos `8629ace`
+
+#### 1. Prova live maior com `--apply --prove-cache-hit` sem sobrescrever artifacts principais
+
+- Comando executado:
+
+```bash
+cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 \
+  VALIDATION_LIMIT=4 \
+  VALIDATION_ARTIFACT_DIR=test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27 \
+  VALIDATION_SUMMARY_JSON_PATH=test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/latest_summary.json \
+  VALIDATION_SUMMARY_MD_PATH=doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_APPLY_PROBE_2026-04-27.md \
+  dart run bin/run_commander_only_optimization_validation.dart --apply --prove-cache-hit
+```
+
+- Artefatos separados:
+  - `server/test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/latest_summary.json`
+  - `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_APPLY_PROBE_2026-04-27.md`
+- Resultado: `total=4`, `passed=4`, `failed=0`, `completed=4`, `cache_hit_probe_enabled=true`.
+- Comandantes validados:
+  - `Auntie Ool, Cursewretch`
+  - `Jin-Gitaxias // The Great Synthesis`
+  - `Talrand, Sky Summoner`
+  - `Atraxa, Praetors' Voice`
+- Media `total_ms`: `10464.75`
+- Medias por etapa:
+  - `complete.fill_remainder`: `3403.50ms`
+  - `complete.ai_suggestion_loop`: `2076.75ms`
+  - `complete.build_final_response`: `1225.25ms`
+  - `complete.prepare_commander_seed`: `754.25ms`
+- Leitura: o fluxo `complete` continua saudavel; a maior latencia segue concentrada no preenchimento final e no loop de sugestoes, nao no apply nem no validate.
+
+#### 2. Latencia de `POST /ai/archetypes`
+
+- Antes do patch, a rota:
+  - nao tinha cache proprio;
+  - fazia `SELECT name, format FROM decks` + `SELECT c.name, dc.is_commander, dc.quantity FROM deck_cards ...`;
+  - chamava sempre `https://api.openai.com/v1/chat/completions`;
+  - nao capturava excecoes via `captureRouteException(...)`;
+  - nao emitia `timings` estruturados para o proprio endpoint.
+- Correcao pequena aplicada em `server/routes/ai/archetypes/index.dart`:
+  - reuso de `EndpointCache` com chave por conteudo do deck (`archetypes:v1:<hash>`);
+  - resposta agora inclui `cache.hit` e `timings.stages_ms`;
+  - logs estruturados `[ARCHETYPES_TIMING]`;
+  - erros da rota agora passam por `captureRouteException(...)`.
+- Teste focado adicionado:
+  - `server/test/ai_archetypes_flow_test.dart`
+  - prova que a primeira chamada retorna `cache.hit=false` e a segunda `cache.hit=true`.
+- Medicao live no backend atualizado (`seed_deck_id=4d0d245c-ce37-491a-8150-279086b3b419`):
+  - primeira chamada: `12022.4ms`, `cache.hit=false`
+  - `timings.total_ms=11995`
+  - `deck_lookup=605ms`
+  - `cards_lookup=624ms`
+  - `openai_call=10756ms`
+  - segunda chamada: `1322.1ms`, `cache.hit=true`
+  - `timings.total_ms=1277`
+  - `deck_lookup=660ms`
+  - `cards_lookup=607ms`
+  - `openai_call=0ms`
+- Evidencia adicional do log backend:
+  - `[ARCHETYPES_TIMING] cache=miss key=archetypes:v1:441f99bc total_ms=11995 deck_lookup_ms=605 cards_lookup_ms=624 openai_call_ms=10756 response_parse_ms=2`
+  - `[ARCHETYPES_TIMING] cache=hit key=archetypes:v1:441f99bc total_ms=1277 deck_lookup_ms=660 cards_lookup_ms=607 openai_call_ms=0 response_parse_ms=0`
+- Veredito: o gargalo principal e a chamada externa OpenAI; as queries locais ficaram na casa de `~0.6s` cada. O cache novo elimina a chamada externa no request repetido, mas ainda nao remove o custo das duas queries.
+
+#### 3. Rerun iPhone 15 Simulator contra backend atualizado
+
+- Comandos executados:
+
+```bash
+cd app && flutter analyze lib/features/decks test/features/decks
+cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart
+cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+```
+
+- Resultado:
+  - `flutter analyze lib/features/decks test/features/decks` -> `OK`
+  - testes focados de decks/optimize -> `OK`
+  - rerun `iPhone 15` -> `OK`
+- Evidencia do runtime atualizado:
+  - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output_backend_updated.txt`
+  - `GET /ai/optimize/jobs/<jobId> -> completed after 4 polls`
+  - `CAPTURE_TAKEN 09_preview bytes=271451`
+  - `CAPTURE_TAKEN 10_complete_validated bytes=244136`
+- Leitura: `preview -> apply -> validate` permaneceu funcional depois do patch do backend para `/ai/archetypes`; nao houve regressao no fluxo real do app.
+
+#### Pass/fail resumido da continuacao
+
+| Check | Resultado |
+|---|---|
+| live apply probe `VALIDATION_LIMIT=4` | OK |
+| `POST /ai/archetypes` com cache/timings | OK |
+| `dart test test/ai_archetypes_flow_test.dart` | OK |
+| suite server focada com novo teste | OK |
+| focused app analyze/tests | OK |
+| iPhone 15 rerun em `8082` | OK |
+
+#### Menores proximos ajustes
+
+1. Se a meta UX de `/ai/archetypes` for sub-1s tambem no primeiro hit, o proximo alvo deve ser reduzir `deck_lookup/cards_lookup` ou promover esse cache para um nivel persistente compartilhado.
+2. O cache novo de `/ai/archetypes` e process-local; melhora o backend local e repeticoes dentro da mesma instancia, mas nao substitui cache cross-process.

@@ -1,6 +1,59 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Continuacao da auditoria Commander optimize com apply probe maior, cache de `/ai/archetypes` e rerun iPhone 15
+
+### O Porquê
+- A auditoria anterior ja tinha provado o fluxo `optimize -> preview/apply -> validate`, mas ainda faltavam tres evidencias pedidas explicitamente:
+  - uma validacao live maior com `--apply --prove-cache-hit` em `8082` sem sobrescrever os artifacts principais;
+  - uma investigacao mensuravel da latencia de `POST /ai/archetypes`;
+  - um rerun do iPhone 15 Simulator contra o backend atualizado para confirmar ausencia de regressao.
+- A rota `/ai/archetypes` aparecia como ponto cego: sem cache proprio, sem `timings` estruturados e sem captura via `captureRouteException(...)`.
+
+### O Como
+- Foi rodada uma prova live separada do corpus commander-only:
+  - `TEST_API_BASE_URL=http://127.0.0.1:8082`
+  - `VALIDATION_LIMIT=4`
+  - `VALIDATION_ARTIFACT_DIR=test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27`
+  - `VALIDATION_SUMMARY_JSON_PATH=test/artifacts/commander_only_optimization_validation_apply_probe_2026-04-27/latest_summary.json`
+  - `VALIDATION_SUMMARY_MD_PATH=doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_APPLY_PROBE_2026-04-27.md`
+  - `dart run bin/run_commander_only_optimization_validation.dart --apply --prove-cache-hit`
+- Resultado do apply probe:
+  - `total=4`, `passed=4`, `failed=0`
+  - media `total_ms=10464.75`
+  - etapa dominante continua em `complete.fill_remainder` e `complete.ai_suggestion_loop`
+  - os artifacts principais de `latest_summary.json` da prova historica permaneceram intactos.
+- `server/routes/ai/archetypes/index.dart` foi endurecida sem reescrever a arquitetura:
+  - passou a reutilizar `EndpointCache` com chave por conteudo do deck (`archetypes:v1:<hash>`);
+  - o payload agora retorna `cache.hit` e `timings.stages_ms`;
+  - o backend escreve logs estruturados `[ARCHETYPES_TIMING]`;
+  - falhas inesperadas agora passam por `captureRouteException(...)`.
+- Medicao live apos o patch:
+  - primeira chamada `POST /ai/archetypes`: `~12.0s`, com `openai_call=10756ms`
+  - segunda chamada igual: `~1.3s`, com `openai_call=0ms` e `cache.hit=true`
+  - leitura: a chamada externa OpenAI e o maior gargalo; as duas queries locais ainda consomem cerca de `~0.6s` cada.
+- Foi adicionado `server/test/ai_archetypes_flow_test.dart` para provar o contrato do cache:
+  - primeira resposta com `cache.hit=false`
+  - segunda resposta com `cache.hit=true`
+  - `timings.stages_ms.openai_call=0` no hit.
+- Validacoes executadas nesta continuacao:
+  - `cd server && dart format routes/ai/archetypes/index.dart test/ai_archetypes_flow_test.dart`
+  - `cd server && dart analyze routes/ai/archetypes/index.dart test/ai_archetypes_flow_test.dart`
+  - `cd server && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_archetypes_flow_test.dart`
+  - `cd server && dart analyze lib/ai routes/ai bin test`
+  - `cd server && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart test/ai_archetypes_flow_test.dart`
+  - `cd app && flutter analyze lib/features/decks test/features/decks`
+  - `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart`
+  - `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`
+
+### Observações operacionais
+- O cache novo de `/ai/archetypes` e intencionalmente leve e process-local; ele melhora a UX do backend local e de repeticoes na mesma instancia, sem introduzir dependencia nova nem mudar o contrato consumido pelo app.
+- O rerun do iPhone 15 permaneceu aprovado apos o patch do backend:
+  - polling completo em `4` polls
+  - preview capturado em `09_preview`
+  - tela final validada capturada em `10_complete_validated`
+- O warning de Apple Silicon para os pods transitivos de MLKit continuou aparecendo no build do iOS Simulator, mas nao bloqueou o runtime real.
+
 ## 2026-04-27 — Auditoria end-to-end do fluxo Commander optimize
 
 ### O Porque
