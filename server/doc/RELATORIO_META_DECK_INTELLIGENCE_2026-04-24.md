@@ -1281,7 +1281,8 @@ Escrita real:
 
 ```bash
 cd server
-dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+PORT=8081 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
 ```
 
 ### Evidencia dry-run
@@ -1311,3 +1312,27 @@ Artifacts atualizados:
 - runtime executavel `ManaLoom Deck Runtime E2E`: **proved**
 - guardrail sem escrita por default: **proved**
 - runtime completo `login/register -> create deck -> optimize -> apply -> validate`: continua dependente de `--apply`
+
+### Atualizacao do guardrail de API
+
+O primeiro `--apply` local apontou para `http://127.0.0.1:8080`, que respondia como servidor estatico e retornou HTML `501 Unsupported method ('POST')` em `/auth/register`.
+
+Correcao aplicada:
+
+- antes de qualquer escrita, o runner valida `GET /health` com `service=mtgia-server`
+- tambem valida `POST /auth/login` com payload vazio esperando erro JSON da API ManaLoom
+- se a porta estiver errada, o comando para antes de `login/register`
+
+Validacao executada:
+
+```bash
+cd server
+TEST_API_BASE_URL=http://127.0.0.1:8080 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+Resultado:
+
+- falha controlada em `GET /health`
+- nenhuma autenticacao
+- nenhuma criacao de deck
+- nenhuma chamada `optimize/apply`

@@ -177,8 +177,9 @@ Future<void> main(List<String> args) async {
     artifactsDir.createSync(recursive: true);
   }
 
-  if (!await _ensureServerIsReachable(apiBaseUrl)) {
-    stderr.writeln('Servidor inacessivel em $apiBaseUrl.');
+  final apiReadinessError = await _validateApiBaseUrl(apiBaseUrl);
+  if (apiReadinessError != null) {
+    stderr.writeln(apiReadinessError);
     exitCode = 1;
     return;
   }
@@ -830,14 +831,44 @@ List<ValidationCorpusEntry> _loadCorpusEntries(String path) {
       .toList();
 }
 
-Future<bool> _ensureServerIsReachable(String apiBaseUrl) async {
+Future<String?> _validateApiBaseUrl(String apiBaseUrl) async {
   try {
-    final response = await http
+    final healthResponse = await http
         .get(Uri.parse('$apiBaseUrl/health'))
         .timeout(const Duration(seconds: 5));
-    return response.statusCode < 500;
-  } catch (_) {
-    return false;
+    if (healthResponse.statusCode != 200) {
+      return 'API invalida em $apiBaseUrl: GET /health retornou '
+          '${_httpFailureSummary(healthResponse)}.';
+    }
+
+    final healthBody = _tryDecodeJsonObject(healthResponse.body);
+    if (healthBody?['service'] != 'mtgia-server') {
+      return 'API invalida em $apiBaseUrl: GET /health nao retornou '
+          'service=mtgia-server. Resposta: ${_bodyPreview(healthResponse.body)}. '
+          'Suba o backend com `cd server && PORT=8081 dart run .dart_frog/server.dart` '
+          'e rode com `TEST_API_BASE_URL=http://127.0.0.1:8081`.';
+    }
+
+    final authProbe = await http
+        .post(
+          Uri.parse('$apiBaseUrl/auth/login'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(const <String, dynamic>{}),
+        )
+        .timeout(const Duration(seconds: 5));
+    final authBody = _tryDecodeJsonObject(authProbe.body);
+    final authLooksValid = authProbe.statusCode == 400 &&
+        (authBody?['message']?.toString().trim().isNotEmpty ?? false);
+    if (!authLooksValid) {
+      return 'API invalida em $apiBaseUrl: POST /auth/login nao respondeu '
+          'como a API ManaLoom. Resposta: ${_httpFailureSummary(authProbe)}. '
+          'Verifique se a porta nao esta ocupada por servidor estatico.';
+    }
+
+    return null;
+  } catch (error) {
+    return 'Servidor inacessivel em $apiBaseUrl: $error. '
+        'Suba o backend e/ou defina TEST_API_BASE_URL para a porta correta.';
   }
 }
 
@@ -867,14 +898,18 @@ Future<String> _getOrCreateAuthToken(String apiBaseUrl) async {
     );
 
     if (register.statusCode != 201 && register.statusCode != 400) {
-      throw Exception('Falha ao registrar usuario de teste: ${register.body}');
+      throw Exception(
+        'Falha ao registrar usuario de teste: ${_httpFailureSummary(register)}',
+      );
     }
 
     response = await login();
   }
 
   if (response.statusCode != 200) {
-    throw Exception('Falha ao autenticar usuario de teste: ${response.body}');
+    throw Exception(
+      'Falha ao autenticar usuario de teste: ${_httpFailureSummary(response)}',
+    );
   }
 
   final decoded = jsonDecode(response.body) as Map<String, dynamic>;
@@ -891,6 +926,26 @@ Map<String, dynamic> _decodeJson(http.Response response) {
   final decoded = jsonDecode(body);
   if (decoded is Map<String, dynamic>) return decoded;
   return {'value': decoded};
+}
+
+Map<String, dynamic>? _tryDecodeJsonObject(String raw) {
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is Map<String, dynamic>) return decoded;
+  } catch (_) {
+    return null;
+  }
+  return null;
+}
+
+String _httpFailureSummary(http.Response response) {
+  return 'status=${response.statusCode}, body=${_bodyPreview(response.body)}';
+}
+
+String _bodyPreview(String raw) {
+  final normalized = raw.replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (normalized.length <= 220) return normalized;
+  return '${normalized.substring(0, 220)}...';
 }
 
 Map<String, dynamic> _extractTimingSummary(Map<String, dynamic> body) {

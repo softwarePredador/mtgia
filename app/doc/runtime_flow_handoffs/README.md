@@ -34,8 +34,11 @@ Use explicit apply only when real backend writes are intended:
 
 ```bash
 cd server
-dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+PORT=8081 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
 ```
+
+The runner verifies `GET /health` and `POST /auth/login` before writes. If the URL points to a static server or wrong port, it stops before `login/register`.
 
 ## Typical fix owners
 

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-27T09:12:02.756819",
-  "run_started_at": "2026-04-27T09:12:02.753573",
+  "generated_at": "2026-04-27T09:15:05.631830",
+  "run_started_at": "2026-04-27T09:15:05.629372",
   "mode": "dry_run",
   "api_base_url": "http://127.0.0.1:8080",
   "artifact_dir": "test/artifacts/commander_only_optimization_validation",

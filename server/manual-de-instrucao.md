@@ -8534,8 +8534,17 @@ Escrita real:
 
 ```bash
 cd server
-dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
 ```
+
+Antes do `--apply`, suba a API Dart Frog na porta usada:
+
+```bash
+cd server
+PORT=8081 dart run .dart_frog/server.dart
+```
+
+O runner valida `GET /health` e `POST /auth/login` antes de qualquer escrita. Se `TEST_API_BASE_URL` apontar para servidor estatico ou porta errada, ele para antes de `login/register`.
 
 ### 93.2 Evidencia
 
@@ -8559,3 +8568,21 @@ dart format bin/run_commander_only_optimization_validation.dart bin/mana_loom_de
 dart analyze bin/run_commander_only_optimization_validation.dart bin/mana_loom_deck_runtime_e2e.dart test/commander_only_runtime_validation_config_test.dart
 dart test test/commander_only_runtime_validation_config_test.dart
 ```
+
+### 93.4 Guardrail de porta errada
+
+Caso `TEST_API_BASE_URL` aponte para `http://127.0.0.1:8080` com outro servidor na porta, o runner agora falha cedo com mensagem clara, sem despejar HTML de `POST /auth/register`.
+
+Validacao executada:
+
+```bash
+cd server
+TEST_API_BASE_URL=http://127.0.0.1:8080 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+Resultado esperado nesse caso:
+
+- `API invalida`
+- nenhuma autenticacao
+- nenhuma criacao de deck
+- nenhuma chamada de optimize/apply
