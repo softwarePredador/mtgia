@@ -1,0 +1,359 @@
+{
+  "generated_at": "2026-04-27T19:30:55.051048Z",
+  "mode": "dry_run",
+  "source_name": "EDHTop16",
+  "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+  "event_tid": "cedh-arcanum-sanctorum-57",
+  "expansion_path": [
+    "edhtop16_graphql",
+    "topdeck_deck_page"
+  ],
+  "expanded_count": 4,
+  "rejected_count": 4,
+  "candidates": [
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1",
+      "deck_name": "Scion of the Ur-Dragon",
+      "commander_name": "Scion of the Ur-Dragon",
+      "partner_commander_name": null,
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Scion of the Ur-Dragon",
+      "placement": "1",
+      "card_list": "1 Scion of the Ur-Dragon\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Bayou\n1 Beseech the Mirror\n1 Birds of Paradise\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Boseiju, Who Endures\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Copy Enchantment\n1 Culling Ritual\n1 Dark Ritual\n1 Daze\n1 Delighted Halfling\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Elvish Spirit Guide\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Final Fortune\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Ignoble Hierarch\n1 Imperial Seal\n1 Into the Flood Maw\n1 Kinnan, Bonder Prodigy\n1 Korvold, Fae-Cursed King\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Manamorphose\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Necropotence\n1 Noble Hierarch\n1 Noxious Revival\n1 Old Gnawbone\n1 Orim's Chant\n1 Pact of Negation\n1 Polluted Delta\n1 Prismari, the Inspiration\n1 Professional Face-Breaker\n1 Ragavan, Nimble Pilferer\n1 Ranger-Captain of Eos\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Scrubland\n1 Shifting Woodland\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Sol Ring\n1 Storm-Kiln Artist\n1 Summoner's Pact\n1 Swan Song\n1 Taiga\n1 Tainted Pact\n1 Tataru Taru\n1 Thassa's Oracle\n1 The Cabbage Merchant\n1 Trickbind\n1 Tropical Island\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Veil of Summer\n1 Verdant Catacombs\n1 Volcanic Island\n1 Windswept Heath\n1 Wooded Foothills",
+      "validation_status": "candidate",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "cedh-arcanum-sanctorum-57",
+        "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+        "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1",
+        "player_name": "ThePapaSquats",
+        "standing": 1,
+        "topdeck_imported_from": "https://moxfield.com/decks/eecRYCKd8kqSIdjq0YOtzA",
+        "commander_count": 1,
+        "mainboard_count": 99,
+        "total_cards": 100
+      }
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "deck_name": "Norman Osborn // Green Goblin",
+      "commander_name": "Norman Osborn // Green Goblin",
+      "partner_commander_name": null,
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Norman Osborn // Green Goblin",
+      "placement": "4",
+      "card_list": "1 Norman Osborn // Green Goblin\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Attunement\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Breakthrough\n1 Cabal Ritual\n1 Careful Study\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Dark Ritual\n1 Defense Grid\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Counsel\n1 Demonic Tutor\n1 Dramatic Reversal\n1 Exotic Orchard\n1 Faithless Looting\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flooded Strand\n1 Flusterstorm\n1 Forbidden Orchard\n1 Force of Will\n1 Frantic Search\n1 Gamble\n1 Gemstone Caverns\n1 Grim Monolith\n1 Grinding Station\n1 Guild Artisan\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mistrise Village\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Morphic Pool\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Recall\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Steam Vents\n1 Strike It Rich\n1 Tainted Pact\n1 Talisman of Creativity\n1 Talisman of Dominance\n1 Talisman of Indulgence\n1 Tezzeret, Cruel Captain\n1 Thassa's Oracle\n1 Tolarian Winds\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Volcanic Island\n1 Waste Not\n1 Watery Grave\n1 Wheel of Fortune\n1 Windfall\n1 Wishclaw Talisman",
+      "validation_status": "candidate",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "cedh-arcanum-sanctorum-57",
+        "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+        "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/o7B1hWuOEOWme03PYZcejbDKhcG2",
+        "player_name": "Uncle Gibbons",
+        "standing": 4,
+        "topdeck_imported_from": "https://moxfield.com/decks/8NbPA6_QWUGQGMweYe-Dag",
+        "commander_count": 1,
+        "mainboard_count": 99,
+        "total_cards": 100
+      }
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "commander_name": "Malcolm, Keen-Eyed Navigator",
+      "partner_commander_name": "Vial Smasher the Fierce",
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "placement": "5",
+      "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
+      "validation_status": "candidate",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "cedh-arcanum-sanctorum-57",
+        "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+        "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/DAH3KmzYuBe9S2mCrT1FppYzVgS2",
+        "player_name": "Joseph Gilmore",
+        "standing": 5,
+        "topdeck_imported_from": "https://moxfield.com/decks/BVNBHdPxhEWuDwAd35Ls5g",
+        "commander_count": 2,
+        "mainboard_count": 98,
+        "total_cards": 100
+      }
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "commander_name": "Kraum, Ludevic's Opus",
+      "partner_commander_name": "Tymna the Weaver",
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "placement": "8",
+      "card_list": "1 Kraum, Ludevic's Opus\n1 Tymna the Weaver\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Beseech the Mirror\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Culling the Weak\n1 Dark Ritual\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Gitaxian Probe\n1 Grand Abolisher\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Memnite\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Plateau\n1 Polluted Delta\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Ranger-Captain of Eos\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Rhystic Study\n1 Rite of Flame\n1 Rograkh, Son of Rohgahh\n1 Scalding Tarn\n1 Scrubland\n1 Sevinne's Reclamation\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Swan Song\n1 Tainted Pact\n1 Tarnished Citadel\n1 Tataru Taru\n1 Thassa's Oracle\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Voice of Victory\n1 Volcanic Island\n1 Wheel of Fortune\n1 Windswept Heath\n1 Wishclaw Talisman",
+      "validation_status": "candidate",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "cedh-arcanum-sanctorum-57",
+        "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+        "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13",
+        "player_name": "Zach J Gable",
+        "standing": 8,
+        "topdeck_imported_from": "https://moxfield.com/decks/b8RZsIyaK0y0Ju6j3UyJYg",
+        "commander_count": 2,
+        "mainboard_count": 98,
+        "total_cards": 100
+      }
+    }
+  ],
+  "results": [
+    {
+      "expansion_status": "expanded",
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+      "event_tid": "cedh-arcanum-sanctorum-57",
+      "standing": 1,
+      "player_name": "ThePapaSquats",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1",
+      "commanders": [
+        "Scion of the Ur-Dragon"
+      ],
+      "mainboard_count": 99,
+      "commander_count": 1,
+      "total_cards": 100,
+      "card_list": "1 Scion of the Ur-Dragon\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Bayou\n1 Beseech the Mirror\n1 Birds of Paradise\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Boseiju, Who Endures\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Copy Enchantment\n1 Culling Ritual\n1 Dark Ritual\n1 Daze\n1 Delighted Halfling\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Elvish Spirit Guide\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Final Fortune\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Ignoble Hierarch\n1 Imperial Seal\n1 Into the Flood Maw\n1 Kinnan, Bonder Prodigy\n1 Korvold, Fae-Cursed King\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Manamorphose\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Necropotence\n1 Noble Hierarch\n1 Noxious Revival\n1 Old Gnawbone\n1 Orim's Chant\n1 Pact of Negation\n1 Polluted Delta\n1 Prismari, the Inspiration\n1 Professional Face-Breaker\n1 Ragavan, Nimble Pilferer\n1 Ranger-Captain of Eos\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Scrubland\n1 Shifting Woodland\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Sol Ring\n1 Storm-Kiln Artist\n1 Summoner's Pact\n1 Swan Song\n1 Taiga\n1 Tainted Pact\n1 Tataru Taru\n1 Thassa's Oracle\n1 The Cabbage Merchant\n1 Trickbind\n1 Tropical Island\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Veil of Summer\n1 Verdant Catacombs\n1 Volcanic Island\n1 Windswept Heath\n1 Wooded Foothills",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1",
+        "deck_name": "Scion of the Ur-Dragon",
+        "commander_name": "Scion of the Ur-Dragon",
+        "partner_commander_name": null,
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Scion of the Ur-Dragon",
+        "placement": "1",
+        "card_list": "1 Scion of the Ur-Dragon\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Bayou\n1 Beseech the Mirror\n1 Birds of Paradise\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Boseiju, Who Endures\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Copy Enchantment\n1 Culling Ritual\n1 Dark Ritual\n1 Daze\n1 Delighted Halfling\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Elvish Spirit Guide\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Final Fortune\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Ignoble Hierarch\n1 Imperial Seal\n1 Into the Flood Maw\n1 Kinnan, Bonder Prodigy\n1 Korvold, Fae-Cursed King\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Manamorphose\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Necropotence\n1 Noble Hierarch\n1 Noxious Revival\n1 Old Gnawbone\n1 Orim's Chant\n1 Pact of Negation\n1 Polluted Delta\n1 Prismari, the Inspiration\n1 Professional Face-Breaker\n1 Ragavan, Nimble Pilferer\n1 Ranger-Captain of Eos\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Scrubland\n1 Shifting Woodland\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Sol Ring\n1 Storm-Kiln Artist\n1 Summoner's Pact\n1 Swan Song\n1 Taiga\n1 Tainted Pact\n1 Tataru Taru\n1 Thassa's Oracle\n1 The Cabbage Merchant\n1 Trickbind\n1 Tropical Island\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Veil of Summer\n1 Verdant Catacombs\n1 Volcanic Island\n1 Windswept Heath\n1 Wooded Foothills",
+        "validation_status": "candidate",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+        "research_payload": {
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "source_context": "edhtop16_tournament_entry",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/nwBkSm4qiOd4umllUQShekwHVXq1",
+          "player_name": "ThePapaSquats",
+          "standing": 1,
+          "topdeck_imported_from": "https://moxfield.com/decks/eecRYCKd8kqSIdjq0YOtzA",
+          "commander_count": 1,
+          "mainboard_count": 99,
+          "total_cards": 100
+        }
+      }
+    },
+    {
+      "expansion_status": "rejected",
+      "rejection_reason": "topdeck_deckobj_missing",
+      "standing": 2,
+      "player_name": "Luke Lindsay",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/08zOUub7ojOb3ijto8jZuSKWHfG3"
+    },
+    {
+      "expansion_status": "rejected",
+      "rejection_reason": "topdeck_deckobj_missing",
+      "standing": 3,
+      "player_name": "Holden Prio 🤝🅿️",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/JJTMzhm4EdbQ1229zeD9dXMNEY63"
+    },
+    {
+      "expansion_status": "expanded",
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+      "event_tid": "cedh-arcanum-sanctorum-57",
+      "standing": 4,
+      "player_name": "Uncle Gibbons",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/o7B1hWuOEOWme03PYZcejbDKhcG2",
+      "commanders": [
+        "Norman Osborn // Green Goblin"
+      ],
+      "mainboard_count": 99,
+      "commander_count": 1,
+      "total_cards": 100,
+      "card_list": "1 Norman Osborn // Green Goblin\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Attunement\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Breakthrough\n1 Cabal Ritual\n1 Careful Study\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Dark Ritual\n1 Defense Grid\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Counsel\n1 Demonic Tutor\n1 Dramatic Reversal\n1 Exotic Orchard\n1 Faithless Looting\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flooded Strand\n1 Flusterstorm\n1 Forbidden Orchard\n1 Force of Will\n1 Frantic Search\n1 Gamble\n1 Gemstone Caverns\n1 Grim Monolith\n1 Grinding Station\n1 Guild Artisan\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mistrise Village\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Morphic Pool\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Recall\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Steam Vents\n1 Strike It Rich\n1 Tainted Pact\n1 Talisman of Creativity\n1 Talisman of Dominance\n1 Talisman of Indulgence\n1 Tezzeret, Cruel Captain\n1 Thassa's Oracle\n1 Tolarian Winds\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Volcanic Island\n1 Waste Not\n1 Watery Grave\n1 Wheel of Fortune\n1 Windfall\n1 Wishclaw Talisman",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+        "deck_name": "Norman Osborn // Green Goblin",
+        "commander_name": "Norman Osborn // Green Goblin",
+        "partner_commander_name": null,
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Norman Osborn // Green Goblin",
+        "placement": "4",
+        "card_list": "1 Norman Osborn // Green Goblin\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Attunement\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Breakthrough\n1 Cabal Ritual\n1 Careful Study\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Dark Ritual\n1 Defense Grid\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Counsel\n1 Demonic Tutor\n1 Dramatic Reversal\n1 Exotic Orchard\n1 Faithless Looting\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flooded Strand\n1 Flusterstorm\n1 Forbidden Orchard\n1 Force of Will\n1 Frantic Search\n1 Gamble\n1 Gemstone Caverns\n1 Grim Monolith\n1 Grinding Station\n1 Guild Artisan\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mistrise Village\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Morphic Pool\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Recall\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Steam Vents\n1 Strike It Rich\n1 Tainted Pact\n1 Talisman of Creativity\n1 Talisman of Dominance\n1 Talisman of Indulgence\n1 Tezzeret, Cruel Captain\n1 Thassa's Oracle\n1 Tolarian Winds\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Volcanic Island\n1 Waste Not\n1 Watery Grave\n1 Wheel of Fortune\n1 Windfall\n1 Wishclaw Talisman",
+        "validation_status": "candidate",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+        "research_payload": {
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "source_context": "edhtop16_tournament_entry",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/o7B1hWuOEOWme03PYZcejbDKhcG2",
+          "player_name": "Uncle Gibbons",
+          "standing": 4,
+          "topdeck_imported_from": "https://moxfield.com/decks/8NbPA6_QWUGQGMweYe-Dag",
+          "commander_count": 1,
+          "mainboard_count": 99,
+          "total_cards": 100
+        }
+      }
+    },
+    {
+      "expansion_status": "expanded",
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+      "event_tid": "cedh-arcanum-sanctorum-57",
+      "standing": 5,
+      "player_name": "Joseph Gilmore",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/DAH3KmzYuBe9S2mCrT1FppYzVgS2",
+      "commanders": [
+        "Malcolm, Keen-Eyed Navigator",
+        "Vial Smasher the Fierce"
+      ],
+      "mainboard_count": 98,
+      "commander_count": 2,
+      "total_cards": 100,
+      "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+        "deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "commander_name": "Malcolm, Keen-Eyed Navigator",
+        "partner_commander_name": "Vial Smasher the Fierce",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "placement": "5",
+        "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
+        "validation_status": "candidate",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+        "research_payload": {
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "source_context": "edhtop16_tournament_entry",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/DAH3KmzYuBe9S2mCrT1FppYzVgS2",
+          "player_name": "Joseph Gilmore",
+          "standing": 5,
+          "topdeck_imported_from": "https://moxfield.com/decks/BVNBHdPxhEWuDwAd35Ls5g",
+          "commander_count": 2,
+          "mainboard_count": 98,
+          "total_cards": 100
+        }
+      }
+    },
+    {
+      "expansion_status": "rejected",
+      "rejection_reason": "topdeck_deckobj_missing",
+      "standing": 6,
+      "player_name": "Michael Tunison",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/j6dS084uEWPUVq2lF1oi5LyLeUi1"
+    },
+    {
+      "expansion_status": "rejected",
+      "rejection_reason": "topdeck_deckobj_missing",
+      "standing": 7,
+      "player_name": "Oliver Chenault",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/gx5yRFOfvJYlAujxwoyKPsjTdWs1"
+    },
+    {
+      "expansion_status": "expanded",
+      "source_name": "EDHTop16",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+      "event_tid": "cedh-arcanum-sanctorum-57",
+      "standing": 8,
+      "player_name": "Zach J Gable",
+      "deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13",
+      "commanders": [
+        "Kraum, Ludevic's Opus",
+        "Tymna the Weaver"
+      ],
+      "mainboard_count": 98,
+      "commander_count": 2,
+      "total_cards": 100,
+      "card_list": "1 Kraum, Ludevic's Opus\n1 Tymna the Weaver\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Beseech the Mirror\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Culling the Weak\n1 Dark Ritual\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Gitaxian Probe\n1 Grand Abolisher\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Memnite\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Plateau\n1 Polluted Delta\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Ranger-Captain of Eos\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Rhystic Study\n1 Rite of Flame\n1 Rograkh, Son of Rohgahh\n1 Scalding Tarn\n1 Scrubland\n1 Sevinne's Reclamation\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Swan Song\n1 Tainted Pact\n1 Tarnished Citadel\n1 Tataru Taru\n1 Thassa's Oracle\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Voice of Victory\n1 Volcanic Island\n1 Wheel of Fortune\n1 Windswept Heath\n1 Wishclaw Talisman",
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+        "deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+        "commander_name": "Kraum, Ludevic's Opus",
+        "partner_commander_name": "Tymna the Weaver",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Kraum, Ludevic's Opus + Tymna the Weaver",
+        "placement": "8",
+        "card_list": "1 Kraum, Ludevic's Opus\n1 Tymna the Weaver\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Beseech the Mirror\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Culling the Weak\n1 Dark Ritual\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Gitaxian Probe\n1 Grand Abolisher\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Lion's Eye Diamond\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Memnite\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mnemonic Betrayal\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Plateau\n1 Polluted Delta\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Ranger-Captain of Eos\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Rhystic Study\n1 Rite of Flame\n1 Rograkh, Son of Rohgahh\n1 Scalding Tarn\n1 Scrubland\n1 Sevinne's Reclamation\n1 Silence\n1 Simian Spirit Guide\n1 Smothering Tithe\n1 Snapback\n1 Sol Ring\n1 Starting Town\n1 Swan Song\n1 Tainted Pact\n1 Tarnished Citadel\n1 Tataru Taru\n1 Thassa's Oracle\n1 Tundra\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Voice of Victory\n1 Volcanic Island\n1 Wheel of Fortune\n1 Windswept Heath\n1 Wishclaw Talisman",
+        "validation_status": "candidate",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified.",
+        "research_payload": {
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "source_context": "edhtop16_tournament_entry",
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/u89rt5P3rkgk8yki7kJ2sSMlhM13",
+          "player_name": "Zach J Gable",
+          "standing": 8,
+          "topdeck_imported_from": "https://moxfield.com/decks/b8RZsIyaK0y0Ju6j3UyJYg",
+          "commander_count": 2,
+          "mainboard_count": 98,
+          "total_cards": 100
+        }
+      }
+    }
+  ]
+}

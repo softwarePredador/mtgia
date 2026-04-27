@@ -1,44 +1,108 @@
-[
-  {
-    "source": "external",
-    "format": "cEDH",
-    "color_identity": "unknown",
-    "deck_count": 1
-  },
-  {
-    "source": "mtgtop8",
-    "format": "cEDH",
-    "color_identity": "unknown",
-    "deck_count": 212
-  },
-  {
-    "source": "mtgtop8",
-    "format": "cEDH",
-    "color_identity": "BGRUW",
-    "deck_count": 1
-  },
-  {
-    "source": "mtgtop8",
-    "format": "cEDH",
-    "color_identity": "BW",
-    "deck_count": 1
-  },
-  {
-    "source": "mtgtop8",
-    "format": "EDH",
-    "color_identity": "unknown",
-    "deck_count": 155
-  },
-  {
-    "source": "mtgtop8",
-    "format": "EDH",
-    "color_identity": "RW",
-    "deck_count": 5
-  },
-  {
-    "source": "mtgtop8",
-    "format": "EDH",
-    "color_identity": "GR",
-    "deck_count": 2
-  }
-]
+{
+  "generated_at": "2026-04-27T19:35:30.919497Z",
+  "summary_by_source_format": [
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "deck_count": 214,
+      "resolved_identity_count": 212,
+      "unknown_identity_count": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "deck_count": 162,
+      "resolved_identity_count": 161,
+      "unknown_identity_count": 1
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "deck_count": 3,
+      "resolved_identity_count": 3,
+      "unknown_identity_count": 0
+    }
+  ],
+  "top_resolved_identities": [
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGRUW",
+      "decks": 202
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGRUW",
+      "decks": 153
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BGRU",
+      "decks": 4
+    },
+    {
+      "source": "external",
+      "format": "cEDH",
+      "commander_color_identity": "BGRUW",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "GRUW",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BGRU",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "BRUW",
+      "decks": 3
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GRUW",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_color_identity": "BRUW",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "GRU",
+      "decks": 1
+    },
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_color_identity": "RUW",
+      "decks": 1
+    }
+  ],
+  "top_unknown_commanders": [
+    {
+      "source": "mtgtop8",
+      "format": "cEDH",
+      "commander_label": "Prismari, the Inspiration",
+      "decks": 2
+    },
+    {
+      "source": "mtgtop8",
+      "format": "EDH",
+      "commander_label": "Witherbloom, the Balancer",
+      "decks": 1
+    }
+  ]
+}

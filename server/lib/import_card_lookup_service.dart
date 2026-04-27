@@ -29,7 +29,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   if (exactKeys.isNotEmpty) {
     final exactResult = await pool.execute(
       Sql.named('''
-        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text
+        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text, mana_cost
         FROM cards
         WHERE lower(name) = ANY(@names)
       '''),
@@ -46,6 +46,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       final colorIdentity = row[4];
       final colors = row[5];
       final oracleText = row[6] as String?;
+      final manaCost = row[7] as String?;
       foundCardsMap[name.toLowerCase()] = {
         'id': id,
         'name': name,
@@ -54,6 +55,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
         'color_identity': colorIdentity,
         'colors': colors,
         'oracle_text': oracleText,
+        'mana_cost': manaCost,
       };
     }
   }
@@ -77,7 +79,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   if (splitPatternsToQuery.isNotEmpty) {
     final splitResult = await pool.execute(
       Sql.named('''
-        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text
+        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text, mana_cost
         FROM cards
         WHERE lower(name) LIKE ANY(@patterns)
       '''),
@@ -94,6 +96,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       final colorIdentity = row[4];
       final colors = row[5];
       final oracleText = row[6] as String?;
+      final manaCost = row[7] as String?;
       final dbNameLower = dbName.toLowerCase();
 
       final parts = dbNameLower.split(RegExp(r'\s*//\s*'));
@@ -109,6 +112,7 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
           'color_identity': colorIdentity,
           'colors': colors,
           'oracle_text': oracleText,
+          'mana_cost': manaCost,
         };
       }
     }

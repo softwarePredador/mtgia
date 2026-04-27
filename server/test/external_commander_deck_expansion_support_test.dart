@@ -73,6 +73,39 @@ void main() {
         contains('1 Kraum, Ludevic\'s Opus\n1 Tymna the Weaver\n2 Island'),
       );
     });
+
+    test('falls back to copyDecklist template when deckObj is absent', () {
+      final html = '''
+<html>
+  <body>
+    <a title="View Original Source" href="https://moxfield.com/decks/example"></a>
+    <script>
+      function copyDecklist() {
+        const decklistContent = `~~Commanders~~
+1 Malcolm, Keen-Eyed Navigator
+1 Vial Smasher the Fierce
+
+~~Mainboard~~
+98 Island
+`;
+        navigator.clipboard.writeText(decklistContent);
+      }
+    </script>
+  </body>
+</html>
+''';
+
+      final deck = parseTopDeckDeckObjectFromHtml(html);
+
+      expect(deck.commanderCount, 2);
+      expect(deck.mainboardCount, 98);
+      expect(deck.totalCards, 100);
+      expect(
+        deck.commanderNames,
+        ['Malcolm, Keen-Eyed Navigator', 'Vial Smasher the Fierce'],
+      );
+      expect(deck.importedFrom, 'https://moxfield.com/decks/example');
+    });
   });
 
   group('buildExternalCommanderCandidateFromExpansion', () {

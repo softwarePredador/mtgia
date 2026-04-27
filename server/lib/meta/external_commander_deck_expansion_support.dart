@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:html/parser.dart' as html_parser;
+
 class EdhTop16TournamentEntry {
   const EdhTop16TournamentEntry({
     required this.standing,
@@ -82,11 +84,24 @@ List<EdhTop16TournamentEntry> parseEdhTop16TournamentEntries(
 }
 
 ExpandedTopDeckDeck parseTopDeckDeckObjectFromHtml(String html) {
+  final deckFromObject = _tryParseEmbeddedTopDeckDeckObject(html);
+  if (deckFromObject != null) return deckFromObject;
+
+  final deckFromClipboard = _tryParseTopDeckCopyDecklist(html);
+  if (deckFromClipboard != null) return deckFromClipboard;
+
+  final deckFromRenderedHtml = _tryParseRenderedTopDeckDeck(html);
+  if (deckFromRenderedHtml != null) return deckFromRenderedHtml;
+
+  throw const FormatException(
+    'TopDeck deck page nao contem const deckObj nem decklist renderizada.',
+  );
+}
+
+ExpandedTopDeckDeck? _tryParseEmbeddedTopDeckDeckObject(String html) {
   const startMarker = 'const deckObj = ';
   final start = html.indexOf(startMarker);
-  if (start < 0) {
-    throw const FormatException('TopDeck deck page nao contem const deckObj.');
-  }
+  if (start < 0) return null;
 
   final jsonStart = html.indexOf('{', start + startMarker.length);
   if (jsonStart < 0) {
@@ -98,6 +113,94 @@ ExpandedTopDeckDeck parseTopDeckDeckObjectFromHtml(String html) {
     throw const FormatException('TopDeck deckObj nao e objeto JSON.');
   }
   return parseTopDeckDeckObject(decoded);
+}
+
+ExpandedTopDeckDeck? _tryParseTopDeckCopyDecklist(String html) {
+  const startMarker = 'const decklistContent = `';
+  final start = html.indexOf(startMarker);
+  if (start < 0) return null;
+
+  final contentStart = start + startMarker.length;
+  final contentEnd = _findTemplateLiteralEnd(html, contentStart);
+  final decklistContent = html.substring(contentStart, contentEnd);
+  final importedFrom = _extractImportedFrom(html);
+  return _parseTopDeckDeckFromDecklistText(
+    decklistContent,
+    importedFrom: importedFrom,
+  );
+}
+
+ExpandedTopDeckDeck? _tryParseRenderedTopDeckDeck(String html) {
+  final document = html_parser.parse(html);
+  final commanderLines = document
+      .querySelectorAll('.commanders-sidebar .card-name-text')
+      .map((node) => _normalizeDeckText(node.text))
+      .where((line) => line.isNotEmpty)
+      .toList(growable: false);
+  final mainboardLines = document
+      .querySelectorAll('.deck-main .text-list-item .card-name-text')
+      .map((node) => _normalizeDeckText(node.text))
+      .where((line) => line.isNotEmpty)
+      .toList(growable: false);
+  if (commanderLines.isEmpty || mainboardLines.isEmpty) return null;
+
+  final decklistContent = [
+    '~~Commanders~~',
+    ...commanderLines,
+    '',
+    '~~Mainboard~~',
+    ...mainboardLines,
+  ].join('\n');
+  return _parseTopDeckDeckFromDecklistText(
+    decklistContent,
+    importedFrom: _extractImportedFrom(html),
+  );
+}
+
+ExpandedTopDeckDeck _parseTopDeckDeckFromDecklistText(
+  String decklistContent, {
+  String? importedFrom,
+}) {
+  final commanders = <ExpandedDeckCard>[];
+  final mainboard = <ExpandedDeckCard>[];
+  var section = 'unknown';
+
+  for (final rawLine in decklistContent.split('\n')) {
+    final line = rawLine.trim();
+    if (line.isEmpty) continue;
+
+    final normalizedSection = _normalizeDeckSection(line);
+    if (normalizedSection != null) {
+      section = normalizedSection;
+      continue;
+    }
+
+    final parsedCard = _parseExpandedDeckCardFromText(line);
+    if (parsedCard == null) continue;
+
+    if (section == 'commanders') {
+      commanders.add(parsedCard);
+    } else if (section == 'mainboard') {
+      mainboard.add(parsedCard);
+    }
+  }
+
+  if (commanders.isEmpty || mainboard.isEmpty) {
+    throw const FormatException(
+      'TopDeck decklistContent nao contem sections Commanders/Mainboard validas.',
+    );
+  }
+
+  final allCards = <ExpandedDeckCard>[...commanders, ...mainboard];
+  final cardList =
+      allCards.map((card) => '${card.quantity} ${card.name}').join('\n').trim();
+
+  return ExpandedTopDeckDeck(
+    commanders: commanders,
+    mainboard: mainboard,
+    cardList: cardList,
+    importedFrom: importedFrom,
+  );
 }
 
 int _findBalancedJsonObjectEnd(String value, int startIndex) {
@@ -136,6 +239,27 @@ int _findBalancedJsonObjectEnd(String value, int startIndex) {
 
   throw const FormatException(
       'TopDeck deckObj JSON nao terminou corretamente.');
+}
+
+int _findTemplateLiteralEnd(String value, int startIndex) {
+  var escaping = false;
+
+  for (var i = startIndex; i < value.length; i++) {
+    final char = value[i];
+    if (escaping) {
+      escaping = false;
+      continue;
+    }
+    if (char == r'\') {
+      escaping = true;
+      continue;
+    }
+    if (char == '`') return i;
+  }
+
+  throw const FormatException(
+    'TopDeck decklistContent nao terminou corretamente.',
+  );
 }
 
 ExpandedTopDeckDeck parseTopDeckDeckObject(Map<String, dynamic> deckObj) {
@@ -215,6 +339,44 @@ List<ExpandedDeckCard> _parseDeckCards(dynamic raw) {
       })
       .whereType<ExpandedDeckCard>()
       .toList(growable: false);
+}
+
+ExpandedDeckCard? _parseExpandedDeckCardFromText(String line) {
+  final match = RegExp(r'^(\d+)\s+(.+)$').firstMatch(line);
+  if (match == null) return null;
+
+  final quantity = int.tryParse(match.group(1) ?? '') ?? 0;
+  final name = match.group(2)?.trim() ?? '';
+  if (quantity <= 0 || name.isEmpty) return null;
+
+  return ExpandedDeckCard(name: name, quantity: quantity);
+}
+
+String? _normalizeDeckSection(String line) {
+  if (!line.startsWith('~~') || !line.endsWith('~~')) return null;
+  final normalized = line.replaceAll('~', '').trim().toLowerCase();
+  if (normalized.contains('commander')) return 'commanders';
+  if (normalized.contains('mainboard') || normalized == 'deck') {
+    return 'mainboard';
+  }
+  return 'ignore';
+}
+
+String _normalizeDeckText(String raw) {
+  return raw.replaceAll(RegExp(r'\s+'), ' ').trim();
+}
+
+String? _extractImportedFrom(String html) {
+  final importedFromMatch = RegExp(
+    r'href="(https://(?:www\.)?moxfield\.com/decks/[^"]+)"',
+    caseSensitive: false,
+  ).firstMatch(html);
+  final importedFrom = importedFromMatch?.group(1)?.trim();
+  if (importedFrom != null && importedFrom.isNotEmpty) {
+    return importedFrom;
+  }
+
+  return null;
 }
 
 String _deckNameForEntry(

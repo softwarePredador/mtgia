@@ -1,20 +1,20 @@
 ═══════════════════════════════════════════════════════════════
   META INSIGHTS EXTRACTOR - Imitation Learning Pipeline
   Modo: REPORT ONLY
-  Data: 2026-04-27T15:27:22.508806
+  Data: 2026-04-27T16:33:44.623612
 ═══════════════════════════════════════════════════════════════
 
 🔌 Conectando ao banco: 143.198.230.247:5433/halder (env: development)
 ✅ Pool de conexões inicializado (SSL: disable).
 📥 Carregando meta decks do banco...
-   Encontrados 642 decks
+   Encontrados 644 decks
 
 🔄 Processando deck lists...
-   642 decks parseados
+   644 decks parseados
 
 🧭 Resumo source/subformat/shell...
 {
-  "total_decks": 642,
+  "total_decks": 644,
   "by_source": [
     {
       "source": "mtgtop8",
@@ -22,7 +22,7 @@
     },
     {
       "source": "external",
-      "deck_count": 1
+      "deck_count": 3
     }
   ],
   "by_source_format": [
@@ -74,7 +74,7 @@
     {
       "source": "external",
       "format": "competitive_commander",
-      "deck_count": 1
+      "deck_count": 3
     }
   ],
   "by_source_subformat": [
@@ -91,7 +91,7 @@
     {
       "source": "external",
       "subformat": "competitive_commander",
-      "deck_count": 1
+      "deck_count": 3
     }
   ],
   "top_commander_shells": [
@@ -284,16 +284,16 @@
       "deck_count": 4
     },
     {
+      "source": "external",
+      "subformat": "competitive_commander",
+      "strategy_archetype": "combo",
+      "deck_count": 3
+    },
+    {
       "source": "mtgtop8",
       "subformat": "competitive_commander",
       "strategy_archetype": "tribal",
       "deck_count": 2
-    },
-    {
-      "source": "external",
-      "subformat": "competitive_commander",
-      "strategy_archetype": "combo",
-      "deck_count": 1
     },
     {
       "source": "mtgtop8",

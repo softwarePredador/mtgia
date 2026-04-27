@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-04-27T19:32:29.159803Z",
+  "mode": "dry_run",
+  "scope": {
+    "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+    "limit": null
+  },
+  "rules": {
+    "validation_status": "staged",
+    "subformat": "competitive_commander",
+    "deck_total_exact": 100,
+    "legal_status_allowed": [
+      "valid",
+      "warning_reviewed"
+    ],
+    "requires_commander_name": true,
+    "requires_unique_source_url": true,
+    "requires_unique_deck_fingerprint": true,
+    "requires_source_allowlist": true,
+    "requires_research_payload_source_chain": true,
+    "requires_research_payload_staging_audit": true
+  },
+  "summary": {
+    "total": 1,
+    "promotable": 1,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "accepted": true,
+      "candidate": {
+        "source_name": "EDHTop16",
+        "source_host": "edhtop16.com",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+        "deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "commander_name": "Malcolm, Keen-Eyed Navigator",
+        "partner_commander_name": "Vial Smasher the Fierce",
+        "format": "commander",
+        "subformat": "competitive_commander",
+        "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
+        "placement": "5",
+        "color_identity": [
+          "B",
+          "R",
+          "U"
+        ],
+        "is_commander_legal": true,
+        "validation_status": "staged",
+        "legal_status": "valid",
+        "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+        "research_payload": {
+          "standing": 5,
+          "player_name": "Joseph Gilmore",
+          "total_cards": 100,
+          "source_chain": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ],
+          "stage_status": "staged",
+          "staging_audit": {
+            "issues": [
+              {
+                "code": "missing_color_identity",
+                "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto.",
+                "severity": "warning"
+              }
+            ],
+            "accepted": true,
+            "illegal_cards": [],
+            "unresolved_cards": [],
+            "validation_profile": "topdeck_edhtop16_stage2",
+            "expansion_generated_at": "2026-04-27T19:30:55.051048Z",
+            "validation_generated_at": "2026-04-27T19:31:19.126657Z",
+            "validation_legal_status": "legal",
+            "commander_color_identity": [
+              "B",
+              "R",
+              "U"
+            ],
+            "expansion_rejected_count": 0,
+            "validation_rejected_count": 0
+          },
+          "tournament_id": "cedh-arcanum-sanctorum-57",
+          "source_context": "edhtop16_tournament_entry",
+          "tournament_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57",
+          "commander_count": 2,
+          "mainboard_count": 98,
+          "topdeck_deck_url": "https://topdeck.gg/deck/cedh-arcanum-sanctorum-57/DAH3KmzYuBe9S2mCrT1FppYzVgS2",
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "topdeck_imported_from": "https://moxfield.com/decks/BVNBHdPxhEWuDwAd35Ls5g"
+        },
+        "imported_by": "meta_deck_intelligence_2026_04_27"
+      },
+      "card_count": 100,
+      "promoted_to_meta_decks_at": null,
+      "issues": [],
+      "planned_meta_deck": {
+        "format": "cEDH",
+        "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "commander_name": "Malcolm, Keen-Eyed Navigator",
+        "partner_commander_name": "Vial Smasher the Fierce",
+        "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+        "strategy_archetype": "combo",
+        "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+        "card_list": "1 Malcolm, Keen-Eyed Navigator\n1 Vial Smasher the Fierce\n1 Ad Nauseam\n1 An Offer You Can't Refuse\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Badlands\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Cavern of Souls\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Tower\n1 Curiosity\n1 Dark Ritual\n1 Deadly Rollick\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Exotic Orchard\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Final Fortune\n1 Flare of Duplication\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Glint-Horn Buccaneer\n1 Grim Monolith\n1 Hexing Squelcher\n1 Imperial Seal\n1 Into the Flood Maw\n1 Intuition\n1 Jeska's Will\n1 Kediss, Emberclaw Familiar\n1 Leyline of Transformation\n1 Lightning-Rig Crew\n1 Lion's Eye Diamond\n1 Lively Dirge\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Praetor's Grasp\n1 Professional Face-Breaker\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Reanimate\n1 Red Elemental Blast\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Siren Stormtamer\n1 Sol Ring\n1 Spectral Sailor\n1 Spire of Industry\n1 Starting Town\n1 Steam Vents\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Creativity\n1 Thassa's Oracle\n1 Undercity Sewers\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vexing Bauble\n1 Volcanic Island\n1 Watery Grave\n1 Wheel of Fortune\n1 Wishclaw Talisman",
+        "placement": "5"
+      }
+    }
+  ]
+}

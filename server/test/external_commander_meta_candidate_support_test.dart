@@ -567,6 +567,118 @@ void main() {
           externalCommanderMetaLegalStatusNotProven);
     });
 
+    test('stage 2 splits single-slash commander labels for partner pairs',
+        () async {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url':
+              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-12',
+          'deck_name': 'Single Slash Pair',
+          'commander_name':
+              'Malcolm, Keen-Eyed Navigator / Vial Smasher the Fierce',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list': [
+            '1 Malcolm, Keen-Eyed Navigator',
+            '1 Vial Smasher the Fierce',
+            '98 Island',
+          ].join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 100,
+          },
+        },
+      );
+
+      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+        candidate,
+        repository: _FakeLegalityRepository(
+          resolvedByName: <String, Map<String, dynamic>>{
+            'malcolm, keen-eyed navigator': _cardRecord(
+              id: 'cmd-malcolm',
+              name: 'Malcolm, Keen-Eyed Navigator',
+              colors: <String>['U'],
+            ),
+            'vial smasher the fierce': _cardRecord(
+              id: 'cmd-vial',
+              name: 'Vial Smasher the Fierce',
+              colors: <String>['B', 'R'],
+            ),
+            'island': _cardRecord(
+              id: 'deck-island',
+              name: 'Island',
+              typeLine: 'Basic Land — Island',
+            ),
+          },
+          commanderLegalityById: const <String, String>{
+            'cmd-malcolm': 'legal',
+            'cmd-vial': 'legal',
+            'deck-island': 'legal',
+          },
+        ),
+      );
+
+      expect(candidate.commanderNames, <String>[
+        'Malcolm, Keen-Eyed Navigator',
+        'Vial Smasher the Fierce',
+      ]);
+      expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
+      expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
+    });
+
+    test('stage 2 derives commander identity from colors and oracle text',
+        () async {
+      final candidate = ExternalCommanderMetaCandidate.fromJson(
+        <String, dynamic>{
+          'source_name': 'EDHTop16',
+          'source_url':
+              'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-13',
+          'deck_name': 'Norman Fixture',
+          'commander_name': 'Norman Osborn // Green Goblin',
+          'format': 'commander',
+          'subformat': 'competitive_commander',
+          'card_list': [
+            '1 Norman Osborn // Green Goblin',
+            '99 Island',
+          ].join('\n'),
+          'research_payload': <String, dynamic>{
+            'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+            'source_context': 'edhtop16_tournament_entry',
+            'total_cards': 100,
+          },
+        },
+      );
+
+      final evidence = await evaluateExternalCommanderMetaCandidateLegality(
+        candidate,
+        repository: _FakeLegalityRepository(
+          resolvedByName: <String, Map<String, dynamic>>{
+            'norman osborn // green goblin': _cardRecord(
+              id: 'cmd-norman',
+              name: 'Norman Osborn // Green Goblin',
+              colors: <String>['U'],
+              oracleText:
+                  '{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.',
+            ),
+            'island': _cardRecord(
+              id: 'deck-island',
+              name: 'Island',
+              typeLine: 'Basic Land — Island',
+            ),
+          },
+          commanderLegalityById: const <String, String>{
+            'cmd-norman': 'legal',
+            'deck-island': 'legal',
+          },
+        ),
+      );
+
+      expect(evidence.commanderColorIdentity, <String>{'U', 'B', 'R'});
+      expect(evidence.legalStatus, externalCommanderMetaLegalStatusLegal);
+    });
+
     test(
         'artifact de validacao stage 2 expoe commander_color_identity e status',
         () {
@@ -635,6 +747,7 @@ Map<String, dynamic> _cardRecord({
   List<String> colors = const <String>[],
   String typeLine = 'Artifact',
   String? oracleText,
+  String? manaCost,
 }) {
   return <String, dynamic>{
     'id': id,
@@ -643,5 +756,6 @@ Map<String, dynamic> _cardRecord({
     'color_identity': colorIdentity,
     'colors': colors,
     'oracle_text': oracleText,
+    'mana_cost': manaCost,
   };
 }

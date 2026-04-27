@@ -322,7 +322,18 @@ class ExternalCommanderMetaCandidate {
       }
     }
 
-    addName(commanderName);
+    final normalizedCommander = commanderName?.trim();
+    final normalizedPartner = partnerCommanderName?.trim();
+    if ((normalizedPartner == null || normalizedPartner.isEmpty) &&
+        normalizedCommander != null &&
+        normalizedCommander.contains(' / ') &&
+        !normalizedCommander.contains(' // ')) {
+      for (final name in normalizedCommander.split(RegExp(r'\s/\s'))) {
+        addName(name);
+      }
+    } else {
+      addName(normalizedCommander);
+    }
     for (final name
         in (partnerCommanderName ?? '').split(RegExp(r'\s*\+\s*'))) {
       addName(name);
@@ -1261,6 +1272,7 @@ Set<String> _resolveIdentityFromCardRecord(Map<String, dynamic> card) {
     colorIdentity: _iterableOfStrings(card['color_identity']),
     colors: _iterableOfStrings(card['colors']),
     oracleText: card['oracle_text']?.toString(),
+    manaCost: card['mana_cost']?.toString(),
   );
 }
 

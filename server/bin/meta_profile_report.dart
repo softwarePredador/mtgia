@@ -1,15 +1,25 @@
 import 'dart:convert';
 
 import '../lib/database.dart';
+import '../lib/color_identity.dart';
 import '../lib/meta/meta_deck_analytics_support.dart';
 import '../lib/meta/meta_deck_card_list_support.dart';
 import '../lib/meta/meta_deck_format_support.dart';
 
 class CardInfo {
-  CardInfo({required this.typeLine, required this.colorIdentity});
+  CardInfo({
+    required this.typeLine,
+    required this.colorIdentity,
+    required this.colors,
+    this.oracleText,
+    this.manaCost,
+  });
 
   final String typeLine;
   final List<String> colorIdentity;
+  final List<String> colors;
+  final String? oracleText;
+  final String? manaCost;
 }
 
 class MutableProfile {
@@ -41,7 +51,7 @@ Future<void> main() async {
   final conn = db.connection;
 
   final cardRows = await conn.execute('''
-    SELECT LOWER(name) AS name, type_line, color_identity
+    SELECT LOWER(name) AS name, type_line, color_identity, colors, oracle_text, mana_cost
     FROM cards
   ''');
 
@@ -51,7 +61,16 @@ Future<void> main() async {
     if (name.isEmpty) continue;
     final typeLine = (row[1] as String?) ?? '';
     final ci = (row[2] as List?)?.cast<String>() ?? const <String>[];
-    cardMap[name] = CardInfo(typeLine: typeLine, colorIdentity: ci);
+    final colors = (row[3] as List?)?.cast<String>() ?? const <String>[];
+    final oracleText = row[4] as String?;
+    final manaCost = row[5] as String?;
+    cardMap[name] = CardInfo(
+      typeLine: typeLine,
+      colorIdentity: ci,
+      colors: colors,
+      oracleText: oracleText,
+      manaCost: manaCost,
+    );
   }
 
   final deckRows = await conn.execute('''
@@ -423,7 +442,12 @@ ParsedDeck _parseDeck({
     final info = cardMap[name];
     if (info == null) continue;
 
-    for (final color in info.colorIdentity) {
+    for (final color in resolveCardColorIdentity(
+      colorIdentity: info.colorIdentity,
+      colors: info.colors,
+      oracleText: info.oracleText,
+      manaCost: info.manaCost,
+    )) {
       final upper = color.toUpperCase().trim();
       if (upper.isNotEmpty && 'WUBRGC'.contains(upper)) {
         colors.add(upper);
