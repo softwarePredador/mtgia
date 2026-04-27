@@ -18,6 +18,15 @@ The purpose here is:
 ## Primary owner
 
 - QA/runtime owner: `ManaLoom Deck Runtime E2E`
+- Physical Android owner: `Mobile Runtime Device QA`
+
+## Physical M2006 runbook
+
+Use this runbook for Android physical-device proof:
+
+- `app/doc/runtime_flow_handoffs/M2006_DEVICE_RUNTIME_RUNBOOK.md`
+
+The M2006 proof is not complete unless the handoff includes the device id from `flutter devices` or `adb devices -l`, backend LAN URL, backend health proof, exact Flutter command, and logs/artifacts.
 
 ## Safe backend runner
 

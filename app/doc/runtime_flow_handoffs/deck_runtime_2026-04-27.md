@@ -69,6 +69,11 @@ Launch command: `cd app && flutter test test/features/decks/screens/deck_runtime
 - physical device taps
 - shell/home tab navigation before entering `/decks`
 
+Physical Android follow-up is now owned by `Mobile Runtime Device QA` using:
+
+- `app/doc/runtime_flow_handoffs/M2006_DEVICE_RUNTIME_RUNBOOK.md`
+- target output: `app/doc/runtime_flow_handoffs/deck_runtime_m2006_YYYY-MM-DD.md`
+
 ## Navigation Path
 
 - `/register`
