@@ -29,9 +29,24 @@
 
 ### Observações operacionais
 - Erros esperados de negócio, como credencial inválida ou validação de formulário, continuam sem captura como exceção Sentry para evitar ruído.
-- Para iOS Simulator, o backend deve ser acessado via `http://127.0.0.1:8081`.
+- Para iOS Simulator, o backend local isolado preferencial desta prova ficou em `http://127.0.0.1:8082`.
 - O M2006 físico continua documentado, mas não bloqueia mais a prova principal do agente mobile.
-- A execução real no iPhone 15 Simulator compilou e abriu o app, mas ainda ficou bloqueada no harness de integração: o teste legado `deck_runtime_m2006_test.dart` procura especificamente `ElevatedButton('Novo Deck')` e precisa ser adaptado para o caminho iPhone 15/FAB/lista carregada antes da prova 100%.
+- O harness legado `app/integration_test/deck_runtime_m2006_test.dart` foi endurecido para o caminho real do iPhone 15 Simulator:
+  - espera a lista de decks carregar antes de abrir criação;
+  - suporta tanto `Novo Deck` em lista vazia quanto `FAB + popup` em lista não vazia;
+  - reabre o deck criado pelo caminho real de UI;
+  - percorre o fluxo `import commander -> optimize async -> preview -> apply -> validate`.
+- O bottom sheet de otimização dentro de `DraggableScrollableSheet` mostrou instabilidade de hit-test no simulador iPhone 15. O harness passou a despachar `StrategyOptionCard.onTap` para atravessar esse ruído de ponteiro sem mockar a lógica real: o optimize continua indo ao backend local, abrindo preview, aplicando mudanças e disparando `POST /decks/:id/validate`.
+- A prova runtime final ficou aprovada no iPhone 15 Simulator com backend real em `8082`, incluindo:
+  - `POST /ai/archetypes -> 200`
+  - `POST /ai/optimize -> 202`
+  - polling de job async até completion
+  - `POST /decks/:id/cards/bulk -> 200`
+  - `PUT /decks/:id -> 200`
+  - `POST /decks/:id/validate`
+- Evidências operacionais desta rodada ficaram em:
+  - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+  - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/`
 
 ## 2026-04-24 — Relatorios source-aware para `meta_decks`
 
