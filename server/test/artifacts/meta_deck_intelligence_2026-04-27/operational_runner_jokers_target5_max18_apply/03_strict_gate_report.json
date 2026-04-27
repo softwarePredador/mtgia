@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-04-27T20:32:13.524250Z",
+  "strict_gate": {
+    "accepted_only": true,
+    "subformat": "competitive_commander",
+    "card_count_exact": 100,
+    "legal_status": "legal",
+    "unresolved_cards_exact": 0,
+    "illegal_cards_exact": 0
+  },
+  "summary": {
+    "eligible_count": 4,
+    "excluded_count": 1,
+    "exclusion_counts_by_reason": {
+      "validation_rejected": 1,
+      "card_count_not_100": 1,
+      "legal_status_not_legal": 1,
+      "unresolved_cards_non_zero": 1
+    }
+  },
+  "decisions": [
+    {
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-2",
+      "deck_name": "Kinnan, Bonder Prodigy",
+      "accepted": true,
+      "eligible_for_stage_apply": true,
+      "card_count": 100,
+      "subformat": "competitive_commander",
+      "legal_status": "legal",
+      "unresolved_count": 0,
+      "illegal_count": 0,
+      "reasons": []
+    },
+    {
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+      "deck_name": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "accepted": true,
+      "eligible_for_stage_apply": true,
+      "card_count": 100,
+      "subformat": "competitive_commander",
+      "legal_status": "legal",
+      "unresolved_count": 0,
+      "illegal_count": 0,
+      "reasons": []
+    },
+    {
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-5",
+      "deck_name": "Vivi Ornitier",
+      "accepted": false,
+      "eligible_for_stage_apply": false,
+      "card_count": 85,
+      "subformat": "competitive_commander",
+      "legal_status": "not_proven",
+      "unresolved_count": 2,
+      "illegal_count": 0,
+      "reasons": [
+        "validation_rejected",
+        "card_count_not_100",
+        "legal_status_not_legal",
+        "unresolved_cards_non_zero"
+      ]
+    },
+    {
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-6",
+      "deck_name": "Ob Nixilis, Captive Kingpin",
+      "accepted": true,
+      "eligible_for_stage_apply": true,
+      "card_count": 100,
+      "subformat": "competitive_commander",
+      "legal_status": "legal",
+      "unresolved_count": 0,
+      "illegal_count": 0,
+      "reasons": []
+    },
+    {
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-7",
+      "deck_name": "Sisay, Weatherlight Captain",
+      "accepted": true,
+      "eligible_for_stage_apply": true,
+      "card_count": 100,
+      "subformat": "competitive_commander",
+      "legal_status": "legal",
+      "unresolved_count": 0,
+      "illegal_count": 0,
+      "reasons": []
+    }
+  ]
+}

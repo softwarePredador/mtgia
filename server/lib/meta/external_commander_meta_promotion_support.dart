@@ -1,3 +1,5 @@
+import 'package:postgres/postgres.dart';
+
 import 'external_commander_meta_candidate_support.dart';
 import 'meta_deck_commander_shell_support.dart';
 import 'meta_deck_card_list_support.dart';
@@ -173,6 +175,46 @@ class ExternalCommanderMetaPromotionPlan {
       results.where((result) => result.accepted).toList(growable: false);
 }
 
+Map<String, dynamic> buildExternalCommanderMetaPromotionReport(
+  ExternalCommanderMetaPromotionPlan plan, {
+  required String mode,
+  String? sourceUrl,
+  int? limit,
+}) {
+  return <String, dynamic>{
+    'generated_at': DateTime.now().toUtc().toIso8601String(),
+    'mode': mode,
+    'scope': <String, dynamic>{
+      'source_url': sourceUrl,
+      'limit': limit,
+    },
+    'rules': const <String, dynamic>{
+      'validation_status': 'staged',
+      'subformat': 'competitive_commander',
+      'deck_total_exact': 100,
+      'legal_status_allowed': <String>[
+        'valid',
+        'warning_reviewed',
+      ],
+      'requires_commander_name': true,
+      'requires_unique_source_url': true,
+      'requires_unique_deck_fingerprint': true,
+      'requires_source_allowlist': true,
+      'requires_research_payload_source_chain': true,
+      'requires_research_payload_staging_audit': true,
+      'requires_unresolved_cards_zero': true,
+      'requires_illegal_cards_zero': true,
+    },
+    'summary': <String, dynamic>{
+      'total': plan.totalCount,
+      'promotable': plan.acceptedCount,
+      'blocked': plan.blockedCount,
+    },
+    'results':
+        plan.results.map((result) => result.toJson()).toList(growable: false),
+  };
+}
+
 ExternalCommanderMetaPromotionPlan buildExternalCommanderMetaPromotionPlan(
   List<ExternalCommanderMetaPromotionSnapshot> snapshots, {
   Set<String> sourceUrlsAlreadyInMetaDecks = const <String>{},
@@ -199,12 +241,12 @@ ExternalCommanderMetaPromotionPlan buildExternalCommanderMetaPromotionPlan(
             snapshot,
             sourceUrlOccurrencesInStage:
                 occurrencesBySourceUrl[snapshot.candidate.sourceUrl] ?? 0,
-            deckFingerprintOccurrencesInStage: occurrencesByDeckFingerprint[
-                    buildMetaDeckCardListFingerprint(
+            deckFingerprintOccurrencesInStage:
+                occurrencesByDeckFingerprint[buildMetaDeckCardListFingerprint(
                       format: legacyCompetitiveCommanderFormatCode,
                       cardList: snapshot.candidate.cardList,
                     )] ??
-                0,
+                    0,
             sourceUrlAlreadyInMetaDecks: sourceUrlsAlreadyInMetaDecks
                 .contains(snapshot.candidate.sourceUrl),
             deckFingerprintAlreadyInMetaDecks:
@@ -218,6 +260,118 @@ ExternalCommanderMetaPromotionPlan buildExternalCommanderMetaPromotionPlan(
         )
         .toList(growable: false),
   );
+}
+
+Future<Set<String>> loadExistingMetaDeckSourceUrls(
+  dynamic executor,
+  Set<String> sourceUrls,
+) async {
+  if (sourceUrls.isEmpty) return <String>{};
+
+  final result = await executor.execute(
+    Sql.named('''
+      SELECT source_url
+      FROM meta_decks
+      WHERE source_url = ANY(@source_urls)
+    '''),
+    parameters: <String, dynamic>{
+      'source_urls': TypedValue(
+        Type.textArray,
+        sourceUrls.toList(growable: false),
+      ),
+    },
+  );
+
+  return {
+    for (final row in result)
+      if ((row[0] as String?)?.trim().isNotEmpty ?? false) row[0] as String,
+  };
+}
+
+Future<Set<String>> loadExistingMetaDeckFingerprints(dynamic executor) async {
+  final result = await executor.execute(
+    Sql.named('''
+      SELECT format, card_list
+      FROM meta_decks
+      WHERE format = @format
+    '''),
+    parameters: <String, dynamic>{
+      'format': legacyCompetitiveCommanderFormatCode,
+    },
+  );
+
+  return {
+    for (final row in result)
+      if ((row[1] as String?)?.trim().isNotEmpty ?? false)
+        buildMetaDeckCardListFingerprint(
+          format: (row[0] as String?) ?? legacyCompetitiveCommanderFormatCode,
+          cardList: row[1] as String,
+        ),
+  };
+}
+
+Future<void> persistExternalCommanderMetaPromotionResults(
+  dynamic executor,
+  Iterable<ExternalCommanderMetaPromotionResult> acceptedResults,
+) async {
+  for (final result in acceptedResults) {
+    final insertPlan = result.insertPlan;
+    if (insertPlan == null) {
+      throw StateError(
+        'Resultado aceito sem insertPlan para ${result.candidate.sourceUrl}.',
+      );
+    }
+    await executor.execute(
+      Sql.named('''
+        INSERT INTO meta_decks (
+          format,
+          archetype,
+          commander_name,
+          partner_commander_name,
+          shell_label,
+          strategy_archetype,
+          source_url,
+          card_list,
+          placement
+        )
+        VALUES (
+          @format,
+          @archetype,
+          @commander_name,
+          @partner_commander_name,
+          @shell_label,
+          @strategy_archetype,
+          @source_url,
+          @card_list,
+          @placement
+        )
+      '''),
+      parameters: <String, dynamic>{
+        'format': insertPlan.format,
+        'archetype': insertPlan.archetype,
+        'commander_name': insertPlan.commanderName,
+        'partner_commander_name': insertPlan.partnerCommanderName,
+        'shell_label': insertPlan.shellLabel,
+        'strategy_archetype': insertPlan.strategyArchetype,
+        'source_url': insertPlan.sourceUrl,
+        'card_list': insertPlan.cardList,
+        'placement': insertPlan.placement,
+      },
+    );
+    await executor.execute(
+      Sql.named('''
+        UPDATE external_commander_meta_candidates
+        SET
+          validation_status = 'promoted',
+          promoted_to_meta_decks_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE source_url = @source_url
+      '''),
+      parameters: <String, dynamic>{
+        'source_url': result.snapshot.candidate.sourceUrl,
+      },
+    );
+  }
 }
 
 ExternalCommanderMetaPromotionResult
@@ -242,7 +396,8 @@ ExternalCommanderMetaPromotionResult
     );
   }
 
-  if (candidate.validationStatus != externalCommanderMetaStagedValidationStatus) {
+  if (candidate.validationStatus !=
+      externalCommanderMetaStagedValidationStatus) {
     issues.add(
       ExternalCommanderMetaPromotionIssue(
         code: 'validation_status_not_staged',
@@ -556,8 +711,10 @@ _PromotionDeckProfile _buildPromotionDeckProfile(
     totalCards: parsed.effectiveTotal,
     unresolvedCards: _readAuditList(stagingAudit['unresolved_cards']),
     illegalCards: _readAuditList(stagingAudit['illegal_cards']),
-    validationLegalStatus:
-        stagingAudit['validation_legal_status']?.toString().trim().toLowerCase(),
+    validationLegalStatus: stagingAudit['validation_legal_status']
+        ?.toString()
+        .trim()
+        .toLowerCase(),
     hasStagingAudit: true,
   );
 }
@@ -577,9 +734,9 @@ bool _isSourceAllowlisted(ExternalCommanderMetaCandidate candidate) {
   final normalizedName = candidate.normalizedSourceName.toLowerCase();
 
   for (final policy in externalCommanderMetaControlledSourcePolicies) {
-    final matchesName = policy.canonicalSourceName.toLowerCase() ==
-            normalizedName ||
-        policy.aliases.contains(normalizedName);
+    final matchesName =
+        policy.canonicalSourceName.toLowerCase() == normalizedName ||
+            policy.aliases.contains(normalizedName);
     final matchesHost = policy.allowedHosts.contains(sourceHost);
     if ((matchesName || matchesHost) &&
         sourcePath.startsWith(policy.requiredPathPrefix)) {

@@ -125,6 +125,76 @@ Campos recomendados:
 
 ## Fluxo recomendado
 
+### 0. Runner operacional unico (preferido desde 2026-04-27)
+
+Objetivo:
+
+- substituir a sequencia manual `expand -> import validation -> filtro ad hoc -> stage -> promote`
+- manter `dry-run` como padrao
+- exigir limites explicitos
+- produzir artifacts separados por etapa
+- bloquear `stage apply` e `promote apply` quando qualquer deck sair de:
+  - `subformat=competitive_commander`
+  - `card_count=100`
+  - `legal_status=legal`
+  - `unresolved_cards=0`
+  - `illegal_cards=0`
+
+Comando recomendado:
+
+```bash
+cd server
+dart run bin/run_external_commander_meta_pipeline.dart \
+  --source-url=https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton \
+  --target-valid=5 \
+  --max-standing=18
+```
+
+Aplicacao real:
+
+```bash
+cd server
+dart run bin/run_external_commander_meta_pipeline.dart \
+  --apply \
+  --source-url=https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton \
+  --target-valid=5 \
+  --max-standing=18 \
+  --output-dir=test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply
+```
+
+Contrato operacional do runner:
+
+1. `--source-url`, `--target-valid` e `--max-standing` sao obrigatorios
+2. `--dry-run` e implicito quando `--apply` nao aparece
+3. `stage apply` e `promote apply` so rodam com `--apply`
+4. o runner sempre gera:
+   - `01_expansion_dry_run.json`
+   - `02_import_validation_dry_run.json`
+   - `03_strict_gate_report.json`
+   - `03_strict_gate_expansion.json`
+   - `03_strict_gate_validation.json`
+   - `04_stage_dry_run.json`
+   - `05_promote_dry_run.json`
+   - `08_pipeline_summary.json`
+5. com `--apply`, ele gera tambem:
+   - `06_stage_apply.json`
+   - `07_promote_apply.json`
+6. o `strict gate` substitui o filtro manual inline:
+   - nao persiste `warning_pending`
+   - nao persiste `unresolved_cards > 0`
+   - nao persiste `illegal_cards > 0`
+   - nao persiste `card_count != 100`
+7. os guards de duplicidade continuam ativos em `promote`:
+   - `source_url` unico em `meta_decks`
+   - fingerprint unico em `meta_decks`
+
+Leitura:
+
+- use os bins isolados abaixo quando precisar depurar uma etapa especifica
+- para operacao normal, preferir o runner unico
+- o runner nao substitui a policy de fontes; ele apenas operacionaliza com menos risco
+- o `stage` isolado ainda aceita `warning_pending`; quem endurece `unresolved=0` antes do apply e o runner
+
 ### 1. Criar schema
 
 ```bash
@@ -303,6 +373,11 @@ Resultado observado:
   - `standing-4` -> `topdeck_deckobj_missing`
 
 ### 3. Persistencia segura do stage 2 em `external_commander_meta_candidates`
+
+Observacao:
+
+- esta etapa isolada continua servindo para depuracao
+- para operacao segura com `unresolved=0` obrigatorio antes do apply, preferir o runner unico da secao `0`
 
 ```bash
 cd server

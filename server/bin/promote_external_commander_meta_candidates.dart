@@ -24,9 +24,9 @@ Future<void> main(List<String> args) async {
         .where((url) => url.trim().isNotEmpty)
         .toSet();
     final sourceUrlsAlreadyInMetaDecks =
-        await _loadExistingMetaDeckSourceUrls(conn, sourceUrls);
+        await loadExistingMetaDeckSourceUrls(conn, sourceUrls);
     final deckFingerprintsAlreadyInMetaDecks =
-        await _loadExistingMetaDeckFingerprints(conn);
+        await loadExistingMetaDeckFingerprints(conn);
     final plan = buildExternalCommanderMetaPromotionPlan(
       snapshots,
       sourceUrlsAlreadyInMetaDecks: sourceUrlsAlreadyInMetaDecks,
@@ -57,37 +57,12 @@ Future<void> main(List<String> args) async {
       await outputFile.parent.create(recursive: true);
       await outputFile.writeAsString(
         const JsonEncoder.withIndent('  ').convert(
-          <String, dynamic>{
-            'generated_at': DateTime.now().toUtc().toIso8601String(),
-            'mode': config.dryRun ? 'dry_run' : 'apply',
-            'scope': <String, dynamic>{
-              'source_url': config.sourceUrl,
-              'limit': config.limit,
-            },
-            'rules': const <String, dynamic>{
-              'validation_status': 'staged',
-              'subformat': 'competitive_commander',
-              'deck_total_exact': 100,
-              'legal_status_allowed': <String>[
-                'valid',
-                'warning_reviewed',
-              ],
-              'requires_commander_name': true,
-              'requires_unique_source_url': true,
-              'requires_unique_deck_fingerprint': true,
-              'requires_source_allowlist': true,
-              'requires_research_payload_source_chain': true,
-              'requires_research_payload_staging_audit': true,
-            },
-            'summary': <String, dynamic>{
-              'total': plan.totalCount,
-              'promotable': plan.acceptedCount,
-              'blocked': plan.blockedCount,
-            },
-            'results': plan.results
-                .map((result) => result.toJson())
-                .toList(growable: false),
-          },
+          buildExternalCommanderMetaPromotionReport(
+            plan,
+            mode: config.dryRun ? 'dry_run' : 'apply',
+            sourceUrl: config.sourceUrl,
+            limit: config.limit,
+          ),
         ),
       );
       stdout.writeln('Promotion report salvo em: ${outputFile.path}');
@@ -104,14 +79,14 @@ Future<void> main(List<String> args) async {
     }
 
     await conn.runTx((session) async {
-      final recheckedSourceUrls = await _loadExistingMetaDeckSourceUrls(
+      final recheckedSourceUrls = await loadExistingMetaDeckSourceUrls(
         session,
         plan.acceptedResults
             .map((result) => result.candidate.sourceUrl)
             .toSet(),
       );
       final recheckedDeckFingerprints =
-          await _loadExistingMetaDeckFingerprints(session);
+          await loadExistingMetaDeckFingerprints(session);
       if (recheckedSourceUrls.isNotEmpty) {
         throw StateError(
           'Promocao bloqueada: source_url ja presente em meta_decks: '
@@ -136,10 +111,10 @@ Future<void> main(List<String> args) async {
         );
       }
 
-      for (final result in plan.acceptedResults) {
-        await _insertMetaDeck(session, result.insertPlan!);
-        await _markCandidateAsPromoted(session, result.snapshot);
-      }
+      await persistExternalCommanderMetaPromotionResults(
+        session,
+        plan.acceptedResults,
+      );
     });
 
     stdout.writeln(
@@ -222,116 +197,6 @@ Future<List<ExternalCommanderMetaPromotionSnapshot>> _loadPromotionSnapshots(
         promotedToMetaDecksAt: row[18] as DateTime?,
       ),
   ];
-}
-
-Future<Set<String>> _loadExistingMetaDeckSourceUrls(
-  dynamic executor,
-  Set<String> sourceUrls,
-) async {
-  if (sourceUrls.isEmpty) return <String>{};
-
-  final result = await executor.execute(
-    Sql.named('''
-      SELECT source_url
-      FROM meta_decks
-      WHERE source_url = ANY(@source_urls)
-    '''),
-    parameters: <String, dynamic>{
-      'source_urls': TypedValue(
-        Type.textArray,
-        sourceUrls.toList(growable: false),
-      ),
-    },
-  );
-
-  return {
-    for (final row in result)
-      if ((row[0] as String?)?.trim().isNotEmpty ?? false) row[0] as String,
-  };
-}
-
-Future<Set<String>> _loadExistingMetaDeckFingerprints(dynamic executor) async {
-  final result = await executor.execute(
-    Sql.named('''
-      SELECT format, card_list
-      FROM meta_decks
-      WHERE format = @format
-    '''),
-    parameters: <String, dynamic>{
-      'format': legacyCompetitiveCommanderFormatCode,
-    },
-  );
-
-  return {
-    for (final row in result)
-      if ((row[1] as String?)?.trim().isNotEmpty ?? false)
-        buildMetaDeckCardListFingerprint(
-          format: (row[0] as String?) ?? legacyCompetitiveCommanderFormatCode,
-          cardList: row[1] as String,
-        ),
-  };
-}
-
-Future<void> _insertMetaDeck(
-  dynamic executor,
-  ExternalCommanderMetaPromotionInsertPlan insertPlan,
-) async {
-  await executor.execute(
-    Sql.named('''
-      INSERT INTO meta_decks (
-        format,
-        archetype,
-        commander_name,
-        partner_commander_name,
-        shell_label,
-        strategy_archetype,
-        source_url,
-        card_list,
-        placement
-      )
-      VALUES (
-        @format,
-        @archetype,
-        @commander_name,
-        @partner_commander_name,
-        @shell_label,
-        @strategy_archetype,
-        @source_url,
-        @card_list,
-        @placement
-      )
-    '''),
-    parameters: <String, dynamic>{
-      'format': insertPlan.format,
-      'archetype': insertPlan.archetype,
-      'commander_name': insertPlan.commanderName,
-      'partner_commander_name': insertPlan.partnerCommanderName,
-      'shell_label': insertPlan.shellLabel,
-      'strategy_archetype': insertPlan.strategyArchetype,
-      'source_url': insertPlan.sourceUrl,
-      'card_list': insertPlan.cardList,
-      'placement': insertPlan.placement,
-    },
-  );
-}
-
-Future<void> _markCandidateAsPromoted(
-  dynamic executor,
-  ExternalCommanderMetaPromotionSnapshot snapshot,
-) async {
-  await executor.execute(
-    Sql.named('''
-      UPDATE external_commander_meta_candidates
-      SET
-        validation_status = 'promoted',
-        promoted_to_meta_decks_at = CURRENT_TIMESTAMP,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE source_url = @source_url
-    '''),
-    parameters: <String, dynamic>{
-      'source_url': snapshot.candidate.sourceUrl,
-    },
-  );
 }
 
 Map<String, dynamic> _decodeJsonObject(dynamic raw) {

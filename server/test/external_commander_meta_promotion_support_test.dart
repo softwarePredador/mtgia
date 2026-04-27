@@ -223,6 +223,36 @@ void main() {
       );
     });
   });
+
+  group('buildExternalCommanderMetaPromotionReport', () {
+    test('explicita guards de unresolved e illegal zero', () {
+      final plan = buildExternalCommanderMetaPromotionPlan(
+        <ExternalCommanderMetaPromotionSnapshot>[
+          _snapshot(
+            sourceUrl: 'https://edhtop16.com/tournament/sample#standing-1',
+          ),
+        ],
+      );
+
+      final report = buildExternalCommanderMetaPromotionReport(
+        plan,
+        mode: 'dry_run',
+        limit: 1,
+      );
+
+      expect(report['mode'], 'dry_run');
+      expect(
+        (report['rules']
+            as Map<String, dynamic>)['requires_unresolved_cards_zero'],
+        isTrue,
+      );
+      expect(
+        (report['rules']
+            as Map<String, dynamic>)['requires_illegal_cards_zero'],
+        isTrue,
+      );
+    });
+  });
 }
 
 ExternalCommanderMetaPromotionSnapshot _snapshot({

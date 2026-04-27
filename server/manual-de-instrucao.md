@@ -1,6 +1,102 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-27 — Runner operacional seguro para `external commander meta`
+
+### O Porque
+- O fluxo externo ja tinha sido auditado, mas ainda dependia de uma sequencia manual demais:
+  - expansao dry-run
+  - import validation
+  - filtro inline
+  - stage dry-run/apply
+  - promote dry-run/apply
+- O risco principal nao era parser puro; era operacao:
+  - esquecer `dry-run`
+  - rodar sem limite explicito
+  - aplicar `stage` com `warning_pending`
+  - promover candidato com `unresolved_cards > 0`
+- A meta desta rodada foi transformar a trilha auditada em comando unico, seguro por default e com artifacts separados por etapa.
+
+### O Como
+- `server/bin/run_external_commander_meta_pipeline.dart`
+  - novo runner operacional unico
+  - exige:
+    - `--source-url`
+    - `--target-valid`
+    - `--max-standing`
+  - usa `dry-run` por padrao
+  - so executa escrita real com `--apply`
+  - sempre gera:
+    - `01_expansion_dry_run.json`
+    - `02_import_validation_dry_run.json`
+    - `03_strict_gate_report.json`
+    - `03_strict_gate_expansion.json`
+    - `03_strict_gate_validation.json`
+    - `04_stage_dry_run.json`
+    - `05_promote_dry_run.json`
+    - `08_pipeline_summary.json`
+  - com `--apply`, gera tambem:
+    - `06_stage_apply.json`
+    - `07_promote_apply.json`
+- `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+  - novo suporte para:
+    - parse/config do runner
+    - `strict gate` pre-apply
+    - filtragem de artifacts
+  - o gate obrigatorio agora preserva apenas candidatos que atendem simultaneamente:
+    - `subformat=competitive_commander`
+    - `card_count=100`
+    - `legal_status=legal`
+    - `unresolved_cards=0`
+    - `illegal_cards=0`
+- `server/lib/meta/external_commander_deck_expansion_support.dart`
+  - passou a expor helpers reutilizaveis de fetch/expansao do `EDHTop16 -> TopDeck`
+  - o bin antigo de expansao e o runner unico passaram a reaproveitar a mesma implementacao
+- `server/lib/meta/external_commander_meta_promotion_support.dart`
+  - passou a concentrar:
+    - report de promote
+    - leitura de `source_url`/fingerprint ja presentes em `meta_decks`
+    - persistencia dos resultados aceitos
+  - o report explicita tambem:
+    - `requires_unresolved_cards_zero`
+    - `requires_illegal_cards_zero`
+- `server/bin/promote_external_commander_meta_candidates.dart`
+  - foi simplificado para reutilizar os helpers compartilhados acima
+- `server/bin/expand_external_commander_meta_candidates.dart`
+  - foi simplificado para reutilizar o builder compartilhado de artifact
+
+### Validacao executada
+- `dart analyze lib/meta lib/ai routes/ai bin test` -> verde
+- suite focada `meta/optimize/generate` -> verde, sem falhas novas
+- prova live do runner:
+  - evento: `jokers-are-wild-monthly-1k-hosted-by-trenton`
+  - `target_valid=5`
+  - `max_standing=18`
+  - dry-run:
+    - `expanded_count=5`
+    - `validation_accepted_count=4`
+    - `strict_gate_eligible_count=4`
+    - `promote_dry_run_promotable_count=2`
+  - apply:
+    - `stage_to_persist_count=4`
+    - `promote_apply_promoted_count=2`
+
+### Resultado
+- O fluxo externo deixa de depender de filtro manual inline e passa a ter um caminho oficial de baixo risco.
+- A promocao live desta rodada adicionou mais `2` decks externos validos:
+  - `Ob Nixilis, Captive Kingpin`
+  - `Sisay, Weatherlight Captain`
+- Estado final observado no corpus:
+  - `meta_decks=650`
+  - `external=9`
+  - cobertura de identidade externa `cEDH=9/9` resolvida
+
+### Padroes aplicados
+- **Safe by default:** `dry-run` como comportamento padrao; escrita so com `--apply`.
+- **Fail-fast operacional:** sem `source-url/target-valid/max-standing`, o runner aborta.
+- **Guard rails antes da persistencia:** `unresolved=0` e `illegal=0` passam a ser obrigatorios no caminho oficial de apply.
+- **Reuso em vez de duplicacao:** bins de expansao/promocao reutilizam helpers compartilhados em `lib/meta`.
+
 ## 2026-04-27 — Prova viva de consumo externo, fix no caminho keyword-only de `generate` e segunda promocao pequena
 
 ### O Porquê

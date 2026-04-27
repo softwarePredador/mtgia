@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:html/parser.dart' as html_parser;
+import 'package:http/http.dart' as http;
 
 class EdhTop16TournamentEntry {
   const EdhTop16TournamentEntry({
@@ -41,6 +42,233 @@ class ExpandedDeckCard {
 
   final String name;
   final int quantity;
+}
+
+Future<Map<String, dynamic>> buildEdhTop16ExpansionArtifact({
+  required String sourceUrl,
+  required int targetValid,
+  required int maxStanding,
+  http.Client? client,
+}) async {
+  if (targetValid <= 0) {
+    throw ArgumentError('targetValid precisa ser maior que zero.');
+  }
+  if (maxStanding <= 0) {
+    throw ArgumentError('maxStanding precisa ser maior que zero.');
+  }
+  if (maxStanding < targetValid) {
+    throw ArgumentError('maxStanding precisa ser >= targetValid.');
+  }
+
+  final tournamentId = edhTop16TournamentIdFromUrl(sourceUrl);
+  final graphqlPayload = await fetchEdhTop16TournamentPayload(
+    tournamentId: tournamentId,
+    limit: maxStanding,
+    client: client,
+  );
+  final entries = parseEdhTop16TournamentEntries(graphqlPayload);
+
+  final results = <Map<String, dynamic>>[];
+  var expandedCount = 0;
+  for (final entry in entries.take(maxStanding)) {
+    if (expandedCount >= targetValid) {
+      break;
+    }
+    final result = await expandEdhTop16TournamentEntry(
+      tournamentUrl: sourceUrl,
+      tournamentId: tournamentId,
+      entry: entry,
+      client: client,
+    );
+    results.add(result);
+    if (result['expansion_status'] == 'expanded') {
+      expandedCount++;
+    }
+  }
+
+  final rejectedCount = results.length - expandedCount;
+  final goalReached = expandedCount >= targetValid;
+  final candidates = results
+      .where((result) => result['expansion_status'] == 'expanded')
+      .map((result) => result['candidate'])
+      .whereType<Map<String, dynamic>>()
+      .toList(growable: false);
+
+  return <String, dynamic>{
+    'generated_at': DateTime.now().toUtc().toIso8601String(),
+    'mode': 'dry_run',
+    'source_name': 'EDHTop16',
+    'source_url': sourceUrl,
+    'event_tid': tournamentId,
+    'expansion_path': const <String>[
+      'edhtop16_graphql',
+      'topdeck_deck_page',
+    ],
+    'target_valid_count': targetValid,
+    'max_standing_scanned': maxStanding,
+    'entries_available': entries.length,
+    'attempted_count': results.length,
+    'goal_reached': goalReached,
+    'stop_reason': goalReached ? 'target_valid_reached' : 'entries_exhausted',
+    'expanded_count': expandedCount,
+    'rejected_count': rejectedCount,
+    'candidates': candidates,
+    'results': results,
+  };
+}
+
+Future<Map<String, dynamic>> fetchEdhTop16TournamentPayload({
+  required String tournamentId,
+  required int limit,
+  http.Client? client,
+}) async {
+  const query = r'''
+query($tid: String!, $maxStanding: Int!) {
+  tournament(TID: $tid) {
+    TID
+    name
+    size
+    entries(maxStanding: $maxStanding) {
+      standing
+      decklist
+      player { name }
+      commander { name }
+    }
+  }
+}
+''';
+
+  final ownedClient = client ?? http.Client();
+  try {
+    final response = await ownedClient
+        .post(
+          Uri.parse('https://edhtop16.com/api/graphql'),
+          headers: const <String, String>{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode(<String, dynamic>{
+            'query': query,
+            'variables': <String, dynamic>{
+              'tid': tournamentId,
+              'maxStanding': limit,
+            },
+          }),
+        )
+        .timeout(const Duration(seconds: 25));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError(
+        'EDHTop16 GraphQL falhou: HTTP ${response.statusCode} '
+        '${response.body.substring(0, response.body.length.clamp(0, 200))}',
+      );
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('Resposta GraphQL nao e objeto JSON.');
+    }
+    if (decoded['errors'] != null) {
+      throw StateError(
+          'EDHTop16 GraphQL retornou errors: ${decoded['errors']}');
+    }
+    return decoded;
+  } finally {
+    if (client == null) {
+      ownedClient.close();
+    }
+  }
+}
+
+Future<Map<String, dynamic>> expandEdhTop16TournamentEntry({
+  required String tournamentUrl,
+  required String tournamentId,
+  required EdhTop16TournamentEntry entry,
+  http.Client? client,
+}) async {
+  final deckUri = Uri.tryParse(entry.decklistUrl);
+  if (deckUri == null ||
+      deckUri.host.toLowerCase().replaceFirst('www.', '') != 'topdeck.gg' ||
+      !deckUri.path.startsWith('/deck/')) {
+    return rejectedEdhTop16TournamentEntry(
+      entry,
+      'decklist_not_topdeck_deck_page',
+    );
+  }
+
+  final ownedClient = client ?? http.Client();
+  try {
+    final response = await ownedClient.get(
+      deckUri,
+      headers: const <String, String>{'Accept': 'text/html'},
+    ).timeout(const Duration(seconds: 25));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      return rejectedEdhTop16TournamentEntry(
+        entry,
+        'topdeck_http_${response.statusCode}',
+      );
+    }
+
+    final expandedDeck = parseTopDeckDeckObjectFromHtml(response.body);
+    if (expandedDeck.commanderCount <= 0) {
+      return rejectedEdhTop16TournamentEntry(entry, 'missing_commanders');
+    }
+    if (expandedDeck.totalCards != 100) {
+      return rejectedEdhTop16TournamentEntry(
+        entry,
+        'invalid_total_cards_${expandedDeck.totalCards}',
+      );
+    }
+
+    return <String, dynamic>{
+      'expansion_status': 'expanded',
+      'source_name': 'EDHTop16',
+      'source_url': tournamentUrl,
+      'event_tid': tournamentId,
+      'standing': entry.standing,
+      'player_name': entry.playerName,
+      'deck_url': entry.decklistUrl,
+      'commanders': expandedDeck.commanderNames,
+      'mainboard_count': expandedDeck.mainboardCount,
+      'commander_count': expandedDeck.commanderCount,
+      'total_cards': expandedDeck.totalCards,
+      'card_list': expandedDeck.cardList,
+      'candidate': buildExternalCommanderCandidateFromExpansion(
+        tournamentUrl: tournamentUrl,
+        tournamentId: tournamentId,
+        entry: entry,
+        expandedDeck: expandedDeck,
+      ),
+    };
+  } on FormatException catch (error) {
+    final message = error.message.toLowerCase();
+    if (message.contains('deckobj')) {
+      return rejectedEdhTop16TournamentEntry(entry, 'topdeck_deckobj_missing');
+    }
+    return rejectedEdhTop16TournamentEntry(entry, 'topdeck_parse_error');
+  } catch (error) {
+    return rejectedEdhTop16TournamentEntry(
+      entry,
+      'exception_${error.runtimeType}',
+    );
+  } finally {
+    if (client == null) {
+      ownedClient.close();
+    }
+  }
+}
+
+Map<String, dynamic> rejectedEdhTop16TournamentEntry(
+  EdhTop16TournamentEntry entry,
+  String reason,
+) {
+  return <String, dynamic>{
+    'expansion_status': 'rejected',
+    'rejection_reason': reason,
+    'standing': entry.standing,
+    'player_name': entry.playerName,
+    'deck_url': entry.decklistUrl,
+  };
 }
 
 String edhTop16TournamentIdFromUrl(String sourceUrl) {

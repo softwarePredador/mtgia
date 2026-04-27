@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-04-27T20:32:22.816288Z",
+  "mode": "apply",
+  "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+  "limits": {
+    "target_valid": 5,
+    "max_standing": 18
+  },
+  "mandatory_guards": {
+    "subformat": "competitive_commander",
+    "card_count_exact": 100,
+    "legal_status": "legal",
+    "unresolved_cards_exact": 0,
+    "illegal_cards_exact": 0,
+    "dry_run_default": true
+  },
+  "artifacts": {
+    "expansion_dry_run": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/01_expansion_dry_run.json",
+    "import_validation_dry_run": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/02_import_validation_dry_run.json",
+    "strict_gate_report": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/03_strict_gate_report.json",
+    "strict_gate_expansion": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/03_strict_gate_expansion.json",
+    "strict_gate_validation": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/03_strict_gate_validation.json",
+    "stage_dry_run": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/04_stage_dry_run.json",
+    "promote_dry_run": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/05_promote_dry_run.json",
+    "stage_apply": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/06_stage_apply.json",
+    "promote_apply": "test/artifacts/meta_deck_intelligence_2026-04-27/operational_runner_jokers_target5_max18_apply/07_promote_apply.json"
+  },
+  "counts": {
+    "expanded_count": 5,
+    "validation_accepted_count": 4,
+    "validation_rejected_count": 1,
+    "strict_gate_eligible_count": 4,
+    "strict_gate_excluded_count": 1,
+    "stage_to_persist_count": 4,
+    "promote_dry_run_promotable_count": 2,
+    "promote_dry_run_blocked_count": 2,
+    "promote_apply_promoted_count": 2,
+    "promote_apply_blocked_count": 2
+  },
+  "imported_by": "external_meta_pipeline_2026_04_27_jokers_are_wild_monthly_1k_hosted_by_trenton"
+}

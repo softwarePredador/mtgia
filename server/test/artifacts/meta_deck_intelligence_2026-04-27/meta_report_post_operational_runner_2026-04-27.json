@@ -1,0 +1,232 @@
+{
+  "total_meta_decks": 650,
+  "by_format": [
+    {
+      "format": "cEDH",
+      "count": 223,
+      "format_family": "commander",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander"
+    },
+    {
+      "format": "EDH",
+      "count": 162,
+      "format_family": "commander",
+      "format_label": "Duel Commander (MTGTop8 EDH)",
+      "subformat": "duel_commander"
+    },
+    {
+      "format": "ST",
+      "count": 46,
+      "format_family": "st",
+      "format_label": "Standard",
+      "subformat": null
+    },
+    {
+      "format": "PI",
+      "count": 46,
+      "format_family": "pi",
+      "format_label": "Pioneer",
+      "subformat": null
+    },
+    {
+      "format": "VI",
+      "count": 44,
+      "format_family": "vi",
+      "format_label": "Vintage",
+      "subformat": null
+    },
+    {
+      "format": "MO",
+      "count": 41,
+      "format_family": "mo",
+      "format_label": "Modern",
+      "subformat": null
+    },
+    {
+      "format": "PAU",
+      "count": 40,
+      "format_family": "pau",
+      "format_label": "Pauper",
+      "subformat": null
+    },
+    {
+      "format": "LE",
+      "count": 40,
+      "format_family": "le",
+      "format_label": "Legacy",
+      "subformat": null
+    },
+    {
+      "format": "PREM",
+      "count": 8,
+      "format_family": "prem",
+      "format_label": "Premodern",
+      "subformat": null
+    }
+  ],
+  "by_commander_subformat": {
+    "competitive_commander": 223,
+    "duel_commander": 162
+  },
+  "commander_shell_strategy_coverage": [
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "deck_count": 223,
+      "with_commander_name": 223,
+      "with_partner_commander_name": 85,
+      "with_shell_label": 223,
+      "with_strategy_archetype": 223
+    },
+    {
+      "format": "EDH",
+      "format_label": "Duel Commander (MTGTop8 EDH)",
+      "subformat": "duel_commander",
+      "deck_count": 162,
+      "with_commander_name": 162,
+      "with_partner_commander_name": 5,
+      "with_shell_label": 162,
+      "with_strategy_archetype": 162
+    }
+  ],
+  "mtgtop8_count": 641,
+  "latest_samples": [
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Sisay, Weatherlight Captain",
+      "commander_name": "Sisay, Weatherlight Captain",
+      "partner_commander_name": null,
+      "shell_label": "Sisay, Weatherlight Captain",
+      "strategy_archetype": "control",
+      "placement": "7",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-7",
+      "created_at": "2026-04-27 20:32:17.696427Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Ob Nixilis, Captive Kingpin",
+      "commander_name": "Ob Nixilis, Captive Kingpin",
+      "partner_commander_name": null,
+      "shell_label": "Ob Nixilis, Captive Kingpin",
+      "strategy_archetype": "combo",
+      "placement": "6",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-6",
+      "created_at": "2026-04-27 20:32:17.696427Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "commander_name": "Rograkh, Son of Rohgahh",
+      "partner_commander_name": "Silas Renn, Seeker Adept",
+      "shell_label": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "strategy_archetype": "combo",
+      "placement": "3",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+      "created_at": "2026-04-27 20:12:47.680317Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Kinnan, Bonder Prodigy",
+      "commander_name": "Kinnan, Bonder Prodigy",
+      "partner_commander_name": null,
+      "shell_label": "Kinnan, Bonder Prodigy",
+      "strategy_archetype": "combo",
+      "placement": "2",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-2",
+      "created_at": "2026-04-27 20:12:47.676332Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "commander_name": "Thrasios, Triton Hero",
+      "partner_commander_name": "Yoshimaru, Ever Faithful",
+      "shell_label": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "strategy_archetype": "control",
+      "placement": "10",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-10",
+      "created_at": "2026-04-27 19:50:11.386911Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "commander_name": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "partner_commander_name": null,
+      "shell_label": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "strategy_archetype": "combo",
+      "placement": "9",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-9",
+      "created_at": "2026-04-27 19:49:55.718886Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "commander_name": "Kraum, Ludevic's Opus",
+      "partner_commander_name": "Tymna the Weaver",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "strategy_archetype": "combo",
+      "placement": "8",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-8",
+      "created_at": "2026-04-27 19:32:47.975640Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "commander_name": "Malcolm, Keen-Eyed Navigator",
+      "partner_commander_name": "Vial Smasher the Fierce",
+      "shell_label": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "strategy_archetype": "combo",
+      "placement": "5",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-5",
+      "created_at": "2026-04-27 19:32:47.822387Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Norman Osborn // Green Goblin",
+      "commander_name": "Norman Osborn // Green Goblin",
+      "partner_commander_name": null,
+      "shell_label": "Norman Osborn // Green Goblin",
+      "strategy_archetype": "combo",
+      "placement": "4",
+      "source_url": "https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-4",
+      "created_at": "2026-04-27 12:04:17.032793Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Kraum + Tymna",
+      "commander_name": "Kraum, Ludevic's Opus",
+      "partner_commander_name": "Tymna the Weaver",
+      "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "strategy_archetype": "combo",
+      "placement": "3",
+      "source_url": "https://www.mtgtop8.com/?e=83867&d=837115&f=cEDH",
+      "created_at": "2026-04-23 20:02:52.000285Z"
+    },
+    {
+      "format": "cEDH",
+      "format_label": "Competitive Commander (MTGTop8 cEDH)",
+      "subformat": "competitive_commander",
+      "archetype": "Dargo + Tymna",
+      "commander_name": "Dargo, the Shipwrecker",
+      "partner_comma

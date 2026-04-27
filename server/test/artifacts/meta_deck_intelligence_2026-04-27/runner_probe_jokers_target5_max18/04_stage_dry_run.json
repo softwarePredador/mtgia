@@ -1,0 +1,273 @@
+{
+  "generated_at": "2026-04-27T20:31:35.984912Z",
+  "mode": "dry_run",
+  "expansion_artifact": "test/artifacts/meta_deck_intelligence_2026-04-27/runner_probe_jokers_target5_max18/03_strict_gate_expansion.json",
+  "validation_artifact": "test/artifacts/meta_deck_intelligence_2026-04-27/runner_probe_jokers_target5_max18/03_strict_gate_validation.json",
+  "validation_profile": "topdeck_edhtop16_stage2",
+  "summary": {
+    "accepted_count": 4,
+    "validation_rejected_count": 0,
+    "expansion_rejected_count": 1,
+    "to_persist_count": 4,
+    "duplicate_source_url_count": 0
+  },
+  "duplicate_source_urls": [],
+  "candidates": [
+    {
+      "source_name": "EDHTop16",
+      "source_host": "edhtop16.com",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-2",
+      "deck_name": "Kinnan, Bonder Prodigy",
+      "commander_name": "Kinnan, Bonder Prodigy",
+      "partner_commander_name": null,
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Kinnan, Bonder Prodigy",
+      "card_list": "1 Kinnan, Bonder Prodigy\n1 Amphibian Downpour\n1 Ancient Tomb\n1 Arcane Signet\n1 Barkchannel Pathway // Tidechannel Pathway\n1 Basalt Monolith\n1 Birds of Paradise\n1 Bloom Tender\n1 Borne Upon a Wind\n1 Boseiju, Who Endures\n1 Breeding Pool\n1 Cephalid Coliseum\n1 Chain of Vapor\n1 Chord of Calling\n1 Chrome Mox\n1 City of Brass\n1 Clever Impersonator\n1 Command Tower\n1 Commandeer\n1 Consecrated Sphinx\n1 Copy Artifact\n1 Copy Enchantment\n1 Dispel\n1 Dizzy Spell\n1 Dramatic Reversal\n1 Drift of Phantasms\n1 Elvish Mystic\n1 Elvish Spirit Guide\n1 Endurance\n1 Enduring Vitality\n1 Faerie Mastermind\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Finale of Devastation\n1 Flash Photography\n1 Flesh Duplicate\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Forest\n1 Freed from the Real\n1 Fyndhorn Elves\n1 Gaea's Cradle\n1 Gemstone Caverns\n1 Gene Pollinator\n1 Grim Monolith\n1 Hidden Strings\n1 High Fae Trickster\n1 Hullbreaker Horror\n1 Invasion of Ikoria // Zilortha, Apex of Ikoria\n1 Island\n1 Llanowar Elves\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mirage Mirror\n1 Mirrormade\n1 Misdirection\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Nature's Rhythm\n1 Nezahal, Primal Tide\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Polluted Delta\n1 Rejuvenating Springs\n1 Rhystic Study\n1 Scalding Tarn\n1 Sink into Stupor // Soporific Springs\n1 Snapback\n1 Sol Ring\n1 Springleaf Drum\n1 Subtlety\n1 Swan Song\n1 Sylvan Library\n1 Talisman of Curiosity\n1 The Cabbage Merchant\n1 The One Ring\n1 The Unagi of Kyoshi Island\n1 Thrasios, Triton Hero\n1 Transmute Artifact\n1 Treasure Vault\n1 Trophy Mage\n1 Tropical Island\n1 Valley Floodcaller\n1 Verdant Catacombs\n1 Walking Ballista\n1 Wan Shi Tong, Librarian\n1 Waterlogged Grove\n1 Whir of Invention\n1 Windswept Heath\n1 Wooded Foothills\n1 Yavimaya Coast",
+      "placement": "2",
+      "color_identity": [
+        "G",
+        "U"
+      ],
+      "is_commander_legal": true,
+      "validation_status": "staged",
+      "legal_status": "valid",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "tournament_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "topdeck_deck_url": "https://topdeck.gg/deck/jokers-are-wild-monthly-1k-hosted-by-trenton/oYrf8JZC4pa6jvoQEdUmkkjnFsT2",
+        "player_name": "Eric Ward",
+        "standing": 2,
+        "topdeck_imported_from": "https://moxfield.com/decks/sgic222q2U63nncGrJNxyg",
+        "commander_count": 1,
+        "mainboard_count": 99,
+        "total_cards": 100,
+        "stage_status": "staged",
+        "staging_audit": {
+          "validation_profile": "topdeck_edhtop16_stage2",
+          "accepted": true,
+          "validation_legal_status": "legal",
+          "commander_color_identity": [
+            "G",
+            "U"
+          ],
+          "unresolved_cards": [],
+          "illegal_cards": [],
+          "issues": [
+            {
+              "severity": "warning",
+              "code": "missing_color_identity",
+              "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
+            }
+          ],
+          "validation_generated_at": "2026-04-27T20:31:35.978056Z",
+          "validation_rejected_count": 0,
+          "expansion_generated_at": "2026-04-27T20:31:35.977215Z",
+          "expansion_rejected_count": 1
+        }
+      },
+      "imported_by": "external_meta_pipeline_2026_04_27_jokers_are_wild_monthly_1k_hosted_by_trenton"
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_host": "edhtop16.com",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-3",
+      "deck_name": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "commander_name": "Rograkh, Son of Rohgahh",
+      "partner_commander_name": "Silas Renn, Seeker Adept",
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "card_list": "1 Rograkh, Son of Rohgahh\n1 Silas Renn, Seeker Adept\n1 Ad Nauseam\n1 Ancient Tomb\n1 Arcane Signet\n1 Arid Mesa\n1 Artist's Talent\n1 Ashling, Flame Dancer\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling // Harnfel, Horn of Bounty\n1 Blood Crypt\n1 Bloodstained Mire\n1 Borne Upon a Wind\n1 Brain Freeze\n1 Cabal Ritual\n1 Chain of Vapor\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Clever Impersonator\n1 Command Tower\n1 Copy Enchantment\n1 Culling the Weak\n1 Dark Ritual\n1 Deflecting Swat\n1 Demonic Consultation\n1 Demonic Tutor\n1 Diabolic Intent\n1 Dispel\n1 Emergence Zone\n1 Faerie Mastermind\n1 Fierce Guardianship\n1 Final Fortune\n1 Firestorm\n1 Flare of Duplication\n1 Flash Photography\n1 Flooded Strand\n1 Flusterstorm\n1 Force of Negation\n1 Force of Will\n1 Gamble\n1 Gemstone Caverns\n1 Grinding Station\n1 Hexing Squelcher\n1 Imperial Seal\n1 Imposter Mech\n1 Into the Flood Maw\n1 Jeska's Will\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mental Misstep\n1 Mindbreak Trap\n1 Mirrormade\n1 Misty Rainforest\n1 Mockingbird\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Mystic Remora\n1 Mystical Tutor\n1 Necropotence\n1 Opposition Agent\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Pact of Negation\n1 Paradise Mantle\n1 Polluted Delta\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Relic of Legends\n1 Reliquary Tower\n1 Rhystic Study\n1 Rite of Flame\n1 Scalding Tarn\n1 Simian Spirit Guide\n1 Sink into Stupor // Soporific Springs\n1 Snapback\n1 Sol Ring\n1 Springleaf Drum\n1 Steam Vents\n1 Storm-Kiln Artist\n1 Swan Song\n1 Tainted Pact\n1 Talisman of Dominance\n1 Thassa's Oracle\n1 Underground Sea\n1 Underworld Breach\n1 Valley Floodcaller\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Volcanic Island\n1 Watery Grave\n1 Wooded Foothills",
+      "placement": "3",
+      "color_identity": [
+        "B",
+        "R",
+        "U"
+      ],
+      "is_commander_legal": true,
+      "validation_status": "staged",
+      "legal_status": "valid",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "tournament_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "topdeck_deck_url": "https://topdeck.gg/deck/jokers-are-wild-monthly-1k-hosted-by-trenton/NAnEj55NfLa0CLXI7R4wWIZIQ2F2",
+        "player_name": "Breezy [TYRNT]",
+        "standing": 3,
+        "topdeck_imported_from": "https://moxfield.com/decks/13MX2fZGcEuUhTPt62d6BA",
+        "commander_count": 2,
+        "mainboard_count": 98,
+        "total_cards": 100,
+        "stage_status": "staged",
+        "staging_audit": {
+          "validation_profile": "topdeck_edhtop16_stage2",
+          "accepted": true,
+          "validation_legal_status": "legal",
+          "commander_color_identity": [
+            "B",
+            "R",
+            "U"
+          ],
+          "unresolved_cards": [],
+          "illegal_cards": [],
+          "issues": [
+            {
+              "severity": "warning",
+              "code": "missing_color_identity",
+              "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
+            }
+          ],
+          "validation_generated_at": "2026-04-27T20:31:35.978056Z",
+          "validation_rejected_count": 0,
+          "expansion_generated_at": "2026-04-27T20:31:35.977215Z",
+          "expansion_rejected_count": 1
+        }
+      },
+      "imported_by": "external_meta_pipeline_2026_04_27_jokers_are_wild_monthly_1k_hosted_by_trenton"
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_host": "edhtop16.com",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-6",
+      "deck_name": "Ob Nixilis, Captive Kingpin",
+      "commander_name": "Ob Nixilis, Captive Kingpin",
+      "partner_commander_name": null,
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Ob Nixilis, Captive Kingpin",
+      "card_list": "1 Ob Nixilis, Captive Kingpin\n1 Ad Nauseam\n1 Agatha's Soul Cauldron\n1 All Will Be One\n1 Ancient Tomb\n1 Arcane Signet\n1 Badlands\n1 Beseech the Mirror\n1 Birgi, God of Storytelling\n1 Black Mage's Rod\n1 Blazemire Verge\n1 Blood Crypt\n1 Bloodstained Mire\n1 Bolt Bend\n1 Cabal Ritual\n1 Casey Jones, Back Alley Brute\n1 Cavern of Souls\n1 Chrome Mox\n1 City of Brass\n1 City of Traitors\n1 Command Beacon\n1 Command Tower\n1 Coruscation Mage\n1 Culling the Weak\n1 Dark Ritual\n1 Deadly Rollick\n1 Defense Grid\n1 Deflecting Swat\n1 Demonic Tutor\n1 Desperate Ritual\n1 Dualcaster Mage\n1 Fellwar Stone\n1 Final Fortune\n1 Firebrand Archer\n1 Flare of Duplication\n1 Gamble\n1 Gemstone Caverns\n1 Glaring Fleshraker\n1 Grapeshot\n1 Grim Monolith\n1 Grinding Station\n1 Gut Shot\n1 Hexing Squelcher\n1 Imperial Seal\n1 Jeska's Will\n1 Kederekt Parasite\n1 Kessig Flamebreather\n1 Lion's Eye Diamond\n1 Lotus Petal\n1 Luxury Suite\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Mayhem Devil\n1 Mount Doom\n1 Mox Amber\n1 Mox Diamond\n1 Mox Opal\n1 Necropotence\n1 Orcish Bowmasters\n1 Party Thrasher\n1 Phyrexian Tower\n1 Polluted Delta\n1 Praetor's Grasp\n1 Prosper, Tome-Bound\n1 Pyroblast\n1 Ragavan, Nimble Pilferer\n1 Rain of Filth\n1 Raucous Theater\n1 Razorkin Needlehead\n1 Reckless Fireweaver\n1 Red Elemental Blast\n1 Redirect Lightning\n1 Rite of Flame\n1 Scalding Tarn\n1 Scrawling Crawler\n1 Simian Spirit Guide\n1 Sol Ring\n1 Springleaf Drum\n1 Starting Town\n1 Sulfurous Springs\n1 Tainted Pact\n1 Talisman of Indulgence\n1 The Last Agni Kai\n1 The One Ring\n1 Tibalt's Trickery\n1 Twinflame\n1 Underworld Breach\n1 Unstable Amulet\n1 Untimely Malfunction\n1 Urborg, Tomb of Yawgmoth\n1 Urza's Saga\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Vivi's Persistence\n1 Walking Ballista\n1 Wheel of Fortune\n1 Wishclaw Talisman\n1 Wooded Foothills\n1 Yawgmoth's Will",
+      "placement": "6",
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "is_commander_legal": true,
+      "validation_status": "staged",
+      "legal_status": "valid",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "tournament_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "topdeck_deck_url": "https://topdeck.gg/deck/jokers-are-wild-monthly-1k-hosted-by-trenton/JelDIQ4n1GaeHlWCAmpMbgquE9R2",
+        "player_name": "Jeffrey Herman",
+        "standing": 6,
+        "topdeck_imported_from": null,
+        "commander_count": 1,
+        "mainboard_count": 99,
+        "total_cards": 100,
+        "stage_status": "staged",
+        "staging_audit": {
+          "validation_profile": "topdeck_edhtop16_stage2",
+          "accepted": true,
+          "validation_legal_status": "legal",
+          "commander_color_identity": [
+            "B",
+            "R"
+          ],
+          "unresolved_cards": [],
+          "illegal_cards": [],
+          "issues": [
+            {
+              "severity": "warning",
+              "code": "missing_color_identity",
+              "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
+            }
+          ],
+          "validation_generated_at": "2026-04-27T20:31:35.978056Z",
+          "validation_rejected_count": 0,
+          "expansion_generated_at": "2026-04-27T20:31:35.977215Z",
+          "expansion_rejected_count": 1
+        }
+      },
+      "imported_by": "external_meta_pipeline_2026_04_27_jokers_are_wild_monthly_1k_hosted_by_trenton"
+    },
+    {
+      "source_name": "EDHTop16",
+      "source_host": "edhtop16.com",
+      "source_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton#standing-7",
+      "deck_name": "Sisay, Weatherlight Captain",
+      "commander_name": "Sisay, Weatherlight Captain",
+      "partner_commander_name": null,
+      "format": "commander",
+      "subformat": "competitive_commander",
+      "archetype": "Sisay, Weatherlight Captain",
+      "card_list": "1 Sisay, Weatherlight Captain\n1 Abrupt Decay\n1 Agatha's Soul Cauldron\n1 Ancient Tomb\n1 Arcane Signet\n1 Ashiok, Dream Render\n1 Avacyn's Pilgrim\n1 Badgermole Cub\n1 Bayou\n1 Birds of Paradise\n1 Bloom Tender\n1 Boseiju, Who Endures\n1 Chainer, Nightmare Adept\n1 Chrome Mox\n1 City of Brass\n1 Command Tower\n1 Crop Rotation\n1 Cyclonic Rift\n1 Deadpool, Trading Card\n1 Deafening Silence\n1 Deathrite Shaman\n1 Deflecting Swat\n1 Demonic Tutor\n1 Derevi, Empyrial Tactician\n1 Elvish Spirit Guide\n1 Emiel the Blessed\n1 Enduring Vitality\n1 Enlightened Tutor\n1 Ertai Resurrected\n1 Esika, God of the Tree // The Prismatic Bridge\n1 Esper Sentinel\n1 Faeburrow Elder\n1 Fellwar Stone\n1 Fierce Guardianship\n1 Finale of Devastation\n1 Flash Thompson, Spider-Fan\n1 Flooded Strand\n1 Force of Will\n1 Gaea's Cradle\n1 Galadriel's Dismissal\n1 Gemstone Caverns\n1 Ignoble Hierarch\n1 Into the Flood Maw\n1 Ioreth of the Healing House\n1 K-9, Mark I\n1 Kalain, Reclusive Painter\n1 Kambal, Profiteering Mayor\n1 Katilda, Dawnhart Prime\n1 Kinnan, Bonder Prodigy\n1 Lavinia, Azorius Renegade\n1 Legolas's Quick Reflexes\n1 Lotho, Corrupt Shirriff\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Vault\n1 Marsh Flats\n1 Marvin, Murderous Mimic\n1 Mental Misstep\n1 Mindbreak Trap\n1 Misty Rainforest\n1 Mount Doom\n1 Mox Amber\n1 Mox Diamond\n1 Mystic Remora\n1 Noble Hierarch\n1 Orcish Bowmasters\n1 Otawara, Soaring City\n1 Peter Parker's Camera\n1 Plateau\n1 Polluted Delta\n1 Ragavan, Nimble Pilferer\n1 Relic of Legends\n1 Ruby, Daring Tracker\n1 Sakashima the Impostor\n1 Savannah\n1 Scalding Tarn\n1 Scrubland\n1 Selvala, Heart of the Wilds\n1 Silence\n1 Smothering Tithe\n1 Sol Ring\n1 Spider-Woman, Stunning Savior\n1 Taiga\n1 Tam, Mindful First-Year\n1 Tarnished Citadel\n1 Tataru Taru\n1 Teferi, Time Raveler\n1 The Cabbage Merchant\n1 The Soul Stone\n1 Touch the Spirit Realm\n1 Tropical Island\n1 Tundra\n1 Tyvar, Jubilant Brawler\n1 Vampiric Tutor\n1 Verdant Catacombs\n1 Volcanic Island\n1 Wan Shi Tong, Librarian\n1 Watery Grave\n1 Windswept Heath\n1 Wooded Foothills",
+      "placement": "7",
+      "color_identity": [
+        "B",
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "is_commander_legal": true,
+      "validation_status": "staged",
+      "legal_status": "valid",
+      "validation_notes": "Expanded by dry-run from EDHTop16 GraphQL -> TopDeck deck page. Commander legality not independently verified. Staged from topdeck_edhtop16_stage2 (legal_status=legal, unresolved_cards=0, illegal_cards=0).",
+      "research_payload": {
+        "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+        "source_context": "edhtop16_tournament_entry",
+        "source_chain": [
+          "edhtop16_graphql",
+          "topdeck_deck_page"
+        ],
+        "tournament_id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "tournament_url": "https://edhtop16.com/tournament/jokers-are-wild-monthly-1k-hosted-by-trenton",
+        "topdeck_deck_url": "https://topdeck.gg/deck/jokers-are-wild-monthly-1k-hosted-by-trenton/q73DmkaSfSWX19FooCHD61cUm8E2",
+        "player_name": "Darison E [TYRNT]",
+        "standing": 7,
+        "topdeck_imported_from": "https://moxfield.com/decks/Nn6lvmKmDkCNhFQqQ4oylg",
+        "commander_count": 1,
+        "mainboard_count": 99,
+        "total_cards": 100,
+        "stage_status": "staged",
+        "staging_audit": {
+          "validation_profile": "topdeck_edhtop16_stage2",
+          "accepted": true,
+          "validation_legal_status": "legal",
+          "commander_color_identity": [
+            "B",
+            "G",
+            "R",
+            "U",
+            "W"
+          ],
+          "unresolved_cards": [],
+          "illegal_cards": [],
+          "issues": [
+            {
+              "severity": "warning",
+              "code": "missing_color_identity",
+              "message": "Color identity ausente. Dry-run ainda passa se o restante do schema estiver correto."
+            }
+          ],
+          "validation_generated_at": "2026-04-27T20:31:35.978056Z",
+          "validation_rejected_count": 0,
+          "expansion_generated_at": "2026-04-27T20:31:35.977215Z",
+          "expansion_rejected_count": 1
+        }
+      },
+      "imported_by": "external_meta_pipeline_2026_04_27_jokers_are_wild_monthly_1k_hosted_by_trenton"
+    }
+  ]
+}
