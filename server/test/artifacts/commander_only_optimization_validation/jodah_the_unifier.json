@@ -1,9 +1,9 @@
 {
   "source_deck_id": "2070158d-5aa0-4918-9325-5f1eff41d359",
   "source_deck_name": "Corpus Seed - Jodah, the Unifier",
-  "seed_deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
+  "seed_deck_id": "d44a8622-f71d-4602-bc63-e1d67f880d49",
   "optimize_request": {
-    "deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
+    "deck_id": "d44a8622-f71d-4602-bc63-e1d67f880d49",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -20,13 +20,14 @@
     },
     "bracket": 2,
     "timings": {
-      "job_id": "354317bf4af3031c707e9fe44a109825",
-      "deck_id": "aa1b948d-d50d-4245-9c04-7af23e542617",
-      "total_ms": 12629,
+      "job_id": "e4511e04945444e0788330b46f86bad0",
+      "deck_id": "d44a8622-f71d-4602-bc63-e1d67f880d49",
+      "total_ms": 10832,
       "stages_ms": {
-        "complete.fill_remainder": 4834,
-        "complete.build_final_response": 1465,
-        "complete.prepare_commander_seed": 2123,
+        "complete.fill_remainder": 3462,
+        "complete.ai_suggestion_loop": 2119,
+        "complete.build_final_response": 1292,
+        "complete.prepare_commander_seed": 794,
         "complete.rebalance_land_deficit": 0,
         "complete.build_intermediate_payload": 0
       },
@@ -34,6 +35,12 @@
     },
     "removals": [],
     "additions": [
+      "Swan Song",
+      "Swiftfoot Boots",
+      "The One Ring",
+      "Mystic Remora",
+      "An Offer You Can't Refuse",
+      "Fellwar Stone",
       "Arcane Denial",
       "Arcane Signet",
       "Beast Within",
@@ -42,27 +49,9 @@
       "Counterspell",
       "Cultivate",
       "Cyclonic Rift",
-      "Fact or Fiction",
-      "Farseek",
-      "Generous Gift",
-      "Kodama's Reach",
-      "Lightning Greaves",
-      "Mind Stone",
-      "Mystical Tutor",
-      "Nature's Lore",
-      "Negate",
-      "Path to Exile",
-      "Ponder",
-      "Preordain",
-      "Read the Bones",
-      "Swan Song",
-      "Swiftfoot Boots",
-      "The One Ring",
-      "Mystic Remora",
-      "An Offer You Can't Refuse",
-      "Fellwar Stone",
       "Sol Ring",
       "Rhystic Study",
+      "Lightning Greaves",
       "Swords to Plowshares",
       "Birds of Paradise",
       "Delighted Halfling",
@@ -72,16 +61,14 @@
       "Commander's Sphere",
       "Jhoira, Weatherlight Captain",
       "Timeless Lotus",
-      "Basim Ibn Ishaq",
-      "Grazilaxx, Illithid Scholar",
       "Inga and Esika",
       "Reki, the History of Kamigawa",
       "Shanid, Sleepers' Scourge",
       "Vega, the Watcher",
       "Vraska Joins Up",
+      "Path to Exile",
       "Faeburrow Elder",
       "Kutzil, Malamet Exemplar",
-      "Selvala, Heart of the Wilds",
       "Toski, Bearer of Secrets",
       "Relic of Legends",
       "Smothering Tithe",
@@ -89,18 +76,41 @@
       "Shalai, Voice of Plenty",
       "Minsc & Boo, Timeless Heroes",
       "Kenrith, the Returned King",
-      "Bard Class",
-      "Gold-Forged Thopteryx",
       "Hajar, Loyal Bodyguard",
       "K-9, Mark I",
-      "Pippin, Guard of the Citadel",
       "Yoshimaru, Ever Faithful",
       "Aragorn, the Uniter",
       "Arvad the Cursed",
+      "Captain Sisay",
+      "Kellan, the Kid",
+      "Lotus Petal",
+      "Kodama's Reach",
+      "Chrome Mox",
+      "Llanowar Elves",
+      "Farseek",
+      "Heroic Intervention",
+      "Thoughtseize",
+      "Ancestral Vision",
+      "Everflowing Chalice",
+      "Force of Will",
+      "Ponder",
+      "Fatal Push",
+      "Lightning Bolt",
+      "Mental Misstep",
+      "Spell Snare",
+      "Authority of the Consuls",
+      "Path of Ancestry",
+      "Starting Town",
+      "Cavern of Souls",
+      "Lazotep Quarry",
+      "Abandoned Outpost",
+      "Bog Wreckage",
+      "Ravaged Highlands",
+      "Talon Gates of Madara",
       "Forest",
       "Island",
-      "Mountain",
       "Plains",
+      "Mountain",
       "Swamp"
     ],
     "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
@@ -127,38 +137,74 @@
       "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
     },
     "post_analysis": {
-      "average_cmc": "2.51",
+      "average_cmc": "2.30",
       "total_cards": 100,
       "type_distribution": {
-        "lands": 37,
+        "lands": 36,
         "battles": 0,
-        "instants": 13,
-        "artifacts": 14,
-        "creatures": 25,
-        "sorceries": 7,
+        "instants": 15,
+        "artifacts": 15,
+        "creatures": 23,
+        "sorceries": 6,
         "enchantments": 5,
         "planeswalkers": 1
       },
       "detected_archetype": "midrange",
       "archetype_confidence": "média",
-      "mana_base_assessment": "Falta mana W (Tem 8 fontes, ideal > 10). Falta mana U (Tem 8 fontes, ideal > 15). Falta mana G (Tem 9 fontes, ideal > 10)",
-      "mana_curve_assessment": "BOA: Curva equilibrada para Midrange"
+      "mana_base_assessment": "Base de mana equilibrada",
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
     },
     "consistency_slo": {
       "added_total": 99,
-      "basic_added": 36,
+      "basic_added": 27,
       "target_total": 99,
       "ai_stage_used": false,
-      "non_basic_added": 63,
+      "non_basic_added": 72,
       "completed_target": true,
-      "deterministic_stage_used": false,
+      "deterministic_stage_used": true,
       "average_deck_seed_stage_used": true,
-      "competitive_model_stage_used": true,
+      "competitive_model_stage_used": false,
       "guaranteed_basics_stage_used": false
     },
     "target_additions": 99,
     "removals_detailed": [],
     "additions_detailed": [
+      {
+        "name": "Swan Song",
+        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Swiftfoot Boots",
+        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "The One Ring",
+        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mystic Remora",
+        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "An Offer You Can't Refuse",
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fellwar Stone",
+        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
       {
         "name": "Arcane Denial",
         "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
@@ -208,128 +254,20 @@
         "is_basic_land": false
       },
       {
-        "name": "Fact or Fiction",
-        "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Farseek",
-        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Generous Gift",
-        "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Kodama's Reach",
-        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Lightning Greaves",
-        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mind Stone",
-        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mystical Tutor",
-        "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Nature's Lore",
-        "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Negate",
-        "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Path to Exile",
-        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Ponder",
-        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Preordain",
-        "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Read the Bones",
-        "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Swan Song",
-        "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Swiftfoot Boots",
-        "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "The One Ring",
-        "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mystic Remora",
-        "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "An Offer You Can't Refuse",
-        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Fellwar Stone",
-        "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Sol Ring",
-        "card_id": "c971ff63-79d9-45e4-a7d9-4aec4eecd525",
+        "card_id": "95773544-9c24-45d9-bb76-1b02594d9179",
         "quantity": 1,
         "is_basic_land": false
       },
       {
         "name": "Rhystic Study",
         "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -341,7 +279,7 @@
       },
       {
         "name": "Birds of Paradise",
-        "card_id": "461498dd-f877-458e-b4f5-c674e250e6b0",
+        "card_id": "b15a743c-f7cc-496a-82e3-d5e5a0e5887e",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -388,18 +326,6 @@
         "is_basic_land": false
       },
       {
-        "name": "Basim Ibn Ishaq",
-        "card_id": "bb7d81cd-e975-4c84-9bd3-fcb5a99e9fb2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Grazilaxx, Illithid Scholar",
-        "card_id": "d46795c3-9266-49ec-8646-df3e9c701594",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Inga and Esika",
         "card_id": "9c592899-71e0-479c-b0b3-6b1425157451",
         "quantity": 1,
@@ -430,6 +356,12 @@
         "is_basic_land": false
       },
       {
+        "name": "Path to Exile",
+        "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
         "name": "Faeburrow Elder",
         "card_id": "ea005602-5c63-4293-a1f7-52f5a2fb3532",
         "quantity": 1,
@@ -438,12 +370,6 @@
       {
         "name": "Kutzil, Malamet Exemplar",
         "card_id": "d3c2b16f-34ee-46c8-93a8-46ecdda81c9d",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Selvala, Heart of the Wilds",
-        "card_id": "d9ec1451-478e-4b72-a1d8-cd0949fcd171",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -490,18 +416,6 @@
         "is_basic_land": false
       },
       {
-        "name": "Bard Class",
-        "card_id": "06a25da6-259e-440d-8881-43bb00a83189",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Gold-Forged Thopteryx",
-        "card_id": "bea56e01-ed27-42f6-b19c-2a9528f8fe9a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Hajar, Loyal Bodyguard",
         "card_id": "e90d5849-fbf6-460a-b901-eb8477d65c0a",
         "quantity": 1,
@@ -510,12 +424,6 @@
       {
         "name": "K-9, Mark I",
         "card_id": "e1413f6a-aa28-4ed1-ac25-913e7e590cb9",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Pippin, Guard of the Citadel",
-        "card_id": "aa63dcab-63a1-4e6e-87b7-6382fcd78952",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -538,33 +446,189 @@
         "is_basic_land": false
       },
       {
+        "name": "Captain Sisay",
+        "card_id": "65b86b7c-e65b-4180-8793-dff29b4b83e3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kellan, the Kid",
+        "card_id": "a6d717b4-622e-4e01-905c-a5f98b715505",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lotus Petal",
+        "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Kodama's Reach",
+        "card_id": "8351227c-0412-4515-96c5-b560dff18316",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chrome Mox",
+        "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Llanowar Elves",
+        "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Farseek",
+        "card_id": "b1a17f11-0d5b-4a97-bc6e-5a7fb8db51c7",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Heroic Intervention",
+        "card_id": "eb81625b-60df-4040-8a9d-4b392030c44f",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Thoughtseize",
+        "card_id": "8e15243c-509c-47cb-9bd5-a4b4b75b6a71",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ancestral Vision",
+        "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Everflowing Chalice",
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Force of Will",
+        "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ponder",
+        "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fatal Push",
+        "card_id": "a412a94e-6156-4fa1-bea4-8fe8d48567b8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lightning Bolt",
+        "card_id": "0e7f9811-d536-4bac-b4e3-727b6d3f1c73",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mental Misstep",
+        "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Spell Snare",
+        "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Authority of the Consuls",
+        "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path of Ancestry",
+        "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Starting Town",
+        "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cavern of Souls",
+        "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lazotep Quarry",
+        "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abandoned Outpost",
+        "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Bog Wreckage",
+        "card_id": "e3dd19b2-446e-4ab4-b3ad-373dd29218c8",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ravaged Highlands",
+        "card_id": "bf5a103c-8d60-4753-aac1-cc3871727464",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talon Gates of Madara",
+        "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
         "name": "Forest",
         "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
-        "quantity": 8,
+        "quantity": 10,
         "is_basic_land": true
       },
       {
         "name": "Island",
         "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
-        "quantity": 7,
-        "is_basic_land": true
-      },
-      {
-        "name": "Mountain",
-        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
-        "quantity": 7,
+        "quantity": 6,
         "is_basic_land": true
       },
       {
         "name": "Plains",
         "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
-        "quantity": 7,
+        "quantity": 5,
+        "is_basic_land": true
+      },
+      {
+        "name": "Mountain",
+        "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+        "quantity": 3,
         "is_basic_land": true
       },
       {
         "name": "Swamp",
         "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
-        "quantity": 7,
+        "quantity": 3,
         "is_basic_land": true
       }
     ],
@@ -589,6 +653,30 @@
       ],
       "cmc": 5.0,
       "oracle_text": "Legendary creatures you control get +X/+X, where X is the number of legendary creatures you control.\nWhenever you cast a legendary spell from your hand, exile cards from the top of your library until you exile a legendary nonland card with lesser mana value. You may cast that card without paying its mana cost. Put the rest on the bottom of your library in a random order."
+    },
+    {
+      "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abandoned Outpost",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {W}.\n{T}, Sacrifice this land: Add one mana of any color."
+    },
+    {
+      "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ancestral Vision",
+      "type_line": "Sorcery",
+      "mana_cost": "",
+      "colors": [
+        "U"
+      ],
+      "cmc": 0.0,
+      "oracle_text": "Suspend 4—{U} (Rather than cast this card from your hand, pay {U} and exile it with four time counters on it. At the beginning of your upkeep, remove a time counter. When the last is removed, you may cast it without paying its mana cost.)\nTarget player draws three cards."
     },
     {
       "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
@@ -658,32 +746,17 @@
       "oracle_text": "Deathtouch, lifelink\nOther legendary creatures you control get +2/+2."
     },
     {
-      "card_id": "06a25da6-259e-440d-8881-43bb00a83189",
+      "card_id": "a5ff2002-0a02-4886-9d21-e0640a704b5b",
       "quantity": 1,
       "is_commander": false,
-      "name": "Bard Class",
-      "type_line": "Enchantment — Class",
-      "mana_cost": "{R}{G}",
+      "name": "Authority of the Consuls",
+      "type_line": "Enchantment",
+      "mana_cost": "{W}",
       "colors": [
-        "G",
-        "R"
+        "W"
       ],
-      "cmc": 2.0,
-      "oracle_text": "(Gain the next level as a sorcery to add its ability.)\nLegendary creatures you control enter with an additional +1/+1 counter on them.\n{R}{G}: Level 2\nLegendary spells you cast cost {R}{G} less to cast. This effect reduces only the amount of colored mana you pay.\n{3}{R}{G}: Level 3\nWhenever you cast a legendary spell, exile the top two cards of your library. You may play them this turn."
-    },
-    {
-      "card_id": "bb7d81cd-e975-4c84-9bd3-fcb5a99e9fb2",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Basim Ibn Ishaq",
-      "type_line": "Legendary Creature — Human Assassin",
-      "mana_cost": "{U}{B}",
-      "colors": [
-        "B",
-        "U"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Whenever you cast a historic spell, draw a card. Basim Ibn Ishaq can't be blocked this turn. This ability triggers only once each turn. (Artifacts, legendaries, and Sagas are historic.)\nWhenever Basim Ibn Ishaq deals combat damage to a player, put a +1/+1 counter on it."
+      "cmc": 1.0,
+      "oracle_text": "Creatures your opponents control enter tapped.\nWhenever a creature an opponent controls enters, you gain 1 life."
     },
     {
       "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
@@ -699,7 +772,7 @@
       "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
     },
     {
-      "card_id": "461498dd-f877-458e-b4f5-c674e250e6b0",
+      "card_id": "b15a743c-f7cc-496a-82e3-d5e5a0e5887e",
       "quantity": 1,
       "is_commander": false,
       "name": "Birds of Paradise",
@@ -723,6 +796,17 @@
       ],
       "cmc": 2.0,
       "oracle_text": "Vivid — {T}: For each color among permanents you control, add one mana of that color."
+    },
+    {
+      "card_id": "e3dd19b2-446e-4ab4-b3ad-373dd29218c8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Bog Wreckage",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {B}.\n{T}, Sacrifice this land: Add one mana of any color."
     },
     {
       "card_id": "098d718b-2e82-4365-a94d-00ebd437fa45",
@@ -751,6 +835,31 @@
       "oracle_text": "Draw three cards, then put two cards from your hand on top of your library in any order."
     },
     {
+      "card_id": "65b86b7c-e65b-4180-8793-dff29b4b83e3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Captain Sisay",
+      "type_line": "Legendary Creature — Human Soldier",
+      "mana_cost": "{2}{G}{W}",
+      "colors": [
+        "G",
+        "W"
+      ],
+      "cmc": 4.0,
+      "oracle_text": "{T}: Search your library for a legendary card, reveal that card, put it into your hand, then shuffle."
+    },
+    {
+      "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cavern of Souls",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered."
+    },
+    {
       "card_id": "b908bb55-1c1e-4d3f-8309-d08167bfd8e3",
       "quantity": 1,
       "is_commander": false,
@@ -760,6 +869,17 @@
       "colors": [],
       "cmc": 3.0,
       "oracle_text": "Lands you control have \"{T}: Add one mana of any color.\"\n{T}: Add one mana of any color."
+    },
+    {
+      "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chrome Mox",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.\n{T}: Add one mana of any of the exiled card's colors."
     },
     {
       "card_id": "d54af606-9e7b-43a9-a9bc-8c4e7735de9a",
@@ -836,17 +956,15 @@
       "oracle_text": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell, and that spell can't be countered."
     },
     {
-      "card_id": "5dd7f93a-1a11-4f7e-a798-3ed79de1fd34",
+      "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
       "quantity": 1,
       "is_commander": false,
-      "name": "Fact or Fiction",
-      "type_line": "Instant",
-      "mana_cost": "{3}{U}",
-      "colors": [
-        "U"
-      ],
-      "cmc": 4.0,
-      "oracle_text": "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your hand and the other into your graveyard."
+      "name": "Everflowing Chalice",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Multikicker {2} (You may pay an additional {2} any number of times as you cast this spell.)\nThis artifact enters with a charge counter on it for each time it was kicked.\n{T}: Add {C} for each charge counter on this artifact."
     },
     {
       "card_id": "ea005602-5c63-4293-a1f7-52f5a2fb3532",
@@ -876,6 +994,19 @@
       "oracle_text": "Search your library for a Plains, Island, Swamp, or Mountain card, put it onto the battlefield tapped, then shuffle."
     },
     {
+      "card_id": "a412a94e-6156-4fa1-bea4-8fe8d48567b8",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Fatal Push",
+      "type_line": "Instant",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn."
+    },
+    {
       "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
       "quantity": 1,
       "is_commander": false,
@@ -887,8 +1018,21 @@
       "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
     },
     {
+      "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Force of Will",
+      "type_line": "Instant",
+      "mana_cost": "{3}{U}{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 5.0,
+      "oracle_text": "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell."
+    },
+    {
       "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
-      "quantity": 8,
+      "quantity": 10,
       "is_commander": false,
       "name": "Forest",
       "type_line": "Basic Land — Forest",
@@ -896,46 +1040,6 @@
       "colors": [],
       "cmc": 0.0,
       "oracle_text": "({T}: Add {G}.)"
-    },
-    {
-      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Generous Gift",
-      "type_line": "Instant",
-      "mana_cost": "{2}{W}",
-      "colors": [
-        "W"
-      ],
-      "cmc": 3.0,
-      "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Elephant creature token."
-    },
-    {
-      "card_id": "bea56e01-ed27-42f6-b19c-2a9528f8fe9a",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Gold-Forged Thopteryx",
-      "type_line": "Artifact Creature — Dinosaur Thopter",
-      "mana_cost": "{W}{U}",
-      "colors": [
-        "U",
-        "W"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Flying, lifelink\nEach legendary permanent you control has ward {2}. (Whenever it becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)"
-    },
-    {
-      "card_id": "d46795c3-9266-49ec-8646-df3e9c701594",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Grazilaxx, Illithid Scholar",
-      "type_line": "Legendary Creature — Horror",
-      "mana_cost": "{1}{U}{U}",
-      "colors": [
-        "U"
-      ],
-      "cmc": 3.0,
-      "oracle_text": "Whenever a creature you control becomes blocked, you may return it to its owner's hand.\nWhenever one or more creatures you control deal combat damage to a player, draw a card."
     },
     {
       "card_id": "e90d5849-fbf6-460a-b901-eb8477d65c0a",
@@ -950,6 +1054,19 @@
       ],
       "cmc": 2.0,
       "oracle_text": "Sacrifice Hajar: Legendary creatures you control get +1/+0 and gain indestructible until end of turn."
+    },
+    {
+      "card_id": "eb81625b-60df-4040-8a9d-4b392030c44f",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Heroic Intervention",
+      "type_line": "Instant",
+      "mana_cost": "{1}{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Permanents you control gain hexproof and indestructible until end of turn."
     },
     {
       "card_id": "9c592899-71e0-479c-b0b3-6b1425157451",
@@ -967,7 +1084,7 @@
     },
     {
       "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
-      "quantity": 7,
+      "quantity": 6,
       "is_commander": false,
       "name": "Island",
       "type_line": "Basic Land — Island",
@@ -1002,6 +1119,21 @@
       ],
       "cmc": 1.0,
       "oracle_text": "Negative — As long as K-9 is untapped, other legendary creatures you control have ward {1}.\nAffirmative — {1}{U}, {T}: Target legendary creature can't be blocked this turn.\nDoctor's companion (You can have two commanders if the other is the Doctor.)"
+    },
+    {
+      "card_id": "a6d717b4-622e-4e01-905c-a5f98b715505",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Kellan, the Kid",
+      "type_line": "Legendary Creature — Human Faerie Rogue",
+      "mana_cost": "{G}{W}{U}",
+      "colors": [
+        "G",
+        "U",
+        "W"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "Flying, lifelink\nWhenever you cast a spell from anywhere other than your hand, you may cast a permanent spell with equal or lesser mana value from your hand without paying its mana cost. If you don't, you may put a land card from your hand onto the battlefield."
     },
     {
       "card_id": "bf21a489-c2f3-4f99-806c-cc6475996dd0",
@@ -1044,6 +1176,30 @@
       "oracle_text": "Your opponents can't cast spells during your turn.\nWhenever one or more creatures you control each with power greater than its base power deals combat damage to a player, draw a card."
     },
     {
+      "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lazotep Quarry",
+      "type_line": "Land — Desert",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery."
+    },
+    {
+      "card_id": "0e7f9811-d536-4bac-b4e3-727b6d3f1c73",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lightning Bolt",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Lightning Bolt deals 3 damage to any target."
+    },
+    {
       "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
       "quantity": 1,
       "is_commander": false,
@@ -1055,15 +1211,41 @@
       "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
     },
     {
-      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
       "quantity": 1,
       "is_commander": false,
-      "name": "Mind Stone",
+      "name": "Llanowar Elves",
+      "type_line": "Creature — Elf Druid",
+      "mana_cost": "{G}",
+      "colors": [
+        "G"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "{T}: Add {G}."
+    },
+    {
+      "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Lotus Petal",
       "type_line": "Artifact",
-      "mana_cost": "{2}",
+      "mana_cost": "{0}",
       "colors": [],
-      "cmc": 2.0,
-      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+      "cmc": 0.0,
+      "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color."
+    },
+    {
+      "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mental Misstep",
+      "type_line": "Instant",
+      "mana_cost": "{U/P}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "({U/P} can be paid with either {U} or 2 life.)\nCounter target spell with mana value 1."
     },
     {
       "card_id": "0647f69c-fe1e-40e2-a704-019a1032440f",
@@ -1081,7 +1263,7 @@
     },
     {
       "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
-      "quantity": 7,
+      "quantity": 3,
       "is_commander": false,
       "name": "Mountain",
       "type_line": "Basic Land — Mountain",
@@ -1102,19 +1284,6 @@
       "oracle_text": "{T}: Add one mana of any color among legendary creatures and planeswalkers you control."
     },
     {
-      "card_id": "401ee6a5-12b7-4ea5-8726-bc5fceac6739",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Mystical Tutor",
-      "type_line": "Instant",
-      "mana_cost": "{U}",
-      "colors": [
-        "U"
-      ],
-      "cmc": 1.0,
-      "oracle_text": "Search your library for an instant or sorcery card, reveal it, then shuffle and put that card on top."
-    },
-    {
       "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
       "quantity": 1,
       "is_commander": false,
@@ -1128,30 +1297,15 @@
       "oracle_text": "Cumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)\nWhenever an opponent casts a noncreature spell, you may draw a card unless that player pays {4}."
     },
     {
-      "card_id": "72118ebb-3bfe-4e82-8eee-85381521eefa",
+      "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
       "quantity": 1,
       "is_commander": false,
-      "name": "Nature's Lore",
-      "type_line": "Sorcery",
-      "mana_cost": "{1}{G}",
-      "colors": [
-        "G"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle."
-    },
-    {
-      "card_id": "80c1b3a7-7e93-4694-9713-da69949b585b",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Negate",
-      "type_line": "Instant",
-      "mana_cost": "{1}{U}",
-      "colors": [
-        "U"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Counter target noncreature spell."
+      "name": "Path of Ancestry",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add one mana of any color in your commander's color identity. When that mana is spent to cast a creature spell that shares a creature type with your commander, scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
     },
     {
       "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
@@ -1167,22 +1321,8 @@
       "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle."
     },
     {
-      "card_id": "aa63dcab-63a1-4e6e-87b7-6382fcd78952",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Pippin, Guard of the Citadel",
-      "type_line": "Legendary Creature — Halfling Soldier",
-      "mana_cost": "{W}{U}",
-      "colors": [
-        "U",
-        "W"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Vigilance, ward {1}\n{T}: Another target creature you control gains protection from the card type of your choice until end of turn. (It can't be blocked, targeted, dealt damage, enchanted, or equipped by anything of that type.)"
-    },
-    {
       "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
-      "quantity": 7,
+      "quantity": 5,
       "is_commander": false,
       "name": "Plains",
       "type_line": "Basic Land — Plains",
@@ -1205,30 +1345,15 @@
       "oracle_text": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
     },
     {
-      "card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+      "card_id": "bf5a103c-8d60-4753-aac1-cc3871727464",
       "quantity": 1,
       "is_commander": false,
-      "name": "Preordain",
-      "type_line": "Sorcery",
-      "mana_cost": "{U}",
-      "colors": [
-        "U"
-      ],
-      "cmc": 1.0,
-      "oracle_text": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
-    },
-    {
-      "card_id": "7252b8a9-69cb-4380-945a-bed4c0a38710",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Read the Bones",
-      "type_line": "Sorcery",
-      "mana_cost": "{2}{B}",
-      "colors": [
-        "B"
-      ],
-      "cmc": 3.0,
-      "oracle_text": "Scry 2, then draw two cards. You lose 2 life. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+      "name": "Ravaged Highlands",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {R}.\n{T}, Sacrifice this land: Add one mana of any color."
     },
     {
       "card_id": "2c2a8779-e217-41f9-b990-55c652102652",
@@ -1266,19 +1391,6 @@
       ],
       "cmc": 3.0,
       "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}."
-    },
-    {
-      "card_id": "d9ec1451-478e-4b72-a1d8-cd0949fcd171",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Selvala, Heart of the Wilds",
-      "type_line": "Legendary Creature — Elf Scout",
-      "mana_cost": "{1}{G}{G}",
-      "colors": [
-        "G"
-      ],
-      "cmc": 3.0,
-      "oracle_text": "Whenever another creature enters, its controller may draw a card if its power is greater than each other creature's power.\n{G}, {T}: Add X mana in any combination of colors, where X is the greatest power among creatures you control."
     },
     {
       "card_id": "add6119f-93fb-4a65-9ffe-eb285da4080e",
@@ -1322,7 +1434,7 @@
       "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
     },
     {
-      "card_id": "c971ff63-79d9-45e4-a7d9-4aec4eecd525",
+      "card_id": "95773544-9c24-45d9-bb76-1b02594d9179",
       "quantity": 1,
       "is_commander": false,
       "name": "Sol Ring",
@@ -1333,8 +1445,32 @@
       "oracle_text": "{T}: Add {C}{C}."
     },
     {
+      "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Spell Snare",
+      "type_line": "Instant",
+      "mana_cost": "{U}",
+      "colors": [
+        "U"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Counter target spell with mana value 2."
+    },
+    {
+      "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Starting Town",
+      "type_line": "Land — Town",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped unless it's your first, second, or third turn of the game.\n{T}: Add {C}.\n{T}, Pay 1 life: Add one mana of any color."
+    },
+    {
       "card_id": "258cb391-43bd-49ac-8abb-06ff150bdb05",
-      "quantity": 7,
+      "quantity": 3,
       "is_commander": false,
       "name": "Swamp",
       "type_line": "Basic Land — Swamp",
@@ -1381,6 +1517,17 @@
       "oracle_text": "Exile target creature. Its controller gains life equal to its power."
     },
     {
+      "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talon Gates of Madara",
+      "type_line": "Land — Gate",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "When this land enters, up to one target creature phases out.\n{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{4}: Put this card from your hand onto the battlefield."
+    },
+    {
       "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
       "quantity": 1,
       "is_commander": false,
@@ -1390,6 +1537,19 @@
       "colors": [],
       "cmc": 4.0,
       "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
+    },
+    {
+      "card_id": "8e15243c-509c-47cb-9bd5-a4b4b75b6a71",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Thoughtseize",
+      "type_line": "Sorcery",
+      "mana_cost": "{B}",
+      "colors": [
+        "B"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life."
     },
     {
       "card_id": "b1b14583-ae55-4522-b77e-6309ad55cb93",

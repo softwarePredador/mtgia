@@ -1,9 +1,9 @@
 {
   "source_deck_id": "169d8b11-5210-4bfc-b8f0-9fbfe6bbb635",
   "source_deck_name": "Corpus Seed - Krenko, Mob Boss",
-  "seed_deck_id": "14f01eaf-3fea-47c2-9ca0-d25b9bc29f30",
+  "seed_deck_id": "c4c78724-1b80-4d4d-ac2a-bb9b6ec5aaad",
   "optimize_request": {
-    "deck_id": "14f01eaf-3fea-47c2-9ca0-d25b9bc29f30",
+    "deck_id": "c4c78724-1b80-4d4d-ac2a-bb9b6ec5aaad",
     "archetype": "midrange",
     "bracket": 2,
     "keep_theme": true
@@ -20,28 +20,28 @@
     },
     "bracket": 2,
     "timings": {
-      "job_id": "45a743ee479b39d3be0e50c9d98d26d9",
-      "deck_id": "14f01eaf-3fea-47c2-9ca0-d25b9bc29f30",
-      "total_ms": 11629,
+      "job_id": "e3aaefaf332e06abd20b50f54a6f10a0",
+      "deck_id": "c4c78724-1b80-4d4d-ac2a-bb9b6ec5aaad",
+      "total_ms": 11682,
       "stages_ms": {
-        "complete.fill_remainder": 3952,
-        "complete.build_final_response": 1203,
-        "complete.prepare_commander_seed": 2519,
-        "complete.rebalance_land_deficit": 0,
+        "complete.fill_remainder": 4451,
+        "complete.ai_suggestion_loop": 2187,
+        "complete.build_final_response": 1190,
+        "complete.prepare_commander_seed": 641,
+        "complete.rebalance_land_deficit": 1,
         "complete.build_intermediate_payload": 0
       },
       "request_mode": "complete_async"
     },
     "removals": [],
     "additions": [
-      "Arcane Signet",
-      "Command Tower",
-      "Lightning Greaves",
-      "Mind Stone",
       "Swiftfoot Boots",
       "The One Ring",
       "Fellwar Stone",
+      "Arcane Signet",
+      "Command Tower",
       "Sol Ring",
+      "Lightning Greaves",
       "Lightning Bolt",
       "Skullclamp",
       "Faithless Looting",
@@ -52,13 +52,10 @@
       "Goblin Trashmaster",
       "Hazoret's Monument",
       "Staff of Domination",
-      "Vanquisher's Banner",
       "Battle Hymn",
       "Brightstone Ritual",
-      "Throne of the God-Pharaoh",
       "Patriar's Seal",
       "Hexing Squelcher",
-      "Ashnod's Altar",
       "Gempalm Incinerator",
       "Howlsquad Heavy",
       "Skirk Prospector",
@@ -69,27 +66,16 @@
       "Shared Animosity",
       "Battle Cry Goblin",
       "Conspicuous Snoop",
-      "Foundry Street Denizen",
       "Goblin Chirurgeon",
       "Goblin Grenade",
       "Goblin Instigator",
-      "Goblin Lookout",
-      "Goblin Motivator",
       "Goblin Recruiter",
-      "Goblin Wardriver",
       "Goro-Goro, Disciple of Ryusei",
-      "Grenzo, Havoc Raiser",
-      "Legion Loyalist",
       "Mogg War Marshal",
-      "Moria Marauder",
       "Quest for the Goblin Lord",
       "Rundvelt Hordemaster",
-      "Searslicer Goblin",
       "Sting, the Glinting Dagger",
-      "Thornbite Staff",
-      "Torch Courier",
       "Warren Instigator",
-      "Battle Squadron",
       "Beetleback Chief",
       "Boggart Shenanigans",
       "General Kreat, the Boltbringer",
@@ -97,6 +83,30 @@
       "Hobgoblin Bandit Lord",
       "Legion Warboss",
       "Pashalik Mons",
+      "Lotus Petal",
+      "Crimson Wisps",
+      "Chrome Mox",
+      "Harmonic Prodigy",
+      "Chaos Warp",
+      "Everflowing Chalice",
+      "Burst Lightning",
+      "Expedite",
+      "Expedition Map",
+      "Gamble",
+      "Mana Vault",
+      "Agatha's Soul Cauldron",
+      "Cathartic Reunion",
+      "Cori-Steel Cutter",
+      "Demand Answers",
+      "Fists of Flame",
+      "Path of Ancestry",
+      "Starting Town",
+      "Cavern of Souls",
+      "Lazotep Quarry",
+      "Ravaged Highlands",
+      "Talon Gates of Madara",
+      "Abstergo Entertainment",
+      "Aether Hub",
       "Mountain"
     ],
     "reasoning": "Deck completado com cartas sinérgicas ao arquétipo midrange, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
@@ -123,62 +133,38 @@
       "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
     },
     "post_analysis": {
-      "average_cmc": "2.30",
+      "average_cmc": "2.08",
       "total_cards": 100,
       "type_distribution": {
-        "lands": 37,
+        "lands": 36,
         "battles": 0,
-        "instants": 5,
-        "artifacts": 16,
-        "creatures": 34,
-        "sorceries": 3,
+        "instants": 11,
+        "artifacts": 18,
+        "creatures": 25,
+        "sorceries": 5,
         "enchantments": 6,
         "planeswalkers": 0
       },
-      "detected_archetype": "aggro",
+      "detected_archetype": "midrange",
       "archetype_confidence": "média",
       "mana_base_assessment": "Base de mana equilibrada",
-      "mana_curve_assessment": "OK: Curva aceitável para Aggro"
+      "mana_curve_assessment": "ALERTA: Curva fora do ideal para Midrange (2.5-3.5)"
     },
     "consistency_slo": {
       "added_total": 99,
-      "basic_added": 36,
+      "basic_added": 27,
       "target_total": 99,
       "ai_stage_used": false,
-      "non_basic_added": 63,
+      "non_basic_added": 72,
       "completed_target": true,
-      "deterministic_stage_used": false,
+      "deterministic_stage_used": true,
       "average_deck_seed_stage_used": true,
-      "competitive_model_stage_used": true,
+      "competitive_model_stage_used": false,
       "guaranteed_basics_stage_used": false
     },
     "target_additions": 99,
     "removals_detailed": [],
     "additions_detailed": [
-      {
-        "name": "Arcane Signet",
-        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Command Tower",
-        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Lightning Greaves",
-        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Mind Stone",
-        "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
-        "quantity": 1,
-        "is_basic_land": false
-      },
       {
         "name": "Swiftfoot Boots",
         "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
@@ -198,14 +184,32 @@
         "is_basic_land": false
       },
       {
+        "name": "Arcane Signet",
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Command Tower",
+        "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
         "name": "Sol Ring",
         "card_id": "6d1479e1-2d35-4861-a672-cc70ace5da50",
         "quantity": 1,
         "is_basic_land": false
       },
       {
+        "name": "Lightning Greaves",
+        "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
         "name": "Lightning Bolt",
-        "card_id": "ff4fa05d-33ac-403b-b5e3-27432e6bad0b",
+        "card_id": "b9024041-fdb5-4d03-9f22-fa38370d27b9",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -223,7 +227,7 @@
       },
       {
         "name": "Goblin Bombardment",
-        "card_id": "4e962136-660c-4fa7-9e5c-2632ce92dd8f",
+        "card_id": "5246cf1f-6470-4bc2-b487-1a30b7faa06a",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -264,12 +268,6 @@
         "is_basic_land": false
       },
       {
-        "name": "Vanquisher's Banner",
-        "card_id": "ea496a3f-c480-40d7-aa55-a7b7fb1cd184",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Battle Hymn",
         "card_id": "4ee370c6-04d7-4341-8186-1002d9f8f7d1",
         "quantity": 1,
@@ -282,12 +280,6 @@
         "is_basic_land": false
       },
       {
-        "name": "Throne of the God-Pharaoh",
-        "card_id": "5149ff29-f51f-4982-96d6-8e20923ca95a",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Patriar's Seal",
         "card_id": "3a1d9e26-ab86-452f-a7fc-d510cea0f8d5",
         "quantity": 1,
@@ -296,12 +288,6 @@
       {
         "name": "Hexing Squelcher",
         "card_id": "b6c9d0b5-7919-49e7-9299-4aa59b3bdb6e",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Ashnod's Altar",
-        "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -366,12 +352,6 @@
         "is_basic_land": false
       },
       {
-        "name": "Foundry Street Denizen",
-        "card_id": "86f036eb-f0fe-45e0-83d8-236d271a69d6",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Goblin Chirurgeon",
         "card_id": "51dc1356-46f4-4ca7-8e0d-9e6909fe2bb1",
         "quantity": 1,
@@ -390,26 +370,8 @@
         "is_basic_land": false
       },
       {
-        "name": "Goblin Lookout",
-        "card_id": "6f5bae2f-aaa1-469c-9536-8ede712423e2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Goblin Motivator",
-        "card_id": "b52a4b91-13fe-4299-93f1-05bbcbf6325f",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Goblin Recruiter",
         "card_id": "88268761-7ccf-47da-b527-b3f60b7730bb",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Goblin Wardriver",
-        "card_id": "e919f0d2-f97e-4116-9412-41ae4f67cad9",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -420,26 +382,8 @@
         "is_basic_land": false
       },
       {
-        "name": "Grenzo, Havoc Raiser",
-        "card_id": "1f4f3600-1e8e-4cd8-aac3-2db1ee78d526",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Legion Loyalist",
-        "card_id": "2602311e-d249-4f8f-8667-a760349c6033",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Mogg War Marshal",
         "card_id": "9df82f92-c7e7-4474-b1c3-813fabd615c2",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Moria Marauder",
-        "card_id": "55cac75c-772f-464a-828d-f966a61ec955",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -456,38 +400,14 @@
         "is_basic_land": false
       },
       {
-        "name": "Searslicer Goblin",
-        "card_id": "497a7437-8875-4b33-aa1b-7ec381c59bdc",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Sting, the Glinting Dagger",
         "card_id": "3cbb574f-1fca-49a3-900f-a2cfa0d96250",
         "quantity": 1,
         "is_basic_land": false
       },
       {
-        "name": "Thornbite Staff",
-        "card_id": "a041ce88-2d54-42f0-9141-7545f4fd7e10",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Torch Courier",
-        "card_id": "a985835c-4bbf-4a1d-b584-e2969dbfadcb",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
         "name": "Warren Instigator",
         "card_id": "b7a3066b-9a95-4bc5-b748-8d90f149e514",
-        "quantity": 1,
-        "is_basic_land": false
-      },
-      {
-        "name": "Battle Squadron",
-        "card_id": "870626a9-c33b-4c8d-9416-7a61a6a28557",
         "quantity": 1,
         "is_basic_land": false
       },
@@ -534,9 +454,153 @@
         "is_basic_land": false
       },
       {
+        "name": "Lotus Petal",
+        "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Crimson Wisps",
+        "card_id": "f3eb41b4-fbdd-4ad9-8e27-301d4d53ac3a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chrome Mox",
+        "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Harmonic Prodigy",
+        "card_id": "72c3394f-a105-42f1-97d6-6914afff36f4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Chaos Warp",
+        "card_id": "13aeaa4a-1027-455f-869b-1722685354b6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Everflowing Chalice",
+        "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Burst Lightning",
+        "card_id": "b9ddb561-f561-409f-979d-b5f73b330fe3",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Expedite",
+        "card_id": "5e92b031-b69a-41d5-ba32-9699e6b450b1",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Expedition Map",
+        "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Gamble",
+        "card_id": "5fe2a15b-e631-472b-b7bb-34f515ebdb7e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Mana Vault",
+        "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Agatha's Soul Cauldron",
+        "card_id": "bf87b955-e319-425a-9ce1-760f7c35d137",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cathartic Reunion",
+        "card_id": "4013b9d7-32c9-47bd-85a6-05a58e5a1dce",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cori-Steel Cutter",
+        "card_id": "c0103bde-479f-4a8d-8939-1eec3e5b7768",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Demand Answers",
+        "card_id": "efe0138e-557f-4135-a48f-c4672a818f2e",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Fists of Flame",
+        "card_id": "0ea2b961-bdf0-459d-82a7-29f5f5999352",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Path of Ancestry",
+        "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Starting Town",
+        "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Cavern of Souls",
+        "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Lazotep Quarry",
+        "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Ravaged Highlands",
+        "card_id": "bf5a103c-8d60-4753-aac1-cc3871727464",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Talon Gates of Madara",
+        "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Abstergo Entertainment",
+        "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
+        "name": "Aether Hub",
+        "card_id": "18a2bf1d-6d6f-476f-a90c-03483a342f51",
+        "quantity": 1,
+        "is_basic_land": false
+      },
+      {
         "name": "Mountain",
         "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
-        "quantity": 36,
+        "quantity": 27,
         "is_basic_land": true
       }
     ],
@@ -572,6 +636,39 @@
       "oracle_text": "Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact."
     },
     {
+      "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Abstergo Entertainment",
+      "type_line": "Legendary Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{3}, {T}, Exile Abstergo Entertainment: Return up to one target historic card from your graveyard to your hand, then exile all graveyards. (Artifacts, legendaries, and Sagas are historic.)"
+    },
+    {
+      "card_id": "18a2bf1d-6d6f-476f-a90c-03483a342f51",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Aether Hub",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "When this land enters, you get {E} (an energy counter).\n{T}: Add {C}.\n{T}, Pay {E}: Add one mana of any color."
+    },
+    {
+      "card_id": "bf87b955-e319-425a-9ce1-760f7c35d137",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Agatha's Soul Cauldron",
+      "type_line": "Legendary Artifact",
+      "mana_cost": "{2}",
+      "colors": [],
+      "cmc": 2.0,
+      "oracle_text": "You may spend mana as though it were mana of any color to activate abilities of creatures you control.\nCreatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.\n{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target creature you control."
+    },
+    {
       "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
       "quantity": 1,
       "is_commander": false,
@@ -581,17 +678,6 @@
       "colors": [],
       "cmc": 2.0,
       "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
-    },
-    {
-      "card_id": "066a791c-be94-4552-9bc0-db45136509cf",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Ashnod's Altar",
-      "type_line": "Artifact",
-      "mana_cost": "{3}",
-      "colors": [],
-      "cmc": 3.0,
-      "oracle_text": "Sacrifice a creature: Add {C}{C}."
     },
     {
       "card_id": "08661f74-dbaf-4689-b718-b967bcba3ec6",
@@ -618,19 +704,6 @@
       ],
       "cmc": 2.0,
       "oracle_text": "Add {R} for each creature you control."
-    },
-    {
-      "card_id": "870626a9-c33b-4c8d-9416-7a61a6a28557",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Battle Squadron",
-      "type_line": "Creature — Goblin",
-      "mana_cost": "{3}{R}{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 5.0,
-      "oracle_text": "Flying\nBattle Squadron's power and toughness are each equal to the number of creatures you control."
     },
     {
       "card_id": "72f97ad2-b138-4014-a383-340ee9f47bd7",
@@ -672,6 +745,67 @@
       "oracle_text": "Add {R} for each Goblin on the battlefield."
     },
     {
+      "card_id": "b9ddb561-f561-409f-979d-b5f73b330fe3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Burst Lightning",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Kicker {4} (You may pay an additional {4} as you cast this spell.)\nBurst Lightning deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead."
+    },
+    {
+      "card_id": "4013b9d7-32c9-47bd-85a6-05a58e5a1dce",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cathartic Reunion",
+      "type_line": "Sorcery",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, discard two cards.\nDraw three cards."
+    },
+    {
+      "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cavern of Souls",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered."
+    },
+    {
+      "card_id": "13aeaa4a-1027-455f-869b-1722685354b6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chaos Warp",
+      "type_line": "Instant",
+      "mana_cost": "{2}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 3.0,
+      "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield."
+    },
+    {
+      "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Chrome Mox",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Imprint — When this artifact enters, you may exile a nonartifact, nonland card from your hand.\n{T}: Add one mana of any of the exiled card's colors."
+    },
+    {
       "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
       "quantity": 1,
       "is_commander": false,
@@ -694,6 +828,80 @@
       ],
       "cmc": 2.0,
       "oracle_text": "Play with the top card of your library revealed.\nYou may cast Goblin spells from the top of your library.\nAs long as the top card of your library is a Goblin card, this creature has all activated abilities of that card."
+    },
+    {
+      "card_id": "c0103bde-479f-4a8d-8939-1eec3e5b7768",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Cori-Steel Cutter",
+      "type_line": "Artifact — Equipment",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Equipped creature gets +1/+1 and has trample and haste.\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it. (Whenever you cast a noncreature spell, the token gets +1/+1 until end of turn.)\nEquip {1}{R}"
+    },
+    {
+      "card_id": "f3eb41b4-fbdd-4ad9-8e27-301d4d53ac3a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Crimson Wisps",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Target creature becomes red and gains haste until end of turn. (It can attack and {T} this turn.)\nDraw a card."
+    },
+    {
+      "card_id": "efe0138e-557f-4135-a48f-c4672a818f2e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Demand Answers",
+      "type_line": "Instant",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "As an additional cost to cast this spell, sacrifice an artifact or discard a card.\nDraw two cards."
+    },
+    {
+      "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Everflowing Chalice",
+      "type_line": "Artifact",
+      "mana_cost": "{0}",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "Multikicker {2} (You may pay an additional {2} any number of times as you cast this spell.)\nThis artifact enters with a charge counter on it for each time it was kicked.\n{T}: Add {C} for each charge counter on this artifact."
+    },
+    {
+      "card_id": "5e92b031-b69a-41d5-ba32-9699e6b450b1",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Expedite",
+      "type_line": "Instant",
+      "mana_cost": "{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 1.0,
+      "oracle_text": "Target creature gains haste until end of turn.\nDraw a card."
+    },
+    {
+      "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Expedition Map",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle."
     },
     {
       "card_id": "7ba9fa98-e1b4-439a-bd14-87b0d3315beb",
@@ -720,17 +928,30 @@
       "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
     },
     {
-      "card_id": "86f036eb-f0fe-45e0-83d8-236d271a69d6",
+      "card_id": "0ea2b961-bdf0-459d-82a7-29f5f5999352",
       "quantity": 1,
       "is_commander": false,
-      "name": "Foundry Street Denizen",
-      "type_line": "Creature — Goblin Warrior",
+      "name": "Fists of Flame",
+      "type_line": "Instant",
+      "mana_cost": "{1}{R}",
+      "colors": [
+        "R"
+      ],
+      "cmc": 2.0,
+      "oracle_text": "Draw a card. Until end of turn, target creature gains trample and gets +1/+0 for each card you've drawn this turn. (A creature with trample can deal excess combat damage to the player or planeswalker it's attacking.)"
+    },
+    {
+      "card_id": "5fe2a15b-e631-472b-b7bb-34f515ebdb7e",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Gamble",
+      "type_line": "Sorcery",
       "mana_cost": "{R}",
       "colors": [
         "R"
       ],
       "cmc": 1.0,
-      "oracle_text": "Whenever another red creature you control enters, this creature gets +1/+0 until end of turn."
+      "oracle_text": "Search your library for a card, put that card into your hand, discard a card at random, then shuffle."
     },
     {
       "card_id": "f9c656ce-4e1e-4fc8-868f-c2142fd1b3cf",
@@ -759,7 +980,7 @@
       "oracle_text": "Whenever one or more Goblins you control attack, create a 1/1 red Goblin creature token that's tapped and attacking.\nWhenever another creature you control enters, General Kreat deals 1 damage to each opponent."
     },
     {
-      "card_id": "4e962136-660c-4fa7-9e5c-2632ce92dd8f",
+      "card_id": "5246cf1f-6470-4bc2-b487-1a30b7faa06a",
       "quantity": 1,
       "is_commander": false,
       "name": "Goblin Bombardment",
@@ -824,32 +1045,6 @@
       "oracle_text": "When this creature enters, create a 1/1 red Goblin creature token."
     },
     {
-      "card_id": "6f5bae2f-aaa1-469c-9536-8ede712423e2",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Goblin Lookout",
-      "type_line": "Creature — Goblin",
-      "mana_cost": "{1}{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "{T}, Sacrifice a Goblin: Goblin creatures get +2/+0 until end of turn."
-    },
-    {
-      "card_id": "b52a4b91-13fe-4299-93f1-05bbcbf6325f",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Goblin Motivator",
-      "type_line": "Creature — Goblin Warrior",
-      "mana_cost": "{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 1.0,
-      "oracle_text": "{T}: Target creature gains haste until end of turn. (It can attack and {T} this turn.)"
-    },
-    {
       "card_id": "88268761-7ccf-47da-b527-b3f60b7730bb",
       "quantity": 1,
       "is_commander": false,
@@ -876,19 +1071,6 @@
       "oracle_text": "Other Goblins you control get +1/+1.\nSacrifice a Goblin: Destroy target artifact."
     },
     {
-      "card_id": "e919f0d2-f97e-4116-9412-41ae4f67cad9",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Goblin Wardriver",
-      "type_line": "Creature — Goblin Warrior",
-      "mana_cost": "{R}{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)"
-    },
-    {
       "card_id": "da615fc2-310d-45d7-8eae-0bd8a164dcf6",
       "quantity": 1,
       "is_commander": false,
@@ -902,17 +1084,17 @@
       "oracle_text": "{R}: Creatures you control gain haste until end of turn.\n{3}{R}{R}: Create a 5/5 red Dragon Spirit creature token with flying. Activate only if you control an attacking modified creature. (Equipment, Auras you control, and counters are modifications.)"
     },
     {
-      "card_id": "1f4f3600-1e8e-4cd8-aac3-2db1ee78d526",
+      "card_id": "72c3394f-a105-42f1-97d6-6914afff36f4",
       "quantity": 1,
       "is_commander": false,
-      "name": "Grenzo, Havoc Raiser",
-      "type_line": "Legendary Creature — Goblin Rogue",
-      "mana_cost": "{R}{R}",
+      "name": "Harmonic Prodigy",
+      "type_line": "Creature — Human Wizard",
+      "mana_cost": "{1}{R}",
       "colors": [
         "R"
       ],
       "cmc": 2.0,
-      "oracle_text": "Whenever a creature you control deals combat damage to a player, choose one —\n• Goad target creature that player controls.\n• Exile the top card of that player's library. Until end of turn, you may cast that card and you may spend mana as though it were mana of any color to cast that spell."
+      "oracle_text": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nIf an ability of a Shaman or another Wizard you control triggers, that ability triggers an additional time."
     },
     {
       "card_id": "c3bd1765-4bc4-44b8-bcc8-974340a93aeb",
@@ -1004,17 +1186,15 @@
       "oracle_text": "Whenever Krenko attacks, put a +1/+1 counter on it, then create a number of 1/1 red Goblin creature tokens equal to Krenko's power."
     },
     {
-      "card_id": "2602311e-d249-4f8f-8667-a760349c6033",
+      "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
       "quantity": 1,
       "is_commander": false,
-      "name": "Legion Loyalist",
-      "type_line": "Creature — Goblin Soldier",
-      "mana_cost": "{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 1.0,
-      "oracle_text": "Haste\nBattalion — Whenever this creature and at least two other creatures attack, creatures you control gain first strike and trample until end of turn and can't be blocked by creature tokens this turn."
+      "name": "Lazotep Quarry",
+      "type_line": "Land — Desert",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add one mana of any color.\n{X}{2}, {T}, Sacrifice a Desert: Exile target creature card with mana value X from your graveyard. Create a token that's a copy of it, except it's a 4/4 black Zombie. Activate only as a sorcery."
     },
     {
       "card_id": "b58c2e2e-ed31-496f-98ec-ef36c5e59c8d",
@@ -1030,7 +1210,7 @@
       "oracle_text": "Mentor (Whenever this creature attacks, put a +1/+1 counter on target attacking creature with lesser power.)\nAt the beginning of combat on your turn, create a 1/1 red Goblin creature token. That token gains haste until end of turn and attacks this combat if able."
     },
     {
-      "card_id": "ff4fa05d-33ac-403b-b5e3-27432e6bad0b",
+      "card_id": "b9024041-fdb5-4d03-9f22-fa38370d27b9",
       "quantity": 1,
       "is_commander": false,
       "name": "Lightning Bolt",
@@ -1054,15 +1234,26 @@
       "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
     },
     {
-      "card_id": "2fc58b83-442e-4853-86d9-ad1b252515eb",
+      "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
       "quantity": 1,
       "is_commander": false,
-      "name": "Mind Stone",
+      "name": "Lotus Petal",
       "type_line": "Artifact",
-      "mana_cost": "{2}",
+      "mana_cost": "{0}",
       "colors": [],
-      "cmc": 2.0,
-      "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this artifact: Draw a card."
+      "cmc": 0.0,
+      "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color."
+    },
+    {
+      "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Mana Vault",
+      "type_line": "Artifact",
+      "mana_cost": "{1}",
+      "colors": [],
+      "cmc": 1.0,
+      "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}."
     },
     {
       "card_id": "9df82f92-c7e7-4474-b1c3-813fabd615c2",
@@ -1078,21 +1269,8 @@
       "oracle_text": "Echo {1}{R} (At the beginning of your upkeep, if this came under your control since the beginning of your last upkeep, sacrifice it unless you pay its echo cost.)\nWhen this creature enters or dies, create a 1/1 red Goblin creature token."
     },
     {
-      "card_id": "55cac75c-772f-464a-828d-f966a61ec955",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Moria Marauder",
-      "type_line": "Creature — Goblin Warrior",
-      "mana_cost": "{R}{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Double strike\nWhenever a Goblin or Orc you control deals combat damage to a player, exile the top card of your library. You may play that card this turn."
-    },
-    {
       "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
-      "quantity": 36,
+      "quantity": 27,
       "is_commander": false,
       "name": "Mountain",
       "type_line": "Basic Land — Mountain",
@@ -1113,6 +1291,17 @@
       ],
       "cmc": 3.0,
       "oracle_text": "Whenever Pashalik Mons or another Goblin you control dies, Pashalik Mons deals 1 damage to any target.\n{3}{R}, Sacrifice a Goblin: Create two 1/1 red Goblin creature tokens."
+    },
+    {
+      "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Path of Ancestry",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add one mana of any color in your commander's color identity. When that mana is spent to cast a creature spell that shares a creature type with your commander, scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
     },
     {
       "card_id": "3a1d9e26-ab86-452f-a7fc-d510cea0f8d5",
@@ -1152,6 +1341,17 @@
       "oracle_text": "Whenever a Goblin you control enters, you may put a quest counter on this enchantment.\nAs long as this enchantment has five or more quest counters on it, creatures you control get +2/+0."
     },
     {
+      "card_id": "bf5a103c-8d60-4753-aac1-cc3871727464",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Ravaged Highlands",
+      "type_line": "Land",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped.\n{T}: Add {R}.\n{T}, Sacrifice this land: Add one mana of any color."
+    },
+    {
       "card_id": "db5eb354-0831-4514-b4fc-2a14062f1ef6",
       "quantity": 1,
       "is_commander": false,
@@ -1163,19 +1363,6 @@
       ],
       "cmc": 2.0,
       "oracle_text": "Other Goblins you control get +1/+1.\nWhenever this creature or another Goblin you control dies, exile the top card of your library. If it's a Goblin creature card, you may cast that card until the end of your next turn."
-    },
-    {
-      "card_id": "497a7437-8875-4b33-aa1b-7ec381c59bdc",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Searslicer Goblin",
-      "type_line": "Creature — Goblin Warrior",
-      "mana_cost": "{1}{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 2.0,
-      "oracle_text": "Raid — At the beginning of your end step, if you attacked this turn, create a 1/1 red Goblin creature token."
     },
     {
       "card_id": "7ac8919d-01ee-4a12-9a1d-888c9515123b",
@@ -1237,6 +1424,17 @@
       "oracle_text": "{1}: Untap this artifact.\n{2}, {T}: You gain 1 life.\n{3}, {T}: Untap target creature.\n{4}, {T}: Tap target creature.\n{5}, {T}: Draw a card."
     },
     {
+      "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Starting Town",
+      "type_line": "Land — Town",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "This land enters tapped unless it's your first, second, or third turn of the game.\n{T}: Add {C}.\n{T}, Pay 1 life: Add one mana of any color."
+    },
+    {
       "card_id": "3cbb574f-1fca-49a3-900f-a2cfa0d96250",
       "quantity": 1,
       "is_commander": false,
@@ -1259,6 +1457,17 @@
       "oracle_text": "Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)"
     },
     {
+      "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+      "quantity": 1,
+      "is_commander": false,
+      "name": "Talon Gates of Madara",
+      "type_line": "Land — Gate",
+      "mana_cost": "",
+      "colors": [],
+      "cmc": 0.0,
+      "oracle_text": "When this land enters, up to one target creature phases out.\n{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{4}: Put this card from your hand onto the battlefield."
+    },
+    {
       "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
       "quantity": 1,
       "is_commander": false,
@@ -1268,17 +1477,6 @@
       "colors": [],
       "cmc": 4.0,
       "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."
-    },
-    {
-      "card_id": "a041ce88-2d54-42f0-9141-7545f4fd7e10",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Thornbite Staff",
-      "type_line": "Kindred Artifact — Shaman Equipment",
-      "mana_cost": "{2}",
-      "colors": [],
-      "cmc": 2.0,
-      "oracle_text": "Equipped creature has \"{2}, {T}: This creature deals 1 damage to any target\" and \"Whenever a creature dies, untap this creature.\"\nWhenever a Shaman creature enters, you may attach this Equipment to it.\nEquip {4}"
     },
     {
       "card_id": "fb102ddb-25a2-4d9b-a078-6a8a18b2617b",
@@ -1294,30 +1492,6 @@
       "oracle_text": "As an additional cost to cast this spell, discard a card.\nDraw two cards."
     },
     {
-      "card_id": "5149ff29-f51f-4982-96d6-8e20923ca95a",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Throne of the God-Pharaoh",
-      "type_line": "Legendary Artifact",
-      "mana_cost": "{2}",
-      "colors": [],
-      "cmc": 2.0,
-      "oracle_text": "At the beginning of your end step, each opponent loses life equal to the number of tapped creatures you control."
-    },
-    {
-      "card_id": "a985835c-4bbf-4a1d-b584-e2969dbfadcb",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Torch Courier",
-      "type_line": "Creature — Goblin",
-      "mana_cost": "{R}",
-      "colors": [
-        "R"
-      ],
-      "cmc": 1.0,
-      "oracle_text": "Haste\nSacrifice this creature: Another target creature gains haste until end of turn."
-    },
-    {
       "card_id": "93a52a4c-a8d5-4cbf-9f5d-fa73c3233548",
       "quantity": 1,
       "is_commander": false,
@@ -1329,17 +1503,6 @@
       ],
       "cmc": 1.0,
       "oracle_text": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
-    },
-    {
-      "card_id": "ea496a3f-c480-40d7-aa55-a7b7fb1cd184",
-      "quantity": 1,
-      "is_commander": false,
-      "name": "Vanquisher's Banner",
-      "type_line": "Artifact",
-      "mana_cost": "{5}",
-      "colors": [],
-      "cmc": 5.0,
-      "oracle_text": "As this artifact enters, choose a creature type.\nCreatures you control of the chosen type get +1/+1.\nWhenever you cast a creature spell of the chosen type, draw a card."
     },
     {
       "card_id": "b7a3066b-9a95-4bc5-b748-8d90f149e514",

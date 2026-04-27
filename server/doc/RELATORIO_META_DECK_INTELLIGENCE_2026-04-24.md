@@ -1336,3 +1336,27 @@ Resultado:
 - nenhuma autenticacao
 - nenhuma criacao de deck
 - nenhuma chamada `optimize/apply`
+
+### Runtime completo comprovado
+
+Com a API Dart Frog em `8081`, o runtime foi executado com `--apply`:
+
+```bash
+cd server
+PORT=8081 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+Resumo final:
+
+- `mode=apply`
+- `total=19`
+- `passed=19`
+- `failed=0`
+- `completed=19`
+- `protected_rejections=0`
+
+Leitura atualizada:
+
+- runtime completo `login/register -> create deck -> optimize -> apply -> validate`: **proved para 19/19 candidatos**
+- os artifacts Commander-only agora representam uma execução real de backend, nao apenas dry-run

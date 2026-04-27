@@ -67,6 +67,8 @@ The live backend path passed for `Talrand, Sky Summoner`: account creation, logi
 
 The fresh commander-only runner on the same backend stayed at `8 passed / 11 failed`, so the 2026-04-21 report is still materially current. The missing proof is a real tap-driven app run for `login/register -> create/generate deck -> details -> optimize -> apply -> validate`; this CLI session has device discovery but no UI automation for those taps, and the repo does not yet contain an integration test for that main deck journey.
 
+Update 2026-04-27: `server/bin/mana_loom_deck_runtime_e2e.dart --apply` was executed against `TEST_API_BASE_URL=http://127.0.0.1:8081` and passed `19/19` Commander-only backend runtime cases. This proves the backend path `login/register -> create deck -> optimize -> bulk apply -> validate` for the current corpus. The remaining gap is still tap-driven app UI proof.
+
 A small safe app-side fix was applied in this round: `applyOptimizationWithIds` now filters additions outside commander identity before saving, which reduces blast radius for cases like `Kozilek` when the backend returns an illegal suggestion.
 
 ## Stop Point

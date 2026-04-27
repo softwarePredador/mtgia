@@ -8586,3 +8586,29 @@ Resultado esperado nesse caso:
 - nenhuma autenticacao
 - nenhuma criacao de deck
 - nenhuma chamada de optimize/apply
+
+### 93.5 Runtime E2E completo comprovado
+
+Em 2026-04-27, com a API Dart Frog em `8081`, o runtime completo foi executado com escrita real:
+
+```bash
+cd server
+PORT=8081 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8081 dart run bin/mana_loom_deck_runtime_e2e.dart --apply
+```
+
+Resultado:
+
+- `mode=apply`
+- `total=19`
+- `passed=19`
+- `failed=0`
+- `completed=19`
+- `protected_rejections=0`
+- `api_base_url=http://127.0.0.1:8081`
+
+Leitura:
+
+- fluxo `login/register -> create deck -> optimize -> bulk apply -> validate` ficou **proved** para o corpus Commander-only atual;
+- os blockers antigos de Kaalia, Kozilek, Jodah e Sword Coast Sailor + Wilson passaram na rodada live;
+- os artifacts individuais em `server/test/artifacts/commander_only_optimization_validation/` foram atualizados com os seed decks e respostas finais da execução real.
