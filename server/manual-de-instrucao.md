@@ -1,6 +1,37 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-28 — Auditoria dry-run de integridade MTG para Sets/Colecoes
+
+### O Porquê
+- O catalogo Sets/Colecoes ficou funcional com dedupe query-level, mas o backlog nao bloqueante ainda pedia prova DB-backed para:
+  - duplicidade ampla de `sets.code` por casing;
+  - `cards.color_identity IS NULL`;
+  - risco operacional de futuras sincronizacoes reintroduzirem casing nao canonico.
+
+### O Como
+- Adicionado `server/bin/mtg_data_integrity.dart` como comando dry-run.
+- Adicionado `server/lib/mtg_data_integrity_support.dart` com helpers puros para:
+  - decidir backfill deterministico de `color_identity`;
+  - inferir identidade por `colors`, `mana_cost`, `oracle_text` e subtipos de land;
+  - normalizar set codes para uppercase.
+- Adicionado `server/test/mtg_data_integrity_support_test.dart`.
+- Gerados artefatos em `server/test/artifacts/mtg_data_integrity_2026-04-28/`.
+
+### Resultado da auditoria
+- `LOWER(sets.code)` duplicado: 80 grupos / 160 variantes.
+- Exemplos confirmados: `10e/10E`, `2x2/2X2`, `2xm/2XM`, `30a/30A`, `8ed/8ED`.
+- `cards.color_identity IS NULL`: 33.138 linhas.
+- Nulls recentes/futuros: 899.
+- Nulls futuros: 0.
+- Candidatos determinísticos para backfill: 33.138.
+- Unresolved: 0.
+
+### Decisao
+- Nenhum UPDATE/DELETE foi executado nesta etapa.
+- Para `sets.code`, manter dedupe query-level por enquanto, porque variantes lowercase ainda possuem referencias em `cards.set_code`; a etapa seguinte deve endurecer o sync para evitar novas duplicidades.
+- Para `color_identity`, o dry-run provou backfill deterministico usando somente campos locais confiaveis; o apply deve ser separado, idempotente e condicionado a `color_identity IS NULL`.
+
 ## 2026-04-28 — Prontidao de produto do catalogo Sets/Colecoes e acesso via Search
 
 ### O Porquê

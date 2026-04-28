@@ -1,0 +1,712 @@
+[
+  {
+    "lower_code": "10e",
+    "cards_set_code": "10e",
+    "card_count": 2
+  },
+  {
+    "lower_code": "10e",
+    "cards_set_code": "10E",
+    "card_count": 362
+  },
+  {
+    "lower_code": "2x2",
+    "cards_set_code": "2x2",
+    "card_count": 5
+  },
+  {
+    "lower_code": "2x2",
+    "cards_set_code": "2X2",
+    "card_count": 311
+  },
+  {
+    "lower_code": "2xm",
+    "cards_set_code": "2xm",
+    "card_count": 6
+  },
+  {
+    "lower_code": "2xm",
+    "cards_set_code": "2XM",
+    "card_count": 312
+  },
+  {
+    "lower_code": "30a",
+    "cards_set_code": "30a",
+    "card_count": 6
+  },
+  {
+    "lower_code": "8ed",
+    "cards_set_code": "8ed",
+    "card_count": 2
+  },
+  {
+    "lower_code": "8ed",
+    "cards_set_code": "8ED",
+    "card_count": 114
+  },
+  {
+    "lower_code": "blc",
+    "cards_set_code": "blc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "blc",
+    "cards_set_code": "BLC",
+    "card_count": 194
+  },
+  {
+    "lower_code": "c13",
+    "cards_set_code": "c13",
+    "card_count": 1
+  },
+  {
+    "lower_code": "c13",
+    "cards_set_code": "C13",
+    "card_count": 187
+  },
+  {
+    "lower_code": "c14",
+    "cards_set_code": "c14",
+    "card_count": 1
+  },
+  {
+    "lower_code": "c14",
+    "cards_set_code": "C14",
+    "card_count": 163
+  },
+  {
+    "lower_code": "clb",
+    "cards_set_code": "clb",
+    "card_count": 2
+  },
+  {
+    "lower_code": "clb",
+    "cards_set_code": "CLB",
+    "card_count": 434
+  },
+  {
+    "lower_code": "clu",
+    "cards_set_code": "clu",
+    "card_count": 1
+  },
+  {
+    "lower_code": "clu",
+    "cards_set_code": "CLU",
+    "card_count": 173
+  },
+  {
+    "lower_code": "cmm",
+    "cards_set_code": "cmm",
+    "card_count": 4
+  },
+  {
+    "lower_code": "cmm",
+    "cards_set_code": "CMM",
+    "card_count": 318
+  },
+  {
+    "lower_code": "cmr",
+    "cards_set_code": "cmr",
+    "card_count": 2
+  },
+  {
+    "lower_code": "cmr",
+    "cards_set_code": "CMR",
+    "card_count": 239
+  },
+  {
+    "lower_code": "cn2",
+    "cards_set_code": "cn2",
+    "card_count": 1
+  },
+  {
+    "lower_code": "cn2",
+    "cards_set_code": "CN2",
+    "card_count": 126
+  },
+  {
+    "lower_code": "ddn",
+    "cards_set_code": "ddn",
+    "card_count": 1
+  },
+  {
+    "lower_code": "ddn",
+    "cards_set_code": "DDN",
+    "card_count": 18
+  },
+  {
+    "lower_code": "dmr",
+    "cards_set_code": "dmr",
+    "card_count": 6
+  },
+  {
+    "lower_code": "dmr",
+    "cards_set_code": "DMR",
+    "card_count": 97
+  },
+  {
+    "lower_code": "drc",
+    "cards_set_code": "drc",
+    "card_count": 2
+  },
+  {
+    "lower_code": "drc",
+    "cards_set_code": "DRC",
+    "card_count": 55
+  },
+  {
+    "lower_code": "dsc",
+    "cards_set_code": "dsc",
+    "card_count": 2
+  },
+  {
+    "lower_code": "dsc",
+    "cards_set_code": "DSC",
+    "card_count": 124
+  },
+  {
+    "lower_code": "dst",
+    "cards_set_code": "dst",
+    "card_count": 1
+  },
+  {
+    "lower_code": "dst",
+    "cards_set_code": "DST",
+    "card_count": 115
+  },
+  {
+    "lower_code": "ecc",
+    "cards_set_code": "ecc",
+    "card_count": 2
+  },
+  {
+    "lower_code": "ecc",
+    "cards_set_code": "ECC",
+    "card_count": 132
+  },
+  {
+    "lower_code": "ema",
+    "cards_set_code": "ema",
+    "card_count": 1
+  },
+  {
+    "lower_code": "ema",
+    "cards_set_code": "EMA",
+    "card_count": 55
+  },
+  {
+    "lower_code": "eoc",
+    "cards_set_code": "eoc",
+    "card_count": 2
+  },
+  {
+    "lower_code": "eoc",
+    "cards_set_code": "EOC",
+    "card_count": 50
+  },
+  {
+    "lower_code": "eos",
+    "cards_set_code": "eos",
+    "card_count": 4
+  },
+  {
+    "lower_code": "eos",
+    "cards_set_code": "EOS",
+    "card_count": 19
+  },
+  {
+    "lower_code": "exp",
+    "cards_set_code": "exp",
+    "card_count": 1
+  },
+  {
+    "lower_code": "exp",
+    "cards_set_code": "EXP",
+    "card_count": 13
+  },
+  {
+    "lower_code": "f03",
+    "cards_set_code": "f03",
+    "card_count": 1
+  },
+  {
+    "lower_code": "f03",
+    "cards_set_code": "F03",
+    "card_count": 6
+  },
+  {
+    "lower_code": "fca",
+    "cards_set_code": "fca",
+    "card_count": 2
+  },
+  {
+    "lower_code": "fca",
+    "cards_set_code": "FCA",
+    "card_count": 20
+  },
+  {
+    "lower_code": "fdc",
+    "cards_set_code": "fdc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "fic",
+    "cards_set_code": "fic",
+    "card_count": 5
+  },
+  {
+    "lower_code": "fic",
+    "cards_set_code": "FIC",
+    "card_count": 146
+  },
+  {
+    "lower_code": "g11",
+    "cards_set_code": "g11",
+    "card_count": 1
+  },
+  {
+    "lower_code": "gk2",
+    "cards_set_code": "gk2",
+    "card_count": 1
+  },
+  {
+    "lower_code": "gk2",
+    "cards_set_code": "GK2",
+    "card_count": 29
+  },
+  {
+    "lower_code": "gn3",
+    "cards_set_code": "gn3",
+    "card_count": 2
+  },
+  {
+    "lower_code": "gn3",
+    "cards_set_code": "GN3",
+    "card_count": 28
+  },
+  {
+    "lower_code": "ima",
+    "cards_set_code": "ima",
+    "card_count": 1
+  },
+  {
+    "lower_code": "ima",
+    "cards_set_code": "IMA",
+    "card_count": 47
+  },
+  {
+    "lower_code": "jmp",
+    "cards_set_code": "jmp",
+    "card_count": 1
+  },
+  {
+    "lower_code": "jmp",
+    "cards_set_code": "JMP",
+    "card_count": 94
+  },
+  {
+    "lower_code": "khm",
+    "cards_set_code": "khm",
+    "card_count": 2
+  },
+  {
+    "lower_code": "khm",
+    "cards_set_code": "KHM",
+    "card_count": 241
+  },
+  {
+    "lower_code": "ltc",
+    "cards_set_code": "ltc",
+    "card_count": 4
+  },
+  {
+    "lower_code": "ltc",
+    "cards_set_code": "LTC",
+    "card_count": 114
+  },
+  {
+    "lower_code": "m10",
+    "cards_set_code": "m10",
+    "card_count": 1
+  },
+  {
+    "lower_code": "m10",
+    "cards_set_code": "M10",
+    "card_count": 59
+  },
+  {
+    "lower_code": "m11",
+    "cards_set_code": "m11",
+    "card_count": 1
+  },
+  {
+    "lower_code": "m11",
+    "cards_set_code": "M11",
+    "card_count": 51
+  },
+  {
+    "lower_code": "m12",
+    "cards_set_code": "m12",
+    "card_count": 1
+  },
+  {
+    "lower_code": "m12",
+    "cards_set_code": "M12",
+    "card_count": 55
+  },
+  {
+    "lower_code": "mar",
+    "cards_set_code": "mar",
+    "card_count": 2
+  },
+  {
+    "lower_code": "mar",
+    "cards_set_code": "MAR",
+    "card_count": 2
+  },
+  {
+    "lower_code": "mb2",
+    "cards_set_code": "mb2",
+    "card_count": 2
+  },
+  {
+    "lower_code": "mb2",
+    "cards_set_code": "MB2",
+    "card_count": 175
+  },
+  {
+    "lower_code": "mh2",
+    "cards_set_code": "mh2",
+    "card_count": 3
+  },
+  {
+    "lower_code": "mh2",
+    "cards_set_code": "MH2",
+    "card_count": 102
+  },
+  {
+    "lower_code": "mkc",
+    "cards_set_code": "mkc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "mkc",
+    "cards_set_code": "MKC",
+    "card_count": 60
+  },
+  {
+    "lower_code": "mm3",
+    "cards_set_code": "mm3",
+    "card_count": 1
+  },
+  {
+    "lower_code": "mm3",
+    "cards_set_code": "MM3",
+    "card_count": 24
+  },
+  {
+    "lower_code": "mma",
+    "cards_set_code": "mma",
+    "card_count": 1
+  },
+  {
+    "lower_code": "mma",
+    "cards_set_code": "MMA",
+    "card_count": 36
+  },
+  {
+    "lower_code": "mps",
+    "cards_set_code": "mps",
+    "card_count": 2
+  },
+  {
+    "lower_code": "mps",
+    "cards_set_code": "MPS",
+    "card_count": 2
+  },
+  {
+    "lower_code": "nph",
+    "cards_set_code": "nph",
+    "card_count": 1
+  },
+  {
+    "lower_code": "nph",
+    "cards_set_code": "NPH",
+    "card_count": 94
+  },
+  {
+    "lower_code": "olgc",
+    "cards_set_code": "olgc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pf24",
+    "cards_set_code": "pf24",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pf24",
+    "cards_set_code": "PF24",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pf25",
+    "cards_set_code": "pf25",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pf25",
+    "cards_set_code": "PF25",
+    "card_count": 4
+  },
+  {
+    "lower_code": "pfdn",
+    "cards_set_code": "pfdn",
+    "card_count": 1
+  },
+  {
+    "lower_code": "phpr",
+    "cards_set_code": "phpr",
+    "card_count": 1
+  },
+  {
+    "lower_code": "phpr",
+    "cards_set_code": "PHPR",
+    "card_count": 2
+  },
+  {
+    "lower_code": "pkhm",
+    "cards_set_code": "pkhm",
+    "card_count": 3
+  },
+  {
+    "lower_code": "plst",
+    "cards_set_code": "plst",
+    "card_count": 10
+  },
+  {
+    "lower_code": "plst",
+    "cards_set_code": "PLST",
+    "card_count": 476
+  },
+  {
+    "lower_code": "pm11",
+    "cards_set_code": "pm11",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pmei",
+    "cards_set_code": "pmei",
+    "card_count": 1
+  },
+  {
+    "lower_code": "pmei",
+    "cards_set_code": "PMEI",
+    "card_count": 9
+  },
+  {
+    "lower_code": "pnph",
+    "cards_set_code": "pnph",
+    "card_count": 1
+  },
+  {
+    "lower_code": "ppro",
+    "cards_set_code": "ppro",
+    "card_count": 1
+  },
+  {
+    "lower_code": "puma",
+    "cards_set_code": "puma",
+    "card_count": 1
+  },
+  {
+    "lower_code": "puma",
+    "cards_set_code": "PUMA",
+    "card_count": 1
+  },
+  {
+    "lower_code": "purl",
+    "cards_set_code": "purl",
+    "card_count": 1
+  },
+  {
+    "lower_code": "purl",
+    "cards_set_code": "PURL",
+    "card_count": 2
+  },
+  {
+    "lower_code": "rav",
+    "cards_set_code": "rav",
+    "card_count": 1
+  },
+  {
+    "lower_code": "rav",
+    "cards_set_code": "RAV",
+    "card_count": 117
+  },
+  {
+    "lower_code": "rtr",
+    "cards_set_code": "rtr",
+    "card_count": 1
+  },
+  {
+    "lower_code": "rtr",
+    "cards_set_code": "RTR",
+    "card_count": 92
+  },
+  {
+    "lower_code": "rvr",
+    "cards_set_code": "rvr",
+    "card_count": 8
+  },
+  {
+    "lower_code": "rvr",
+    "cards_set_code": "RVR",
+    "card_count": 4
+  },
+  {
+    "lower_code": "scd",
+    "cards_set_code": "scd",
+    "card_count": 1
+  },
+  {
+    "lower_code": "scd",
+    "cards_set_code": "SCD",
+    "card_count": 3
+  },
+  {
+    "lower_code": "sch",
+    "cards_set_code": "sch",
+    "card_count": 1
+  },
+  {
+    "lower_code": "sch",
+    "cards_set_code": "SCH",
+    "card_count": 1
+  },
+  {
+    "lower_code": "slc",
+    "cards_set_code": "slc",
+    "card_count": 2
+  },
+  {
+    "lower_code": "sld",
+    "cards_set_code": "sld",
+    "card_count": 45
+  },
+  {
+    "lower_code": "sld",
+    "cards_set_code": "SLD",
+    "card_count": 90
+  },
+  {
+    "lower_code": "slp",
+    "cards_set_code": "slp",
+    "card_count": 2
+  },
+  {
+    "lower_code": "soc",
+    "cards_set_code": "soc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "soc",
+    "cards_set_code": "SOC",
+    "card_count": 10
+  },
+  {
+    "lower_code": "spg",
+    "cards_set_code": "spg",
+    "card_count": 7
+  },
+  {
+    "lower_code": "sta",
+    "cards_set_code": "sta",
+    "card_count": 4
+  },
+  {
+    "lower_code": "sta",
+    "cards_set_code": "STA",
+    "card_count": 1
+  },
+  {
+    "lower_code": "tdc",
+    "cards_set_code": "tdc",
+    "card_count": 1
+  },
+  {
+    "lower_code": "tdc",
+    "cards_set_code": "TDC",
+    "card_count": 50
+  },
+  {
+    "lower_code": "tla",
+    "cards_set_code": "tla",
+    "card_count": 1
+  },
+  {
+    "lower_code": "tla",
+    "cards_set_code": "TLA",
+    "card_count": 270
+  },
+  {
+    "lower_code": "tle",
+    "cards_set_code": "tle",
+    "card_count": 2
+  },
+  {
+    "lower_code": "tle",
+    "cards_set_code": "TLE",
+    "card_count": 136
+  },
+  {
+    "lower_code": "tmp",
+    "cards_set_code": "tmp",
+    "card_count": 2
+  },
+  {
+    "lower_code": "tmp",
+    "cards_set_code": "TMP",
+    "card_count": 134
+  },
+  {
+    "lower_code": "uma",
+    "cards_set_code": "uma",
+    "card_count": 1
+  },
+  {
+    "lower_code": "uma",
+    "cards_set_code": "UMA",
+    "card_count": 1
+  },
+  {
+    "lower_code": "v10",
+    "cards_set_code": "v10",
+    "card_count": 1
+  },
+  {
+    "lower_code": "v12",
+    "cards_set_code": "v12",
+    "card_count": 1
+  },
+  {
+    "lower_code": "wc02",
+    "cards_set_code": "wc02",
+    "card_count": 1
+  },
+  {
+    "lower_code": "wc99",
+    "cards_set_code": "wc99",
+    "card_count": 2
+  },
+  {
+    "lower_code": "wot",
+    "cards_set_code": "wot",
+    "card_count": 1
+  },
+  {
+    "lower_code": "zne",
+    "cards_set_code": "zne",
+    "card_count": 1
+  }
+]
