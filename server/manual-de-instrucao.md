@@ -9290,3 +9290,112 @@ Leitura:
 - fluxo `login/register -> create deck -> optimize -> bulk apply -> validate` ficou **proved** para o corpus Commander-only atual;
 - os blockers antigos de Kaalia, Kozilek, Jodah e Sword Coast Sailor + Wilson passaram na rodada live;
 - os artifacts individuais em `server/test/artifacts/commander_only_optimization_validation/` foram atualizados com os seed decks e respostas finais da execução real.
+
+---
+
+## 94. Catalogo de Colecoes/Sets ManaLoom (2026-04-28)
+
+### 94.1 Objetivo
+
+Entregar uma experiencia mobile de catalogo de colecoes equivalente a um browser moderno de sets MTG, usando apenas dados locais sincronizados:
+
+- listar todos os sets;
+- buscar por nome/codigo;
+- destacar sets futuros, novos, atuais e antigos;
+- abrir o detalhe do set;
+- listar cartas via `GET /cards?set=<code>`;
+- manter busca de cartas, fichario, decks e demais fluxos existentes.
+
+### 94.2 Backend
+
+`GET /sets` foi evoluido sem quebrar contrato:
+
+- parametros preservados: `q`, `code`, `limit`, `page`;
+- novos campos por set: `card_count` e `status`;
+- `card_count` vem de `LEFT JOIN cards ON LOWER(cards.set_code) = LOWER(sets.code)`;
+- `status` e calculado por `release_date`:
+  - `future`: data futura;
+  - `new`: ate 30 dias;
+  - `current`: 31 a 180 dias;
+  - `old`: mais antigo ou sem data;
+- ordenacao continua por `release_date DESC NULLS LAST, name ASC`;
+- duplicatas de casing como `soc`/`SOC` sao resolvidas em query com `ROW_NUMBER() OVER (PARTITION BY LOWER(code))`, preferindo codigo em maiusculas.
+
+Arquivos principais:
+
+- `server/routes/sets/index.dart`
+- `server/routes/cards/index.dart`
+- `server/lib/sets_catalog_contract.dart`
+- `server/lib/card_query_contract.dart`
+- `server/test/sets_route_test.dart`
+- `server/test/cards_route_test.dart`
+
+### 94.3 Sync
+
+O sync oficial em `server/bin/sync_cards.dart` ja baixa `SetList.json`, cria `sets` e persiste metadados futuros antes de haver cartas locais. Cards aparecem quando o set JSON ou sync incremental/full ja foi executado.
+
+Comando oficial:
+
+```bash
+cd server
+dart run bin/sync_cards.dart
+```
+
+### 94.4 App
+
+A area `Colecao` ganhou uma aba `Colecoes` e atalho no app bar. A tela `Colecoes MTG` usa `GET /sets`, exibe codigo, nome, release date, tipo, `card_count` e badge de status. A busca usa `q` por nome/codigo.
+
+O detalhe foi generalizado em `SetCardsScreen`, reutilizado tambem por `LatestSetCollectionScreen`. Sets futuros sem cartas locais exibem estado explicito de dados parciais, evitando falha silenciosa.
+
+Arquivos principais:
+
+- `app/lib/features/collection/models/mtg_set.dart`
+- `app/lib/features/collection/screens/sets_catalog_screen.dart`
+- `app/lib/features/collection/screens/set_cards_screen.dart`
+- `app/lib/features/collection/screens/latest_set_collection_screen.dart`
+- `app/lib/features/collection/screens/collection_screen.dart`
+- `app/integration_test/sets_catalog_runtime_test.dart`
+
+### 94.5 Validacao executada
+
+Backend:
+
+```bash
+cd server
+dart analyze routes/sets routes/cards bin test
+dart test test/sets_route_test.dart test/cards_route_test.dart
+curl -s 'http://127.0.0.1:8082/sets?limit=10&page=1'
+curl -s 'http://127.0.0.1:8082/sets?q=Marvel&limit=10&page=1'
+curl -s 'http://127.0.0.1:8082/sets?code=soc&limit=10&page=1'
+curl -s 'http://127.0.0.1:8082/cards?set=ECC&limit=3&page=1'
+```
+
+App:
+
+```bash
+cd app
+flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection
+flutter test test/features/cards test/features/collection
+flutter analyze lib/main.dart
+flutter analyze integration_test/sets_catalog_runtime_test.dart
+```
+
+iPhone 15 Simulator:
+
+```bash
+cd app
+flutter test integration_test/sets_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado: `All tests passed!`.
+
+### 94.6 Limitacoes conhecidas
+
+- `card_count` representa cartas locais sincronizadas, nao total oficial remoto em tempo real.
+- Sets futuros podem aparecer sem cartas ate novo sync.
+- Filtros de status no app sao aplicados sobre a pagina carregada; busca por nome/codigo e paginacao continuam preservando acesso aos sets antigos.
