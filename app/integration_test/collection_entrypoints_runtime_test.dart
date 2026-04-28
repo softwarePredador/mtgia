@@ -37,6 +37,19 @@ void main() {
     await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
     await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
 
+    await tester.tap(
+      find.widgetWithText(Tab, 'Marketplace'),
+      warnIfMissed: false,
+    );
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Buscar carta no marketplace...'));
+
+    await tester.tap(find.widgetWithText(Tab, 'Trades'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Recebidas'));
+    await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Enviadas'));
+    await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Finalizadas'));
+
     await tester.tap(find.widgetWithText(Tab, 'Coleções'), warnIfMissed: false);
     await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Catálogo de Coleções'));

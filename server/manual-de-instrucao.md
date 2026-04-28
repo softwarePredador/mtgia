@@ -1,6 +1,57 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-28 — QA release ampla no iPhone 15 Simulator com backend real
+
+### O Porquê
+- Antes de seguir para release, era necessario provar regressao ampla do app ManaLoom no iPhone 15 Simulator depois das entregas de Sets/Colecoes e saneamento MTG.
+- A validacao precisava usar backend local real em `http://127.0.0.1:8082`, registrar device id, health, comandos, resultados por fluxo e pendencias reais.
+
+### O Como
+- Device primario descoberto e usado:
+  - `iPhone 15` / `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` / `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend Dart Frog iniciado de forma persistente para os testes finais:
+  - `nohup env PORT=8082 dart run .dart_frog/server.dart`.
+- Health validado em `http://127.0.0.1:8082/health` com `status=healthy`.
+- Rodados:
+  - `flutter analyze lib test integration_test --no-version-check`;
+  - `flutter test test/features/cards test/features/collection test/features/decks --no-version-check`;
+  - `sets_catalog_runtime_test.dart` no iPhone 15;
+  - `sets_search_catalog_runtime_test.dart` no iPhone 15;
+  - `collection_entrypoints_runtime_test.dart` no iPhone 15;
+  - `deck_runtime_m2006_test.dart` no iPhone 15.
+- Ampliados os harnesses de runtime:
+  - `sets_search_catalog_runtime_test.dart` agora prova Search -> Cartas com `Black Lotus`, garante que tocar no texto nao abre detalhe, abre `CardDetailScreen` pela imagem e volta antes de validar Search -> Colecoes/ECC.
+  - `collection_entrypoints_runtime_test.dart` agora alterna por Fichario, Marketplace, Trades e Colecoes, validando entrypoints sem crash.
+
+### Resultado
+- `flutter analyze lib test integration_test --no-version-check`: sem issues.
+- `flutter test test/features/cards test/features/collection test/features/decks --no-version-check`: passou.
+- iPhone 15 + backend real:
+  - `integration_test/sets_catalog_runtime_test.dart`: passou.
+  - `integration_test/sets_search_catalog_runtime_test.dart`: passou apos corrigir o harness para fechar rota Material com `Navigator.pop()`.
+  - `integration_test/collection_entrypoints_runtime_test.dart`: passou.
+  - `integration_test/deck_runtime_m2006_test.dart`: passou.
+- Fluxos provados:
+  - register/autenticacao equivalente via runtime de deck;
+  - Search -> Cartas -> detalhe por imagem;
+  - Search -> Colecoes -> ECC -> `/cards?set=ECC`;
+  - Colecao -> Colecoes -> Marvel/MSH e OM2 futuro/parcial;
+  - Colecao -> Fichario/Marketplace/Trades sem crash;
+  - deck Commander real -> importar comandante -> optimize async -> preview -> apply -> validade final na UI.
+
+### Artefatos
+- Handoff: `app/doc/runtime_flow_handoffs/release_qa_iphone15_simulator_2026-04-28.md`.
+- Logs e screenshots locais: `app/doc/runtime_flow_proofs_2026-04-28_iphone15_simulator_release/`.
+- A pasta de provas e ignorada por `.gitignore` (`app/doc/*proofs*/`) para evitar commitar blobs grandes; o handoff registra os caminhos.
+
+### Pendencias
+- Scanner camera/OCR no simulador permanece `not proven`; `CardScannerScreen` depende de permissao/camera real e stream para MLKit.
+- Logout/login separado nao foi exercitado; a cobertura de auth desta rodada foi register -> shell autenticado -> chamadas JWT reais.
+- Warnings conhecidos durante tests isolados:
+  - MLKit/GoogleMLKit sem suporte arm64 para simuladores Apple Silicon iOS 26+;
+  - Firebase Performance indisponivel sem `Firebase.initializeApp()` nos harnesses isolados.
+
 ## 2026-04-28 — QA geral iPhone 15 para Sets/Colecoes com backend real
 
 ### O Porquê

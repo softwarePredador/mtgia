@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:manaloom/core/widgets/cached_card_image.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
+import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:manaloom/features/cards/screens/card_search_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +28,20 @@ void main() {
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
       await tester.enterText(find.byType(TextField).first, 'Black Lotus');
       await tester.pump(const Duration(milliseconds: 500));
+      await _pumpUntilFound(tester, find.text('Black Lotus'));
+      expect(find.byType(CardDetailScreen), findsNothing);
+
+      await tester.tap(find.text('Black Lotus').first);
+      await tester.pumpAndSettle();
+      expect(find.byType(CardDetailScreen), findsNothing);
+
+      await tester.tap(find.byType(CachedCardImage).first);
+      await tester.pumpAndSettle();
+      await _pumpUntilFound(tester, find.byType(CardDetailScreen));
+      expect(find.text('Detalhes'), findsWidgets);
+
+      Navigator.of(tester.element(find.byType(CardDetailScreen))).pop();
+      await tester.pumpAndSettle();
       await _pumpUntilFound(tester, find.text('Black Lotus'));
 
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Coleções'));
