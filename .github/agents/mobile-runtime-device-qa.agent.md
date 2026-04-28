@@ -3,7 +3,7 @@ name: Mobile Runtime Device QA
 description: Compila e valida o app ManaLoom no iPhone 15 Simulator como alvo principal, com backend local real, integration tests, logs, screenshots e handoff de runtime app/UI contra API viva.
 user-invocable: true
 disable-model-invocation: false
-model: gpt-5.4
+model: gpt-5.5
 tools:
   - read
   - edit

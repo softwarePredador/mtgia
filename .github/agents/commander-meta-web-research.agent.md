@@ -3,7 +3,7 @@ name: Commander Meta Web Research Analyst
 description: Faz pesquisa web multi-fonte para Commander e cEDH, valida se uma lista é realmente de Commander, interpreta intenção estratégica dos decks e cruza achados externos com o pipeline local de meta_decks do repositório mtgia.
 user-invocable: true
 disable-model-invocation: false
-model: gpt-5.4
+model: gpt-5.5
 tools:
   - read
   - edit

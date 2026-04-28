@@ -3,7 +3,7 @@ name: Meta Deck Intelligence Analyst
 description: Audita a ingestão de meta_decks, valida a busca em fontes reais, usa pesquisa web quando necessário para confirmar contexto de Commander/cEDH, mede cobertura por formato e identidade de cor, e traduz padrões competitivos úteis para optimize e generate no repositório mtgia.
 user-invocable: true
 disable-model-invocation: false
-model: gpt-5.4
+model: gpt-5.5
 tools:
   - read
   - edit

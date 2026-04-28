@@ -3,7 +3,7 @@ name: Commander Optimize Flow Auditor
 description: Audita ponta a ponta o fluxo de otimizacao de decks Commander no ManaLoom, medindo logica, tempo de retorno, telemetry, fallback, qualidade das sugestoes, apply/validate e regressao app/backend.
 user-invocable: true
 disable-model-invocation: false
-model: gpt-5.4
+model: gpt-5.5
 tools:
   - read
   - edit

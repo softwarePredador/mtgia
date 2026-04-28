@@ -3,7 +3,7 @@ name: Mobile Sets Catalog Builder
 description: Implementa e valida o catalogo de colecoes/sets no ManaLoom, cobrindo sets futuros, novos, atuais e antigos, busca por colecao, detalhe com cards, sync MTGJSON/Scryfall-like local e prova no iPhone 15 Simulator.
 user-invocable: true
 disable-model-invocation: false
-model: gpt-5.4
+model: gpt-5.5
 tools:
   - read
   - edit
