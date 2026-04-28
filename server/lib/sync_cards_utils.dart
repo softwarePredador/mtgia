@@ -2,6 +2,7 @@
 ///
 /// Extraídas do sync_cards.dart para serem testáveis independentemente
 /// do Postgres e HTTP.
+import 'mtg_data_integrity_support.dart';
 
 /// Extrai dados de uma carta do AtomicCards para upsert no banco.
 ///
@@ -39,15 +40,17 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   final colorIdentity =
       (chosen['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
-  final setCode =
-      (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString();
+  final setCode = normalizeMtgSetCode(
+    (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
+  );
   final rarity = chosen['rarity']?.toString();
 
   // Use scryfallId for direct image URL (more reliable than name-based)
   final scryfallId = ids?['scryfallId']?.toString();
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl = 'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
+    imageUrl =
+        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
   } else {
     // Fallback to name-based URL (less reliable)
     final encodedName = Uri.encodeQueryComponent(name);
@@ -58,8 +61,16 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   }
 
   return [
-    oracleId, name, manaCost, typeLine, oracleText,
-    colors, colorIdentity, imageUrl, setCode, rarity,
+    oracleId,
+    name,
+    manaCost,
+    typeLine,
+    oracleText,
+    colors,
+    colorIdentity,
+    imageUrl,
+    setCode,
+    rarity,
   ];
 }
 
@@ -71,10 +82,10 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
 List<String> getNewSetCodesSinceFromData(
     List<dynamic> setListData, DateTime since) {
   final cutoff = since.subtract(const Duration(days: 2));
-  final codes = <String>[];
+  final codes = <String>{};
   for (final item in setListData) {
     if (item is! Map) continue;
-    final code = item['code']?.toString();
+    final code = normalizeMtgSetCode(item['code']?.toString());
     final releaseDateStr = item['releaseDate']?.toString();
     if (code == null || releaseDateStr == null) continue;
     final releaseDate = DateTime.tryParse(releaseDateStr);
@@ -82,8 +93,8 @@ List<String> getNewSetCodesSinceFromData(
       codes.add(code);
     }
   }
-  codes.sort();
-  return codes;
+  final sorted = codes.toList()..sort();
+  return sorted;
 }
 
 /// Parseia o argumento --since-days=<N> dos args da CLI.
@@ -103,6 +114,7 @@ int? parseSinceDays(List<String> args) {
 /// Diferente de [extractCardRow], recebe o JSON direto do set
 /// (não do AtomicCards).
 List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
+  final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   final ids = card['identifiers'] as Map<String, dynamic>?;
   final oracleId = ids?['scryfallOracleId']?.toString();
   if (oracleId == null || oracleId.isEmpty) return null;
@@ -110,9 +122,8 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
   final name = card['name']?.toString();
   if (name == null || name.isEmpty) return null;
 
-  final colors =
-      (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
+  final colors = (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
+      const <String>[];
   final colorIdentity =
       (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
@@ -121,19 +132,27 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
   final scryfallId = ids?['scryfallId']?.toString();
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl = 'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
+    imageUrl =
+        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
   } else {
     // Fallback to name-based URL (less reliable)
     final encodedName = Uri.encodeQueryComponent(name);
-    final setParam = setCode.isNotEmpty ? '&set=$setCode' : '';
+    final setParam =
+        canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
     imageUrl =
         'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
   }
 
   return [
-    oracleId, name, card['manaCost']?.toString(),
-    card['type']?.toString(), card['text']?.toString(),
-    colors, colorIdentity, imageUrl, setCode,
+    oracleId,
+    name,
+    card['manaCost']?.toString(),
+    card['type']?.toString(),
+    card['text']?.toString(),
+    colors,
+    colorIdentity,
+    imageUrl,
+    canonicalSetCode,
     card['rarity']?.toString(),
   ];
 }

@@ -181,3 +181,119 @@ Probe pos-apply:
   "db_mutations": false
 }
 ```
+
+## Etapa 3 - Hardening de sync_cards
+
+### Comandos executados
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server
+dart format bin/sync_cards.dart lib/sync_cards_utils.dart test/sync_cards_test.dart
+dart analyze bin/sync_cards.dart lib/sync_cards_utils.dart lib/mtg_data_integrity_support.dart test/sync_cards_test.dart
+dart test test/sync_cards_test.dart
+```
+
+### Auditoria do sync
+
+Achados:
+
+- `SetList.json` ja era baixado antes do sync de cards e persistia sets futuros/novos em `sets`.
+- A descoberta incremental usava `releaseDate` com buffer de 2 dias, mas nao deduplicava/canonicalizava codes por casing.
+- `_syncSetsFromData` fazia `INSERT ... ON CONFLICT (code)`, portanto `SOC` e `soc` eram chaves diferentes e podiam coexistir.
+- Upserts de cards full/incremental preservavam o casing recebido no `set_code`.
+- `color_identity` no parser ja vinha de `colorIdentity` do MTGJSON; o backlog de nulos era historico/local e foi saneado no apply da etapa 2.
+
+### Mudancas de codigo
+
+- `server/lib/sync_cards_utils.dart`
+  - `extractCardRow` normaliza `set_code` para uppercase;
+  - `extractSetCardRow` normaliza `set_code` e URL fallback;
+  - `getNewSetCodesSinceFromData` normaliza e deduplica codigos por casing.
+- `server/bin/sync_cards.dart`
+  - incremental passa a usar set codes uppercase/deduplicados;
+  - full sync normaliza set code extraido de `printings`;
+  - incremental normaliza `set_code` persistido em cards;
+  - `_syncSetsFromData` faz update case-insensitive antes do insert canonico, evitando criar nova variante quando ja existe algum `LOWER(code)` correspondente.
+- `server/test/sync_cards_test.dart`
+  - cobre normalizacao do AtomicCards;
+  - cobre normalizacao incremental;
+  - cobre dedupe `soc/SOC` em descoberta incremental.
+
+### Decisao sobre sets.code existentes
+
+As 80 duplicidades existentes por casing permanecem sem migracao destrutiva nesta entrega. Motivo:
+
+- ha variantes lowercase ainda referenciadas por `cards.set_code`;
+- as rotas `/sets` e `/cards` ja usam comparacao case-insensitive/dedupe;
+- uma consolidacao fisica segura deve ser uma etapa propria, com mapeamento de FKs/referencias e rollback dedicado.
+
+O sync agora evita novas duplicidades por casing sem reescrever historico.
+
+### Rotina operacional oficial
+
+Refresh incremental padrao para futuras colecoes:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server
+dart run bin/sync_cards.dart
+```
+
+Fallback quando nao houver checkpoint confiavel:
+
+```bash
+dart run bin/sync_cards.dart --since-days=45
+```
+
+Full sync controlado:
+
+```bash
+dart run bin/sync_cards.dart --full
+```
+
+Relatorio de saude/dry-run apos sync:
+
+```bash
+dart run bin/mtg_data_integrity.dart --artifact-dir=test/artifacts/mtg_data_integrity_2026-04-28/post_sync_probe
+```
+
+### Validacao final
+
+Checks locais:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server
+dart analyze bin lib routes/cards routes/sets test
+dart test test/sets_route_test.dart test/cards_route_test.dart test/sync_cards_test.dart test/mtg_data_integrity_support_test.dart
+```
+
+Resultado: sem issues e todos os testes passaram.
+
+Sanidade HTTP com backend temporario em `8082`:
+
+```bash
+curl -sS 'http://127.0.0.1:8082/sets?code=soc&limit=10&page=1'
+curl -sS 'http://127.0.0.1:8082/cards?set=SOC&limit=3&page=1'
+curl -sS 'http://127.0.0.1:8082/cards?set=ECC&limit=3&page=1'
+```
+
+Evidencia:
+
+- `/sets?code=soc` retornou uma unica entrada canonica `SOC`, `card_count=11`, `status=new`.
+- `/cards?set=SOC` retornou 3 cards, todos com `color_identity` preenchido.
+- `/cards?set=ECC` retornou 3 cards, todos com `color_identity` preenchido.
+- `set_code` em algumas cartas historicas ainda aparece lowercase (`soc`, `ecc`) porque nao houve migracao fisica de `cards.set_code`; a busca segue case-insensitive e o sync foi endurecido para novas entradas.
+
+`post_sync_probe/summary_dry_run.json`:
+
+```json
+{
+  "duplicate_set_code_groups": 80,
+  "duplicate_set_code_variants": 160,
+  "null_color_identity_total": 0,
+  "null_color_identity_recent_or_future_total": 0,
+  "null_color_identity_future_total": 0,
+  "color_identity_deterministic_backfill_candidates": 0,
+  "color_identity_unresolved_rows": 0,
+  "db_mutations": false
+}
+```

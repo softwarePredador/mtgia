@@ -131,6 +131,21 @@ void main() {
       expect(row[8], isNull); // setCode
     });
 
+    test('normaliza set_code do AtomicCards para uppercase', () {
+      final printings = [
+        {
+          'name': 'Case Test',
+          'identifiers': {'scryfallOracleId': 'case-id'},
+          'printings': ['soc'],
+        },
+      ];
+
+      final row = extractCardRow('Case Test', printings);
+      expect(row, isNotNull);
+      expect(row![8], 'SOC');
+      expect(row[7], contains('set=SOC'));
+    });
+
     test('campos opcionais são null quando ausentes', () {
       final printings = [
         {
@@ -229,6 +244,18 @@ void main() {
       };
       expect(extractSetCardRow(card, 'SET'), isNull);
     });
+
+    test('normaliza set_code incremental para uppercase', () {
+      final card = {
+        'name': 'Incremental Case',
+        'identifiers': {'scryfallOracleId': 'incremental-case-id'},
+      };
+
+      final row = extractSetCardRow(card, 'ecc');
+      expect(row, isNotNull);
+      expect(row![8], 'ECC');
+      expect(row[7], contains('set=ECC'));
+    });
   });
 
   // ════════════════════════════════════════════════════════════════════════
@@ -282,7 +309,9 @@ void main() {
 
     test('filtra items de tipo inválido', () {
       final data = [
-        'string', 42, null,
+        'string',
+        42,
+        null,
         {'code': 'OK', 'releaseDate': '2025-01-01'},
       ];
       final codes = getNewSetCodesSinceFromData(data, DateTime(2024));
@@ -297,6 +326,16 @@ void main() {
       ];
       final codes = getNewSetCodesSinceFromData(data, DateTime(2024));
       expect(codes, equals(['AAA', 'MMM', 'ZZZ']));
+    });
+
+    test('normaliza e deduplica codigos por casing', () {
+      final data = [
+        {'code': 'soc', 'releaseDate': '2026-04-24'},
+        {'code': 'SOC', 'releaseDate': '2026-04-24'},
+        {'code': 'ecc', 'releaseDate': '2026-01-23'},
+      ];
+      final codes = getNewSetCodesSinceFromData(data, DateTime(2025));
+      expect(codes, equals(['ECC', 'SOC']));
     });
 
     test('data com formato inválido é ignorada', () {
@@ -368,9 +407,15 @@ void main() {
   group('extractOracleIds', () {
     test('extrai oracle IDs únicos', () {
       final cards = [
-        {'identifiers': {'scryfallOracleId': 'id-1'}},
-        {'identifiers': {'scryfallOracleId': 'id-2'}},
-        {'identifiers': {'scryfallOracleId': 'id-1'}}, // duplicata
+        {
+          'identifiers': {'scryfallOracleId': 'id-1'}
+        },
+        {
+          'identifiers': {'scryfallOracleId': 'id-2'}
+        },
+        {
+          'identifiers': {'scryfallOracleId': 'id-1'}
+        }, // duplicata
       ];
       final ids = extractOracleIds(cards);
       expect(ids, hasLength(2));
@@ -380,7 +425,9 @@ void main() {
     test('ignora cartas sem identifiers', () {
       final cards = <Map<String, dynamic>>[
         {'name': 'No Ids'},
-        {'identifiers': {'scryfallOracleId': 'ok-id'}},
+        {
+          'identifiers': {'scryfallOracleId': 'ok-id'}
+        },
       ];
       final ids = extractOracleIds(cards);
       expect(ids, equals({'ok-id'}));
@@ -388,8 +435,12 @@ void main() {
 
     test('ignora oracleId vazio', () {
       final cards = [
-        {'identifiers': {'scryfallOracleId': ''}},
-        {'identifiers': {'scryfallOracleId': 'valid'}},
+        {
+          'identifiers': {'scryfallOracleId': ''}
+        },
+        {
+          'identifiers': {'scryfallOracleId': 'valid'}
+        },
       ];
       final ids = extractOracleIds(cards);
       expect(ids, equals({'valid'}));
@@ -454,7 +505,8 @@ void main() {
       expect(url, contains('format=image'));
     });
 
-    test('oracleId (row[0]) é sempre string não-vazia quando row não é null', () {
+    test('oracleId (row[0]) é sempre string não-vazia quando row não é null',
+        () {
       final printings = [
         {
           'identifiers': {'scryfallOracleId': 'valid'},
@@ -563,11 +615,14 @@ void main() {
       expect(row![1], 'Fire // Ice');
     });
 
-    test('getNewSetCodesSinceFromData com centenas de sets não causa problema', () {
-      final bigList = List.generate(1000, (i) => {
-        'code': 'S${i.toString().padLeft(4, '0')}',
-        'releaseDate': '2025-06-01',
-      });
+    test('getNewSetCodesSinceFromData com centenas de sets não causa problema',
+        () {
+      final bigList = List.generate(
+          1000,
+          (i) => {
+                'code': 'S${i.toString().padLeft(4, '0')}',
+                'releaseDate': '2025-06-01',
+              });
       final codes = getNewSetCodesSinceFromData(bigList, DateTime(2024));
       expect(codes, hasLength(1000));
       // Deve estar ordenado

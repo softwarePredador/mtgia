@@ -60,6 +60,38 @@
 - O backfill e idempotente e preenche apenas nulos a partir de campos locais confiaveis.
 - Rollback tecnico exigiria backup pre-apply ou usar `color_identity_backfill_apply_candidates.*` para setar `NULL` nos IDs atualizados; isso nao e recomendado porque reintroduz o problema saneado.
 
+## 2026-04-28 — Hardening operacional de `sync_cards.dart`
+
+### O Porquê
+- A auditoria confirmou 80 grupos duplicados em `sets.code` por casing.
+- A causa operacional possivel era o `INSERT ... ON CONFLICT (code)`, pois `code` e case-sensitive no Postgres.
+- Mesmo mantendo query-level dedupe para os dados historicos, o sync precisava parar de introduzir novas variantes por casing.
+
+### O Como
+- `server/lib/sync_cards_utils.dart`
+  - normaliza `set_code` do AtomicCards e do incremental para uppercase;
+  - normaliza e deduplica codigos novos vindos de `SetList.json`.
+- `server/bin/sync_cards.dart`
+  - usa `normalizeMtgSetCode`;
+  - no sync de sets, faz `UPDATE ... WHERE LOWER(code) = LOWER($1)` antes de tentar insert;
+  - se nenhuma linha case-insensitive existir, insere o codigo canonico uppercase;
+  - upserts de cards passam a gravar `set_code` canonico para novas entradas.
+- `server/test/sync_cards_test.dart`
+  - adiciona regressao para `soc/SOC`;
+  - garante URL fallback e `set_code` uppercase no full e incremental.
+
+### Rotina oficial
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server
+dart run bin/sync_cards.dart
+dart run bin/mtg_data_integrity.dart --artifact-dir=test/artifacts/mtg_data_integrity_2026-04-28/post_sync_probe
+```
+
+### Decisao
+- Nao foi feita consolidacao fisica das 80 duplicidades historicas de `sets`.
+- O contrato das rotas continua protegido por dedupe/query case-insensitive.
+- A proxima consolidacao fisica, se necessaria, deve ser migracao propria com update controlado de `cards.set_code`, contagens pre/pos e rollback dedicado.
+
 ## 2026-04-28 — Prontidao de produto do catalogo Sets/Colecoes e acesso via Search
 
 ### O Porquê

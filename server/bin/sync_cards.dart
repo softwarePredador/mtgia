@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/mtg_data_integrity_support.dart';
 
 /// Sincroniza cartas e legalidades do MTGJSON para o Postgres.
 ///
@@ -185,8 +186,7 @@ Opcoes:
     await _logSync(pool,
         syncType: 'card_legalities',
         status: 'success',
-        recordsInserted:
-            (afterLegalities - beforeLegalities).clamp(0, 1 << 31),
+        recordsInserted: (afterLegalities - beforeLegalities).clamp(0, 1 << 31),
         recordsUpdated:
             (processedLegalities - (afterLegalities - beforeLegalities))
                 .clamp(0, 1 << 31),
@@ -286,7 +286,8 @@ Future<http.Response> _httpGetWithRetry(
         return response;
       }
 
-      final retryable = response.statusCode == 429 || response.statusCode >= 500;
+      final retryable =
+          response.statusCode == 429 || response.statusCode >= 500;
       final message =
           'Falha ao baixar $label: status=${response.statusCode} (tentativa $attempt/$_httpMaxRetries)';
 
@@ -311,7 +312,8 @@ Future<http.Response> _httpGetWithRetry(
     }
   }
 
-  throw Exception('Falha ao baixar $label apos $_httpMaxRetries tentativas: $lastError');
+  throw Exception(
+      'Falha ao baixar $label apos $_httpMaxRetries tentativas: $lastError');
 }
 
 Future<void> _runWithConcurrency<T>(
@@ -338,7 +340,8 @@ Future<void> _runWithConcurrency<T>(
   await Future.wait(workers);
 }
 
-Future<void> _logSync(Pool pool, {
+Future<void> _logSync(
+  Pool pool, {
   required String syncType,
   required String status,
   required int recordsInserted,
@@ -410,10 +413,10 @@ Future<List<dynamic>> _fetchSetListData() async {
 List<String> _getNewSetCodesSinceFromData(
     List<dynamic> setListData, DateTime since) {
   final cutoff = since.subtract(const Duration(days: 2));
-  final codes = <String>[];
+  final codes = <String>{};
   for (final item in setListData) {
     if (item is! Map) continue;
-    final code = item['code']?.toString();
+    final code = normalizeMtgSetCode(item['code']?.toString());
     final releaseDateStr = item['releaseDate']?.toString();
     if (code == null || releaseDateStr == null) continue;
     final releaseDate = DateTime.tryParse(releaseDateStr);
@@ -421,8 +424,8 @@ List<String> _getNewSetCodesSinceFromData(
       codes.add(code);
     }
   }
-  codes.sort();
-  return codes;
+  final sorted = codes.toList()..sort();
+  return sorted;
 }
 
 Future<Map<String, dynamic>> _fetchSetJson(String setCode) async {
@@ -462,7 +465,20 @@ Future<File> _downloadAtomicCards({required bool force}) async {
 Future<void> _syncSetsFromData(Pool pool, List<dynamic> setListData) async {
   print('📋 Sincronizando ${setListData.length} sets...');
   await pool.runTx((session) async {
-    final stmt = await session.prepare('''
+    final updateStmt = await session.prepare('''
+      UPDATE sets
+      SET
+        name = \$2,
+        release_date = \$3,
+        type = \$4,
+        block = \$5,
+        is_online_only = \$6,
+        is_foreign_only = \$7,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE LOWER(code) = LOWER(\$1)
+      RETURNING code
+    ''');
+    final insertStmt = await session.prepare('''
       INSERT INTO sets (code, name, release_date, type, block, is_online_only, is_foreign_only, updated_at)
       VALUES (\$1, \$2, \$3, \$4, \$5, \$6, \$7, CURRENT_TIMESTAMP)
       ON CONFLICT (code) DO UPDATE SET
@@ -474,15 +490,16 @@ Future<void> _syncSetsFromData(Pool pool, List<dynamic> setListData) async {
     try {
       for (final item in setListData) {
         if (item is! Map) continue;
-        final code = item['code']?.toString().trim();
+        final code = normalizeMtgSetCode(item['code']?.toString());
         final name = item['name']?.toString().trim();
-        if (code == null || code.isEmpty || name == null || name.isEmpty) continue;
+        if (code == null || code.isEmpty || name == null || name.isEmpty)
+          continue;
 
         final releaseDateStr = item['releaseDate']?.toString();
         final releaseDate =
             releaseDateStr != null ? DateTime.tryParse(releaseDateStr) : null;
 
-        await stmt.run([
+        final values = [
           code,
           name,
           releaseDate?.toIso8601String().split('T').first,
@@ -490,10 +507,15 @@ Future<void> _syncSetsFromData(Pool pool, List<dynamic> setListData) async {
           item['block']?.toString(),
           item['isOnlineOnly'] as bool?,
           item['isForeignOnly'] as bool?,
-        ]);
+        ];
+        final updated = await updateStmt.run(values);
+        if (updated.isEmpty) {
+          await insertStmt.run(values);
+        }
       }
     } finally {
-      await stmt.dispose();
+      await updateStmt.dispose();
+      await insertStmt.dispose();
     }
   });
 }
@@ -554,7 +576,8 @@ Future<int> _upsertCardsFromAtomic(
 /// Incremental: processa cartas de um set em batch.
 Future<int> _upsertCardsFromSet(
     Session session, List<Map<String, dynamic>> cards, String setCode) async {
-  print('🃏 Upsert de ${cards.length} cards (set=$setCode)...');
+  final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
+  print('🃏 Upsert de ${cards.length} cards (set=$canonicalSetCode)...');
 
   final stmt = await session.prepare('''
     INSERT INTO cards (
@@ -598,11 +621,13 @@ Future<int> _upsertCardsFromSet(
       final scryfallId = ids?['scryfallId']?.toString();
       String imageUrl;
       if (scryfallId != null && scryfallId.isNotEmpty) {
-        imageUrl = 'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
+        imageUrl =
+            'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
       } else {
         // Fallback to name-based URL (less reliable)
         final encodedName = Uri.encodeQueryComponent(name);
-        final setParam = setCode.isNotEmpty ? '&set=$setCode' : '';
+        final setParam =
+            canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
         imageUrl =
             'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
       }
@@ -622,11 +647,18 @@ Future<int> _upsertCardsFromSet(
       }
 
       rows.add([
-        oracleId, name, card['manaCost']?.toString(),
-        card['type']?.toString(), card['text']?.toString(),
-        colors, colorIdentity, imageUrl, setCode,
+        oracleId,
+        name,
+        card['manaCost']?.toString(),
+        card['type']?.toString(),
+        card['text']?.toString(),
+        colors,
+        colorIdentity,
+        imageUrl,
+        canonicalSetCode,
         card['rarity']?.toString(),
-        collectorNumber, foil,
+        collectorNumber,
+        foil,
       ]);
     }
 
@@ -672,15 +704,17 @@ List<Object?>? _extractCardRow(String cardName, List<dynamic> printings) {
   final colorIdentity =
       (chosen['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
-  final setCode =
-      (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString();
+  final setCode = normalizeMtgSetCode(
+    (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
+  );
   final rarity = chosen['rarity']?.toString();
 
   // Use scryfallId for direct image URL (more reliable than name-based)
   final scryfallId = ids?['scryfallId']?.toString();
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl = 'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
+    imageUrl =
+        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
   } else {
     // Fallback to name-based URL (less reliable)
     final encodedName = Uri.encodeQueryComponent(name);
@@ -691,8 +725,16 @@ List<Object?>? _extractCardRow(String cardName, List<dynamic> printings) {
   }
 
   return [
-    oracleId, name, manaCost, typeLine, oracleText,
-    colors, colorIdentity, imageUrl, setCode, rarity,
+    oracleId,
+    name,
+    manaCost,
+    typeLine,
+    oracleText,
+    colors,
+    colorIdentity,
+    imageUrl,
+    setCode,
+    rarity,
   ];
 }
 
