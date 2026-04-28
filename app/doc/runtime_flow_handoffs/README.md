@@ -30,7 +30,7 @@ The iPhone 15 Simulator proof is not complete unless the handoff includes the si
 
 Latest iPhone 15 Simulator attempt:
 
-- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-28.md`
 
 ## Physical M2006 fallback runbook
 

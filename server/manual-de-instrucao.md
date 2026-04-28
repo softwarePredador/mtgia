@@ -1,6 +1,37 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-28 — QA geral iPhone 15 para Sets/Colecoes com backend real
+
+### O Porquê
+- Era necessario provar que a feature Sets/Colecoes nao causou regressao nos fluxos principais navegaveis do app no iPhone 15 Simulator.
+- A validacao precisava usar backend real em `http://127.0.0.1:8082` e registrar device id, health, comandos e pendencias reais.
+
+### O Como
+- Backend local Dart Frog iniciado em `PORT=8082`.
+- Device primario: `iPhone 15` / `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` / iOS Simulator runtime `17.4`.
+- Ampliados os integration tests:
+  - `sets_catalog_runtime_test.dart` agora tambem abre `OM2` e valida o estado de set futuro/parcial.
+  - `sets_search_catalog_runtime_test.dart` agora cobre `Search -> Cards` com busca real por `Black Lotus` antes de `Search -> Colecoes`.
+  - novo `collection_entrypoints_runtime_test.dart` cobre entrypoint `Colecao/Fichario` e alternancia para `Colecoes`.
+- Corrigido overflow encontrado no iPhone 15 em `AppStatePanel` usando `LayoutBuilder`, `SingleChildScrollView` e `ConstrainedBox`.
+- `app_state_panel_test.dart` passou a validar layout compacto com altura restrita.
+
+### Resultado
+- `flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection --no-version-check`: sem issues.
+- `flutter test test/features/cards test/features/collection --no-version-check`: passou.
+- iPhone 15 + backend real:
+  - `integration_test/sets_catalog_runtime_test.dart`: passou.
+  - `integration_test/sets_search_catalog_runtime_test.dart`: passou.
+  - `integration_test/collection_entrypoints_runtime_test.dart`: passou.
+- Suite focada de decks/generate/optimize/apply/validate em widget runtime: passou.
+- Handoff salvo em `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-28.md`.
+- Logs salvos em `app/doc/runtime_flow_proofs_2026-04-28_iphone15_simulator/`.
+
+### Pendencias
+- Deck `register/login -> generate -> optimize -> apply -> validate` ainda nao foi provado no iPhone 15 com backend real nesta rodada; a cobertura executada para decks usa `ApiClient` mockado.
+- Binder autenticado nao foi exercitado; o QA apenas provou entrypoint sem crash e recebeu 401 esperado sem login.
+
 ## 2026-04-28 — Auditoria dry-run de integridade MTG para Sets/Colecoes
 
 ### O Porquê

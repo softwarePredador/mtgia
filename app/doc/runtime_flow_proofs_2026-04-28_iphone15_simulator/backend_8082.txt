@@ -1,0 +1,4 @@
+[hotreload] Hot reload not enabled. Run this app with --enable-vm-service (or use debug run) in order to enable hot reload.
+[observability] Sentry inicializado (env=staging, release=4edfbdf)
+🔌 Conectando ao banco: 143.198.230.247:5433/halder (env: development)
+✅ Pool de conexões inicializado (SSL: disable).

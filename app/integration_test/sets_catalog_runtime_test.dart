@@ -44,6 +44,18 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('setsCatalogList')), findsOneWidget);
+
+      await tester.enterText(find.byKey(const Key('setsSearchField')), 'OM2');
+      await tester.pump(const Duration(milliseconds: 500));
+      await _pumpUntilFound(tester, find.text('Through the Omenpaths 2'));
+
+      await tester.tap(find.text('Through the Omenpaths 2'));
+      await tester.pumpAndSettle();
+      await _pumpUntilFound(tester, find.text('Dados parciais de set futuro'));
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('setsCatalogList')), findsOneWidget);
     },
   );
 }

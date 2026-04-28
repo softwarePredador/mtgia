@@ -10,6 +10,7 @@ void main() {
       home: Scaffold(
         body: SizedBox(
           width: 280,
+          height: 180,
           child: AppStatePanel(
             icon: Icons.info_outline_rounded,
             title: 'Nenhum conteúdo por aqui',

@@ -23,6 +23,11 @@ void main() {
         ),
       );
 
+      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cards'));
+      await tester.enterText(find.byType(TextField).first, 'Black Lotus');
+      await tester.pump(const Duration(milliseconds: 500));
+      await _pumpUntilFound(tester, find.text('Black Lotus'));
+
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Coleções'));
       await tester.tap(find.widgetWithText(Tab, 'Coleções'));
       await tester.pumpAndSettle();

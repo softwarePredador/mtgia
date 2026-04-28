@@ -1,0 +1,20 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/collection_entrypoints_runtime_test.dart
+The following target(s) do not support arm64 architecture, which is a requirement for Apple Silicon iOS 26+ simulators:
+  - GoogleMLKit (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLImage (transitive dependency of Flutter plugin google_mlkit_commons)
+  - MLKitCommon (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitVision (transitive dependency of Flutter plugin google_mlkit_commons)
+
+Please contact plugin maintainers to request arm64 support to continue to be able to use the plugin on a simulator.
+Running Xcode build...                                          
+Xcode build done.                                           20.9s
+00:00 +0: collection hub exposes binder and sets entry points
+[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+[🌐 ApiClient] GET http://127.0.0.1:8082/binder?page=1&limit=20&list_type=have
+[🌐 ApiClient] GET http://127.0.0.1:8082/binder/stats
+[🌐 ApiClient] GET /binder?page=1&limit=20&list_type=have → 401 (208ms)
+[🌐 ApiClient] GET /binder/stats → 401 (229ms)
+[🌐 ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1
+[🌐 ApiClient] GET /sets?limit=50&page=1 → 200 (226ms)
+00:06 +1: (tearDownAll)
+00:06 +1: All tests passed!

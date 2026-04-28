@@ -1,0 +1,24 @@
+00:00 +0: loading /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app/integration_test/sets_catalog_runtime_test.dart
+The following target(s) do not support arm64 architecture, which is a requirement for Apple Silicon iOS 26+ simulators:
+  - GoogleMLKit (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLImage (transitive dependency of Flutter plugin google_mlkit_commons)
+  - MLKitCommon (transitive dependency of Flutter plugin google_mlkit_text_recognition)
+  - MLKitVision (transitive dependency of Flutter plugin google_mlkit_commons)
+
+Please contact plugin maintainers to request arm64 support to continue to be able to use the plugin on a simulator.
+Running Xcode build...                                          
+Xcode build done.                                           19.9s
+00:00 +0: sets catalog searches and opens set detail against live backend
+[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+[🌐 ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1
+[🌐 ApiClient] GET /sets?limit=50&page=1 → 200 (1730ms)
+[🌐 ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1&q=Marvel
+[🌐 ApiClient] GET /sets?limit=50&page=1&q=Marvel → 200 (675ms)
+[🌐 ApiClient] GET http://127.0.0.1:8082/cards?set=MSH&limit=100&page=1&dedupe=true
+[🌐 ApiClient] GET /cards?set=MSH&limit=100&page=1&dedupe=true → 200 (1295ms)
+[🌐 ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1&q=OM2
+[🌐 ApiClient] GET /sets?limit=50&page=1&q=OM2 → 200 (641ms)
+[🌐 ApiClient] GET http://127.0.0.1:8082/cards?set=OM2&limit=100&page=1&dedupe=true
+[🌐 ApiClient] GET /cards?set=OM2&limit=100&page=1&dedupe=true → 200 (1296ms)
+00:14 +1: (tearDownAll)
+00:15 +1: All tests passed!
