@@ -71,3 +71,66 @@ All tests passed!
 ## Not proven
 
 Nada ficou `not proven` para o fluxo de catalogo de sets.
+
+## Validacao complementar - Search Cards | Colecoes
+
+Decisao de produto: **expor Colecoes tambem na area de Search**. O acesso `Colecao -> Colecoes` permanece, mas a descoberta por busca agora tambem existe em `CardSearchScreen` com abas `Cards | Colecoes`.
+
+### Fluxos provados no iPhone 15
+
+1. `Colecao -> Colecoes`
+2. Busca `Marvel`
+3. Abre `Marvel Super Heroes`
+4. Carrega `/cards?set=MSH`
+5. Volta ao catalogo sem crash
+6. `Search -> Colecoes`
+7. Busca `ECC`
+8. Abre `Lorwyn Eclipsed Commander`
+9. Carrega `/cards?set=ECC`
+10. Volta ao catalogo sem crash
+
+### Comandos complementares executados
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app
+flutter test integration_test/sets_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app
+flutter test integration_test/sets_search_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+### Evidencia complementar
+
+```text
+[ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1
+[ApiClient] GET /sets?limit=50&page=1 -> 200
+[ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1&q=Marvel
+[ApiClient] GET /sets?limit=50&page=1&q=Marvel -> 200
+[ApiClient] GET http://127.0.0.1:8082/cards?set=MSH&limit=100&page=1&dedupe=true
+[ApiClient] GET /cards?set=MSH&limit=100&page=1&dedupe=true -> 200
+All tests passed!
+
+[ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1
+[ApiClient] GET /sets?limit=50&page=1 -> 200
+[ApiClient] GET http://127.0.0.1:8082/sets?limit=50&page=1&q=ECC
+[ApiClient] GET /sets?limit=50&page=1&q=ECC -> 200
+[ApiClient] GET http://127.0.0.1:8082/cards?set=ECC&limit=100&page=1&dedupe=true
+[ApiClient] GET /cards?set=ECC&limit=100&page=1&dedupe=true -> 200
+All tests passed!
+```
+
+### Resultado complementar
+
+`proved` para o acesso original por Colecao e para o novo acesso por Search no iPhone 15 Simulator.

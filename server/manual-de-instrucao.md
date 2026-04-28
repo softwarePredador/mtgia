@@ -1,6 +1,60 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-28 — Prontidao de produto do catalogo Sets/Colecoes e acesso via Search
+
+### O Porquê
+- A sprint de catalogo de Sets ja entregava backend `/sets`, UI em `Colecao -> Colecoes` e prova inicial no iPhone 15.
+- A auditoria final precisava responder se a feature estava pronta para produto e se a area de Search tambem deveria expor `Cards | Colecoes`.
+- A decisao foi **sim**: descobrir sets por busca e comportamento natural para usuario de MTG, enquanto o hub `Colecao` continua adequado para gerenciamento de fichario/market/trades.
+
+### O Como
+- `app/lib/features/cards/screens/card_search_screen.dart`
+  - passou a usar `TabController` com abas `Cards` e `Colecoes`;
+  - a aba `Cards` preserva o fluxo atual de busca/adicao de cartas;
+  - a aba `Colecoes` reusa `SetsCatalogScreen`.
+- `app/lib/features/collection/screens/sets_catalog_screen.dart`
+  - ganhou `showAppBar`, permitindo uso como tela completa ou conteudo embutido em Search.
+- `app/test/features/cards/screens/card_search_screen_test.dart`
+  - adiciona cobertura para `Search -> Colecoes -> detalhe do set`.
+- `app/integration_test/sets_search_catalog_runtime_test.dart`
+  - prova o fluxo novo contra backend real no iPhone 15 Simulator.
+
+### Auditoria de dados
+- Backend local real em `http://127.0.0.1:8082` confirmou:
+  - `/sets` retorna `status` e `card_count`;
+  - `/sets?q=Marvel` encontra `MSH` e `MSC` como futuros;
+  - `/sets?code=soc` retorna apenas `SOC`;
+  - `/cards?set=MSH` retorna cards reais;
+  - `/cards?set=OM2` retorna lista vazia, esperada para futuro com `card_count=0`.
+- Foi encontrado somente um set futuro com `card_count=0` no recorte auditado:
+  - `OM2 | Through the Omenpaths 2 | 2026-06-26`.
+- Existem 80 codigos duplicados por casing em `sets`; o endpoint esta protegido por dedupe query-level e nenhuma migracao destrutiva foi feita.
+- Existem cartas recentes/futuras com `color_identity IS NULL`; para o catalogo de Sets isso e seguro, mas em filtros Commander client-side pode tratar cartas como incolores. Ficou registrado como backlog de saneamento de dados.
+
+### Validacao executada
+- Server:
+  - `dart analyze routes/sets routes/cards bin test`
+  - `dart test test/sets_route_test.dart test/cards_route_test.dart`
+  - curls reais em `/health`, `/sets`, `/sets?q=Marvel`, `/sets?code=soc`, `/cards?set=MSH`, `/cards?set=OM2`
+- App:
+  - `flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection --no-version-check`
+  - `flutter test test/features/cards test/features/collection --no-version-check`
+  - `flutter analyze lib/main.dart --no-version-check`
+- Runtime iPhone 15:
+  - `integration_test/sets_catalog_runtime_test.dart`
+  - `integration_test/sets_search_catalog_runtime_test.dart`
+  - ambos com `API_BASE_URL=http://127.0.0.1:8082`
+
+### Resultado
+- Catalogo Sets/Colecoes ficou pronto para produto nos fluxos:
+  - `Colecao -> Colecoes -> buscar Marvel -> abrir Marvel Super Heroes -> voltar`;
+  - `Search -> Colecoes -> buscar ECC -> abrir Lorwyn Eclipsed Commander -> voltar`.
+- Nenhuma pendencia funcional ficou `not proven`.
+- Backlog nao bloqueante:
+  - migracao segura para consolidar casing de `sets.code`;
+  - saneamento de `cards.color_identity` nulo em sets recentes/futuros.
+
 ## 2026-04-28 — Explainability estruturada para referencias externas em `optimize/generate`
 
 ### O Porquê

@@ -10,8 +10,9 @@ import 'set_cards_screen.dart';
 
 class SetsCatalogScreen extends StatefulWidget {
   final ApiClient? apiClient;
+  final bool showAppBar;
 
-  const SetsCatalogScreen({super.key, this.apiClient});
+  const SetsCatalogScreen({super.key, this.apiClient, this.showAppBar = true});
 
   @override
   State<SetsCatalogScreen> createState() => _SetsCatalogScreenState();
@@ -164,20 +165,9 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundAbyss,
-      appBar: AppBar(
-        title: const Text('Coleções MTG'),
-        backgroundColor: AppTheme.surfaceElevated,
-        actions: [
-          IconButton(
-            tooltip: 'Recarregar coleções',
-            onPressed: _isLoading ? null : _loadFirstPage,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: Column(
+    final content = ColoredBox(
+      color: AppTheme.backgroundAbyss,
+      child: Column(
         children: [
           _CatalogHeader(
             controller: _searchController,
@@ -192,6 +182,26 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
           Expanded(child: _buildBody()),
         ],
       ),
+    );
+
+    if (!widget.showAppBar) {
+      return content;
+    }
+
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundAbyss,
+      appBar: AppBar(
+        title: const Text('Coleções MTG'),
+        backgroundColor: AppTheme.surfaceElevated,
+        actions: [
+          IconButton(
+            tooltip: 'Recarregar coleções',
+            onPressed: _isLoading ? null : _loadFirstPage,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+      body: content,
     );
   }
 

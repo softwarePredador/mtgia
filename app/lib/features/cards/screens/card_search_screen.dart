@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../providers/card_provider.dart';
@@ -7,12 +8,14 @@ import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
+import '../../collection/screens/sets_catalog_screen.dart';
 import 'card_detail_screen.dart';
 import 'dart:async';
 
 class CardSearchScreen extends StatefulWidget {
   final String deckId;
   final String? mode;
+  final ApiClient? setsApiClient;
 
   /// Callback opcional para modo binder — ao selecionar carta,
   /// chama essa função ao invés de adicionar ao deck.
@@ -22,6 +25,7 @@ class CardSearchScreen extends StatefulWidget {
     super.key,
     required this.deckId,
     this.mode,
+    this.setsApiClient,
     this.onCardSelectedForBinder,
   });
 
@@ -31,14 +35,18 @@ class CardSearchScreen extends StatefulWidget {
   State<CardSearchScreen> createState() => _CardSearchScreenState();
 }
 
-class _CardSearchScreenState extends State<CardSearchScreen> {
+class _CardSearchScreenState extends State<CardSearchScreen>
+    with SingleTickerProviderStateMixin {
   final _searchController = TextEditingController();
   Timer? _debounce;
   final _scrollController = ScrollController();
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this)
+      ..addListener(_onTabChanged);
     _scrollController.addListener(_onScroll);
     if (!widget.isBinderMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -53,10 +61,18 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
   @override
   void dispose() {
     _debounce?.cancel();
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
     _scrollController.removeListener(_onScroll);
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _onScroll() {
@@ -234,230 +250,268 @@ class _CardSearchScreenState extends State<CardSearchScreen> {
         !widget.isBinderMode &&
         (widget.mode ?? '').toLowerCase() == 'commander';
 
+    final isSetsTab = _tabController.index == 1;
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: TextField(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            autofocus: true,
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              hintText:
-                  widget.isBinderMode
-                      ? 'Buscar carta para o fichário...'
-                      : isCommanderMode
-                      ? 'Buscar comandante...'
-                      : 'Buscar cartas...',
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true,
-              hintStyle: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 16,
-              ),
-            ),
-            style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
-            cursorColor: AppTheme.textPrimary,
-          ),
-        ),
-      ),
-      body: Consumer<CardProvider>(
-        builder: (context, provider, child) {
-          final query = _searchController.text.trim();
-
-          if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppTheme.manaViolet),
-            );
-          }
-
-          if (provider.errorMessage != null) {
-            return AppStatePanel(
-              icon: Icons.error_outline_rounded,
-              title: 'Falha ao buscar cartas',
-              message: provider.errorMessage!,
-              accent: AppTheme.error,
-              actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
-              onAction:
-                  query.length >= 3 ? () => _onSearchChanged(query) : null,
-            );
-          }
-
-          if (provider.searchResults.isEmpty) {
-            return AppStatePanel(
-              icon:
-                  query.length >= 3
-                      ? Icons.search_off_rounded
-                      : Icons.search_rounded,
-              title:
-                  query.length >= 3
-                      ? 'Nenhuma carta encontrada'
-                      : 'Busque uma carta',
-              message:
-                  query.length >= 3
-                      ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
-                      : 'Digite pelo menos 3 letras para começar a busca.',
-              accent:
-                  query.length >= 3 ? AppTheme.warning : AppTheme.primarySoft,
-            );
-          }
-
-          final totalItems =
-              provider.searchResults.length + (provider.hasMore ? 1 : 0);
-
-          return ListView.builder(
-            controller: _scrollController,
-            itemCount: totalItems,
-            itemBuilder: (context, index) {
-              if (index >= provider.searchResults.length) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppTheme.manaViolet,
-                    ),
-                  ),
-                );
-              }
-              final card = provider.searchResults[index];
-              final isCommanderEligible = _isCommanderEligible(card);
-              final allowedByIdentity =
-                  !isCommanderFormat ||
-                  commanderIdentity == null ||
-                  _isSubset(card.colorIdentity, commanderIdentity);
-              final canAdd =
-                  widget.isBinderMode
-                      ? true
-                      : isCommanderMode
-                      ? isCommanderEligible
-                      : (mustPickCommanderFirst
-                          ? isCommanderEligible
-                          : allowedByIdentity);
-              return ListTile(
-                leading: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CardDetailScreen(card: card),
+        titleSpacing: isSetsTab ? null : 0,
+        title:
+            isSetsTab
+                ? const Text('Coleções')
+                : Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                    autofocus: true,
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                      hintText:
+                          widget.isBinderMode
+                              ? 'Buscar carta para o fichário...'
+                              : isCommanderMode
+                              ? 'Buscar comandante...'
+                              : 'Buscar cartas...',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      hintStyle: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 16,
                       ),
-                    );
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    child: CachedCardImage(
-                      imageUrl: card.imageUrl,
-                      width: 40,
-                      height: 56,
                     ),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 16,
+                    ),
+                    cursorColor: AppTheme.textPrimary,
                   ),
                 ),
-                title: Text(card.name),
-                subtitle:
-                    widget.isBinderMode
-                        ? Row(
-                          children: [
-                            if (card.setCode.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
+        bottom: TabBar(
+          key: const Key('cardSearchTabs'),
+          controller: _tabController,
+          indicatorColor: AppTheme.manaViolet,
+          labelColor: AppTheme.manaViolet,
+          unselectedLabelColor: AppTheme.textSecondary,
+          tabs: const [
+            Tab(icon: Icon(Icons.style_outlined), text: 'Cards'),
+            Tab(
+              icon: Icon(Icons.auto_awesome_mosaic_outlined),
+              text: 'Coleções',
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildCardSearchResults(
+            isCommanderFormat: isCommanderFormat,
+            commanderIdentity: commanderIdentity,
+            mustPickCommanderFirst: mustPickCommanderFirst,
+            isCommanderMode: isCommanderMode,
+          ),
+          SetsCatalogScreen(apiClient: widget.setsApiClient, showAppBar: false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardSearchResults({
+    required bool isCommanderFormat,
+    required Set<String>? commanderIdentity,
+    required bool mustPickCommanderFirst,
+    required bool isCommanderMode,
+  }) {
+    return Consumer<CardProvider>(
+      builder: (context, provider, child) {
+        final query = _searchController.text.trim();
+
+        if (provider.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.manaViolet),
+          );
+        }
+
+        if (provider.errorMessage != null) {
+          return AppStatePanel(
+            icon: Icons.error_outline_rounded,
+            title: 'Falha ao buscar cartas',
+            message: provider.errorMessage!,
+            accent: AppTheme.error,
+            actionLabel: query.length >= 3 ? 'Tentar novamente' : null,
+            onAction: query.length >= 3 ? () => _onSearchChanged(query) : null,
+          );
+        }
+
+        if (provider.searchResults.isEmpty) {
+          return AppStatePanel(
+            icon:
+                query.length >= 3
+                    ? Icons.search_off_rounded
+                    : Icons.search_rounded,
+            title:
+                query.length >= 3
+                    ? 'Nenhuma carta encontrada'
+                    : 'Busque uma carta',
+            message:
+                query.length >= 3
+                    ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
+                    : 'Digite pelo menos 3 letras para começar a busca.',
+            accent: query.length >= 3 ? AppTheme.warning : AppTheme.primarySoft,
+          );
+        }
+
+        final totalItems =
+            provider.searchResults.length + (provider.hasMore ? 1 : 0);
+
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: totalItems,
+          itemBuilder: (context, index) {
+            if (index >= provider.searchResults.length) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                ),
+              );
+            }
+            final card = provider.searchResults[index];
+            final isCommanderEligible = _isCommanderEligible(card);
+            final allowedByIdentity =
+                !isCommanderFormat ||
+                commanderIdentity == null ||
+                _isSubset(card.colorIdentity, commanderIdentity);
+            final canAdd =
+                widget.isBinderMode
+                    ? true
+                    : isCommanderMode
+                    ? isCommanderEligible
+                    : (mustPickCommanderFirst
+                        ? isCommanderEligible
+                        : allowedByIdentity);
+            return ListTile(
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CardDetailScreen(card: card),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  child: CachedCardImage(
+                    imageUrl: card.imageUrl,
+                    width: 40,
+                    height: 56,
+                  ),
+                ),
+              ),
+              title: Text(card.name),
+              subtitle:
+                  widget.isBinderMode
+                      ? Row(
+                        children: [
+                          if (card.setCode.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: AppTheme.manaViolet.withValues(
+                                  alpha: 0.2,
                                 ),
-                                margin: const EdgeInsets.only(right: 6),
-                                decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
                                   color: AppTheme.manaViolet.withValues(
-                                    alpha: 0.2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: AppTheme.manaViolet.withValues(
-                                      alpha: 0.4,
-                                    ),
-                                  ),
-                                ),
-                                child: Text(
-                                  card.setCode.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.manaViolet,
-                                    letterSpacing: 0.5,
+                                    alpha: 0.4,
                                   ),
                                 ),
                               ),
-                            Flexible(
                               child: Text(
-                                [
-                                  if ((card.setName ?? '').trim().isNotEmpty)
-                                    card.setName!,
-                                  if ((card.setReleaseDate ?? '')
-                                      .trim()
-                                      .isNotEmpty)
-                                    card.setReleaseDate!.substring(0, 4),
-                                  card.rarity.isNotEmpty
-                                      ? card.rarity[0].toUpperCase() +
-                                          card.rarity.substring(1)
-                                      : '',
-                                ].where((s) => s.isNotEmpty).join(' • '),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                card.setCode.toUpperCase(),
                                 style: const TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  fontSize: 12,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.manaViolet,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ),
-                          ],
-                        )
-                        : Text(
-                          [
-                            card.typeLine,
-                            if ((card.setName ?? '').trim().isNotEmpty)
-                              card.setName!,
-                            if ((card.setReleaseDate ?? '').trim().isNotEmpty)
-                              card.setReleaseDate!,
-                            if (mustPickCommanderFirst && !isCommanderEligible)
-                              'Selecione um comandante primeiro',
-                            if (!mustPickCommanderFirst &&
-                                isCommanderFormat &&
-                                commanderIdentity != null &&
-                                !allowedByIdentity)
-                              'Fora da identidade do comandante',
-                          ].join(' • '),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                trailing: IconButton(
-                  tooltip: 'Adicionar',
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed:
-                      canAdd
-                          ? () {
-                            if (widget.isBinderMode) {
-                              final cardData = {
-                                'id': card.id,
-                                'name': card.name,
-                                'image_url': card.imageUrl,
-                                'set_code': card.setCode,
-                                'mana_cost': card.manaCost,
-                                'rarity': card.rarity,
-                              };
-                              Navigator.pop(context);
-                              widget.onCardSelectedForBinder?.call(cardData);
-                            } else {
-                              _addCardToDeck(card);
-                            }
+                          Flexible(
+                            child: Text(
+                              [
+                                if ((card.setName ?? '').trim().isNotEmpty)
+                                  card.setName!,
+                                if ((card.setReleaseDate ?? '')
+                                    .trim()
+                                    .isNotEmpty)
+                                  card.setReleaseDate!.substring(0, 4),
+                                card.rarity.isNotEmpty
+                                    ? card.rarity[0].toUpperCase() +
+                                        card.rarity.substring(1)
+                                    : '',
+                              ].where((s) => s.isNotEmpty).join(' • '),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                      : Text(
+                        [
+                          card.typeLine,
+                          if ((card.setName ?? '').trim().isNotEmpty)
+                            card.setName!,
+                          if ((card.setReleaseDate ?? '').trim().isNotEmpty)
+                            card.setReleaseDate!,
+                          if (mustPickCommanderFirst && !isCommanderEligible)
+                            'Selecione um comandante primeiro',
+                          if (!mustPickCommanderFirst &&
+                              isCommanderFormat &&
+                              commanderIdentity != null &&
+                              !allowedByIdentity)
+                            'Fora da identidade do comandante',
+                        ].join(' • '),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+              trailing: IconButton(
+                tooltip: 'Adicionar',
+                icon: const Icon(Icons.add_circle_outline),
+                onPressed:
+                    canAdd
+                        ? () {
+                          if (widget.isBinderMode) {
+                            final cardData = {
+                              'id': card.id,
+                              'name': card.name,
+                              'image_url': card.imageUrl,
+                              'set_code': card.setCode,
+                              'mana_cost': card.manaCost,
+                              'rarity': card.rarity,
+                            };
+                            Navigator.pop(context);
+                            widget.onCardSelectedForBinder?.call(cardData);
+                          } else {
+                            _addCardToDeck(card);
                           }
-                          : null,
-                ),
-              );
-            },
-          );
-        },
-      ),
+                        }
+                        : null,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
