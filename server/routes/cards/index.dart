@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/card_query_contract.dart';
 import '../../lib/endpoint_cache.dart';
 import '../../lib/scryfall_image_url.dart';
 
@@ -15,7 +16,7 @@ Future<Response> onRequest(RequestContext context) async {
 
   final params = context.request.uri.queryParameters;
   final nameFilter = params['name'];
-  final setFilter = params['set']?.trim();
+  final setFilter = normalizeCardSetFilter(params['set']);
   // Deduplicar por padrão para evitar variantes duplicadas
   // Use ?dedupe=false para obter todas as variantes
   final deduplicate = params['dedupe']?.toLowerCase() != 'false';
