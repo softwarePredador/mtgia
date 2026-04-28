@@ -1,0 +1,16 @@
+{
+  "mode": "dry_run",
+  "started_at": "2026-04-28T14:30:52.338105",
+  "finished_at": "2026-04-28T14:30:57.771590",
+  "artifact_dir": "test/artifacts/mtg_data_integrity_2026-04-28/post_apply_probe",
+  "duplicate_set_code_groups": 80,
+  "duplicate_set_code_variants": 160,
+  "null_color_identity_total": 0,
+  "null_color_identity_recent_or_future_total": 0,
+  "null_color_identity_future_total": 0,
+  "color_identity_deterministic_backfill_candidates": 0,
+  "color_identity_unresolved_rows": 0,
+  "color_identity_updated_rows": 0,
+  "null_color_identity_after_apply": 0,
+  "db_mutations": false
+}

@@ -14,17 +14,21 @@ mtg_data_integrity.dart - Auditoria e saneamento seguro de dados MTG
 
 Uso:
   dart run bin/mtg_data_integrity.dart
+  dart run bin/mtg_data_integrity.dart --apply-color-identity
   dart run bin/mtg_data_integrity.dart --artifact-dir=test/artifacts/mtg_data_integrity_2026-04-28
 
 Opcoes:
-  --artifact-dir=<path>  Diretorio dos artefatos (default: $_defaultArtifactDir)
-  --help                Mostra esta ajuda
+  --apply-color-identity  Executa backfill idempotente em cards.color_identity IS NULL
+  --artifact-dir=<path>   Diretorio dos artefatos (default: $_defaultArtifactDir)
+  --help                 Mostra esta ajuda
 
-Este comando e dry-run: nao executa UPDATE/DELETE.
+Sem --apply-color-identity, o comando e dry-run e nao executa UPDATE/DELETE.
 ''');
     return;
   }
 
+  final applyColorIdentity = args.contains('--apply-color-identity');
+  final mode = applyColorIdentity ? 'apply' : 'dry_run';
   final artifactDir = Directory(
     _readArgValue(args, '--artifact-dir=') ?? _defaultArtifactDir,
   );
@@ -131,12 +135,19 @@ Este comando e dry-run: nao executa UPDATE/DELETE.
       }
     }
 
+    final backfillFilePrefix = applyColorIdentity
+        ? 'color_identity_backfill_apply_candidates'
+        : 'color_identity_backfill_dry_run';
+    final unresolvedFilePrefix = applyColorIdentity
+        ? 'color_identity_unresolved_apply'
+        : 'color_identity_unresolved_dry_run';
+
     await _writeJson(
-      '${artifactDir.path}/color_identity_backfill_dry_run.json',
+      '${artifactDir.path}/$backfillFilePrefix.json',
       backfillCandidates,
     );
     await _writeCsv(
-      '${artifactDir.path}/color_identity_backfill_dry_run.csv',
+      '${artifactDir.path}/$backfillFilePrefix.csv',
       backfillCandidates,
       [
         'id',
@@ -153,11 +164,11 @@ Este comando e dry-run: nao executa UPDATE/DELETE.
       ],
     );
     await _writeJson(
-      '${artifactDir.path}/color_identity_unresolved_dry_run.json',
+      '${artifactDir.path}/$unresolvedFilePrefix.json',
       unresolvedRows,
     );
     await _writeCsv(
-      '${artifactDir.path}/color_identity_unresolved_dry_run.csv',
+      '${artifactDir.path}/$unresolvedFilePrefix.csv',
       unresolvedRows,
       [
         'id',
@@ -174,8 +185,15 @@ Este comando e dry-run: nao executa UPDATE/DELETE.
       ],
     );
 
+    var updatedRows = 0;
+    var nullAfterApply = nullTotal;
+    if (applyColorIdentity) {
+      updatedRows = await _applyColorIdentityBackfill(pool, backfillCandidates);
+      nullAfterApply = await _countNullColorIdentity(pool);
+    }
+
     final summary = {
-      'mode': 'dry_run',
+      'mode': mode,
       'started_at': startedAt.toIso8601String(),
       'finished_at': DateTime.now().toIso8601String(),
       'artifact_dir': artifactDir.path,
@@ -189,22 +207,33 @@ Este comando e dry-run: nao executa UPDATE/DELETE.
       'color_identity_deterministic_backfill_candidates':
           backfillCandidates.length,
       'color_identity_unresolved_rows': unresolvedRows.length,
-      'db_mutations': false,
+      'color_identity_updated_rows': updatedRows,
+      'null_color_identity_after_apply': nullAfterApply,
+      'db_mutations': applyColorIdentity,
     };
-    await _writeJson('${artifactDir.path}/summary_dry_run.json', summary);
+    await _writeJson('${artifactDir.path}/summary_$mode.json', summary);
     await _writeSummaryMarkdown(
-      '${artifactDir.path}/summary_dry_run.md',
+      '${artifactDir.path}/summary_$mode.md',
       summary,
     );
 
-    stdout.writeln('✅ Auditoria dry-run concluida.');
+    stdout.writeln(
+      applyColorIdentity
+          ? '✅ Backfill de color_identity concluido.'
+          : '✅ Auditoria dry-run concluida.',
+    );
     stdout.writeln('  - Artefatos: ${artifactDir.path}');
     stdout.writeln('  - Duplicidades LOWER(sets.code): $duplicateGroupCount');
-    stdout.writeln('  - cards.color_identity IS NULL: $nullTotal');
+    stdout.writeln('  - cards.color_identity IS NULL antes: $nullTotal');
     stdout.writeln(
       '  - Candidatos deterministicos: ${backfillCandidates.length}',
     );
     stdout.writeln('  - Unresolved: ${unresolvedRows.length}');
+    if (applyColorIdentity) {
+      stdout.writeln('  - Linhas atualizadas: $updatedRows');
+      stdout
+          .writeln('  - cards.color_identity IS NULL depois: $nullAfterApply');
+    }
   } finally {
     await database.close();
   }
@@ -386,6 +415,50 @@ Future<List<Map<String, dynamic>>> _loadNullColorIdentityRows(Pool pool) async {
   return result.map((row) => row.toColumnMap()).toList();
 }
 
+Future<int> _applyColorIdentityBackfill(
+  Pool pool,
+  List<Map<String, dynamic>> candidates,
+) async {
+  var updated = 0;
+
+  final idsByIdentity = <String, List<String>>{};
+  for (final candidate in candidates) {
+    final id = candidate['id']?.toString();
+    if (id == null || id.isEmpty) continue;
+    final identityKey = candidate['resolved_color_identity']?.toString() ?? '';
+    idsByIdentity.putIfAbsent(identityKey, () => <String>[]).add(id);
+  }
+
+  for (final entry in idsByIdentity.entries) {
+    final identity = _splitIdentity(entry.key);
+    final ids = entry.value;
+    for (var i = 0; i < ids.length; i += 500) {
+      final batch = ids.sublist(i, (i + 500).clamp(0, ids.length));
+      final result = await pool.execute(
+        Sql.named('''
+          UPDATE cards
+          SET color_identity = @identity
+          WHERE id::text = ANY(@ids) AND color_identity IS NULL
+          RETURNING id
+        '''),
+        parameters: {
+          'ids': batch,
+          'identity': identity,
+        },
+      );
+      updated += result.length;
+    }
+  }
+
+  return updated;
+}
+
+List<String> _splitIdentity(Object? value) {
+  final text = value?.toString() ?? '';
+  if (text.isEmpty) return const <String>[];
+  return text.split('|').where((item) => item.isNotEmpty).toList();
+}
+
 String? _readArgValue(List<String> args, String prefix) {
   for (final arg in args) {
     if (arg.startsWith(prefix)) return arg.substring(prefix.length).trim();
@@ -462,6 +535,8 @@ Future<void> _writeSummaryMarkdown(
     '- Future null color identities: ${summary['null_color_identity_future_total']}',
     '- Deterministic backfill candidates: ${summary['color_identity_deterministic_backfill_candidates']}',
     '- Unresolved rows: ${summary['color_identity_unresolved_rows']}',
+    '- Updated rows: ${summary['color_identity_updated_rows']}',
+    '- Null color identities after apply: ${summary['null_color_identity_after_apply']}',
     '- DB mutations: `${summary['db_mutations']}`',
     '',
   ];

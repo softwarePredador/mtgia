@@ -32,6 +32,34 @@
 - Para `sets.code`, manter dedupe query-level por enquanto, porque variantes lowercase ainda possuem referencias em `cards.set_code`; a etapa seguinte deve endurecer o sync para evitar novas duplicidades.
 - Para `color_identity`, o dry-run provou backfill deterministico usando somente campos locais confiaveis; o apply deve ser separado, idempotente e condicionado a `color_identity IS NULL`.
 
+## 2026-04-28 — Backfill seguro de `cards.color_identity`
+
+### O Porquê
+- O dry-run DB-backed encontrou 33.138 cartas com `color_identity IS NULL`, incluindo 899 em sets recentes/atuais.
+- Esse nulo nao quebrava o catalogo Sets/Colecoes, mas podia afetar filtros Commander/client-side e qualquer logica que trate `NULL` como incolor por engano.
+
+### O Como
+- `server/bin/mtg_data_integrity.dart` ganhou flag explicita `--apply-color-identity`.
+- O modo padrao continua dry-run sem mutacao.
+- O apply agrupa candidatos por identidade resolvida e executa batches idempotentes com:
+  - `WHERE id::text = ANY(@ids)`;
+  - `AND color_identity IS NULL`;
+  - `RETURNING id` para contagem real de linhas atualizadas.
+- Um primeiro apply linha-a-linha foi interrompido antes da conclusao por lentidao; a versao final em batch executou com sucesso.
+
+### Resultado
+- Antes: 33.138 `cards.color_identity IS NULL`.
+- Atualizadas: 33.138 linhas.
+- Depois: 0 `cards.color_identity IS NULL`.
+- Probe pos-apply dry-run confirmou:
+  - candidatos restantes: 0;
+  - unresolved: 0;
+  - mutacoes no probe: false.
+
+### Rollback
+- O backfill e idempotente e preenche apenas nulos a partir de campos locais confiaveis.
+- Rollback tecnico exigiria backup pre-apply ou usar `color_identity_backfill_apply_candidates.*` para setar `NULL` nos IDs atualizados; isso nao e recomendado porque reintroduz o problema saneado.
+
 ## 2026-04-28 — Prontidao de produto do catalogo Sets/Colecoes e acesso via Search
 
 ### O Porquê

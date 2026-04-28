@@ -1,0 +1,1282 @@
+[
+  {
+    "lower_code": "10e",
+    "code": "10E",
+    "name": "Tenth Edition",
+    "release_date": "2007-07-13",
+    "type": "core",
+    "cards_exact_reference_count": 362
+  },
+  {
+    "lower_code": "10e",
+    "code": "10e",
+    "name": "Tenth Edition",
+    "release_date": "2007-07-13",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "2x2",
+    "code": "2X2",
+    "name": "Double Masters 2022",
+    "release_date": "2022-07-08",
+    "type": "masters",
+    "cards_exact_reference_count": 311
+  },
+  {
+    "lower_code": "2x2",
+    "code": "2x2",
+    "name": "Double Masters 2022",
+    "release_date": "2022-07-08",
+    "type": null,
+    "cards_exact_reference_count": 5
+  },
+  {
+    "lower_code": "2xm",
+    "code": "2XM",
+    "name": "Double Masters",
+    "release_date": "2020-08-07",
+    "type": "masters",
+    "cards_exact_reference_count": 312
+  },
+  {
+    "lower_code": "2xm",
+    "code": "2xm",
+    "name": "Double Masters",
+    "release_date": "2020-08-07",
+    "type": null,
+    "cards_exact_reference_count": 6
+  },
+  {
+    "lower_code": "30a",
+    "code": "30A",
+    "name": "30th Anniversary Edition",
+    "release_date": "2022-11-28",
+    "type": "memorabilia",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "30a",
+    "code": "30a",
+    "name": "30th Anniversary Edition",
+    "release_date": "2022-11-28",
+    "type": null,
+    "cards_exact_reference_count": 6
+  },
+  {
+    "lower_code": "8ed",
+    "code": "8ED",
+    "name": "Eighth Edition",
+    "release_date": "2003-07-28",
+    "type": "core",
+    "cards_exact_reference_count": 114
+  },
+  {
+    "lower_code": "8ed",
+    "code": "8ed",
+    "name": "Eighth Edition",
+    "release_date": "2003-07-28",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "blc",
+    "code": "BLC",
+    "name": "Bloomburrow Commander",
+    "release_date": "2024-08-02",
+    "type": "commander",
+    "cards_exact_reference_count": 194
+  },
+  {
+    "lower_code": "blc",
+    "code": "blc",
+    "name": "Bloomburrow Commander",
+    "release_date": "2024-08-02",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "c13",
+    "code": "C13",
+    "name": "Commander 2013",
+    "release_date": "2013-11-01",
+    "type": "commander",
+    "cards_exact_reference_count": 187
+  },
+  {
+    "lower_code": "c13",
+    "code": "c13",
+    "name": "Commander 2013",
+    "release_date": "2013-11-01",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "c14",
+    "code": "C14",
+    "name": "Commander 2014",
+    "release_date": "2014-11-07",
+    "type": "commander",
+    "cards_exact_reference_count": 163
+  },
+  {
+    "lower_code": "c14",
+    "code": "c14",
+    "name": "Commander 2014",
+    "release_date": "2014-11-07",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "clb",
+    "code": "CLB",
+    "name": "Commander Legends: Battle for Baldur's Gate",
+    "release_date": "2022-06-10",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 434
+  },
+  {
+    "lower_code": "clb",
+    "code": "clb",
+    "name": "Commander Legends: Battle for Baldur's Gate",
+    "release_date": "2022-06-10",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "clu",
+    "code": "CLU",
+    "name": "Ravnica: Clue Edition",
+    "release_date": "2024-02-23",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 173
+  },
+  {
+    "lower_code": "clu",
+    "code": "clu",
+    "name": "Ravnica: Clue Edition",
+    "release_date": "2024-02-23",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "cmm",
+    "code": "CMM",
+    "name": "Commander Masters",
+    "release_date": "2023-08-04",
+    "type": "masters",
+    "cards_exact_reference_count": 318
+  },
+  {
+    "lower_code": "cmm",
+    "code": "cmm",
+    "name": "Commander Masters",
+    "release_date": "2023-08-04",
+    "type": null,
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "cmr",
+    "code": "CMR",
+    "name": "Commander Legends",
+    "release_date": "2020-11-20",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 239
+  },
+  {
+    "lower_code": "cmr",
+    "code": "cmr",
+    "name": "Commander Legends",
+    "release_date": "2020-11-20",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "cn2",
+    "code": "CN2",
+    "name": "Conspiracy: Take the Crown",
+    "release_date": "2016-08-26",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 126
+  },
+  {
+    "lower_code": "cn2",
+    "code": "cn2",
+    "name": "Conspiracy: Take the Crown",
+    "release_date": "2016-08-26",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "ddn",
+    "code": "DDN",
+    "name": "Duel Decks: Speed vs. Cunning",
+    "release_date": "2014-09-05",
+    "type": "duel_deck",
+    "cards_exact_reference_count": 18
+  },
+  {
+    "lower_code": "ddn",
+    "code": "ddn",
+    "name": "Duel Decks: Speed vs. Cunning",
+    "release_date": "2014-09-05",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "dmr",
+    "code": "DMR",
+    "name": "Dominaria Remastered",
+    "release_date": "2023-01-13",
+    "type": "masters",
+    "cards_exact_reference_count": 97
+  },
+  {
+    "lower_code": "dmr",
+    "code": "dmr",
+    "name": "Dominaria Remastered",
+    "release_date": "2023-01-13",
+    "type": null,
+    "cards_exact_reference_count": 6
+  },
+  {
+    "lower_code": "drc",
+    "code": "DRC",
+    "name": "Aetherdrift Commander",
+    "release_date": "2025-02-14",
+    "type": "commander",
+    "cards_exact_reference_count": 55
+  },
+  {
+    "lower_code": "drc",
+    "code": "drc",
+    "name": "Aetherdrift Commander",
+    "release_date": "2025-02-14",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "dsc",
+    "code": "DSC",
+    "name": "Duskmourn: House of Horror Commander",
+    "release_date": "2024-09-27",
+    "type": "commander",
+    "cards_exact_reference_count": 124
+  },
+  {
+    "lower_code": "dsc",
+    "code": "dsc",
+    "name": "Duskmourn: House of Horror Commander",
+    "release_date": "2024-09-27",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "dst",
+    "code": "DST",
+    "name": "Darksteel",
+    "release_date": "2004-02-06",
+    "type": "expansion",
+    "cards_exact_reference_count": 115
+  },
+  {
+    "lower_code": "dst",
+    "code": "dst",
+    "name": "Darksteel",
+    "release_date": "2004-02-06",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "ecc",
+    "code": "ECC",
+    "name": "Lorwyn Eclipsed Commander",
+    "release_date": "2026-01-23",
+    "type": "commander",
+    "cards_exact_reference_count": 132
+  },
+  {
+    "lower_code": "ecc",
+    "code": "ecc",
+    "name": "Lorwyn Eclipsed Commander",
+    "release_date": "2026-01-23",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "ema",
+    "code": "EMA",
+    "name": "Eternal Masters",
+    "release_date": "2016-06-10",
+    "type": "masters",
+    "cards_exact_reference_count": 55
+  },
+  {
+    "lower_code": "ema",
+    "code": "ema",
+    "name": "Eternal Masters",
+    "release_date": "2016-06-10",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "eoc",
+    "code": "EOC",
+    "name": "Edge of Eternities Commander",
+    "release_date": "2025-08-01",
+    "type": "commander",
+    "cards_exact_reference_count": 50
+  },
+  {
+    "lower_code": "eoc",
+    "code": "eoc",
+    "name": "Edge of Eternities Commander",
+    "release_date": "2025-08-01",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "eos",
+    "code": "EOS",
+    "name": "Edge of Eternities: Stellar Sights",
+    "release_date": "2025-08-01",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 19
+  },
+  {
+    "lower_code": "eos",
+    "code": "eos",
+    "name": "Edge of Eternities: Stellar Sights",
+    "release_date": "2025-08-01",
+    "type": null,
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "exp",
+    "code": "EXP",
+    "name": "Zendikar Expeditions",
+    "release_date": "2015-10-02",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 13
+  },
+  {
+    "lower_code": "exp",
+    "code": "exp",
+    "name": "Zendikar Expeditions",
+    "release_date": "2016-01-22",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "f03",
+    "code": "F03",
+    "name": "Friday Night Magic 2003",
+    "release_date": "2003-01-01",
+    "type": "promo",
+    "cards_exact_reference_count": 6
+  },
+  {
+    "lower_code": "f03",
+    "code": "f03",
+    "name": "Friday Night Magic 2003",
+    "release_date": "2003-01-01",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "fca",
+    "code": "FCA",
+    "name": "Final Fantasy: Through the Ages",
+    "release_date": "2025-06-13",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 20
+  },
+  {
+    "lower_code": "fca",
+    "code": "fca",
+    "name": "Final Fantasy: Through the Ages",
+    "release_date": "2025-06-13",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "fdc",
+    "code": "FDC",
+    "name": "Foundations Commander",
+    "release_date": "2024-11-15",
+    "type": "commander",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "fdc",
+    "code": "fdc",
+    "name": "Foundations Commander",
+    "release_date": "2024-11-15",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "fic",
+    "code": "FIC",
+    "name": "Final Fantasy Commander",
+    "release_date": "2025-06-13",
+    "type": "commander",
+    "cards_exact_reference_count": 146
+  },
+  {
+    "lower_code": "fic",
+    "code": "fic",
+    "name": "Final Fantasy Commander",
+    "release_date": "2025-06-13",
+    "type": null,
+    "cards_exact_reference_count": 5
+  },
+  {
+    "lower_code": "g11",
+    "code": "G11",
+    "name": "Judge Gift Cards 2011",
+    "release_date": "2011-01-01",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "g11",
+    "code": "g11",
+    "name": "Judge Gift Cards 2011",
+    "release_date": "2011-01-01",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "gk2",
+    "code": "GK2",
+    "name": "RNA Guild Kit",
+    "release_date": "2019-02-15",
+    "type": "box",
+    "cards_exact_reference_count": 29
+  },
+  {
+    "lower_code": "gk2",
+    "code": "gk2",
+    "name": "RNA Guild Kit",
+    "release_date": "2019-02-15",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "gn3",
+    "code": "GN3",
+    "name": "Game Night: Free-for-All",
+    "release_date": "2022-10-14",
+    "type": "box",
+    "cards_exact_reference_count": 28
+  },
+  {
+    "lower_code": "gn3",
+    "code": "gn3",
+    "name": "Game Night: Free-for-All",
+    "release_date": "2022-10-14",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "ima",
+    "code": "IMA",
+    "name": "Iconic Masters",
+    "release_date": "2017-11-17",
+    "type": "masters",
+    "cards_exact_reference_count": 47
+  },
+  {
+    "lower_code": "ima",
+    "code": "ima",
+    "name": "Iconic Masters",
+    "release_date": "2017-11-17",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "jmp",
+    "code": "JMP",
+    "name": "Jumpstart",
+    "release_date": "2020-07-17",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 94
+  },
+  {
+    "lower_code": "jmp",
+    "code": "jmp",
+    "name": "Jumpstart",
+    "release_date": "2020-07-17",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "khm",
+    "code": "KHM",
+    "name": "Kaldheim",
+    "release_date": "2021-02-05",
+    "type": "expansion",
+    "cards_exact_reference_count": 241
+  },
+  {
+    "lower_code": "khm",
+    "code": "khm",
+    "name": "Kaldheim",
+    "release_date": "2021-02-05",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "ltc",
+    "code": "LTC",
+    "name": "Tales of Middle-earth Commander",
+    "release_date": "2023-06-23",
+    "type": "commander",
+    "cards_exact_reference_count": 114
+  },
+  {
+    "lower_code": "ltc",
+    "code": "ltc",
+    "name": "Tales of Middle-earth Commander",
+    "release_date": "2023-06-23",
+    "type": null,
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "m10",
+    "code": "M10",
+    "name": "Magic 2010",
+    "release_date": "2009-07-17",
+    "type": "core",
+    "cards_exact_reference_count": 59
+  },
+  {
+    "lower_code": "m10",
+    "code": "m10",
+    "name": "Magic 2010",
+    "release_date": "2009-07-17",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "m11",
+    "code": "M11",
+    "name": "Magic 2011",
+    "release_date": "2010-07-16",
+    "type": "core",
+    "cards_exact_reference_count": 51
+  },
+  {
+    "lower_code": "m11",
+    "code": "m11",
+    "name": "Magic 2011",
+    "release_date": "2010-07-16",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "m12",
+    "code": "M12",
+    "name": "Magic 2012",
+    "release_date": "2011-07-15",
+    "type": "core",
+    "cards_exact_reference_count": 55
+  },
+  {
+    "lower_code": "m12",
+    "code": "m12",
+    "name": "Magic 2012",
+    "release_date": "2011-07-15",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "mar",
+    "code": "MAR",
+    "name": "Marvel Universe",
+    "release_date": "2025-09-26",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "mar",
+    "code": "mar",
+    "name": "Marvel Universe",
+    "release_date": "2025-09-26",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "mb2",
+    "code": "MB2",
+    "name": "Mystery Booster 2",
+    "release_date": "2024-08-02",
+    "type": "masters",
+    "cards_exact_reference_count": 175
+  },
+  {
+    "lower_code": "mb2",
+    "code": "mb2",
+    "name": "Mystery Booster 2",
+    "release_date": "2024-08-02",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "mh2",
+    "code": "MH2",
+    "name": "Modern Horizons 2",
+    "release_date": "2021-06-18",
+    "type": "draft_innovation",
+    "cards_exact_reference_count": 102
+  },
+  {
+    "lower_code": "mh2",
+    "code": "mh2",
+    "name": "Modern Horizons 2",
+    "release_date": "2021-06-18",
+    "type": null,
+    "cards_exact_reference_count": 3
+  },
+  {
+    "lower_code": "mkc",
+    "code": "MKC",
+    "name": "Murders at Karlov Manor Commander",
+    "release_date": "2024-02-09",
+    "type": "commander",
+    "cards_exact_reference_count": 60
+  },
+  {
+    "lower_code": "mkc",
+    "code": "mkc",
+    "name": "Murders at Karlov Manor Commander",
+    "release_date": "2024-02-09",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "mm3",
+    "code": "MM3",
+    "name": "Modern Masters 2017",
+    "release_date": "2017-03-17",
+    "type": "masters",
+    "cards_exact_reference_count": 24
+  },
+  {
+    "lower_code": "mm3",
+    "code": "mm3",
+    "name": "Modern Masters 2017",
+    "release_date": "2017-03-17",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "mma",
+    "code": "MMA",
+    "name": "Modern Masters",
+    "release_date": "2013-06-07",
+    "type": "masters",
+    "cards_exact_reference_count": 36
+  },
+  {
+    "lower_code": "mma",
+    "code": "mma",
+    "name": "Modern Masters",
+    "release_date": "2013-06-07",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "mps",
+    "code": "MPS",
+    "name": "Kaladesh Inventions",
+    "release_date": "2016-09-30",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "mps",
+    "code": "mps",
+    "name": "Kaladesh Inventions",
+    "release_date": "2016-09-30",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "nph",
+    "code": "NPH",
+    "name": "New Phyrexia",
+    "release_date": "2011-05-13",
+    "type": "expansion",
+    "cards_exact_reference_count": 94
+  },
+  {
+    "lower_code": "nph",
+    "code": "nph",
+    "name": "New Phyrexia",
+    "release_date": "2011-05-13",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "olgc",
+    "code": "OLGC",
+    "name": "Legacy Championship",
+    "release_date": "2011-01-01",
+    "type": "memorabilia",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "olgc",
+    "code": "olgc",
+    "name": "Legacy Championship",
+    "release_date": "2023-12-08",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pf24",
+    "code": "PF24",
+    "name": "MagicFest 2024",
+    "release_date": "2024-01-01",
+    "type": "promo",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pf24",
+    "code": "pf24",
+    "name": "MagicFest 2024",
+    "release_date": "2024-02-23",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pf25",
+    "code": "PF25",
+    "name": "MagicFest 2025",
+    "release_date": "2025-01-01",
+    "type": "promo",
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "pf25",
+    "code": "pf25",
+    "name": "MagicFest 2025",
+    "release_date": "2025-08-18",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pfdn",
+    "code": "PFDN",
+    "name": "Foundations Promos",
+    "release_date": "2024-11-15",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "pfdn",
+    "code": "pfdn",
+    "name": "Foundations Promos",
+    "release_date": "2024-11-15",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "phpr",
+    "code": "PHPR",
+    "name": "HarperPrism Book Promos",
+    "release_date": "1994-09-01",
+    "type": "promo",
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "phpr",
+    "code": "phpr",
+    "name": "HarperPrism Book Promos",
+    "release_date": "1995-05-01",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pkhm",
+    "code": "PKHM",
+    "name": "Kaldheim Promos",
+    "release_date": "2021-02-05",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "pkhm",
+    "code": "pkhm",
+    "name": "Kaldheim Promos",
+    "release_date": "2022-10-10",
+    "type": null,
+    "cards_exact_reference_count": 3
+  },
+  {
+    "lower_code": "plst",
+    "code": "PLST",
+    "name": "The List",
+    "release_date": "2020-09-26",
+    "type": "masters",
+    "cards_exact_reference_count": 476
+  },
+  {
+    "lower_code": "plst",
+    "code": "plst",
+    "name": "The List",
+    "release_date": "2021-09-25",
+    "type": null,
+    "cards_exact_reference_count": 10
+  },
+  {
+    "lower_code": "pm11",
+    "code": "PM11",
+    "name": "Magic 2011 Promos",
+    "release_date": "2010-07-15",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "pm11",
+    "code": "pm11",
+    "name": "Magic 2011 Promos",
+    "release_date": "2010-07-15",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pmei",
+    "code": "PMEI",
+    "name": "Media and Collaboration Promos",
+    "release_date": "1995-01-01",
+    "type": "promo",
+    "cards_exact_reference_count": 9
+  },
+  {
+    "lower_code": "pmei",
+    "code": "pmei",
+    "name": "Media and Collaboration Promos",
+    "release_date": "2021-04-26",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "pnph",
+    "code": "PNPH",
+    "name": "New Phyrexia Promos",
+    "release_date": "2011-05-12",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "pnph",
+    "code": "pnph",
+    "name": "New Phyrexia Promos",
+    "release_date": "2011-05-12",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "ppro",
+    "code": "PPRO",
+    "name": "Pro Tour Promos",
+    "release_date": "2007-02-09",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "ppro",
+    "code": "ppro",
+    "name": "Pro Tour Promos",
+    "release_date": "2020-12-31",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "puma",
+    "code": "PUMA",
+    "name": "Ultimate Box Topper",
+    "release_date": "2018-12-07",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "puma",
+    "code": "puma",
+    "name": "Ultimate Box Topper",
+    "release_date": "2018-12-07",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "purl",
+    "code": "PURL",
+    "name": "URL/Convention Promos",
+    "release_date": "2009-02-08",
+    "type": "promo",
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "purl",
+    "code": "purl",
+    "name": "URL/Convention Promos",
+    "release_date": "2024-10-18",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "rav",
+    "code": "RAV",
+    "name": "Ravnica: City of Guilds",
+    "release_date": "2005-10-07",
+    "type": "expansion",
+    "cards_exact_reference_count": 117
+  },
+  {
+    "lower_code": "rav",
+    "code": "rav",
+    "name": "Ravnica: City of Guilds",
+    "release_date": "2005-10-07",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "rtr",
+    "code": "RTR",
+    "name": "Return to Ravnica",
+    "release_date": "2012-10-05",
+    "type": "expansion",
+    "cards_exact_reference_count": 92
+  },
+  {
+    "lower_code": "rtr",
+    "code": "rtr",
+    "name": "Return to Ravnica",
+    "release_date": "2012-10-05",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "rvr",
+    "code": "RVR",
+    "name": "Ravnica Remastered",
+    "release_date": "2024-01-12",
+    "type": "masters",
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "rvr",
+    "code": "rvr",
+    "name": "Ravnica Remastered",
+    "release_date": "2024-01-12",
+    "type": null,
+    "cards_exact_reference_count": 8
+  },
+  {
+    "lower_code": "scd",
+    "code": "SCD",
+    "name": "Starter Commander Decks",
+    "release_date": "2022-12-02",
+    "type": "commander",
+    "cards_exact_reference_count": 3
+  },
+  {
+    "lower_code": "scd",
+    "code": "scd",
+    "name": "Starter Commander Decks",
+    "release_date": "2022-12-02",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "sch",
+    "code": "SCH",
+    "name": "Store Championships",
+    "release_date": "2022-07-09",
+    "type": "promo",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "sch",
+    "code": "sch",
+    "name": "Store Championships",
+    "release_date": "2026-02-06",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "slc",
+    "code": "SLC",
+    "name": "Secret Lair Countdown",
+    "release_date": "2022-11-01",
+    "type": "box",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "slc",
+    "code": "slc",
+    "name": "Secret Lair Countdown",
+    "release_date": "2025-11-03",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "sld",
+    "code": "SLD",
+    "name": "Secret Lair Drop",
+    "release_date": "2019-12-02",
+    "type": "box",
+    "cards_exact_reference_count": 90
+  },
+  {
+    "lower_code": "sld",
+    "code": "sld",
+    "name": "Secret Lair Drop",
+    "release_date": "2026-01-26",
+    "type": null,
+    "cards_exact_reference_count": 45
+  },
+  {
+    "lower_code": "slp",
+    "code": "SLP",
+    "name": "Secret Lair Promo",
+    "release_date": "2023-02-17",
+    "type": "promo",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "slp",
+    "code": "slp",
+    "name": "Secret Lair Promo",
+    "release_date": "2025-02-21",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "soc",
+    "code": "SOC",
+    "name": "Secrets of Strixhaven Commander",
+    "release_date": "2026-04-24",
+    "type": "commander",
+    "cards_exact_reference_count": 10
+  },
+  {
+    "lower_code": "soc",
+    "code": "soc",
+    "name": "Secrets of Strixhaven Commander",
+    "release_date": "2026-04-24",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "spg",
+    "code": "SPG",
+    "name": "Special Guests",
+    "release_date": "2023-11-17",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "spg",
+    "code": "spg",
+    "name": "Special Guests",
+    "release_date": "2023-11-17",
+    "type": null,
+    "cards_exact_reference_count": 7
+  },
+  {
+    "lower_code": "sta",
+    "code": "STA",
+    "name": "Strixhaven Mystical Archive",
+    "release_date": "2021-04-23",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "sta",
+    "code": "sta",
+    "name": "Strixhaven Mystical Archive",
+    "release_date": "2021-04-23",
+    "type": null,
+    "cards_exact_reference_count": 4
+  },
+  {
+    "lower_code": "tdc",
+    "code": "TDC",
+    "name": "Tarkir: Dragonstorm Commander",
+    "release_date": "2025-04-11",
+    "type": "commander",
+    "cards_exact_reference_count": 50
+  },
+  {
+    "lower_code": "tdc",
+    "code": "tdc",
+    "name": "Tarkir: Dragonstorm Commander",
+    "release_date": "2025-04-11",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "tla",
+    "code": "TLA",
+    "name": "Avatar: The Last Airbender",
+    "release_date": "2025-11-21",
+    "type": "expansion",
+    "cards_exact_reference_count": 270
+  },
+  {
+    "lower_code": "tla",
+    "code": "tla",
+    "name": "Avatar: The Last Airbender",
+    "release_date": "2025-11-21",
+    "type": "expansion",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "tle",
+    "code": "TLE",
+    "name": "Avatar: The Last Airbender Eternal",
+    "release_date": "2025-11-21",
+    "type": "eternal",
+    "cards_exact_reference_count": 136
+  },
+  {
+    "lower_code": "tle",
+    "code": "tle",
+    "name": "Avatar: The Last Airbender Eternal",
+    "release_date": "2025-11-21",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "tmp",
+    "code": "TMP",
+    "name": "Tempest",
+    "release_date": "1997-10-14",
+    "type": "expansion",
+    "cards_exact_reference_count": 134
+  },
+  {
+    "lower_code": "tmp",
+    "code": "tmp",
+    "name": "Tempest",
+    "release_date": "1997-10-14",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "uma",
+    "code": "UMA",
+    "name": "Ultimate Masters",
+    "release_date": "2018-12-07",
+    "type": "masters",
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "uma",
+    "code": "uma",
+    "name": "Ultimate Masters",
+    "release_date": "2018-12-07",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "v10",
+    "code": "V10",
+    "name": "From the Vault: Relics",
+    "release_date": "2010-08-27",
+    "type": "from_the_vault",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "v10",
+    "code": "v10",
+    "name": "From the Vault: Relics",
+    "release_date": "2010-08-27",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "v12",
+    "code": "V12",
+    "name": "From the Vault: Realms",
+    "release_date": "2012-08-31",
+    "type": "from_the_vault",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "v12",
+    "code": "v12",
+    "name": "From the Vault: Realms",
+    "release_date": "2012-08-31",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "wc02",
+    "code": "WC02",
+    "name": "World Championship Decks 2002",
+    "release_date": "2002-12-01",
+    "type": "memorabilia",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "wc02",
+    "code": "wc02",
+    "name": "World Championship Decks 2002",
+    "release_date": "2002-12-01",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "wc99",
+    "code": "WC99",
+    "name": "World Championship Decks 1999",
+    "release_date": "1999-08-04",
+    "type": "memorabilia",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "wc99",
+    "code": "wc99",
+    "name": "World Championship Decks 1999",
+    "release_date": "1999-08-04",
+    "type": null,
+    "cards_exact_reference_count": 2
+  },
+  {
+    "lower_code": "wot",
+    "code": "WOT",
+    "name": "Wilds of Eldraine: Enchanting Tales",
+    "release_date": "2023-09-08",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "wot",
+    "code": "wot",
+    "name": "Wilds of Eldraine: Enchanting Tales",
+    "release_date": "2023-09-08",
+    "type": null,
+    "cards_exact_reference_count": 1
+  },
+  {
+    "lower_code": "zne",
+    "code": "ZNE",
+    "name": "Zendikar Rising Expeditions",
+    "release_date": "2020-09-25",
+    "type": "masterpiece",
+    "cards_exact_reference_count": 0
+  },
+  {
+    "lower_code": "zne",
+    "code": "zne",
+    "name": "Zendikar Rising Expeditions",
+    "release_date": "2020-09-25",
+    "type": null,
+    "cards_exact_reference_count": 1
+  }
+]

@@ -114,3 +114,70 @@ Etapa 1 e somente dry-run. O apply de `color_identity` sera implementado com fla
 ### Remaining unresolved
 
 Nenhuma linha unresolved no dry-run de `color_identity`.
+
+## Etapa 2 - Backfill seguro de cards.color_identity
+
+### Comandos executados
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server
+dart format bin/mtg_data_integrity.dart
+dart analyze bin/mtg_data_integrity.dart lib/mtg_data_integrity_support.dart test/mtg_data_integrity_support_test.dart
+dart test test/mtg_data_integrity_support_test.dart
+dart run bin/mtg_data_integrity.dart --apply-color-identity --artifact-dir=test/artifacts/mtg_data_integrity_2026-04-28
+dart run bin/mtg_data_integrity.dart --artifact-dir=test/artifacts/mtg_data_integrity_2026-04-28/post_apply_probe
+```
+
+### Resultado apply
+
+Artefatos novos/atualizados:
+
+- `summary_apply.json`
+- `summary_apply.md`
+- `color_identity_backfill_apply_candidates.csv/json`
+- `color_identity_unresolved_apply.csv/json`
+- `post_apply_probe/summary_dry_run.json`
+
+Contagens:
+
+| Metrica | Antes | Depois |
+|---|---:|---:|
+| `cards.color_identity IS NULL` | 33.138 | 0 |
+| Linhas atualizadas | 0 | 33.138 |
+| Recentes/futuros nulos | 899 | 0 |
+| Futuros nulos | 0 | 0 |
+| Unresolved | 0 | 0 |
+
+### Dry-run/apply distinction
+
+- Sem flag, `bin/mtg_data_integrity.dart` continua dry-run e nao executa mutacao.
+- O apply exige `--apply-color-identity`.
+- O UPDATE e idempotente:
+
+```sql
+UPDATE cards
+SET color_identity = @identity
+WHERE id::text = ANY(@ids) AND color_identity IS NULL
+RETURNING id
+```
+
+### DB changes
+
+Mutacao aplicada somente em `cards.color_identity`, para linhas previamente nulas e com decisao deterministica. Nenhum `sets.code`, `cards.set_code`, legalidade Commander ou tabela social/app foi alterado.
+
+### Rollback note
+
+O backfill e seguro/idempotente porque preenche apenas valores nulos com dados derivados de campos locais ja existentes. Para rollback estrito seria necessario restaurar snapshot/backup pre-apply ou usar a lista `color_identity_backfill_apply_candidates.*` para zerar exatamente os IDs atualizados. Esse rollback nao e recomendado como operacao padrao, pois reintroduziria o bug de dados (`color_identity IS NULL`) ja saneado.
+
+### Validacao pos-apply
+
+Probe pos-apply:
+
+```json
+{
+  "null_color_identity_total": 0,
+  "color_identity_deterministic_backfill_candidates": 0,
+  "color_identity_unresolved_rows": 0,
+  "db_mutations": false
+}
+```
