@@ -6,11 +6,12 @@ import '../../binder/screens/binder_screen.dart' show BinderTabContent;
 import '../../binder/screens/marketplace_screen.dart'
     show MarketplaceTabContent;
 import '../../trades/screens/trade_inbox_screen.dart' show TradeInboxTabContent;
+import 'sets_catalog_screen.dart';
 
 /// Tela "Coleção" — hub unificado para Fichário, Marketplace e Trades.
 /// Substitui os 3 menus órfãos por uma navegação clara com tabs.
 class CollectionScreen extends StatefulWidget {
-  /// Tab inicial: 0 = Fichário, 1 = Marketplace, 2 = Trades
+  /// Tab inicial: 0 = Fichário, 1 = Marketplace, 2 = Trades, 3 = Coleções
   final int initialTab;
 
   const CollectionScreen({super.key, this.initialTab = 0});
@@ -27,9 +28,9 @@ class _CollectionScreenState extends State<CollectionScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: 4,
       vsync: this,
-      initialIndex: widget.initialTab.clamp(0, 2),
+      initialIndex: widget.initialTab.clamp(0, 3),
     );
   }
 
@@ -47,6 +48,11 @@ class _CollectionScreenState extends State<CollectionScreen>
         title: const Text('Coleção'),
         backgroundColor: AppTheme.surfaceElevated,
         actions: [
+          IconButton(
+            tooltip: 'Catálogo de coleções',
+            onPressed: () => context.push('/collection/sets'),
+            icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+          ),
           IconButton(
             tooltip: 'Última edição',
             onPressed: () => context.push('/collection/latest-set'),
@@ -71,6 +77,10 @@ class _CollectionScreenState extends State<CollectionScreen>
             ),
             Tab(icon: Icon(Icons.storefront, size: 20), text: 'Marketplace'),
             Tab(icon: Icon(Icons.swap_horiz, size: 20), text: 'Trades'),
+            Tab(
+              icon: Icon(Icons.auto_awesome_mosaic_outlined, size: 20),
+              text: 'Coleções',
+            ),
           ],
         ),
       ),
@@ -80,6 +90,7 @@ class _CollectionScreenState extends State<CollectionScreen>
           BinderTabContent(),
           MarketplaceTabContent(),
           TradeInboxTabContent(),
+          SetsCatalogScreen(),
         ],
       ),
     );

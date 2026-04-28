@@ -41,6 +41,8 @@ import 'features/trades/screens/trade_detail_screen.dart';
 import 'features/trades/screens/create_trade_screen.dart';
 import 'features/collection/screens/collection_screen.dart';
 import 'features/collection/screens/latest_set_collection_screen.dart';
+import 'features/collection/screens/set_cards_screen.dart';
+import 'features/collection/screens/sets_catalog_screen.dart';
 import 'features/messages/providers/message_provider.dart';
 import 'features/messages/screens/message_inbox_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
@@ -272,6 +274,19 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             GoRoute(
               path: '/collection/latest-set',
               builder: (context, state) => const LatestSetCollectionScreen(),
+            ),
+            GoRoute(
+              path: '/collection/sets',
+              builder: (context, state) => const SetsCatalogScreen(),
+              routes: [
+                GoRoute(
+                  path: ':code',
+                  builder: (context, state) {
+                    final code = state.pathParameters['code']!;
+                    return SetCardsScreen(setCode: code);
+                  },
+                ),
+              ],
             ),
             GoRoute(
               path: '/market',
