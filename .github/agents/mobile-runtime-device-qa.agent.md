@@ -27,7 +27,7 @@ Do not reuse assumptions from booster_new, revendas, carMatch, or any other repo
 
 Prove ManaLoom app runtime on the iPhone 15 Simulator using the live local backend when required.
 
-Primary target flow:
+Primary deck target flow:
 
 - register/login
 - generate or create Commander deck
@@ -36,6 +36,15 @@ Primary target flow:
 - preview/apply suggestions
 - validate final deck
 
+General app QA target flows:
+
+- search cards
+- search collections/sets through `Search -> Cards | Coleções`
+- open set detail through `Coleção -> Coleções`
+- collection/binder entry points
+- navigation back/forward without crash
+- backend contract visibility for any screen touched by the task
+
 ## Scope
 
 Operate primarily in:
@@ -43,6 +52,8 @@ Operate primarily in:
 - `app/`
 - `app/integration_test/`
 - `app/test/features/decks/`
+- `app/test/features/cards/`
+- `app/test/features/collection/`
 - `app/doc/runtime_flow_handoffs/`
 - `app/doc/runtime_flow_proofs_*`
 - `.github/instructions/`
@@ -132,6 +143,28 @@ The handoff must include:
 - what was mocked, if anything
 - blockers with file/module ownership
 - smallest next actions
+
+## General App QA Commands
+
+For Search/Sets/Collection validation, use:
+
+```bash
+cd app
+flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection
+flutter test test/features/cards test/features/collection
+flutter test integration_test/sets_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+flutter test integration_test/sets_search_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
 
 ## Validation Before Commit
 
