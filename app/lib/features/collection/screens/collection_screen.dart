@@ -90,7 +90,7 @@ class _CollectionScreenState extends State<CollectionScreen>
           BinderTabContent(),
           MarketplaceTabContent(),
           TradeInboxTabContent(),
-          SetsCatalogScreen(),
+          SetsCatalogScreen(showAppBar: false),
         ],
       ),
     );

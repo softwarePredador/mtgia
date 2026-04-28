@@ -434,7 +434,7 @@ class _EmptySetCardsState extends StatelessWidget {
               : Icons.inventory_2_outlined,
       title:
           set.isFuture
-              ? 'Dados parciais de set futuro'
+              ? 'Dados parciais de coleção futura'
               : 'Nenhuma carta local nesta coleção',
       message:
           set.isFuture

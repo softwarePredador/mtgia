@@ -134,3 +134,44 @@ All tests passed!
 ### Resultado complementar
 
 `proved` para o acesso original por Colecao e para o novo acesso por Search no iPhone 15 Simulator.
+
+## Revisao final de UX - 15h
+
+### Ajustes aplicados
+
+- `Search -> Cards | Colecoes` ficou `Search -> Cartas | Colecoes`.
+- Placeholder do catalogo agora fala `codigo da colecao`.
+- Empty state de futuro sem cards agora fala `Dados parciais de colecao futura`.
+- A aba `Colecao -> Colecoes` usa o AppBar do hub `Colecao` e nao duplica o AppBar `Colecoes MTG`.
+
+### Prova no iPhone 15
+
+Fluxos provados novamente contra backend real `http://127.0.0.1:8082`:
+
+1. `Search -> Cartas`: busca `Black Lotus`, provando ausencia de regressao na busca de cartas.
+2. `Search -> Colecoes`: busca `ECC`, abre `Lorwyn Eclipsed Commander`, carrega `/cards?set=ECC`.
+3. `Colecao -> Colecoes`: busca `Marvel`, abre `Marvel Super Heroes`, carrega `/cards?set=MSH`.
+4. Busca `OM2`, abre `Through the Omenpaths 2`, renderiza empty state explicito de colecao futura sem cards.
+5. Navegacao de volta ao catalogo sem crash.
+
+Comandos:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/app
+flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection
+flutter test test/features/cards test/features/collection
+flutter test integration_test/sets_search_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+flutter test integration_test/sets_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado: `All tests passed!` nos dois testes runtime. Houve aviso conhecido de MLKit sem suporte arm64 para simulador Apple Silicon iOS 26+, mas o build e os testes concluiram com sucesso.

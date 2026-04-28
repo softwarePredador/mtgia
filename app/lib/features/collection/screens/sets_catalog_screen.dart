@@ -323,7 +323,7 @@ class _CatalogHeader extends StatelessWidget {
                   onChanged: onChanged,
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: 'Buscar por nome ou código do set...',
+                    hintText: 'Buscar por nome ou código da coleção...',
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon:
                         controller.text.isEmpty

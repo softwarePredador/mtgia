@@ -9575,3 +9575,30 @@ Resultado: `All tests passed!`.
 - `card_count` representa cartas locais sincronizadas, nao total oficial remoto em tempo real.
 - Sets futuros podem aparecer sem cartas ate novo sync.
 - Filtros de status no app sao aplicados sobre a pagina carregada; busca por nome/codigo e paginacao continuam preservando acesso aos sets antigos.
+
+## 95. Revisao final UX Sets/Colecoes - 2026-04-28 15h
+
+### 95.1 Objetivo
+
+Revisar a experiencia final de Sets/Colecoes para garantir que os acessos `Search -> Cartas | Colecoes` e `Colecao -> Colecoes` estejam claros, consistentes, responsivos no iPhone 15 e sem regressao na busca de cartas.
+
+### 95.2 Ajustes aplicados
+
+- Aba `Cards` renomeada para `Cartas` em `CardSearchScreen`.
+- Placeholder do catalogo alterado para `Buscar por nome ou codigo da colecao...`.
+- Empty state de set futuro sem cartas alterado para `Dados parciais de colecao futura`.
+- `CollectionScreen` passa `showAppBar: false` para `SetsCatalogScreen`, evitando AppBar duplicado dentro da aba `Colecoes`.
+
+### 95.3 Validacao
+
+Comandos executados:
+
+```bash
+cd app
+flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection
+flutter test test/features/cards test/features/collection
+flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/sets_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+```
+
+Resultado: todos passaram. O teste `sets_search_catalog_runtime_test.dart` tambem busca `Black Lotus` na aba `Cartas`, cobrindo ausencia de regressao no fluxo de busca de cartas.

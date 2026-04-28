@@ -297,3 +297,38 @@ Pendencias nao bloqueantes para backlog:
 
 - sanear duplicidades historicas de `sets.code` por casing com migracao segura;
 - sanear `cards.color_identity IS NULL` em sets recentes/futuros para evitar permissividade indevida em filtros Commander client-side.
+
+## Revisao final de UX - 2026-04-28 15h
+
+Objetivo: validar se `Search -> Cartas | Colecoes` e `Colecao -> Colecoes` estao claros, consistentes e prontos para usuario final.
+
+Ajustes pequenos aplicados:
+
+- Aba de busca renomeada de `Cards` para `Cartas`, mantendo `Colecoes` ao lado.
+- Placeholder do catalogo alterado de `codigo do set` para `codigo da colecao`.
+- Empty state de futuro sem cartas alterado para `Dados parciais de colecao futura`.
+- `Colecao -> Colecoes` agora renderiza o catalogo sem AppBar interna duplicada, mantendo o AppBar do hub `Colecao`.
+
+Itens revisados:
+
+- labels em portugues: OK apos ajustes acima;
+- badges `Futura`, `Nova`, `Atual`, `Antiga`: OK;
+- empty state para colecao futura sem cards: OK com `OM2`;
+- loading/error state: preservados via progress indicator e `AppStatePanel`;
+- ordenacao e busca: preservadas pelo contrato `/sets` e busca `q`;
+- detalhe do set: preservado via `SetCardsScreen` com `/cards?set=<code>`;
+- responsividade no iPhone 15: provada em simulador;
+- regressao na busca de cartas: nao houve regressao; `Search -> Cartas` buscou `Black Lotus` antes de abrir a aba `Colecoes`.
+
+Comandos executados nesta revisao:
+
+```bash
+cd app
+dart format lib/features/cards/screens/card_search_screen.dart lib/features/collection/screens/collection_screen.dart lib/features/collection/screens/set_cards_screen.dart lib/features/collection/screens/sets_catalog_screen.dart test/features/collection/sets_catalog_screen_test.dart integration_test/sets_catalog_runtime_test.dart integration_test/sets_search_catalog_runtime_test.dart
+flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection
+flutter test test/features/cards test/features/collection
+flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/sets_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+```
+
+Resultado final: todos os comandos passaram. O primeiro run do teste de catalogo em paralelo ficou preso por concorrencia/lock de Flutter/Xcode e foi encerrado pelo PID especifico; o teste foi reexecutado sozinho e passou com `All tests passed!`.

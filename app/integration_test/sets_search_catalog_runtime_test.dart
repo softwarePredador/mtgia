@@ -23,7 +23,7 @@ void main() {
         ),
       );
 
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cards'));
+      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
       await tester.enterText(find.byType(TextField).first, 'Black Lotus');
       await tester.pump(const Duration(milliseconds: 500));
       await _pumpUntilFound(tester, find.text('Black Lotus'));

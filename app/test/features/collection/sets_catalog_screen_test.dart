@@ -174,7 +174,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Dados parciais de set futuro'), findsOneWidget);
+    expect(find.text('Dados parciais de coleção futura'), findsOneWidget);
     expect(find.textContaining('próximo sync do MTGJSON'), findsOneWidget);
   });
 }

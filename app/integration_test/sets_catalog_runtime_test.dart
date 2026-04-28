@@ -33,7 +33,7 @@ void main() {
       await _pumpUntilFound(tester, find.text('Marvel Super Heroes'));
 
       final cardsList = find.byKey(const Key('setCardsList'));
-      final partialState = find.text('Dados parciais de set futuro');
+      final partialState = find.text('Dados parciais de coleção futura');
       await _pumpUntilAnyFound(tester, [cardsList, partialState]);
 
       expect(
@@ -51,7 +51,10 @@ void main() {
 
       await tester.tap(find.text('Through the Omenpaths 2'));
       await tester.pumpAndSettle();
-      await _pumpUntilFound(tester, find.text('Dados parciais de set futuro'));
+      await _pumpUntilFound(
+        tester,
+        find.text('Dados parciais de coleção futura'),
+      );
 
       await tester.pageBack();
       await tester.pumpAndSettle();
