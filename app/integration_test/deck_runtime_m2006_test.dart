@@ -349,6 +349,18 @@ void main() {
       ], attempts: 240);
       await _capture(binding, tester, '08_optimize_sheet');
 
+      final bracketDropdown = find.byType(DropdownButton<int>);
+      if (bracketDropdown.evaluate().isNotEmpty) {
+        await tester.ensureVisible(bracketDropdown.first);
+        await tester.tap(bracketDropdown.first);
+        await tester.pump();
+        final cedhOption = find.text('4 - cEDH');
+        await _pumpUntilFound(tester, cedhOption.last, attempts: 60);
+        await tester.tap(cedhOption.last);
+        await tester.pump();
+        await _capture(binding, tester, '08b_optimize_sheet_cedh');
+      }
+
       if (applyCurrentStrategy.evaluate().isNotEmpty) {
         await tester.ensureVisible(applyCurrentStrategy.first);
         await tester.tap(applyCurrentStrategy.first);

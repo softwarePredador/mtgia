@@ -298,3 +298,167 @@ cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 
 
 1. Se a meta UX de `/ai/archetypes` for sub-1s tambem no primeiro hit, o proximo alvo deve ser reduzir `deck_lookup/cards_lookup` ou promover esse cache para um nivel persistente compartilhado.
 2. O cache novo de `/ai/archetypes` e process-local; melhora o backend local e repeticoes dentro da mesma instancia, mas nao substitui cache cross-process.
+
+## Follow-up 2026-04-28 — Explainability de referencias externas e prova competitiva no app
+
+### Escopo desta rodada
+
+- continuar apos `fffe4b8`
+- auditar se `optimize` e `generate` devolvem contexto suficiente quando usam referencias externas/meta
+- confirmar que a ampliacao do payload nao quebra o contrato atual nem confunde a UI do app
+- rerun competitivo real no `iPhone 15 Simulator` com `Bracket / Power level = 4 - cEDH`
+
+### Veredito
+
+**Aprovado com patch backend aditivo e seguro.**
+
+O backend passou a expor um bloco opcional `meta_reference_context` com proveniencia estruturada suficiente para auditoria e futura UX dedicada, sem quebrar o contrato atual. O app continuou claro no fluxo `preview -> apply -> validate` porque a UI principal ignora campos extras e o bloco novo fica restrito ao payload bruto/debug.
+
+### Campos agora disponiveis no payload
+
+Quando ha referencias competitivas aplicadas, `optimize` e `generate` agora podem devolver:
+
+- `meta_reference_context.meta_scope`
+- `selection_reason_code`
+- `selection_reason`
+- `priority_source`
+- `source_summary`
+- `priority_cards`
+- `influenced_cards`
+- `references[]` com:
+  - `selection_rank`
+  - `commanders`
+  - `strategy_archetype`
+  - `placement`
+  - `standing`
+  - `source`
+  - `source_kind`
+  - `source_host`
+  - `source_chain`
+  - `provenance`
+  - `event`
+  - `player_name`
+- `suggested_cards_influenced`
+
+Leitura: agora o payload responde exatamente as perguntas de produto desta auditoria:
+
+- **source** -> `source/source_kind/source_host/source_chain/provenance`
+- **evento** -> `event.id/event.label`
+- **commander/shell** -> `commanders/shell_label`
+- **cartas influenciadas** -> `influenced_cards/suggested_cards_influenced`
+- **ranking** -> `selection_rank/placement/standing`
+- **motivo** -> `selection_reason_code/selection_reason/priority_source`
+
+### Implementacao aplicada
+
+- `server/lib/meta/meta_deck_reference_support.dart`
+  - ampliou o builder de evidencia estruturada
+  - passou a derivar proveniencia/evento/jogador/origem
+  - ganhou `augmentMetaDeckEvidencePayloadWithOutputMatches(...)`
+- `server/routes/ai/optimize/index.dart`
+  - anexa `meta_reference_context` na resposta final de optimize
+- `server/lib/ai/optimize_complete_support.dart`
+  - carrega e preserva `meta_reference_context` durante o fluxo async de `complete`
+- `server/routes/ai/generate/index.dart`
+  - anexa `meta_reference_context` na resposta final de generate
+- `server/test/meta_deck_reference_support_test.dart`
+  - cobre forma do payload e match entre cartas influenciadas e output real
+- `app/test/features/decks/widgets/deck_optimize_flow_support_test.dart`
+  - prova que o app tolera o novo campo e preserva o raw payload no debug JSON
+
+### Artefatos desta rodada
+
+- `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_payload_summary.json`
+- `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_optimize_complete_kinnan_bracket4.json`
+- `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_generate_kinnan_bracket4.json`
+- `server/test/artifacts/meta_deck_intelligence_2026-04-27/meta_reference_probe_post_explainability_2026-04-28.json`
+- `server/test/artifacts/commander_only_optimization_validation_2026-04-28/dry_run_summary.json`
+- `server/test/artifacts/commander_only_optimization_validation_2026-04-28/dry_run_summary.md`
+- `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output_backend_updated.txt`
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+
+### Evidencia live de explainability
+
+Arquivo: `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_payload_summary.json`
+
+- `optimize_has_meta_reference_context=true`
+- `generate_has_meta_reference_context=true`
+- `optimize_selection_reason="exact commander shell match"`
+- `generate_selection_reason="keyword-driven meta match"`
+- `optimize_priority_source="competitive_meta_exact_shell_match"`
+- `generate_priority_source="competitive_meta_keyword_meta_match"`
+- `optimize_reference_count=3`
+- `generate_reference_count=3`
+- `optimize_suggested_cards_influenced=6`
+- `generate_suggested_cards_influenced=12`
+
+Leitura: o fluxo agora devolve contexto suficiente tanto para explainability de shell exato (`optimize`) quanto para selecao por palavras-chave competitivas (`generate`).
+
+### Evidencia live de source/event/shell/ranking
+
+Arquivo: `live_optimize_complete_kinnan_bracket4.json`
+
+- referencia externa `rank 1`:
+  - `source=EDHTop16`
+  - `source_kind=external`
+  - `source_host=edhtop16.com`
+  - `event.id=jokers-are-wild-monthly-1k-hosted-by-trenton`
+  - `event.label=Jokers Are Wild Monthly 1k Hosted By Trenton`
+  - `standing=2`
+  - `placement="2"`
+  - `player_name="Eric Ward"`
+  - `commanders=["Kinnan, Bonder Prodigy"]`
+  - `shell_label="Kinnan, Bonder Prodigy"`
+- referencias auxiliares:
+  - `MTGTop8` como ranks `2` e `3`
+- cartas influenciadas:
+  - `Ancient Tomb`
+  - `Arcane Signet`
+  - `Basalt Monolith`
+  - `Birds of Paradise`
+  - `Boseiju, Who Endures`
+  - `Breeding Pool`
+
+Arquivo: `live_generate_kinnan_bracket4.json`
+
+- `selection_reason_code=keyword_meta_match`
+- `source_summary.external=1`
+- `source_summary.mtgtop8=2`
+- `suggested_cards_influenced[]` devolve as cartas do output que tambem aparecem nas referencias escolhidas
+
+### UX/product audit no app
+
+Rerun real no `iPhone 15 Simulator` usou o harness atualizado para selecionar explicitamente `4 - cEDH` antes da otimizacao.
+
+Evidencia:
+
+- `app/integration_test/deck_runtime_m2006_test.dart`
+- `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output_backend_updated.txt`
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+
+Achados:
+
+1. **Preview/apply/validate permaneceu OK.**
+   - `POST /ai/optimize -> 202`
+   - polling completou em `4` chamadas
+   - preview foi capturado
+   - apply persistiu deck e `validate` fechou verde
+2. **A UI nao ficou confusa.**
+   - nenhum novo campo bruto foi despejado na preview principal
+   - o texto da preview continua focado em additions/removals/reasoning
+   - o contexto novo fica disponivel no payload bruto para debug/auditoria sem poluir a interface normal
+3. **O contrato atual ficou preservado.**
+   - `complete` continuou `202 + poll_url`
+   - a resposta final so ganhou campo opcional
+   - `OptimizePreviewData.fromResult(...)` segue tolerante a campos extras
+
+### Nota nao bloqueante
+
+- Um prompt inicial live de `generate` para `Talrand, Sky Summoner` retornou `422 Generated deck failed validation` por sugerir carta banida (`Mana Crypt`).
+- Isso nao foi causado pelo novo payload de explainability; o contrato de erro permaneceu correto e a evidencia positiva desta rodada foi fechada com shell competitivo promovido e banlist-safe (`Kinnan, Bonder Prodigy`).
+
+### Fechamento desta rodada
+
+- explainability estruturada de referencias externas ficou suficiente para produto, auditoria e futura UX dedicada
+- o app permaneceu estavel no fluxo competitivo real do `iPhone 15 Simulator`
+- nao houve quebra de contrato nem regressao no caminho `preview -> apply -> validate`

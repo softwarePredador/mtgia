@@ -22,6 +22,16 @@ void main() {
       'deck_analysis': const {'average_cmc': 3.2},
       'post_analysis': const {'average_cmc': 3.0},
       'quality_warning': const {'message': 'partial'},
+      'meta_reference_context': const {
+        'priority_source': 'competitive_meta_exact_shell_match',
+        'references': [
+          {
+            'shell_label': 'Kraum + Tymna',
+            'source': 'EDHTop16',
+            'selection_rank': 1,
+          },
+        ],
+      },
     });
 
     expect(preview.hasChanges, isTrue);
@@ -38,13 +48,20 @@ void main() {
       archetype: 'control',
       bracket: 2,
       keepTheme: true,
-      result: const {'mode': 'optimize'},
+      result: const {
+        'mode': 'optimize',
+        'meta_reference_context': {
+          'priority_source': 'competitive_meta_exact_shell_match',
+        },
+      },
     );
 
     expect(text, contains('"deck_id": "deck-1"'));
     expect(text, contains('"archetype": "control"'));
     expect(text, contains('"keep_theme": true'));
     expect(text, contains('"mode": "optimize"'));
+    expect(text, contains('"meta_reference_context"'));
+    expect(text, contains('"priority_source"'));
   });
 
   test('describeDeckAiFailure classifies needs_repair correctly', () {

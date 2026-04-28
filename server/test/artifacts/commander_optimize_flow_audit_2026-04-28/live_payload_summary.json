@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-04-28T13:28:24Z",
+  "user_email": "copilot.audit.1777382845@example.com",
+  "deck_id": "2df66407-e8e9-4103-8b43-228dcb32d8b3",
+  "optimize_has_meta_reference_context": true,
+  "generate_has_meta_reference_context": true,
+  "optimize_selection_reason": "exact commander shell match",
+  "generate_selection_reason": "keyword-driven meta match",
+  "optimize_priority_source": "competitive_meta_exact_shell_match",
+  "generate_priority_source": "competitive_meta_keyword_meta_match",
+  "optimize_reference_count": 3,
+  "generate_reference_count": 3,
+  "optimize_suggested_cards_influenced": 6,
+  "generate_suggested_cards_influenced": 12
+}

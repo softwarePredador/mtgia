@@ -114,6 +114,7 @@ Backend-updated rerun after the `/ai/archetypes` cache/telemetry patch also prov
   - non-empty list `FAB -> popup -> Novo Deck`
 - The test opens the created deck through either the fresh success path or the persisted deck list path.
 - The optimize sheet path now handles the real iPhone 15 simulator behavior:
+  - explicitly switches `Bracket / Power level` to `4 - cEDH` before continuing
   - waits for strategy options/current strategy actions
   - keeps the real optimize/apply/validate backend flow
   - dispatches the `StrategyOptionCard.onTap` callback inside the harness when the simulator hit-test for the draggable sheet becomes unreliable
@@ -128,6 +129,7 @@ Backend-updated rerun after the `/ai/archetypes` cache/telemetry patch also prov
 - Deck creation path on real Decks screen.
 - Empty Commander deck details path.
 - Commander import path using `Talrand, Sky Summoner`.
+- Competitive bracket selection path using `4 - cEDH`.
 - Async optimize job path with real polling.
 - Preview/apply flow.
 - Real post-apply deck update plus `/validate` request.

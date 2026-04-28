@@ -226,4 +226,151 @@ void main() {
       expect(text.contains('http://') || text.contains('https://'), isFalse);
     });
   });
+
+  group('buildMetaDeckEvidencePayload', () {
+    MetaDeckReferenceSelectionResult buildSelection() {
+      return selectMetaDeckReferenceCandidates(
+        candidates: [
+          MetaDeckReferenceCandidate(
+            format: 'cEDH',
+            archetype: 'Blue Farm',
+            commanderName: 'Kraum, Ludevic\'s Opus',
+            partnerCommanderName: 'Tymna the Weaver',
+            shellLabel: 'Kraum, Ludevic\'s Opus + Tymna the Weaver',
+            strategyArchetype: 'combo',
+            sourceUrl:
+                'https://edhtop16.com/tournament/cedh-arcanum-sanctorum-57#standing-1',
+            cardList: '''
+1 Kraum, Ludevic's Opus
+1 Tymna the Weaver
+1 Thassa's Oracle
+1 Demonic Consultation
+1 Underworld Breach
+96 Island
+''',
+            placement: '1',
+            createdAt: DateTime.utc(2026, 4, 24),
+            sourceName: 'EDHTop16',
+            sourceHost: 'edhtop16.com',
+            sourceChain: const ['edhtop16_graphql', 'topdeck_deck_page'],
+            researchPayload: const <String, dynamic>{
+              'collection_method': 'edhtop16_graphql_topdeck_deck_page_dry_run',
+              'source_context': 'edhtop16_tournament_entry',
+              'source_chain': <String>[
+                'edhtop16_graphql',
+                'topdeck_deck_page',
+              ],
+              'tournament_id': 'cedh-arcanum-sanctorum-57',
+              'player_name': 'ThePapaSquats',
+              'standing': 1,
+            },
+          ),
+          MetaDeckReferenceCandidate(
+            format: 'cEDH',
+            archetype: 'Blue Farm',
+            commanderName: 'Kraum, Ludevic\'s Opus',
+            partnerCommanderName: 'Tymna the Weaver',
+            shellLabel: 'Kraum, Ludevic\'s Opus + Tymna the Weaver',
+            strategyArchetype: 'combo',
+            sourceUrl: 'https://www.mtgtop8.com/event?e=1&d=1',
+            cardList: '''
+1 Kraum, Ludevic's Opus
+1 Tymna the Weaver
+1 Thassa's Oracle
+1 Mystic Remora
+1 Ad Nauseam
+96 Island
+''',
+            placement: '2',
+            createdAt: DateTime.utc(2026, 4, 23),
+            sourceName: 'MTGTop8',
+            sourceHost: 'mtgtop8.com',
+            sourceChain: const <String>[],
+          ),
+        ],
+        commanderNames: const [
+          'Kraum, Ludevic\'s Opus',
+          'Tymna the Weaver',
+        ],
+        keywordPatterns: const ['blue farm'],
+        commanderScope: 'competitive_commander',
+        deckLimit: 2,
+        priorityCardLimit: 8,
+        preferExternalCompetitive: true,
+      );
+    }
+
+    test('captures provenance event ranking and influenced cards', () {
+      final payload = buildMetaDeckEvidencePayload(
+        buildSelection(),
+        maxPriorityCards: 8,
+        maxReferences: 2,
+      );
+
+      expect(payload['selection_reason_code'], 'exact_shell_match');
+      expect(payload['priority_source'], 'competitive_meta_exact_shell_match');
+
+      final references = (payload['references'] as List)
+          .whereType<Map>()
+          .map((entry) => entry.cast<String, dynamic>())
+          .toList(growable: false);
+      expect(references, hasLength(2));
+      expect(references.first['selection_rank'], 1);
+      expect(
+        references.first['commanders'],
+        containsAll(const [
+          'Kraum, Ludevic\'s Opus',
+          'Tymna the Weaver',
+        ]),
+      );
+      expect(
+        (references.first['event'] as Map)['id'],
+        'cedh-arcanum-sanctorum-57',
+      );
+      expect(
+        ((references.first['event'] as Map)['label'] as String),
+        contains('cEDH'),
+      );
+      expect(
+        (references.first['provenance'] as Map)['collection_method'],
+        'edhtop16_graphql_topdeck_deck_page_dry_run',
+      );
+
+      final influencedCards = (payload['influenced_cards'] as List)
+          .whereType<Map>()
+          .map((entry) => entry.cast<String, dynamic>())
+          .toList(growable: false);
+      final oracle = influencedCards.firstWhere(
+        (card) => card['name'] == 'Thassa\'s Oracle',
+      );
+      expect(oracle['reference_count'], 2);
+      expect(oracle['reason'], contains('Repeated across selected meta'));
+    });
+
+    test('matches returned output cards against influenced references', () {
+      final payload = buildMetaDeckEvidencePayload(
+        buildSelection(),
+        maxPriorityCards: 8,
+        maxReferences: 2,
+      );
+      final augmented = augmentMetaDeckEvidencePayloadWithOutputMatches(
+        payload,
+        outputCardNames: const ['Thassa\'s Oracle', 'Mystic Remora', 'Island'],
+      );
+
+      final matchedCards = (augmented['suggested_cards_influenced'] as List)
+          .whereType<Map>()
+          .map((entry) => entry.cast<String, dynamic>())
+          .toList(growable: false);
+      expect(matchedCards, hasLength(2));
+      expect(
+        matchedCards.map((entry) => entry['name']),
+        containsAll(const ['Thassa\'s Oracle', 'Mystic Remora']),
+      );
+      expect(
+        matchedCards.first['reason'],
+        contains('selected meta references'),
+      );
+    });
+  });
 }

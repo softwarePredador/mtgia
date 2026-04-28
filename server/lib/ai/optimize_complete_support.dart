@@ -22,6 +22,7 @@ class CompleteBuildAccumulator {
   final Set<String> aiSuggestedNames;
   final Set<String> commanderMetaPriorityNames;
   String? commanderMetaEvidenceText;
+  Map<String, dynamic>? commanderMetaEvidencePayload;
   int virtualTotal;
   int maxBasicAdditions = 999;
   int? commanderRecommendedLands;
@@ -128,6 +129,11 @@ Future<void> prepareCompleteCommanderSeed({
     );
     if (metaReferenceSelection.hasReferences) {
       state.commanderMetaEvidenceText = buildMetaDeckEvidenceText(
+        metaReferenceSelection,
+        maxPriorityCards: 14,
+        maxReferences: 3,
+      );
+      state.commanderMetaEvidencePayload = buildMetaDeckEvidencePayload(
         metaReferenceSelection,
         maxPriorityCards: 14,
         maxReferences: 3,
@@ -1332,6 +1338,9 @@ Map<String, dynamic> buildCompleteIntermediatePayload({
       'non_basic_added': nonBasicAdded,
       'basic_added': basicAdded,
     },
+    if (state.commanderMetaEvidencePayload != null &&
+        state.commanderMetaEvidencePayload!.isNotEmpty)
+      'meta_reference_context': state.commanderMetaEvidencePayload,
     if (qualityError != null) 'quality_error': qualityError,
   }, defaultMode: 'optimize');
 }
@@ -1534,6 +1543,16 @@ Future<Map<String, dynamic>> buildCompleteFinalResponse({
   final consistencySlo = jsonResponse['consistency_slo'];
   if (consistencySlo is Map) {
     responseBody['consistency_slo'] = consistencySlo.cast<String, dynamic>();
+  }
+
+  final metaReferenceContext = jsonResponse['meta_reference_context'];
+  if (metaReferenceContext is Map) {
+    responseBody['meta_reference_context'] =
+        augmentMetaDeckEvidencePayloadWithOutputMatches(
+      metaReferenceContext.cast<String, dynamic>(),
+      outputCardNames:
+          additionsDetailed.map((entry) => '${entry['name'] ?? ''}'),
+    );
   }
 
   return responseBody;

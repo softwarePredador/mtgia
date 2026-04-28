@@ -46,6 +46,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     var metaContext = '';
+    Map<String, dynamic>? metaReferenceContext;
 
     try {
       final metaKeywordPatterns = prompt
@@ -91,6 +92,11 @@ Future<Response> onRequest(RequestContext context) async {
 
         if (metaSelection.hasReferences) {
           metaContext = buildMetaDeckEvidenceText(
+            metaSelection,
+            maxPriorityCards: 12,
+            maxReferences: 3,
+          );
+          metaReferenceContext = buildMetaDeckEvidencePayload(
             metaSelection,
             maxPriorityCards: 12,
             maxReferences: 3,
@@ -273,6 +279,11 @@ $metaContext
       commanderName: commanderName,
     );
 
+    final generatedCardNames = cards
+        .map((card) => card['name']?.toString().trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toList(growable: false);
+
     final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
@@ -286,6 +297,12 @@ $metaContext
         'invalid_cards': validation.invalidCards.length,
       },
       'validation': validation.validationSummary(),
+      if (metaReferenceContext != null && metaReferenceContext.isNotEmpty)
+        'meta_reference_context':
+            augmentMetaDeckEvidencePayloadWithOutputMatches(
+          metaReferenceContext,
+          outputCardNames: generatedCardNames,
+        ),
     };
 
     if (validation.invalidCards.isNotEmpty || validation.warnings.isNotEmpty) {

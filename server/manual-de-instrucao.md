@@ -1,6 +1,113 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-28 — Explainability estruturada para referencias externas em `optimize/generate`
+
+### O Porquê
+- O pipeline competitivo de Commander ja estava usando referencias externas reais (`EDHTop16`, `MTGTop8`) para shortlist, prompt enrichment e selecao de shell.
+- O problema restante era de **produto/auditoria**, nao de selecao:
+  - o payload final ainda nao explicava com estrutura suficiente **de onde** veio a referencia usada;
+  - faltavam campos seguros e consumiveis para responder:
+    - qual foi a source priorizada;
+    - qual evento/lista sustentou a recomendacao;
+    - qual commander/shell foi usado como ancora;
+    - quais cartas foram influenciadas;
+    - qual ranking/standing pesou;
+    - qual motivo levou a selecao.
+- O objetivo desta rodada foi **ampliar a explainability sem quebrar o contrato atual** do app:
+  - manter texto/shape legado;
+  - adicionar apenas um bloco opcional novo;
+  - provar que `preview -> apply -> validate` continuava limpo no iPhone 15.
+
+### O Como
+- `server/lib/meta/meta_deck_reference_support.dart`
+  - `MetaDeckReferenceCandidate` passou a carregar `researchPayload`
+  - o suporte agora deriva dados estruturados de:
+    - `collection_method`
+    - `source_context`
+    - `player_name`
+    - `standing`
+    - `event_id`
+    - `event_label`
+    - `commanders`
+  - `buildMetaDeckEvidencePayload(...)` foi ampliado para devolver:
+    - `selection_reason_code`
+    - `selection_reason`
+    - `priority_source`
+    - `source_summary`
+    - `priority_cards`
+    - `influenced_cards`
+    - `references[]` com origem/evento/ranking/proveniencia
+  - foi adicionado `augmentMetaDeckEvidencePayloadWithOutputMatches(...)`
+    - cruza o output real retornado pelo backend com `influenced_cards`
+    - gera `suggested_cards_influenced`
+- `server/routes/ai/optimize/index.dart`
+  - passou a anexar `meta_reference_context` no payload final do optimize sincrono
+- `server/lib/ai/optimize_complete_support.dart`
+  - passou a preservar `meta_reference_context` durante o fluxo async de `complete`
+  - a resposta final do job agora tambem recebe `suggested_cards_influenced`
+- `server/routes/ai/generate/index.dart`
+  - passou a anexar `meta_reference_context` na resposta final de `generate`
+  - o bloco e enriquecido com os nomes realmente gerados
+- `app/test/features/decks/widgets/deck_optimize_flow_support_test.dart`
+  - confirma que o app ignora o novo bloco na preview principal
+  - e preserva o raw payload no debug JSON
+
+### Bug real encontrado e corrigido
+- O primeiro patch de `augmentMetaDeckEvidencePayloadWithOutputMatches(...)` indexava `influenced_cards` com `.toLowerCase()`, mas normalizava o output com `_normalizeMetaDeckText(...)`.
+- Isso quebrava match para nomes com pontuacao/apostrofo, como `Thassa's Oracle`.
+- Correcao aplicada:
+  - normalizar os dois lados com `_normalizeMetaDeckText(...)`
+- Cobertura adicionada:
+  - `server/test/meta_deck_reference_support_test.dart`
+
+### Contrato preservado
+- Nenhum campo legado foi removido ou reformatado.
+- O backend so adiciona um campo opcional novo:
+  - `meta_reference_context`
+- O app continua lendo os campos antigos:
+  - `mode`
+  - `reasoning`
+  - `warnings`
+  - `additions_detailed`
+  - `removals_detailed`
+- Resultado pratico:
+  - a explainability nova fica disponivel para auditoria, debug e futura UX dedicada;
+  - a UI normal nao fica ruidosa nem muda de comportamento.
+
+### Validacao executada
+- Server:
+  - `dart analyze lib/ai routes/ai bin test`
+  - suite focada incluindo `test/meta_deck_reference_support_test.dart`
+- App:
+  - `flutter analyze lib/features/decks test/features/decks`
+  - testes focados de `deck_provider`, `deck_details_screen` e `deck_optimize_flow_support`
+- Runtime live:
+  - backend local em `http://127.0.0.1:8082`
+  - probe real salvo em:
+    - `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_optimize_complete_kinnan_bracket4.json`
+    - `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_generate_kinnan_bracket4.json`
+    - `server/test/artifacts/commander_optimize_flow_audit_2026-04-28/live_payload_summary.json`
+  - rerun `iPhone 15 Simulator` confirmado em:
+    - `app/doc/runtime_flow_proofs_2026-04-27_iphone15_simulator/flutter_test_output_backend_updated.txt`
+    - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-27.md`
+
+### Resultado
+- `optimize` e `generate` agora devolvem explainability suficiente para:
+  - source
+  - evento
+  - commander/shell
+  - cartas influenciadas
+  - ranking
+  - motivo da selecao
+- O fluxo competitivo real do app continuou saudavel:
+  - `POST /ai/optimize -> 202`
+  - polling do job async
+  - preview
+  - apply
+  - validate
+- A mudanca ficou **additive-safe**: mais contexto para produto sem regressao de UX.
+
 ## 2026-04-27 — Runner operacional seguro para `external commander meta`
 
 ### O Porque

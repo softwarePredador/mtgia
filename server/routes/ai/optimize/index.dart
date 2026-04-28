@@ -509,6 +509,7 @@ Future<Response> onRequest(RequestContext context) async {
     var optimizeCommanderPrioritySource = 'none';
     final optimizeCommanderPriorityNames = <String>[];
     String? optimizeMetaEvidenceContext;
+    Map<String, dynamic>? optimizeMetaReferenceContext;
     final deterministicSwapCandidates = <Map<String, dynamic>>[];
 
     Future<Response> respondWithOptimizeTelemetry({
@@ -669,6 +670,11 @@ Future<Response> onRequest(RequestContext context) async {
           }
           if (metaSelection.hasReferences) {
             optimizeMetaEvidenceContext = buildMetaDeckEvidenceText(
+              metaSelection,
+              maxPriorityCards: 14,
+              maxReferences: 3,
+            );
+            optimizeMetaReferenceContext = buildMetaDeckEvidencePayload(
               metaSelection,
               maxPriorityCards: 14,
               maxReferences: 3,
@@ -2577,6 +2583,16 @@ Future<Response> onRequest(RequestContext context) async {
 
       if (warnings.isNotEmpty) {
         responseBody['warnings'] = warnings;
+      }
+
+      if (optimizeMetaReferenceContext != null &&
+          optimizeMetaReferenceContext.isNotEmpty) {
+        responseBody['meta_reference_context'] =
+            augmentMetaDeckEvidencePayloadWithOutputMatches(
+          optimizeMetaReferenceContext,
+          outputCardNames:
+              (responseBody['additions'] as List).map((entry) => '$entry'),
+        );
       }
 
       try {

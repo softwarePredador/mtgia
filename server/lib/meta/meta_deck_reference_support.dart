@@ -21,6 +21,7 @@ class MetaDeckReferenceCandidate {
     required this.sourceName,
     required this.sourceHost,
     required this.sourceChain,
+    this.researchPayload = const <String, dynamic>{},
   });
 
   final String format;
@@ -36,6 +37,7 @@ class MetaDeckReferenceCandidate {
   final String sourceName;
   final String sourceHost;
   final List<String> sourceChain;
+  final Map<String, dynamic> researchPayload;
 
   MetaDeckFormatDescriptor get formatDescriptor =>
       describeMetaDeckFormat(format);
@@ -67,6 +69,63 @@ class MetaDeckReferenceCandidate {
 
   String get sourceChainSummary =>
       effectiveSourceChain.map(_humanizeSourceChainToken).join(' -> ');
+
+  String? get collectionMethod =>
+      _readResearchPayloadString(researchPayload, 'collection_method');
+
+  String? get sourceContext =>
+      _readResearchPayloadString(researchPayload, 'source_context');
+
+  String? get playerName =>
+      _readResearchPayloadString(researchPayload, 'player_name');
+
+  int? get standing =>
+      _readResearchPayloadInt(researchPayload, 'standing') ??
+      _parsePlacementRank(placement);
+
+  List<String> get commanders => <String>[
+        if (commanderName.trim().isNotEmpty) commanderName.trim(),
+        if (partnerCommanderName.trim().isNotEmpty) partnerCommanderName.trim(),
+      ];
+
+  String? get eventId {
+    final fromPayload =
+        _readResearchPayloadString(researchPayload, 'tournament_id') ??
+            _readResearchPayloadString(researchPayload, 'event_id') ??
+            _readResearchPayloadString(researchPayload, 'event_tid');
+    if (fromPayload != null && fromPayload.isNotEmpty) return fromPayload;
+
+    final uri = Uri.tryParse(sourceUrl);
+    if (uri == null) return null;
+
+    final segments =
+        uri.pathSegments.where((segment) => segment.trim().isNotEmpty).toList();
+    final tournamentIndex = segments.indexOf('tournament');
+    if (tournamentIndex >= 0 && tournamentIndex + 1 < segments.length) {
+      return segments[tournamentIndex + 1].trim();
+    }
+
+    final eventQuery = uri.queryParameters['e'];
+    if (eventQuery != null && eventQuery.trim().isNotEmpty) {
+      return 'event-${eventQuery.trim()}';
+    }
+
+    if (segments.isNotEmpty &&
+        segments.first == 'deck' &&
+        segments.length > 1) {
+      return segments[1].trim();
+    }
+
+    return null;
+  }
+
+  String? get eventLabel {
+    final rawLabel = _readResearchPayloadString(researchPayload, 'event_name');
+    if (rawLabel != null && rawLabel.isNotEmpty) return rawLabel;
+    final id = eventId;
+    if (id == null || id.isEmpty) return null;
+    return _humanizeEventIdentifier(id);
+  }
 
   String get bestShellLabel {
     final shell = shellLabel.trim();
@@ -100,6 +159,7 @@ class MetaDeckReferenceCandidate {
       sourceName: (row[10] as String?) ?? '',
       sourceHost: (row[11] as String?) ?? '',
       sourceChain: _decodeSourceChain(row[12]),
+      researchPayload: _decodeResearchPayload(row[12]),
     );
   }
 }
@@ -372,31 +432,101 @@ Map<String, dynamic> buildMetaDeckEvidencePayload(
           ? 'Format meta'
           : commanderMetaScopeLabel(selection.commanderScope),
     },
+    'selection_reason_code': selection.selectionReason,
     'selection_reason': _selectionReasonLabel(selection.selectionReason),
+    'priority_source': selection.optimizePrioritySource,
     'source_chain_note':
         'source_chain is provenance metadata that explains how each reference list was observed in the ingestion pipeline; use it as evidence, not as a gameplay instruction.',
     'source_summary': selection.sourceBreakdown,
     'priority_cards': selection.priorityCardNames
         .take(maxPriorityCards)
         .toList(growable: false),
-    'references': selection.references
-        .take(maxReferences)
-        .map(
-          (candidate) => <String, dynamic>{
-            'shell_label': candidate.bestShellLabel,
-            if (candidate.strategyArchetype.trim().isNotEmpty)
-              'strategy_archetype': candidate.strategyArchetype.trim(),
-            if (candidate.placement.trim().isNotEmpty)
-              'placement': candidate.placement.trim(),
-            'meta_scope': candidate.commanderSubformat == null
-                ? candidate.formatDescriptor.label
-                : commanderMetaScopeLabel(candidate.commanderSubformat),
-            'source': candidate.sourceLabel,
-            'source_chain': candidate.sourceChainSummary,
+    'influenced_cards': _buildInfluencedCardPayload(
+      selection.references,
+      limit: maxPriorityCards,
+    ),
+    'references': <Map<String, dynamic>>[
+      for (final indexed in selection.references.take(maxReferences).indexed)
+        <String, dynamic>{
+          'selection_rank': indexed.$1 + 1,
+          'shell_label': indexed.$2.bestShellLabel,
+          'commanders': indexed.$2.commanders,
+          if (indexed.$2.strategyArchetype.trim().isNotEmpty)
+            'strategy_archetype': indexed.$2.strategyArchetype.trim(),
+          if (indexed.$2.placement.trim().isNotEmpty)
+            'placement': indexed.$2.placement.trim(),
+          if (indexed.$2.standing != null) 'standing': indexed.$2.standing,
+          'meta_scope': indexed.$2.commanderSubformat == null
+              ? indexed.$2.formatDescriptor.label
+              : commanderMetaScopeLabel(indexed.$2.commanderSubformat),
+          'source': indexed.$2.sourceLabel,
+          'source_kind': indexed.$2.sourceKind,
+          if (indexed.$2.sourceHost.trim().isNotEmpty)
+            'source_host': indexed.$2.sourceHost.trim(),
+          'source_chain': indexed.$2.sourceChainSummary,
+          'provenance': <String, dynamic>{
+            if (indexed.$2.collectionMethod != null)
+              'collection_method': indexed.$2.collectionMethod,
+            if (indexed.$2.sourceContext != null)
+              'source_context': indexed.$2.sourceContext,
+            'source_chain_tokens': indexed.$2.effectiveSourceChain,
           },
-        )
-        .toList(growable: false),
+          if (indexed.$2.eventId != null || indexed.$2.eventLabel != null)
+            'event': <String, dynamic>{
+              if (indexed.$2.eventId != null) 'id': indexed.$2.eventId,
+              if (indexed.$2.eventLabel != null) 'label': indexed.$2.eventLabel,
+            },
+          if (indexed.$2.playerName != null)
+            'player_name': indexed.$2.playerName,
+        },
+    ],
   };
+}
+
+Map<String, dynamic> augmentMetaDeckEvidencePayloadWithOutputMatches(
+  Map<String, dynamic> payload, {
+  required Iterable<String> outputCardNames,
+  int maxMatches = 12,
+}) {
+  if (payload.isEmpty) return const <String, dynamic>{};
+
+  final matchesByLower = <String, Map<String, dynamic>>{};
+  final influencedCards =
+      (payload['influenced_cards'] as List?)?.whereType<Map>().map((entry) {
+            final normalized = entry.cast<String, dynamic>();
+            final name =
+                _normalizeMetaDeckText(normalized['name']?.toString() ?? '');
+            if (name.isNotEmpty) {
+              matchesByLower[name] = normalized;
+            }
+            return normalized;
+          }).toList(growable: false) ??
+          const <Map<String, dynamic>>[];
+  if (influencedCards.isEmpty) return Map<String, dynamic>.from(payload);
+
+  final matched = <Map<String, dynamic>>[];
+  final seen = <String>{};
+  for (final rawName in outputCardNames) {
+    final name = rawName.trim();
+    if (name.isEmpty) continue;
+    final normalized = _normalizeMetaDeckText(name);
+    if (!seen.add(normalized)) continue;
+    final influence = matchesByLower[normalized];
+    if (influence == null) continue;
+    matched.add(<String, dynamic>{
+      'name': influence['name'] ?? name,
+      'reference_count': influence['reference_count'],
+      if (influence['copy_count'] != null)
+        'copy_count': influence['copy_count'],
+      if (influence['shells'] is List) 'shells': influence['shells'],
+      'reason': 'Returned output also appears in the selected meta references.',
+    });
+    if (matched.length >= maxMatches) break;
+  }
+
+  final normalizedPayload = Map<String, dynamic>.from(payload);
+  normalizedPayload['suggested_cards_influenced'] = matched;
+  return normalizedPayload;
 }
 
 String buildMetaDeckEvidenceText(
@@ -418,6 +548,12 @@ String buildMetaDeckEvidenceText(
   }).toList(growable: false);
   final priorityCards =
       (payload['priority_cards'] as List).map((entry) => '$entry').toList();
+  final outputMatches = (payload['suggested_cards_influenced'] as List?)
+          ?.whereType<Map>()
+          .map((entry) => entry['name']?.toString() ?? '')
+          .where((entry) => entry.trim().isNotEmpty)
+          .toList(growable: false) ??
+      const <String>[];
   final sourceSummary =
       (payload['source_summary'] as Map).cast<String, dynamic>();
 
@@ -437,6 +573,12 @@ String buildMetaDeckEvidenceText(
   if (priorityCards.isNotEmpty) {
     buffer.writeln(
       '- Repeated priority cards from selected references: ${priorityCards.join(', ')}.',
+    );
+  }
+
+  if (outputMatches.isNotEmpty) {
+    buffer.writeln(
+      '- Suggested output aligned with selected references: ${outputMatches.join(', ')}.',
     );
   }
 
@@ -604,28 +746,77 @@ List<String> _buildPriorityCardNames(
   return sorted.take(limit).map((entry) => entry.key).toList(growable: false);
 }
 
-List<String> _decodeSourceChain(dynamic rawPayload) {
+List<Map<String, dynamic>> _buildInfluencedCardPayload(
+  Iterable<MetaDeckReferenceCandidate> references, {
+  required int limit,
+}) {
+  final insights = <String, _InfluencedCardInsight>{};
+  final excluded = <String>{};
+  for (final candidate in references) {
+    excluded.addAll(candidate.commanderSet);
+    final parsed = parseMetaDeckCardList(
+      cardList: candidate.cardList,
+      format: candidate.format,
+    );
+    final seenInReference = <String>{};
+    for (final entry in parsed.effectiveCards.entries) {
+      final name = entry.key.trim();
+      final normalized = _normalizeMetaDeckText(name);
+      if (normalized.isEmpty ||
+          excluded.contains(normalized) ||
+          _isBasicLandName(normalized)) {
+        continue;
+      }
+      final insight = insights.putIfAbsent(
+        normalized,
+        () => _InfluencedCardInsight(name: name),
+      );
+      insight.copyCount += entry.value;
+      if (seenInReference.add(normalized)) {
+        insight.referenceCount += 1;
+      }
+      insight.shells.add(candidate.bestShellLabel);
+    }
+  }
+
+  final sorted = insights.values.toList()
+    ..sort((a, b) {
+      final byReferenceCount = b.referenceCount.compareTo(a.referenceCount);
+      if (byReferenceCount != 0) return byReferenceCount;
+      final byCopyCount = b.copyCount.compareTo(a.copyCount);
+      if (byCopyCount != 0) return byCopyCount;
+      return a.name.compareTo(b.name);
+    });
+
+  return sorted.take(limit).map((insight) => insight.toJson()).toList();
+}
+
+Map<String, dynamic> _decodeResearchPayload(dynamic rawPayload) {
   if (rawPayload is! String || rawPayload.trim().isEmpty) {
-    return const <String>[];
+    return const <String, dynamic>{};
   }
 
   try {
     final decoded = jsonDecode(rawPayload);
-    if (decoded is! Map) return const <String>[];
-    final rawChain = decoded['source_chain'];
-    if (rawChain is String && rawChain.trim().isNotEmpty) {
-      return <String>[rawChain.trim()];
-    }
-    if (rawChain is Iterable) {
-      return rawChain
-          .map((entry) => entry.toString().trim())
-          .where((entry) => entry.isNotEmpty)
-          .toList(growable: false);
-    }
+    if (decoded is! Map) return const <String, dynamic>{};
+    return decoded.cast<String, dynamic>();
   } catch (_) {
-    return const <String>[];
+    return const <String, dynamic>{};
   }
+}
 
+List<String> _decodeSourceChain(dynamic rawPayload) {
+  final researchPayload = _decodeResearchPayload(rawPayload);
+  final rawChain = researchPayload['source_chain'];
+  if (rawChain is String && rawChain.trim().isNotEmpty) {
+    return <String>[rawChain.trim()];
+  }
+  if (rawChain is Iterable) {
+    return rawChain
+        .map((entry) => entry.toString().trim())
+        .where((entry) => entry.isNotEmpty)
+        .toList(growable: false);
+  }
   return const <String>[];
 }
 
@@ -636,6 +827,42 @@ int? _parsePlacementRank(String rawPlacement) {
 
 String _normalizeMetaDeckText(String value) {
   return value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+}
+
+String? _readResearchPayloadString(
+  Map<String, dynamic> payload,
+  String key,
+) {
+  final value = payload[key];
+  if (value == null) return null;
+  final normalized = value.toString().trim();
+  return normalized.isEmpty ? null : normalized;
+}
+
+int? _readResearchPayloadInt(
+  Map<String, dynamic> payload,
+  String key,
+) {
+  final value = payload[key];
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString().trim() ?? '');
+}
+
+String _humanizeEventIdentifier(String rawId) {
+  final normalized = rawId.trim().toLowerCase();
+  if (normalized.isEmpty) return rawId;
+
+  return normalized
+      .split(RegExp(r'[_\-\s]+'))
+      .where((part) => part.isNotEmpty)
+      .map((part) {
+    return switch (part) {
+      'cedh' => 'cEDH',
+      'edh' => 'EDH',
+      _ => part[0].toUpperCase() + part.substring(1),
+    };
+  }).join(' ');
 }
 
 const Map<String, String> _sourceChainTokenLabels = <String, String>{
@@ -686,4 +913,25 @@ class _RankedMetaDeckReference {
   final MetaDeckReferenceCandidate candidate;
   final int score;
   final String selectionReason;
+}
+
+class _InfluencedCardInsight {
+  _InfluencedCardInsight({required this.name});
+
+  final String name;
+  int referenceCount = 0;
+  int copyCount = 0;
+  final Set<String> shells = <String>{};
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'reference_count': referenceCount,
+      'copy_count': copyCount,
+      'shells': shells.take(3).toList(growable: false),
+      'reason': referenceCount > 1
+          ? 'Repeated across selected meta references.'
+          : 'Present in a selected meta reference.',
+    };
+  }
 }

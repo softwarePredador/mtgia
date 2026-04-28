@@ -1,0 +1,936 @@
+{
+  "mode": "complete",
+  "cache": {
+    "hit": false,
+    "cache_key": "v6:c7cb07a4"
+  },
+  "theme": {
+    "theme": "tribal-human",
+    "confidence": "alta",
+    "core_cards": [
+      "Kinnan, Bonder Prodigy"
+    ],
+    "match_score": 1.0
+  },
+  "bracket": 4,
+  "timings": {
+    "job_id": "db07a247a98116a594e66d1f6f6d480c",
+    "deck_id": "2df66407-e8e9-4103-8b43-228dcb32d8b3",
+    "total_ms": 11430,
+    "stages_ms": {
+      "complete.fill_remainder": 3356,
+      "complete.ai_suggestion_loop": 2026,
+      "complete.build_final_response": 1216,
+      "complete.prepare_commander_seed": 1819,
+      "complete.rebalance_land_deficit": 0,
+      "complete.build_intermediate_payload": 0
+    },
+    "request_mode": "complete_async"
+  },
+  "removals": [],
+  "additions": [
+    "Swan Song",
+    "Swiftfoot Boots",
+    "The One Ring",
+    "Mystic Remora",
+    "An Offer You Can't Refuse",
+    "Fellwar Stone",
+    "Arcane Denial",
+    "Arcane Signet",
+    "Beast Within",
+    "Brainstorm",
+    "Command Tower",
+    "Counterspell",
+    "Cultivate",
+    "Cyclonic Rift",
+    "Force of Will",
+    "Mental Misstep",
+    "Force of Negation",
+    "Sol Ring",
+    "Mana Vault",
+    "Chrome Mox",
+    "Mox Diamond",
+    "Grim Monolith",
+    "Pact of Negation",
+    "Fierce Guardianship",
+    "Rhystic Study",
+    "Lotus Petal",
+    "Flusterstorm",
+    "Llanowar Elves",
+    "Mox Opal",
+    "Birds of Paradise",
+    "Formidable Speaker",
+    "Delighted Halfling",
+    "Wan Shi Tong, Librarian",
+    "Badgermole Cub",
+    "Crop Rotation",
+    "Elvish Spirit Guide",
+    "Elvish Mystic",
+    "Mox Amber",
+    "Endurance",
+    "Subtlety",
+    "Fyndhorn Elves",
+    "Borne Upon a Wind",
+    "Mindbreak Trap",
+    "Dispel",
+    "Springleaf Drum",
+    "Agatha's Soul Cauldron",
+    "Enduring Vitality",
+    "Chain of Vapor",
+    "Faerie Mastermind",
+    "Finale of Devastation",
+    "Bloom Tender",
+    "Heroic Intervention",
+    "Archdruid's Charm",
+    "Ancestral Vision",
+    "Everflowing Chalice",
+    "Ponder",
+    "Spell Snare",
+    "Careful Study",
+    "Consider",
+    "Curiosity",
+    "Essence Flux",
+    "Expedition Map",
+    "Exploration",
+    "Gilded Goose",
+    "Gitaxian Probe",
+    "Gran-Gran",
+    "Hardened Scales",
+    "Haywire Mite",
+    "Path of Ancestry",
+    "Starting Town",
+    "Cavern of Souls",
+    "Lazotep Quarry",
+    "Talon Gates of Madara",
+    "Abstergo Entertainment",
+    "Aether Hub",
+    "Ally Encampment",
+    "Island",
+    "Forest"
+  ],
+  "reasoning": "Deck completado com cartas sinérgicas ao arquétipo combo, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
+  "iterations": 0,
+  "constraints": {
+    "keep_theme": true
+  },
+  "preferences": {
+    "keep_theme": true,
+    "memory_applied": false,
+    "preferred_bracket": null
+  },
+  "deck_analysis": {
+    "average_cmc": "2.00",
+    "total_cards": 1,
+    "type_distribution": {
+      "lands": 0,
+      "battles": 0,
+      "instants": 0,
+      "artifacts": 0,
+      "creatures": 1,
+      "sorceries": 0,
+      "enchantments": 0,
+      "planeswalkers": 0
+    },
+    "detected_archetype": "aggro",
+    "archetype_confidence": "baixa",
+    "mana_base_assessment": "Poucos terrenos para Commander (Tem 0, ideal >= 34). Falta mana U (Tem 0 fontes, ideal > 15). Falta mana G (Tem 0 fontes, ideal > 15)",
+    "mana_curve_assessment": "OK: Curva aceitável para Aggro"
+  },
+  "post_analysis": {
+    "average_cmc": "1.60",
+    "total_cards": 100,
+    "type_distribution": {
+      "lands": 32,
+      "battles": 0,
+      "instants": 23,
+      "artifacts": 17,
+      "creatures": 18,
+      "sorceries": 6,
+      "enchantments": 6,
+      "planeswalkers": 0
+    },
+    "detected_archetype": "combo",
+    "archetype_confidence": "média",
+    "mana_base_assessment": "Base de mana equilibrada",
+    "mana_curve_assessment": "OK: Curva dentro de parâmetros aceitáveis"
+  },
+  "consistency_slo": {
+    "added_total": 99,
+    "basic_added": 23,
+    "target_total": 99,
+    "ai_stage_used": false,
+    "non_basic_added": 76,
+    "completed_target": true,
+    "deterministic_stage_used": true,
+    "average_deck_seed_stage_used": false,
+    "competitive_model_stage_used": true,
+    "guaranteed_basics_stage_used": false
+  },
+  "target_additions": 99,
+  "removals_detailed": [],
+  "additions_detailed": [
+    {
+      "name": "Swan Song",
+      "card_id": "c2b30be2-9982-4ea7-877f-84b227198eed",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Swiftfoot Boots",
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "The One Ring",
+      "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mystic Remora",
+      "card_id": "cb09f65c-445e-4757-a08a-5ff8d9435e01",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "An Offer You Can't Refuse",
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Fellwar Stone",
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Arcane Denial",
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Arcane Signet",
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Beast Within",
+      "card_id": "d7ac4043-9138-46cf-9985-58394c8c498d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Brainstorm",
+      "card_id": "6b822d6e-67aa-4a37-8b41-b11192592044",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Command Tower",
+      "card_id": "e0350ea1-a2b6-4799-b75b-e4593ac61766",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Counterspell",
+      "card_id": "ec764a62-83e8-467a-ac97-c679d272a0c9",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Cultivate",
+      "card_id": "4e471ed8-9cce-41f1-84a1-f352dc0dde77",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Cyclonic Rift",
+      "card_id": "69ff8944-04ea-41ea-8de2-59838aaa81b9",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Force of Will",
+      "card_id": "b683fbd5-e1e2-4a8e-9dbe-af2cf8dbf06c",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mental Misstep",
+      "card_id": "a212a248-c50d-4678-a664-0089fe0005f9",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Force of Negation",
+      "card_id": "0e3f626d-0418-46e0-b1da-c0db1e71c1f6",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Sol Ring",
+      "card_id": "6b2d582a-fb73-469e-95dc-8fb1c96ffd8b",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mana Vault",
+      "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Chrome Mox",
+      "card_id": "697a0893-70df-4c1f-b91c-c9a28e54c5c3",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mox Diamond",
+      "card_id": "b732f43f-bcda-4bcd-919a-22636567b41d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Grim Monolith",
+      "card_id": "cf3119bb-bce3-4be2-8ffd-2b63e57785bb",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Pact of Negation",
+      "card_id": "b6272fcb-79b3-4cde-b95f-e3b3d7e1fa12",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Fierce Guardianship",
+      "card_id": "573295d2-e94a-42d3-b401-a0a61e1f3a2c",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Rhystic Study",
+      "card_id": "22f842b3-b07a-43de-ab2e-38177f81c442",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Lotus Petal",
+      "card_id": "faba20dd-1030-4fd2-bfe3-41e95da2cc65",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Flusterstorm",
+      "card_id": "72116402-fd94-43cc-bc20-dc6ffb5abe10",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Llanowar Elves",
+      "card_id": "f652c452-353d-4ec2-a1b2-c2a50d42ad08",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mox Opal",
+      "card_id": "f8a5f4c9-cc27-4540-acca-dfc4e0d0c8cd",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Birds of Paradise",
+      "card_id": "037e2cf5-cd46-4d03-975d-fb877e4de51a",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Formidable Speaker",
+      "card_id": "2c71b9a6-ed6d-4252-94ff-2208452dbfb6",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Delighted Halfling",
+      "card_id": "f833bd42-cd55-4eeb-91bd-f7e901fc06da",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Wan Shi Tong, Librarian",
+      "card_id": "f7d92871-55ea-4865-a14e-4e46f4ff7cab",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Badgermole Cub",
+      "card_id": "d17ea998-1903-427e-b410-cec812d18e75",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Crop Rotation",
+      "card_id": "cc63576d-6d84-4933-95f4-bee29ac47835",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Elvish Spirit Guide",
+      "card_id": "12fb6723-88e7-4a45-af26-2bd021814380",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Elvish Mystic",
+      "card_id": "cd1d9a78-a41d-4342-b3e4-f1acb7ebab87",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mox Amber",
+      "card_id": "bcd7d52d-b4e2-42e1-9bca-768f1672bc4b",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Endurance",
+      "card_id": "0dd83722-975f-4d05-b503-ae80639fc5ff",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Subtlety",
+      "card_id": "81fe071c-8441-4aad-847d-29bd443bbbda",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Fyndhorn Elves",
+      "card_id": "53e0928b-4cc4-4ae2-b88b-6c02bc3eb31d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Borne Upon a Wind",
+      "card_id": "7a2f23b2-6ffe-41f4-9a61-af036671da93",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Mindbreak Trap",
+      "card_id": "667aba86-ab9c-4d88-a93e-53067228a757",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Dispel",
+      "card_id": "49dfb22f-e25e-4ca8-9755-ab09c269aeb5",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Springleaf Drum",
+      "card_id": "fa451259-2c5c-423c-8804-f36a61a8983f",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Agatha's Soul Cauldron",
+      "card_id": "bf87b955-e319-425a-9ce1-760f7c35d137",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Enduring Vitality",
+      "card_id": "5519ea20-663b-4e81-b616-65c6d5425ae5",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Chain of Vapor",
+      "card_id": "0fbe3c61-6755-42ee-81fb-e5c2533e116d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Faerie Mastermind",
+      "card_id": "3d631d75-7d65-4b97-8a77-fafedc6b5015",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Finale of Devastation",
+      "card_id": "5b126209-bec1-43a4-bf35-8a1f7c7b7ebb",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Bloom Tender",
+      "card_id": "5bbf2a68-94d3-4c98-a20d-bf41cf00291e",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Heroic Intervention",
+      "card_id": "eb81625b-60df-4040-8a9d-4b392030c44f",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Archdruid's Charm",
+      "card_id": "5e62c280-33b2-4e08-84b5-ab7eedff7af6",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Ancestral Vision",
+      "card_id": "1598d0f3-b23c-48cf-addc-88dc164a5043",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Everflowing Chalice",
+      "card_id": "bede9e2b-04b8-4a4a-82dc-76e45859d02a",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Ponder",
+      "card_id": "007ccd31-5201-4c62-b5d1-18ee12e0f94e",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Spell Snare",
+      "card_id": "acd9dcc6-856c-4faa-8932-e419cb07cad5",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Careful Study",
+      "card_id": "07a9fef0-81ee-4940-b7f9-aa36f0f2936e",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Consider",
+      "card_id": "f4daf4d7-7c95-4579-af9c-afb31b2a16a7",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Curiosity",
+      "card_id": "055787c6-ab49-4a56-bd7f-990fca8fc29c",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Essence Flux",
+      "card_id": "c394d204-d288-47c6-9171-4cfc827c1ba6",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Expedition Map",
+      "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Exploration",
+      "card_id": "24968de6-ed7a-4dc6-86e3-72b09ac17a52",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Gilded Goose",
+      "card_id": "3434a07f-9a35-47d2-9e94-e48efc57f5c2",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Gitaxian Probe",
+      "card_id": "d305a97b-ed2d-40ef-bd02-5b121af27f2d",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Gran-Gran",
+      "card_id": "c5383969-40dc-482a-b836-6753758c2111",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Hardened Scales",
+      "card_id": "e7ad0ae2-a2fc-454c-b9ad-af9853479601",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Haywire Mite",
+      "card_id": "994f4aac-deb4-4605-a8db-7d1d7b80dab7",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Path of Ancestry",
+      "card_id": "8410f44b-d1cb-4612-a15b-57c2efeccbb5",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Starting Town",
+      "card_id": "05fc243b-c12e-4231-bc62-ec429b5789e6",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Cavern of Souls",
+      "card_id": "689d3dbb-f807-4841-8a22-de7857c33e70",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Lazotep Quarry",
+      "card_id": "6ee6150d-97dd-4f47-9205-eb004cd1d7ec",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Talon Gates of Madara",
+      "card_id": "4e7e6e23-7ede-4388-b2e6-427eb1a07733",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Abstergo Entertainment",
+      "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Aether Hub",
+      "card_id": "18a2bf1d-6d6f-476f-a90c-03483a342f51",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Ally Encampment",
+      "card_id": "62baba2e-ef14-49b1-b514-d99d2aa3de95",
+      "quantity": 1,
+      "is_basic_land": false
+    },
+    {
+      "name": "Island",
+      "card_id": "b07b9a40-a94a-4827-97a0-03b30c8acd59",
+      "quantity": 12,
+      "is_basic_land": true
+    },
+    {
+      "name": "Forest",
+      "card_id": "115a89fa-3dac-4cf4-8b6b-c6de50a3d62e",
+      "quantity": 11,
+      "is_basic_land": true
+    }
+  ],
+  "validation_warnings": [],
+  "meta_reference_context": {
+    "meta_scope": {
+      "key": "competitive_commander",
+      "label": "Competitive Commander"
+    },
+    "references": [
+      {
+        "event": {
+          "id": "jokers-are-wild-monthly-1k-hosted-by-trenton",
+          "label": "Jokers Are Wild Monthly 1k Hosted By Trenton"
+        },
+        "source": "EDHTop16",
+        "standing": 2,
+        "placement": "2",
+        "commanders": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "meta_scope": "Competitive Commander",
+        "provenance": {
+          "source_context": "edhtop16_tournament_entry",
+          "collection_method": "edhtop16_graphql_topdeck_deck_page_dry_run",
+          "source_chain_tokens": [
+            "edhtop16_graphql",
+            "topdeck_deck_page"
+          ]
+        },
+        "player_name": "Eric Ward",
+        "shell_label": "Kinnan, Bonder Prodigy",
+        "source_host": "edhtop16.com",
+        "source_kind": "external",
+        "source_chain": "EDHTop16 standings -> TopDeck deck page",
+        "selection_rank": 1,
+        "strategy_archetype": "combo"
+      },
+      {
+        "event": {
+          "id": "event-83869",
+          "label": "Event 83869"
+        },
+        "source": "MTGTop8",
+        "standing": 2,
+        "placement": "2",
+        "commanders": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "meta_scope": "Competitive Commander",
+        "provenance": {
+          "source_chain_tokens": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        "shell_label": "Kinnan, Bonder Prodigy",
+        "source_kind": "mtgtop8",
+        "source_chain": "MTGTop8 format page -> MTGTop8 event page -> MTGTop8 deck page",
+        "selection_rank": 2,
+        "strategy_archetype": "control"
+      },
+      {
+        "event": {
+          "id": "event-83879",
+          "label": "Event 83879"
+        },
+        "source": "MTGTop8",
+        "standing": 3,
+        "placement": "3",
+        "commanders": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "meta_scope": "Competitive Commander",
+        "provenance": {
+          "source_chain_tokens": [
+            "mtgtop8_format_page",
+            "mtgtop8_event",
+            "mtgtop8_deck_page"
+          ]
+        },
+        "shell_label": "Kinnan, Bonder Prodigy",
+        "source_kind": "mtgtop8",
+        "source_chain": "MTGTop8 format page -> MTGTop8 event page -> MTGTop8 deck page",
+        "selection_rank": 3,
+        "strategy_archetype": "control"
+      }
+    ],
+    "priority_cards": [
+      "Ancient Tomb",
+      "Arcane Signet",
+      "Basalt Monolith",
+      "Birds of Paradise",
+      "Boseiju, Who Endures",
+      "Breeding Pool",
+      "Chord of Calling",
+      "Chrome Mox",
+      "City of Brass",
+      "Clever Impersonator",
+      "Command Tower",
+      "Consecrated Sphinx",
+      "Elvish Mystic",
+      "Elvish Spirit Guide"
+    ],
+    "source_summary": {
+      "mtgtop8": 3,
+      "external": 1
+    },
+    "priority_source": "competitive_meta_exact_shell_match",
+    "influenced_cards": [
+      {
+        "name": "Ancient Tomb",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Arcane Signet",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Basalt Monolith",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Birds of Paradise",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Boseiju, Who Endures",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Breeding Pool",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Chord of Calling",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Chrome Mox",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "City of Brass",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Clever Impersonator",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Command Tower",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Consecrated Sphinx",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Elvish Mystic",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Elvish Spirit Guide",
+        "reason": "Repeated across selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      }
+    ],
+    "selection_reason": "exact commander shell match",
+    "source_chain_note": "source_chain is provenance metadata that explains how each reference list was observed in the ingestion pipeline; use it as evidence, not as a gameplay instruction.",
+    "selection_reason_code": "exact_shell_match",
+    "suggested_cards_influenced": [
+      {
+        "name": "Arcane Signet",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Command Tower",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Chrome Mox",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Birds of Paradise",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Elvish Spirit Guide",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      },
+      {
+        "name": "Elvish Mystic",
+        "reason": "Returned output also appears in the selected meta references.",
+        "shells": [
+          "Kinnan, Bonder Prodigy"
+        ],
+        "copy_count": 4,
+        "reference_count": 4
+      }
+    ]
+  }
+}
