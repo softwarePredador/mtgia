@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../lib/notification_service.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
+import '../../lib/request_trace.dart';
 
 /// GET  /trades  → Listar trades do usuário
 /// POST /trades  → Criar proposta de trade
@@ -24,8 +25,10 @@ Future<Response> _createTrade(RequestContext context) async {
     final receiverId = body['receiver_id'] as String?;
     final type = body['type'] as String? ?? 'trade';
     final message = body['message'] as String?;
-    final myItems = (body['my_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final requestedItems = (body['requested_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final myItems =
+        (body['my_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final requestedItems =
+        (body['requested_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     final paymentAmount = body['payment_amount'];
     final paymentMethod = body['payment_method'] as String?;
 
@@ -46,6 +49,16 @@ Future<Response> _createTrade(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'error': 'Tipo inválido. Use: trade, sale, mixed'},
+      );
+    }
+    if (paymentMethod != null &&
+        !['pix', 'cash', 'transfer', 'other'].contains(paymentMethod)) {
+      _logInvalidPayload(context, 'POST /trades', 'invalid_payment_method');
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error': 'payment_method inválido. Use: pix, cash, transfer, other'
+        },
       );
     }
     if (myItems.isEmpty && requestedItems.isEmpty) {
@@ -149,14 +162,19 @@ Future<Response> _createTrade(RequestContext context) async {
           if (!foundMap.containsKey(biId)) {
             return Response.json(
               statusCode: HttpStatus.badRequest,
-              body: {'error': 'Item $biId não pertence ao destinatário ou não existe'},
+              body: {
+                'error': 'Item $biId não pertence ao destinatário ou não existe'
+              },
             );
           }
           final row = foundMap[biId]!;
           if (row['for_trade'] != true && row['for_sale'] != true) {
             return Response.json(
               statusCode: HttpStatus.badRequest,
-              body: {'error': 'Item $biId do destinatário não está disponível para troca/venda'},
+              body: {
+                'error':
+                    'Item $biId do destinatário não está disponível para troca/venda'
+              },
             );
           }
         }
@@ -175,7 +193,9 @@ Future<Response> _createTrade(RequestContext context) async {
         'receiverId': receiverId,
         'type': type,
         'message': message,
-        'paymentAmount': paymentAmount != null ? double.tryParse(paymentAmount.toString()) : null,
+        'paymentAmount': paymentAmount != null
+            ? double.tryParse(paymentAmount.toString())
+            : null,
         'paymentMethod': paymentMethod,
       });
       final offer = offerResult.first.toColumnMap();
@@ -191,7 +211,9 @@ Future<Response> _createTrade(RequestContext context) async {
           'binderId': item['binder_item_id'],
           'ownerId': userId,
           'qty': item['quantity'] as int? ?? 1,
-          'price': item['agreed_price'] != null ? double.tryParse(item['agreed_price'].toString()) : null,
+          'price': item['agreed_price'] != null
+              ? double.tryParse(item['agreed_price'].toString())
+              : null,
         });
       }
 
@@ -205,7 +227,9 @@ Future<Response> _createTrade(RequestContext context) async {
           'binderId': item['binder_item_id'],
           'ownerId': receiverId,
           'qty': item['quantity'] as int? ?? 1,
-          'price': item['agreed_price'] != null ? double.tryParse(item['agreed_price'].toString()) : null,
+          'price': item['agreed_price'] != null
+              ? double.tryParse(item['agreed_price'].toString())
+              : null,
         });
       }
 
@@ -216,7 +240,8 @@ Future<Response> _createTrade(RequestContext context) async {
       '''), parameters: {'tradeId': tradeId, 'userId': userId});
 
       if (offer['created_at'] is DateTime) {
-        offer['created_at'] = (offer['created_at'] as DateTime).toIso8601String();
+        offer['created_at'] =
+            (offer['created_at'] as DateTime).toIso8601String();
       }
 
       return {
@@ -234,22 +259,17 @@ Future<Response> _createTrade(RequestContext context) async {
       };
     });
 
-    // 🔔 Notificação: proposta de trade recebida
-    final senderInfo = await pool.execute(
-      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-      parameters: {'id': userId},
-    );
-    final senderName = senderInfo.isNotEmpty
-        ? (senderInfo.first.toColumnMap()['display_name'] ??
-            senderInfo.first.toColumnMap()['username']) as String
-        : 'Alguém';
-    await NotificationService.create(
+    NotificationService.createFromActorDeferred(
       pool: pool,
+      actorUserId: userId,
       userId: receiverId,
       type: 'trade_offer_received',
-      title: '$senderName enviou uma proposta de trade',
+      titleBuilder: (senderName) => '$senderName enviou uma proposta de trade',
       body: message,
       referenceId: tradeResult['id'] as String?,
+      endpoint: 'POST /trades',
+      requestId: _requestId(context),
+      tradeId: tradeResult['id'] as String?,
     );
 
     return Response.json(statusCode: HttpStatus.created, body: tradeResult);
@@ -267,6 +287,31 @@ Future<Response> _createTrade(RequestContext context) async {
       body: {'error': 'Erro interno ao criar trade'},
     );
   }
+}
+
+String _requestId(RequestContext context) {
+  try {
+    return context.read<RequestTrace>().requestId;
+  } catch (_) {
+    return context.request.headers['x-request-id'] ?? 'n/a';
+  }
+}
+
+void _logInvalidPayload(
+  RequestContext context,
+  String endpoint,
+  String reason,
+) {
+  String userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = 'n/a';
+  }
+  Log.w(
+    '[social_write] invalid_payload endpoint=$endpoint reason=$reason '
+    'request_id=${_requestId(context)} user_id=$userId',
+  );
 }
 
 // ─── GET /trades ────────────────────────────────────────────────

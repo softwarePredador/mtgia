@@ -159,6 +159,57 @@ Future<void> captureObservedException(
   );
 }
 
+Future<void> captureObservedMessage(
+  String message, {
+  Request? request,
+  RequestTrace? trace,
+  String? userId,
+  SentryLevel level = SentryLevel.info,
+  Map<String, String>? tags,
+  Map<String, Object?>? extras,
+}) async {
+  if (!isSentryEnabled()) {
+    return;
+  }
+
+  await ensureObservabilityInitialized();
+
+  await Sentry.captureMessage(
+    message,
+    level: level,
+    withScope: (scope) {
+      if (trace != null) {
+        scope.setTag('request_id', trace.requestId);
+      }
+
+      if (request != null) {
+        scope.setTag('http_method', request.method.name.toUpperCase());
+        scope.setTag('http_path', request.uri.path);
+        scope.setContexts('request', <String, Object?>{
+          'method': request.method.name.toUpperCase(),
+          'path': request.uri.path,
+          'query': request.uri.query,
+          'headers': sanitizeObservedHeaders(request.headers),
+        });
+      }
+
+      if (userId != null && userId.isNotEmpty) {
+        scope.setUser(SentryUser(id: userId));
+      }
+
+      if (tags != null) {
+        for (final entry in tags.entries) {
+          scope.setTag(entry.key, entry.value);
+        }
+      }
+
+      if (extras != null) {
+        scope.setContexts('extras', extras);
+      }
+    },
+  );
+}
+
 Future<void> captureRouteException(
   RequestContext context,
   Object error, {

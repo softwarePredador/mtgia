@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/request_trace.dart';
 
 /// GET  /conversations/:id/messages → Listar mensagens
 /// POST /conversations/:id/messages → Enviar mensagem
@@ -29,7 +30,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
 
     // Verificar participação
     final convResult = await pool.execute(
-      Sql.named('SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+      Sql.named(
+          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -71,7 +73,8 @@ Future<Response> _getMessages(RequestContext context, String id) async {
     } else {
       // Count completo para paginação tradicional.
       final countFuture = pool.execute(
-        Sql.named('SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id'),
+        Sql.named(
+            'SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id'),
         parameters: {'id': id},
       );
 
@@ -123,7 +126,10 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       e,
       stackTrace: st,
       source: 'conversation_messages_route',
-      extras: {'operation': 'list_conversation_messages', 'conversation_id': id},
+      extras: {
+        'operation': 'list_conversation_messages',
+        'conversation_id': id
+      },
     );
     Log.e('[ERROR] list conversation messages failed: $e');
     return Response.json(
@@ -142,6 +148,7 @@ Future<Response> _postMessage(RequestContext context, String id) async {
 
     final message = (body['message'] as String?)?.trim();
     if (message == null || message.isEmpty) {
+      _logInvalidPayload(context, id, 'missing_message');
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'error': 'message é obrigatório'},
@@ -150,7 +157,8 @@ Future<Response> _postMessage(RequestContext context, String id) async {
 
     // Verificar participação
     final convResult = await pool.execute(
-      Sql.named('SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
+      Sql.named(
+          'SELECT user_a_id, user_b_id FROM conversations WHERE id = @id'),
       parameters: {'id': id},
     );
     if (convResult.isEmpty) {
@@ -172,45 +180,40 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         ? conv['user_b_id'] as String
         : conv['user_a_id'] as String;
 
-    // Inserir mensagem + atualizar last_message_at
+    // Inserir mensagem + atualizar last_message_at em um round-trip.
     final insertResult = await pool.execute(
       Sql.named('''
-        INSERT INTO direct_messages (conversation_id, sender_id, message)
-        VALUES (@convId, @senderId, @message)
-        RETURNING id, created_at
+        WITH inserted AS (
+          INSERT INTO direct_messages (conversation_id, sender_id, message)
+          VALUES (@convId, @senderId, @message)
+          RETURNING id, created_at
+        ),
+        updated AS (
+          UPDATE conversations
+          SET last_message_at = (SELECT created_at FROM inserted)
+          WHERE id = @convId
+          RETURNING id
+        )
+        SELECT inserted.id, inserted.created_at
+        FROM inserted, updated
       '''),
       parameters: {'convId': id, 'senderId': userId, 'message': message},
-    );
-
-    await pool.execute(
-      Sql.named('''
-        UPDATE conversations SET last_message_at = CURRENT_TIMESTAMP
-        WHERE id = @id
-      '''),
-      parameters: {'id': id},
     );
 
     final msg = insertResult.first.toColumnMap();
     final createdAt = msg['created_at'];
 
-    // Buscar username do remetente para a notificação
-    final senderResult = await pool.execute(
-      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-      parameters: {'id': userId},
-    );
-    final senderName = senderResult.isNotEmpty
-        ? (senderResult.first.toColumnMap()['display_name'] ??
-            senderResult.first.toColumnMap()['username']) as String
-        : 'Alguém';
-
-    // Notificação de mensagem direta
-    await NotificationService.create(
+    NotificationService.createFromActorDeferred(
       pool: pool,
+      actorUserId: userId,
       userId: receiverId,
       type: 'direct_message',
-      title: 'Nova mensagem de $senderName',
+      titleBuilder: (senderName) => 'Nova mensagem de $senderName',
       body: message.length > 100 ? '${message.substring(0, 100)}...' : message,
       referenceId: id, // conversation id
+      endpoint: 'POST /conversations/:id/messages',
+      requestId: _requestId(context),
+      conversationId: id,
     );
 
     return Response.json(
@@ -220,7 +223,9 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         'conversation_id': id,
         'sender_id': userId,
         'message': message,
-        'created_at': createdAt is DateTime ? createdAt.toIso8601String() : createdAt?.toString(),
+        'created_at': createdAt is DateTime
+            ? createdAt.toIso8601String()
+            : createdAt?.toString(),
       },
     );
   } catch (e, st) {
@@ -237,4 +242,30 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       body: {'error': 'Erro ao enviar mensagem'},
     );
   }
+}
+
+String _requestId(RequestContext context) {
+  try {
+    return context.read<RequestTrace>().requestId;
+  } catch (_) {
+    return context.request.headers['x-request-id'] ?? 'n/a';
+  }
+}
+
+void _logInvalidPayload(
+  RequestContext context,
+  String conversationId,
+  String reason,
+) {
+  String userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = 'n/a';
+  }
+  Log.w(
+    '[social_write] invalid_payload endpoint=POST /conversations/:id/messages '
+    'reason=$reason request_id=${_requestId(context)} user_id=$userId '
+    'conversation_id=$conversationId',
+  );
 }

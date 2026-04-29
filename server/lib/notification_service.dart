@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:postgres/postgres.dart';
 
+import 'logger.dart';
+import 'observability.dart';
 import 'push_notification_service.dart';
 
 /// Serviço helper para criar notificações de forma consistente.
@@ -16,6 +20,7 @@ class NotificationService {
     required String title,
     String? body,
     String? referenceId,
+    bool rethrowOnError = false,
   }) async {
     try {
       await pool.execute(
@@ -43,8 +48,89 @@ class NotificationService {
           if (referenceId != null) 'reference_id': referenceId,
         },
       );
-    } catch (e) {
-      print('[⚠️ NotificationService] Falha ao criar notificação: $e');
+    } catch (e, st) {
+      Log.e(
+          '[notification_service] create_failed type=$type user_id=$userId reference_id=${referenceId ?? 'n/a'} error=$e');
+      if (rethrowOnError) {
+        Error.throwWithStackTrace(e, st);
+      }
     }
+  }
+
+  static void createFromActorDeferred({
+    required Pool pool,
+    required String actorUserId,
+    required String userId,
+    required String type,
+    required String Function(String actorName) titleBuilder,
+    String? body,
+    String? referenceId,
+    required String endpoint,
+    required String requestId,
+    String source = 'social_notification_deferred',
+    String? tradeId,
+    String? conversationId,
+  }) {
+    final startedAt = DateTime.now();
+    unawaited(
+      Future<void>(() async {
+        final actorName = await _resolveActorName(pool, actorUserId);
+        await create(
+          pool: pool,
+          userId: userId,
+          type: type,
+          title: titleBuilder(actorName),
+          body: body,
+          referenceId: referenceId,
+          rethrowOnError: true,
+        );
+      }).timeout(const Duration(seconds: 10)).then((_) {
+        final durationMs = DateTime.now().difference(startedAt).inMilliseconds;
+        if (durationMs >= 1000) {
+          Log.w(
+            '[social_notification] slow_deferred '
+            'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
+            'actor_user_id=$actorUserId recipient_user_id=$userId '
+            'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
+            'conversation_id=${conversationId ?? 'n/a'} type=$type',
+          );
+        }
+      }).catchError((Object error, StackTrace stackTrace) async {
+        final durationMs = DateTime.now().difference(startedAt).inMilliseconds;
+        Log.e(
+          '[social_notification] deferred_failed '
+          'endpoint=$endpoint duration_ms=$durationMs request_id=$requestId '
+          'actor_user_id=$actorUserId recipient_user_id=$userId '
+          'reference_id=${referenceId ?? 'n/a'} trade_id=${tradeId ?? 'n/a'} '
+          'conversation_id=${conversationId ?? 'n/a'} type=$type error=$error',
+        );
+        await captureObservedException(
+          error,
+          stackTrace: stackTrace,
+          userId: actorUserId,
+          tags: {'source': source, 'endpoint': endpoint, 'type': type},
+          extras: {
+            'request_id': requestId,
+            'recipient_user_id': userId,
+            if (referenceId != null) 'reference_id': referenceId,
+            if (tradeId != null) 'trade_id': tradeId,
+            if (conversationId != null) 'conversation_id': conversationId,
+            'duration_ms': durationMs,
+          },
+        );
+      }),
+    );
+  }
+
+  static Future<String> _resolveActorName(Pool pool, String actorUserId) async {
+    final result = await pool.execute(
+      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
+      parameters: {'id': actorUserId},
+    );
+    if (result.isEmpty) {
+      return 'Alguém';
+    }
+    final row = result.first.toColumnMap();
+    return (row['display_name'] ?? row['username']) as String? ?? 'Alguém';
   }
 }

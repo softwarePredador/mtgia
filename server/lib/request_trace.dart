@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:dart_frog/dart_frog.dart';
 
 class RequestTrace {
-  const RequestTrace({required this.requestId});
+  RequestTrace({required this.requestId});
 
   final String requestId;
+  String? userId;
 }
 
 final Random _requestIdRandom = Random.secure();
@@ -44,7 +45,8 @@ String resolveRequestId(
   return generateRequestId(prefix: prefix, now: now, random: random);
 }
 
-RequestTrace getRequestTrace(RequestContext context) => context.read<RequestTrace>();
+RequestTrace getRequestTrace(RequestContext context) =>
+    context.read<RequestTrace>();
 
 String? tryGetRequestId(RequestContext context) {
   try {

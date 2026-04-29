@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/request_trace.dart';
 
 /// GET /trades/:id/messages → Listar mensagens do trade
 /// POST /trades/:id/messages → Enviar mensagem no trade
@@ -111,6 +112,7 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     final attachmentType = body['attachment_type'] as String?;
 
     if ((message == null || message.trim().isEmpty) && attachmentUrl == null) {
+      _logInvalidPayload(context, id, 'missing_message_or_attachment');
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'error': 'message ou attachment_url é obrigatório'},
@@ -119,11 +121,14 @@ Future<Response> _postMessage(RequestContext context, String id) async {
 
     // Validar attachment_type (se fornecido)
     const validAttachmentTypes = ['receipt', 'tracking', 'photo', 'other'];
-    if (attachmentType != null && !validAttachmentTypes.contains(attachmentType)) {
+    if (attachmentType != null &&
+        !validAttachmentTypes.contains(attachmentType)) {
+      _logInvalidPayload(context, id, 'invalid_attachment_type');
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {
-          'error': 'attachment_type inválido. Use: ${validAttachmentTypes.join(', ')}',
+          'error':
+              'attachment_type inválido. Use: ${validAttachmentTypes.join(', ')}',
         },
       );
     }
@@ -153,7 +158,9 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     if (closedStatuses.contains(trade['status'])) {
       return Response.json(
         statusCode: HttpStatus.badRequest,
-        body: {'error': 'Não é possível enviar mensagens em trade ${trade['status']}'},
+        body: {
+          'error': 'Não é possível enviar mensagens em trade ${trade['status']}'
+        },
       );
     }
 
@@ -175,23 +182,19 @@ Future<Response> _postMessage(RequestContext context, String id) async {
     final recipientId = trade['sender_id'] == userId
         ? trade['receiver_id'] as String
         : trade['sender_id'] as String;
-    final senderInfo = await pool.execute(
-      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-      parameters: {'id': userId},
-    );
-    final senderName = senderInfo.isNotEmpty
-        ? (senderInfo.first.toColumnMap()['display_name'] ??
-            senderInfo.first.toColumnMap()['username']) as String
-        : 'Alguém';
-    await NotificationService.create(
+    NotificationService.createFromActorDeferred(
       pool: pool,
+      actorUserId: userId,
       userId: recipientId,
       type: 'trade_message',
-      title: '$senderName enviou mensagem no trade',
+      titleBuilder: (senderName) => '$senderName enviou mensagem no trade',
       body: message != null && message.length > 100
           ? '${message.substring(0, 100)}...'
           : message,
       referenceId: id,
+      endpoint: 'POST /trades/:id/messages',
+      requestId: _requestId(context),
+      tradeId: id,
     );
 
     return Response.json(
@@ -220,4 +223,30 @@ Future<Response> _postMessage(RequestContext context, String id) async {
       body: {'error': 'Erro ao enviar mensagem'},
     );
   }
+}
+
+String _requestId(RequestContext context) {
+  try {
+    return context.read<RequestTrace>().requestId;
+  } catch (_) {
+    return context.request.headers['x-request-id'] ?? 'n/a';
+  }
+}
+
+void _logInvalidPayload(
+  RequestContext context,
+  String tradeId,
+  String reason,
+) {
+  String userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = 'n/a';
+  }
+  Log.w(
+    '[social_write] invalid_payload endpoint=POST /trades/:id/messages '
+    'reason=$reason request_id=${_requestId(context)} user_id=$userId '
+    'trade_id=$tradeId',
+  );
 }

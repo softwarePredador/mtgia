@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/request_trace.dart';
 
 /// PUT /trades/:id/status → Atualizar status de entrega
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -28,10 +29,27 @@ Future<Response> onRequest(RequestContext context, String id) async {
       );
     }
 
-    if (!['shipped', 'delivered', 'completed', 'cancelled', 'disputed'].contains(newStatus)) {
+    if (!['shipped', 'delivered', 'completed', 'cancelled', 'disputed']
+        .contains(newStatus)) {
+      _logInvalidPayload(context, id, 'invalid_status');
       return Response.json(
         statusCode: HttpStatus.badRequest,
-        body: {'error': 'Status inválido. Use: shipped, delivered, completed, cancelled, disputed'},
+        body: {
+          'error':
+              'Status inválido. Use: shipped, delivered, completed, cancelled, disputed'
+        },
+      );
+    }
+    if (deliveryMethod != null &&
+        !['correios', 'motoboy', 'pessoalmente', 'outro']
+            .contains(deliveryMethod)) {
+      _logInvalidPayload(context, id, 'invalid_delivery_method');
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error':
+              'delivery_method inválido. Use: correios, motoboy, pessoalmente, outro',
+        },
       );
     }
 
@@ -91,7 +109,10 @@ Future<Response> onRequest(RequestContext context, String id) async {
         }
       }
 
-      final setClauses = <String>['status = @newStatus', 'updated_at = CURRENT_TIMESTAMP'];
+      final setClauses = <String>[
+        'status = @newStatus',
+        'updated_at = CURRENT_TIMESTAMP'
+      ];
       final params = <String, dynamic>{'id': id, 'newStatus': newStatus};
 
       if (deliveryMethod != null) {
@@ -154,27 +175,30 @@ Future<Response> onRequest(RequestContext context, String id) async {
       case 'only_receiver_ship_sale':
         return Response.json(
           statusCode: HttpStatus.forbidden,
-          body: {'error': 'Em vendas, apenas o vendedor (quem recebeu a proposta) pode marcar como enviado'},
+          body: {
+            'error':
+                'Em vendas, apenas o vendedor (quem recebeu a proposta) pode marcar como enviado'
+          },
         );
       case 'only_sender_deliver_sale':
         return Response.json(
           statusCode: HttpStatus.forbidden,
-          body: {'error': 'Em vendas, apenas o comprador (quem criou a proposta) pode confirmar recebimento'},
+          body: {
+            'error':
+                'Em vendas, apenas o comprador (quem criou a proposta) pode confirmar recebimento'
+          },
         );
     }
 
     // 🔔 Notificação: status do trade atualizado → notificar a outra parte
-    final notifyType = 'trade_$newStatus'; // trade_shipped, trade_delivered, trade_completed
-    final validNotifTypes = ['trade_shipped', 'trade_delivered', 'trade_completed'];
+    final notifyType =
+        'trade_$newStatus'; // trade_shipped, trade_delivered, trade_completed
+    final validNotifTypes = [
+      'trade_shipped',
+      'trade_delivered',
+      'trade_completed'
+    ];
     if (validNotifTypes.contains(notifyType)) {
-      final changerInfo = await pool.execute(
-        Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-        parameters: {'id': userId},
-      );
-      final changerName = changerInfo.isNotEmpty
-          ? (changerInfo.first.toColumnMap()['display_name'] ??
-              changerInfo.first.toColumnMap()['username']) as String
-          : 'Alguém';
       final notifyUserId = isSender
           ? trade['receiver_id'] as String
           : trade['sender_id'] as String;
@@ -183,12 +207,17 @@ Future<Response> onRequest(RequestContext context, String id) async {
         'trade_delivered': 'confirmou o recebimento do trade',
         'trade_completed': 'finalizou o trade',
       };
-      await NotificationService.create(
+      NotificationService.createFromActorDeferred(
         pool: pool,
+        actorUserId: userId,
         userId: notifyUserId,
         type: notifyType,
-        title: '$changerName ${statusLabels[notifyType]}',
+        titleBuilder: (changerName) =>
+            '$changerName ${statusLabels[notifyType]}',
         referenceId: id,
+        endpoint: 'PUT /trades/:id/status',
+        requestId: _requestId(context),
+        tradeId: id,
       );
     }
 
@@ -212,4 +241,30 @@ Future<Response> onRequest(RequestContext context, String id) async {
       body: {'error': 'Erro interno ao atualizar status'},
     );
   }
+}
+
+String _requestId(RequestContext context) {
+  try {
+    return context.read<RequestTrace>().requestId;
+  } catch (_) {
+    return context.request.headers['x-request-id'] ?? 'n/a';
+  }
+}
+
+void _logInvalidPayload(
+  RequestContext context,
+  String tradeId,
+  String reason,
+) {
+  String userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = 'n/a';
+  }
+  Log.w(
+    '[social_write] invalid_payload endpoint=PUT /trades/:id/status '
+    'reason=$reason request_id=${_requestId(context)} user_id=$userId '
+    'trade_id=$tradeId',
+  );
 }

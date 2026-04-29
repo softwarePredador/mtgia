@@ -1,8 +1,9 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'auth_service.dart';
+import 'request_trace.dart';
 
 /// Middleware de autenticação para proteger rotas
-/// 
+///
 /// Uso:
 /// ```dart
 /// // Em routes/_middleware.dart
@@ -10,12 +11,12 @@ import 'auth_service.dart';
 ///   return handler.use(authMiddleware());
 /// }
 /// ```
-/// 
+///
 /// Verifica:
 /// - Presença do header Authorization
 /// - Formato "Bearer <token>"
 /// - Validade do JWT token
-/// 
+///
 /// Se válido, injeta o userId no RequestContext para uso nos handlers
 Middleware authMiddleware() {
   return (handler) {
@@ -52,6 +53,11 @@ Middleware authMiddleware() {
 
       // Injetar userId no contexto para uso nos handlers
       final userId = payload['userId'] as String;
+      try {
+        context.read<RequestTrace>().userId = userId;
+      } catch (_) {
+        // Rotas protegidas continuam funcionando mesmo sem middleware raiz.
+      }
       final requestWithUser = context.provide<String>(() => userId);
 
       return handler(requestWithUser);
@@ -60,7 +66,7 @@ Middleware authMiddleware() {
 }
 
 /// Extrai o userId do contexto injetado pelo middleware
-/// 
+///
 /// Uso dentro de um handler protegido:
 /// ```dart
 /// Future<Response> onRequest(RequestContext context) async {
@@ -72,6 +78,7 @@ String getUserId(RequestContext context) {
   try {
     return context.read<String>();
   } catch (e) {
-    throw Exception('UserId não encontrado no contexto. Certifique-se de que authMiddleware() está aplicado.');
+    throw Exception(
+        'UserId não encontrado no contexto. Certifique-se de que authMiddleware() está aplicado.');
   }
 }
