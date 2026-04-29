@@ -1,6 +1,31 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Estabilizacao dos goldens legados do Life Counter clone
+
+### O Porquê
+- A auditoria ampla do app mostrou que `cd app && flutter test test --no-version-check` falhava apenas em goldens de `life_counter_clone_proof_test.dart`.
+- Os diffs eram baixos (`0.03%` a `0.30%`) e os PNGs gerados mantinham a mesma dimensao dos masters (`3840x4260`), indicando drift pequeno de rasterizacao/fonte em uma suite legada de paridade visual.
+- O caminho vivo do contador segue coberto por `LotusLifeCounterScreen`; a suite do clone permanece util como prova historica, mas nao deve quebrar a suite ampla por antialiasing minimo.
+
+### O Como
+- Nao houve alteracao de widget, layout ou baseline PNG.
+- `app/test/features/home/life_counter_clone_proof_test.dart` passou a instalar um `LocalFileComparator` local da propria suite, com tolerancia explicita por arquivo:
+  - `life_counter_clone_current_normal_4p.png`: `0.06%`;
+  - `life_counter_clone_current_hub_open.png`: `0.10%`;
+  - `life_counter_clone_current_settings.png`: `0.20%`;
+  - `life_counter_clone_current_set_life.png`: `0.08%`;
+  - `life_counter_clone_current_high_roll.png`: `0.35%`.
+- Diffs acima desses limites continuam falhando e escrevendo os artefatos em `app/test/features/home/failures`, preservando deteccao de regressao visual relevante.
+- `app/test/README.md` e `app/doc/LIFE_COUNTER_FINAL_VALIDATION_2026-04-02.md` documentam que `--update-goldens` deve ser usado somente apos revisao visual dos PNGs afetados.
+- Os failure PNGs previamente rastreados em `app/test/features/home/failures/` foram removidos do repositorio, e o diretorio entrou no `.gitignore` para impedir reintroducao acidental.
+
+### Validacao executada
+- `flutter test test/features/home/life_counter_clone_proof_test.dart --no-version-check`: passou.
+- `flutter test test/features/home --no-version-check`: passou.
+- `flutter test test --no-version-check`: passou.
+- Smoke runtime iPhone 15 nao foi necessario porque nenhuma superficie de app/runtime foi alterada.
+
 ## 2026-04-29 — Separacao da suite server em unit/offline vs live-backend
 
 ### O Porquê

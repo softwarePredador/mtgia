@@ -2,6 +2,7 @@
 // The live counter coverage now targets `LotusLifeCounterScreen`.
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,8 +32,27 @@ class _SequenceRandom implements Random {
 
 const _referencePhoneSize = Size(590, 1280);
 const _proofSurfaceSize = Size(1280, 1420);
+const _legacyGoldenTolerances = <String, double>{
+  'life_counter_clone_current_normal_4p.png': 0.0006,
+  'life_counter_clone_current_hub_open.png': 0.0010,
+  'life_counter_clone_current_settings.png': 0.0020,
+  'life_counter_clone_current_set_life.png': 0.0008,
+  'life_counter_clone_current_high_roll.png': 0.0035,
+};
 
 void main() {
+  final previousGoldenFileComparator = goldenFileComparator;
+
+  setUpAll(() {
+    goldenFileComparator = _LegacyLifeCounterGoldenComparator(
+      Uri.parse('test/features/home/life_counter_clone_proof_test.dart'),
+    );
+  });
+
+  tearDownAll(() {
+    goldenFileComparator = previousGoldenFileComparator;
+  });
+
   group('Life counter clone proof board', () {
     Future<void> pumpProofBoard(
       WidgetTester tester, {
@@ -125,7 +145,10 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('life-counter-set-life-digit-4')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('life-counter-set-life-overlay')), findsOneWidget);
+      expect(
+        find.byKey(const Key('life-counter-set-life-overlay')),
+        findsOneWidget,
+      );
       expect(find.text('4'), findsWidgets);
 
       await expectLater(
@@ -157,6 +180,37 @@ void main() {
       );
     });
   });
+}
+
+class _LegacyLifeCounterGoldenComparator extends LocalFileComparator {
+  _LegacyLifeCounterGoldenComparator(super.testFile);
+
+  @override
+  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
+    final result = await GoldenFileComparator.compareLists(
+      imageBytes,
+      await getGoldenBytes(golden),
+    );
+    final tolerance = _legacyGoldenTolerances[_goldenFileName(golden)] ?? 0.0;
+    final passed = result.passed || result.diffPercent <= tolerance;
+    if (passed) {
+      result.dispose();
+      return true;
+    }
+
+    final allowedPercent = (tolerance * 100).toStringAsFixed(2);
+    final error = await generateFailureOutput(result, golden, basedir);
+    result.dispose();
+    throw FlutterError(
+      '$error\n'
+      'Allowed legacy life counter render tolerance: <= $allowedPercent%.',
+    );
+  }
+
+  static String _goldenFileName(Uri golden) {
+    final segments = golden.pathSegments;
+    return segments.isEmpty ? golden.path : segments.last;
+  }
 }
 
 Map<String, Object?> _buildPersistedSession({

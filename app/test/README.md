@@ -116,9 +116,8 @@ flutter test
 ### Prova visual do life counter clone
 
 ```bash
-flutter test test/features/home/life_counter_clone_proof_test.dart --update-goldens
+flutter test test/features/home/life_counter_clone_proof_test.dart --no-version-check
 powershell -ExecutionPolicy Bypass -File tool/generate_life_counter_clone_proof.ps1
-flutter test test/features/home/life_counter_clone_proof_test.dart
 ```
 
 Essa suite gera a prova side-by-side do clone:
@@ -132,6 +131,18 @@ Leitura de aceite:
 - a mesa, o hub e os overlays precisam bater visualmente na leitura imediata
 - banners promocionais do app de referencia nao entram como criterio de aceite
 - qualquer regressao visual relevante passa a aparecer no diff do golden
+
+Nota operacional de 2026-04-29:
+
+- `life_counter_clone_proof_test.dart` e suite legada de paridade historica; o caminho vivo segue em `LotusLifeCounterScreen`.
+- A suite usa tolerancia por arquivo apenas para ruido pequeno de rasterizacao/fonte observado na auditoria ampla:
+  - normal 4p: ate `0.06%`
+  - hub aberto: ate `0.10%`
+  - settings: ate `0.20%`
+  - set life: ate `0.08%`
+  - high roll: ate `0.35%`
+- Diffs acima desses limites continuam falhando e gerando artefatos em `test/features/home/failures`.
+- Use `--update-goldens` somente depois de revisar visualmente os PNGs afetados e confirmar mudanca legitima de baseline.
 
 ## Life counter vivo
 

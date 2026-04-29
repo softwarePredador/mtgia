@@ -34,6 +34,7 @@ app/doc/current_screen_proofs_*/
 app/doc/live_menu_proofs_*/
 app/doc/menu_audit_iteration_*/
 app/doc/menu_icon_iteration_*/
+app/test/features/home/failures/
 
 # Local server test artifacts
 server/test/artifacts/*.pid
