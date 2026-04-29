@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET /binder  → Lista itens do binder do usuário autenticado
 /// POST /binder → Adiciona carta ao binder
@@ -54,16 +56,15 @@ Future<Response> _listBinder(RequestContext context) async {
     final where = whereClauses.join(' AND ');
 
     // Count total
-    final countResult = await pool.execute(Sql.named('''
+    final countFuture = pool.execute(Sql.named('''
       SELECT COUNT(*) as cnt
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
       WHERE $where
     '''), parameters: sqlParams);
-    final total = countResult.first[0] as int? ?? 0;
 
     // Fetch items
-    final result = await pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(Sql.named('''
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency,
              bi.notes, bi.language, bi.list_type, bi.created_at, bi.updated_at,
@@ -76,6 +77,11 @@ Future<Response> _listBinder(RequestContext context) async {
       ORDER BY c.name ASC, bi.condition ASC
       LIMIT @limit OFFSET @offset
     '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
+
+    final queryResults = await Future.wait([countFuture, itemsFuture]);
+    final countResult = queryResults[0];
+    final result = queryResults[1];
+    final total = countResult.first[0] as int? ?? 0;
 
     final items = result.map((row) {
       final cols = row.toColumnMap();
@@ -111,8 +117,15 @@ Future<Response> _listBinder(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao listar binder: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'binder_route',
+      extras: {'operation': 'list_binder'},
+    );
+    Log.e('[ERROR] list binder failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao listar binder'},
@@ -232,8 +245,15 @@ Future<Response> _addToBinder(RequestContext context) async {
         'message': 'Carta adicionada ao fichário',
       },
     );
-  } catch (e) {
-    print('[ERROR] Erro ao adicionar ao binder: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'binder_route',
+      extras: {'operation': 'add_binder_item'},
+    );
+    Log.e('[ERROR] add binder item failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao adicionar ao binder'},

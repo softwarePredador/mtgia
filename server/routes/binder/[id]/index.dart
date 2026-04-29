@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// PUT /binder/:id  → Atualiza item do binder
 /// DELETE /binder/:id → Remove item do binder
@@ -45,8 +47,15 @@ Future<Response> _getStats(RequestContext context) async {
       'for_sale_count': row['for_sale_count'] ?? 0,
       'estimated_value': double.tryParse(row['estimated_value'].toString()) ?? 0.0,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao calcular estatísticas: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'binder_item_route',
+      extras: {'operation': 'get_binder_stats'},
+    );
+    Log.e('[ERROR] get binder stats failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao calcular estatísticas'},
@@ -153,8 +162,15 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
     '''), parameters: params);
 
     return Response.json(body: {'message': 'Item atualizado', 'id': id});
-  } catch (e) {
-    print('[ERROR] Erro ao atualizar item: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'binder_item_route',
+      extras: {'operation': 'update_binder_item', 'binder_item_id': id},
+    );
+    Log.e('[ERROR] update binder item failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao atualizar item'},
@@ -182,8 +198,15 @@ Future<Response> _deleteBinderItem(RequestContext context, String id) async {
     }
 
     return Response(statusCode: HttpStatus.noContent);
-  } catch (e) {
-    print('[ERROR] Erro ao remover item: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'binder_item_route',
+      extras: {'operation': 'delete_binder_item', 'binder_item_id': id},
+    );
+    Log.e('[ERROR] delete binder item failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao remover item'},

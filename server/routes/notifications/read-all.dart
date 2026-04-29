@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// PUT /notifications/read-all → Marcar todas as notificações como lidas
 Future<Response> onRequest(RequestContext context) async {
@@ -24,8 +26,15 @@ Future<Response> onRequest(RequestContext context) async {
     return Response.json(body: {
       'marked_read': result.affectedRows,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao marcar todas como lidas: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'notifications_read_all_route',
+      extras: {'operation': 'mark_all_notifications_read'},
+    );
+    Log.e('[ERROR] mark all notifications read failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao marcar todas como lidas'},

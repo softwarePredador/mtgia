@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET /notifications/count → Contagem de não lidas
 Future<Response> onRequest(RequestContext context) async {
@@ -22,8 +24,15 @@ Future<Response> onRequest(RequestContext context) async {
     final unread = (result.first[0] as int?) ?? 0;
 
     return Response.json(body: {'unread': unread});
-  } catch (e) {
-    print('[ERROR] Erro ao contar notificações: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'notifications_count_route',
+      extras: {'operation': 'count_unread_notifications'},
+    );
+    Log.e('[ERROR] count unread notifications failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao contar notificações'},

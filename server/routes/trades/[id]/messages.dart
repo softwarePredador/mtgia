@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// GET /trades/:id/messages → Listar mensagens do trade
 /// POST /trades/:id/messages → Enviar mensagem no trade
@@ -82,8 +84,15 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       'limit': safeLimit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao buscar mensagens: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trade_messages_route',
+      extras: {'operation': 'list_trade_messages', 'trade_id': id},
+    );
+    Log.e('[ERROR] list trade messages failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao buscar mensagens'},
@@ -197,8 +206,15 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         'created_at': row['created_at']?.toString(),
       },
     );
-  } catch (e) {
-    print('[ERROR] Erro ao enviar mensagem: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trade_messages_route',
+      extras: {'operation': 'post_trade_message', 'trade_id': id},
+    );
+    Log.e('[ERROR] post trade message failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao enviar mensagem'},

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// PUT /trades/:id/status → Atualizar status de entrega
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -196,8 +198,15 @@ Future<Response> onRequest(RequestContext context, String id) async {
       'status': newStatus,
       'message': 'Status atualizado para $newStatus',
     });
-  } catch (e) {
-    print('[ERROR] Erro ao atualizar status trade $id: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trade_status_route',
+      extras: {'operation': 'update_trade_status', 'trade_id': id},
+    );
+    Log.e('[ERROR] update trade status failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro interno ao atualizar status'},

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// PUT /notifications/:id/read → Marcar uma notificação como lida
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -29,8 +31,15 @@ Future<Response> onRequest(RequestContext context, String id) async {
     }
 
     return Response.json(body: {'ok': true});
-  } catch (e) {
-    print('[ERROR] Erro ao marcar como lida: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'notification_read_route',
+      extras: {'operation': 'mark_notification_read', 'notification_id': id},
+    );
+    Log.e('[ERROR] mark notification read failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao marcar como lida'},

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// GET /community/marketplace → Busca global de cartas para troca/venda
 Future<Response> onRequest(RequestContext context) async {
@@ -35,7 +37,8 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final validConditions = {'NM', 'LP', 'MP', 'HP', 'DMG'};
-    if (condition != null && validConditions.contains(condition.toUpperCase())) {
+    if (condition != null &&
+        validConditions.contains(condition.toUpperCase())) {
       whereClauses.add('bi.condition = @condition');
       sqlParams['condition'] = condition.toUpperCase();
     }
@@ -57,21 +60,35 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final where = whereClauses.join(' AND ');
+    final needsCardJoinForCount = search != null && search.isNotEmpty ||
+        setCode != null && setCode.isNotEmpty ||
+        rarity != null && rarity.isNotEmpty;
 
-    // Count total
-    final countResult = await pool.execute(Sql.named('''
-      SELECT COUNT(*) as cnt
-      FROM user_binder_items bi
-      JOIN cards c ON c.id = bi.card_id
-      WHERE $where
-    '''), parameters: sqlParams);
-    final total = countResult.first[0] as int? ?? 0;
+    // Count total. Avoid the cards join on the unfiltered marketplace path;
+    // card filters still use the join because their predicates live on cards.
+    final countFuture = pool.execute(
+      Sql.named(
+        needsCardJoinForCount
+            ? '''
+              SELECT COUNT(*) as cnt
+              FROM user_binder_items bi
+              JOIN cards c ON c.id = bi.card_id
+              WHERE $where
+            '''
+            : '''
+              SELECT COUNT(*) as cnt
+              FROM user_binder_items bi
+              WHERE $where
+            ''',
+      ),
+      parameters: sqlParams,
+    );
 
     // Items com dados do dono e da carta
-    final result = await pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(Sql.named('''
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
              bi.for_trade, bi.for_sale, bi.price, bi.currency, bi.notes,
-             bi.user_id, bi.list_type,
+             bi.user_id, bi.language, bi.list_type,
              c.name AS card_name, c.image_url AS card_image_url,
              c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
              c.rarity AS card_rarity, c.type_line AS card_type_line,
@@ -87,6 +104,11 @@ Future<Response> onRequest(RequestContext context) async {
       ORDER BY bi.created_at DESC
       LIMIT @limit OFFSET @offset
     '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
+
+    final queryResults = await Future.wait([countFuture, itemsFuture]);
+    final countResult = queryResults[0];
+    final result = queryResults[1];
+    final total = countResult.first[0] as int? ?? 0;
 
     final items = result.map((row) {
       final cols = row.toColumnMap();
@@ -111,6 +133,7 @@ Future<Response> onRequest(RequestContext context) async {
             : null,
         'currency': cols['currency'],
         'notes': cols['notes'],
+        'language': cols['language'],
         'list_type': cols['list_type'] ?? 'have',
         'owner': {
           'id': cols['user_id'],
@@ -130,8 +153,15 @@ Future<Response> onRequest(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao buscar marketplace: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_marketplace_route',
+      extras: {'operation': 'list_marketplace'},
+    );
+    Log.e('[ERROR] marketplace list failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao buscar marketplace'},

@@ -138,14 +138,66 @@ CREATE INDEX IF NOT EXISTS idx_price_history_date_card_price
   INCLUDE (price_usd);
 
 -- ========================================
--- 9. Verificar Índices Criados
+-- 9. Índices para Binder / Marketplace / Trades / Mensagens
+-- ========================================
+
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_updated
+  ON trade_offers(sender_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_updated
+  ON trade_offers(receiver_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_status_updated
+  ON trade_offers(sender_id, status, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_status_updated
+  ON trade_offers(receiver_id, status, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_trade_items_offer_direction
+  ON trade_items(trade_offer_id, direction);
+
+CREATE INDEX IF NOT EXISTS idx_trade_messages_offer_created
+  ON trade_messages(trade_offer_id, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_trade_history_offer_created
+  ON trade_status_history(trade_offer_id, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_binder_marketplace_available_created
+  ON user_binder_items(created_at DESC)
+  WHERE for_trade = TRUE OR for_sale = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_binder_user_list_name_filters
+  ON user_binder_items(user_id, list_type, condition, for_trade, for_sale);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_created
+  ON notifications(user_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_created
+  ON notifications(user_id, created_at DESC)
+  WHERE read_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation_created
+  ON direct_messages(conversation_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_direct_messages_unread_by_conversation
+  ON direct_messages(conversation_id, sender_id)
+  WHERE read_at IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_conversations_user_a_last
+  ON conversations(user_a_id, last_message_at DESC, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_user_b_last
+  ON conversations(user_b_id, last_message_at DESC, created_at DESC);
+
+-- ========================================
+-- 10. Verificar Índices Criados
 -- ========================================
 
 -- Para verificar se os índices foram criados corretamente:
 -- SELECT schemaname, tablename, indexname FROM pg_indexes WHERE schemaname = 'public' ORDER BY tablename, indexname;
 
 -- ========================================
--- 10. Estatísticas e Manutenção
+-- 11. Estatísticas e Manutenção
 -- ========================================
 
 -- Atualizar estatísticas do PostgreSQL para melhor performance
@@ -157,6 +209,14 @@ ANALYZE users;
 ANALYZE meta_decks;
 ANALYZE battle_simulations;
 ANALYZE price_history;
+ANALYZE trade_offers;
+ANALYZE trade_items;
+ANALYZE trade_messages;
+ANALYZE trade_status_history;
+ANALYZE user_binder_items;
+ANALYZE notifications;
+ANALYZE conversations;
+ANALYZE direct_messages;
 
 -- ========================================
 -- FIM DOS ÍNDICES

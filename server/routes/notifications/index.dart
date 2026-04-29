@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET /notifications → Listar notificações do usuário
 Future<Response> onRequest(RequestContext context) async {
@@ -22,14 +24,13 @@ Future<Response> onRequest(RequestContext context) async {
         : 'user_id = @userId';
 
     // Count
-    final countResult = await pool.execute(
+    final countFuture = pool.execute(
       Sql.named('SELECT COUNT(*)::int FROM notifications WHERE $whereClause'),
       parameters: {'userId': userId},
     );
-    final total = (countResult.first[0] as int?) ?? 0;
 
     // List
-    final result = await pool.execute(
+    final notificationsFuture = pool.execute(
       Sql.named('''
         SELECT id, type, reference_id, title, body, read_at, created_at
         FROM notifications
@@ -39,6 +40,11 @@ Future<Response> onRequest(RequestContext context) async {
       '''),
       parameters: {'userId': userId, 'lim': limit, 'off': offset},
     );
+
+    final queryResults = await Future.wait([countFuture, notificationsFuture]);
+    final countResult = queryResults[0];
+    final result = queryResults[1];
+    final total = (countResult.first[0] as int?) ?? 0;
 
     final notifications = result.map((row) {
       final m = row.toColumnMap();
@@ -62,8 +68,15 @@ Future<Response> onRequest(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao listar notificações: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'notifications_route',
+      extras: {'operation': 'list_notifications'},
+    );
+    Log.e('[ERROR] list notifications failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao listar notificações'},

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// GET  /conversations/:id/messages → Listar mensagens
 /// POST /conversations/:id/messages → Enviar mensagem
@@ -68,14 +70,13 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       total = msgResult.length;
     } else {
       // Count completo para paginação tradicional.
-      final countResult = await pool.execute(
+      final countFuture = pool.execute(
         Sql.named('SELECT COUNT(*)::int FROM direct_messages WHERE conversation_id = @id'),
         parameters: {'id': id},
       );
-      total = (countResult.first[0] as int?) ?? 0;
 
       // Messages (modo tradicional)
-      msgResult = await pool.execute(
+      final msgFuture = pool.execute(
         Sql.named('''
           SELECT dm.id, dm.sender_id, dm.message, dm.read_at, dm.created_at,
                  u.username AS sender_username, u.display_name AS sender_display_name,
@@ -88,6 +89,9 @@ Future<Response> _getMessages(RequestContext context, String id) async {
         '''),
         parameters: {'id': id, 'lim': limit, 'off': offset},
       );
+      final queryResults = await Future.wait([countFuture, msgFuture]);
+      total = (queryResults[0].first[0] as int?) ?? 0;
+      msgResult = queryResults[1];
     }
 
     final messages = msgResult.map((row) {
@@ -113,8 +117,15 @@ Future<Response> _getMessages(RequestContext context, String id) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao buscar mensagens: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'conversation_messages_route',
+      extras: {'operation': 'list_conversation_messages', 'conversation_id': id},
+    );
+    Log.e('[ERROR] list conversation messages failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao buscar mensagens'},
@@ -212,8 +223,15 @@ Future<Response> _postMessage(RequestContext context, String id) async {
         'created_at': createdAt is DateTime ? createdAt.toIso8601String() : createdAt?.toString(),
       },
     );
-  } catch (e) {
-    print('[ERROR] Erro ao enviar mensagem: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'conversation_messages_route',
+      extras: {'operation': 'post_conversation_message', 'conversation_id': id},
+    );
+    Log.e('[ERROR] post conversation message failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao enviar mensagem'},

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// GET  /trades/:id           → Detalhe do trade
 /// PUT  /trades/:id           → (não usado diretamente, sub-rotas respond/status)
@@ -52,7 +54,7 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
     }
 
     // Buscar items com dados da carta
-    final itemsResult = await pool.execute(Sql.named('''
+    final itemsFuture = pool.execute(Sql.named('''
       SELECT
         ti.id, ti.direction, ti.quantity, ti.agreed_price,
         ti.owner_id, ti.binder_item_id,
@@ -66,6 +68,38 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       WHERE ti.trade_offer_id = @tradeId
       ORDER BY ti.direction, c.name
     '''), parameters: {'tradeId': id});
+
+    // Buscar mensagens (últimas 50)
+    final msgsFuture = pool.execute(Sql.named('''
+      SELECT
+        tm.id, tm.sender_id, tm.message, tm.attachment_url, tm.attachment_type, tm.created_at,
+        u.username as sender_username
+      FROM trade_messages tm
+      JOIN users u ON u.id = tm.sender_id
+      WHERE tm.trade_offer_id = @tradeId
+      ORDER BY tm.created_at ASC
+      LIMIT 50
+    '''), parameters: {'tradeId': id});
+
+    // Buscar histórico de status
+    final historyFuture = pool.execute(Sql.named('''
+      SELECT
+        tsh.id, tsh.old_status, tsh.new_status, tsh.notes, tsh.created_at,
+        u.username as changed_by_username
+      FROM trade_status_history tsh
+      JOIN users u ON u.id = tsh.changed_by
+      WHERE tsh.trade_offer_id = @tradeId
+      ORDER BY tsh.created_at ASC
+    '''), parameters: {'tradeId': id});
+
+    final detailResults = await Future.wait([
+      itemsFuture,
+      msgsFuture,
+      historyFuture,
+    ]);
+    final itemsResult = detailResults[0];
+    final msgsResult = detailResults[1];
+    final historyResult = detailResults[2];
 
     final myItems = <Map<String, dynamic>>[];
     final theirItems = <Map<String, dynamic>>[];
@@ -100,18 +134,6 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       }
     }
 
-    // Buscar mensagens (últimas 50)
-    final msgsResult = await pool.execute(Sql.named('''
-      SELECT
-        tm.id, tm.sender_id, tm.message, tm.attachment_url, tm.attachment_type, tm.created_at,
-        u.username as sender_username
-      FROM trade_messages tm
-      JOIN users u ON u.id = tm.sender_id
-      WHERE tm.trade_offer_id = @tradeId
-      ORDER BY tm.created_at ASC
-      LIMIT 50
-    '''), parameters: {'tradeId': id});
-
     final messages = msgsResult.map((row) {
       final m = row.toColumnMap();
       if (m['created_at'] is DateTime) {
@@ -127,17 +149,6 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         'created_at': m['created_at'],
       };
     }).toList();
-
-    // Buscar histórico de status
-    final historyResult = await pool.execute(Sql.named('''
-      SELECT
-        tsh.id, tsh.old_status, tsh.new_status, tsh.notes, tsh.created_at,
-        u.username as changed_by_username
-      FROM trade_status_history tsh
-      JOIN users u ON u.id = tsh.changed_by
-      WHERE tsh.trade_offer_id = @tradeId
-      ORDER BY tsh.created_at ASC
-    '''), parameters: {'tradeId': id});
 
     final history = historyResult.map((row) {
       final m = row.toColumnMap();
@@ -191,8 +202,15 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
       'created_at': trade['created_at'],
       'updated_at': trade['updated_at'],
     });
-  } catch (e) {
-    print('[ERROR] Erro ao buscar trade: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trade_detail_route',
+      extras: {'operation': 'get_trade_detail', 'trade_id': id},
+    );
+    Log.e('[ERROR] get trade detail failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao buscar trade'},

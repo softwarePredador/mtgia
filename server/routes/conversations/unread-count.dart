@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET /conversations/unread-count
 /// Retorna a contagem global de mensagens não lidas do usuário autenticado.
@@ -27,8 +29,15 @@ Future<Response> onRequest(RequestContext context) async {
 
     final unread = (result.first[0] as int?) ?? 0;
     return Response.json(body: {'unread': unread});
-  } catch (e) {
-    print('[ERROR] Erro ao contar mensagens não lidas: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'conversation_unread_count_route',
+      extras: {'operation': 'count_unread_direct_messages'},
+    );
+    Log.e('[ERROR] count unread direct messages failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao contar mensagens não lidas'},

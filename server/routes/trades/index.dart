@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../lib/notification_service.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET  /trades  → Listar trades do usuário
 /// POST /trades  → Criar proposta de trade
@@ -251,8 +253,15 @@ Future<Response> _createTrade(RequestContext context) async {
     );
 
     return Response.json(statusCode: HttpStatus.created, body: tradeResult);
-  } catch (e) {
-    print('[ERROR] _createTrade: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trades_route',
+      extras: {'operation': 'create_trade'},
+    );
+    Log.e('[ERROR] create trade failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro interno ao criar trade'},
@@ -294,14 +303,13 @@ Future<Response> _listTrades(RequestContext context) async {
     final where = whereParts.join(' AND ');
 
     // Count
-    final countResult = await pool.execute(
+    final countFuture = pool.execute(
       Sql.named('SELECT COUNT(*)::int FROM trade_offers t WHERE $where'),
       parameters: filterParams,
     );
-    final total = (countResult.first[0] as int?) ?? 0;
 
     // Fetch
-    final result = await pool.execute(Sql.named('''
+    final tradesFuture = pool.execute(Sql.named('''
       SELECT
         t.id, t.status, t.type, t.message,
         t.payment_amount, t.payment_currency,
@@ -319,6 +327,11 @@ Future<Response> _listTrades(RequestContext context) async {
       ORDER BY t.updated_at DESC
       LIMIT @lim OFFSET @off
     '''), parameters: {...filterParams, 'lim': limit, 'off': offset});
+
+    final queryResults = await Future.wait([countFuture, tradesFuture]);
+    final countResult = queryResults[0];
+    final result = queryResults[1];
+    final total = (countResult.first[0] as int?) ?? 0;
 
     final trades = result.map((row) {
       final m = row.toColumnMap();
@@ -361,8 +374,15 @@ Future<Response> _listTrades(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] _listTrades: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trades_route',
+      extras: {'operation': 'list_trades'},
+    );
+    Log.e('[ERROR] list trades failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro interno ao listar trades'},

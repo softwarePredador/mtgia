@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/notification_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 /// PUT /trades/:id/respond → Aceitar ou recusar trade
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -99,8 +101,15 @@ Future<Response> onRequest(RequestContext context, String id) async {
       'status': newStatus,
       'message': action == 'accept' ? 'Trade aceito!' : 'Trade recusado.',
     });
-  } catch (e) {
-    print('[ERROR] Erro ao responder trade $id: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'trade_respond_route',
+      extras: {'operation': 'respond_trade', 'trade_id': id},
+    );
+    Log.e('[ERROR] respond trade failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro interno ao responder trade'},

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/logger.dart';
+import '../../lib/observability.dart';
 
 /// GET  /conversations  → Listar conversas do usuário
 /// POST /conversations  → Criar/obter conversa com outro usuário
@@ -23,17 +25,16 @@ Future<Response> _listConversations(RequestContext context) async {
     final offset = (page - 1) * limit;
 
     // Conta total
-    final countResult = await pool.execute(
+    final countFuture = pool.execute(
       Sql.named('''
         SELECT COUNT(*)::int FROM conversations
         WHERE user_a_id = @userId OR user_b_id = @userId
       '''),
       parameters: {'userId': userId},
     );
-    final total = (countResult.first[0] as int?) ?? 0;
 
     // Lista com preview da última mensagem + contagem de não lidas
-    final result = await pool.execute(
+    final conversationsFuture = pool.execute(
       Sql.named('''
         SELECT
           c.id,
@@ -67,6 +68,11 @@ Future<Response> _listConversations(RequestContext context) async {
       parameters: {'userId': userId, 'lim': limit, 'off': offset},
     );
 
+    final queryResults = await Future.wait([countFuture, conversationsFuture]);
+    final countResult = queryResults[0];
+    final result = queryResults[1];
+    final total = (countResult.first[0] as int?) ?? 0;
+
     final conversations = result.map((row) {
       final m = row.toColumnMap();
       for (final k in ['last_message_at', 'created_at']) {
@@ -94,8 +100,15 @@ Future<Response> _listConversations(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Erro ao listar conversas: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'conversations_route',
+      extras: {'operation': 'list_conversations'},
+    );
+    Log.e('[ERROR] list conversations failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao listar conversas'},
@@ -173,8 +186,15 @@ Future<Response> _createConversation(RequestContext context) async {
         'created_at': createdAt is DateTime ? createdAt.toIso8601String() : createdAt?.toString(),
       },
     );
-  } catch (e) {
-    print('[ERROR] Erro ao criar conversa: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'conversations_route',
+      extras: {'operation': 'create_conversation'},
+    );
+    Log.e('[ERROR] create conversation failed: $e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Erro ao criar conversa'},
