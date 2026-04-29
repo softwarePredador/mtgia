@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 
@@ -5,12 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_import_to_deck@example.com',

@@ -1,6 +1,60 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Separacao da suite server em unit/offline vs live-backend
+
+### O Porquê
+- A auditoria de 2026-04-29 provou que `cd server && dart test` misturava testes unitarios/offline com testes HTTP live que esperavam backend vivo.
+- O efeito era falso vermelho local/CI quando nao havia backend em `localhost:8080`, especialmente em suites como `ai_archetypes_flow_test.dart` e `decks_crud_test.dart`.
+- A correcao precisava preservar testes live, nao enfraquecer asserts e deixar um comando offline verde sem infraestrutura externa.
+
+### O Como
+- Criado `server/dart_test.yaml` com:
+  - `paths` padrao contendo somente os testes unit/offline;
+  - preset `live` contendo os testes HTTP reais;
+  - tags declaradas: `live`, `live_backend`, `live_db_write`, `live_external`.
+- Marcados como live os testes HTTP:
+  - `ai_archetypes_flow_test.dart`;
+  - `ai_generate_create_optimize_flow_test.dart`;
+  - `ai_optimize_flow_test.dart`;
+  - `ai_optimize_telemetry_contract_test.dart`;
+  - `auth_flow_integration_test.dart`;
+  - `commander_reference_atraxa_test.dart`;
+  - `core_flow_smoke_test.dart`;
+  - `deck_analysis_contract_test.dart`;
+  - `decks_crud_test.dart`;
+  - `decks_incremental_add_test.dart`;
+  - `error_contract_test.dart`;
+  - `import_to_deck_flow_test.dart`.
+- Os testes live agora usam `TEST_API_BASE_URL` com fallback local `http://127.0.0.1:8082`, removendo a dependencia operacional de `localhost:8080`.
+- `RUN_INTEGRATION_TESTS=1` deixou de ser requisito para rodar live; `RUN_INTEGRATION_TESTS=0` fica como opt-out explicito em invocacoes manuais.
+- Ajustes de confiabilidade live:
+  - `core_flow_smoke_test.dart` recebeu timeout de 2 minutos no fluxo que chama `/ai/optimize`;
+  - o smoke passou a aceitar `422` com `quality_error` como contrato valido de rejeicao de qualidade do optimize, alinhado com `ai_optimize_flow_test.dart`;
+  - `ai_generate_create_optimize_flow_test.dart` passou a usar timeout HTTP de 3 minutos para a chamada inicial de `/ai/optimize`.
+
+### Comandos oficiais
+```bash
+cd server
+dart test
+```
+
+```bash
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live
+```
+
+### Resultado
+- `dart analyze test bin lib routes`: sem issues.
+- `dart test`: passou com `554` testes offline/unitarios.
+- Backend temporario em `8082`: `/health` retornou `200`.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live`: passou com `162` testes live e `3` skips declarados.
+
+### Documentacao
+- `server/test/README.md` agora contem inventario completo por arquivo, categoria, escrita DB/API, dependencia externa e uso de `TEST_API_BASE_URL`.
+- `server/doc/APP_BACKEND_CONTRACT_AUDIT_2026-04-29.md` foi atualizado para refletir o novo estado green da suite offline e da suite live explicita.
+
 ## 2026-04-29 — Correcao P0/P1 de performance em `GET /market/movers`
 
 ### O Porquê

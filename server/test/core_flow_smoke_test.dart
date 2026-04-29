@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write', 'live_external'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 
@@ -5,12 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_core_flow_smoke@example.com',
@@ -136,11 +139,14 @@ void main() {
       }),
     );
 
-    expect(response.statusCode, anyOf(200, 500), reason: response.body);
+    expect(response.statusCode, anyOf(200, 422, 500), reason: response.body);
     final body = decodeJson(response);
 
     if (response.statusCode == 200) {
       expect(body['reasoning'], isA<String>(), reason: response.body);
+    } else if (response.statusCode == 422) {
+      expect(body['error'], isA<String>(), reason: response.body);
+      expect(body['quality_error'], isA<Map>(), reason: response.body);
     } else {
       expect(body['error'], isA<String>(), reason: response.body);
     }
@@ -193,6 +199,7 @@ void main() {
         await optimizeDeckContract(deckId);
       },
       skip: skipIntegration,
+      timeout: const Timeout(Duration(minutes: 2)),
     );
 
     test(

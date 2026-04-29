@@ -88,17 +88,20 @@ Atualizacao pos-correcao em 2026-04-29: o endpoint foi otimizado no backend sem 
 
 | Comando | Resultado | Classificacao |
 | --- | --- | --- |
-| `cd server && dart analyze lib routes bin test` | Passou, sem issues | Green |
-| `cd server && dart test` | Falhou por testes live sem backend em `localhost:8080` | Ambiente/test infra |
+| `cd server && dart analyze test bin lib routes` | Passou, sem issues | Green |
+| `cd server && dart test` | Passou com `554` testes offline/unitarios | Green |
+| `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live` | Passou com `162` testes live e `3` skips declarados | Green live-backend |
 | `curl http://127.0.0.1:8082/health` | Healthy | Green |
 | `POST /decks/not-a-uuid/cards*` sem token | `401` para `/cards`, `/cards/bulk`, `/cards/set`, `/cards/replace` | Middleware/roteamento existem |
 | `curl /market/movers?limit=5&min_price=1.0` | Auditoria original: sem resposta em >60s; pos-correcao: `200` em `1.918091s` frio e `0.005164s` quente | Corrigido |
 
-Falha de `dart test` ampla:
+Separacao de testes aplicada em 2026-04-29:
 
-- `test/ai_archetypes_flow_test.dart`: `Connection refused`, tentativa em `http://localhost:8080/auth/login`.
-- `test/decks_crud_test.dart`: o proprio setup imprime que o servidor precisa estar rodando em `http://localhost:8080`.
-- Leitura: a suite mistura testes unitarios e testes live. Para CI/auditoria, separar tags ou comandos por `unit`, `contract-live`, `db-live`.
+- `server/dart_test.yaml` define `paths` offline para `dart test`.
+- O preset `live` carrega os testes HTTP marcados com `@Tags(['live', ...])`.
+- Tags usadas: `live`, `live_backend`, `live_db_write`, `live_external`.
+- Testes live usam `TEST_API_BASE_URL` e fallback local `http://127.0.0.1:8082`, sem `localhost:8080` hardcoded para backend real.
+- `RUN_INTEGRATION_TESTS=1` deixou de ser requisito; `RUN_INTEGRATION_TESTS=0` permanece como opt-out explicito para invocacao manual.
 
 ## Contratos provados no iPhone 15
 
@@ -114,7 +117,7 @@ Falha de `dart test` ampla:
 | Severidade | Contrato | Evidencia | Impacto |
 | --- | --- | --- | --- |
 | P0/P1 | `GET /market/movers?limit=5&min_price=1.0` | Corrigido em 2026-04-29: `200` em `1.918091s` frio e `0.005164s` quente | Risco imediato removido; manter observabilidade de p95/p99 |
-| P1 | Test infra live em `localhost:8080` | `dart test` falha sem servidor live | CI/auditoria ampla fica vermelha por ambiente ausente |
+| P1 | Test infra live em `localhost:8080` | Corrigido em 2026-04-29 com `dart_test.yaml`, tags live e preset `live` | Risco removido; manter inventario em `server/test/README.md` atualizado |
 | P1 | Social/trades/messages full contracts | Rotas existem e error contract cobre parte, mas runtime end-to-end nao foi fresco | Risco funcional antes de release social/trades |
 | P2 | Observability live | Sentry/Firebase presentes, mas DSN/config real nao provados nesta auditoria | Falta visibilidade de producao/staging |
 
@@ -132,15 +135,13 @@ Hipoteses da auditoria original, confirmadas/refinadas na correcao:
 ### P0
 
 1. Manter dashboard/metricas de p95/p99 para `/market/movers` em producao.
-2. Separar testes server por tags/comandos:
-   - unit/offline;
-   - route/error contract local;
-   - live backend `TEST_API_BASE_URL`;
-   - DB write/apply.
+2. Manter dashboard de saude dos testes server separados:
+   - `dart test` unit/offline;
+   - `TEST_API_BASE_URL=... dart test -P live` para live backend/DB write.
 
 ### P1
 
-1. Parametrizar testes live para `TEST_API_BASE_URL`, evitando `localhost:8080` hardcoded.
+1. Manter a separacao `dart test` offline vs `dart test -P live` em novos testes server.
 2. Criar contract smoke app-provider endpoints vs `server/routes` para detectar rotas ausentes.
 3. Criar runtime backend fixtures para messages/trades/notifications com dois usuarios.
 
@@ -152,5 +153,5 @@ Hipoteses da auditoria original, confirmadas/refinadas na correcao:
 
 ## Menores proximas acoes
 
-1. Criar `dart test` padrao que rode sem backend externo e mover live tests para comando explicito.
+1. Adicionar fixtures live dedicadas para social/trading/messages sem depender de dados manuais.
 2. Adicionar uma prova iPhone 15 para cada dominio social/trading ainda `not proven`.

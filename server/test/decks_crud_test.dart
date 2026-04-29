@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:test/test.dart';
@@ -12,20 +15,17 @@ import 'package:http/http.dart' as http;
 /// - Testes de permissão (ownership)
 /// - Edge cases e cenários de erro
 ///
-/// NOTA: Estes são testes de integração que requerem o servidor rodando
-/// e um banco de dados configurado. Para executar:
-/// 1. Configure o .env com credenciais válidas
-/// 2. Execute: dart_frog dev
-/// 3. Em outro terminal: dart test test/decks_crud_test.dart
+/// NOTA: Estes sao testes live-backend que requerem servidor rodando
+/// e um banco de dados configurado. Veja `test/README.md`.
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   // URL base do servidor (ajustável via TEST_API_BASE_URL)
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   // Credenciais de teste - devem existir no banco ou serem criadas no setup
   const testUser = {

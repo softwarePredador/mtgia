@@ -13,75 +13,199 @@ Este diretorio concentra a malha principal de confiabilidade do produto, com foc
 
 Em `2026-03-23`, a auditoria do core confirmou que a cobertura relevante de otimizacao esta forte, mas distribuida em tres camadas diferentes. A leitura correta dos testes depende dessa separacao.
 
-## Modelo de validacao
+## Modelo de validacao - atualizado em 2026-04-29
 
-### 1. Suites deterministicas e de regra
+A suite agora esta separada por `dart_test.yaml`:
 
-Rodam em `dart test` puro, sem servidor externo.
+- `dart test` carrega somente testes unit/offline listados em `paths`.
+- `dart test -P live` carrega somente testes HTTP marcados com `@Tags(['live', ...])`.
+- testes live nao foram removidos, nao tiveram asserts enfraquecidos e nao dependem mais de `RUN_INTEGRATION_TESTS=1` para rodar quando chamados explicitamente.
 
-Essas suites provam a maior parte da logica critica do motor de otimizacao:
+Tags usadas:
 
-- `optimization_rules_test.dart` - 52 testes
-- `optimization_quality_gate_test.dart` - 8 testes
-- `optimization_final_validation_test.dart` - 25 testes
-- `optimization_goal_validation_test.dart` - 3 testes
-- `optimization_validator_test.dart` - 6 testes
-- `goldfish_simulator_test.dart` - 14 testes
-- `generated_deck_validation_service_test.dart` - 3 testes
-- `optimize_learning_pipeline_test.dart` - 12 testes
-- `optimize_payload_parser_test.dart` - 3 testes
-- `card_resolution_support_test.dart` - 5 testes
-- `commander_reference_atraxa_test.dart` - 1 teste
-- `ml_analyzer_test.dart` - 31 testes
+| Tag | Significado |
+| --- | --- |
+| `live` | Teste opt-in fora da suite offline padrao. |
+| `live_backend` | Exige backend HTTP vivo em `TEST_API_BASE_URL`. |
+| `live_db_write` | Escreve via API/banco de teste, normalmente criando usuarios/decks. |
+| `live_external` | Pode acionar IA/servico externo pelo backend, principalmente OpenAI. |
 
-Cobrem principalmente:
+## Comandos recomendados
 
-- tamanho final do deck por formato
-- limite de copias
-- identidade de cor
-- elegibilidade de commander
-- banlist e restricted list
-- classificacao funcional por papel
-- quality gates para swaps inseguros
-- validacao final da lista virtual apos swaps
-- consistencia e goldfish simulation
-- parser e aprendizado do pipeline
+### Unit/offline green
 
-### 2. Suites de integracao estilo simulacao
+```bash
+cd server
+dart test
+```
 
-Tambem rodam em `dart test` puro, mas nao fazem a jornada HTTP real.
+Esse comando nao exige backend HTTP, banco externo ativo via API, OpenAI ou Scryfall. Em 2026-04-29 passou com `554` testes.
 
-- `optimization_pipeline_integration_test.dart` - 23 testes
+### Live-backend explicito
 
-Importante:
+Pre-requisitos:
 
-- o nome "integration" aqui significa integracao interna do pipeline
-- ela valida composicao de helpers, parser, analise virtual e derivacao de outcome
-- ela nao substitui a validacao real de endpoint, auth, persistencia ou banco
+- backend vivo e saudavel;
+- banco configurado no ambiente do backend;
+- `TEST_API_BASE_URL` apontando para o backend alvo.
 
-### 3. Suites de contrato e integracao HTTP real
+```bash
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live
+```
 
-Essas suites sao opt-in por ambiente e ficam protegidas por `RUN_INTEGRATION_TESTS=1`.
+Comando equivalente usando selector por tag e arquivos explicitos:
 
-- `ai_optimize_flow_test.dart` - 11 testes
-- `ai_generate_create_optimize_flow_test.dart` - 2 testes
-- `ai_optimize_telemetry_contract_test.dart` - 4 testes
-- `deck_analysis_contract_test.dart` - 3 testes
-- `decks_crud_test.dart`
-- `core_flow_smoke_test.dart`
-- `error_contract_test.dart`
-- `import_to_deck_flow_test.dart`
+```bash
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -t live \
+  test/ai_archetypes_flow_test.dart \
+  test/ai_generate_create_optimize_flow_test.dart \
+  test/ai_optimize_flow_test.dart \
+  test/ai_optimize_telemetry_contract_test.dart \
+  test/auth_flow_integration_test.dart \
+  test/commander_reference_atraxa_test.dart \
+  test/core_flow_smoke_test.dart \
+  test/deck_analysis_contract_test.dart \
+  test/decks_crud_test.dart \
+  test/decks_incremental_add_test.dart \
+  test/error_contract_test.dart \
+  test/import_to_deck_flow_test.dart
+```
 
-Essas suites devem ser lidas como:
+Em 2026-04-29, contra `http://127.0.0.1:8082`, passou com `162` testes e `3` skips declarados.
 
-- passam de verdade quando servidor, auth e banco estao disponiveis
-- fazem skip controlado quando o ambiente nao foi armado
-- suites que dependem de geracao por IA tambem podem ser puladas quando a credencial OpenAI do ambiente estiver invalida
-- nao devem derrubar a suite local por ausencia de infraestrutura
+### Variaveis de ambiente relevantes
 
-Observacao operacional nova:
+| Variavel | Uso |
+| --- | --- |
+| `TEST_API_BASE_URL` | Base HTTP usada pelos testes live. Fallback local: `http://127.0.0.1:8082`. |
+| `RUN_INTEGRATION_TESTS` | Legado. Nao e mais necessario para rodar live; `RUN_INTEGRATION_TESTS=0` desativa testes live quando um arquivo for invocado manualmente. |
+| `OPENAI_API_KEY` | Usada pelo backend para rotas de IA. Em dev/staging, algumas rotas degradam para fallback; `ai_generate_create_optimize_flow_test.dart` marca skip explicito se a unica falha for credencial OpenAI invalida. |
+| `DATABASE_URL` | Usada pelo backend live, nao pelo runner offline. Necessaria para testes live que criam usuarios/decks. |
+| `JWT_SECRET` | Usada pelo backend live para auth/JWT. |
+| `TEST_USER_EMAIL`, `TEST_USER_PASSWORD`, `TEST_USER_USERNAME` | Overrides opcionais em alguns testes live de IA. |
+| `SOURCE_DECK_ID` | Override opcional para regressao live de optimize em `ai_optimize_flow_test.dart`. |
+| `SENTRY_AUTH_TOKEN` | Nao e requerido por esta suite; relevante apenas para tooling de release/upload Sentry fora destes testes. |
 
-- rotas com fallback seguro de IA (`generate`, `archetypes`, `explain`) agora degradam em `dev/staging` quando a chave existe mas esta invalida, preservando a validacao local do fluxo
+## Inventario 2026-04-29
+
+| Teste | Categoria | Backend HTTP | Escrita DB/API | Rede externa | `TEST_API_BASE_URL`/localhost |
+| --- | --- | --- | --- | --- | --- |
+| `ai_archetypes_flow_test.dart` | live-backend | Sim | Sim | Nao direto | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `ai_generate_create_optimize_flow_test.dart` | live-backend/live-external | Sim | Sim | OpenAI via backend/fallback | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `ai_optimize_flow_test.dart` | live-backend/live-external | Sim | Sim | OpenAI via backend/fallback | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `ai_optimize_telemetry_contract_test.dart` | live-backend | Sim | Sim | Nao direto | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `auth_flow_integration_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `commander_reference_atraxa_test.dart` | live-backend | Sim | Sim | Nao direto; depende de dados/cache do backend | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `core_flow_smoke_test.dart` | live-backend/live-external | Sim | Sim | OpenAI via `/ai/optimize`/fallback | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `deck_analysis_contract_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `decks_crud_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `decks_incremental_add_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `error_contract_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `import_to_deck_flow_test.dart` | live-backend | Sim | Sim | Nao | Usa `TEST_API_BASE_URL`, fallback `127.0.0.1:8082` |
+| `auth_service_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `card_resolution_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `cards_route_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `color_identity_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `commander_only_runtime_validation_config_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `deck_validation_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `external_commander_deck_expansion_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `external_commander_meta_candidate_support_test.dart` | unit/offline local-file | Nao | Nao | Nao | Nao |
+| `external_commander_meta_import_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `external_commander_meta_operational_runner_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `external_commander_meta_promotion_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `external_commander_meta_staging_support_test.dart` | unit/offline local-file | Nao | Nao | Nao | Nao |
+| `generated_deck_validation_service_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `goldfish_simulator_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `health_readiness_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `import_list_service_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `import_parser_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `market_movers_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `meta_deck_analytics_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `meta_deck_card_list_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `meta_deck_commander_shell_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `meta_deck_format_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `meta_deck_reference_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `ml_analyzer_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `mtg_data_integrity_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `mtg_rules_validation_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `mtgtop8_meta_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `observability_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `openai_runtime_config_test.dart` | unit/offline config | Nao | Nao | Nao | Nao |
+| `optimization_final_validation_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimization_goal_validation_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimization_pipeline_integration_test.dart` | integracao interna/offline | Nao | Nao | Nao | Nao |
+| `optimization_quality_gate_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimization_rules_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimization_validator_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimize_complete_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimize_learning_pipeline_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimize_payload_parser_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `optimize_runtime_support_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `rate_limit_middleware_test.dart` | unit/offline | Nao | Nao | Nao | Contem `localhost:8080` apenas como valor de header `Host` |
+| `request_trace_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `sets_route_test.dart` | unit/offline | Nao | Nao | Nao | Nao |
+| `sync_cards_test.dart` | unit/offline | Nao | Nao | Nao | Apenas valida utilitarios/URLs Scryfall-like, sem chamada externa |
+
+## Suites mais importantes para release do core
+
+Se precisarmos de uma leitura rapida da saude da otimizacao, estas sao as baterias mais importantes:
+
+1. `optimization_rules_test.dart`
+2. `optimization_quality_gate_test.dart`
+3. `optimization_final_validation_test.dart`
+4. `optimization_validator_test.dart`
+5. `optimization_goal_validation_test.dart`
+6. `goldfish_simulator_test.dart`
+7. `optimization_pipeline_integration_test.dart`
+8. `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live`
+
+### Gate recorrente do corpus de resolucao
+
+Para validar o corpus estavel Commander fim a fim:
+
+```bash
+./scripts/quality_gate_resolution_corpus.sh
+```
+
+Ou:
+
+```bash
+./scripts/quality_gate.sh resolution
+```
+
+Esse gate:
+
+- sobe a API local se necessario
+- usa `test/fixtures/optimization_resolution_corpus.json` por padrao
+- calcula `VALIDATION_LIMIT` automaticamente pelo tamanho do corpus
+- executa `bin/run_three_commander_resolution_validation.dart`
+- falha se houver `failed`, `unresolved` ou `total` inconsistente
+
+### Runner operacional local da otimizacao
+
+Para Windows/local, o projeto agora tem bootstrap dedicado para evitar problema de `dart_frog dev` em modo nao interativo:
+
+- `bin/local_test_server.dart`
+- `start_local_test_server.ps1`
+- `stop_local_test_server.ps1`
+- `run_optimize_validation.ps1`
+
+Fluxo recomendado:
+
+```powershell
+.\run_optimize_validation.ps1
+```
+
+Esse runner:
+
+- sobe o backend local em IPv4
+- valida readiness em `127.0.0.1:8080/health/live`
+- roda a bateria deterministica principal
+- roda `ai_optimize_flow_test.dart`
+- roda `ai_generate_create_optimize_flow_test.dart`
+- encerra o servidor ao final
 
 ## Resultado da auditoria de 2026-03-23
 

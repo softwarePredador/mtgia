@@ -1,0 +1,67 @@
+paths:
+  - test/auth_service_test.dart
+  - test/card_resolution_support_test.dart
+  - test/cards_route_test.dart
+  - test/color_identity_test.dart
+  - test/commander_only_runtime_validation_config_test.dart
+  - test/deck_validation_test.dart
+  - test/external_commander_deck_expansion_support_test.dart
+  - test/external_commander_meta_candidate_support_test.dart
+  - test/external_commander_meta_import_support_test.dart
+  - test/external_commander_meta_operational_runner_support_test.dart
+  - test/external_commander_meta_promotion_support_test.dart
+  - test/external_commander_meta_staging_support_test.dart
+  - test/generated_deck_validation_service_test.dart
+  - test/goldfish_simulator_test.dart
+  - test/health_readiness_support_test.dart
+  - test/import_list_service_test.dart
+  - test/import_parser_test.dart
+  - test/market_movers_test.dart
+  - test/meta_deck_analytics_support_test.dart
+  - test/meta_deck_card_list_support_test.dart
+  - test/meta_deck_commander_shell_support_test.dart
+  - test/meta_deck_format_support_test.dart
+  - test/meta_deck_reference_support_test.dart
+  - test/ml_analyzer_test.dart
+  - test/mtg_data_integrity_support_test.dart
+  - test/mtg_rules_validation_test.dart
+  - test/mtgtop8_meta_support_test.dart
+  - test/observability_test.dart
+  - test/openai_runtime_config_test.dart
+  - test/optimization_final_validation_test.dart
+  - test/optimization_goal_validation_test.dart
+  - test/optimization_pipeline_integration_test.dart
+  - test/optimization_quality_gate_test.dart
+  - test/optimization_rules_test.dart
+  - test/optimization_validator_test.dart
+  - test/optimize_complete_support_test.dart
+  - test/optimize_learning_pipeline_test.dart
+  - test/optimize_payload_parser_test.dart
+  - test/optimize_runtime_support_test.dart
+  - test/rate_limit_middleware_test.dart
+  - test/request_trace_test.dart
+  - test/sets_route_test.dart
+  - test/sync_cards_test.dart
+
+presets:
+  live:
+    paths:
+      - test/ai_archetypes_flow_test.dart
+      - test/ai_generate_create_optimize_flow_test.dart
+      - test/ai_optimize_flow_test.dart
+      - test/ai_optimize_telemetry_contract_test.dart
+      - test/auth_flow_integration_test.dart
+      - test/commander_reference_atraxa_test.dart
+      - test/core_flow_smoke_test.dart
+      - test/deck_analysis_contract_test.dart
+      - test/decks_crud_test.dart
+      - test/decks_incremental_add_test.dart
+      - test/error_contract_test.dart
+      - test/import_to_deck_flow_test.dart
+    include_tags: live
+
+tags:
+  live:
+  live_backend:
+  live_db_write:
+  live_external:

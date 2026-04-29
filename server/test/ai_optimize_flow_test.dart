@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write', 'live_external'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform, Directory, File;
 
@@ -5,12 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   final testUserEmail = Platform.environment['TEST_USER_EMAIL'] ??
       'test_optimize_flow@example.com';
@@ -759,12 +762,15 @@ void main() {
         );
         final keepSummary =
             (body['keep_summary'] as Map?)?.cast<String, dynamic>() ?? {};
-        expect((keepSummary['replaced_slots'] as num?)?.toInt(), greaterThan(90),
+        expect(
+            (keepSummary['replaced_slots'] as num?)?.toInt(), greaterThan(90),
             reason: response.body);
 
         final landCards = rebuiltCards
             .where((card) =>
-                (card['type_line'] as String?)?.toLowerCase().contains('land') ??
+                (card['type_line'] as String?)
+                    ?.toLowerCase()
+                    .contains('land') ??
                 false)
             .toList();
         final utilityColorlessLands = landCards.where((card) {

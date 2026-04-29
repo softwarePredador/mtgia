@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 
@@ -8,14 +11,14 @@ import 'package:test/test.dart';
 /// - POST /decks/:id/cards
 /// - POST /decks/:id/validate (modo estrito)
 ///
-/// Requer servidor rodando em http://localhost:8080.
+/// Requer servidor live-backend. Veja `test/README.md`.
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_deck_incremental@example.com',
@@ -178,9 +181,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 200));
   });
 
-  test(
-    'POST /decks/:id/cards should add commander and block outside identity',
-    () async {
+  test('POST /decks/:id/cards should add commander and block outside identity',
+      () async {
     final token = await getAuthToken();
     final deckId = await createDeck(token, format: 'commander');
 
@@ -228,8 +230,8 @@ void main() {
   }, skip: skipIntegration);
 
   test(
-    'POST /decks/:id/validate should fail when deck is not complete (Commander=100)',
-    () async {
+      'POST /decks/:id/validate should fail when deck is not complete (Commander=100)',
+      () async {
     final token = await getAuthToken();
     final deckId = await createDeck(token, format: 'commander');
 

@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write', 'live_external'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 
@@ -11,12 +14,12 @@ class AiGenerationInfraSkip implements Exception {
 }
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_ai_generate_flow@example.com',
@@ -302,10 +305,14 @@ void main() {
     required String deckId,
     required String archetype,
   }) async {
-    final response = await postJson('/ai/optimize', {
-      'deck_id': deckId,
-      'archetype': archetype,
-    });
+    final response = await postJson(
+      '/ai/optimize',
+      {
+        'deck_id': deckId,
+        'archetype': archetype,
+      },
+      timeout: const Duration(minutes: 3),
+    );
 
     if (response.statusCode == 202) {
       final body = decodeJson(response);

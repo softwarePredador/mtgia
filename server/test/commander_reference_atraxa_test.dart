@@ -1,3 +1,6 @@
+@Tags(['live', 'live_backend', 'live_db_write'])
+library;
+
 import 'dart:convert';
 import 'dart:io' show Platform;
 
@@ -5,12 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '1'
-      ? null
-      : 'Requer servidor rodando (defina RUN_INTEGRATION_TESTS=1).';
+  final skipIntegration = Platform.environment['RUN_INTEGRATION_TESTS'] == '0'
+      ? 'Teste live desativado por RUN_INTEGRATION_TESTS=0.'
+      : null;
 
   final baseUrl =
-      Platform.environment['TEST_API_BASE_URL'] ?? 'http://localhost:8080';
+      Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
   const testUser = {
     'email': 'test_error_contract@example.com',
@@ -44,7 +47,8 @@ void main() {
         body: jsonEncode(testUser),
       );
       if (register.statusCode != 200 && register.statusCode != 201) {
-        throw Exception('Falha ao registrar usuário de teste: ${register.body}');
+        throw Exception(
+            'Falha ao registrar usuário de teste: ${register.body}');
       }
 
       response = await http.post(
@@ -106,8 +110,9 @@ void main() {
 
         final averageTypeDistribution = profileMap['average_type_distribution'];
         expect(averageTypeDistribution, isA<Map>(),
-          reason: 'average_type_distribution ausente');
-        final avgLand = ((averageTypeDistribution as Map)['land'] as num?)?.toInt();
+            reason: 'average_type_distribution ausente');
+        final avgLand =
+            ((averageTypeDistribution as Map)['land'] as num?)?.toInt();
         expect(avgLand, isNotNull);
 
         final manaCurve = profileMap['mana_curve'];
@@ -115,13 +120,14 @@ void main() {
         expect((manaCurve as Map).isNotEmpty, isTrue);
 
         final averageDeckSeed = profileMap['average_deck_seed'];
-        expect(averageDeckSeed, isA<List>(), reason: 'average_deck_seed ausente');
+        expect(averageDeckSeed, isA<List>(),
+            reason: 'average_deck_seed ausente');
         final averageDeckSeedList = (averageDeckSeed as List)
-          .whereType<Map>()
-          .map((e) => e.cast<String, dynamic>())
-          .toList();
+            .whereType<Map>()
+            .map((e) => e.cast<String, dynamic>())
+            .toList();
         expect(averageDeckSeedList.isNotEmpty, isTrue,
-          reason: 'average_deck_seed vazio');
+            reason: 'average_deck_seed vazio');
         expect(averageDeckSeedList.first['name'], isA<String>());
       },
       skip: skipIntegration,
