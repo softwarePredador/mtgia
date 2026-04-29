@@ -215,6 +215,8 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     final setCode = p['set']?.toString();
     final rarity = p['rarity']?.toString();
     final cmc = p['cmc']?.toString();
+    final collectorNumber = p['collector_number']?.toString();
+    final foil = p['foil'] is bool ? p['foil'] as bool : null;
 
     final colors = <String>[];
     if (p['colors'] is List) {
@@ -265,13 +267,16 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
-                             colors, color_identity, image_url, set_code, rarity, cmc)
+                             colors, color_identity, image_url, set_code, rarity, cmc,
+                             collector_number, foil)
           VALUES (
             @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal
+            @cmc::decimal, @collector_number, @foil
           )
-          ON CONFLICT (scryfall_id) DO NOTHING
+          ON CONFLICT (scryfall_id) DO UPDATE SET
+            collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
+            foil = COALESCE(cards.foil, EXCLUDED.foil)
         '''),
         parameters: {
           'scryfall_id': scryfallId,
@@ -285,6 +290,8 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
           'set_code': setCode,
           'rarity': rarity,
           'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
+          'collector_number': collectorNumber,
+          'foil': foil,
         },
       );
       imported++;

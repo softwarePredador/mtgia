@@ -104,32 +104,7 @@ class ScannerProvider extends ChangeNotifier {
       _liveConfirmCount = 0;
 
       // Usa o resultado para buscar
-      _lastResult = result;
-      _setState(ScannerState.searching);
-      _errorMessage = null;
-      _foundCards = [];
-      _autoSelectedCard = null;
-
-      try {
-        final resolved = await _resolveBestPrintings(result);
-        if (resolved.isNotEmpty) {
-          _foundCards = resolved;
-          _autoSelectedCard = _tryAutoSelectEdition(
-            printings: resolved,
-            setCodeCandidates: result.setCodeCandidates,
-            collectorInfo: result.collectorInfo,
-          );
-          _setState(ScannerState.found);
-          return true;
-        }
-
-        _errorMessage =
-            'Carta "${result.primaryName}" não encontrada no banco';
-        _setState(ScannerState.notFound);
-      } catch (e) {
-        _errorMessage = 'Erro ao buscar: $e';
-        _setState(ScannerState.error);
-      }
+      await processRecognitionResult(result);
       return true;
     }
 
@@ -155,8 +130,6 @@ class ScannerProvider extends ChangeNotifier {
 
       // Reconhece o texto
       final result = await _recognitionService.recognizeCard(processedFile);
-      _lastResult = result;
-
       // Limpa arquivo processado
       if (processedFile.path != imageFile.path) {
         try {
@@ -164,15 +137,29 @@ class ScannerProvider extends ChangeNotifier {
         } catch (_) {}
       }
 
-      if (!result.success || result.primaryName == null) {
-        _errorMessage = result.error ?? 'Nome não reconhecido';
-        _setState(ScannerState.notFound);
-        return;
-      }
+      await processRecognitionResult(result);
+    } catch (e) {
+      _errorMessage = 'Erro ao processar: $e';
+      _setState(ScannerState.error);
+    }
+  }
 
-      // Busca a carta na API
-      _setState(ScannerState.searching);
+  /// Processes a controlled OCR result without requiring camera or ML Kit.
+  Future<void> processRecognitionResult(CardRecognitionResult result) async {
+    _lastResult = result;
+    _errorMessage = null;
+    _foundCards = [];
+    _autoSelectedCard = null;
 
+    if (!result.success || result.primaryName == null) {
+      _errorMessage = result.error ?? 'Nome não reconhecido';
+      _setState(ScannerState.notFound);
+      return;
+    }
+
+    _setState(ScannerState.searching);
+
+    try {
       final resolved = await _resolveBestPrintings(result);
       if (resolved.isNotEmpty) {
         _foundCards = resolved;
@@ -188,7 +175,7 @@ class ScannerProvider extends ChangeNotifier {
       _errorMessage = 'Carta "${result.primaryName}" não encontrada no banco';
       _setState(ScannerState.notFound);
     } catch (e) {
-      _errorMessage = 'Erro ao processar: $e';
+      _errorMessage = 'Erro ao buscar: $e';
       _setState(ScannerState.error);
     }
   }
@@ -304,15 +291,14 @@ class ScannerProvider extends ChangeNotifier {
         // Se temos collector number, tenta match mais preciso ainda
         if (collectorInfo.collectorNumber != null && matches.length > 1) {
           final cn = collectorInfo.collectorNumber!;
-          final exact = matches.where(
-            (p) => p.collectorNumber == cn,
-          ).toList();
+          final exact = matches.where((p) => p.collectorNumber == cn).toList();
           if (exact.isNotEmpty) {
+            final foilMatched = _firstFoilMatch(exact, collectorInfo.isFoil);
             debugPrint(
               '[📌 AutoSelect] Match exato: $bottomSet #$cn'
               '${collectorInfo.isFoil == true ? " ★FOIL" : ""}',
             );
-            return exact.first;
+            return foilMatched ?? exact.first;
           }
         }
 
@@ -321,7 +307,7 @@ class ScannerProvider extends ChangeNotifier {
           '${collectorInfo.collectorNumber != null ? " #${collectorInfo.collectorNumber}" : ""}'
           '${collectorInfo.isFoil == true ? " ★FOIL" : ""}',
         );
-        return matches.first;
+        return _firstFoilMatch(matches, collectorInfo.isFoil) ?? matches.first;
       }
     }
 
@@ -341,6 +327,14 @@ class ScannerProvider extends ChangeNotifier {
     // (geralmente a mais recente). Não mostra modal — o usuário quer
     // adicionar a carta, não escolher edição manualmente.
     return printings.first;
+  }
+
+  DeckCardItem? _firstFoilMatch(List<DeckCardItem> cards, bool? isFoil) {
+    if (isFoil == null) return null;
+    for (final card in cards) {
+      if (card.foil == isFoil) return card;
+    }
+    return null;
   }
 
   /// Busca manual por um nome alternativo

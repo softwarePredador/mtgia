@@ -1,6 +1,67 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — QA Scanner release: harness controlado no iPhone 15 e contrato Scryfall
+
+### O Porquê
+- A QA release deixou `Scanner camera/OCR` como `not proven`, porque o iPhone 15 Simulator nao prova camera real nem OCR real em uma carta fisica.
+- A melhor cobertura possivel nesta sessao precisava separar explicitamente:
+  - camera/MLKit real, que depende de device fisico/camera/permissao/imagem;
+  - logica acima da camera, que pode ser provada com OCR controlado, provider real e contrato backend.
+
+### O Como
+- Auditoria do scanner em `app/lib/features/scanner`:
+  - `CardScannerScreen` usa `camera`, `permission_handler`, `CameraPreview`, `startImageStream`, `takePicture` e MLKit;
+  - `CardRecognitionService` usa `google_mlkit_text_recognition`;
+  - `ScannerProvider` resolve carta por `GET /cards/printings`, fuzzy local e `POST /cards/resolve`;
+  - nao ha `image_picker` no fluxo do scanner;
+  - Scryfall e auto-import sao mediados pelo backend.
+- Criado parser puro de harness:
+  - `app/lib/features/scanner/services/scanner_ocr_parser.dart`
+  - extrai nome, candidates de set, `collector_number`, total da colecao, `setCode`, `foil/non-foil` e idioma a partir de texto OCR controlado.
+- `ScannerProvider` recebeu `processRecognitionResult(CardRecognitionResult result)` para validar a camada acima da camera sem depender de `CameraImage`/MLKit.
+- `ScannerCardSearchService` passou a mapear `collector_number` e `foil` para `DeckCardItem`.
+- Auto-select de edicao passou a preferir match de foil/non-foil quando OCR traz `CollectorInfo.isFoil`.
+- Backend corrigido:
+  - `server/routes/cards/resolve/index.dart` agora seleciona e retorna `collector_number` e `foil`;
+  - import Scryfall de `/cards/resolve` persiste `collector_number` e `foil`;
+  - sync Scryfall de `/cards/printings?sync=true` tambem persiste estes campos.
+
+### Validacao
+- Device primario:
+  - `iPhone 15` / `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` / `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Device fisico detectado:
+  - `Rafa (wireless)` / `00008130-001C152922BA001C` / `iOS 26.5 23F5043k`.
+  - Nao foi possivel iniciar `flutter test` no device wireless; Flutter pediu `--publish-port`, mas esta flag nao existe em `flutter test`.
+- Backend local:
+  - `PORT=8081 dart run .dart_frog/server.dart`;
+  - `GET http://127.0.0.1:8081/health` retornou `status=healthy`.
+- Comandos green:
+  - `cd app && flutter analyze lib/features/scanner test/features/scanner integration_test --no-version-check`;
+  - `cd app && flutter test test/features/scanner --no-version-check`;
+  - `cd server && dart analyze routes/cards/resolve/index.dart routes/cards/printings/index.dart`;
+  - `cd app && flutter test integration_test/scanner_controlled_harness_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8081 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8081 --reporter expanded --no-version-check`.
+
+### Resultado
+- `Parser/provider/backend fallback controlled path`: aprovado.
+- `Camera hardware` e `MLKit OCR real`: permanecem `not proven`.
+- O harness no iPhone 15 Simulator passou e validou:
+  - texto OCR controlado `Lightning Bolt / 157/274 ★ BLB ★ EN`;
+  - parser de collector/set/foil;
+  - `ScannerProvider` real;
+  - auto-select da printing foil por `collector_number + setCode + foil`.
+- O contrato real do backend foi verificado:
+  - `/cards/printings` expoe `collector_number` e `foil`;
+  - `/cards/resolve` passou a expor `collector_number` e `foil` apos o fix.
+
+### Artefatos
+- Handoff: `app/doc/runtime_flow_handoffs/scanner_runtime_2026-04-29.md`.
+- Logs locais ignorados pelo git: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator/`.
+
+### Pendencias
+- Prova de camera/OCR real ainda exige device fisico utilizavel por cabo, permissao de camera e carta/imagem controlada.
+- O warning conhecido de MLKit sem arm64 para simuladores Apple Silicon iOS 26+ apareceu no build do integration test, mas nao bloqueou o harness controlado.
+
 ## 2026-04-28 — QA release ampla no iPhone 15 Simulator com backend real
 
 ### O Porquê

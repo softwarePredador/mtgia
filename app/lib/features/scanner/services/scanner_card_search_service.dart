@@ -31,30 +31,7 @@ class ScannerCardSearchService {
 
     return cardsJson
         .whereType<Map>()
-        .map((json) {
-          return DeckCardItem(
-            id: json['id']?.toString() ?? '',
-            name: json['name']?.toString() ?? '',
-            manaCost: json['mana_cost']?.toString(),
-            typeLine: json['type_line']?.toString() ?? '',
-            oracleText: json['oracle_text']?.toString(),
-            colors:
-                (json['colors'] as List?)?.map((e) => e.toString()).toList() ??
-                [],
-            colorIdentity:
-                (json['color_identity'] as List?)
-                    ?.map((e) => e.toString())
-                    .toList() ??
-                [],
-            imageUrl: json['image_url']?.toString(),
-            setCode: json['set_code']?.toString() ?? '',
-            setName: json['set_name']?.toString(),
-            setReleaseDate: json['set_release_date']?.toString(),
-            rarity: json['rarity']?.toString() ?? '',
-            quantity: 1,
-            isCommander: false,
-          );
-        })
+        .map(_cardFromJson)
         .where((c) => c.id.isNotEmpty && c.name.trim().isNotEmpty)
         .toList();
   }
@@ -81,30 +58,7 @@ class ScannerCardSearchService {
 
     return cardsJson
         .whereType<Map>()
-        .map((json) {
-          return DeckCardItem(
-            id: json['id']?.toString() ?? '',
-            name: json['name']?.toString() ?? '',
-            manaCost: json['mana_cost']?.toString(),
-            typeLine: json['type_line']?.toString() ?? '',
-            oracleText: json['oracle_text']?.toString(),
-            colors:
-                (json['colors'] as List?)?.map((e) => e.toString()).toList() ??
-                [],
-            colorIdentity:
-                (json['color_identity'] as List?)
-                    ?.map((e) => e.toString())
-                    .toList() ??
-                [],
-            imageUrl: json['image_url']?.toString(),
-            setCode: json['set_code']?.toString() ?? '',
-            setName: json['set_name']?.toString(),
-            setReleaseDate: json['set_release_date']?.toString(),
-            rarity: json['rarity']?.toString() ?? '',
-            quantity: 1,
-            isCommander: false,
-          );
-        })
+        .map(_cardFromJson)
         .where((c) => c.id.isNotEmpty && c.name.trim().isNotEmpty)
         .toList();
   }
@@ -122,10 +76,7 @@ class ScannerCardSearchService {
     if (q.isEmpty) return const [];
 
     try {
-      final response = await _apiClient.post(
-        '/cards/resolve',
-        {'name': q},
-      );
+      final response = await _apiClient.post('/cards/resolve', {'name': q});
 
       if (response.statusCode != 200) {
         return const [];
@@ -137,36 +88,37 @@ class ScannerCardSearchService {
 
       return cardsJson
           .whereType<Map>()
-          .map((json) {
-            return DeckCardItem(
-              id: json['id']?.toString() ?? '',
-              name: json['name']?.toString() ?? '',
-              manaCost: json['mana_cost']?.toString(),
-              typeLine: json['type_line']?.toString() ?? '',
-              oracleText: json['oracle_text']?.toString(),
-              colors:
-                  (json['colors'] as List?)
-                      ?.map((e) => e.toString())
-                      .toList() ??
-                  [],
-              colorIdentity:
-                  (json['color_identity'] as List?)
-                      ?.map((e) => e.toString())
-                      .toList() ??
-                  [],
-              imageUrl: json['image_url']?.toString(),
-              setCode: json['set_code']?.toString() ?? '',
-              setName: json['set_name']?.toString(),
-              setReleaseDate: json['set_release_date']?.toString(),
-              rarity: json['rarity']?.toString() ?? '',
-              quantity: 1,
-              isCommander: false,
-            );
-          })
+          .map(_cardFromJson)
           .where((c) => c.id.isNotEmpty && c.name.trim().isNotEmpty)
           .toList();
     } catch (_) {
       return const [];
     }
+  }
+
+  DeckCardItem _cardFromJson(Map<dynamic, dynamic> json) {
+    return DeckCardItem(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      manaCost: json['mana_cost']?.toString(),
+      typeLine: json['type_line']?.toString() ?? '',
+      oracleText: json['oracle_text']?.toString(),
+      colors:
+          (json['colors'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      colorIdentity:
+          (json['color_identity'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      imageUrl: json['image_url']?.toString(),
+      setCode: json['set_code']?.toString() ?? '',
+      setName: json['set_name']?.toString(),
+      setReleaseDate: json['set_release_date']?.toString(),
+      rarity: json['rarity']?.toString() ?? '',
+      quantity: 1,
+      isCommander: false,
+      collectorNumber: json['collector_number']?.toString(),
+      foil: json['foil'] is bool ? json['foil'] as bool : null,
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import '../models/card_recognition_result.dart';
+import 'scanner_ocr_parser.dart';
 
 /// Serviço AVANÇADO de reconhecimento de cartas MTG usando ML Kit
 /// Múltiplas estratégias de OCR para máxima precisão em TODAS as eras (1993-2026)
@@ -101,33 +102,6 @@ class CardRecognitionService {
     // Split cards: "Fire // Ice"
     RegExp(r'^[A-Z][a-z]+\s*//\s*[A-Z]'),
   ];
-
-  static const _setCodeStopwords = <String>{
-    'THE',
-    'AND',
-    'FOR',
-    'YOU',
-    'WITH',
-    'FROM',
-    'THIS',
-    'THAT',
-    'NOT',
-    'YES',
-    'CAN',
-    'MAY',
-    'ALL',
-    'ANY',
-    'ONE',
-    'TWO',
-    'THREE',
-    'FOUR',
-    'FIVE',
-    'SIX',
-    'SEVEN',
-    'EIGHT',
-    'NINE',
-    'TEN',
-  };
 
   // ══════════════════════════════════════════════════════════════════════════
   // MÉTODO PRINCIPAL - MÚLTIPLAS ESTRATÉGIAS
@@ -385,9 +359,10 @@ class CardRecognitionService {
         }
 
         // Recalcula bounding box relativa ao guia (ou usa original)
-        final relBox = cardGuideRect != null
-            ? _relativizeToGuide(line.boundingBox, cardGuideRect)
-            : line.boundingBox;
+        final relBox =
+            cardGuideRect != null
+                ? _relativizeToGuide(line.boundingBox, cardGuideRect)
+                : line.boundingBox;
 
         final candidate = _evaluateCandidate(
           line.text,
@@ -399,9 +374,10 @@ class CardRecognitionService {
       }
 
       // Avalia bloco completo (pode pegar nome com quebra de linha)
-      final blockBox = cardGuideRect != null
-          ? _relativizeToGuide(block.boundingBox, cardGuideRect)
-          : block.boundingBox;
+      final blockBox =
+          cardGuideRect != null
+              ? _relativizeToGuide(block.boundingBox, cardGuideRect)
+              : block.boundingBox;
 
       final blockCandidate = _evaluateCandidate(
         block.text,
@@ -422,12 +398,13 @@ class CardRecognitionService {
 
     // Debug: mostra top candidatos para diagnóstico
     if (unique.isNotEmpty) {
-      final top = unique.take(3).map(
-        (c) {
-          final relY = (c.boundingBox.top / refHeight * 100).round();
-          return '"${c.text}" (score=${c.score.toStringAsFixed(0)}, y=$relY%)';
-        },
-      ).join(', ');
+      final top = unique
+          .take(3)
+          .map((c) {
+            final relY = (c.boundingBox.top / refHeight * 100).round();
+            return '"${c.text}" (score=${c.score.toStringAsFixed(0)}, y=$relY%)';
+          })
+          .join(', ');
       debugPrint('[🏷️ Candidatos] $strategy: $top');
     }
 
@@ -461,38 +438,7 @@ class CardRecognitionService {
   }
 
   List<String> _extractSetCodeCandidates(String rawText) {
-    final text = rawText.replaceAll('\n', ' ');
-    final matches = RegExp(r'\b[A-Za-z0-9]{2,6}\b').allMatches(text);
-
-    final seen = <String>{};
-    final candidates = <String>[];
-
-    for (final m in matches) {
-      final token = m.group(0);
-      if (token == null) continue;
-
-      final upper = token.toUpperCase();
-      if (_setCodeStopwords.contains(upper)) continue;
-
-      // Set codes normalmente têm 3-5 chars ou incluem dígitos (ex: 2XM, M21).
-      final hasDigit = upper.contains(RegExp(r'\d'));
-      final len = upper.length;
-      final looksLikeSetCode = (len >= 3 && len <= 5) || (hasDigit && len <= 6);
-      if (!looksLikeSetCode) continue;
-
-      // Evita pegar só números (collector numbers etc).
-      if (RegExp(r'^\d+$').hasMatch(upper)) continue;
-
-      // Evita tokens muito "palavra comum" do OCR que já filtramos como não-nome.
-      if (_nonNameKeywords.contains(upper.toLowerCase())) continue;
-
-      if (seen.add(upper)) {
-        candidates.add(upper);
-        if (candidates.length >= 10) break;
-      }
-    }
-
-    return candidates;
+    return ScannerOcrParser.extractSetCodeCandidates(rawText);
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -564,7 +510,9 @@ class CardRecognitionService {
       // Se temos guia, verifica se o bloco está horizontalmente dentro
       final blockCenterX = block.boundingBox.left + block.boundingBox.width / 2;
       if (cardGuideRect != null) {
-        if (blockCenterX < refLeft - 20 || blockCenterX > refRight + 20) continue;
+        if (blockCenterX < refLeft - 20 || blockCenterX > refRight + 20) {
+          continue;
+        }
       }
 
       final relTop = (block.boundingBox.top - refTop) / refHeight;
@@ -588,121 +536,25 @@ class CardRecognitionService {
 
     if (bottomTexts.isEmpty) return null;
 
-    String? collectorNumber;
-    String? totalInSet;
-    String? setCode;
-    bool? isFoil;
-    String? language;
-
     // Junta todo o texto inferior para análise
     final rawBottom = bottomTexts.join(' ').trim();
-
-    // ── Detecção de foil (★) vs non-foil (•) ──
-    // A estrela ★ (U+2605) indica foil
-    // O ponto • (U+2022) indica non-foil
-    // Alguns OCRs lêem ★ como * ou ✩ ou ☆
-    if (rawBottom.contains('★') ||
-        rawBottom.contains('✩') ||
-        rawBottom.contains('☆')) {
-      isFoil = true;
-    } else if (rawBottom.contains('•') || rawBottom.contains('·')) {
-      isFoil = false;
-    }
-
-    // ── Padrão principal: "157/274" (collector_number/total) ──
-    final collectorSlashPattern = RegExp(r'(\d{1,4})\s*/\s*(\d{1,4})');
-    final slashMatch = collectorSlashPattern.firstMatch(rawBottom);
-    if (slashMatch != null) {
-      collectorNumber = slashMatch.group(1);
-      totalInSet = slashMatch.group(2);
-    }
-
-    // ── Padrão alternativo: número solto sem barra (ex: "157") ──
-    // Só usa se não encontrou o padrão com barra
-    if (collectorNumber == null) {
-      // Procura números de 1-4 dígitos que NÃO sejam parte de um ano (2024)
-      final soloNumberPattern = RegExp(
-        r'(?<!\d)(\d{1,4})(?!\d|/\d)',
-      );
-      for (final m in soloNumberPattern.allMatches(rawBottom)) {
-        final num = m.group(1)!;
-        final numVal = int.tryParse(num);
-        // Ignora anos (1993-2030) e números muito grandes
-        if (numVal != null && (numVal < 1993 || numVal > 2030) && numVal <= 999) {
-          collectorNumber = num;
-          break;
-        }
-      }
-    }
-
-    // ── Detecção de Set Code (3-5 letras maiúsculas) ──
-    // O set code fica próximo ao collector number, geralmente separado por •/★
-    // Exemplos: BLB, CMM, MH3, 2XM, M21
-    final setCodePattern = RegExp(
-      r'\b([A-Z][A-Z0-9]{1,4})\b',
-    );
-    for (final m in setCodePattern.allMatches(rawBottom.toUpperCase())) {
-      final candidate = m.group(1)!;
-      // Filtra: não pode ser só números, não pode ser stopword, não pode ser idioma longo
-      if (RegExp(r'^\d+$').hasMatch(candidate)) continue;
-      if (_setCodeStopwords.contains(candidate)) continue;
-      // Set codes têm 2-5 caracteres e normalmente 3
-      if (candidate.length < 2 || candidate.length > 5) continue;
-      // Ignora tokens que parecem ser parte de texto de artista/copyright
-      if ({
-        'TM',
-        'LLC',
-        'INC',
-        'CO',
-        'BY',
-        'OF',
-        'II',
-        'III',
-        'IV',
-        'VI',
-        'VII',
-        'VIII',
-        'IX',
-        'XI',
-        'XII',
-      }.contains(candidate)) {
-        continue;
-      }
-      setCode = candidate;
-      break;
-    }
-
-    // ── Detecção de idioma (EN, PT, JP, DE, FR, ES, IT, RU, KO, ZH, JA) ──
-    final langPattern = RegExp(
-      r'\b(EN|PT|JP|JA|DE|FR|ES|IT|RU|KO|ZH|PH|CS|CT)\b',
-    );
-    final langMatch = langPattern.firstMatch(rawBottom.toUpperCase());
-    if (langMatch != null) {
-      language = langMatch.group(1);
-    }
-
-    // Se não encontrou nada útil, retorna null
-    if (collectorNumber == null && setCode == null && isFoil == null) {
-      return null;
-    }
+    final collectorInfo = ScannerOcrParser.extractCollectorInfo(rawBottom);
+    if (collectorInfo == null) return null;
 
     debugPrint(
       '[🔍 Collector] Bottom: "$rawBottom" → '
-      '#${collectorNumber ?? "?"}'
-      '/${totalInSet ?? "?"} '
-      '${isFoil == true ? "★FOIL" : isFoil == false ? "•NON-FOIL" : "?"} '
-      '${setCode ?? "?"} '
-      '${language ?? "?"}',
+      '#${collectorInfo.collectorNumber ?? "?"}'
+      '/${collectorInfo.totalInSet ?? "?"} '
+      '${collectorInfo.isFoil == true
+          ? "★FOIL"
+          : collectorInfo.isFoil == false
+          ? "•NON-FOIL"
+          : "?"} '
+      '${collectorInfo.setCode ?? "?"} '
+      '${collectorInfo.language ?? "?"}',
     );
 
-    return CollectorInfo(
-      collectorNumber: collectorNumber,
-      totalInSet: totalInSet,
-      setCode: setCode,
-      isFoil: isFoil,
-      language: language,
-      rawBottomText: rawBottom,
-    );
+    return collectorInfo;
   }
 
   /// Avalia se um texto é candidato a nome de carta
@@ -778,9 +630,10 @@ class CardRecognitionService {
     // Ex: "A turtle-duckling's greatest defense..."
     // Ex: "Until end of turn, this creature..."
     if (RegExp(
-      r'^(a|an|the|this|that|if|when|whenever|until|at|for|each|all|you|it|its)\s',
-      caseSensitive: false,
-    ).hasMatch(cleaned) && wordCount > 3) {
+          r'^(a|an|the|this|that|if|when|whenever|until|at|for|each|all|you|it|its)\s',
+          caseSensitive: false,
+        ).hasMatch(cleaned) &&
+        wordCount > 3) {
       return 0; // provavelmente rules text ou flavor text
     }
 
@@ -1159,14 +1012,15 @@ class CardRecognitionService {
     if (format == null) return null;
 
     // Monta os planes
-    final planes = image.planes.map((plane) {
-      return InputImageMetadata(
-        size: Size(image.width.toDouble(), image.height.toDouble()),
-        rotation: rotation!,
-        format: format,
-        bytesPerRow: plane.bytesPerRow,
-      );
-    }).toList();
+    final planes =
+        image.planes.map((plane) {
+          return InputImageMetadata(
+            size: Size(image.width.toDouble(), image.height.toDouble()),
+            rotation: rotation!,
+            format: format,
+            bytesPerRow: plane.bytesPerRow,
+          );
+        }).toList();
 
     if (planes.isEmpty) return null;
 

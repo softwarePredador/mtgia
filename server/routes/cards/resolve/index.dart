@@ -158,7 +158,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
       s.name AS set_name, s.release_date AS set_release_date,
-      c.rarity, c.price, c.price_updated_at
+      c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
     FROM cards c
     LEFT JOIN sets s ON s.code = c.set_code
     WHERE $condition
@@ -169,7 +169,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
-      c.rarity, c.price, c.price_updated_at
+      c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
     FROM cards c
     WHERE $condition
     ORDER BY c.set_code ASC
@@ -204,6 +204,8 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       'price': m['price'],
       'price_updated_at':
           (m['price_updated_at'] as DateTime?)?.toIso8601String(),
+      'collector_number': m['collector_number'],
+      'foil': m['foil'],
     };
   }).toList();
 }
@@ -387,18 +389,23 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
 
     // CMC
     final cmc = card['cmc']?.toString();
+    final collectorNumber = card['collector_number']?.toString();
+    final foil = card['foil'] is bool ? card['foil'] as bool : null;
 
     try {
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
-                             colors, color_identity, image_url, set_code, rarity, cmc)
+                             colors, color_identity, image_url, set_code, rarity, cmc,
+                             collector_number, foil)
           VALUES (
             @oracle_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal
+            @cmc::decimal, @collector_number, @foil
           )
-          ON CONFLICT (scryfall_id) DO NOTHING
+          ON CONFLICT (scryfall_id) DO UPDATE SET
+            collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
+            foil = COALESCE(cards.foil, EXCLUDED.foil)
         '''),
         parameters: {
           'oracle_id': scryfallUniqueId,
@@ -412,6 +419,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
           'set_code': setCode,
           'rarity': rarity,
           'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
+          'collector_number': collectorNumber,
+          'foil': foil,
         },
       );
       inserted.add(card);
