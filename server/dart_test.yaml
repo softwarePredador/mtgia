@@ -58,6 +58,7 @@ presets:
       - test/decks_incremental_add_test.dart
       - test/error_contract_test.dart
       - test/import_to_deck_flow_test.dart
+      - test/social_trading_live_test.dart
     include_tags: live
 
 tags:

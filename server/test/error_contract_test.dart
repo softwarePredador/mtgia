@@ -26,6 +26,7 @@ void main() {
   const missingNotificationId = '00000000-0000-0000-0000-000000000003';
   const missingTradeId = '00000000-0000-0000-0000-000000000004';
   const missingConversationId = '00000000-0000-0000-0000-000000000005';
+  const missingBinderItemId = '00000000-0000-0000-0000-000000000006';
 
   String? authToken;
   String? authUserId;
@@ -1445,6 +1446,27 @@ void main() {
     );
 
     test(
+      'POST /trades with invalid payment_method returns 400 (or 404 compat)',
+      () async {
+        final response = await http.post(
+          Uri.parse('$baseUrl/trades'),
+          headers: authHeaders(true),
+          body: jsonEncode({
+            'receiver_id': missingUserId,
+            'type': 'sale',
+            'payment_method': 'wire',
+            'requested_items': [
+              {'binder_item_id': missingBinderItemId, 'quantity': 1},
+            ],
+          }),
+        );
+
+        expectOptional400Or404(response);
+      },
+      skip: skipIntegration,
+    );
+
+    test(
       'GET /trades/:id without token returns 401 (or 404 compat)',
       () async {
         final response = await http.get(
@@ -1532,6 +1554,23 @@ void main() {
           Uri.parse('$baseUrl/trades/$missingTradeId/status'),
           headers: authHeaders(true),
           body: jsonEncode({}),
+        );
+
+        expectOptional400Or404(response);
+      },
+      skip: skipIntegration,
+    );
+
+    test(
+      'PUT /trades/:id/status invalid delivery_method returns 400 (or 404 compat)',
+      () async {
+        final response = await http.put(
+          Uri.parse('$baseUrl/trades/$missingTradeId/status'),
+          headers: authHeaders(true),
+          body: jsonEncode({
+            'status': 'shipped',
+            'delivery_method': 'mail',
+          }),
         );
 
         expectOptional400Or404(response);
