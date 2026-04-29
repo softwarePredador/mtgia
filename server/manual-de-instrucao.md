@@ -1,6 +1,85 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Auditoria geral ManaLoom app/backend e runtime iPhone 15
+
+### O Porquê
+- Era necessario criar um panorama completo do app atual, por modulo, sem implementar feature grande nesta rodada.
+- A auditoria precisava diferenciar:
+  - o que esta pronto com evidencia automatizada/runtime;
+  - o que esta parcialmente pronto;
+  - o que permanece `not proven`;
+  - bugs pequenos/provados que poderiam virar backlog imediato.
+
+### O Como
+- Inventariado:
+  - `app/lib/features`, `app/lib/core`, `app/integration_test`, `app/test`;
+  - `server/routes`, `server/bin`;
+  - handoffs recentes em `app/doc/runtime_flow_handoffs`;
+  - docs tecnicos recentes em `server/doc`.
+- Rodados:
+  - `flutter analyze lib test integration_test --no-version-check`;
+  - `flutter test test --no-version-check`;
+  - suites focadas de Cards/Colecoes;
+  - suites focadas de Decks/Optimize/Validate;
+  - `dart analyze lib routes bin test`;
+  - `dart test`.
+- Backend local real iniciado em:
+  - `PORT=8082 dart run .dart_frog/server.dart`.
+- Runtime fresco no device primario:
+  - `iPhone 15` / `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` / `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+  - `API_BASE_URL=http://127.0.0.1:8082`;
+  - `PUBLIC_API_BASE_URL=http://127.0.0.1:8082`.
+
+### Resultado
+- `flutter analyze lib test integration_test --no-version-check`: sem issues.
+- `flutter test test --no-version-check`: falhou apenas em goldens de `life_counter_clone_proof_test.dart` com diffs pequenos de pixel; classificado como baseline/regressao visual a revisar, nao crash core.
+- `flutter analyze lib/features/cards lib/features/collection test/features/cards test/features/collection --no-version-check`: sem issues.
+- `flutter test test/features/cards test/features/collection --no-version-check`: passou.
+- Suite focada de decks:
+  - `deck_runtime_widget_flow_test.dart`;
+  - `deck_details_screen_smoke_test.dart`;
+  - `deck_provider_test.dart`;
+  - `deck_provider_support_test.dart`;
+  - `deck_optimize_flow_support_test.dart`;
+  - passou.
+- `dart analyze lib routes bin test`: sem issues.
+- `dart test`: falhou porque a suite ampla inclui testes live que esperam backend em `http://localhost:8080` (`ai_archetypes_flow_test.dart`, `decks_crud_test.dart`), enquanto a auditoria usou backend runtime em `8082`.
+- Runtime iPhone 15 + backend real em 8082:
+  - `sets_catalog_runtime_test.dart`: passou;
+  - `sets_search_catalog_runtime_test.dart`: passou;
+  - `collection_entrypoints_runtime_test.dart`: passou;
+  - `deck_runtime_m2006_test.dart` rodado no iPhone 15: passou.
+
+### Achado critico
+- `GET /market/movers?limit=5&min_price=1.0` excedeu o timeout de 15s durante o runtime de deck.
+- Probe isolado via `curl` contra `http://127.0.0.1:8082/market/movers?limit=5&min_price=1.0` permaneceu pendurado por mais de 60s e foi encerrado manualmente.
+- Impacto:
+  - Home/Market/Community podem degradar ou logar erro em runtime;
+  - o app captura a falha em `MarketProvider` sem derrubar o fluxo de deck, mas o endpoint deve ser tratado como backlog P0/P1 de performance.
+
+### Artefatos
+- Relatorio app:
+  - `app/doc/APP_AUDIT_2026-04-29.md`.
+- Handoff runtime:
+  - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-29.md`.
+- Relatorio backend:
+  - `server/doc/APP_BACKEND_CONTRACT_AUDIT_2026-04-29.md`.
+- Logs locais ignorados pelo git:
+  - `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_audit/`.
+
+### Pendencias priorizadas
+- P0/P1:
+  - otimizar/corrigir `/market/movers`;
+  - separar `dart test` unit/offline dos testes live que exigem backend.
+- P1:
+  - estabilizar goldens de `life_counter_clone_proof_test.dart`;
+  - criar runtime iPhone 15 dedicado para Binder CRUD, Marketplace -> Trade, Messages, Notifications, Profile e Community/Social.
+- P2:
+  - renomear `deck_runtime_m2006_test.dart` para nome neutro/Commander/iPhone;
+  - automatizar mapa provider -> endpoint -> route;
+  - provar Sentry/Firebase em staging real.
+
 ## 2026-04-29 — QA Scanner release: harness controlado no iPhone 15 e contrato Scryfall
 
 ### O Porquê
