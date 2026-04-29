@@ -139,6 +139,38 @@ Hipoteses da auditoria original, confirmadas/refinadas na correcao:
    - `dart test` unit/offline;
    - `TEST_API_BASE_URL=... dart test -P live` para live backend/DB write.
 
+## Atualizacao - contratos Binder/Marketplace/Trades runtime - 2026-04-29 15:30 -0300
+
+Prova fresca no iPhone 15 Simulator com backend real em `http://127.0.0.1:8082`:
+
+- Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
+- Teste: `app/integration_test/binder_marketplace_trade_runtime_test.dart`.
+- Log PASS: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_pass.log`.
+- Device: `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+
+Contratos exercitados com dados reais `qa_bmt_*`:
+
+| Area | Endpoints provados | Resultado |
+| --- | --- | --- |
+| Auth | `POST /auth/register`, `POST /auth/login` | Seller e buyer criados/logados |
+| Cards | `GET /cards?name=...` | `Sol Ring` e `Arcane Signet` resolvidos |
+| Binder | `GET/POST/PUT/DELETE /binder`, `GET /binder/stats` | CRUD autenticado real; `DELETE /binder/:id` retorna `204` |
+| Marketplace | `GET /community/marketplace` | Item seller visivel para buyer |
+| Trades | `POST /trades`, `GET /trades`, `GET /trades/:id`, `PUT /trades/:id/respond`, `PUT /trades/:id/status` | Trade `744f4e67-4f48-44e4-b5a3-989fdfc98b60` chegou a `completed` |
+| Trade messages | `GET/POST /trades/:id/messages` | Mensagem de trade criada e lida |
+| Notifications | `GET /notifications`, `GET /notifications/count` | Tipos `trade_offer_received`, `trade_accepted`, `trade_message`, `trade_shipped`, `trade_completed` observados |
+
+Impacto app/backend encontrado: o app esperava `200` no delete de binder, mas o backend corretamente respondia `204 No Content`. O app foi alinhado ao contrato.
+
+Risco de performance observado no runtime PASS:
+
+- `POST /trades`: `5293ms`;
+- `PUT /trades/:id/status`: `4097ms`;
+- `GET /trades/:id`: ~`2440ms-2468ms`;
+- `GET /community/marketplace?page=1&limit=20`: `2049ms`.
+
+Backlog adicional P1: medir e otimizar p95/p99 dos endpoints de social trading acima antes de release amplo.
+
 ### P1
 
 1. Manter a separacao `dart test` offline vs `dart test -P live` em novos testes server.

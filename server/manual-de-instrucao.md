@@ -1,6 +1,57 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Prova runtime Binder/Marketplace/Trades no iPhone 15
+
+### O Porquê
+- Binder CRUD, Marketplace com dados reais, criacao de trade, ciclo de trade e notificacoes de trade ainda estavam parcialmente `not proven` na auditoria geral do app.
+- Era necessario validar o fluxo social de colecao contra backend real em `8082`, com dois usuarios controlados, sem dados anonimos permanentes.
+- A execucao tambem confirmou um desalinhamento pequeno de contrato: o backend retorna `204 No Content` em `DELETE /binder/:id`, enquanto o app tratava apenas `200` como sucesso.
+
+### O Como
+- Criado `app/integration_test/binder_marketplace_trade_runtime_test.dart`.
+- O harness usa API HTTP real para setup controlado:
+  - cria seller e buyer com prefixo `qa_bmt_*`;
+  - resolve cartas reais por `/cards`;
+  - cria item seller `Sol Ring` com `for_sale=true`;
+  - cria item buyer `Arcane Signet`;
+  - exercita add/update/delete de binder autenticado;
+  - valida marketplace por `/community/marketplace`.
+- O iPhone 15 executa UI real para:
+  - abrir `CollectionScreen`;
+  - ver Fichario;
+  - buscar marketplace;
+  - abrir `CreateTradeScreen`;
+  - criar proposta;
+  - abrir Trades enviados;
+  - seller aceitar e marcar enviado;
+  - buyer reabrir detalhe e ler status final `Concluido`;
+  - buyer abrir `NotificationScreen`.
+- O fechamento `delivered -> completed` foi feito por API real porque o PASS final nao comprovou visualmente o botao buyer `Confirmar Entrega`; a UI foi reaberta depois para provar leitura do estado final.
+- Corrigido `app/lib/features/binder/providers/binder_provider.dart` para aceitar `200` ou `204` em `removeItem`.
+- Criado teste unitario `app/test/features/binder/providers/binder_provider_test.dart` para o contrato `204`.
+
+### Evidencia
+- Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
+- Log PASS: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_pass.log`.
+- Device: `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend: `http://127.0.0.1:8082`, health healthy.
+- Dados finais: marker `qa_bmt_19dda7ad00b`, trade `744f4e67-4f48-44e4-b5a3-989fdfc98b60`, status `completed`.
+
+### Validacao executada
+- `dart analyze routes/binder routes/community routes/trades routes/conversations routes/notifications lib test`: sem issues.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/error_contract_test.dart -P live`: passou.
+- `dart test`: passou.
+- `flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications lib/features/collection test/features/binder test/features/trades test/features/messages test/features/notifications integration_test --no-version-check`: sem issues.
+- `flutter test test/features/binder test/features/trades test/features/messages test/features/notifications --no-version-check`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: passou.
+
+### Pendencias
+- Provar visualmente add/edit/delete do modal `BinderItemEditor`.
+- Provar visualmente `Confirmar Entrega`/`Finalizar` como buyer ou corrigir harness se a acao estiver fora de arvore/visibilidade.
+- Otimizar ou monitorar latencia de `/trades`, `/trades/:id`, `/trades/:id/status` e `/community/marketplace` sem filtro.
+- Criar runtime separado para mensagens diretas (`/conversations`) entre dois usuarios.
+
 ## 2026-04-29 — Estabilizacao dos goldens legados do Life Counter clone
 
 ### O Porquê

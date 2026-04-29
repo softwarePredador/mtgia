@@ -426,7 +426,7 @@ class BinderProvider extends ChangeNotifier {
   Future<bool> removeItem(String itemId) async {
     try {
       final res = await _api.delete('/binder/$itemId');
-      if (res.statusCode == 200) {
+      if (res.statusCode == 200 || res.statusCode == 204) {
         _items.removeWhere((i) => i.id == itemId);
         notifyListeners();
         await fetchStats();
