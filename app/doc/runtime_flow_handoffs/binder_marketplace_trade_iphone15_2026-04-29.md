@@ -2,9 +2,9 @@
 
 ## Resultado
 
-Verdict: `Approved for binder -> marketplace -> trade sale runtime path / buyer delivered-completed buttons not visually proven`
+Verdict: `Approved for BinderItemEditor CRUD + marketplace sale + full trade lifecycle + trade chat + notifications + direct messages runtime`
 
-Execucao fresca em `2026-04-29 15:30 -0300` no iPhone 15 Simulator contra backend local real em `http://127.0.0.1:8082`.
+Execucao fresca final em `2026-04-29 17:10 -0300` no iPhone 15 Simulator contra backend local real em `http://127.0.0.1:8082`.
 
 ## Ambiente
 
@@ -16,8 +16,8 @@ Execucao fresca em `2026-04-29 15:30 -0300` no iPhone 15 Simulator contra backen
 | Estado | `Booted` |
 | Backend URL usado pelo app | `http://127.0.0.1:8082` |
 | Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
-| Log PASS | `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_pass.log` |
-| Outros logs historicos da tentativa | `binder_marketplace_trade_runtime.log`, `binder_marketplace_trade_runtime_rerun.log`, `binder_marketplace_trade_runtime_final.log` |
+| Log PASS final | `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_after_sprint_pass.log` |
+| Logs de tentativas | `binder_marketplace_trade_runtime_after_sprint_failed_attempt*.log` |
 
 Resumo do `flutter devices`:
 
@@ -62,33 +62,34 @@ flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
   --no-version-check
 ```
 
-Validacoes focadas:
+Validacoes finais:
 
 ```bash
 cd server
-dart analyze routes/binder routes/community routes/trades routes/conversations routes/notifications lib test
-TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/error_contract_test.dart -P live
-dart test
+dart analyze routes/trades routes/market routes/binder routes/conversations routes/notifications lib test
+dart test -r expanded
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded
 ```
 
 ```bash
 cd app
-flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications lib/features/collection test/features/binder test/features/trades test/features/messages test/features/notifications integration_test --no-version-check
+flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications integration_test --no-version-check
 flutter test test/features/binder test/features/trades test/features/messages test/features/notifications --no-version-check
 flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
 ```
 
 ## Dados de teste
 
-Prefixo claro de QA: `qa_bmt_19dda7ad00b`.
+Prefixos claros de QA: `qa_bmt_19ddadb15b4` para Binder/Marketplace/Trades e `qa_dm_19ddadc9d8f` para Direct Messages.
 
 | Papel | Usuario |
 | --- | --- |
-| seller | `qa_bmt_19dda7ad00b_seller_6509d6fbcc58c` |
-| buyer | `qa_bmt_19dda7ad00b_buyer_6509d6fe91eb7` |
-| trade criado | `744f4e67-4f48-44e4-b5a3-989fdfc98b60` |
+| seller | `qa_bmt_19ddadb15b4_seller_6509ee7ccd9b6` |
+| buyer | `qa_bmt_19ddadb15b4_buyer_6509ee7f63ea0` |
+| trade criado | `80366433-a69c-4f1e-90d0-03c923c76f5b` |
 | carta marketplace | `Sol Ring` |
-| carta binder buyer | `Arcane Signet` |
+| carta BinderItemEditor visual | `Command Tower` |
+| conversa direta | `qa_dm_19ddace2aff` |
 
 Os registros permanecem no backend real como dados marcados de QA (`qa_bmt_*`) para rastreabilidade.
 
@@ -96,65 +97,78 @@ Os registros permanecem no backend real como dados marcados de QA (`qa_bmt_*`) p
 
 | Tela/Provider | Endpoint | Teste existente | Runtime provado | Lacuna |
 | --- | --- | --- | --- | --- |
-| `BinderTabContent` / `BinderProvider` | `GET/POST/PUT/DELETE /binder`, `GET /binder/stats` | `binder_provider_test.dart`, `marketplace_screen_overflow_test.dart` | API CRUD autenticado real; UI abriu Fichario e exibiu `Arcane Signet` do buyer | Add/edit/delete visual via modal nao foi exercitado neste runtime |
-| `MarketplaceTabContent` / `BinderProvider` | `GET /community/marketplace` | `marketplace_screen_overflow_test.dart` | API marketplace encontrou item seller; UI buscou `Sol Ring`, exibiu seller e abriu criacao de proposta | Unfiltered marketplace ainda registrou chamada lenta de `2049ms` |
+| `BinderTabContent` / `BinderProvider` | `GET/POST/PUT/DELETE /binder`, `GET /binder/stats` | `binder_provider_test.dart`, `marketplace_screen_overflow_test.dart` | UI visual do `BinderItemEditor` criou `Command Tower`, editou quantidade/preco/condicao/idioma e removeu; backend confirmou `201/200/204` | Sem lacuna P1 neste fluxo |
+| `MarketplaceTabContent` / `BinderProvider` | `GET /community/marketplace` | `marketplace_screen_overflow_test.dart` | UI buscou item seller real, validou listagem sem filtro e iniciou proposta | Latencia monitorada, mas dentro do runtime final: `664ms` sem filtro |
 | `CreateTradeScreen` / `TradeProvider` | `POST /trades` | `create_trade_screen_overflow_test.dart` | UI criou venda a partir do Marketplace; API retornou `201` | Fluxo de troca pura com itens de ambos os lados nao foi provado |
 | `TradeInboxTabContent` / `TradeProvider` | `GET /trades?role=sender/receiver` | testes de overflow + server live | UI exibiu `Enviadas` com trade pendente do buyer | Tap no card para detalhe via `GoRouter` nao foi exercitado no harness MaterialApp |
-| `TradeDetailScreen` / `TradeProvider` | `GET /trades/:id`, `PUT /respond`, `PUT /status` | server live/error contract | UI seller abriu detalhe, aceitou e marcou enviado; UI buyer reabriu detalhe e leu `Concluido` | Botao buyer `Confirmar Entrega` nao foi visualmente provado; `delivered -> completed` foi API real |
-| Trade messages | `GET/POST /trades/:id/messages` | server live/error contract | API real criou mensagem de trade e disparou notificacao | Campo visual de chat no detalhe nao foi exercitado no PASS final |
-| `NotificationScreen` / `NotificationProvider` | `GET /notifications`, `GET /notifications/count` | `notification_models_test.dart` | UI buyer abriu notificacoes e leu notificacao de aceite; API confirmou tipos de trade | `read/read-all` visual nao foi exercitado |
-| `MessageProvider` direct messages | `/conversations*` | `message_models_test.dart`, server live/error contract | Not triggered by trade; nao aplicavel a este fluxo | Inbox/chat direto continua fora deste runtime |
+| `TradeDetailScreen` / `TradeProvider` | `GET /trades/:id`, `PUT /respond`, `PUT /status` | server live/error contract | UI seller aceitou e marcou enviado; UI buyer tocou `Confirmar Entrega` e `Finalizar`; backend final `completed` | Sem lacuna P1 neste fluxo |
+| Trade messages | `GET/POST /trades/:id/messages` | server live/error contract | Chat visual enviou mensagem via input real; backend retornou `201`; UI buyer reabriu detalhe e exibiu a mensagem | Sem lacuna P1 neste fluxo |
+| `NotificationScreen` / `NotificationProvider` | `GET /notifications`, `GET /notifications/count`, `PUT /notifications/:id/read`, `PUT /notifications/read-all` | `notification_models_test.dart` | UI exibiu notificacao de trade, tap navegou ao trade e marcou read; UI `Ler todas` chamou `read-all` e backend ficou com unread `0` | Sem lacuna P1 neste fluxo |
+| `MessageProvider` direct messages | `/conversations*` | `message_models_test.dart`, server live/error contract | Runtime separado criou conversa, abriu chat visual, enviou mensagem, confirmou polling/read receipt e backend real | Sem lacuna P1 neste fluxo |
 
 ## O que foi provado por UI real no iPhone 15
 
 - Login programatico via `AuthProvider` contra backend real para buyer e seller.
-- `CollectionScreen` -> `Fichario` exibindo item real do buyer.
+- `BinderItemEditor` visual criando, editando e removendo `Command Tower`.
+- `CollectionScreen` -> `Fichario` exibindo item real e refresh de stats.
 - `CollectionScreen` -> `Marketplace` buscando `Sol Ring` real.
 - Marketplace -> `CreateTradeScreen` com item seller pre-selecionado.
 - Criacao visual de proposta de venda (`Enviar Proposta`) com `POST /trades 201`.
 - `Trades` -> `Enviadas` exibindo a proposta pendente.
 - `TradeDetailScreen` como seller: `Pendente -> Aceito -> Enviado`.
-- `TradeDetailScreen` como buyer apos fechamento por API: leitura de `Concluido`.
-- `NotificationScreen` como buyer exibindo notificacao de aceite.
+- Chat visual de trade com mensagem enviada pelo input real.
+- `TradeDetailScreen` como buyer: botao `Confirmar Entrega`, botao `Finalizar` e leitura de `Concluido`.
+- `NotificationScreen` como buyer exibindo notificacao, tap com read individual e botao `Ler todas`.
+- `ChatScreen` de mensagens diretas em runtime separado, com envio visual e read receipt.
 
 ## O que foi provado por API real
 
 - Registro de dois usuarios de teste.
 - Resolucao de carta por `GET /cards`.
-- Binder CRUD autenticado: add, update e delete real; delete retornando `204`.
+- Binder CRUD autenticado: add, update e delete real via UI; delete retornando `204`.
 - Marketplace global com item seller publicado.
 - Criacao de trade por UI e leitura por API.
-- Mensagem de trade por `POST /trades/:id/messages`.
+- Mensagem de trade por `POST /trades/:id/messages` via UI.
 - Notificacoes geradas: `trade_offer_received`, `trade_accepted`, `trade_message`, `trade_shipped`, `trade_completed`.
+- Notificacoes read/read-all: `PUT /notifications/:id/read` e `PUT /notifications/read-all`.
 - Status final de trade: `completed`.
+- Direct messages: `GET/POST /conversations`, `GET/POST /conversations/:id/messages`, `PUT /conversations/:id/read`.
 
 ## Mocked / controlado
 
 - Nenhum backend mockado.
 - O setup de dois usuarios e fixtures foi controlado por API HTTP real.
-- Direct Messages (`/conversations`) nao foram disparadas por trade e ficaram fora da prova.
+- Direct Messages (`/conversations`) nao sao disparadas pelo trade e foram provadas em runtime separado no mesmo arquivo.
 
 ## Bugs corrigidos
 
 - `BinderProvider.removeItem` agora trata `204 No Content` como sucesso, alinhado ao contrato real de `DELETE /binder/:id`.
 - Teste focado adicionado: `app/test/features/binder/providers/binder_provider_test.dart`.
+- `TradeProvider.sendMessage` agora atualiza `chatMessages` de forma imutavel para reconstruir `_TradeChat` apos POST 201.
+- `TradeDetailScreen` aceita envio de chat por `TextInputAction.send`, removendo dependencia de hit-test fragil do teclado/safe-area.
+- `NotificationScreen` exibe `Ler todas` quando a lista carregada contem notificacoes nao lidas, mesmo antes do polling do badge.
+- `MessageProvider.fetchMessages` ignora chamadas sobrepostas por conversa, evitando timeouts de polling quando o backend esta lento.
+- `ChatScreen` ajustou padding inferior para safe-area em vez de `viewInsets.bottom`, eliminando overflow subpixel com teclado.
 
 ## Observacoes e riscos
 
-- O runtime PASS registrou chamadas lentas:
-  - `GET /community/marketplace?page=1&limit=20`: `2049ms`;
-  - `POST /trades`: `5293ms`;
-  - `PUT /trades/:id/status`: `4097ms`;
-  - `GET /trades/:id`: ~`2440ms-2468ms`.
+- O runtime PASS final registrou chamadas lentas mas instrumentadas:
+  - `GET /community/marketplace?page=1&limit=20`: `664ms`;
+  - `GET /trades?page=1&limit=20`: `608ms-633ms`;
+  - `GET /trades/:id`: ~`1202ms-1253ms`;
+  - `POST /trades`: `5165ms`;
+  - `PUT /trades/:id/respond`: `3205ms`;
+  - `PUT /trades/:id/status`: `3941ms-3995ms`;
+  - `POST /trades/:id/messages`: `2403ms`;
+  - `POST /conversations/:id/messages`: `3047ms`.
+- App Sentry/observabilidade: requests lentos geraram breadcrumb `api_slow_request` com metodo, endpoint, status, duracao e request ids, sem payload sensivel. HTTP 4xx/5xx agora tambem e reportavel pelo `ApiClient`.
+- Backend Sentry/log estruturado: rotas tocadas (`binder`, `community/marketplace`, `trades`, `conversations`, `notifications`) capturam excecoes via `captureRouteException` com operacao/ids tecnicos e sem dados sensiveis.
 - Warning conhecido de MLKit sem arm64 para simuladores Apple Silicon iOS 26+ apareceu no build, mas nao impediu o iPhone 15 iOS 17.4.
 
 ## Pendencias
 
 | Prioridade | Item | Owner |
 | --- | --- | --- |
-| P1 | Provar visualmente add/edit/delete do `BinderItemEditor` no iPhone 15 | App binder |
-| P1 | Provar botao buyer `Confirmar Entrega` / `Finalizar` por UI ou corrigir harness/visibilidade se reproduzir manualmente | App trades |
-| P1 | Medir e otimizar latencia de `/trades`, `/trades/:id`, `/trades/:id/status` e marketplace sem filtro | Backend social/trades |
-| P2 | Provar chat visual de trade e `read/read-all` de notificacoes | App trades/notifications |
-| P2 | Criar runtime separado para direct messages (`/conversations`) entre dois usuarios | App messages/backend conversations |
-
+| P1 | Reduzir latencia residual de escrita em `POST /trades`, `PUT /trades/:id/status`, `POST /trades/:id/messages` e `POST /conversations/:id/messages` | Backend social/trades |
+| P2 | Criar metricas p95/p99 persistentes para social trading e alertas por endpoint | Backend observability |
+| P2 | Provar FCM real em device/config staging; nao foi escopo do simulador sem Firebase inicializado | App notifications |

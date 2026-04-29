@@ -1,56 +1,56 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
-## 2026-04-29 — Prova runtime Binder/Marketplace/Trades no iPhone 15
+## 2026-04-29 — Fechamento Binder/Marketplace/Trades no iPhone 15
 
 ### O Porquê
-- Binder CRUD, Marketplace com dados reais, criacao de trade, ciclo de trade e notificacoes de trade ainda estavam parcialmente `not proven` na auditoria geral do app.
-- Era necessario validar o fluxo social de colecao contra backend real em `8082`, com dois usuarios controlados, sem dados anonimos permanentes.
-- A execucao tambem confirmou um desalinhamento pequeno de contrato: o backend retorna `204 No Content` em `DELETE /binder/:id`, enquanto o app tratava apenas `200` como sucesso.
+- O sprint precisava fechar as lacunas restantes de Binder/Marketplace/Trades depois do commit `5391ff6`: modal `BinderItemEditor`, botoes buyer `Confirmar Entrega`/`Finalizar`, chat de trade, notificacoes read/read-all, direct messages e latencia P1.
+- A validacao precisava acontecer no iPhone 15 Simulator com backend real em `8082`, sem mascarar falhas por API direta quando a exigencia era prova visual.
+- A auditoria tambem exigia Sentry/log estruturado em rotas tocadas e captura app-side de 4xx/5xx, timeout/slow request, parse/contrato e estados impossiveis sem vazar payload sensivel.
 
 ### O Como
-- Criado `app/integration_test/binder_marketplace_trade_runtime_test.dart`.
-- O harness usa API HTTP real para setup controlado:
-  - cria seller e buyer com prefixo `qa_bmt_*`;
-  - resolve cartas reais por `/cards`;
-  - cria item seller `Sol Ring` com `for_sale=true`;
-  - cria item buyer `Arcane Signet`;
-  - exercita add/update/delete de binder autenticado;
-  - valida marketplace por `/community/marketplace`.
+- Expandido `app/integration_test/binder_marketplace_trade_runtime_test.dart` para dois runtimes:
+  - Binder/Marketplace/Trades/Notifications com seller e buyer `qa_bmt_*`;
+  - Direct Messages com usuarios `qa_dm_*`.
 - O iPhone 15 executa UI real para:
-  - abrir `CollectionScreen`;
-  - ver Fichario;
-  - buscar marketplace;
-  - abrir `CreateTradeScreen`;
-  - criar proposta;
-  - abrir Trades enviados;
-  - seller aceitar e marcar enviado;
-  - buyer reabrir detalhe e ler status final `Concluido`;
-  - buyer abrir `NotificationScreen`.
-- O fechamento `delivered -> completed` foi feito por API real porque o PASS final nao comprovou visualmente o botao buyer `Confirmar Entrega`; a UI foi reaberta depois para provar leitura do estado final.
-- Corrigido `app/lib/features/binder/providers/binder_provider.dart` para aceitar `200` ou `204` em `removeItem`.
-- Criado teste unitario `app/test/features/binder/providers/binder_provider_test.dart` para o contrato `204`.
+  - criar `Command Tower` pelo `BinderItemEditor`;
+  - editar quantidade, preco, condicao e idioma;
+  - remover o item e confirmar `DELETE /binder/:id` `204`;
+  - listar marketplace sem filtro e buscar `Sol Ring`;
+  - criar proposta de venda via `CreateTradeScreen`;
+  - seller aceitar, enviar e mandar mensagem no chat visual de trade;
+  - buyer reabrir detalhe, ver mensagem, tocar `Confirmar Entrega` e `Finalizar`;
+  - abrir `NotificationScreen`, tocar notificacao para read individual e usar `Ler todas`;
+  - abrir `ChatScreen` de direct messages, enviar mensagem e confirmar read receipt.
+- Corrigido `BinderProvider.removeItem` para aceitar `200` ou `204`.
+- Corrigido `TradeProvider.sendMessage` para atualizar `chatMessages` de forma imutavel; o `context.select` de `_TradeChat` agora reconstrui apos POST 201.
+- `TradeDetailScreen` ganhou envio por `TextInputAction.send` e key explicita no botao de envio, evitando hit-test fragil com teclado/safe-area.
+- `MessageProvider.fetchMessages` ganhou guarda por conversa contra polling sobreposto.
+- `ChatScreen` deixou de somar `viewInsets.bottom` dentro do body ja redimensionado pelo teclado, removendo overflow subpixel.
+- `NotificationScreen` mostra `Ler todas` quando a lista carregada tem notificacoes nao lidas, mesmo antes do polling de `unreadCount`.
+- `ApiClient` passou a registrar breadcrumbs de slow request e capturar 4xx/5xx reportaveis com metodo, endpoint, status, duracao e request ids.
+- Rotas backend tocadas (`binder`, `community/marketplace`, `trades`, `conversations`, `notifications`) passaram a capturar excecoes com `captureRouteException` e `Log.e` sanitizado.
+- Queries de list/detail/count independentes foram paralelizadas onde seguro; migration `server/bin/migrate_social_trading_performance.dart` aplicou indices sociais/trading.
 
 ### Evidencia
 - Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
-- Log PASS: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_pass.log`.
+- Log PASS final: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_after_sprint_pass.log`.
 - Device: `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
 - Backend: `http://127.0.0.1:8082`, health healthy.
-- Dados finais: marker `qa_bmt_19dda7ad00b`, trade `744f4e67-4f48-44e4-b5a3-989fdfc98b60`, status `completed`.
+- Dados finais: marker `qa_bmt_19ddadb15b4`, trade `80366433-a69c-4f1e-90d0-03c923c76f5b`, status `completed`; direct messages marker `qa_dm_19ddadc9d8f`.
+- Latencias runtime final: marketplace sem filtro `664ms`; `/trades` list `608ms-633ms`; `/trades/:id` ~`1202ms-1253ms`; `POST /trades` `5165ms`; `PUT /trades/:id/status` `3941ms-3995ms`; `POST /conversations/:id/messages` `3047ms`.
 
 ### Validacao executada
-- `dart analyze routes/binder routes/community routes/trades routes/conversations routes/notifications lib test`: sem issues.
-- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/error_contract_test.dart -P live`: passou.
-- `dart test`: passou.
-- `flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications lib/features/collection test/features/binder test/features/trades test/features/messages test/features/notifications integration_test --no-version-check`: sem issues.
+- `dart analyze routes/trades routes/market routes/binder routes/conversations routes/notifications lib test`: sem issues.
+- `dart test -r expanded`: passou.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: passou.
+- `flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications integration_test --no-version-check`: sem issues.
 - `flutter test test/features/binder test/features/trades test/features/messages test/features/notifications --no-version-check`: passou.
 - `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: passou.
 
 ### Pendencias
-- Provar visualmente add/edit/delete do modal `BinderItemEditor`.
-- Provar visualmente `Confirmar Entrega`/`Finalizar` como buyer ou corrigir harness se a acao estiver fora de arvore/visibilidade.
-- Otimizar ou monitorar latencia de `/trades`, `/trades/:id`, `/trades/:id/status` e `/community/marketplace` sem filtro.
-- Criar runtime separado para mensagens diretas (`/conversations`) entre dois usuarios.
+- Reduzir latencia residual das escritas sociais/trading/direct messages, principalmente notificacoes/FCM/DB remoto no caminho critico.
+- Provar FCM real em device/config staging; o simulador desta prova nao inicializou Firebase App e usou fallback esperado.
 
 ## 2026-04-29 — Estabilizacao dos goldens legados do Life Counter clone
 

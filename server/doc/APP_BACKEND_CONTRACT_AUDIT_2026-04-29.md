@@ -139,13 +139,13 @@ Hipoteses da auditoria original, confirmadas/refinadas na correcao:
    - `dart test` unit/offline;
    - `TEST_API_BASE_URL=... dart test -P live` para live backend/DB write.
 
-## Atualizacao - contratos Binder/Marketplace/Trades runtime - 2026-04-29 15:30 -0300
+## Atualizacao - contratos Binder/Marketplace/Trades runtime - 2026-04-29 17:10 -0300
 
 Prova fresca no iPhone 15 Simulator com backend real em `http://127.0.0.1:8082`:
 
 - Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
 - Teste: `app/integration_test/binder_marketplace_trade_runtime_test.dart`.
-- Log PASS: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_pass.log`.
+- Log PASS: `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_after_sprint_pass.log`.
 - Device: `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
 
 Contratos exercitados com dados reais `qa_bmt_*`:
@@ -153,29 +153,36 @@ Contratos exercitados com dados reais `qa_bmt_*`:
 | Area | Endpoints provados | Resultado |
 | --- | --- | --- |
 | Auth | `POST /auth/register`, `POST /auth/login` | Seller e buyer criados/logados |
-| Cards | `GET /cards?name=...` | `Sol Ring` e `Arcane Signet` resolvidos |
-| Binder | `GET/POST/PUT/DELETE /binder`, `GET /binder/stats` | CRUD autenticado real; `DELETE /binder/:id` retorna `204` |
-| Marketplace | `GET /community/marketplace` | Item seller visivel para buyer |
-| Trades | `POST /trades`, `GET /trades`, `GET /trades/:id`, `PUT /trades/:id/respond`, `PUT /trades/:id/status` | Trade `744f4e67-4f48-44e4-b5a3-989fdfc98b60` chegou a `completed` |
-| Trade messages | `GET/POST /trades/:id/messages` | Mensagem de trade criada e lida |
-| Notifications | `GET /notifications`, `GET /notifications/count` | Tipos `trade_offer_received`, `trade_accepted`, `trade_message`, `trade_shipped`, `trade_completed` observados |
+| Cards | `GET /cards/printings`, `GET /cards?name=...` | `Command Tower` no editor; `Sol Ring` no marketplace |
+| Binder | `GET/POST/PUT/DELETE /binder`, `GET /binder/stats` | CRUD autenticado real via UI; `DELETE /binder/:id` retorna `204` |
+| Marketplace | `GET /community/marketplace` | Listagem sem filtro e busca com item seller visivel para buyer |
+| Trades | `POST /trades`, `GET /trades`, `GET /trades/:id`, `PUT /trades/:id/respond`, `PUT /trades/:id/status` | Trade `80366433-a69c-4f1e-90d0-03c923c76f5b` chegou a `completed`; buyer provou `Confirmar Entrega` e `Finalizar` via UI |
+| Trade messages | `GET/POST /trades/:id/messages` | Mensagem criada via chat visual e lida ao reabrir detalhe |
+| Notifications | `GET /notifications`, `GET /notifications/count`, `PUT /notifications/:id/read`, `PUT /notifications/read-all` | Tipos `trade_offer_received`, `trade_accepted`, `trade_message`, `trade_shipped`, `trade_completed` observados; read/read-all provados |
+| Conversations | `GET/POST /conversations`, `GET/POST /conversations/:id/messages`, `PUT /conversations/:id/read` | Runtime separado de direct messages provou conversa, envio visual e read receipt |
 
-Impacto app/backend encontrado: o app esperava `200` no delete de binder, mas o backend corretamente respondia `204 No Content`. O app foi alinhado ao contrato.
+Impactos app/backend corrigidos: o app esperava `200` no delete de binder, mas o backend corretamente respondia `204 No Content`; o chat de trade mutava lista em memoria e nao reconstruia a UI; polling de direct messages podia sobrepor chamadas lentas; o botao `Ler todas` dependia apenas de `unreadCount` e nao da lista carregada.
 
-Risco de performance observado no runtime PASS:
+Risco de performance observado no runtime PASS final:
 
-- `POST /trades`: `5293ms`;
-- `PUT /trades/:id/status`: `4097ms`;
-- `GET /trades/:id`: ~`2440ms-2468ms`;
-- `GET /community/marketplace?page=1&limit=20`: `2049ms`.
+- `GET /community/marketplace?page=1&limit=20`: `664ms`;
+- `GET /trades?page=1&limit=20`: `608ms-633ms`;
+- `GET /trades/:id`: ~`1202ms-1253ms`;
+- `POST /trades`: `5165ms`;
+- `PUT /trades/:id/respond`: `3205ms`;
+- `PUT /trades/:id/status`: `3941ms-3995ms`;
+- `POST /trades/:id/messages`: `2403ms`;
+- `POST /conversations/:id/messages`: `3047ms`.
 
-Backlog adicional P1: medir e otimizar p95/p99 dos endpoints de social trading acima antes de release amplo.
+Sentry/logs: rotas `binder`, `community/marketplace`, `trades`, `conversations` e `notifications` capturam excecoes com `captureRouteException` e `Log.e` com contexto tecnico sanitizado. O app registra slow-request breadcrumbs e 4xx/5xx reportaveis no `ApiClient` sem payload sensivel.
+
+Backlog adicional P1: reduzir latencia residual de escritas em social trading/direct messages e manter p95/p99 por endpoint antes de release amplo.
 
 ### P1
 
 1. Manter a separacao `dart test` offline vs `dart test -P live` em novos testes server.
 2. Criar contract smoke app-provider endpoints vs `server/routes` para detectar rotas ausentes.
-3. Criar runtime backend fixtures para messages/trades/notifications com dois usuarios.
+3. Criar runtime backend fixtures reaproveitaveis para social/trading/messages com dois usuarios.
 
 ### P2
 
@@ -186,4 +193,4 @@ Backlog adicional P1: medir e otimizar p95/p99 dos endpoints de social trading a
 ## Menores proximas acoes
 
 1. Adicionar fixtures live dedicadas para social/trading/messages sem depender de dados manuais.
-2. Adicionar uma prova iPhone 15 para cada dominio social/trading ainda `not proven`.
+2. Provar FCM real em device/config staging; nao foi coberto pelo simulador sem Firebase inicializado.
