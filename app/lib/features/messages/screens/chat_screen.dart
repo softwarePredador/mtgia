@@ -166,7 +166,7 @@ class _ChatScreenState extends State<ChatScreen> {
               left: 12,
               right: 8,
               top: 8,
-              bottom: 8 + MediaQuery.of(context).viewInsets.bottom,
+              bottom: 8 + MediaQuery.of(context).padding.bottom,
             ),
             decoration: const BoxDecoration(
               color: AppTheme.surfaceElevated,

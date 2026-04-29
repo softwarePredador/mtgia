@@ -36,7 +36,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         actions: [
           Consumer<NotificationProvider>(
             builder: (context, provider, _) {
-              if (provider.unreadCount == 0) return const SizedBox.shrink();
+              final hasUnread =
+                  provider.unreadCount > 0 ||
+                  provider.notifications.any((n) => !n.isRead);
+              if (!hasUnread) return const SizedBox.shrink();
               return TextButton(
                 onPressed: () => provider.markAllAsRead(),
                 child: const Text(

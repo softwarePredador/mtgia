@@ -24,5 +24,12 @@ void main() {
       expect(headers['Authorization'], equals('Bearer token'));
       expect(headers['x-request-id'], equals('req-123'));
     });
+
+    test('classifies 4xx and 5xx as reportable HTTP errors', () {
+      expect(ApiClient.isReportableHttpStatus(200), isFalse);
+      expect(ApiClient.isReportableHttpStatus(399), isFalse);
+      expect(ApiClient.isReportableHttpStatus(400), isTrue);
+      expect(ApiClient.isReportableHttpStatus(500), isTrue);
+    });
   });
 }

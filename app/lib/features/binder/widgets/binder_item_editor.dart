@@ -51,17 +51,20 @@ class BinderItemEditor extends StatefulWidget {
       isScrollControlled: true,
       backgroundColor: AppTheme.surfaceSlate,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXl),
+        ),
       ),
-      builder: (_) => BinderItemEditor(
-        item: item,
-        cardId: cardId,
-        cardName: cardName,
-        cardImageUrl: cardImageUrl,
-        initialListType: initialListType,
-        onSave: onSave,
-        onDelete: onDelete,
-      ),
+      builder:
+          (_) => BinderItemEditor(
+            item: item,
+            cardId: cardId,
+            cardName: cardName,
+            cardImageUrl: cardImageUrl,
+            initialListType: initialListType,
+            onSave: onSave,
+            onDelete: onDelete,
+          ),
     );
   }
 
@@ -76,6 +79,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   late bool _forTrade;
   late bool _forSale;
   late String _listType;
+  late String _language;
   late TextEditingController _priceController;
   late TextEditingController _notesController;
   bool _saving = false;
@@ -93,6 +97,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     'HP': 'Heavily Played',
     'DMG': 'Damaged',
   };
+  static const languages = ['en', 'pt', 'es', 'ja'];
+  static const languageLabels = {
+    'en': 'EN',
+    'pt': 'PT',
+    'es': 'ES',
+    'ja': 'JP',
+  };
 
   @override
   void initState() {
@@ -104,6 +115,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     _forTrade = item?.forTrade ?? false;
     _forSale = item?.forSale ?? false;
     _listType = item?.listType ?? widget.initialListType;
+    _language = item?.language ?? 'en';
     _priceController = TextEditingController(
       text: item?.price?.toStringAsFixed(2) ?? '',
     );
@@ -125,9 +137,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
       // Se só encontrou 0-1 edição, importa do Scryfall e busca de novo
       if (results.length <= 1) {
-        debugPrint('[BinderItemEditor] Poucas edições (${results.length}), resolvendo via Scryfall...');
+        debugPrint(
+          '[BinderItemEditor] Poucas edições (${results.length}), resolvendo via Scryfall...',
+        );
         results = await provider.resolveAndFetchPrintings(widget.cardName!);
-        debugPrint('[BinderItemEditor] Após resolve: ${results.length} edições');
+        debugPrint(
+          '[BinderItemEditor] Após resolve: ${results.length} edições',
+        );
       }
 
       if (!mounted) return;
@@ -190,10 +206,12 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       'is_foil': _isFoil,
       'for_trade': _forTrade,
       'for_sale': _forSale,
+      'language': _language,
       'list_type': _listType,
-      'notes': _notesController.text.trim().isEmpty
-          ? null
-          : _notesController.text.trim(),
+      'notes':
+          _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
     };
 
     // Parse price
@@ -217,35 +235,38 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       Navigator.pop(context);
     } else {
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao salvar')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Erro ao salvar')));
     }
   }
 
   Future<void> _delete() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surfaceSlate,
-        title: const Text('Remover do Fichário?',
-            style: TextStyle(color: AppTheme.textPrimary)),
-        content: Text(
-          'Remover "${widget.item?.cardName}" do seu fichário?',
-          style: const TextStyle(color: AppTheme.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+      builder:
+          (ctx) => AlertDialog(
+            backgroundColor: AppTheme.surfaceSlate,
+            title: const Text(
+              'Remover do Fichário?',
+              style: TextStyle(color: AppTheme.textPrimary),
+            ),
+            content: Text(
+              'Remover "${widget.item?.cardName}" do seu fichário?',
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: TextButton.styleFrom(foregroundColor: AppTheme.error),
+                child: const Text('Remover'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.error),
-            child: const Text('Remover'),
-          ),
-        ],
-      ),
     );
 
     if (confirm != true) return;
@@ -325,11 +346,16 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
               if (_selectedMarketPrice != null)
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.mythicGold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(color: AppTheme.mythicGold.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppTheme.mythicGold.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       'Preço de mercado: US\$ ${_selectedMarketPrice!.toStringAsFixed(2)}',
@@ -351,16 +377,23 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     child: SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.manaViolet),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.manaViolet,
+                      ),
                     ),
                   ),
                 )
               else if (_printings.isNotEmpty) ...[
                 Row(
                   children: [
-                    const Text('Edição',
-                        style: TextStyle(
-                            color: AppTheme.textSecondary, fontSize: AppTheme.fontMd)),
+                    const Text(
+                      'Edição',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: AppTheme.fontMd,
+                      ),
+                    ),
                     const Spacer(),
                     Text(
                       '${_printings.length} ${_printings.length == 1 ? 'disponível' : 'disponíveis'}',
@@ -380,27 +413,46 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     separatorBuilder: (_, __) => const SizedBox(width: 8),
                     itemBuilder: (context, index) {
                       final p = _printings[index];
-                      final setCode = (p['set_code'] as String? ?? '').toUpperCase();
+                      final setCode =
+                          (p['set_code'] as String? ?? '').toUpperCase();
                       final setName = p['set_name'] as String? ?? setCode;
-                      final releaseDate = p['set_release_date'] as String? ?? '';
-                      final year = releaseDate.length >= 4 ? releaseDate.substring(0, 4) : '';
-                      final price = p['price'] is num ? (p['price'] as num).toDouble() : null;
+                      final releaseDate =
+                          p['set_release_date'] as String? ?? '';
+                      final year =
+                          releaseDate.length >= 4
+                              ? releaseDate.substring(0, 4)
+                              : '';
+                      final price =
+                          p['price'] is num
+                              ? (p['price'] as num).toDouble()
+                              : null;
                       final isSelected = index == _selectedPrintingIndex;
 
                       return GestureDetector(
-                        onTap: () => setState(() => _selectedPrintingIndex = index),
+                        onTap:
+                            () =>
+                                setState(() => _selectedPrintingIndex = index),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppTheme.manaViolet.withValues(alpha: 0.25)
-                                : AppTheme.surfaceElevated,
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                            color:
+                                isSelected
+                                    ? AppTheme.manaViolet.withValues(
+                                      alpha: 0.25,
+                                    )
+                                    : AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMd,
+                            ),
                             border: Border.all(
-                              color: isSelected
-                                  ? AppTheme.manaViolet
-                                  : AppTheme.outlineMuted,
+                              color:
+                                  isSelected
+                                      ? AppTheme.manaViolet
+                                      : AppTheme.outlineMuted,
                               width: isSelected ? 2 : 1,
                             ),
                           ),
@@ -412,17 +464,25 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5,
+                                      vertical: 1,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? AppTheme.manaViolet
-                                          : AppTheme.outlineMuted.withValues(alpha: 0.5),
+                                      color:
+                                          isSelected
+                                              ? AppTheme.manaViolet
+                                              : AppTheme.outlineMuted
+                                                  .withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
                                       setCode,
                                       style: TextStyle(
-                                        color: isSelected ? Colors.white : AppTheme.textPrimary,
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : AppTheme.textPrimary,
                                         fontWeight: FontWeight.w800,
                                         fontSize: 11,
                                         letterSpacing: 0.5,
@@ -456,9 +516,10 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                               Text(
                                 setName,
                                 style: TextStyle(
-                                  color: isSelected
-                                      ? AppTheme.textPrimary
-                                      : AppTheme.textSecondary,
+                                  color:
+                                      isSelected
+                                          ? AppTheme.textPrimary
+                                          : AppTheme.textSecondary,
                                   fontSize: 10,
                                 ),
                                 maxLines: 1,
@@ -476,9 +537,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             ],
 
             // Lista: Tenho / Quero
-            const Text('Lista',
-                style: TextStyle(
-                    color: AppTheme.textSecondary, fontSize: AppTheme.fontMd)),
+            const Text(
+              'Lista',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -488,33 +553,42 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: _listType == 'have'
-                            ? AppTheme.primarySoft.withValues(alpha: 0.15)
-                            : AppTheme.surfaceElevated,
+                        color:
+                            _listType == 'have'
+                                ? AppTheme.primarySoft.withValues(alpha: 0.15)
+                                : AppTheme.surfaceElevated,
                         borderRadius: const BorderRadius.horizontal(
-                            left: Radius.circular(AppTheme.radiusMd)),
+                          left: Radius.circular(AppTheme.radiusMd),
+                        ),
                         border: Border.all(
-                          color: _listType == 'have'
-                              ? AppTheme.primarySoft
-                              : AppTheme.outlineMuted,
+                          color:
+                              _listType == 'have'
+                                  ? AppTheme.primarySoft
+                                  : AppTheme.outlineMuted,
                         ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inventory_2,
-                              size: 16,
-                              color: _listType == 'have'
-                                  ? AppTheme.primarySoft
-                                  : AppTheme.textSecondary),
-                          const SizedBox(width: 6),
-                          Text('Tenho',
-                              style: TextStyle(
-                                color: _listType == 'have'
+                          Icon(
+                            Icons.inventory_2,
+                            size: 16,
+                            color:
+                                _listType == 'have'
                                     ? AppTheme.primarySoft
                                     : AppTheme.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              )),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Tenho',
+                            style: TextStyle(
+                              color:
+                                  _listType == 'have'
+                                      ? AppTheme.primarySoft
+                                      : AppTheme.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -526,33 +600,42 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: _listType == 'want'
-                            ? AppTheme.mythicGold.withValues(alpha: 0.15)
-                            : AppTheme.surfaceElevated,
+                        color:
+                            _listType == 'want'
+                                ? AppTheme.mythicGold.withValues(alpha: 0.15)
+                                : AppTheme.surfaceElevated,
                         borderRadius: const BorderRadius.horizontal(
-                            right: Radius.circular(AppTheme.radiusMd)),
+                          right: Radius.circular(AppTheme.radiusMd),
+                        ),
                         border: Border.all(
-                          color: _listType == 'want'
-                              ? AppTheme.mythicGold
-                              : AppTheme.outlineMuted,
+                          color:
+                              _listType == 'want'
+                                  ? AppTheme.mythicGold
+                                  : AppTheme.outlineMuted,
                         ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.favorite_border,
-                              size: 16,
-                              color: _listType == 'want'
-                                  ? AppTheme.mythicGold
-                                  : AppTheme.textSecondary),
-                          const SizedBox(width: 6),
-                          Text('Quero',
-                              style: TextStyle(
-                                color: _listType == 'want'
+                          Icon(
+                            Icons.favorite_border,
+                            size: 16,
+                            color:
+                                _listType == 'want'
                                     ? AppTheme.mythicGold
                                     : AppTheme.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              )),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Quero',
+                            style: TextStyle(
+                              color:
+                                  _listType == 'want'
+                                      ? AppTheme.mythicGold
+                                      : AppTheme.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -565,15 +648,18 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             // Quantidade
             Row(
               children: [
-                const Text('Quantidade',
-                    style: TextStyle(
-                        color: AppTheme.textSecondary, fontSize: AppTheme.fontMd)),
+                const Text(
+                  'Quantidade',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontMd,
+                  ),
+                ),
                 const Spacer(),
                 _QuantityButton(
                   icon: Icons.remove,
-                  onTap: _quantity > 1
-                      ? () => setState(() => _quantity--)
-                      : null,
+                  onTap:
+                      _quantity > 1 ? () => setState(() => _quantity--) : null,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -595,43 +681,90 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             const SizedBox(height: 16),
 
             // Condição (chips)
-            const Text('Condição',
-                style:
-                    TextStyle(color: AppTheme.textSecondary, fontSize: AppTheme.fontMd)),
+            const Text(
+              'Condição',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: conditions.map((c) {
-                final selected = _condition == c;
-                return ChoiceChip(
-                  label: Text(c),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _condition = c),
-                  selectedColor: AppTheme.manaViolet,
-                  backgroundColor: AppTheme.surfaceElevated,
-                  labelStyle: TextStyle(
-                    color: selected
-                        ? Colors.white
-                        : AppTheme.textSecondary,
-                    fontSize: AppTheme.fontSm,
-                  ),
-                  side: BorderSide(
-                    color:
-                        selected ? AppTheme.manaViolet : AppTheme.outlineMuted,
-                  ),
-                  tooltip: conditionLabels[c],
-                );
-              }).toList(),
+              children:
+                  conditions.map((c) {
+                    final selected = _condition == c;
+                    return ChoiceChip(
+                      label: Text(c),
+                      selected: selected,
+                      onSelected: (_) => setState(() => _condition = c),
+                      selectedColor: AppTheme.manaViolet,
+                      backgroundColor: AppTheme.surfaceElevated,
+                      labelStyle: TextStyle(
+                        color: selected ? Colors.white : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                      side: BorderSide(
+                        color:
+                            selected
+                                ? AppTheme.manaViolet
+                                : AppTheme.outlineMuted,
+                      ),
+                      tooltip: conditionLabels[c],
+                    );
+                  }).toList(),
+            ),
+            const SizedBox(height: 16),
+
+            // Idioma
+            const Text(
+              'Idioma',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children:
+                  languages.map((language) {
+                    final selected = _language == language;
+                    return ChoiceChip(
+                      label: Text(
+                        languageLabels[language] ?? language.toUpperCase(),
+                      ),
+                      selected: selected,
+                      onSelected: (_) => setState(() => _language = language),
+                      selectedColor: AppTheme.primarySoft,
+                      backgroundColor: AppTheme.surfaceElevated,
+                      labelStyle: TextStyle(
+                        color: selected ? Colors.white : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      side: BorderSide(
+                        color:
+                            selected
+                                ? AppTheme.primarySoft
+                                : AppTheme.outlineMuted,
+                      ),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 16),
 
             // Foil toggle
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Foil',
-                  style: TextStyle(color: AppTheme.textSecondary)),
-              secondary: Icon(Icons.auto_awesome,
-                  color: _isFoil ? AppTheme.mythicGold : AppTheme.outlineMuted),
+              title: const Text(
+                'Foil',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              secondary: Icon(
+                Icons.auto_awesome,
+                color: _isFoil ? AppTheme.mythicGold : AppTheme.outlineMuted,
+              ),
               value: _isFoil,
               onChanged: (v) => setState(() => _isFoil = v),
               activeThumbColor: AppTheme.mythicGold,
@@ -640,11 +773,14 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             // Para Troca
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Disponível para troca',
-                  style: TextStyle(color: AppTheme.textSecondary)),
-              secondary: Icon(Icons.swap_horiz,
-                  color:
-                      _forTrade ? AppTheme.primarySoft : AppTheme.outlineMuted),
+              title: const Text(
+                'Disponível para troca',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              secondary: Icon(
+                Icons.swap_horiz,
+                color: _forTrade ? AppTheme.primarySoft : AppTheme.outlineMuted,
+              ),
               value: _forTrade,
               onChanged: (v) => setState(() => _forTrade = v),
               activeThumbColor: AppTheme.primarySoft,
@@ -653,11 +789,14 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             // Para Venda
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Disponível para venda',
-                  style: TextStyle(color: AppTheme.textSecondary)),
-              secondary: Icon(Icons.sell,
-                  color:
-                      _forSale ? AppTheme.mythicGold : AppTheme.outlineMuted),
+              title: const Text(
+                'Disponível para venda',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              secondary: Icon(
+                Icons.sell,
+                color: _forSale ? AppTheme.mythicGold : AppTheme.outlineMuted,
+              ),
               value: _forSale,
               onChanged: (v) => setState(() => _forSale = v),
               activeThumbColor: AppTheme.mythicGold,
@@ -668,25 +807,22 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
               const SizedBox(height: 8),
               TextField(
                 controller: _priceController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Preço (R\$)',
-                  labelStyle:
-                      const TextStyle(color: AppTheme.textSecondary),
+                  labelStyle: const TextStyle(color: AppTheme.textSecondary),
                   prefixText: 'R\$ ',
-                  prefixStyle:
-                      const TextStyle(color: AppTheme.textSecondary),
+                  prefixStyle: const TextStyle(color: AppTheme.textSecondary),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    borderSide:
-                        const BorderSide(color: AppTheme.outlineMuted),
+                    borderSide: const BorderSide(color: AppTheme.outlineMuted),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    borderSide:
-                        const BorderSide(color: AppTheme.manaViolet),
+                    borderSide: const BorderSide(color: AppTheme.manaViolet),
                   ),
                 ),
               ),
@@ -700,17 +836,14 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
               style: const TextStyle(color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 labelText: 'Notas (opcional)',
-                labelStyle:
-                    const TextStyle(color: AppTheme.textSecondary),
+                labelStyle: const TextStyle(color: AppTheme.textSecondary),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide:
-                      const BorderSide(color: AppTheme.outlineMuted),
+                  borderSide: const BorderSide(color: AppTheme.outlineMuted),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  borderSide:
-                      const BorderSide(color: AppTheme.manaViolet),
+                  borderSide: const BorderSide(color: AppTheme.manaViolet),
                 ),
               ),
             ),
@@ -728,7 +861,9 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                         side: const BorderSide(color: AppTheme.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMd,
+                          ),
                         ),
                       ),
                       icon: const Icon(Icons.delete_outline, size: 18),
@@ -747,16 +882,17 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                       ),
                     ),
-                    child: _saving
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(isEditing ? 'Salvar' : 'Adicionar'),
+                    child:
+                        _saving
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : Text(isEditing ? 'Salvar' : 'Adicionar'),
                   ),
                 ),
               ],

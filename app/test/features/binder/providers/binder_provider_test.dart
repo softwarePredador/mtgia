@@ -4,6 +4,8 @@ import 'package:manaloom/features/binder/providers/binder_provider.dart';
 
 class _FakeBinderApiClient extends ApiClient {
   var deletedItemId = '';
+  Map<String, dynamic>? lastPostBody;
+  Map<String, dynamic>? lastPutBody;
 
   @override
   Future<ApiResponse> get(String endpoint) async {
@@ -20,6 +22,7 @@ class _FakeBinderApiClient extends ApiClient {
             'for_trade': true,
             'for_sale': false,
             'currency': 'BRL',
+            'language': 'pt',
             'list_type': 'have',
           },
         ],
@@ -47,6 +50,22 @@ class _FakeBinderApiClient extends ApiClient {
     deletedItemId = endpoint.split('/').last;
     return ApiResponse(204, null);
   }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    lastPostBody = body;
+    return ApiResponse(201, {'id': 'binder-created'});
+  }
+
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    lastPutBody = body;
+    return ApiResponse(200, {'message': 'ok'});
+  }
 }
 
 void main() {
@@ -58,6 +77,7 @@ void main() {
 
       await provider.fetchMyBinder(reset: true);
       expect(provider.items, hasLength(1));
+      expect(provider.items.single.language, 'pt');
 
       final removed = await provider.removeItem('binder-1');
 
@@ -65,6 +85,36 @@ void main() {
       expect(api.deletedItemId, 'binder-1');
       expect(provider.items, isEmpty);
       expect(provider.error, isNull);
+    },
+  );
+
+  test('addItem sends language to backend contract', () async {
+    final api = _FakeBinderApiClient();
+    final provider = BinderProvider(apiClient: api);
+
+    final created = await provider.addItem(
+      cardId: 'card-1',
+      language: 'es',
+      condition: 'LP',
+    );
+
+    expect(created, isTrue);
+    expect(api.lastPostBody?['language'], 'es');
+    expect(api.lastPostBody?['condition'], 'LP');
+  });
+
+  test(
+    'updateItem applies language locally when backend accepts update',
+    () async {
+      final api = _FakeBinderApiClient();
+      final provider = BinderProvider(apiClient: api);
+      await provider.fetchMyBinder(reset: true);
+
+      final updated = await provider.updateItem('binder-1', {'language': 'ja'});
+
+      expect(updated, isTrue);
+      expect(api.lastPutBody?['language'], 'ja');
+      expect(provider.items.single.language, 'ja');
     },
   );
 }

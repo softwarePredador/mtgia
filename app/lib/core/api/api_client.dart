@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_performance/firebase_performance.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../observability/app_observability.dart';
 
@@ -100,6 +101,8 @@ class ApiClient {
     };
   }
 
+  static bool isReportableHttpStatus(int statusCode) => statusCode >= 400;
+
   Map<String, String> _getHeaders({String? requestId}) {
     final baseHeaders = {
       'Content-Type': 'application/json',
@@ -165,6 +168,8 @@ class ApiClient {
       
       return _parseResponse(
         response,
+        method: 'GET',
+        endpoint: endpoint,
         durationMs: durationMs,
         requestId: requestId,
       );
@@ -229,6 +234,8 @@ class ApiClient {
       
       return _parseResponse(
         response,
+        method: 'POST',
+        endpoint: endpoint,
         durationMs: durationMs,
         requestId: requestId,
       );
@@ -285,6 +292,8 @@ class ApiClient {
       
       return _parseResponse(
         response,
+        method: 'PUT',
+        endpoint: endpoint,
         durationMs: durationMs,
         requestId: requestId,
       );
@@ -337,6 +346,8 @@ class ApiClient {
       
       return _parseResponse(
         response,
+        method: 'PATCH',
+        endpoint: endpoint,
         durationMs: durationMs,
         requestId: requestId,
       );
@@ -388,6 +399,8 @@ class ApiClient {
       
       return _parseResponse(
         response,
+        method: 'DELETE',
+        endpoint: endpoint,
         durationMs: durationMs,
         requestId: requestId,
       );
@@ -413,6 +426,8 @@ class ApiClient {
 
   ApiResponse _parseResponse(
     http.Response response, {
+    required String method,
+    required String endpoint,
     int durationMs = 0,
     String? requestId,
   }) {
@@ -426,12 +441,69 @@ class ApiClient {
       }
     }
     
-    return ApiResponse(
+    final parsed = ApiResponse(
       response.statusCode,
       data,
       durationMs: durationMs,
       requestId: requestId,
       responseRequestId: response.headers['x-request-id'],
+    );
+
+    _recordHttpResult(
+      method: method,
+      endpoint: endpoint,
+      statusCode: response.statusCode,
+      durationMs: durationMs,
+      requestId: requestId,
+      responseRequestId: response.headers['x-request-id'],
+    );
+    return parsed;
+  }
+
+  void _recordHttpResult({
+    required String method,
+    required String endpoint,
+    required int statusCode,
+    required int durationMs,
+    String? requestId,
+    String? responseRequestId,
+  }) {
+    final data = <String, Object?>{
+      'method': method,
+      'endpoint': endpoint,
+      'status_code': statusCode,
+      'duration_ms': durationMs,
+      if (requestId != null) 'request_id': requestId,
+      if (responseRequestId != null) 'response_request_id': responseRequestId,
+    };
+
+    if (durationMs > 2000) {
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'api_slow_request',
+          category: 'api',
+          level: SentryLevel.warning,
+          data: data,
+        ),
+      );
+    }
+
+    if (!isReportableHttpStatus(statusCode)) {
+      return;
+    }
+
+    unawaited(
+      AppObservability.instance.captureException(
+        Exception('HTTP $statusCode $method $endpoint'),
+        stackTrace: StackTrace.current,
+        level: statusCode >= 500 ? SentryLevel.error : SentryLevel.warning,
+        tags: {
+          'source': 'api_client',
+          'method': method,
+          'http_status': statusCode.toString(),
+        },
+        extras: data,
+      ),
     );
   }
 

@@ -662,7 +662,10 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 201) {
         // Adicionar localmente para feedback imediato
         final msgData = res.data as Map<String, dynamic>;
-        _chatMessages.add(TradeMessage.fromJson(msgData));
+        _chatMessages = [
+          ..._chatMessages,
+          TradeMessage.fromJson(msgData),
+        ];
         _chatTotal++;
         notifyListeners();
         return true;

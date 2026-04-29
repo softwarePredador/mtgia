@@ -232,6 +232,7 @@ class _BinderListViewState extends State<_BinderListView>
                               ? (data['price'] as num).toDouble()
                               : null,
                       notes: data['notes'] as String?,
+                      language: data['language'] as String? ?? 'en',
                       listType: data['list_type'] as String? ?? widget.listType,
                     );
                     if (ok && mounted) {
@@ -276,6 +277,7 @@ class _BinderListViewState extends State<_BinderListView>
                               ? (data['price'] as num).toDouble()
                               : null,
                       notes: data['notes'] as String?,
+                      language: data['language'] as String? ?? 'en',
                       listType: data['list_type'] as String? ?? widget.listType,
                     );
                     if (ok && mounted) {

@@ -36,6 +36,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
   @override
   void deactivate() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
     context.read<TradeProvider>().clearSelectedTrade();
     super.deactivate();
   }
@@ -758,6 +760,13 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
 
   // ─── Input de Mensagem ──────────────────────────────────────
   Widget _buildMessageInput(TradeProvider provider) {
+    Future<void> sendCurrentMessage() async {
+      final text = _messageController.text.trim();
+      if (text.isEmpty) return;
+      _messageController.clear();
+      await provider.sendMessage(widget.tradeId, text);
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: AppTheme.surfaceSlate,
@@ -768,6 +777,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
               child: TextField(
                 controller: _messageController,
                 style: const TextStyle(color: AppTheme.textPrimary),
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => sendCurrentMessage(),
                 decoration: InputDecoration(
                   hintText: 'Escrever mensagem...',
                   hintStyle: const TextStyle(color: AppTheme.textHint),
@@ -786,12 +797,8 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             ),
             const SizedBox(width: 8),
             IconButton(
-              onPressed: () async {
-                final text = _messageController.text.trim();
-                if (text.isEmpty) return;
-                _messageController.clear();
-                await provider.sendMessage(widget.tradeId, text);
-              },
+              key: const ValueKey('trade-message-send-button'),
+              onPressed: sendCurrentMessage,
               icon: const Icon(Icons.send, color: AppTheme.manaViolet),
             ),
           ],

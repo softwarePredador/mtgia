@@ -22,6 +22,7 @@ class BinderItem {
   double? price;
   String currency;
   String? notes;
+  String language;
   String listType; // 'have' or 'want'
 
   BinderItem({
@@ -41,6 +42,7 @@ class BinderItem {
     this.price,
     this.currency = 'BRL',
     this.notes,
+    this.language = 'en',
     this.listType = 'have',
   });
 
@@ -50,11 +52,15 @@ class BinderItem {
       id: json['id'] as String,
       cardId: card?['id'] as String? ?? json['card_id'] as String,
       cardName: card?['name'] as String? ?? json['card_name'] as String? ?? '',
-      cardImageUrl: card?['image_url'] as String? ?? json['card_image_url'] as String?,
-      cardSetCode: card?['set_code'] as String? ?? json['card_set_code'] as String?,
-      cardManaCost: card?['mana_cost'] as String? ?? json['card_mana_cost'] as String?,
+      cardImageUrl:
+          card?['image_url'] as String? ?? json['card_image_url'] as String?,
+      cardSetCode:
+          card?['set_code'] as String? ?? json['card_set_code'] as String?,
+      cardManaCost:
+          card?['mana_cost'] as String? ?? json['card_mana_cost'] as String?,
       cardRarity: card?['rarity'] as String? ?? json['card_rarity'] as String?,
-      cardTypeLine: card?['type_line'] as String? ?? json['card_type_line'] as String?,
+      cardTypeLine:
+          card?['type_line'] as String? ?? json['card_type_line'] as String?,
       quantity: json['quantity'] as int? ?? 1,
       condition: json['condition'] as String? ?? 'NM',
       isFoil: json['is_foil'] as bool? ?? false,
@@ -63,6 +69,7 @@ class BinderItem {
       price: json['price'] != null ? (json['price'] as num).toDouble() : null,
       currency: json['currency'] as String? ?? 'BRL',
       notes: json['notes'] as String?,
+      language: json['language'] as String? ?? 'en',
       listType: json['list_type'] as String? ?? 'have',
     );
   }
@@ -93,9 +100,10 @@ class BinderStats {
       uniqueCards: json['unique_cards'] as int? ?? 0,
       forTradeCount: json['for_trade_count'] as int? ?? 0,
       forSaleCount: json['for_sale_count'] as int? ?? 0,
-      estimatedValue: json['estimated_value'] != null
-          ? (json['estimated_value'] as num).toDouble()
-          : 0.0,
+      estimatedValue:
+          json['estimated_value'] != null
+              ? (json['estimated_value'] as num).toDouble()
+              : 0.0,
     );
   }
 }
@@ -130,6 +138,7 @@ class MarketplaceItem extends BinderItem {
     super.price,
     super.currency,
     super.notes,
+    super.language,
     super.listType,
     required this.ownerId,
     required this.ownerUsername,
@@ -160,6 +169,7 @@ class MarketplaceItem extends BinderItem {
       price: json['price'] != null ? (json['price'] as num).toDouble() : null,
       currency: json['currency'] as String? ?? 'BRL',
       notes: json['notes'] as String?,
+      language: json['language'] as String? ?? 'en',
       listType: json['list_type'] as String? ?? 'have',
       ownerId: owner?['id'] as String? ?? '',
       ownerUsername: owner?['username'] as String? ?? '',
@@ -269,9 +279,10 @@ class BinderProvider extends ChangeNotifier {
       final res = await _api.get(endpoint);
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
-        final list = (data['data'] as List<dynamic>? ?? [])
-            .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final list =
+            (data['data'] as List<dynamic>? ?? [])
+                .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
+                .toList();
         _items.addAll(list);
         _hasMore = list.length >= 20;
         _page++;
@@ -339,6 +350,7 @@ class BinderProvider extends ChangeNotifier {
     bool forSale = false,
     double? price,
     String? notes,
+    String language = 'en',
     String listType = 'have',
   }) async {
     try {
@@ -349,6 +361,7 @@ class BinderProvider extends ChangeNotifier {
         'is_foil': isFoil,
         'for_trade': forTrade,
         'for_sale': forSale,
+        'language': language,
         'list_type': listType,
         if (price != null) 'price': price,
         if (notes != null) 'notes': notes,
@@ -398,12 +411,16 @@ class BinderProvider extends ChangeNotifier {
             item.forSale = updates['for_sale'] as bool;
           }
           if (updates.containsKey('price')) {
-            item.price = updates['price'] != null
-                ? (updates['price'] as num).toDouble()
-                : null;
+            item.price =
+                updates['price'] != null
+                    ? (updates['price'] as num).toDouble()
+                    : null;
           }
           if (updates.containsKey('notes')) {
             item.notes = updates['notes'] as String?;
+          }
+          if (updates.containsKey('language')) {
+            item.language = updates['language'] as String? ?? 'en';
           }
           notifyListeners();
         }
@@ -509,7 +526,9 @@ class BinderProvider extends ChangeNotifier {
       }
       return null;
     } catch (e) {
-      debugPrint('[❌ BinderProvider] fetchPublicBinderDirect($userId, $listType): $e');
+      debugPrint(
+        '[❌ BinderProvider] fetchPublicBinderDirect($userId, $listType): $e',
+      );
       return null;
     }
   }
@@ -540,9 +559,10 @@ class BinderProvider extends ChangeNotifier {
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
         _publicOwner = data['owner'] as Map<String, dynamic>?;
-        final list = (data['data'] as List<dynamic>? ?? [])
-            .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final list =
+            (data['data'] as List<dynamic>? ?? [])
+                .map((e) => BinderItem.fromJson(e as Map<String, dynamic>))
+                .toList();
         _publicItems.addAll(list);
         _hasMorePublic = list.length >= 20;
         _publicPage++;
@@ -594,9 +614,10 @@ class BinderProvider extends ChangeNotifier {
       final res = await _api.get(endpoint);
       if (res.statusCode == 200 && res.data is Map) {
         final data = res.data as Map<String, dynamic>;
-        final list = (data['data'] as List<dynamic>? ?? [])
-            .map((e) => MarketplaceItem.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final list =
+            (data['data'] as List<dynamic>? ?? [])
+                .map((e) => MarketplaceItem.fromJson(e as Map<String, dynamic>))
+                .toList();
         _marketItems.addAll(list);
         _hasMoreMarket = list.length >= 20;
         _marketPage++;

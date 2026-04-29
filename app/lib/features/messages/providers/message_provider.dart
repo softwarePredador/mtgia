@@ -101,8 +101,11 @@ class DirectMessage {
 // ─── Provider ────────────────────────────────────────────────
 
 class MessageProvider extends ChangeNotifier {
-  final ApiClient _api = ApiClient();
+  final ApiClient _api;
   final Map<String, String> _lastMessageAtByConversation = {};
+  final Set<String> _activeMessageFetches = {};
+
+  MessageProvider({ApiClient? apiClient}) : _api = apiClient ?? ApiClient();
 
   List<Conversation> _conversations = [];
   List<Conversation> get conversations => _conversations;
@@ -230,6 +233,11 @@ class MessageProvider extends ChangeNotifier {
     int limit = 50,
     bool incremental = false,
   }) async {
+    if (_activeMessageFetches.contains(conversationId)) {
+      return;
+    }
+    _activeMessageFetches.add(conversationId);
+
     var didChange = false;
     if (!incremental) {
       _isLoadingMessages = true;
@@ -281,9 +289,13 @@ class MessageProvider extends ChangeNotifier {
     } finally {
       if (!incremental) {
         _isLoadingMessages = false;
+        _activeMessageFetches.remove(conversationId);
         notifyListeners();
       } else if (didChange) {
+        _activeMessageFetches.remove(conversationId);
         notifyListeners();
+      } else {
+        _activeMessageFetches.remove(conversationId);
       }
     }
   }
@@ -373,6 +385,7 @@ class MessageProvider extends ChangeNotifier {
     _totalMessages = 0;
     _unreadCount = 0;
     _lastMessageAtByConversation.clear();
+    _activeMessageFetches.clear();
     notifyListeners();
   }
 }
