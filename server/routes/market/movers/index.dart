@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import 'package:server/market_movers.dart';
 
 /// GET /market/movers
 ///
@@ -18,6 +21,8 @@ import 'package:postgres/postgres.dart';
 ///   "losers":  [ ... ],
 ///   "total_tracked": 12345
 /// }
+final _marketMoversCache = MarketMoversCache();
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: 405, body: '{"error":"Method not allowed"}');
@@ -25,192 +30,34 @@ Future<Response> onRequest(RequestContext context) async {
 
   final pool = context.read<Pool>();
   final params = context.request.uri.queryParameters;
-  final limit = (int.tryParse(params['limit'] ?? '20') ?? 20).clamp(1, 50);
-  final minPrice = double.tryParse(params['min_price'] ?? '1.0') ?? 1.0;
+  final limit = normalizeMarketMoversLimit(params['limit']);
+  final minPrice = normalizeMarketMoversMinPrice(params['min_price']);
+
+  final cached = _marketMoversCache.get(limit, minPrice);
+  if (cached != null) {
+    return Response.json(body: cached);
+  }
 
   try {
-    // Descobre as datas disponíveis (até 7 mais recentes)
-    final datesResult = await pool.execute(
-      Sql.named('''
-        SELECT DISTINCT price_date 
-        FROM price_history 
-        ORDER BY price_date DESC 
-        LIMIT 7
-      '''),
-    );
-
-    if (datesResult.length < 2) {
-      return Response.json(
-        body: {
-          'date': datesResult.isNotEmpty
-              ? datesResult.first[0].toString().substring(0, 10)
-              : null,
-          'previous_date': null,
-          'gainers': <dynamic>[],
-          'losers': <dynamic>[],
-          'total_tracked': 0,
-          'message':
-              'Dados insuficientes. São necessários pelo menos 2 dias de histórico de preços.',
-        },
-      );
+    final payload = await _fetchMarketMovers(pool, limit, minPrice)
+        .timeout(marketMoversQueryTimeout);
+    _marketMoversCache.set(limit, minPrice, payload);
+    return Response.json(body: payload);
+  } on TimeoutException catch (e) {
+    print('[WARN] Timeout ao buscar market movers: $e');
+    final stale = _marketMoversCache.get(limit, minPrice, allowStale: true);
+    if (stale != null) {
+      return Response.json(body: stale);
     }
-
-    final today = datesResult[0][0].toString().substring(0, 10);
-
-    // Encontra a melhor data de comparação em uma única query:
-    // a data mais recente (< today) com pelo menos uma variação significativa
-    // (diferença > 0.5%) em cartas com preço > 1.0.
-    // Fallback: se não houver variação detectada, usa a segunda data mais recente.
-    var yesterday = datesResult[1][0].toString().substring(0, 10);
-
-    final comparisonDateResult = await pool.execute(
-      Sql.named('''
-        WITH recent_dates AS (
-          SELECT DISTINCT price_date
-          FROM price_history
-          ORDER BY price_date DESC
-          LIMIT 7
-        )
-        SELECT rd.price_date
-        FROM recent_dates rd
-        WHERE rd.price_date < @today::date
-          AND EXISTS (
-            SELECT 1
-            FROM price_history ph_today
-            JOIN price_history ph_candidate
-              ON ph_candidate.card_id = ph_today.card_id
-             AND ph_candidate.price_date = rd.price_date
-            WHERE ph_today.price_date = @today::date
-              AND ph_today.price_usd > 1.0
-              AND ph_candidate.price_usd > 0
-              AND ABS((ph_today.price_usd - ph_candidate.price_usd) / ph_candidate.price_usd) > 0.005
-            LIMIT 1
-          )
-        ORDER BY rd.price_date DESC
-        LIMIT 1
-      '''),
-      parameters: {'today': today},
-    );
-
-    if (comparisonDateResult.isNotEmpty) {
-      yesterday = comparisonDateResult.first[0].toString().substring(0, 10);
-    }
-
-    // Query para pegar gainers (maior aumento %)
-    final gainersResult = await pool.execute(
-      Sql.named('''
-        SELECT 
-          c.id,
-          c.name,
-          c.set_code,
-          c.image_url,
-          c.rarity,
-          c.type_line,
-          ph_today.price_usd AS price_today,
-          ph_yest.price_usd AS price_yesterday,
-          (ph_today.price_usd - ph_yest.price_usd) AS change_usd,
-          ROUND(
-            ((ph_today.price_usd - ph_yest.price_usd) / ph_yest.price_usd * 100)::numeric, 
-            2
-          ) AS change_pct
-        FROM price_history ph_today
-        JOIN price_history ph_yest 
-          ON ph_today.card_id = ph_yest.card_id
-        JOIN cards c 
-          ON c.id = ph_today.card_id
-        WHERE ph_today.price_date = @today::date
-          AND ph_yest.price_date = @yesterday::date
-          AND ph_yest.price_usd > @min_price
-          AND ph_today.price_usd > 0
-          AND ph_yest.price_usd > 0
-          AND ph_today.price_usd > ph_yest.price_usd
-        ORDER BY change_pct DESC
-        LIMIT @limit
-      '''),
-      parameters: {
-        'today': today,
-        'yesterday': yesterday,
-        'min_price': minPrice,
-        'limit': limit,
-      },
-    );
-
-    // Query para pegar losers (maior queda %)
-    final losersResult = await pool.execute(
-      Sql.named('''
-        SELECT 
-          c.id,
-          c.name,
-          c.set_code,
-          c.image_url,
-          c.rarity,
-          c.type_line,
-          ph_today.price_usd AS price_today,
-          ph_yest.price_usd AS price_yesterday,
-          (ph_today.price_usd - ph_yest.price_usd) AS change_usd,
-          ROUND(
-            ((ph_today.price_usd - ph_yest.price_usd) / ph_yest.price_usd * 100)::numeric, 
-            2
-          ) AS change_pct
-        FROM price_history ph_today
-        JOIN price_history ph_yest 
-          ON ph_today.card_id = ph_yest.card_id
-        JOIN cards c 
-          ON c.id = ph_today.card_id
-        WHERE ph_today.price_date = @today::date
-          AND ph_yest.price_date = @yesterday::date
-          AND ph_yest.price_usd > @min_price
-          AND ph_today.price_usd >= 0
-          AND ph_yest.price_usd > 0
-          AND ph_today.price_usd < ph_yest.price_usd
-        ORDER BY change_pct ASC
-        LIMIT @limit
-      '''),
-      parameters: {
-        'today': today,
-        'yesterday': yesterday,
-        'min_price': minPrice,
-        'limit': limit,
-      },
-    );
-
-    // Total de cartas rastreadas
-    final totalResult = await pool.execute(
-      Sql.named('''
-        SELECT COUNT(DISTINCT card_id) 
-        FROM price_history 
-        WHERE price_date = @today::date
-      '''),
-      parameters: {'today': today},
-    );
-
-    final totalTracked = _toInt(totalResult.first[0]);
-
-    List<Map<String, dynamic>> mapRows(Result rows) {
-      return rows.map((row) {
-        return {
-          'card_id': row[0].toString(),
-          'name': row[1],
-          'set_code': row[2],
-          'image_url': row[3],
-          'rarity': row[4],
-          'type_line': row[5],
-          'price_today': _toDouble(row[6]),
-          'price_yesterday': _toDouble(row[7]),
-          'change_usd': _toDouble(row[8]),
-          'change_pct': _toDouble(row[9]),
-        };
-      }).toList();
-    }
-
     return Response.json(
-      body: {
-        'date': today,
-        'previous_date': yesterday,
-        'gainers': mapRows(gainersResult),
-        'losers': mapRows(losersResult),
-        'total_tracked': totalTracked,
-      },
+      body: buildMarketMoversPayload(
+        date: null,
+        previousDate: null,
+        gainers: const [],
+        losers: const [],
+        totalTracked: 0,
+        message: 'Dados de mercado temporariamente indisponíveis.',
+      ),
     );
   } catch (e) {
     print('[ERROR] Erro ao buscar market movers: $e');
@@ -221,19 +68,68 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-/// Converte valor do PostgreSQL (DECIMAL/NUMERIC vem como String) para double
-double? _toDouble(dynamic value) {
-  if (value == null) return null;
-  if (value is num) return value.toDouble();
-  if (value is String) return double.tryParse(value);
-  return null;
-}
+Future<Map<String, dynamic>> _fetchMarketMovers(
+  Pool pool,
+  int limit,
+  double minPrice,
+) async {
+  final summaryResult = await pool.execute(Sql.named(marketMoversSummarySql));
+  if (summaryResult.isEmpty) {
+    return buildMarketMoversPayload(
+      date: null,
+      previousDate: null,
+      gainers: const [],
+      losers: const [],
+      totalTracked: 0,
+      message:
+          'Dados insuficientes. São necessários pelo menos 2 dias de histórico de preços.',
+    );
+  }
 
-/// Converte valor do PostgreSQL (COUNT vem como int/bigint) para int
-int _toInt(dynamic value) {
-  if (value == null) return 0;
-  if (value is int) return value;
-  if (value is num) return value.toInt();
-  if (value is String) return int.tryParse(value) ?? 0;
-  return 0;
+  final summary = summaryResult.first;
+  final today = dateStringOrNull(summary[0]);
+  final previous = dateStringOrNull(summary[1]);
+  final totalTracked = toInt(summary[2]);
+
+  if (today == null || previous == null) {
+    return buildMarketMoversPayload(
+      date: today,
+      previousDate: null,
+      gainers: const [],
+      losers: const [],
+      totalTracked: 0,
+      message:
+          'Dados insuficientes. São necessários pelo menos 2 dias de histórico de preços.',
+    );
+  }
+
+  final queryParams = {
+    'today': today,
+    'previous': previous,
+    'min_price': minPrice,
+    'limit': limit,
+  };
+
+  final gainersResult = await pool.execute(
+    Sql.named(marketMoversGainersSql),
+    parameters: queryParams,
+  );
+  final losersResult = await pool.execute(
+    Sql.named(marketMoversLosersSql),
+    parameters: queryParams,
+  );
+
+  List<Map<String, dynamic>> mapRows(Result rows) {
+    return rows
+        .map((row) => buildMarketMoverRow((index) => row[index]))
+        .toList();
+  }
+
+  return buildMarketMoversPayload(
+    date: today,
+    previousDate: previous,
+    gainers: mapRows(gainersResult),
+    losers: mapRows(losersResult),
+    totalTracked: totalTracked,
+  );
 }

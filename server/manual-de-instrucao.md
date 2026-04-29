@@ -1,6 +1,66 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Correcao P0/P1 de performance em `GET /market/movers`
+
+### O Porquê
+- A auditoria geral do app/backend provou que `GET /market/movers?limit=5&min_price=1.0` excedia o timeout de 15s no app e ficou pendurado por mais de 60s em probe `curl`.
+- O impacto atingia Home, Market e Community, porque `MarketProvider` consome esse endpoint para renderizar gainers/losers.
+- A correcao precisava preservar o contrato atual do app e nao aumentar timeout no Flutter.
+
+### O Como
+- Diagnostico no banco real:
+  - `price_history`: `2.414.220` linhas, `79` datas, `30.569` cartas por snapshot recente;
+  - agregacao ampla sobre todo o historico levou `11.783s`;
+  - estatisticas defasadas estimavam `1` linha para uma data com `30.569` linhas;
+  - variante de join/order sem materializacao atingiu `statement_timeout` de `20s`.
+- Criado `lib/market_movers.dart` com:
+  - normalizacao de `limit` e `min_price`;
+  - SQLs testaveis;
+  - mapeamento do payload JSON atual;
+  - cache process-local com TTL de 5 minutos e suporte a stale fallback.
+- Refatorado `routes/market/movers/index.dart`:
+  - removeu a busca cara por data alternativa via `EXISTS`;
+  - passou a comparar diretamente as duas datas mais recentes, conforme contrato original (`date` e `previous_date`);
+  - materializa snapshots de hoje/anterior, calcula/ordena variacao, aplica `LIMIT @limit` e so depois faz `JOIN cards`;
+  - substitui `COUNT(DISTINCT card_id)` por `COUNT(*)`, seguro por causa de `UNIQUE(card_id, price_date)`;
+  - adiciona timeout server-side defensivo de 4s com resposta degradada preservando `date`, `previous_date`, `gainers`, `losers` e `total_tracked`.
+- Criada migration nao destrutiva `bin/migrate_market_movers_performance.dart`:
+  ```sql
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_price_history_date_card_price
+  ON price_history(price_date DESC, card_id)
+  INCLUDE (price_usd);
+
+  ANALYZE price_history;
+  ```
+- Atualizado `database_indexes.sql` com o mesmo indice e `ANALYZE price_history`.
+
+### Resultado
+- `EXPLAIN ANALYZE` pos-correcao:
+  - resumo datas/total: `10.919ms`;
+  - gainers: `64.989ms`;
+  - losers: `53.328ms`.
+- Probe HTTP real em `8082`:
+  ```bash
+  curl -sS -o /tmp/market_movers_probe.json \
+    -w "http_code=%{http_code} time_total=%{time_total}\n" \
+    "http://127.0.0.1:8082/market/movers?limit=5&min_price=1.0"
+  ```
+  Resultado: `http_code=200 time_total=1.918091`.
+- Segundo probe com cache process-local: `http_code=200 time_total=0.005164`.
+- Payload preservado:
+  ```json
+  {"date":"2026-04-29","previous_date":"2026-04-28","gainers":[],"losers":[],"total_tracked":30569}
+  ```
+- Teste focado criado: `test/market_movers_test.dart`.
+
+### Validacao executada
+- `dart analyze routes/market lib test`: sem issues.
+- `dart test test/market_movers_test.dart`: passou.
+
+### Pendencia
+- Nao foi provado p95/p99 em producao com concorrencia real; manter observabilidade de latencia para `/market/movers`.
+
 ## 2026-04-29 — Auditoria geral ManaLoom app/backend e runtime iPhone 15
 
 ### O Porquê

@@ -128,14 +128,24 @@ CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner
   ON battle_simulations(winner_deck_id);
 
 -- ========================================
--- 8. Verificar Índices Criados
+-- 8. Índices para Market Movers
+-- ========================================
+
+-- Performance para GET /market/movers.
+-- Query: leituras por price_date + join por card_id + preço para cálculo de variação.
+CREATE INDEX IF NOT EXISTS idx_price_history_date_card_price
+  ON price_history(price_date DESC, card_id)
+  INCLUDE (price_usd);
+
+-- ========================================
+-- 9. Verificar Índices Criados
 -- ========================================
 
 -- Para verificar se os índices foram criados corretamente:
 -- SELECT schemaname, tablename, indexname FROM pg_indexes WHERE schemaname = 'public' ORDER BY tablename, indexname;
 
 -- ========================================
--- 9. Estatísticas e Manutenção
+-- 10. Estatísticas e Manutenção
 -- ========================================
 
 -- Atualizar estatísticas do PostgreSQL para melhor performance
@@ -146,6 +156,7 @@ ANALYZE card_legalities;
 ANALYZE users;
 ANALYZE meta_decks;
 ANALYZE battle_simulations;
+ANALYZE price_history;
 
 -- ========================================
 -- FIM DOS ÍNDICES

@@ -6,7 +6,41 @@ Auditoria dos contratos backend consumidos pelo app ManaLoom em `2026-04-29`, cr
 
 O contrato core app/backend esta coerente para auth, decks, cards, sets, import, optimize, validate, binder, community, trades, conversations e notifications. As variantes incrementais de deck cards existem no backend (`bulk`, `set`, `replace`) e retornam `401` quando chamadas sem token, confirmando roteamento e middleware.
 
-Risco provado: `GET /market/movers?limit=5&min_price=1.0` nao retornou dentro do timeout do app (15s) e tambem nao retornou em probe `curl` apos 60s. Isso afeta Home/Market/Community, mas o app capturou o erro sem quebrar o runtime de deck.
+Risco provado na auditoria original: `GET /market/movers?limit=5&min_price=1.0` nao retornou dentro do timeout do app (15s) e tambem nao retornou em probe `curl` apos 60s. Isso afetava Home/Market/Community, mas o app capturou o erro sem quebrar o runtime de deck.
+
+Atualizacao pos-correcao em 2026-04-29: o endpoint foi otimizado no backend sem alterar o app nem o contrato JSON atual. O probe frio contra backend real em `8082` retornou `200` em `1.918091s`; o hit quente com cache process-local retornou em `0.005164s`.
+
+## Correcao aplicada em `/market/movers`
+
+### Diagnostico real
+
+- Base real: `price_history` com `2.414.220` linhas, `79` datas e `30.569` cartas por snapshot recente.
+- Evidencia original: probe HTTP pendurado por `>60s`.
+- Profiling DB antes da correcao:
+  - agregacao ampla em `price_history` levou `11.783s`;
+  - plano com estatisticas ruins estimava `1` linha para uma data que tinha `30.569` linhas;
+  - variante de join/order sem materializacao e limite cedo atingiu `statement_timeout` de `20s`.
+- Causa: combinacao de estatisticas defasadas, plano ruim para join/order por variacao, busca de data de comparacao com `EXISTS` sobre multiplas datas e ausencia de cache server-side.
+
+### Mudanca tecnica
+
+- A rota passou a comparar diretamente as duas datas mais recentes, conforme contrato documentado (`date` vs `previous_date`).
+- As queries de gainers/losers materializam primeiro os snapshots de hoje/anterior, calculam/ordenam a variacao, aplicam `LIMIT @limit` e so depois fazem `JOIN cards`.
+- `COUNT(DISTINCT card_id)` foi substituido por `COUNT(*)` no snapshot da data, preservando semantica porque `price_history` possui `UNIQUE(card_id, price_date)`.
+- Adicionado cache process-local com TTL de 5 minutos e fallback stale em timeout.
+- Adicionado timeout defensivo server-side de 4s com resposta degradada que preserva `date`, `previous_date`, `gainers`, `losers` e `total_tracked`.
+- Criada migration nao destrutiva `bin/migrate_market_movers_performance.dart` com indice `idx_price_history_date_card_price` e `ANALYZE price_history`.
+
+### Validacao pos-correcao
+
+| Comando/prova | Resultado |
+| --- | --- |
+| `EXPLAIN ANALYZE` resumo datas/total | `10.919ms` |
+| `EXPLAIN ANALYZE` gainers | `64.989ms` |
+| `EXPLAIN ANALYZE` losers | `53.328ms` |
+| `curl -sS -o /tmp/market_movers_probe.json -w "http_code=%{http_code} time_total=%{time_total}\n" "http://127.0.0.1:8082/market/movers?limit=5&min_price=1.0"` | `http_code=200 time_total=1.918091` |
+| Segundo probe HTTP com cache | `http_code=200 time_total=0.005164` |
+| Payload | `{"date":"2026-04-29","previous_date":"2026-04-28","gainers":[],"losers":[],"total_tracked":30569}` |
 
 ## Rotas existentes relevantes
 
@@ -58,7 +92,7 @@ Risco provado: `GET /market/movers?limit=5&min_price=1.0` nao retornou dentro do
 | `cd server && dart test` | Falhou por testes live sem backend em `localhost:8080` | Ambiente/test infra |
 | `curl http://127.0.0.1:8082/health` | Healthy | Green |
 | `POST /decks/not-a-uuid/cards*` sem token | `401` para `/cards`, `/cards/bulk`, `/cards/set`, `/cards/replace` | Middleware/roteamento existem |
-| `curl /market/movers?limit=5&min_price=1.0` | Sem resposta em >60s, processo encerrado manualmente | Falha de performance/hang |
+| `curl /market/movers?limit=5&min_price=1.0` | Auditoria original: sem resposta em >60s; pos-correcao: `200` em `1.918091s` frio e `0.005164s` quente | Corrigido |
 
 Falha de `dart test` ampla:
 
@@ -79,38 +113,36 @@ Falha de `dart test` ampla:
 
 | Severidade | Contrato | Evidencia | Impacto |
 | --- | --- | --- | --- |
-| P0/P1 | `GET /market/movers?limit=5&min_price=1.0` | Timeout no app apos 15s; `curl` isolado pendurado >60s | Home/Market/Community podem carregar lento e gerar erro silencioso/degradado |
+| P0/P1 | `GET /market/movers?limit=5&min_price=1.0` | Corrigido em 2026-04-29: `200` em `1.918091s` frio e `0.005164s` quente | Risco imediato removido; manter observabilidade de p95/p99 |
 | P1 | Test infra live em `localhost:8080` | `dart test` falha sem servidor live | CI/auditoria ampla fica vermelha por ambiente ausente |
 | P1 | Social/trades/messages full contracts | Rotas existem e error contract cobre parte, mas runtime end-to-end nao foi fresco | Risco funcional antes de release social/trades |
 | P2 | Observability live | Sentry/Firebase presentes, mas DSN/config real nao provados nesta auditoria | Falta visibilidade de producao/staging |
 
 ## Hipoteses tecnicas para `/market/movers`
 
-Sem alterar codigo nesta rodada, a leitura operacional e:
+Hipoteses da auditoria original, confirmadas/refinadas na correcao:
 
-1. query possivelmente varre `cards`/precos sem indice seletivo por `price_usd`/`price_updated_at`;
-2. pode haver join/agregacao sem limite aplicado cedo;
-3. falta cache/materializacao para movers, que e dado derivado de mercado;
-4. endpoint leve usa o mesmo timeout de 15s do app, gerando erro perceptivel mesmo sem derrubar fluxo.
+1. havia plano ruim por estatisticas defasadas e join/order sem limite materializado cedo;
+2. faltava cache/materializacao process-local para dado derivado de mercado;
+3. faltava timeout server-side defensivo menor que o timeout do app;
+4. indice cobrindo `(price_date DESC, card_id) INCLUDE (price_usd)` foi adicionado para sustentar as leituras por snapshot.
 
 ## Backlog backend priorizado
 
 ### P0
 
-1. Medir `EXPLAIN ANALYZE` de `/market/movers?limit=5&min_price=1.0` no banco real.
-2. Adicionar indice/camada materializada/cache para movers.
-3. Definir budget: p95 < 1s para `limit<=10`; timeout server-side defensivo com resposta 503/empty degradada se exceder.
-
-### P1
-
-1. Separar testes server por tags/comandos:
+1. Manter dashboard/metricas de p95/p99 para `/market/movers` em producao.
+2. Separar testes server por tags/comandos:
    - unit/offline;
    - route/error contract local;
    - live backend `TEST_API_BASE_URL`;
    - DB write/apply.
-2. Parametrizar testes live para `TEST_API_BASE_URL`, evitando `localhost:8080` hardcoded.
-3. Criar contract smoke app-provider endpoints vs `server/routes` para detectar rotas ausentes.
-4. Criar runtime backend fixtures para messages/trades/notifications com dois usuarios.
+
+### P1
+
+1. Parametrizar testes live para `TEST_API_BASE_URL`, evitando `localhost:8080` hardcoded.
+2. Criar contract smoke app-provider endpoints vs `server/routes` para detectar rotas ausentes.
+3. Criar runtime backend fixtures para messages/trades/notifications com dois usuarios.
 
 ### P2
 
@@ -120,7 +152,5 @@ Sem alterar codigo nesta rodada, a leitura operacional e:
 
 ## Menores proximas acoes
 
-1. Corrigir `/market/movers` antes de qualquer release que exiba Home/Market/Community como caminho principal.
-2. Criar `dart test` padrao que rode sem backend externo e mover live tests para comando explicito.
-3. Adicionar uma prova iPhone 15 para cada dominio social/trading ainda `not proven`.
-
+1. Criar `dart test` padrao que rode sem backend externo e mover live tests para comando explicito.
+2. Adicionar uma prova iPhone 15 para cada dominio social/trading ainda `not proven`.
