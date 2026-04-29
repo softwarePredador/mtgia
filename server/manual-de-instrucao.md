@@ -1,6 +1,60 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-29 — Sprint final de performance e observabilidade Social Trading
+
+### O Porquê
+- O fechamento anterior provou o fluxo Binder/Marketplace/Trades no iPhone 15, mas deixou latencia residual em escritas sociais: `POST /trades`, `PUT /trades/:id/status`, `POST /trades/:id/messages` e `POST /conversations/:id/messages`.
+- A entrega precisava reduzir essa latencia sem alterar contrato JSON, status codes, autenticacao, permissoes ou UX aprovada, e sem perder consistencia de trade/mensagem.
+- Tambem era obrigatorio classificar 4xx/5xx, invalid payload, slow request e side effects lentos com logs/Sentry sanitizados.
+
+### O Como
+- Medicao baseline em backend real `http://127.0.0.1:8082` antes de alterar codigo:
+  - `POST /trades`: `5324.62ms` frio / `6167.93ms` quente;
+  - `PUT /trades/:id/status`: `4061.75ms` / `4060.68ms`;
+  - `POST /trades/:id/messages`: `2440.10ms` / `2443.68ms`;
+  - `POST /conversations/:id/messages`: `3058.88ms` / `3043.00ms`.
+- Criado `NotificationService.createFromActorDeferred`:
+  - resolve nome do ator, insere `notifications` e dispara FCM fora do caminho critico;
+  - usa timeout de 10s;
+  - registra `slow_deferred` e `deferred_failed`;
+  - captura falhas com Sentry via `captureObservedException`, sem token/email/mensagem completa.
+- `POST /conversations/:id/messages` passou a usar CTE para inserir a mensagem e atualizar `conversations.last_message_at` em um unico round-trip.
+- `POST /trades` valida `payment_method` antes do insert.
+- `PUT /trades/:id/status` valida `delivery_method` antes do update, convertendo o payload invalido `mail` de um 500 por constraint em `400` esperado.
+- Middleware raiz passou a classificar slow request e 4xx/5xx com `endpoint`, duracao, request id, user id tecnico e ids seguros. A captura Sentry de mensagem e fire-and-forget para nao reintroduzir latencia.
+- `RequestTrace` ganhou `userId` tecnico preenchido pelo auth middleware; o middleware raiz tambem consegue extrair o `userId` do JWT para logs pos-handler.
+- Adicionado `server/test/social_trading_live_test.dart` ao preset `live`, cobrindo sucesso, response shape, invalid payload `400` e notificacoes essenciais.
+
+### Resultado
+- Medicao final:
+  - `POST /trades`: `4123.00ms` frio / `4941.76ms` quente (`19.9%` a `22.6%` melhor);
+  - `PUT /trades/:id/status`: `2844.34ms` / `2845.01ms` (~`30%` melhor);
+  - `POST /trades/:id/messages`: `1222.30ms` / `1228.63ms` (~`50%` melhor);
+  - `POST /conversations/:id/messages`: `1238.07ms` / `1233.96ms` (~`59%` melhor).
+- Runtime iPhone 15 final:
+  - device `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+  - backend `http://127.0.0.1:8082`, health healthy;
+  - log `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_social_perf_pass.log`;
+  - resultado `01:53 +2: All tests passed!`.
+- Latencias UI final:
+  - `POST /trades`: `3978ms`;
+  - `PUT /trades/:id/status`: `2811ms`, `2786ms`, `2876ms`;
+  - `POST /trades/:id/messages`: `1233ms`;
+  - `POST /conversations/:id/messages`: `1219ms`.
+
+### Validacao executada
+- `dart analyze routes/trades routes/conversations routes/notifications routes/community lib test`: sem issues.
+- `dart test -r expanded`: passou com `554` testes.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: passou com `165` testes e `3` skips declarados.
+- `flutter analyze lib/features/trades lib/features/messages lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check`: sem issues.
+- `flutter test test/features/trades test/features/messages test/features/notifications test/features/binder --no-version-check`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: passou.
+
+### Pendencias
+- `POST /trades` e `PUT /trades/:id/status` ainda ficam na faixa de segundos por DB remoto/round-trips transacionais e validacoes de ownership/status; proximo passo e atacar queries/indices/planos remanescentes sem reduzir consistencia.
+- FCM externo real segue `not proven` no simulador/config local; a cobertura de logs/captura estruturada foi provada em codigo, teste live e runtime.
+
 ## 2026-04-29 — Fechamento Binder/Marketplace/Trades no iPhone 15
 
 ### O Porquê

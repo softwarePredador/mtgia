@@ -178,6 +178,56 @@ Sentry/logs: rotas `binder`, `community/marketplace`, `trades`, `conversations` 
 
 Backlog adicional P1: reduzir latencia residual de escritas em social trading/direct messages e manter p95/p99 por endpoint antes de release amplo.
 
+## Atualizacao - sprint final Social Trading performance/observability - 2026-04-29 17:37 -0300
+
+Escopo executado nos endpoints lentos documentados: `POST /trades`, `PUT /trades/:id/status`, `POST /trades/:id/messages` e `POST /conversations/:id/messages`.
+
+### Baseline antes da alteracao
+
+Medição contra backend real `http://127.0.0.1:8082`, payloads sanitizados, marker `qa_perf_bb17c499a1`:
+
+| Endpoint | Frio | Quente | Status |
+| --- | ---: | ---: | --- |
+| `POST /trades` | `5324.62ms` | `6167.93ms` | `201` |
+| `PUT /trades/:id/status` | `4061.75ms` | `4060.68ms` | `200` |
+| `POST /trades/:id/messages` | `2440.10ms` | `2443.68ms` | `201` |
+| `POST /conversations/:id/messages` | `3058.88ms` | `3043.00ms` | `201` |
+
+Erro classificado antes da correcao: `delivery_method=mail` em `PUT /trades/:id/status` era payload invalido para o schema (`CHECK` aceita `correios`, `motoboy`, `pessoalmente`, `outro`) e caia como `500`. A rota agora valida antes do DB e retorna `400`.
+
+### Resultado depois
+
+Medição final com marker `qa_perf_final_f3357696e1`:
+
+| Endpoint | Frio | Quente | Melhora |
+| --- | ---: | ---: | ---: |
+| `POST /trades` | `4123.00ms` | `4941.76ms` | `22.6%` / `19.9%` |
+| `PUT /trades/:id/status` | `2844.34ms` | `2845.01ms` | `30.0%` / `29.9%` |
+| `POST /trades/:id/messages` | `1222.30ms` | `1228.63ms` | `49.9%` / `49.7%` |
+| `POST /conversations/:id/messages` | `1238.07ms` | `1233.96ms` | `59.5%` / `59.4%` |
+
+Runtime iPhone 15 com app real confirmou:
+
+- `POST /trades`: `3978ms` (`201`);
+- `PUT /trades/:id/status`: `2811ms`, `2786ms`, `2876ms` (`200`);
+- `POST /trades/:id/messages`: `1233ms` (`201`);
+- `POST /conversations/:id/messages`: `1219ms` (`201`).
+
+### Mudancas de contrato/implementacao
+
+- Contrato JSON preservado para sucesso e erros esperados.
+- `NotificationService.createFromActorDeferred` tira criacao de notificacao/FCM do caminho critico com timeout de 10s, logs `slow_deferred`/`deferred_failed` e `captureObservedException` sem payload sensivel.
+- `POST /conversations/:id/messages` usa CTE para inserir mensagem e atualizar `last_message_at` em um round-trip.
+- `POST /trades` valida `payment_method`; `PUT /trades/:id/status` valida `delivery_method`, evitando 5xx por constraint previsivel.
+- Middleware raiz registra/captura 4xx/5xx e slow request com endpoint, duracao, request id, user id tecnico e ids seguros; Sentry e deferido para nao adicionar latencia.
+
+### Cobertura
+
+- Novo teste: `server/test/social_trading_live_test.dart`, incluido em `dart_test.yaml` preset `live`.
+- Cobertura live: usuarios reais, binder item real, `POST /trades`, `PUT /respond`, `PUT /status`, `POST /trades/:id/messages`, `POST /conversations/:id/messages`, `400` esperado de `payment_method`/`delivery_method` e notificacoes `trade_offer_received`/`direct_message`.
+- Logs provados: `[http_observability] classification=slow_request`, `[http_observability] classification=client_error`, `[social_write] invalid_payload`, `[social_notification] slow_deferred`.
+- Sentry/FCM externo: FCM real segue `not proven` no simulador/config local; codigo de captura/log estruturado foi validado por analyze/testes/live runtime.
+
 ### P1
 
 1. Manter a separacao `dart test` offline vs `dart test -P live` em novos testes server.

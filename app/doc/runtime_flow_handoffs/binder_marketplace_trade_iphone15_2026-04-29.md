@@ -165,10 +165,87 @@ Os registros permanecem no backend real como dados marcados de QA (`qa_bmt_*`) p
 - Backend Sentry/log estruturado: rotas tocadas (`binder`, `community/marketplace`, `trades`, `conversations`, `notifications`) capturam excecoes via `captureRouteException` com operacao/ids tecnicos e sem dados sensiveis.
 - Warning conhecido de MLKit sem arm64 para simuladores Apple Silicon iOS 26+ apareceu no build, mas nao impediu o iPhone 15 iOS 17.4.
 
+## Sprint final de performance/observabilidade social trading - 2026-04-29 17:37 -0300
+
+Resultado: `Approved after performance sprint`. O mesmo runtime iPhone 15 passou novamente contra backend real `http://127.0.0.1:8082`, com melhorias mensuraveis nas escritas sociais sem alterar contrato JSON/status codes.
+
+| Item | Evidencia |
+| --- | --- |
+| Device primario | `iPhone 15` |
+| Simulator id | `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| Estado | `Booted` |
+| Backend URL usado pelo app | `http://127.0.0.1:8082` |
+| Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
+| Log PASS social perf | `app/doc/runtime_flow_proofs_2026-04-29_iphone15_simulator_binder_marketplace_trade/binder_marketplace_trade_runtime_social_perf_pass.log` |
+
+Comando iPhone 15 executado:
+
+```bash
+cd app
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado: `01:53 +2: All tests passed!`
+
+### Baseline antes da mudanca
+
+Medição real em `8082` antes de alterar codigo, com payloads sanitizados e usuarios `qa_perf_bb17c499a1_*`:
+
+| Endpoint | Frio | Quente | Status |
+| --- | ---: | ---: | --- |
+| `POST /trades` | `5324.62ms` | `6167.93ms` | `201` |
+| `PUT /trades/:id/status` | `4061.75ms` | `4060.68ms` | `200` |
+| `POST /trades/:id/messages` | `2440.10ms` | `2443.68ms` | `201` |
+| `POST /conversations/:id/messages` | `3058.88ms` | `3043.00ms` | `201` |
+
+Classificacao de erro descoberta durante baseline: `delivery_method=mail` gerava `500` por violar o `CHECK` do banco. O contrato valido aceita `correios`, `motoboy`, `pessoalmente` ou `outro`; a rota agora valida antes do DB e retorna `400` com log `invalid_payload`.
+
+### Depois da otimizacao
+
+Medição final com backend reiniciado e codigo novo, usuarios `qa_perf_final_f3357696e1_*`:
+
+| Endpoint | Frio | Quente | Melhora |
+| --- | ---: | ---: | ---: |
+| `POST /trades` | `4123.00ms` | `4941.76ms` | `22.6%` frio / `19.9%` quente |
+| `PUT /trades/:id/status` | `2844.34ms` | `2845.01ms` | `30.0%` frio / `29.9%` quente |
+| `POST /trades/:id/messages` | `1222.30ms` | `1228.63ms` | `49.9%` frio / `49.7%` quente |
+| `POST /conversations/:id/messages` | `1238.07ms` | `1233.96ms` | `59.5%` frio / `59.4%` quente |
+
+Runtime UI final no iPhone 15 confirmou os ganhos em fluxo real:
+
+- `POST /trades`: `3978ms` (`201`);
+- `PUT /trades/:id/status`: `2811ms`, `2786ms`, `2876ms` (`200`);
+- `POST /trades/:id/messages`: `1233ms` (`201`);
+- `POST /conversations/:id/messages`: `1219ms` (`201`).
+
+### Mudancas tecnicas
+
+- `NotificationService.createFromActorDeferred` moveu a resolucao de nome do ator, insert em `notifications` e FCM para fire-and-forget controlado com timeout de 10s, logs de `slow_deferred` e captura Sentry em falha.
+- `POST /conversations/:id/messages` passou a inserir mensagem e atualizar `last_message_at` em um unico CTE SQL.
+- `POST /trades` e `PUT /trades/:id/status` validam `payment_method`/`delivery_method` antes de tocar o banco, convertendo violacoes previsiveis em `400`.
+- Middleware raiz registra slow requests e 4xx/5xx com `endpoint`, duracao, status, request id e user id tecnico quando autenticado; captura Sentry e deferida para nao voltar ao caminho critico.
+- `server/test/social_trading_live_test.dart` entrou no preset live e cobre sucesso dos endpoints tocados, contratos JSON, `400` esperados e side effects essenciais de notificacao.
+
+### Observabilidade provada
+
+- Logs estruturados vistos em `server`:
+  - `[http_observability] classification=slow_request endpoint=POST /trades ... user_id=<uuid>`;
+  - `[http_observability] classification=client_error endpoint=PUT /trades/:id/status status=400 ... user_id=<uuid>`;
+  - `[social_write] invalid_payload ... trade_id=<uuid>`;
+  - `[social_notification] slow_deferred ... type=trade_message/direct_message`.
+- App continuou gerando breadcrumbs `api_slow_request` com metodo, endpoint, status, duracao e request ids, sem payload sensivel.
+- FCM real externo continua `not proven` no simulador; o backend carregou service account local e o app manteve fallback esperado de Firebase Performance sem Firebase App inicializado no runtime.
+
 ## Pendencias
 
 | Prioridade | Item | Owner |
 | --- | --- | --- |
-| P1 | Reduzir latencia residual de escrita em `POST /trades`, `PUT /trades/:id/status`, `POST /trades/:id/messages` e `POST /conversations/:id/messages` | Backend social/trades |
+| P1 | Reduzir a latencia remanescente de `POST /trades` e `PUT /trades/:id/status`, agora dominada por DB remoto/round-trips transacionais e validacoes de ownership/status | Backend social/trades |
 | P2 | Criar metricas p95/p99 persistentes para social trading e alertas por endpoint | Backend observability |
 | P2 | Provar FCM real em device/config staging; nao foi escopo do simulador sem Firebase inicializado | App notifications |
