@@ -132,6 +132,7 @@ void main() {
         );
         expect(invalidTrade.statusCode, 400);
 
+        final createTradeWatch = Stopwatch()..start();
         final trade = await jsonRequest(
           'POST',
           '/trades',
@@ -151,6 +152,13 @@ void main() {
             ],
             'message': 'Mensagem de contrato live',
           },
+        );
+        createTradeWatch.stop();
+        expect(
+          createTradeWatch.elapsedMilliseconds,
+          lessThan(3500),
+          reason:
+              'POST /trades deve permanecer abaixo do teto live contra DB remoto',
         );
         expect(trade.keys, containsAll(['id', 'status', 'type', 'created_at']));
         expect(trade['status'], 'pending');
@@ -177,6 +185,7 @@ void main() {
         );
         expect(invalidStatus.statusCode, 400);
 
+        final statusWatch = Stopwatch()..start();
         final shipped = await jsonRequest(
           'PUT',
           '/trades/$tradeId/status',
@@ -187,8 +196,26 @@ void main() {
             'tracking_code': 'QA123',
           },
         );
+        statusWatch.stop();
+        expect(
+          statusWatch.elapsedMilliseconds,
+          lessThan(2000),
+          reason:
+              'PUT /trades/:id/status deve permanecer abaixo do teto live contra DB remoto',
+        );
         expect(shipped['old_status'], 'accepted');
         expect(shipped['status'], 'shipped');
+        await Future<void>.delayed(const Duration(milliseconds: 1600));
+        final buyerNotifications = await jsonRequest(
+          'GET',
+          '/notifications?limit=20',
+          token: buyerToken,
+        );
+        final buyerTypes = (buyerNotifications['data'] as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .map((item) => item['type'])
+            .toSet();
+        expect(buyerTypes, contains('trade_shipped'));
 
         final tradeMessage = await jsonRequest(
           'POST',

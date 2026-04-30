@@ -61,86 +61,94 @@ Future<Response> onRequest(RequestContext context, String id) async {
       'pending': ['cancelled'],
     };
 
-    // Buscar trade com lock atômico — atualizar apenas se a transição é válida
-    late final String currentStatus;
-    late final bool isSender;
-    late final bool isReceiver;
-    late final Map<String, dynamic> trade;
-
-    final updated = await pool.runTx((session) async {
-      // SELECT FOR UPDATE garante lock exclusivo dentro da transação
-      final tradeResult = await session.execute(Sql.named('''
+    // Um único statement faz lock, validação, update e histórico para evitar
+    // round-trips transacionais contra o PostgreSQL remoto.
+    final statusResult = await pool.execute(Sql.named('''
+      WITH current_trade AS (
         SELECT id, sender_id, receiver_id, status, type
-        FROM trade_offers WHERE id = @id FOR UPDATE
-      '''), parameters: {'id': id});
-
-      if (tradeResult.isEmpty) return 'not_found';
-
-      trade = tradeResult.first.toColumnMap();
-      currentStatus = trade['status'] as String;
-      isSender = trade['sender_id'] == userId;
-      isReceiver = trade['receiver_id'] == userId;
-
-      if (!isSender && !isReceiver) return 'forbidden';
-
-      final allowed = validTransitions[currentStatus] ?? [];
-      if (!allowed.contains(newStatus)) return 'invalid_transition';
-
-      // Validar quem pode fazer o quê
-      // Em vendas (sale): receiver é o vendedor que envia, sender é o comprador que recebe
-      // Em trocas (trade/mixed): ambos enviam e recebem, qualquer participante pode marcar
-      final tradeType = trade['type'] as String? ?? 'trade';
-
-      if (newStatus == 'shipped') {
-        if (tradeType == 'sale') {
-          // Venda: quem envia é o receiver (dono dos itens solicitados)
-          if (!isReceiver) return 'only_receiver_ship_sale';
-        } else {
-          // Troca/Misto: qualquer participante pode marcar envio
-          // (ambos precisam enviar seus itens)
-        }
-      }
-      if (newStatus == 'delivered') {
-        if (tradeType == 'sale') {
-          // Venda: quem confirma recebimento é o sender (comprador)
-          if (!isSender) return 'only_sender_deliver_sale';
-        } else {
-          // Troca/Misto: qualquer participante pode confirmar recebimento
-        }
-      }
-
-      final setClauses = <String>[
-        'status = @newStatus',
-        'updated_at = CURRENT_TIMESTAMP'
-      ];
-      final params = <String, dynamic>{'id': id, 'newStatus': newStatus};
-
-      if (deliveryMethod != null) {
-        setClauses.add('delivery_method = @deliveryMethod');
-        params['deliveryMethod'] = deliveryMethod;
-      }
-      if (trackingCode != null) {
-        setClauses.add('tracking_code = @trackingCode');
-        params['trackingCode'] = trackingCode;
-      }
-
-      await session.execute(Sql.named('''
-        UPDATE trade_offers SET ${setClauses.join(', ')} WHERE id = @id
-      '''), parameters: params);
-
-      await session.execute(Sql.named('''
-        INSERT INTO trade_status_history (trade_offer_id, old_status, new_status, changed_by, notes)
-        VALUES (@id, @oldStatus, @newStatus, @userId, @notes)
-      '''), parameters: {
-        'id': id,
-        'oldStatus': currentStatus,
-        'newStatus': newStatus,
-        'userId': userId,
-        'notes': notes ?? 'Status atualizado para $newStatus',
-      });
-
-      return 'ok';
+        FROM trade_offers
+        WHERE id = @id
+        FOR UPDATE
+      ),
+      validation AS (
+        SELECT
+          id,
+          sender_id,
+          receiver_id,
+          status,
+          type,
+          CASE
+            WHEN sender_id <> @userId AND receiver_id <> @userId
+              THEN 'forbidden'
+            WHEN NOT (
+              (status = 'accepted' AND @newStatus IN ('shipped', 'cancelled', 'disputed'))
+              OR (status = 'shipped' AND @newStatus IN ('delivered', 'cancelled', 'disputed'))
+              OR (status = 'delivered' AND @newStatus IN ('completed', 'disputed'))
+              OR (status = 'pending' AND @newStatus = 'cancelled')
+            )
+              THEN 'invalid_transition'
+            WHEN @newStatus = 'shipped'
+              AND COALESCE(type, 'trade') = 'sale'
+              AND receiver_id <> @userId
+              THEN 'only_receiver_ship_sale'
+            WHEN @newStatus = 'delivered'
+              AND COALESCE(type, 'trade') = 'sale'
+              AND sender_id <> @userId
+              THEN 'only_sender_deliver_sale'
+            ELSE 'ok'
+          END AS result
+        FROM current_trade
+      ),
+      updated AS (
+        UPDATE trade_offers t
+        SET
+          status = @newStatus,
+          updated_at = CURRENT_TIMESTAMP,
+          delivery_method = COALESCE(@deliveryMethod, t.delivery_method),
+          tracking_code = COALESCE(@trackingCode, t.tracking_code)
+        FROM validation v
+        WHERE t.id = v.id AND v.result = 'ok'
+        RETURNING t.id
+      ),
+      history AS (
+        INSERT INTO trade_status_history (
+          trade_offer_id,
+          old_status,
+          new_status,
+          changed_by,
+          notes
+        )
+        SELECT
+          v.id,
+          v.status,
+          @newStatus,
+          @userId,
+          @notes
+        FROM validation v
+        JOIN updated u ON u.id = v.id
+        RETURNING 1
+      )
+      SELECT
+        COALESCE((SELECT result FROM validation), 'not_found') AS result,
+        (SELECT status FROM current_trade) AS current_status,
+        (SELECT sender_id FROM current_trade) AS sender_id,
+        (SELECT receiver_id FROM current_trade) AS receiver_id,
+        (SELECT type FROM current_trade) AS type,
+        EXISTS(SELECT 1 FROM history) AS history_inserted
+    '''), parameters: {
+      'id': id,
+      'userId': userId,
+      'newStatus': newStatus,
+      'deliveryMethod': deliveryMethod,
+      'trackingCode': trackingCode,
+      'notes': notes ?? 'Status atualizado para $newStatus',
     });
+    final statusRow = statusResult.first.toColumnMap();
+    final updated = statusRow['result'] as String;
+    final currentStatus = statusRow['current_status'] as String?;
+    final senderId = statusRow['sender_id'] as String?;
+    final receiverId = statusRow['receiver_id'] as String?;
+    final isSender = senderId == userId;
 
     // Tratar resultado da transação
     switch (updated) {
@@ -199,26 +207,32 @@ Future<Response> onRequest(RequestContext context, String id) async {
       'trade_completed'
     ];
     if (validNotifTypes.contains(notifyType)) {
-      final notifyUserId = isSender
-          ? trade['receiver_id'] as String
-          : trade['sender_id'] as String;
-      final statusLabels = {
-        'trade_shipped': 'marcou o trade como enviado',
-        'trade_delivered': 'confirmou o recebimento do trade',
-        'trade_completed': 'finalizou o trade',
-      };
-      NotificationService.createFromActorDeferred(
-        pool: pool,
-        actorUserId: userId,
-        userId: notifyUserId,
-        type: notifyType,
-        titleBuilder: (changerName) =>
-            '$changerName ${statusLabels[notifyType]}',
-        referenceId: id,
-        endpoint: 'PUT /trades/:id/status',
-        requestId: _requestId(context),
-        tradeId: id,
-      );
+      final notifyUserId = isSender ? receiverId : senderId;
+      if (notifyUserId == null) {
+        Log.e(
+          '[social_write] impossible_state endpoint=PUT /trades/:id/status '
+          'reason=missing_notify_user request_id=${_requestId(context)} '
+          'user_id=$userId trade_id=$id',
+        );
+      } else {
+        final statusLabels = {
+          'trade_shipped': 'marcou o trade como enviado',
+          'trade_delivered': 'confirmou o recebimento do trade',
+          'trade_completed': 'finalizou o trade',
+        };
+        NotificationService.createFromActorDeferred(
+          pool: pool,
+          actorUserId: userId,
+          userId: notifyUserId,
+          type: notifyType,
+          titleBuilder: (changerName) =>
+              '$changerName ${statusLabels[notifyType]}',
+          referenceId: id,
+          endpoint: 'PUT /trades/:id/status',
+          requestId: _requestId(context),
+          tradeId: id,
+        );
+      }
     }
 
     return Response.json(body: {

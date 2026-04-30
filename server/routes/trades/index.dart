@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
@@ -74,120 +75,193 @@ Future<Response> _createTrade(RequestContext context) async {
       );
     }
 
-    // Verificar que o receiver existe
-    final recvCheck = await pool.execute(
-      Sql.named('SELECT id FROM users WHERE id = @id'),
-      parameters: {'id': receiverId},
-    );
-    if (recvCheck.isEmpty) {
+    final parsedMyItems = _parseTradeItems(myItems, 'my_items');
+    if (parsedMyItems.error != null) {
+      _logInvalidPayload(context, 'POST /trades', parsedMyItems.error!);
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': parsedMyItems.error},
+      );
+    }
+    final parsedRequestedItems =
+        _parseTradeItems(requestedItems, 'requested_items');
+    if (parsedRequestedItems.error != null) {
+      _logInvalidPayload(context, 'POST /trades', parsedRequestedItems.error!);
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': parsedRequestedItems.error},
+      );
+    }
+
+    final validationResult = await pool.execute(Sql.named('''
+      WITH checks AS (
+        SELECT
+          EXISTS(SELECT 1 FROM users WHERE id = @receiverId) AS receiver_exists,
+          (
+            SELECT COUNT(*)::int
+            FROM user_binder_items
+            WHERE id = ANY(@myIds::uuid[]) AND user_id = @userId
+          ) AS my_found,
+          (
+            SELECT COUNT(*)::int
+            FROM user_binder_items
+            WHERE id = ANY(@myIds::uuid[])
+              AND user_id = @userId
+              AND (for_trade = TRUE OR for_sale = TRUE)
+          ) AS my_available,
+          (
+            SELECT COUNT(*)::int
+            FROM user_binder_items
+            WHERE id = ANY(@requestedIds::uuid[]) AND user_id = @receiverId
+          ) AS requested_found,
+          (
+            SELECT COUNT(*)::int
+            FROM user_binder_items
+            WHERE id = ANY(@requestedIds::uuid[])
+              AND user_id = @receiverId
+              AND (for_trade = TRUE OR for_sale = TRUE)
+          ) AS requested_available
+      )
+      SELECT * FROM checks
+    '''), parameters: {
+      'receiverId': receiverId,
+      'userId': userId,
+      'myIds': parsedMyItems.uniqueIds,
+      'requestedIds': parsedRequestedItems.uniqueIds,
+    });
+    final validation = validationResult.first.toColumnMap();
+    if (validation['receiver_exists'] != true) {
       return Response.json(
         statusCode: HttpStatus.notFound,
         body: {'error': 'Usuário destinatário não encontrado'},
       );
     }
-
-    // Validar my_items em batch (pertence ao sender, for_trade ou for_sale)
-    {
-      final myBinderIds = <String>[];
-      for (final item in myItems) {
-        final biId = item['binder_item_id'] as String?;
-        if (biId == null) {
-          return Response.json(
-            statusCode: HttpStatus.badRequest,
-            body: {'error': 'binder_item_id obrigatório em my_items'},
-          );
-        }
-        myBinderIds.add(biId);
-      }
-
-      if (myBinderIds.isNotEmpty) {
-        final check = await pool.execute(
-          Sql.named('''
-            SELECT id, for_trade, for_sale FROM user_binder_items
-            WHERE id = ANY(@ids::uuid[]) AND user_id = @userId
-          '''),
-          parameters: {'ids': myBinderIds, 'userId': userId},
-        );
-        final foundMap = <String, Map<String, dynamic>>{};
-        for (final row in check) {
-          final m = row.toColumnMap();
-          foundMap[m['id'] as String] = m;
-        }
-        for (final biId in myBinderIds) {
-          if (!foundMap.containsKey(biId)) {
-            return Response.json(
-              statusCode: HttpStatus.forbidden,
-              body: {'error': 'Item $biId não pertence a você ou não existe'},
-            );
-          }
-          final row = foundMap[biId]!;
-          if (row['for_trade'] != true && row['for_sale'] != true) {
-            return Response.json(
-              statusCode: HttpStatus.badRequest,
-              body: {'error': 'Item $biId não está marcado para troca/venda'},
-            );
-          }
-        }
-      }
+    if ((validation['my_found'] as int) != parsedMyItems.uniqueIds.length) {
+      return Response.json(
+        statusCode: HttpStatus.forbidden,
+        body: {'error': 'Um ou mais itens não pertencem a você ou não existem'},
+      );
+    }
+    if ((validation['my_available'] as int) != parsedMyItems.uniqueIds.length) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'error': 'Um ou mais itens não estão marcados para troca/venda'},
+      );
+    }
+    if ((validation['requested_found'] as int) !=
+        parsedRequestedItems.uniqueIds.length) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error':
+              'Um ou mais itens não pertencem ao destinatário ou não existem'
+        },
+      );
+    }
+    if ((validation['requested_available'] as int) !=
+        parsedRequestedItems.uniqueIds.length) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error':
+              'Um ou mais itens do destinatário não estão disponíveis para troca/venda'
+        },
+      );
     }
 
-    // Validar requested_items em batch (pertence ao receiver, for_trade ou for_sale)
-    {
-      final reqBinderIds = <String>[];
-      for (final item in requestedItems) {
-        final biId = item['binder_item_id'] as String?;
-        if (biId == null) {
-          return Response.json(
-            statusCode: HttpStatus.badRequest,
-            body: {'error': 'binder_item_id obrigatório em requested_items'},
-          );
-        }
-        reqBinderIds.add(biId);
-      }
-
-      if (reqBinderIds.isNotEmpty) {
-        final check = await pool.execute(
-          Sql.named('''
-            SELECT id, for_trade, for_sale FROM user_binder_items
-            WHERE id = ANY(@ids::uuid[]) AND user_id = @receiverId
-          '''),
-          parameters: {'ids': reqBinderIds, 'receiverId': receiverId},
-        );
-        final foundMap = <String, Map<String, dynamic>>{};
-        for (final row in check) {
-          final m = row.toColumnMap();
-          foundMap[m['id'] as String] = m;
-        }
-        for (final biId in reqBinderIds) {
-          if (!foundMap.containsKey(biId)) {
-            return Response.json(
-              statusCode: HttpStatus.badRequest,
-              body: {
-                'error': 'Item $biId não pertence ao destinatário ou não existe'
-              },
-            );
-          }
-          final row = foundMap[biId]!;
-          if (row['for_trade'] != true && row['for_sale'] != true) {
-            return Response.json(
-              statusCode: HttpStatus.badRequest,
-              body: {
-                'error':
-                    'Item $biId do destinatário não está disponível para troca/venda'
-              },
-            );
-          }
-        }
-      }
-    }
-
-    // Criar trade em transação
+    // Criar trade, itens e histórico em um único round-trip ao PostgreSQL remoto.
     final tradeResult = await pool.runTx((session) async {
-      // 1. Inserir trade_offers
-      final offerResult = await session.execute(Sql.named('''
-        INSERT INTO trade_offers (sender_id, receiver_id, type, message, payment_amount, payment_method)
-        VALUES (@senderId, @receiverId, @type, @message, @paymentAmount, @paymentMethod)
-        RETURNING id, status, type, message, payment_amount, payment_currency, created_at
+      final result = await session.execute(Sql.named('''
+        WITH offer AS (
+          INSERT INTO trade_offers (
+            sender_id,
+            receiver_id,
+            type,
+            message,
+            payment_amount,
+            payment_method
+          )
+          VALUES (
+            @senderId,
+            @receiverId,
+            @type,
+            @message,
+            @paymentAmount,
+            @paymentMethod
+          )
+          RETURNING id, status, type, message, payment_amount, payment_currency, created_at
+        ),
+        offering_items AS (
+          INSERT INTO trade_items (
+            trade_offer_id,
+            binder_item_id,
+            owner_id,
+            direction,
+            quantity,
+            agreed_price
+          )
+          SELECT
+            offer.id,
+            item.binder_item_id,
+            @senderId,
+            'offering',
+            item.quantity,
+            item.agreed_price
+          FROM offer
+          JOIN LATERAL jsonb_to_recordset(@myItems::jsonb) AS item(
+            binder_item_id uuid,
+            quantity int,
+            agreed_price numeric
+          ) ON TRUE
+          RETURNING 1
+        ),
+        requesting_items AS (
+          INSERT INTO trade_items (
+            trade_offer_id,
+            binder_item_id,
+            owner_id,
+            direction,
+            quantity,
+            agreed_price
+          )
+          SELECT
+            offer.id,
+            item.binder_item_id,
+            @receiverId,
+            'requesting',
+            item.quantity,
+            item.agreed_price
+          FROM offer
+          JOIN LATERAL jsonb_to_recordset(@requestedItems::jsonb) AS item(
+            binder_item_id uuid,
+            quantity int,
+            agreed_price numeric
+          ) ON TRUE
+          RETURNING 1
+        ),
+        history AS (
+          INSERT INTO trade_status_history (
+            trade_offer_id,
+            old_status,
+            new_status,
+            changed_by,
+            notes
+          )
+          SELECT offer.id, NULL, 'pending', @senderId, 'Proposta criada'
+          FROM offer
+          RETURNING 1
+        )
+        SELECT
+          offer.id,
+          offer.status,
+          offer.type,
+          offer.message,
+          offer.payment_amount,
+          offer.payment_currency,
+          offer.created_at,
+          (SELECT COUNT(*)::int FROM offering_items) AS my_items_count,
+          (SELECT COUNT(*)::int FROM requesting_items) AS requested_items_count
+        FROM offer, history
       '''), parameters: {
         'senderId': userId,
         'receiverId': receiverId,
@@ -197,47 +271,11 @@ Future<Response> _createTrade(RequestContext context) async {
             ? double.tryParse(paymentAmount.toString())
             : null,
         'paymentMethod': paymentMethod,
+        'myItems': jsonEncode(parsedMyItems.rows),
+        'requestedItems': jsonEncode(parsedRequestedItems.rows),
       });
-      final offer = offerResult.first.toColumnMap();
+      final offer = result.first.toColumnMap();
       final tradeId = offer['id'] as String;
-
-      // 2. Inserir my_items (direction: offering)
-      for (final item in myItems) {
-        await session.execute(Sql.named('''
-          INSERT INTO trade_items (trade_offer_id, binder_item_id, owner_id, direction, quantity, agreed_price)
-          VALUES (@tradeId, @binderId, @ownerId, 'offering', @qty, @price)
-        '''), parameters: {
-          'tradeId': tradeId,
-          'binderId': item['binder_item_id'],
-          'ownerId': userId,
-          'qty': item['quantity'] as int? ?? 1,
-          'price': item['agreed_price'] != null
-              ? double.tryParse(item['agreed_price'].toString())
-              : null,
-        });
-      }
-
-      // 3. Inserir requested_items (direction: requesting)
-      for (final item in requestedItems) {
-        await session.execute(Sql.named('''
-          INSERT INTO trade_items (trade_offer_id, binder_item_id, owner_id, direction, quantity, agreed_price)
-          VALUES (@tradeId, @binderId, @ownerId, 'requesting', @qty, @price)
-        '''), parameters: {
-          'tradeId': tradeId,
-          'binderId': item['binder_item_id'],
-          'ownerId': receiverId,
-          'qty': item['quantity'] as int? ?? 1,
-          'price': item['agreed_price'] != null
-              ? double.tryParse(item['agreed_price'].toString())
-              : null,
-        });
-      }
-
-      // 4. Registrar no histórico
-      await session.execute(Sql.named('''
-        INSERT INTO trade_status_history (trade_offer_id, old_status, new_status, changed_by, notes)
-        VALUES (@tradeId, NULL, 'pending', @userId, 'Proposta criada')
-      '''), parameters: {'tradeId': tradeId, 'userId': userId});
 
       if (offer['created_at'] is DateTime) {
         offer['created_at'] =
@@ -253,8 +291,8 @@ Future<Response> _createTrade(RequestContext context) async {
             ? double.tryParse(offer['payment_amount'].toString())
             : null,
         'payment_currency': offer['payment_currency'],
-        'my_items_count': myItems.length,
-        'requested_items_count': requestedItems.length,
+        'my_items_count': offer['my_items_count'],
+        'requested_items_count': offer['requested_items_count'],
         'created_at': offer['created_at'],
       };
     });
@@ -312,6 +350,65 @@ void _logInvalidPayload(
     '[social_write] invalid_payload endpoint=$endpoint reason=$reason '
     'request_id=${_requestId(context)} user_id=$userId',
   );
+}
+
+_ParsedTradeItems _parseTradeItems(
+  List<Map<String, dynamic>> items,
+  String fieldName,
+) {
+  final rows = <Map<String, dynamic>>[];
+  final ids = <String>[];
+
+  for (final item in items) {
+    final binderItemId = item['binder_item_id'] as String?;
+    if (binderItemId == null || binderItemId.isEmpty) {
+      return _ParsedTradeItems.error(
+        'binder_item_id obrigatório em $fieldName',
+      );
+    }
+
+    final quantityRaw = item['quantity'];
+    final quantity = quantityRaw == null
+        ? 1
+        : quantityRaw is int
+            ? quantityRaw
+            : int.tryParse(quantityRaw.toString());
+    if (quantity == null || quantity < 1) {
+      return _ParsedTradeItems.error('quantity inválida em $fieldName');
+    }
+
+    final priceRaw = item['agreed_price'];
+    final agreedPrice =
+        priceRaw == null ? null : double.tryParse(priceRaw.toString());
+    if (priceRaw != null && agreedPrice == null) {
+      return _ParsedTradeItems.error('agreed_price inválido em $fieldName');
+    }
+
+    ids.add(binderItemId);
+    rows.add({
+      'binder_item_id': binderItemId,
+      'quantity': quantity,
+      'agreed_price': agreedPrice,
+    });
+  }
+
+  return _ParsedTradeItems(rows: rows, uniqueIds: ids.toSet().toList());
+}
+
+class _ParsedTradeItems {
+  const _ParsedTradeItems({
+    required this.rows,
+    required this.uniqueIds,
+    this.error,
+  });
+
+  factory _ParsedTradeItems.error(String error) {
+    return _ParsedTradeItems(rows: const [], uniqueIds: const [], error: error);
+  }
+
+  final List<Map<String, dynamic>> rows;
+  final List<String> uniqueIds;
+  final String? error;
 }
 
 // ─── GET /trades ────────────────────────────────────────────────
