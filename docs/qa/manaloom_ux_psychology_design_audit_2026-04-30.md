@@ -1,5 +1,30 @@
 # ManaLoom UX Psychology Design Audit — 2026-04-30
 
+## Patch status — P1 UX trust/errors/trades — 2026-04-30 12:12 -0300
+
+Sprint aplicada no app sem alterar contratos JSON, providers externos, endpoints, rotas backend, Life Counter/Lotus, Sets pipeline, meta pipeline, optimize/generate core, scanner ou FCM.
+
+| Finding | Status | Evidência |
+| --- | --- | --- |
+| UX-001 Theme inconsistency | `parcial` | Trades/CreateTrade/TradeDetail migraram usos seguros de `manaViolet`, `primarySoft`, `mythicGold` e `Colors.white` para `brass500/brass400/frost400/textPrimary/backgroundAbyss`; aliases legados ainda existem em outros módulos fora do escopo cirúrgico. |
+| UX-002 Sets/Coleções raw errors | `resolvido` | `SetsCatalogScreen` e `SetCardsScreen` usam `FriendlyErrorMapper`; estados/snackbars não exibem `Exception`, status code bruto ou `RequestOptions`. |
+| UX-003 Auth raw errors | `resolvido` | `AuthProvider` mapeia login/register/profile para mensagens amigáveis e mantém `AppObservability.captureProviderException` com contexto técnico sanitizado. |
+| UX-004 Generate AI raw errors | `resolvido` | `DeckGenerateScreen` usa mapper para falha de geração/salvamento; `DeckProvider`/helpers de deck também evitam status code cru em detalhes/validação/mutações tocadas. |
+| UX-005 Trade critical actions | `resolvido` | `TradeDetailScreen` exige confirmação contextual para aceitar, recusar, cancelar, confirmar entrega, finalizar e disputar; envio agora inclui confirmação com método/rastreio e consequência. |
+| UX-019 Trades raw errors | `resolvido` | `TradeProvider`, `CreateTradeScreen` e `TradeDetailScreen` mapeiam falhas de proposta/status/mensagem para copy amigável. |
+| UX-026 Contrast/token risk | `parcial` | Fluxos de Trades tocados evitam `Colors.white` em CTA Brass e usam `frost400` para texto/acento suportivo; auditoria global de contraste permanece pendente fora de Trades. |
+
+Validação executada:
+
+| comando | resultado |
+| --- | --- |
+| `cd app && flutter analyze lib/features/auth lib/features/decks lib/features/collection lib/features/trades lib/features/binder lib/features/market lib/core test --no-version-check` | `PASS`, sem issues. O warning preexistente em `test/features/community/providers/social_provider_test.dart` foi removido de forma neutra. |
+| `cd app && flutter test test/features/auth test/features/decks test/features/collection test/features/trades test/features/binder test/features/market test/core --no-version-check` | `PASS`, `01:02 +178: All tests passed!`. |
+| `flutter devices` + `xcrun simctl list devices available \| grep -E "iPhone 15\|Booted"` | iPhone 15 Simulator real encontrado: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4, Booted. |
+| `curl -sS --max-time 5 http://127.0.0.1:8082/health` | `not run runtime`: backend 8082 recusou conexão (`curl: (7) Failed to connect`). |
+
+Runtime Social Trading iPhone 15 (`integration_test/binder_marketplace_trade_runtime_test.dart`) ficou `not run` porque não havia backend real em `http://127.0.0.1:8082` no momento da sprint. Menor próxima ação: iniciar backend real em 8082 e executar o comando runtime documentado.
+
 ## Executive summary
 
 - **Visão geral:** auditoria first-pass estática do ManaLoom cobrindo design system, navegação, Home, Auth, busca/cartas, coleções, scanner, Life Counter/Lotus, decks Commander, geração/otimização/validação com IA, meta intelligence, fichário, marketplace, trades, mensagens, notificações, perfil e comunidade. Não houve alteração em app/backend.

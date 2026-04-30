@@ -1,6 +1,48 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — App P1 UX trust, erros amigaveis e confirmacoes de trade
+
+### O Porquê
+- A auditoria `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md` apontou P1 de confianca: mensagens tecnicas (`Exception`, status code cru, detalhes de request/stack) podiam chegar ao usuario em Auth, Generate, Deck Details/Validate, Sets, Trades, Binder/Marketplace.
+- Acoes criticas de Social Trading podiam alterar estado de acordo financeiro/social por toque direto, sem confirmacao contextual suficiente.
+- A sprint precisava corrigir o maior ROI de UX sem redesenhar o app e sem mexer em contratos backend, Life Counter/Lotus, Sets pipeline, meta pipeline, optimize/generate core, scanner ou FCM.
+
+### O Como
+- Criado `FriendlyErrorMapper` no app (`app/lib/core/utils/friendly_error_mapper.dart`) com contextos por fluxo:
+  - Auth login/register/profile;
+  - deck generate/save/details/validate/pricing;
+  - sets catalog/detail;
+  - trade list/detail/create/action/message;
+  - binder/marketplace.
+- O mapper converte status `400/401/403/404/409/422/429/5xx`, timeout, rede, respostas invalidas e textos tecnicos em copy amigavel, sem remover logs internos.
+- Providers/telas tocados passaram a usar o mapper em mensagens exibidas ao usuario:
+  - `AuthProvider`;
+  - `DeckProvider` e support helpers de fetch/mutation/common;
+  - `DeckGenerateScreen`, `DeckDetailsScreen`, `deck_details_actions.dart`;
+  - `SetsCatalogScreen`, `SetCardsScreen`;
+  - `TradeProvider`, `CreateTradeScreen`, `TradeDetailScreen`;
+  - `BinderProvider`/Marketplace state.
+- `TradeDetailScreen` agora exige confirmacao contextual para aceitar, recusar, cancelar, marcar como enviado, confirmar entrega, finalizar e disputar. Os dialogs mostram resumo do trade, itens, valores quando disponiveis, consequencia e CTA claro.
+- `CreateTradeScreen` ganhou review final antes do envio, com itens pedidos/oferecidos, quantidade, condicao, idioma, pagamento e aviso de desequilibrio quando a diferenca relevante de valor passa de 20% e R$25.
+- Trades tocados migraram usos seguros de `Colors.white`/aliases legados para `AppTheme.brass500`, `brass400`, `frost400`, `textPrimary` e `backgroundAbyss`.
+- Nenhuma rota, query, schema, endpoint ou contrato JSON do backend foi alterado.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/auth lib/features/decks lib/features/collection lib/features/trades lib/features/binder lib/features/market lib/core test --no-version-check`: PASS sem issues.
+- `cd app && flutter test test/features/auth test/features/decks test/features/collection test/features/trades test/features/binder test/features/market test/core --no-version-check`: PASS, `01:02 +178: All tests passed!`.
+- Device discovery real:
+  - `flutter devices`: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4;
+  - `xcrun simctl list devices available | grep -E "iPhone 15|Booted"`: iPhone 15 bootado.
+- Runtime Social Trading iPhone 15 em 8082: `not run`; `curl -sS --max-time 5 http://127.0.0.1:8082/health` retornou conexao recusada.
+
+### Evidencias e pendencias
+- Audit atualizado: `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md`.
+- App audit atualizado: `app/doc/APP_AUDIT_2026-04-29.md`.
+- Handoff runtime/not-run: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+- UX-001 e UX-026 ficaram `parcial` por escopo: Trades tocado/tokenizado, mas aliases/contraste global ainda precisam sprint propria.
+- Menor proximo passo para device proof: iniciar backend real em `http://127.0.0.1:8082` e rodar `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...`.
+
 ## 2026-04-30 — P1 performance PUT /trades/:id/respond
 
 ### O Porquê
