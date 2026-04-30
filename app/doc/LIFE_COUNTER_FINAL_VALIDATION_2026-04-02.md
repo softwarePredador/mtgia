@@ -314,6 +314,37 @@ Dentro da arquitetura Lotus-first oficial, o life counter fica considerado fecha
 - runtime de jogador e estado auxiliar de mesa passam pela camada canonicamente normalizada do ManaLoom
 - `Planechase`, `Archenemy` e `Bounty` ficam suportados como fluxos Lotus-first com backend ManaLoom por tras
 
+## Update - 2026-04-30 - iPhone 15 Lotus visual runtime proof
+
+Sprint Life Counter/Lotus visual/runtime proof executada no iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`, com backend local vivo em `http://127.0.0.1:8081` e health `healthy`.
+
+Novo harness dedicado: `app/integration_test/life_counter_lotus_visual_runtime_proof_test.dart`.
+
+Comando principal:
+
+```bash
+cd app
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8081 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8081 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado: `PASS`, `00:31 +1: All tests passed!`.
+
+O proof validou runtime real do `LotusLifeCounterScreen`/WKWebView, 4 jogadores renderizados, 4 controles `+1`, 4 controles `-1`, numero principal com caixa renderizada grande (`135.58 x 75.06`), cor clara `rgba(245, 247, 252, 0.96)`, text shadow, ausencia de overflow horizontal, ausencia de erro `Life counter unavailable`, `+1` de `40 -> 41`, `-1` de `41 -> 40`, persistencia final em `41` e reopen restaurando o mesmo total.
+
+Evidencias:
+
+- `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`
+- `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/life_counter_lotus_visual_runtime_test.log`
+- `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/life_counter_lotus_runtime_initial.png`
+- `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/life_counter_lotus_runtime_after_plus.png`
+
+Pendencias P2/P3 restantes: revisar copy PT-BR dos overlays Lotus, perfilar blur/CSS se houver relato de jank em device fisico e decidir produto sobre o grau de independencia visual aceitavel do Life Counter frente ao shell ManaLoom.
+
 ## Explicitly out of scope
 
 Nao faz parte deste encerramento:

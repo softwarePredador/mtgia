@@ -1,5 +1,120 @@
 # Deck runtime iPhone 15 Simulator — 2026-04-30
 
+## Atualizacao — Life Counter/Lotus visual runtime proof
+
+### Resultado
+
+- Verdict: `PASS`
+- Date/time: `2026-04-30T15:30-03:00`
+- Task: Sprint Life Counter/Lotus visual/runtime proof.
+- Runtime target: iPhone 15 Simulator.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend used by app: `http://127.0.0.1:8081` via `API_BASE_URL` and `PUBLIC_API_BASE_URL`.
+- Test target: `app/integration_test/life_counter_lotus_visual_runtime_proof_test.dart`.
+
+### Device discovery
+
+`flutter devices` summary:
+
+```text
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+```
+
+`xcrun simctl list devices available | grep -E "iPhone 15|Booted"` summary:
+
+```text
+iPhone 15 Pro (F3C5B123-673F-4ACC-84B2-489957CB81C8) (Shutdown)
+iPhone 15 Pro Max (DABB9D79-2FDB-4585-94DB-E31F1288EE74) (Shutdown)
+iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)
+iPhone 15 Plus (6A3E5508-0190-48AC-B6D1-E4BA8A94FFD9) (Shutdown)
+```
+
+### Backend health
+
+Command:
+
+```bash
+curl -sS http://127.0.0.1:8081/health
+```
+
+Result:
+
+```json
+{"status":"healthy","service":"mtgia-server","timestamp":"2026-04-30T15:30:13.333370","environment":"development","version":"1.0.0","git_sha":null,"checks":{"process":{"status":"healthy"}}}
+```
+
+### Commands executed
+
+```bash
+cd app
+flutter analyze lib/features/home test/features/home integration_test --no-version-check
+```
+
+Result: `PASS`, no issues.
+
+```bash
+cd app
+flutter test test/features/home --no-version-check
+```
+
+Result: `PASS`, exit code `0`.
+
+```bash
+cd server
+PORT=8081 dart run .dart_frog/server.dart
+```
+
+Result: backend temporary process served health while the simulator proof ran.
+
+```bash
+cd app
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8081 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8081 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `PASS`, `00:31 +1: All tests passed!`.
+
+### What was proven
+
+UI/runtime real on iPhone 15 Simulator:
+
+- `LotusLifeCounterScreen` opened the embedded Lotus WebView bundle;
+- 4 player cards rendered with 4 `.player-life-count` surfaces;
+- 4 `.increase-button.life` and 4 `.decrease-button.life` controls were present;
+- player one and player two started at 40 life from the canonical ManaLoom session;
+- the first player life number had high-contrast color `rgba(245, 247, 252, 0.96)`, text shadow, and a large rendered box (`135.58 x 75.06`);
+- no horizontal overflow and no `Life counter unavailable` WebView error were detected;
+- `+1` changed player one from `40` to `41`;
+- `-1` changed player one from `41` to `40`;
+- final `+1` persisted player one at `41`;
+- closing and reopening the screen restored player one at `41` from persisted state.
+
+### What was real vs mocked
+
+- Real: iPhone 15 Simulator UI, Flutter integration harness, WKWebView-backed Lotus bundle, ManaLoom canonical local stores, screenshot capture, local Dart Frog backend health on `127.0.0.1:8081`.
+- Mocked: no API/provider mocks in the runtime path.
+- Backend contract visibility: Life Counter/Lotus did not call app JSON APIs in this proof; backend participation was limited to required local health and app base URL configuration.
+- Not touched: core Lotus migration, meta pipeline, backend IA, marketplace/trades, scanner/OCR, secrets and JSON contracts.
+
+### Evidence paths
+
+- Proof folder: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/`
+- Runtime log: `life_counter_lotus_visual_runtime_test.log` (sanitized; screenshot base64 omitted)
+- Screenshots:
+  - `life_counter_lotus_runtime_initial.png`
+  - `life_counter_lotus_runtime_after_plus.png`
+
+### Blockers and next actions
+
+- No crash, timeout, overflow, or WebView error remained in the passing run.
+- Expected local warning remains: several pods do not support `arm64` simulator for Apple Silicon iOS 26+; this iPhone 15 iOS 17.4 run succeeded.
+- Smallest P2/P3 next actions: PT-BR copy pass for Lotus overlays, optional profiling for blur/CSS jank, and product decision on how distinct the Life Counter visual language may remain from the main ManaLoom shell.
+
 ## Atualizacao — Visual P1 fora de Trades / Search-Sets runtime
 
 ### Resultado

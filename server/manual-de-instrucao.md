@@ -10473,3 +10473,94 @@ Latencias observadas no runtime final:
 - `POST /users/:id/follow` permanece lento no backend real remoto, ainda que classificado por app/backend; deve virar item de performance se for priorizado.
 - Leituras de perfil publico ficam perto de `1.7s`, tambem classificadas como latencia real de backend remoto.
 - Nao houve 4xx/5xx inesperado, timeout, overflow ou crash no runtime final.
+
+## 97. Sprint Life Counter/Lotus visual runtime proof - 2026-04-30
+
+### 97.1 Objetivo
+
+Provar o runtime visual do Life Counter/Lotus no ManaLoom sem redesenhar o contador, sem tocar no core Lotus migrado e sem alterar contratos JSON, IA, meta pipeline, marketplace/trades, scanner/OCR ou secrets.
+
+### 97.2 Mapeamento tecnico
+
+Foram revisados os documentos de validacao do Life Counter, auditoria UX, auditoria app e os arquivos `app/lib/features/home/life_counter*`, `app/lib/features/home/lotus*` e `app/assets/lotus/*`.
+
+Superficies mapeadas:
+
+- tela Flutter host: `LotusLifeCounterScreen`;
+- host WebView: `LotusHostController`/`WebViewWidget`;
+- bundle Lotus: `app/assets/lotus/index.html`, `js/app.min.js`, `css/styles.min.css`;
+- seletores runtime principais: `.player-card`, `.player-life-count`, `.increase-button.life`, `.decrease-button.life`, `.menu-button`;
+- persistencia: `LifeCounterSessionStore`, `LifeCounterSettingsStore`, `LotusStorageSnapshotStore`, `localStorage.players`.
+
+### 97.3 Teste adicionado
+
+Foi criado `app/integration_test/life_counter_lotus_visual_runtime_proof_test.dart`.
+
+O harness:
+
+- limpa stores canonicos e snapshot Lotus;
+- cria sessao Commander/multiplayer com 4 jogadores;
+- abre `LotusLifeCounterScreen` em `MaterialApp`;
+- usa a bridge debug do shell para provar DOM real do WKWebView;
+- valida 4 jogadores, 4 controles `+1`, 4 controles `-1`, cor clara/text-shadow, caixa renderizada grande do numero principal, ausencia de overflow horizontal e ausencia de erro `Life counter unavailable`;
+- dispara os controles reais `.increase-button.life` e `.decrease-button.life` via eventos DOM/pointer;
+- confirma `40 -> 41`, `41 -> 40`, persistencia final em `41` e reopen restaurando `41`;
+- captura screenshots por `IntegrationTestWidgetsFlutterBinding.takeScreenshot`.
+
+### 97.4 Validacao executada
+
+```bash
+cd app
+flutter analyze lib/features/home test/features/home integration_test --no-version-check
+flutter test test/features/home --no-version-check
+flutter analyze lib/features/home test/features/home integration_test/life_counter_lotus_visual_runtime_proof_test.dart --no-version-check
+```
+
+Resultado: `PASS`.
+
+Backend local:
+
+```bash
+cd server
+PORT=8081 dart run .dart_frog/server.dart
+curl -sS http://127.0.0.1:8081/health
+```
+
+Health: `{"status":"healthy","service":"mtgia-server","timestamp":"2026-04-30T15:30:13.333370","environment":"development","version":"1.0.0","git_sha":null,"checks":{"process":{"status":"healthy"}}}`.
+
+Runtime iPhone 15:
+
+```bash
+cd app
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8081 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8081 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado final: `00:31 +1: All tests passed!`.
+
+### 97.5 Evidencias
+
+- Handoff: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+- Provas: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/`.
+- Log sanitizado: `life_counter_lotus_visual_runtime_test.log`.
+- Screenshots: `life_counter_lotus_runtime_initial.png`, `life_counter_lotus_runtime_after_plus.png`.
+- iPhone 15 Simulator: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend: `http://127.0.0.1:8081`.
+
+### 97.6 Resultado e pendencias
+
+Verdict: `PASS`.
+
+Nao houve crash, timeout, overflow horizontal, erro WebView, 4xx/5xx inesperado ou mudanca de contrato. O aviso local de pods sem suporte `arm64` para Apple Silicon/iOS 26+ continua aparecendo, mas o build/test no iPhone 15 iOS 17.4 passou.
+
+P2/P3 restantes:
+
+- traduzir/revisar copy PT-BR dos overlays Lotus;
+- adicionar screenshots/regressao para 2P, 6P e sheets auxiliares;
+- perfilar blur/CSS/assets se houver relato de jank em device fisico;
+- decidir produto sobre o quanto o Life Counter pode manter linguagem visual propria sem quebrar coerencia ManaLoom.

@@ -733,16 +733,24 @@ Padrões encontrados:
 3. Migrar semanticamente usos de `manaViolet/primarySoft/mythicGold` nos módulos principais para tokens Brass/Frost claros, sem alteração visual inicial.
 4. Reorganizar Home em quatro intenções: Jogar agora, Construir deck, Minha coleção, Trocas e mercado.
 5. Melhorar `OptimizationPreviewDialog` com blocos explícitos de legalidade Commander, preço, risco, curva e motivo das mudanças.
-6. Traduzir overlays Lotus para PT-BR e validar Life Counter/Lotus com screenshots no iPhone 15.
+6. Traduzir overlays Lotus para PT-BR e manter regression visual do Life Counter/Lotus no iPhone 15.
 7. Adicionar summary/trust cards em Binder/Marketplace: valor total, condição, idioma, quantidade, owner, preço, status e disponibilidade.
 8. Decidir produto para Meta Deck Intelligence: superfície própria ou integração em Deck Detail/Generate/Optimize.
 
+## Runtime update - Life Counter/Lotus - 2026-04-30T15:30-03:00
+
+Verdict: `PASS` no iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+
+O novo `app/integration_test/life_counter_lotus_visual_runtime_proof_test.dart` abriu `LotusLifeCounterScreen` em WKWebView, validou 4 jogadores, controles `+1/-1`, legibilidade do numero principal por area renderizada, cor clara e text-shadow, ausencia de overflow horizontal, ausencia de erro WebView, persistencia do life total e reopen.
+
+Evidencias: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_counter_lotus/` e handoff `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+
 ## Not verified
 
-- Prova visual real em iPhone 15 Simulator não foi executada; apenas discovery do device foi coletado.
+- Prova visual real de Life Counter/Lotus em iPhone 15 Simulator foi executada e passou; scanner/camera e fluxos de IA continuam separados.
 - Câmera real do Scanner não pode ser provada em iOS Simulator; precisa device físico.
-- Contraste real de Life Counter/Lotus com 2/4/6 jogadores precisa screenshot/runtime.
-- Performance de WebView Lotus, blur CSS e assets precisa profiling/runtime.
+- Contraste/legibilidade real de Life Counter/Lotus foi provado no cenario 4 jogadores; 2/6 jogadores e sheets especificas ficam como regressao P2.
+- Performance de WebView Lotus, blur CSS e assets ainda precisa profiling dedicado se houver relato de jank.
 - Uso real de `app/assets/symbols/logo.png` em runtime não foi confirmado.
 - Fluxo completo register/login/generate/optimize/apply/validate não foi rodado nesta auditoria porque o pedido era first-pass sem implementação.
 - Decisão de produto pendente para Search global e Meta Deck Intelligence.
@@ -752,9 +760,9 @@ Padrões encontrados:
 - Verified: design system, telas principais, assets/backgrounds, hardcoded colors, error patterns, contraste estático aproximado e testes Flutter app.
 - Visual/UX gaps: CTA hierarchy da Home, semantics Brass/Frost, confiança em Marketplace/Trades, explicabilidade de IA e descoberta de Search/Meta.
 - Background risks: evitar arte oficial de cartas global; Lotus blur/assets precisam runtime proof; `logo.png` 2MB precisa confirmação de uso.
-- Accessibility risks: `frost600` texto, `error` pequeno, Life Counter neon/dinâmico e bolhas/status tonalizados.
+- Accessibility risks: `frost600` texto, `error` pequeno, Life Counter neon/dinâmico em cenarios alem do proof 4P e bolhas/status tonalizados.
 - Performance risks: Lotus WebView blur/CSS, assets grandes, camera scanner e listas com muitas thumbnails.
-- Needs runtime proof: Life Counter/Lotus, Scanner câmera real, screenshots iPhone 15, jank/performance visual.
+- Needs runtime proof: Scanner câmera real, screenshots adicionais 2P/6P/sheets Life Counter e jank/performance visual.
 - Needs product decision: Meta Deck Intelligence surface, Search global, nível de separação visual do Life Counter.
 - Blocked by: nenhum blocker P0; P1 UX em trades sem confirmação e P1 raw errors user-facing.
 - Next step: aplicar primeiro friendly error mapping e confirmações de trade; depois re-hierarquizar Home/IA e rodar prova visual iPhone 15.
