@@ -34,14 +34,19 @@
 - Device discovery real:
   - `flutter devices`: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4;
   - `xcrun simctl list devices available | grep -E "iPhone 15|Booted"`: iPhone 15 bootado.
-- Runtime Social Trading iPhone 15 em 8082: `not run`; `curl -sS --max-time 5 http://127.0.0.1:8082/health` retornou conexao recusada.
+- Runtime Social Trading iPhone 15 em 8082:
+  - primeira tentativa: `not run`; `curl -sS --max-time 5 http://127.0.0.1:8082/health` retornou conexao recusada;
+  - follow-up: backend temporario iniciado em `PORT=8082` e `/health` ficou healthy;
+  - `app/integration_test/binder_marketplace_trade_runtime_test.dart` foi ajustado para confirmar os novos dialogs `Revisar proposta`, `Aceitar trade?`, `Confirmar entrega?` e `Finalizar trade?`;
+  - `flutter analyze integration_test/binder_marketplace_trade_runtime_test.dart --no-version-check`: PASS;
+  - rerun no iPhone 15 ficou `blocked by simulator build`, pois o build iOS Simulator falhou antes do app abrir ao linkar `Pods/MLImage.framework/MLImage` compilado para `iOS` em target `iOS-simulator`.
 
 ### Evidencias e pendencias
 - Audit atualizado: `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md`.
 - App audit atualizado: `app/doc/APP_AUDIT_2026-04-29.md`.
-- Handoff runtime/not-run: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+- Handoff runtime/build-blocked: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
 - UX-001 e UX-026 ficaram `parcial` por escopo: Trades tocado/tokenizado, mas aliases/contraste global ainda precisam sprint propria.
-- Menor proximo passo para device proof: iniciar backend real em `http://127.0.0.1:8082` e rodar `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...`.
+- Menor proximo passo para device proof: resolver/contornar o link do MLKit/MLImage no iOS Simulator ou rodar o mesmo harness em device iOS fisico com backend `http://127.0.0.1:8082` healthy.
 
 ## 2026-04-30 — P1 performance PUT /trades/:id/respond
 

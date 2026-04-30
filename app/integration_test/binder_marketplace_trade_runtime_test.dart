@@ -377,7 +377,10 @@ void main() {
       await tester.enterText(find.byType(TextField).first, '1.23');
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
-      await _tapVisible(tester, find.widgetWithText(ElevatedButton, 'Adicionar'));
+      await _tapVisible(
+        tester,
+        find.widgetWithText(ElevatedButton, 'Adicionar'),
+      );
       await tester.pump();
       await _pumpUntil(tester, () async {
         final data = await api.getJson(
@@ -396,7 +399,9 @@ void main() {
         description: 'BinderItemEditor add sheet dismissed',
       );
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Abrir editor edit'));
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Abrir editor edit'),
+      );
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Editar — Command Tower'));
       await _tapVisible(tester, find.byIcon(Icons.add).last);
@@ -424,7 +429,9 @@ void main() {
         description: 'BinderItemEditor edit sheet dismissed',
       );
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Abrir editor edit'));
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Abrir editor edit'),
+      );
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Editar — Command Tower'));
       await _tapVisible(tester, find.widgetWithText(OutlinedButton, 'Remover'));
@@ -497,6 +504,11 @@ void main() {
       await tester.ensureVisible(find.text('Enviar Proposta'));
       await tester.tap(find.text('Enviar Proposta'));
       await tester.pump();
+      await _pumpUntilFound(tester, find.text('Revisar proposta'));
+      await tester.tap(
+        find.byKey(const ValueKey('create-trade-review-confirm-button')),
+      );
+      await tester.pump();
       await _pumpUntilFound(
         tester,
         find.text('Proposta enviada com sucesso! 🎉'),
@@ -540,6 +552,9 @@ void main() {
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Pendente'));
       await tester.tap(find.text('Aceitar'));
+      await tester.pump();
+      await _pumpUntilFound(tester, find.text('Aceitar trade?'));
+      await tester.tap(find.text('Aceitar trade'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Aceito'));
       expect(
@@ -613,9 +628,15 @@ void main() {
       await tester.ensureVisible(find.text('Confirmar Entrega'));
       await tester.tap(find.text('Confirmar Entrega'));
       await tester.pump();
+      await _pumpUntilFound(tester, find.text('Confirmar entrega?'));
+      await tester.tap(find.text('Confirmar entrega'));
+      await tester.pump();
       await _pumpUntilFound(tester, find.text('Entregue'));
       await tester.ensureVisible(find.text('Finalizar'));
       await tester.tap(find.text('Finalizar'));
+      await tester.pump();
+      await _pumpUntilFound(tester, find.text('Finalizar trade?'));
+      await tester.tap(find.text('Finalizar trade'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Concluído'));
       expect(await api.tradeStatus(buyer.token, tradeId), 'completed');

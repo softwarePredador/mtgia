@@ -22,8 +22,11 @@ Validação executada:
 | `cd app && flutter test test/features/auth test/features/decks test/features/collection test/features/trades test/features/binder test/features/market test/core --no-version-check` | `PASS`, `01:02 +178: All tests passed!`. |
 | `flutter devices` + `xcrun simctl list devices available \| grep -E "iPhone 15\|Booted"` | iPhone 15 Simulator real encontrado: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4, Booted. |
 | `curl -sS --max-time 5 http://127.0.0.1:8082/health` | `not run runtime`: backend 8082 recusou conexão (`curl: (7) Failed to connect`). |
+| Follow-up `PORT=8082 dart run .dart_frog/server.dart` + `/health` | `PASS`: backend temporario ficou healthy em 8082. |
+| Follow-up `flutter analyze integration_test/binder_marketplace_trade_runtime_test.dart --no-version-check` | `PASS`: harness atualizado para confirmar `Revisar proposta`, `Aceitar trade?`, `Confirmar entrega?` e `Finalizar trade?`. |
+| Follow-up `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...` | `BLOCKED`: build iOS Simulator falhou antes do app abrir por link de `Pods/MLImage.framework/MLImage` compilado para `iOS` ao buildar `iOS-simulator`. |
 
-Runtime Social Trading iPhone 15 (`integration_test/binder_marketplace_trade_runtime_test.dart`) ficou `not run` porque não havia backend real em `http://127.0.0.1:8082` no momento da sprint. Menor próxima ação: iniciar backend real em 8082 e executar o comando runtime documentado.
+Runtime Social Trading iPhone 15 (`integration_test/binder_marketplace_trade_runtime_test.dart`) saiu de `not run por backend indisponivel` para `blocked by simulator build`. Menor próxima ação: resolver/contornar o link do MLKit/MLImage no simulador ou rodar o mesmo teste em device iOS físico, mantendo backend 8082 healthy.
 
 ## Executive summary
 

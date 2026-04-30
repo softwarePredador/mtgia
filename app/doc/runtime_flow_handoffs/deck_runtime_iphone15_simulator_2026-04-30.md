@@ -35,15 +35,15 @@ Command:
 curl -sS --max-time 5 http://127.0.0.1:8082/health
 ```
 
-Result:
+Initial sprint result:
 
 ```text
 curl: (7) Failed to connect to 127.0.0.1 port 8082 after 5 ms: Couldn't connect to server
 ```
 
-Backend result: `not available`; runtime app/backend proof in 8082 was `not run`.
+Follow-up validation started a temporary backend on `8082` and `/health` returned `healthy`.
 
-## Command intended but not executed
+## Runtime command
 
 ```bash
 cd app
@@ -55,13 +55,28 @@ flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
   --no-version-check
 ```
 
-Reason: backend health failed before runtime; no live local backend was listening on `8082`.
+Follow-up status: `blocked by simulator build`, not by backend health.
+
+The harness was updated to match the new UX trust dialogs:
+
+- `CreateTradeScreen`: taps `Revisar proposta` and confirms `create-trade-review-confirm-button`.
+- `TradeDetailScreen`: confirms `Aceitar trade?`, `Confirmar entrega?` and `Finalizar trade?`.
+
+`flutter analyze integration_test/binder_marketplace_trade_runtime_test.dart --no-version-check` passed after the harness update.
+
+The rerun on iPhone 15 reached iOS build and then failed before app launch with the known MLKit simulator link issue:
+
+```text
+Failed to build iOS app
+Error (Xcode): Building for 'iOS-simulator', but linking in object file (.../Pods/MLImage/Frameworks/MLImage.framework/MLImage[arm64][2](GMLImage.o)) built for 'iOS'
+Error (Xcode): Linker command failed with exit code 1
+```
 
 ## What was real vs mocked
 
-- Real: code changes, static analysis, focused Flutter unit/widget tests, simulator discovery for iPhone 15.
+- Real: code changes, static analysis, focused Flutter unit/widget tests, simulator discovery for iPhone 15, backend health after temporary 8082 startup, and iOS build attempt.
 - Mocked/faked in tests: ApiClient/provider responses for Auth timeout, Sets 500, TradeProvider failures, CreateTrade review and TradeDetail action confirmations.
-- Not proven in device UI: `binder_marketplace_trade_runtime_test.dart` against backend 8082.
+- Not proven in device UI: `binder_marketplace_trade_runtime_test.dart` against backend 8082, because the iOS Simulator build failed before app launch on MLKit/MLImage linking.
 - Not touched: backend code/contracts, Life Counter/Lotus, meta pipeline, scanner, FCM.
 
 ## Validation run
@@ -84,5 +99,4 @@ Result: `PASS`, `01:02 +178: All tests passed!`.
 
 | Area | Owner/module | Status | Smallest next action |
 | --- | --- | --- | --- |
-| Social Trading iPhone 15 runtime | local backend/app QA | `not proven` | Start real backend on `http://127.0.0.1:8082`, verify `/health`, then run `integration_test/binder_marketplace_trade_runtime_test.dart` on iPhone 15. |
-
+| Social Trading iPhone 15 runtime | local backend/app QA | `blocked by simulator build` | Resolve/guard the MLKit `MLImage.framework` simulator link issue or run the same command on a physical iOS device, then rerun `integration_test/binder_marketplace_trade_runtime_test.dart`. |
