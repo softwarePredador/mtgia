@@ -56,13 +56,20 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     setState(() => _isToggling = true);
 
     final provider = context.read<SocialProvider>();
+    var ok = true;
     if (provider.isFollowingVisited) {
-      await provider.unfollowUser(widget.userId);
+      ok = await provider.unfollowUser(widget.userId);
     } else {
-      await provider.followUser(widget.userId);
+      ok = await provider.followUser(widget.userId);
     }
 
-    if (mounted) setState(() => _isToggling = false);
+    if (!mounted) return;
+    setState(() => _isToggling = false);
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível atualizar follow')),
+      );
+    }
   }
 
   Future<void> _openChat(String userId) async {
@@ -332,6 +339,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     _UsersListTab(
                       users: provider.followers,
                       isLoading: provider.isLoadingFollowers,
+                      errorMessage: provider.followersError,
                       emptyMessage: 'Nenhum seguidor ainda',
                       hasMore: provider.hasMoreFollowers,
                       onLoadMore: () => provider.fetchFollowers(widget.userId),
@@ -339,6 +347,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     _UsersListTab(
                       users: provider.following,
                       isLoading: provider.isLoadingFollowing,
+                      errorMessage: provider.followingError,
                       emptyMessage: 'Não segue ninguém ainda',
                       hasMore: provider.hasMoreFollowing,
                       onLoadMore: () => provider.fetchFollowing(widget.userId),
@@ -570,6 +579,7 @@ class _DecksTab extends StatelessWidget {
 class _UsersListTab extends StatefulWidget {
   final List<PublicUser> users;
   final bool isLoading;
+  final String? errorMessage;
   final String emptyMessage;
   final bool hasMore;
   final VoidCallback? onLoadMore;
@@ -577,6 +587,7 @@ class _UsersListTab extends StatefulWidget {
   const _UsersListTab({
     required this.users,
     required this.isLoading,
+    this.errorMessage,
     required this.emptyMessage,
     this.hasMore = false,
     this.onLoadMore,
@@ -616,6 +627,33 @@ class _UsersListTabState extends State<_UsersListTab> {
     if (widget.isLoading && widget.users.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: AppTheme.manaViolet),
+      );
+    }
+
+    if (widget.errorMessage != null && widget.users.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppTheme.textSecondary,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.errorMessage!,
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
+            if (widget.onLoadMore != null) ...[
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: widget.onLoadMore,
+                child: const Text('Tentar novamente'),
+              ),
+            ],
+          ],
+        ),
       );
     }
 

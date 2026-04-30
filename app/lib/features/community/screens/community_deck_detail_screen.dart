@@ -19,8 +19,7 @@ class CommunityDeckDetailScreen extends StatefulWidget {
       _CommunityDeckDetailScreenState();
 }
 
-class _CommunityDeckDetailScreenState
-    extends State<CommunityDeckDetailScreen> {
+class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   Map<String, dynamic>? _deckData;
   bool _isLoading = true;
   String? _error;
@@ -38,9 +37,9 @@ class _CommunityDeckDetailScreenState
       _error = null;
     });
 
-    final data = await context
-        .read<CommunityProvider>()
-        .fetchPublicDeckDetails(widget.deckId);
+    final data = await context.read<CommunityProvider>().fetchPublicDeckDetails(
+      widget.deckId,
+    );
 
     if (mounted) {
       setState(() {
@@ -54,8 +53,9 @@ class _CommunityDeckDetailScreenState
   Future<void> _copyDeck() async {
     setState(() => _isCopying = true);
 
-    final result =
-        await context.read<DeckProvider>().copyPublicDeck(widget.deckId);
+    final result = await context.read<DeckProvider>().copyPublicDeck(
+      widget.deckId,
+    );
 
     if (!mounted) return;
     setState(() => _isCopying = false);
@@ -87,14 +87,17 @@ class _CommunityDeckDetailScreenState
         actions: [
           if (_deckData != null)
             IconButton(
-              icon: _isCopying
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppTheme.primarySoft),
-                    )
-                  : const Icon(Icons.copy, color: AppTheme.primarySoft),
+              icon:
+                  _isCopying
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppTheme.primarySoft,
+                        ),
+                      )
+                      : const Icon(Icons.copy, color: AppTheme.primarySoft),
               tooltip: 'Copiar para meus decks',
               onPressed: _isCopying ? null : _copyDeck,
             ),
@@ -116,11 +119,16 @@ class _CommunityDeckDetailScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline,
-                size: 48, color: AppTheme.textSecondary),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppTheme.textSecondary,
+            ),
             const SizedBox(height: 12),
-            Text(_error!,
-                style: const TextStyle(color: AppTheme.textSecondary)),
+            Text(
+              _error!,
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _loadDeck,
@@ -133,8 +141,7 @@ class _CommunityDeckDetailScreenState
 
     final deck = _deckData!;
     final commander = (deck['commander'] as List?) ?? [];
-    final mainBoard =
-        (deck['main_board'] as Map<String, dynamic>?) ?? {};
+    final mainBoard = (deck['main_board'] as Map<String, dynamic>?) ?? {};
     final stats = (deck['stats'] as Map<String, dynamic>?) ?? {};
 
     return SingleChildScrollView(
@@ -167,10 +174,11 @@ class _CommunityDeckDetailScreenState
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color:
-                            AppTheme.manaViolet.withValues(alpha: 0.2),
+                        color: AppTheme.manaViolet.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                       ),
                       child: Text(
@@ -187,30 +195,41 @@ class _CommunityDeckDetailScreenState
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.person_outline,
-                        size: 16, color: AppTheme.textSecondary),
+                    const Icon(
+                      Icons.person_outline,
+                      size: 16,
+                      color: AppTheme.textSecondary,
+                    ),
                     const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: deck['owner_id'] != null
-                          ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => UserProfileScreen(
-                                      userId: deck['owner_id'] as String),
-                                ),
-                              );
-                            }
-                          : null,
-                      child: Text(
-                        deck['owner_username'] ?? 'Anônimo',
-                        style: TextStyle(
-                          color: AppTheme.primarySoft,
-                          fontSize: AppTheme.fontMd,
-                          decoration: deck['owner_id'] != null
-                              ? TextDecoration.underline
-                              : null,
-                          decorationColor: AppTheme.primarySoft,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap:
+                            deck['owner_id'] != null
+                                ? () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => UserProfileScreen(
+                                            userId: deck['owner_id'] as String,
+                                          ),
+                                    ),
+                                  );
+                                }
+                                : null,
+                        child: Text(
+                          deck['owner_username'] ?? 'Anônimo',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppTheme.primarySoft,
+                            fontSize: AppTheme.fontMd,
+                            decoration:
+                                deck['owner_id'] != null
+                                    ? TextDecoration.underline
+                                    : null,
+                            decorationColor: AppTheme.primarySoft,
+                          ),
                         ),
                       ),
                     ),
@@ -239,8 +258,11 @@ class _CommunityDeckDetailScreenState
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(Icons.auto_awesome,
-                          size: 16, color: AppTheme.mythicGold),
+                      const Icon(
+                        Icons.auto_awesome,
+                        size: 16,
+                        color: AppTheme.mythicGold,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Sinergia: ${deck['synergy_score']}%',
@@ -263,23 +285,27 @@ class _CommunityDeckDetailScreenState
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _isCopying ? null : _copyDeck,
-              icon: _isCopying
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Icon(Icons.file_copy_outlined),
-              label: Text(_isCopying
-                  ? 'Copiando...'
-                  : 'Copiar Deck para minha coleção'),
+              icon:
+                  _isCopying
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : const Icon(Icons.file_copy_outlined),
+              label: Text(
+                _isCopying ? 'Copiando...' : 'Copiar Deck para minha coleção',
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primarySoft,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                ),
               ),
             ),
           ),
@@ -297,8 +323,9 @@ class _CommunityDeckDetailScreenState
               ),
             ),
             const SizedBox(height: 8),
-            ...commander.map((card) => _buildCardTile(
-                card as Map<String, dynamic>)),
+            ...commander.map(
+              (card) => _buildCardTile(card as Map<String, dynamic>),
+            ),
             const SizedBox(height: 16),
           ],
 
@@ -307,7 +334,9 @@ class _CommunityDeckDetailScreenState
             final type = entry.key;
             final cards = entry.value as List;
             final totalQty = cards.fold<int>(
-                0, (sum, c) => sum + ((c as Map)['quantity'] as int));
+              0,
+              (sum, c) => sum + ((c as Map)['quantity'] as int),
+            );
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -320,8 +349,9 @@ class _CommunityDeckDetailScreenState
                   ),
                 ),
                 const SizedBox(height: 6),
-                ...cards.map((card) =>
-                    _buildCardTile(card as Map<String, dynamic>)),
+                ...cards.map(
+                  (card) => _buildCardTile(card as Map<String, dynamic>),
+                ),
                 const SizedBox(height: 12),
               ],
             );
@@ -342,16 +372,15 @@ class _CommunityDeckDetailScreenState
       color: AppTheme.surfaceElevated,
       margin: const EdgeInsets.only(bottom: 4),
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+      ),
       child: ListTile(
         dense: true,
         onTap: () {
           final deckCard = DeckCardItem.fromJson(card);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => CardDetailScreen(card: deckCard),
-            ),
+            MaterialPageRoute(builder: (_) => CardDetailScreen(card: deckCard)),
           );
         },
         leading: CachedCardImage(
@@ -375,15 +404,16 @@ class _CommunityDeckDetailScreenState
             fontSize: AppTheme.fontSm,
           ),
         ),
-        trailing: manaCost.isNotEmpty
-            ? Text(
-                manaCost,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: AppTheme.fontSm,
-                ),
-              )
-            : null,
+        trailing:
+            manaCost.isNotEmpty
+                ? Text(
+                  manaCost,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                )
+                : null,
       ),
     );
   }

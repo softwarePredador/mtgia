@@ -248,7 +248,15 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> refreshProfile() async {
     try {
       final response = await _apiClient.get('/users/me');
-      if (response.statusCode != 200) return false;
+      if (response.statusCode != 200) {
+        _recordProfileProviderEvent(
+          'profile_refresh_http_error',
+          operation: 'refreshProfile',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
+        return false;
+      }
       final data = response.data;
       if (data is Map && data['user'] is Map<String, dynamic>) {
         _user = User.fromJson((data['user'] as Map<String, dynamic>));
@@ -256,8 +264,22 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      _recordProfileProviderEvent(
+        'profile_refresh_contract_error',
+        operation: 'refreshProfile',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
       return false;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'AuthProvider',
+          operation: 'refreshProfile',
+        ),
+      );
       return false;
     }
   }
@@ -281,6 +303,12 @@ class AuthProvider extends ChangeNotifier {
         if (tradeNotes != null) 'trade_notes': tradeNotes,
       });
       if (response.statusCode != 200) {
+        _recordProfileProviderEvent(
+          'profile_update_http_error',
+          operation: 'updateProfile',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
         if (response.data is Map && response.data['error'] != null) {
           _errorMessage = response.data['error'].toString();
         } else {
@@ -294,6 +322,16 @@ class AuthProvider extends ChangeNotifier {
         _user = User.fromJson((data['user'] as Map<String, dynamic>));
         await _saveCredentials();
         notifyListeners();
+      } else {
+        _recordProfileProviderEvent(
+          'profile_update_contract_error',
+          operation: 'updateProfile',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
+        _errorMessage = 'Resposta inválida do servidor';
+        notifyListeners();
+        return false;
       }
       return true;
     } catch (e, stackTrace) {
@@ -317,5 +355,29 @@ class AuthProvider extends ChangeNotifier {
       return 'unknown';
     }
     return parts.last.trim().toLowerCase();
+  }
+
+  void _recordProfileProviderEvent(
+    String message, {
+    required String operation,
+    int? statusCode,
+    String? requestId,
+  }) {
+    debugPrint(
+      '[AuthProvider] $message operation=$operation '
+      'status=${statusCode ?? 'n/a'} request_id=${requestId ?? 'n/a'}',
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        message,
+        category: 'profile',
+        data: {
+          'provider': 'AuthProvider',
+          'operation': operation,
+          if (statusCode != null) 'status_code': statusCode,
+          if (requestId != null) 'request_id': requestId,
+        },
+      ),
+    );
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
 
 /// Modelo de usuário público
 class PublicUser {
@@ -32,9 +35,10 @@ class PublicUser {
       followerCount: json['follower_count'] as int? ?? 0,
       followingCount: json['following_count'] as int? ?? 0,
       publicDeckCount: json['public_deck_count'] as int? ?? 0,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'] as String)
-          : null,
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.tryParse(json['created_at'] as String)
+              : null,
     );
   }
 
@@ -75,9 +79,10 @@ class PublicDeckSummary {
       cardCount: json['card_count'] as int? ?? 0,
       commanderName: json['commander_name'] as String?,
       commanderImageUrl: json['commander_image_url'] as String?,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'] as String)
-          : null,
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.tryParse(json['created_at'] as String)
+              : null,
     );
   }
 }
@@ -117,6 +122,8 @@ class SocialProvider extends ChangeNotifier {
   List<PublicUser> _following = [];
   bool _isLoadingFollowers = false;
   bool _isLoadingFollowing = false;
+  String? _followersError;
+  String? _followingError;
   int _followersTotal = 0;
   int _followingTotal = 0;
   int _followersPage = 1;
@@ -130,6 +137,8 @@ class SocialProvider extends ChangeNotifier {
   List<PublicUser> get following => _following;
   bool get isLoadingFollowers => _isLoadingFollowers;
   bool get isLoadingFollowing => _isLoadingFollowing;
+  String? get followersError => _followersError;
+  String? get followingError => _followingError;
   int get followersTotal => _followersTotal;
   int get followingTotal => _followingTotal;
   bool get hasMoreFollowers => _hasMoreFollowers;
@@ -138,17 +147,19 @@ class SocialProvider extends ChangeNotifier {
   // --- Feed de seguidos ---
   List<PublicDeckSummary> _followingFeed = [];
   bool _isLoadingFeed = false;
+  String? _feedError;
   bool _hasMoreFeed = true;
   int _feedPage = 1;
   int _feedTotal = 0;
 
   List<PublicDeckSummary> get followingFeed => _followingFeed;
   bool get isLoadingFeed => _isLoadingFeed;
+  String? get feedError => _feedError;
   bool get hasMoreFeed => _hasMoreFeed;
   int get feedTotal => _feedTotal;
 
   SocialProvider({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   // ======================================================================
   // Busca de Usuários
@@ -178,21 +189,39 @@ class SocialProvider extends ChangeNotifier {
 
     try {
       final encoded = Uri.encodeComponent(query.trim());
-      final response =
-          await _apiClient.get('/community/users?q=$encoded&limit=30');
+      final response = await _apiClient.get(
+        '/community/users?q=$encoded&limit=30',
+      );
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _searchResults = list
-            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-            .toList();
+        _searchResults =
+            list
+                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+                .toList();
         _searchTotal = data['total'] as int? ?? _searchResults.length;
       } else {
+        _recordSocialEvent(
+          'social_search_http_error',
+          operation: 'searchUsers',
+          endpoint: '/community/users',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
         _searchError = 'Falha ao buscar usuários';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] searchUsers error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'searchUsers',
+          extras: {'endpoint': '/community/users'},
+        ),
+      );
       _searchError = 'Erro de conexão';
     }
 
@@ -229,28 +258,58 @@ class SocialProvider extends ChangeNotifier {
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
-        final userMap = data['user'] as Map<String, dynamic>;
+        final rawUser = data['user'];
+        if (rawUser is! Map<String, dynamic>) {
+          _recordSocialEvent(
+            'social_profile_contract_error',
+            operation: 'fetchUserProfile',
+            endpoint: '/community/users/:id',
+            statusCode: response.statusCode,
+            requestId: response.requestId,
+          );
+          _profileError = 'Erro ao carregar perfil';
+          return;
+        }
+        final userMap = rawUser;
         _visitedUser = PublicUser.fromJson(userMap);
         _isFollowingVisited = userMap['is_following'] == true;
         _isOwnProfile = userMap['is_own_profile'] == true;
 
         final decksList = (data['public_decks'] as List?) ?? [];
-        _visitedUserDecks = decksList
-            .map((d) =>
-                PublicDeckSummary.fromJson(d as Map<String, dynamic>))
-            .toList();
+        _visitedUserDecks =
+            decksList
+                .map(
+                  (d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>),
+                )
+                .toList();
       } else if (response.statusCode == 404) {
         _profileError = 'Usuário não encontrado';
       } else {
+        _recordSocialEvent(
+          'social_profile_http_error',
+          operation: 'fetchUserProfile',
+          endpoint: '/community/users/:id',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
         _profileError = 'Erro ao carregar perfil';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] fetchUserProfile error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'fetchUserProfile',
+          extras: {'endpoint': '/community/users/:id'},
+        ),
+      );
       _profileError = 'Erro de conexão';
+    } finally {
+      _isLoadingProfile = false;
+      notifyListeners();
     }
-
-    _isLoadingProfile = false;
-    notifyListeners();
   }
 
   // ======================================================================
@@ -260,8 +319,7 @@ class SocialProvider extends ChangeNotifier {
   /// Seguir um usuário
   Future<bool> followUser(String targetId) async {
     try {
-      final response =
-          await _apiClient.post('/users/$targetId/follow', {});
+      final response = await _apiClient.post('/users/$targetId/follow', {});
 
       if (response.statusCode == 200) {
         _isFollowingVisited = true;
@@ -284,9 +342,25 @@ class SocialProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      _recordSocialEvent(
+        'social_follow_http_error',
+        operation: 'followUser',
+        endpoint: '/users/:id/follow',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] followUser error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'followUser',
+          extras: {'endpoint': '/users/:id/follow'},
+        ),
+      );
       return false;
     }
   }
@@ -316,9 +390,25 @@ class SocialProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      _recordSocialEvent(
+        'social_unfollow_http_error',
+        operation: 'unfollowUser',
+        endpoint: '/users/:id/follow',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] unfollowUser error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'unfollowUser',
+          extras: {'endpoint': '/users/:id/follow'},
+        ),
+      );
       return false;
     }
   }
@@ -334,31 +424,54 @@ class SocialProvider extends ChangeNotifier {
       _followersTotal = 0;
       _followersPage = 1;
       _hasMoreFollowers = true;
+      _followersError = null;
       _currentFollowersUserId = userId;
     }
 
     if (!_hasMoreFollowers || _isLoadingFollowers) return;
 
     _isLoadingFollowers = true;
+    _followersError = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient
-          .get('/users/$userId/followers?page=$_followersPage&limit=30');
+      final response = await _apiClient.get(
+        '/users/$userId/followers?page=$_followersPage&limit=30',
+      );
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newUsers = list
-            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-            .toList();
+        final newUsers =
+            list
+                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+                .toList();
         _followers.addAll(newUsers);
         _followersTotal = data['total'] as int? ?? _followers.length;
         _hasMoreFollowers = _followers.length < _followersTotal;
         _followersPage++;
+      } else {
+        _recordSocialEvent(
+          'social_followers_http_error',
+          operation: 'fetchFollowers',
+          endpoint: '/users/:id/followers',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
+        _followersError = 'Erro ao carregar seguidores';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] fetchFollowers error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'fetchFollowers',
+          extras: {'endpoint': '/users/:id/followers'},
+        ),
+      );
+      _followersError = 'Erro de conexão';
     }
 
     _isLoadingFollowers = false;
@@ -372,31 +485,54 @@ class SocialProvider extends ChangeNotifier {
       _followingTotal = 0;
       _followingPage = 1;
       _hasMoreFollowing = true;
+      _followingError = null;
       _currentFollowingUserId = userId;
     }
 
     if (!_hasMoreFollowing || _isLoadingFollowing) return;
 
     _isLoadingFollowing = true;
+    _followingError = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient
-          .get('/users/$userId/following?page=$_followingPage&limit=30');
+      final response = await _apiClient.get(
+        '/users/$userId/following?page=$_followingPage&limit=30',
+      );
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newUsers = list
-            .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
-            .toList();
+        final newUsers =
+            list
+                .map((u) => PublicUser.fromJson(u as Map<String, dynamic>))
+                .toList();
         _following.addAll(newUsers);
         _followingTotal = data['total'] as int? ?? _following.length;
         _hasMoreFollowing = _following.length < _followingTotal;
         _followingPage++;
+      } else {
+        _recordSocialEvent(
+          'social_following_http_error',
+          operation: 'fetchFollowing',
+          endpoint: '/users/:id/following',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
+        _followingError = 'Erro ao carregar seguindo';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] fetchFollowing error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'fetchFollowing',
+          extras: {'endpoint': '/users/:id/following'},
+        ),
+      );
+      _followingError = 'Erro de conexão';
     }
 
     _isLoadingFollowing = false;
@@ -414,31 +550,58 @@ class SocialProvider extends ChangeNotifier {
       _followingFeed = [];
       _hasMoreFeed = true;
       _feedTotal = 0;
+      _feedError = null;
     }
 
     if (!_hasMoreFeed || _isLoadingFeed) return;
 
     _isLoadingFeed = true;
+    _feedError = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient
-          .get('/community/decks/following?page=$_feedPage&limit=20');
+      final response = await _apiClient.get(
+        '/community/decks/following?page=$_feedPage&limit=20',
+      );
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final newDecks = list
-            .map((d) =>
-                PublicDeckSummary.fromJson(d as Map<String, dynamic>))
-            .toList();
+        final newDecks =
+            list
+                .map(
+                  (d) => PublicDeckSummary.fromJson(d as Map<String, dynamic>),
+                )
+                .toList();
         _followingFeed.addAll(newDecks);
         _feedTotal = data['total'] as int? ?? 0;
         _hasMoreFeed = _followingFeed.length < _feedTotal;
         _feedPage++;
+      } else {
+        _recordSocialEvent(
+          'social_following_feed_http_error',
+          operation: 'fetchFollowingFeed',
+          endpoint: '/community/decks/following',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
+        _feedError =
+            response.statusCode == 401
+                ? 'Entre novamente para ver o feed de seguidos'
+                : 'Erro ao carregar feed de seguidos';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[SocialProvider] fetchFollowingFeed error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'SocialProvider',
+          operation: 'fetchFollowingFeed',
+          extras: {'endpoint': '/community/decks/following'},
+        ),
+      );
+      _feedError = 'Erro de conexão';
     }
 
     _isLoadingFeed = false;
@@ -461,6 +624,8 @@ class SocialProvider extends ChangeNotifier {
         _following.isEmpty &&
         !_isLoadingFollowers &&
         !_isLoadingFollowing &&
+        _followersError == null &&
+        _followingError == null &&
         _followersTotal == 0 &&
         _followingTotal == 0 &&
         _followersPage == 1 &&
@@ -471,6 +636,7 @@ class SocialProvider extends ChangeNotifier {
         _currentFollowingUserId == null &&
         _followingFeed.isEmpty &&
         !_isLoadingFeed &&
+        _feedError == null &&
         _hasMoreFeed &&
         _feedPage == 1 &&
         _feedTotal == 0) {
@@ -491,6 +657,8 @@ class SocialProvider extends ChangeNotifier {
     _following = [];
     _isLoadingFollowers = false;
     _isLoadingFollowing = false;
+    _followersError = null;
+    _followingError = null;
     _followersTotal = 0;
     _followingTotal = 0;
     _followersPage = 1;
@@ -501,9 +669,36 @@ class SocialProvider extends ChangeNotifier {
     _currentFollowingUserId = null;
     _followingFeed = [];
     _isLoadingFeed = false;
+    _feedError = null;
     _hasMoreFeed = true;
     _feedPage = 1;
     _feedTotal = 0;
     notifyListeners();
+  }
+
+  void _recordSocialEvent(
+    String message, {
+    required String operation,
+    required String endpoint,
+    int? statusCode,
+    String? requestId,
+  }) {
+    debugPrint(
+      '[SocialProvider] $message operation=$operation endpoint=$endpoint '
+      'status=${statusCode ?? 'n/a'} request_id=${requestId ?? 'n/a'}',
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        message,
+        category: 'social',
+        data: {
+          'provider': 'SocialProvider',
+          'operation': operation,
+          'endpoint': endpoint,
+          if (statusCode != null) 'status_code': statusCode,
+          if (requestId != null) 'request_id': requestId,
+        },
+      ),
+    );
   }
 }

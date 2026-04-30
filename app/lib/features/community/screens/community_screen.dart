@@ -407,6 +407,35 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           );
         }
 
+        if (provider.feedError != null && provider.followingFeed.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppTheme.textSecondary,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    provider.feedError!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppTheme.textSecondary),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => provider.fetchFollowingFeed(reset: true),
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         if (provider.followingFeed.isEmpty) {
           return Center(
             child: Padding(
@@ -733,37 +762,41 @@ class _CommunityDeckCard extends StatelessWidget {
                           color: AppTheme.textSecondary.withValues(alpha: 0.8),
                         ),
                         const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap:
-                              deck.ownerId != null
-                                  ? () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => UserProfileScreen(
-                                              userId: deck.ownerId!,
-                                            ),
-                                      ),
-                                    );
-                                  }
-                                  : null,
-                          child: Text(
-                            deck.ownerUsername ?? 'Anônimo',
-                            style: TextStyle(
-                              color:
-                                  deck.ownerId != null
-                                      ? AppTheme.textPrimary.withValues(
-                                        alpha: 0.92,
-                                      )
-                                      : AppTheme.textSecondary.withValues(
-                                        alpha: 0.8,
-                                      ),
-                              fontSize: AppTheme.fontSm,
-                              fontWeight:
-                                  deck.ownerId != null
-                                      ? FontWeight.w500
-                                      : FontWeight.w400,
+                        Expanded(
+                          child: GestureDetector(
+                            onTap:
+                                deck.ownerId != null
+                                    ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) => UserProfileScreen(
+                                                userId: deck.ownerId!,
+                                              ),
+                                        ),
+                                      );
+                                    }
+                                    : null,
+                            child: Text(
+                              deck.ownerUsername ?? 'Anônimo',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color:
+                                    deck.ownerId != null
+                                        ? AppTheme.textPrimary.withValues(
+                                          alpha: 0.92,
+                                        )
+                                        : AppTheme.textSecondary.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                fontSize: AppTheme.fontSm,
+                                fontWeight:
+                                    deck.ownerId != null
+                                        ? FontWeight.w500
+                                        : FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),

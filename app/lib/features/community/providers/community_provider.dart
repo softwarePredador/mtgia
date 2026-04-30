@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
 
 /// Modelo simplificado de deck público da comunidade
 class CommunityDeck {
@@ -68,7 +71,7 @@ class CommunityProvider extends ChangeNotifier {
   String? get formatFilter => _formatFilter;
 
   CommunityProvider({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   /// Busca decks públicos com paginação e filtros
   Future<void> fetchPublicDecks({
@@ -91,10 +94,7 @@ class CommunityProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final queryParams = <String, String>{
-        'page': '$_page',
-        'limit': '20',
-      };
+      final queryParams = <String, String>{'page': '$_page', 'limit': '20'};
       if (_searchQuery != null && _searchQuery!.isNotEmpty) {
         queryParams['search'] = _searchQuery!;
       }
@@ -102,27 +102,59 @@ class CommunityProvider extends ChangeNotifier {
         queryParams['format'] = _formatFilter!;
       }
 
-      final queryString =
-          queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+      final queryString = queryParams.entries
+          .map(
+            (e) =>
+                '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
+          )
+          .join('&');
 
-      final response =
-          await _apiClient.get('/community/decks?$queryString');
+      final response = await _apiClient.get('/community/decks?$queryString');
 
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
-        final deckList = (data['data'] as List?) ?? [];
-        final newDecks =
-            deckList.map((d) => CommunityDeck.fromJson(d as Map<String, dynamic>)).toList();
+        final deckList = data['data'];
+        if (deckList is! List) {
+          _recordCommunityEvent(
+            'community_decks_contract_error',
+            operation: 'fetchPublicDecks',
+            endpoint: '/community/decks',
+            statusCode: response.statusCode,
+            requestId: response.requestId,
+          );
+          _errorMessage = 'Resposta inválida da comunidade';
+        } else {
+          final newDecks =
+              deckList
+                  .map((d) => CommunityDeck.fromJson(d as Map<String, dynamic>))
+                  .toList();
 
-        _decks.addAll(newDecks);
-        _total = data['total'] as int? ?? 0;
-        _hasMore = _decks.length < _total;
-        _page++;
+          _decks.addAll(newDecks);
+          _total = data['total'] as int? ?? 0;
+          _hasMore = _decks.length < _total;
+          _page++;
+        }
       } else {
+        _recordCommunityEvent(
+          'community_decks_http_error',
+          operation: 'fetchPublicDecks',
+          endpoint: '/community/decks',
+          statusCode: response.statusCode,
+          requestId: response.requestId,
+        );
         _errorMessage = 'Falha ao carregar decks da comunidade';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[CommunityProvider] fetchPublicDecks error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'CommunityProvider',
+          operation: 'fetchPublicDecks',
+          extras: {'endpoint': '/community/decks'},
+        ),
+      );
       _errorMessage = 'Erro de conexão: $e';
     }
 
@@ -144,9 +176,25 @@ class CommunityProvider extends ChangeNotifier {
       if (response.statusCode == 200 && response.data is Map) {
         return Map<String, dynamic>.from(response.data);
       }
+      _recordCommunityEvent(
+        'community_deck_detail_http_error',
+        operation: 'fetchPublicDeckDetails',
+        endpoint: '/community/decks/:id',
+        statusCode: response.statusCode,
+        requestId: response.requestId,
+      );
       return null;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[CommunityProvider] fetchPublicDeckDetails error: $e');
+      unawaited(
+        AppObservability.instance.captureProviderException(
+          e,
+          stackTrace: stackTrace,
+          provider: 'CommunityProvider',
+          operation: 'fetchPublicDeckDetails',
+          extras: {'endpoint': '/community/decks/:id'},
+        ),
+      );
       return null;
     }
   }
@@ -173,5 +221,31 @@ class CommunityProvider extends ChangeNotifier {
     _searchQuery = null;
     _formatFilter = null;
     notifyListeners();
+  }
+
+  void _recordCommunityEvent(
+    String message, {
+    required String operation,
+    required String endpoint,
+    int? statusCode,
+    String? requestId,
+  }) {
+    debugPrint(
+      '[CommunityProvider] $message operation=$operation endpoint=$endpoint '
+      'status=${statusCode ?? 'n/a'} request_id=${requestId ?? 'n/a'}',
+    );
+    unawaited(
+      AppObservability.instance.recordEvent(
+        message,
+        category: 'community',
+        data: {
+          'provider': 'CommunityProvider',
+          'operation': operation,
+          'endpoint': endpoint,
+          if (statusCode != null) 'status_code': statusCode,
+          if (requestId != null) 'request_id': requestId,
+        },
+      ),
+    );
   }
 }
