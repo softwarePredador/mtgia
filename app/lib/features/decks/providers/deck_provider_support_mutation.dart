@@ -1,4 +1,5 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 import 'deck_provider_support_common.dart';
@@ -19,9 +20,9 @@ DeckCreateResult parseCreateDeckResponse(ApiResponse response) {
   }
   return DeckCreateResult(
     isSuccess: false,
-    errorMessage: extractApiError(
-      response.data,
-      fallback: 'Erro ao criar deck: ${response.statusCode}',
+    errorMessage: FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
     ),
   );
 }
@@ -49,10 +50,10 @@ DeckAddCardResult parseAddCardResponse(ApiResponse response) {
     return const DeckAddCardResult(isSuccess: true);
   }
 
-  var message = 'Erro ao adicionar carta: ${response.statusCode}';
-  if (response.data is Map && response.data['error'] != null) {
-    message = response.data['error'].toString();
-  }
+  final message = FriendlyErrorMapper.fromApiResponse(
+    response,
+    context: FriendlyErrorContext.deckSave,
+  );
   return DeckAddCardResult(isSuccess: false, errorMessage: message);
 }
 
@@ -95,11 +96,11 @@ DeckMutationResult parseDeckMutationResponse(
     return const DeckMutationResult(isSuccess: true);
   }
 
-  final data = response.data;
-  final message =
-      (data is Map && data['error'] != null)
-          ? data['error'].toString()
-          : '$fallbackMessage: ${response.statusCode}';
+  final message = FriendlyErrorMapper.fromApiResponse(
+    response,
+    context: FriendlyErrorContext.deckSave,
+    fallback: fallbackMessage,
+  );
   return DeckMutationResult(isSuccess: false, errorMessage: message);
 }
 
@@ -179,7 +180,12 @@ Map<String, dynamic> parseDeckValidationResponse(ApiResponse response) {
     final body = (response.data as Map).cast<String, dynamic>();
     if (body['ok'] == false) return body;
   }
-  throw Exception('Falha ao validar deck: ${response.statusCode}');
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckValidate,
+    ),
+  );
 }
 
 Future<Map<String, dynamic>> validateDeckRequest(

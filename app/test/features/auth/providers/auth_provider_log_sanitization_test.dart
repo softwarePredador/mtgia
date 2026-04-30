@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
@@ -20,6 +22,17 @@ class _AuthSuccessApiClient extends ApiClient {
         'email': 'qa_user@example.com',
       },
     });
+  }
+}
+
+class _AuthTimeoutApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    throw TimeoutException('SocketException RequestOptions stackTrace');
   }
 }
 
@@ -49,5 +62,20 @@ void main() {
     expect(joined, isNot(contains('super-secret-token-value')));
     expect(joined, contains('email_domain=example.com'));
     expect(joined, contains('token recebido: sim'));
+  });
+
+  test('login network failure exposes friendly user message only', () async {
+    SharedPreferences.setMockInitialValues({});
+    final provider = AuthProvider(apiClient: _AuthTimeoutApiClient());
+
+    final ok = await provider.login('qa_user@example.com', 'Password123!');
+
+    expect(ok, isFalse);
+    expect(
+      provider.errorMessage,
+      'A conexão demorou mais que o esperado. Tente novamente em instantes.',
+    );
+    expect(provider.errorMessage, isNot(contains('SocketException')));
+    expect(provider.errorMessage, isNot(contains('RequestOptions')));
   });
 }

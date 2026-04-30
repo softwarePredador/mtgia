@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../cards/screens/card_detail_screen.dart';
@@ -70,7 +71,10 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.setCards,
+        );
       });
     } finally {
       if (mounted) {
@@ -88,7 +92,12 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
             : '/sets?code=${Uri.encodeQueryComponent(widget.setCode ?? _set?.code ?? '')}&limit=1&page=1';
     final response = await _apiClient.get(endpoint);
     if (response.statusCode != 200) {
-      throw Exception('Falha ao buscar coleção (${response.statusCode})');
+      throw Exception(
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.setCards,
+        ),
+      );
     }
 
     final body = response.data as Map<String, dynamic>;
@@ -119,7 +128,10 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
     );
     if (response.statusCode != 200) {
       throw Exception(
-        'Falha ao buscar cartas da coleção (${response.statusCode})',
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.setCards,
+        ),
       );
     }
 
@@ -179,8 +191,12 @@ class _SetCardsScreenState extends State<SetCardsScreen> {
       await _fetchCardsPage(page: _page + 1, append: true);
     } catch (e) {
       if (!mounted) return;
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.setCards,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar mais cartas: $e')),
+        SnackBar(content: Text(message), backgroundColor: AppTheme.error),
       );
     } finally {
       if (mounted) {

@@ -1,4 +1,5 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 import 'deck_provider_support_common.dart';
@@ -98,7 +99,10 @@ DeckDetailsFetchState parseDeckDetailsResponse(ApiResponse response) {
 
   return DeckDetailsFetchState(
     selectedDeck: null,
-    errorMessage: 'Erro ao carregar detalhes do deck: ${response.statusCode}',
+    errorMessage: FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckDetails,
+    ),
     statusCode: response.statusCode,
   );
 }
@@ -132,7 +136,10 @@ DeckListFetchState parseDeckListResponse(ApiResponse response) {
 
   return DeckListFetchState(
     decks: null,
-    errorMessage: 'Erro ao carregar decks: ${response.statusCode}',
+    errorMessage: FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckDetails,
+    ),
   );
 }
 
@@ -195,7 +202,7 @@ DeckDeleteResult parseDeleteDeckResponse(ApiResponse response) {
   }
   return DeckDeleteResult(
     isSuccess: false,
-    errorMessage: 'Erro ao deletar deck: ${response.statusCode}',
+    errorMessage: FriendlyErrorMapper.fromApiResponse(response),
   );
 }
 

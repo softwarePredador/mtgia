@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_card_item.dart';
@@ -493,10 +494,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color:
                       isCommanderSection
@@ -744,7 +742,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                           Text(
                             card.typeLine,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary.withValues(alpha: 0.92),
+                              color: AppTheme.textSecondary.withValues(
+                                alpha: 0.92,
+                              ),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -761,9 +761,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 _buildDeckCardMetaPill(
                                   label: card.setCode.toUpperCase(),
                                   textColor: AppTheme.textSecondary,
-                                  backgroundColor: AppTheme.surfaceSlate.withValues(
-                                    alpha: 0.78,
-                                  ),
+                                  backgroundColor: AppTheme.surfaceSlate
+                                      .withValues(alpha: 0.78),
                                 ),
                               if (card.condition != CardCondition.nm)
                                 _buildDeckCardMetaPill(
@@ -782,9 +781,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   textColor: theme.colorScheme.error,
                                   backgroundColor: theme.colorScheme.error
                                       .withValues(alpha: 0.12),
-                                  borderColor: theme.colorScheme.error.withValues(
-                                    alpha: 0.24,
-                                  ),
+                                  borderColor: theme.colorScheme.error
+                                      .withValues(alpha: 0.24),
                                   icon: Icons.warning_amber_rounded,
                                 ),
                             ],
@@ -861,9 +859,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       if (!mounted) return;
     } catch (e) {
       if (!mounted) return;
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro ao atualizar: $e'),
+          content: Text(message),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -1138,8 +1140,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        SnackBar(content: Text(message), backgroundColor: AppTheme.error),
       );
     }
   }

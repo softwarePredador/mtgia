@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../models/mtg_set.dart';
 import 'set_cards_screen.dart';
@@ -78,7 +79,10 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.setsCatalog,
+        );
       });
     } finally {
       if (mounted) {
@@ -98,7 +102,12 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Falha ao buscar coleções (${response.statusCode})');
+      throw Exception(
+        FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.setsCatalog,
+        ),
+      );
     }
 
     final body = response.data as Map<String, dynamic>;
@@ -134,8 +143,12 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
       await _fetchPage(page: _page + 1, append: true);
     } catch (e) {
       if (!mounted) return;
+      final message = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.setsCatalog,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar mais coleções: $e')),
+        SnackBar(content: Text(message), backgroundColor: AppTheme.error),
       );
     } finally {
       if (mounted) {

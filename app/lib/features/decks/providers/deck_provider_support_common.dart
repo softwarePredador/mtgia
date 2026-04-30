@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 
@@ -352,20 +353,27 @@ void ensureSuccessfulDeckMutationResponse(
   if (response.statusCode == 200) {
     return;
   }
-  final data = response.data;
-  final msg =
-      (data is Map && data['error'] != null)
-          ? data['error'].toString()
-          : '$fallbackMessage: ${response.statusCode}';
-  throw Exception(msg);
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
+      fallback: fallbackMessage,
+    ),
+  );
 }
 
 Map<String, dynamic> buildConnectionFailureResult(Object error) {
-  return {'success': false, 'error': 'Erro de conexão: $error'};
+  return {
+    'success': false,
+    'error': FriendlyErrorMapper.fromException(
+      error,
+      context: FriendlyErrorContext.deckSave,
+    ),
+  };
 }
 
 Map<String, dynamic> buildExportConnectionFailureResult(Object error) {
-  return {'error': 'Erro de conexão: $error'};
+  return {'error': FriendlyErrorMapper.fromException(error)};
 }
 
 Future<Map<String, dynamic>> runConnectionSafeMapRequest(

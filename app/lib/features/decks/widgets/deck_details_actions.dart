@@ -2,21 +2,16 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 
 typedef DeckSnackBarPresenter =
-    void Function({
-      required String message,
-      required Color backgroundColor,
-    });
+    void Function({required String message, required Color backgroundColor});
 
 typedef DeckValidationResultHandler =
     void Function(Map<String, dynamic> result, Set<String> invalidCardNames);
 
 typedef DeckErrorDialogPresenter =
-    Future<void> Function({
-      required String title,
-      required String message,
-    });
+    Future<void> Function({required String title, required String message});
 
 typedef DeckExportTextLoader =
     Future<Map<String, dynamic>> Function(String deckId);
@@ -140,7 +135,10 @@ Future<void> executeDeckValidation({
     closeLoading();
     await showErrorDialog(
       title: 'Deck inválido',
-      message: error.toString().replaceFirst('Exception: ', ''),
+      message: FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckValidate,
+      ),
     );
   }
 }
@@ -160,7 +158,10 @@ Future<void> executeSilentDeckValidation({
   } catch (error) {
     final errorResult = {
       'ok': false,
-      'error': error.toString().replaceFirst('Exception: ', ''),
+      'error': FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckValidate,
+      ),
     };
     onValidationResult(errorResult, extractInvalidCardNames(errorResult));
   } finally {
@@ -181,7 +182,12 @@ Future<void> executeDeckPricingLoad({
     final pricing = await fetchDeckPricing(deckId, force: force);
     onPricingLoaded(pricing);
   } catch (error) {
-    onError(error.toString().replaceFirst('Exception: ', ''));
+    onError(
+      FriendlyErrorMapper.fromException(
+        error,
+        context: FriendlyErrorContext.deckPricing,
+      ),
+    );
   } finally {
     onLoadingChanged(false);
   }
@@ -201,7 +207,8 @@ Future<void> executeDeckDescriptionUpdate({
   if (!response) return;
 
   showSnackBar(
-    message: description.isEmpty ? 'Descrição removida' : 'Descrição atualizada',
+    message:
+        description.isEmpty ? 'Descrição removida' : 'Descrição atualizada',
     backgroundColor: AppTheme.success,
   );
 }

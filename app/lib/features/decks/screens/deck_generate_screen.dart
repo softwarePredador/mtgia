@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
@@ -118,9 +119,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       });
 
       if (mounted) {
+        final message = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.deckGenerate,
+        );
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao gerar deck: $e')));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     }
   }
@@ -214,16 +219,24 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         );
         context.go('/decks');
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Erro ao salvar o deck')));
+        final message = FriendlyErrorMapper.fromException(
+          context.read<DeckProvider>().errorMessage,
+          context: FriendlyErrorContext.deckSave,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: AppTheme.error),
+        );
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading
+        final message = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.deckSave,
+        );
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao salvar deck: $e')));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     }
   }

@@ -186,7 +186,10 @@ void main() {
       );
 
       expect(created, isFalse);
-      expect(provider.errorMessage, contains('resolve failed'));
+      expect(
+        provider.errorMessage,
+        'Não foi possível encontrar todas as cartas. Revise a lista e tente novamente.',
+      );
       expect(apiClient.postCalls, equals(['/cards/resolve/batch']));
     });
 
@@ -213,7 +216,10 @@ void main() {
       );
 
       expect(created, isFalse);
-      expect(provider.errorMessage, contains('Unknown Card'));
+      expect(
+        provider.errorMessage,
+        'Não foi possível encontrar todas as cartas. Revise a lista e tente novamente.',
+      );
       expect(apiClient.postCalls, equals(['/cards/resolve/batch']));
     });
 
@@ -247,9 +253,10 @@ void main() {
       );
 
       expect(created, isFalse);
-      expect(provider.errorMessage, contains('Lightning'));
-      expect(provider.errorMessage, contains('Lightning Bolt'));
-      expect(provider.errorMessage, contains('Lightning Helix'));
+      expect(
+        provider.errorMessage,
+        'Não foi possível encontrar todas as cartas. Revise a lista e tente novamente.',
+      );
       expect(apiClient.postCalls, equals(['/cards/resolve/batch']));
     });
 

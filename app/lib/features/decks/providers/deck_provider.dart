@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
 import '../../../core/services/activation_funnel_service.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
@@ -183,7 +184,10 @@ class DeckProvider extends ChangeNotifier {
         );
       }
     } catch (e, stackTrace) {
-      _detailsErrorMessage = 'Erro de conexão: $e';
+      _detailsErrorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+      );
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -257,7 +261,10 @@ class DeckProvider extends ChangeNotifier {
         _errorMessage = state.errorMessage;
       }
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckDetails,
+      );
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -324,11 +331,17 @@ class DeckProvider extends ChangeNotifier {
         return true;
       }
 
-      _errorMessage = result.errorMessage;
+      _errorMessage = FriendlyErrorMapper.fromException(
+        result.errorMessage,
+        context: FriendlyErrorContext.deckSave,
+      );
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro ao criar deck: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckSave,
+      );
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -360,7 +373,7 @@ class DeckProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro ao deletar deck: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(e);
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -413,7 +426,10 @@ class DeckProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro ao adicionar carta: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckSave,
+      );
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -929,7 +945,10 @@ class DeckProvider extends ChangeNotifier {
       return result;
     } catch (e, stackTrace) {
       _isLoading = false;
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.deckSave,
+      );
       _captureProviderException(
         e,
         stackTrace: stackTrace,

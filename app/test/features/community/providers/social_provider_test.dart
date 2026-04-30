@@ -5,7 +5,7 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/social/providers/social_provider.dart';
 
 class _FakeSocialApiClient extends ApiClient {
-  _FakeSocialApiClient({this.getHandler, this.postHandler, this.deleteHandler});
+  _FakeSocialApiClient({this.getHandler, this.postHandler});
 
   final Future<ApiResponse> Function(String endpoint)? getHandler;
   final Future<ApiResponse> Function(
@@ -13,7 +13,6 @@ class _FakeSocialApiClient extends ApiClient {
     Map<String, dynamic> body,
   )?
   postHandler;
-  final Future<ApiResponse> Function(String endpoint)? deleteHandler;
 
   @override
   Future<ApiResponse> get(String endpoint) {
@@ -35,9 +34,7 @@ class _FakeSocialApiClient extends ApiClient {
 
   @override
   Future<ApiResponse> delete(String endpoint) {
-    final handler = deleteHandler;
-    if (handler == null) throw UnimplementedError('No DELETE for $endpoint');
-    return handler(endpoint);
+    throw UnimplementedError('No DELETE for $endpoint');
   }
 }
 

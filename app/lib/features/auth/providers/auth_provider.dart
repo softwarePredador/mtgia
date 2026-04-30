@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/user.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
@@ -112,21 +113,20 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        if (response.statusCode >= 500) {
-          _errorMessage =
-              'Servidor indisponível. Tente novamente em instantes.';
-        } else if (response.data is Map && response.data['message'] != null) {
-          _errorMessage = response.data['message'].toString();
-        } else {
-          _errorMessage = 'Credenciais inválidas';
-        }
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.authLogin,
+        );
         debugPrint('[🔑 Auth] login falhou: $_errorMessage');
         _status = AuthStatus.unauthenticated;
         notifyListeners();
         return false;
       }
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.authLogin,
+      );
       debugPrint('[❌ Auth] login() EXCEPTION: $e');
       unawaited(
         AppObservability.instance.captureProviderException(
@@ -172,20 +172,19 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        if (response.statusCode >= 500) {
-          _errorMessage =
-              'Servidor indisponível. Tente novamente em instantes.';
-        } else if (response.data is Map && response.data['message'] != null) {
-          _errorMessage = response.data['message'].toString();
-        } else {
-          _errorMessage = 'Erro ao criar conta';
-        }
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.authRegister,
+        );
         _status = AuthStatus.unauthenticated;
         notifyListeners();
         return false;
       }
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.authRegister,
+      );
       unawaited(
         AppObservability.instance.captureProviderException(
           e,
@@ -309,11 +308,10 @@ class AuthProvider extends ChangeNotifier {
           statusCode: response.statusCode,
           requestId: response.requestId,
         );
-        if (response.data is Map && response.data['error'] != null) {
-          _errorMessage = response.data['error'].toString();
-        } else {
-          _errorMessage = 'Falha ao atualizar perfil';
-        }
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          response,
+          context: FriendlyErrorContext.authProfile,
+        );
         notifyListeners();
         return false;
       }
@@ -335,7 +333,10 @@ class AuthProvider extends ChangeNotifier {
       }
       return true;
     } catch (e, stackTrace) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.authProfile,
+      );
       unawaited(
         AppObservability.instance.captureProviderException(
           e,

@@ -94,6 +94,15 @@ class _FakeApiClient extends ApiClient {
   }
 }
 
+class _FailingApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    return ApiResponse(500, {
+      'error': 'Exception: statusCode=500 RequestOptions /sets stackTrace',
+    });
+  }
+}
+
 void main() {
   testWidgets('sets catalog lists statuses and searches by code/name', (
     tester,
@@ -176,5 +185,58 @@ void main() {
 
     expect(find.text('Dados parciais de coleção futura'), findsOneWidget);
     expect(find.textContaining('próximo sync do MTGJSON'), findsOneWidget);
+  });
+
+  testWidgets('sets catalog error state hides technical backend details', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetsCatalogScreen(apiClient: _FailingApiClient()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Falha ao carregar coleções'), findsOneWidget);
+    expect(
+      find.text(
+        'Servidor indisponível no momento. Tente novamente em instantes.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('RequestOptions'), findsNothing);
+    expect(find.textContaining('500'), findsNothing);
+  });
+
+  testWidgets('set detail error state hides technical backend details', (
+    tester,
+  ) async {
+    const set = MtgSet(
+      code: 'ERR',
+      name: 'Erro Controlado',
+      releaseDate: '2026-01-23',
+      type: 'expansion',
+      cardCount: 1,
+      status: 'current',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: SetCardsScreen(initialSet: set, apiClient: _FailingApiClient()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Falha ao carregar coleção'), findsOneWidget);
+    expect(
+      find.text(
+        'Servidor indisponível no momento. Tente novamente em instantes.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('RequestOptions'), findsNothing);
+    expect(find.textContaining('500'), findsNothing);
   });
 }

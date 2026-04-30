@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 
 // =====================================================================
 // Model: BinderItem
@@ -288,11 +289,17 @@ class BinderProvider extends ChangeNotifier {
         _page++;
         _error = null;
       } else {
-        _error = res.data?['error'] ?? 'Erro ao carregar fichário';
+        _error = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.binder,
+        );
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] fetchMyBinder: $e');
-      _error = 'Não foi possível conectar ao servidor';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.binder,
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -374,13 +381,19 @@ class BinderProvider extends ChangeNotifier {
         await fetchStats();
         return true;
       } else {
-        _error = res.data?['error'] ?? 'Erro ao adicionar';
+        _error = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.binder,
+        );
         notifyListeners();
         return false;
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] addItem: $e');
-      _error = 'Erro de conexão';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.binder,
+      );
       notifyListeners();
       return false;
     }
@@ -427,13 +440,19 @@ class BinderProvider extends ChangeNotifier {
         await fetchStats();
         return true;
       } else {
-        _error = res.data?['error'] ?? 'Erro ao atualizar';
+        _error = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.binder,
+        );
         notifyListeners();
         return false;
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] updateItem: $e');
-      _error = 'Erro de conexão';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.binder,
+      );
       notifyListeners();
       return false;
     }
@@ -449,13 +468,19 @@ class BinderProvider extends ChangeNotifier {
         await fetchStats();
         return true;
       } else {
-        _error = res.data?['error'] ?? 'Erro ao remover';
+        _error = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.binder,
+        );
         notifyListeners();
         return false;
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] removeItem: $e');
-      _error = 'Erro de conexão';
+      _error = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.binder,
+      );
       notifyListeners();
       return false;
     }
@@ -567,11 +592,17 @@ class BinderProvider extends ChangeNotifier {
         _hasMorePublic = list.length >= 20;
         _publicPage++;
       } else {
-        _publicError = res.data?['error'] ?? 'Erro ao carregar fichário';
+        _publicError = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.binder,
+        );
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] fetchPublicBinder: $e');
-      _publicError = 'Não foi possível conectar ao servidor';
+      _publicError = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.binder,
+      );
     } finally {
       _isLoadingPublic = false;
       notifyListeners();
@@ -622,11 +653,17 @@ class BinderProvider extends ChangeNotifier {
         _hasMoreMarket = list.length >= 20;
         _marketPage++;
       } else {
-        _marketError = res.data?['error'] ?? 'Erro ao carregar marketplace';
+        _marketError = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.marketplace,
+        );
       }
     } catch (e) {
       debugPrint('[❌ BinderProvider] fetchMarketplace: $e');
-      _marketError = 'Não foi possível conectar ao servidor';
+      _marketError = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.marketplace,
+      );
     } finally {
       _isLoadingMarket = false;
       notifyListeners();
