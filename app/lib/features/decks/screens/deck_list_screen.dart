@@ -402,7 +402,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         child: ListTile(
                           leading: Icon(
                             Icons.content_paste,
-                            color: AppTheme.mythicGold,
+                            color: AppTheme.brass400,
                           ),
                           title: const Text('Importar Lista'),
                           subtitle: const Text('Colar de outro site'),

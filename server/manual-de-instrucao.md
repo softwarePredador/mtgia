@@ -1,6 +1,63 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — P1 visual fora de Trades com runtime Search/Sets iPhone 15
+
+### O Porquê
+- A auditoria `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md` apontou que, fora de Trades, o maior ganho P1 era reduzir overload visual e aumentar confianca/clareza sem mexer em contrato backend.
+- O escopo precisava reforcar a identidade Obsidian + Brass + Frost Blue em Home, Decks, Deck Detail, Generate/Optimize/Validate, Binder/Fichario, Marketplace, Search/Cards e Sets/Colecoes.
+- Fora de escopo ficaram Life Counter/Lotus, Scanner camera/OCR, meta pipeline backend, contratos JSON, rotas backend, secrets, assets oficiais de MTG e release builds.
+
+### O Como
+- Home foi reorganizada por intencao:
+  - `Jogar agora`;
+  - `Construir deck`;
+  - `IA de decks`;
+  - `Minha colecao`;
+  - `Trocas e mercado`.
+- Deck Detail recebeu um card de confianca de legalidade/validacao perto do topo, com estado desconhecido, validando, valido/invalido, contagem e comandante.
+- Generate com IA ganhou microcopy de revisao antes de salvar, painel `IA assistida, decisao sua`, CTA `Gerar proposta` e save `Salvar deck revisado`.
+- Optimize preview ganhou `Controle antes de aplicar`, com plano, quantidade de mudancas, cartas depois e terrenos. A acao tecnica de debug ficou restrita a `kDebugMode` e com copy `Copiar relatorio tecnico`.
+- Binder ganhou resumo horizontal com total, unicas, duplicadas, troca, venda e valor estimado usando stats existentes.
+- Marketplace ganhou header de confianca e cards mais verificaveis com quantidade, condicao, idioma, set, preco, owner/localizacao/notas e CTA de proposta.
+- Search/Cards, Sets/Colecoes e Collection hub trocaram acentos tocados para Frost em busca/filtros/suporte e Brass em valor/decisao.
+- `DeckMetaChip` passou a usar `Flexible` + ellipsis para evitar overflow em labels longos em layouts estreitos.
+- Nenhum endpoint, schema, contrato JSON, rota backend ou regra de negocio foi alterado.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/home lib/features/decks lib/features/cards lib/features/collection lib/features/binder lib/features/market lib/core test --no-version-check`: `No issues found!`.
+- `cd app && flutter test test/features/home test/features/decks test/features/cards test/features/collection test/features/binder test/features/market test/core --no-version-check`: `00:23 +463: All tests passed!`.
+- Device discovery:
+  - `flutter devices`: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+  - `xcrun simctl list devices available | grep -E "iPhone 15|Booted"`: iPhone 15 bootado.
+- Backend temporario:
+  - `cd server && PORT=8082 dart run .dart_frog/server.dart`;
+  - `curl -sS --max-time 5 http://127.0.0.1:8082/health`: healthy.
+- Runtime iPhone 15:
+  - `cd app && flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`;
+  - resultado: `00:18 +1: All tests passed!`.
+
+### Resultado
+- Runtime real iPhone 15 + backend real provou Search/Cards -> Colecoes -> Set detail:
+  - `GET /cards?name=Black+Lotus&limit=50&page=1 200`;
+  - `GET /sets?limit=50&page=1 200`;
+  - `GET /sets?limit=50&page=1&q=ECC 200`;
+  - `GET /cards?set=ECC&limit=100&page=1&dedupe=true 200`.
+- Sem 4xx/5xx inesperado, timeout, crash ou overflow na rodada final.
+- Backend 8082 foi encerrado ao final.
+
+### Evidencias
+- Audit atualizado: `docs/qa/manaloom_ux_psychology_design_audit_2026-04-30.md`.
+- App audit atualizado: `app/doc/APP_AUDIT_2026-04-29.md`.
+- Handoff atualizado: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+- Proof folder: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_visual_p1/`.
+
+### Pendencias P2/P3
+- Decidir produto para Search global e superficie de Meta Deck Intelligence.
+- Capturar screenshots/prova visual de Home, Deck Detail, Generate/Optimize, Binder e Marketplace.
+- Fazer auditoria global dos aliases legados fora dos modulos tocados.
+- Provar Life Counter/Lotus e Scanner em sprint propria, pois ficaram fora de escopo.
+
 ## 2026-04-30 — iPhone 15 PASS Social Trading UX trust apos dialogs
 
 ### O Porquê

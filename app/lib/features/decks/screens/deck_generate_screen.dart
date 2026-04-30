@@ -267,9 +267,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             // Header
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.auto_awesome,
-                  color: theme.colorScheme.primary,
+                  color: AppTheme.frost400,
                   size: 32,
                 ),
                 const SizedBox(width: 12),
@@ -285,11 +285,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Descreva o deck que você quer e ele será gerado automaticamente.',
+              'Descreva o deck que você quer. A IA monta uma proposta e você revisa antes de salvar.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
               ),
             ),
+            const SizedBox(height: 16),
+            const _AiTrustPanel(),
             const SizedBox(height: 24),
 
             // Format Selector
@@ -336,7 +338,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Generate Button (CTA primeiro, para não ficar “abaixo do fold”)
+            // Generate Button (CTA primeiro, para não ficar "abaixo do fold")
             ElevatedButton.icon(
               onPressed: _isGenerating ? null : _generateDeck,
               icon:
@@ -348,7 +350,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                       )
                       : const Icon(Icons.auto_awesome),
               label: Text(
-                _isGenerating ? 'Gerando...' : 'Gerar Deck',
+                _isGenerating ? 'Gerando proposta...' : 'Gerar proposta',
                 style: const TextStyle(
                   fontSize: AppTheme.fontLg,
                   fontWeight: FontWeight.bold,
@@ -356,8 +358,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
+                backgroundColor: AppTheme.brass500,
+                foregroundColor: AppTheme.backgroundAbyss,
               ),
             ),
             const SizedBox(height: 20),
@@ -404,15 +406,23 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               Row(
                 key: _previewKey,
                 children: [
-                  Icon(Icons.preview, color: theme.colorScheme.secondary),
+                  const Icon(Icons.preview, color: AppTheme.frost400),
                   const SizedBox(width: 8),
                   Text(
-                    'Preview do Deck',
+                    'Preview antes de salvar',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.35,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -441,17 +451,17 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 onPressed: _isGeneratedDeckValid() ? _saveDeck : null,
                 icon: const Icon(Icons.save),
                 label: const Text(
-                  'Salvar Deck',
+                  'Salvar deck revisado',
                   style: TextStyle(
                     fontSize: AppTheme.fontLg,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.backgroundAbyss,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: AppTheme.success,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.brass500,
+                  foregroundColor: AppTheme.backgroundAbyss,
                 ),
               ),
             ],
@@ -652,6 +662,68 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+}
+
+class _AiTrustPanel extends StatelessWidget {
+  const _AiTrustPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.frost400.withValues(alpha: 0.26),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppTheme.frost400.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
+            child: const Icon(
+              Icons.psychology_alt_outlined,
+              color: AppTheme.frost400,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'IA assistida, decisão sua',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Commander pode levar alguns segundos. O resultado mostra avisos de validação e só é salvo após seu review.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

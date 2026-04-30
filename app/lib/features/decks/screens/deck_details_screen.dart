@@ -323,6 +323,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 pricing: _pricing,
                 isCardInvalid: _isCardInvalid,
                 bracketLabel: _bracketLabel,
+                onValidateNow: _validateDeck,
                 onValidationTap: () {
                   final ok = _validationResult!['ok'] == true;
                   if (ok) {

@@ -505,16 +505,22 @@ void main() {
       await tester.tap(find.widgetWithText(OutlinedButton, 'Gerar com IA'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Gerar Deck'), findsAtLeastNWidgets(1));
+      expect(find.text('Gerar Deck'), findsOneWidget);
+      expect(find.text('Gerar proposta'), findsOneWidget);
 
       await tester.enterText(
         find.byType(TextField).first,
         'Talrand commander de spellslinger azul com instants baratos',
       );
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Gerar Deck'));
+      final generateProposalButton = find.widgetWithText(
+        ElevatedButton,
+        'Gerar proposta',
+      );
+      await tester.ensureVisible(generateProposalButton);
+      await tester.tap(generateProposalButton);
       await tester.pumpAndSettle();
 
-      expect(find.text('Preview do Deck'), findsOneWidget);
+      expect(find.text('Preview antes de salvar'), findsOneWidget);
       expect(find.text('1x Talrand, Sky Summoner'), findsOneWidget);
 
       await tester.enterText(
@@ -524,11 +530,13 @@ void main() {
 
       final generateScrollable = find.byType(Scrollable).first;
       await tester.scrollUntilVisible(
-        find.text('Salvar Deck'),
+        find.text('Salvar deck revisado'),
         200,
         scrollable: generateScrollable,
       );
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Salvar Deck'));
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Salvar deck revisado'),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Runtime Talrand'), findsOneWidget);

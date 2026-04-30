@@ -63,8 +63,8 @@ class _CollectionScreenState extends State<CollectionScreen>
         bottom: TabBar(
           controller: _tabController,
           dividerColor: Colors.transparent,
-          indicatorColor: AppTheme.manaViolet,
-          labelColor: AppTheme.manaViolet,
+          indicatorColor: AppTheme.frost400,
+          labelColor: AppTheme.frost400,
           unselectedLabelColor: AppTheme.textSecondary,
           labelStyle: const TextStyle(
             fontSize: AppTheme.fontMd,

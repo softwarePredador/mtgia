@@ -1,5 +1,35 @@
 # ManaLoom UX Psychology Design Audit — 2026-04-30
 
+## Patch status — P1 visual fora de Trades — 2026-04-30 14:58 -0300
+
+Sprint visual P1 aplicada fora de Trades, preservando contratos JSON, rotas backend, meta pipeline, scanner/OCR, Life Counter/Lotus, secrets, assets oficiais de MTG e release builds.
+
+| Finding | Status | Evidência |
+| --- | --- | --- |
+| UX-001 Theme inconsistency | `parcial` | Home, Deck Detail, Generate/Optimize, Binder, Marketplace, Search/Cards, Sets/Coleções e Collection hub migraram call-sites tocados para semântica `brass500/brass400` como ação/valor e `frost400` como IA/suporte/filtro. Aliases legados ainda existem em módulos não tocados. |
+| UX-007 Home CTA hierarchy | `resolvido` | Home reorganizada por intenção: `Jogar agora`, `Construir deck`, `IA de decks`, `Minha coleção`, `Trocas e mercado`, com copy curta e CTA menos sobrecarregado. |
+| UX-014 Optimize AI explainability | `parcial` | `OptimizationPreviewDialog` ganhou bloco `Controle antes de aplicar` com plano, quantidade de mudanças, cartas depois e terrenos; botão técnico aparece só em debug e foi renomeado para `Copiar relatório técnico`. |
+| UX-015 Optimize debug copy | `resolvido` | `Copiar debug` não aparece fora de `kDebugMode`; copy final é menos técnica. |
+| UX-017 Binder collection progress | `parcial` | Fichário ganhou `Resumo da coleção` com total, únicas, duplicadas, troca, venda e valor estimado quando stats já existem. |
+| UX-018 Marketplace trust hierarchy | `resolvido` | Marketplace ganhou header de confiança, filtros mais legíveis, cards com quantidade, condição, idioma, set, preço, owner/localização/notas e CTA `Propor troca/compra`. |
+| UX-023 Search/Cards + Coleções discovery | `parcial` | Search mantém tabs `Cartas`/`Coleções`, melhora empty state para explicar busca mínima e runtime iPhone 15 provou busca de coleções e detalhe via backend real. Decisão de produto sobre Search global continua P2/P3. |
+| UX-026 Contrast/token risk | `parcial` | Foregrounds `Colors.white` em CTAs tocados foram removidos onde geravam contraste ruim; `DeckMetaChip` agora trunca texto para evitar overflow em largura estreita. Auditoria global de contraste permanece pendente. |
+
+Validação executada:
+
+| comando | resultado |
+| --- | --- |
+| `cd app && flutter analyze lib/features/home lib/features/decks lib/features/cards lib/features/collection lib/features/binder lib/features/market lib/core test --no-version-check` | `PASS`, sem issues. |
+| `cd app && flutter test test/features/home test/features/decks test/features/cards test/features/collection test/features/binder test/features/market test/core --no-version-check` | `PASS`, `00:23 +463: All tests passed!`. |
+| `flutter devices` | iPhone 15 Simulator disponível: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. |
+| `xcrun simctl list devices available \| grep -E "iPhone 15\|Booted"` | iPhone 15 `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` Booted. |
+| `cd server && PORT=8082 dart run .dart_frog/server.dart` + `curl -sS --max-time 5 http://127.0.0.1:8082/health` | `PASS`, backend temporário healthy em `http://127.0.0.1:8082`. |
+| `cd app && flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | `PASS`, `00:18 +1: All tests passed!`. |
+
+Runtime iPhone 15 provou UI real + backend real para Search/Cards -> Coleções: `GET /cards?name=Black+Lotus 200`, `GET /sets 200`, `GET /sets?q=ECC 200`, `GET /cards?set=ECC 200`. Evidências: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_visual_p1/` e handoff `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+
+Pendências P2/P3 reais: decisão de produto para Search global e Meta Deck Intelligence surface; prova visual/screenshot de Home/Deck Detail/Generate/Binder/Marketplace em device; auditoria global de aliases legados fora dos módulos tocados; Life Counter/Lotus e Scanner seguem fora de escopo desta sprint.
+
 ## Patch status — P1 UX trust/errors/trades — 2026-04-30 12:12 -0300
 
 Sprint aplicada no app sem alterar contratos JSON, providers externos, endpoints, rotas backend, Life Counter/Lotus, Sets pipeline, meta pipeline, optimize/generate core, scanner ou FCM.

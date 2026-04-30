@@ -1,5 +1,122 @@
 # Deck runtime iPhone 15 Simulator — 2026-04-30
 
+## Atualizacao — Visual P1 fora de Trades / Search-Sets runtime
+
+### Resultado
+
+- Verdict: `PASS`
+- Date/time: `2026-04-30T14:58-03:00`
+- Task: Sprint visual P1 fora de Trades para Home, Decks, IA, Binder, Marketplace, Search/Cards e Sets/Colecoes.
+- Runtime target: iPhone 15 Simulator.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend used by app: `http://127.0.0.1:8082`.
+- Test target: `app/integration_test/sets_search_catalog_runtime_test.dart`.
+
+### Device discovery
+
+`flutter devices` summary:
+
+```text
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+```
+
+`xcrun simctl list devices available | grep -E "iPhone 15|Booted"` summary:
+
+```text
+iPhone 15 Pro (F3C5B123-673F-4ACC-84B2-489957CB81C8) (Shutdown)
+iPhone 15 Pro Max (DABB9D79-2FDB-4585-94DB-E31F1288EE74) (Shutdown)
+iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)
+iPhone 15 Plus (6A3E5508-0190-48AC-B6D1-E4BA8A94FFD9) (Shutdown)
+```
+
+### Backend health
+
+Command:
+
+```bash
+curl -sS --max-time 5 http://127.0.0.1:8082/health
+```
+
+Result:
+
+```json
+{"status":"healthy","service":"mtgia-server","timestamp":"2026-04-30T14:57:19.223536","environment":"development","version":"1.0.0","git_sha":null,"checks":{"process":{"status":"healthy"}}}
+```
+
+### Commands executed
+
+```bash
+cd app
+flutter analyze lib/features/home lib/features/decks lib/features/cards lib/features/collection lib/features/binder lib/features/market lib/core test --no-version-check
+```
+
+Result: `PASS`, no issues.
+
+```bash
+cd app
+flutter test test/features/home test/features/decks test/features/cards test/features/collection test/features/binder test/features/market test/core --no-version-check
+```
+
+Result: `PASS`, `00:23 +463: All tests passed!`.
+
+```bash
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+```
+
+Result: backend temporary process served health and runtime traffic.
+
+```bash
+cd app
+flutter test integration_test/sets_search_catalog_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `PASS`, `00:18 +1: All tests passed!`.
+
+### What was proven
+
+UI/runtime real on iPhone 15 Simulator against live local backend:
+
+- Search/Cards opened and searched `Black Lotus`;
+- Colecoes tab opened from Search;
+- sets catalog loaded from `/sets`;
+- search by set code `ECC` returned a collection;
+- set detail opened and loaded cards from `/cards?set=ECC`.
+
+Captured backend contract visibility:
+
+- `GET /cards?name=Black+Lotus&limit=50&page=1 -> 200 (1335ms)`;
+- `GET /sets?limit=50&page=1 -> 200 (869ms)`;
+- `GET /sets?limit=50&page=1&q=ECC -> 200 (626ms)`;
+- `GET /cards?set=ECC&limit=100&page=1&dedupe=true -> 200 (1597ms)`.
+
+### What was real vs mocked
+
+- Real: iPhone 15 Simulator UI, Flutter integration harness, local Dart Frog backend on `127.0.0.1:8082`, PostgreSQL-backed `/cards` and `/sets` API contracts.
+- Mocked: no API/provider mocks in this runtime path.
+- Not proven in this run: full register/generate/optimize/apply/validate on simulator, Home/Deck/Binder/Marketplace screenshots, APNS/FCM, Scanner camera and Life Counter/Lotus.
+
+### Evidence paths
+
+- Proof folder: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_visual_p1/`
+- Device discovery: `flutter_devices.log`, `simctl_devices.log`
+- Backend health: `backend_health.json`
+- Runtime log: `sets_search_catalog_runtime.log`
+- Screenshots: not captured in this run.
+
+### Blockers and next actions
+
+- No crash, overflow, timeout or 4xx/5xx remained in the passing runtime.
+- Expected local warning remains: several pods do not support arm64 simulator for Apple Silicon iOS 26+; this iPhone 15 iOS 17.4 run succeeded.
+- Backend 8082 was stopped after validation.
+- Smallest P2/P3 next actions: screenshots for Home/Deck Detail/Generate/Optimize/Binder/Marketplace, product decision for Search global and Meta Deck Intelligence surface, and separate Life Counter/Lotus/Scanner runtime proof.
+
 ## Resultado
 
 - Verdict: `PASS`

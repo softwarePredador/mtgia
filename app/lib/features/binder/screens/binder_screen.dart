@@ -56,12 +56,12 @@ class _BinderTabContentState extends State<BinderTabContent>
             dividerColor: Colors.transparent,
             indicatorColor:
                 _subTabController.index == 0
-                    ? AppTheme.primarySoft
-                    : AppTheme.mythicGold,
+                    ? AppTheme.frost400
+                    : AppTheme.brass400,
             labelColor:
                 _subTabController.index == 0
-                    ? AppTheme.primarySoft
-                    : AppTheme.mythicGold,
+                    ? AppTheme.frost400
+                    : AppTheme.brass400,
             unselectedLabelColor: AppTheme.textSecondary,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,
@@ -370,7 +370,7 @@ class _BinderListViewState extends State<_BinderListView>
   Widget _buildList(bool isHave) {
     if (_isLoading && _items.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+        child: CircularProgressIndicator(color: AppTheme.frost400),
       );
     }
 
@@ -444,8 +444,8 @@ class _BinderListViewState extends State<_BinderListView>
                     label: const Text('Buscar carta'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          isHave ? AppTheme.primarySoft : AppTheme.mythicGold,
-                      foregroundColor: Colors.white,
+                          isHave ? AppTheme.brass500 : AppTheme.brass400,
+                      foregroundColor: AppTheme.backgroundAbyss,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -454,8 +454,8 @@ class _BinderListViewState extends State<_BinderListView>
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Escanear'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.manaViolet,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.frost400,
+                      foregroundColor: AppTheme.backgroundAbyss,
                     ),
                   ),
                 ],
@@ -472,7 +472,7 @@ class _BinderListViewState extends State<_BinderListView>
         await _fetchItems(reset: true);
         await binderProvider.fetchStats();
       },
-      color: AppTheme.manaViolet,
+      color: AppTheme.frost400,
       child: ListView.builder(
         controller: _scrollController,
         padding: EdgeInsets.fromLTRB(
@@ -487,7 +487,7 @@ class _BinderListViewState extends State<_BinderListView>
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Center(
-                child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                child: CircularProgressIndicator(color: AppTheme.frost400),
               ),
             );
           }
@@ -513,81 +513,103 @@ class _StatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final duplicateCopies =
+        stats.totalItems > stats.uniqueCards
+            ? stats.totalItems - stats.uniqueCards
+            : 0;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
       color: AppTheme.surfaceElevated,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          const Text(
+            'Resumo da coleção',
+            style: TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _StatChip(
+                _StatCard(
                   icon: Icons.collections_bookmark,
-                  label: '${stats.totalItems}',
-                  tooltip: 'Total de cartas',
+                  label: 'Total',
+                  value: '${stats.totalItems}',
+                  tooltip: 'Cartas cadastradas no fichário',
                 ),
-                _StatChip(
+                _StatCard(
                   icon: Icons.style,
-                  label: '${stats.uniqueCards}',
+                  label: 'Únicas',
+                  value: '${stats.uniqueCards}',
                   tooltip: 'Cartas únicas',
                 ),
-                _StatChip(
+                _StatCard(
+                  icon: Icons.library_add_check_outlined,
+                  label: 'Duplicadas',
+                  value: '$duplicateCopies',
+                  tooltip: 'Cópias além da primeira',
+                  color: AppTheme.frost400,
+                ),
+                _StatCard(
                   icon: Icons.swap_horiz,
-                  label: '${stats.forTradeCount}',
-                  tooltip: 'Para troca',
-                  color: AppTheme.primarySoft,
+                  label: 'Troca',
+                  value: '${stats.forTradeCount}',
+                  tooltip: 'Itens marcados para troca',
+                  color: AppTheme.frost400,
                 ),
-                _StatChip(
+                _StatCard(
                   icon: Icons.sell,
-                  label: '${stats.forSaleCount}',
-                  tooltip: 'Para venda',
-                  color: AppTheme.mythicGold,
+                  label: 'Venda',
+                  value: '${stats.forSaleCount}',
+                  tooltip: 'Itens marcados para venda',
+                  color: AppTheme.brass400,
                 ),
-                _StatChip(
+                _StatCard(
                   icon: Icons.attach_money,
-                  label: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
+                  label: 'Valor',
+                  value: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
                   tooltip: 'Valor estimado',
-                  color: AppTheme.mythicGold,
+                  color: AppTheme.brass400,
                 ),
+                if (onScan != null)
+                  _ActionIconButton(
+                    icon: Icons.camera_alt,
+                    tooltip: 'Escanear carta',
+                    onPressed: onScan!,
+                    color: AppTheme.frost400,
+                  ),
+                if (onAdd != null)
+                  _ActionIconButton(
+                    icon: Icons.add,
+                    tooltip: 'Adicionar carta',
+                    onPressed: onAdd!,
+                    color: AppTheme.brass500,
+                  ),
               ],
             ),
           ),
-          if (onScan != null) ...[
-            const SizedBox(width: 4),
-            IconButton(
-              icon: const Icon(Icons.camera_alt, color: AppTheme.primarySoft),
-              tooltip: 'Escanear carta',
-              onPressed: onScan,
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(4),
-            ),
-          ],
-          if (onAdd != null) ...[
-            const SizedBox(width: 4),
-            IconButton(
-              icon: const Icon(Icons.add, color: AppTheme.manaViolet),
-              tooltip: 'Adicionar carta',
-              onPressed: onAdd,
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(4),
-            ),
-          ],
         ],
       ),
     );
   }
 }
 
-class _StatChip extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String value;
   final String tooltip;
   final Color color;
 
-  const _StatChip({
+  const _StatCard({
     required this.icon,
     required this.label,
+    required this.value,
     required this.tooltip,
     this.color = AppTheme.textSecondary,
   });
@@ -596,20 +618,74 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: AppTheme.fontSm,
-              fontWeight: FontWeight.w600,
+      child: Container(
+        width: 82,
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: color.withValues(alpha: 0.22)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: color),
+            const SizedBox(height: 5),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.w800,
+              ),
             ),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final Color color;
+
+  const _ActionIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 2),
+        child: IconButton.filledTonal(
+          onPressed: onPressed,
+          icon: Icon(icon, color: color, size: 18),
+          style: IconButton.styleFrom(
+            backgroundColor: color.withValues(alpha: 0.12),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -694,19 +770,19 @@ class _SearchFilterBar extends StatelessWidget {
                   label: const Text('Troca'),
                   selected: tradeFilter == true,
                   onSelected: (_) => onTradeToggle(),
-                  selectedColor: AppTheme.primarySoft.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
                         tradeFilter == true
-                            ? AppTheme.primarySoft
+                            ? AppTheme.frost400
                             : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
                         tradeFilter == true
-                            ? AppTheme.primarySoft
+                            ? AppTheme.frost400
                             : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
@@ -714,7 +790,7 @@ class _SearchFilterBar extends StatelessWidget {
                     size: 14,
                     color:
                         tradeFilter == true
-                            ? AppTheme.primarySoft
+                            ? AppTheme.frost400
                             : AppTheme.textSecondary,
                   ),
                 ),
@@ -723,19 +799,19 @@ class _SearchFilterBar extends StatelessWidget {
                   label: const Text('Venda'),
                   selected: saleFilter == true,
                   onSelected: (_) => onSaleToggle(),
-                  selectedColor: AppTheme.mythicGold.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
                         saleFilter == true
-                            ? AppTheme.mythicGold
+                            ? AppTheme.brass400
                             : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
                         saleFilter == true
-                            ? AppTheme.mythicGold
+                            ? AppTheme.brass400
                             : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
@@ -743,7 +819,7 @@ class _SearchFilterBar extends StatelessWidget {
                     size: 14,
                     color:
                         saleFilter == true
-                            ? AppTheme.mythicGold
+                            ? AppTheme.brass400
                             : AppTheme.textSecondary,
                   ),
                 ),
@@ -868,7 +944,7 @@ class _BinderItemCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        _badge('×${item.quantity}', AppTheme.manaViolet),
+                        _badge('×${item.quantity}', AppTheme.frost400),
                         const SizedBox(width: 6),
                         _badge(item.condition, _conditionColor(item.condition)),
                         if (item.isFoil) ...[
@@ -876,7 +952,7 @@ class _BinderItemCard extends StatelessWidget {
                           Icon(
                             Icons.auto_awesome,
                             size: 14,
-                            color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                            color: AppTheme.brass400.withValues(alpha: 0.8),
                           ),
                         ],
                         if (item.cardSetCode != null) ...[
@@ -898,17 +974,17 @@ class _BinderItemCard extends StatelessWidget {
                       Row(
                         children: [
                           if (item.forTrade)
-                            _statusTag('Troca', AppTheme.primarySoft),
+                            _statusTag('Troca', AppTheme.frost400),
                           if (item.forSale) ...[
                             if (item.forTrade) const SizedBox(width: 6),
-                            _statusTag('Venda', AppTheme.mythicGold),
+                            _statusTag('Venda', AppTheme.brass400),
                           ],
                           if (item.price != null) ...[
                             const SizedBox(width: 6),
                             Text(
                               'R\$ ${item.price!.toStringAsFixed(2)}',
                               style: const TextStyle(
-                                color: AppTheme.mythicGold,
+                                color: AppTheme.brass400,
                                 fontSize: AppTheme.fontSm,
                                 fontWeight: FontWeight.w600,
                               ),

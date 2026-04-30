@@ -56,13 +56,13 @@ void main() {
     await tester.pumpWidget(_buildSubject());
     await tester.pumpAndSettle();
 
-    expect(find.text('Criar e otimizar deck'), findsOneWidget);
-    expect(find.text('Novo Deck'), findsOneWidget);
-    expect(find.text('Importar lista'), findsNWidgets(2));
-    expect(find.text('Gerar com IA'), findsOneWidget);
-    expect(find.text('Minha Coleção'), findsOneWidget);
-    expect(find.text('Vida'), findsOneWidget);
-    expect(find.text('Marketplace'), findsOneWidget);
+    expect(find.text('Escolha sua intenção'), findsOneWidget);
+    expect(find.text('Jogar agora'), findsOneWidget);
+    expect(find.text('Construir deck'), findsOneWidget);
+    expect(find.text('IA de decks'), findsOneWidget);
+    expect(find.text('Minha coleção'), findsOneWidget);
+    expect(find.text('Trocas e mercado'), findsOneWidget);
+    expect(find.text('Importar lista'), findsOneWidget);
 
     expect(find.text('Nenhum deck criado ainda'), findsOneWidget);
     expect(

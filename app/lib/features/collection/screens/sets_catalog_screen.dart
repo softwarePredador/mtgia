@@ -221,7 +221,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+        child: CircularProgressIndicator(color: AppTheme.frost400),
       );
     }
 
@@ -257,7 +257,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
     }
 
     return RefreshIndicator(
-      color: AppTheme.manaViolet,
+      color: AppTheme.frost400,
       onRefresh: _loadFirstPage,
       child: ListView.separated(
         key: const Key('setsCatalogList'),
@@ -270,7 +270,7 @@ class _SetsCatalogScreenState extends State<SetsCatalogScreen> {
             return const Padding(
               padding: EdgeInsets.all(16),
               child: Center(
-                child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                child: CircularProgressIndicator(color: AppTheme.frost400),
               ),
             );
           }
@@ -365,7 +365,7 @@ class _CatalogHeader extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                      borderSide: const BorderSide(color: AppTheme.manaViolet),
+                      borderSide: const BorderSide(color: AppTheme.frost400),
                     ),
                   ),
                 ),
@@ -430,10 +430,10 @@ class _FilterChip extends StatelessWidget {
         label: Text(label),
         selected: selected,
         onSelected: (_) => onSelected(),
-        selectedColor: AppTheme.manaViolet.withValues(alpha: 0.22),
+        selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
         backgroundColor: AppTheme.surfaceSlate,
         side: BorderSide(
-          color: selected ? AppTheme.manaViolet : AppTheme.outlineMuted,
+          color: selected ? AppTheme.frost400 : AppTheme.outlineMuted,
         ),
         labelStyle: TextStyle(
           color: selected ? AppTheme.textPrimary : AppTheme.textSecondary,
@@ -477,7 +477,7 @@ class _SetCatalogTile extends StatelessWidget {
               set.code,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.backgroundAbyss,
                 fontWeight: FontWeight.w800,
                 fontSize: AppTheme.fontSm,
               ),
@@ -532,7 +532,7 @@ class _MiniMeta extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: AppTheme.primarySoft),
+        Icon(icon, size: 13, color: AppTheme.frost400),
         const SizedBox(width: 4),
         Text(
           label,
@@ -554,9 +554,9 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (set.status) {
-      'future' => AppTheme.primarySoft,
+      'future' => AppTheme.frost400,
       'new' => AppTheme.success,
-      'current' => AppTheme.mythicGold,
+      'current' => AppTheme.brass400,
       _ => AppTheme.textSecondary,
     };
     return Container(

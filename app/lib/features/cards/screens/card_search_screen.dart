@@ -290,8 +290,8 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         bottom: TabBar(
           key: const Key('cardSearchTabs'),
           controller: _tabController,
-          indicatorColor: AppTheme.manaViolet,
-          labelColor: AppTheme.manaViolet,
+          indicatorColor: AppTheme.frost400,
+          labelColor: AppTheme.frost400,
           unselectedLabelColor: AppTheme.textSecondary,
           tabs: const [
             Tab(icon: Icon(Icons.style_outlined), text: 'Cartas'),
@@ -329,7 +329,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
 
         if (provider.isLoading) {
           return const Center(
-            child: CircularProgressIndicator(color: AppTheme.manaViolet),
+            child: CircularProgressIndicator(color: AppTheme.frost400),
           );
         }
 
@@ -357,8 +357,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
             message:
                 query.length >= 3
                     ? 'Tente outro nome, revise a grafia ou procure pela versão em inglês.'
-                    : 'Digite pelo menos 3 letras para começar a busca.',
-            accent: query.length >= 3 ? AppTheme.warning : AppTheme.primarySoft,
+                    : widget.isBinderMode
+                    ? 'Digite pelo menos 3 letras para encontrar cartas e adicionar ao fichário.'
+                    : 'Digite pelo menos 3 letras para buscar cartas ou abra a aba Coleções.',
+            accent: query.length >= 3 ? AppTheme.warning : AppTheme.frost400,
           );
         }
 
@@ -373,7 +375,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(
-                  child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                  child: CircularProgressIndicator(color: AppTheme.frost400),
                 ),
               );
             }
@@ -423,12 +425,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                               ),
                               margin: const EdgeInsets.only(right: 6),
                               decoration: BoxDecoration(
-                                color: AppTheme.manaViolet.withValues(
-                                  alpha: 0.2,
-                                ),
+                                color: AppTheme.frost400.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
-                                  color: AppTheme.manaViolet.withValues(
+                                  color: AppTheme.frost400.withValues(
                                     alpha: 0.4,
                                   ),
                                 ),
@@ -438,7 +438,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: AppTheme.manaViolet,
+                                  color: AppTheme.frost400,
                                   letterSpacing: 0.5,
                                 ),
                               ),

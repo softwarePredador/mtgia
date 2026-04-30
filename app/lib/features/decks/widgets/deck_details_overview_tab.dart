@@ -23,6 +23,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final Map<String, dynamic>? pricing;
   final bool Function(DeckCardItem card) isCardInvalid;
   final String Function(int bracket) bracketLabel;
+  final VoidCallback onValidateNow;
   final VoidCallback onValidationTap;
   final VoidCallback onOpenCards;
   final VoidCallback onForcePricingRefresh;
@@ -47,6 +48,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.pricing,
     required this.isCardInvalid,
     required this.bracketLabel,
+    required this.onValidateNow,
     required this.onValidationTap,
     required this.onOpenCards,
     required this.onForcePricingRefresh,
@@ -275,7 +277,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                               label: deck.isPublic ? 'Público' : 'Privado',
                               color:
                                   deck.isPublic
-                                      ? AppTheme.primarySoft
+                                      ? AppTheme.frost400
                                       : AppTheme.textSecondary,
                               icon:
                                   deck.isPublic
@@ -301,6 +303,17 @@ class DeckDetailsOverviewTab extends StatelessWidget {
             )
           else ...[
             _OverviewQuickActions(onOptimize: onShowOptimizationOptions),
+            const SizedBox(height: 16),
+            _LegalityConfidenceCard(
+              isCommanderFormat: isCommanderFormat,
+              isValidating: isValidating,
+              validationResult: validationResult,
+              totalCards: totalCards,
+              maxCards: maxCards,
+              hasCommander: deck.commander.isNotEmpty,
+              onValidateNow: onValidateNow,
+              onValidationTap: onValidationTap,
+            ),
             const SizedBox(height: 16),
             DeckProgressIndicator(
               deck: deck,
@@ -497,6 +510,162 @@ class _CommanderSection extends StatelessWidget {
   }
 }
 
+class _LegalityConfidenceCard extends StatelessWidget {
+  final bool isCommanderFormat;
+  final bool isValidating;
+  final Map<String, dynamic>? validationResult;
+  final int totalCards;
+  final int? maxCards;
+  final bool hasCommander;
+  final VoidCallback onValidateNow;
+  final VoidCallback onValidationTap;
+
+  const _LegalityConfidenceCard({
+    required this.isCommanderFormat,
+    required this.isValidating,
+    required this.validationResult,
+    required this.totalCards,
+    required this.maxCards,
+    required this.hasCommander,
+    required this.onValidateNow,
+    required this.onValidationTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ok = validationResult?['ok'] == true;
+    final hasResult = validationResult != null && !isValidating;
+    final accent =
+        isValidating
+            ? AppTheme.frost400
+            : hasResult
+            ? (ok ? AppTheme.success : AppTheme.error)
+            : AppTheme.frost400;
+    final title =
+        isValidating
+            ? 'Validando legalidade'
+            : hasResult
+            ? (ok ? 'Deck legal para o formato' : 'Atenção na legalidade')
+            : 'Legalidade ainda não verificada';
+    final target =
+        maxCards == null
+            ? '$totalCards cartas'
+            : '$totalCards/$maxCards cartas';
+    final message =
+        isValidating
+            ? 'Checando formato, comandante, contagem e identidade de cor.'
+            : hasResult
+            ? (ok
+                ? 'A lista passou nas regras conhecidas do app. Revise preço e estratégia antes da mesa.'
+                : (validationResult?['error']?.toString() ??
+                    'Revise as cartas sinalizadas antes de jogar.'))
+            : isCommanderFormat
+            ? 'Commander precisa de 100 cartas, 1 comandante e identidade de cor consistente. Valide antes de otimizar ou jogar.'
+            : 'Valide a lista antes de exportar, compartilhar ou jogar.';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.28), width: 0.9),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            ),
+            child:
+                isValidating
+                    ? const Padding(
+                      padding: EdgeInsets.all(9),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Icon(
+                      ok
+                          ? Icons.verified_rounded
+                          : hasResult
+                          ? Icons.warning_amber_rounded
+                          : Icons.rule_folder_outlined,
+                      color: accent,
+                      size: 20,
+                    ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    DeckMetaChip(label: target, color: accent),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  message,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    DeckMetaChip(
+                      label:
+                          hasCommander
+                              ? 'Comandante definido'
+                              : 'Sem comandante',
+                      color: hasCommander ? AppTheme.success : AppTheme.warning,
+                      icon:
+                          hasCommander
+                              ? Icons.workspace_premium
+                              : Icons.person_search_outlined,
+                    ),
+                    if (hasResult)
+                      OutlinedButton.icon(
+                        onPressed: onValidationTap,
+                        icon: const Icon(Icons.info_outline, size: 16),
+                        label: const Text('Ver status'),
+                      )
+                    else
+                      OutlinedButton.icon(
+                        onPressed: isValidating ? null : onValidateNow,
+                        icon: const Icon(Icons.verified_outlined, size: 16),
+                        label: const Text('Validar agora'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _InlineCommanderBadge extends StatelessWidget {
   final String label;
   final Color color;
@@ -658,19 +827,17 @@ class _OverviewQuickActions extends StatelessWidget {
         onPressed: onOptimize,
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
-          side: BorderSide(
-            color: theme.colorScheme.primary.withValues(alpha: 0.28),
-          ),
+          backgroundColor: AppTheme.frost400.withValues(alpha: 0.12),
+          side: BorderSide(color: AppTheme.frost400.withValues(alpha: 0.28)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
         ),
-        icon: Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
+        icon: const Icon(Icons.auto_fix_high, color: AppTheme.frost400),
         label: Text(
-          'Otimizar deck',
+          'Otimizar com IA',
           style: theme.textTheme.titleSmall?.copyWith(
-            color: theme.colorScheme.primary,
+            color: AppTheme.frost400,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -730,8 +897,7 @@ class _StrategySummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final toneColor =
-        hasArchetype ? theme.colorScheme.primary : AppTheme.primarySoft;
+    final toneColor = hasArchetype ? AppTheme.brass500 : AppTheme.frost400;
 
     return Container(
       width: double.infinity,
@@ -888,12 +1054,12 @@ class _DeckEmptyState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.primarySoft.withValues(alpha: 0.18),
+                  color: AppTheme.frost400.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
                 child: const Icon(
                   Icons.auto_awesome_outlined,
-                  color: AppTheme.primarySoft,
+                  color: AppTheme.frost400,
                 ),
               ),
               const SizedBox(width: 12),

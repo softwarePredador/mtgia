@@ -92,6 +92,7 @@ void main() {
             pricing: const {'estimated_total_usd': 123.45, 'currency': 'USD'},
             isCardInvalid: (_) => false,
             bracketLabel: (_) => 'Casual',
+            onValidateNow: onValidationTap,
             onValidationTap: onValidationTap,
             onOpenCards: onOpenCards,
             onForcePricingRefresh: onForcePricingRefresh,
@@ -138,7 +139,8 @@ void main() {
     expect(find.text('99 cartas'), findsOneWidget);
     expect(find.text('Abrir cartas'), findsNothing);
     expect(find.text('Abrir análise'), findsNothing);
-    expect(find.text('Otimizar deck'), findsOneWidget);
+    expect(find.text('Otimizar com IA'), findsOneWidget);
+    expect(find.text('Atenção na legalidade'), findsOneWidget);
     expect(find.text('Descrição'), findsOneWidget);
     expect(find.text('Estratégia'), findsOneWidget);
     expect(find.text('Selecionar'), findsOneWidget);
@@ -154,6 +156,7 @@ void main() {
     expect(commanderPromptTop.dy, lessThan(strategyTop.dy));
     expect(strategyTop.dy, lessThan(descriptionTop.dy));
 
+    await tester.ensureVisible(find.text('Inválido'));
     await tester.tap(find.text('Inválido'));
     await tester.pumpAndSettle();
     expect(validationTapped, 1);
@@ -168,8 +171,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(commanderTapped, 1);
 
-    await tester.ensureVisible(find.text('Otimizar deck'));
-    await tester.tap(find.text('Otimizar deck'));
+    await tester.ensureVisible(find.text('Otimizar com IA'));
+    await tester.tap(find.text('Otimizar com IA'));
     await tester.pumpAndSettle();
     expect(optimizationTapped, 1);
 

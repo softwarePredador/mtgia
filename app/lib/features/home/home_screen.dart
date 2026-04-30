@@ -106,83 +106,70 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Quick Actions
-                  _SectionHeader(label: 'Ações Rápidas', icon: Icons.bolt),
-                  const SizedBox(height: 12),
-
-                  // CTA principal com gradiente
-                  _GradientButton(
-                    icon: Icons.auto_awesome,
-                    label: 'Criar e otimizar deck',
-                    gradient: AppTheme.primaryGradient,
-                    glowColor: AppTheme.manaViolet,
-                    onTap: () => context.go('/onboarding/core-flow'),
+                  _SectionHeader(
+                    label: 'Escolha sua intenção',
+                    icon: Icons.explore_outlined,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Quatro caminhos claros para jogar, construir, colecionar ou negociar sem ruído.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      height: 1.35,
+                    ),
                   ),
                   const SizedBox(height: 12),
-
+                  _IntentCard(
+                    icon: Icons.favorite,
+                    title: 'Jogar agora',
+                    subtitle: 'Abrir contador de vida para a mesa.',
+                    accentColor: AppTheme.brass500,
+                    primary: true,
+                    onTap: () => openLifeCounterRoute(context),
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
-                        child: _QuickAction(
-                          icon: Icons.add_rounded,
-                          label: 'Novo Deck',
-                          accentColor: AppTheme.primarySoft,
-                          highlighted: true,
-                          onTap: () => context.go('/decks'),
+                        child: _IntentCard(
+                          icon: Icons.construction_rounded,
+                          title: 'Construir deck',
+                          subtitle: 'Criar, importar ou ajustar uma lista.',
+                          accentColor: AppTheme.brass500,
+                          onTap: () => context.go('/onboarding/core-flow'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: _QuickAction(
-                          icon: Icons.content_paste,
-                          label: 'Importar lista',
-                          accentColor: AppTheme.primarySoft,
-                          highlighted: true,
-                          onTap: () => context.go('/decks/import'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _QuickAction(
+                        child: _IntentCard(
                           icon: Icons.auto_awesome,
-                          label: 'Gerar com IA',
-                          accentColor: AppTheme.primarySoft,
-                          highlighted: true,
+                          title: 'IA de decks',
+                          subtitle: 'Gerar e otimizar com revisão.',
+                          accentColor: AppTheme.frost400,
                           onTap: () => context.go('/decks/generate'),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickAction(
-                          icon: Icons.collections_bookmark,
-                          label: 'Minha Coleção',
-                          accentColor: AppTheme.textSecondary,
-                          onTap: () => context.go('/collection'),
-                        ),
-                      ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
-                        child: _QuickAction(
-                          icon: Icons.favorite,
-                          label: 'Vida',
-                          accentColor: AppTheme.textSecondary,
-                          onTap: () => openLifeCounterRoute(context),
+                        child: _IntentCard(
+                          icon: Icons.collections_bookmark,
+                          title: 'Minha coleção',
+                          subtitle: 'Fichário, wishlist e coleções.',
+                          accentColor: AppTheme.frost400,
+                          onTap: () => context.go('/collection'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: _QuickAction(
-                          icon: Icons.store,
-                          label: 'Marketplace',
-                          accentColor: AppTheme.textSecondary,
+                        child: _IntentCard(
+                          icon: Icons.storefront,
+                          title: 'Trocas e mercado',
+                          subtitle: 'Marketplace e propostas seguras.',
+                          accentColor: AppTheme.brass400,
                           onTap: () => context.go('/collection?tab=1'),
                         ),
                       ),
@@ -227,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Decks',
                             value: '${deckStats.total}',
                             icon: Icons.style,
-                            color: AppTheme.primarySoft,
+                            color: AppTheme.frost400,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -311,7 +298,7 @@ class _HeroBanner extends StatelessWidget {
               gradient: AppTheme.primaryGradient,
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.manaViolet.withValues(alpha: 0.4),
+                  color: AppTheme.brass500.withValues(alpha: 0.4),
                   blurRadius: 16,
                   spreadRadius: 2,
                 ),
@@ -346,7 +333,7 @@ class _SectionHeader extends StatelessWidget {
           width: 3,
           height: 18,
           decoration: BoxDecoration(
-            color: AppTheme.primarySoft,
+            color: AppTheme.frost400,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -365,88 +352,28 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ── Gradient CTA Button ──────────────────────────────────────────────────────
+// ── Intent Card ──────────────────────────────────────────────────────────────
 
-class _GradientButton extends StatelessWidget {
+class _IntentCard extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final LinearGradient gradient;
-  final Color glowColor;
-  final VoidCallback onTap;
-
-  const _GradientButton({
-    required this.icon,
-    required this.label,
-    required this.gradient,
-    required this.glowColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        boxShadow: [
-          BoxShadow(
-            color: glowColor.withValues(alpha: 0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: AppTheme.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          onTap: onTap,
-          splashColor: AppTheme.backgroundAbyss.withValues(alpha: 0.14),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: AppTheme.backgroundAbyss, size: 20),
-                const SizedBox(width: 10),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppTheme.backgroundAbyss,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppTheme.fontLg,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Quick Action ─────────────────────────────────────────────────────────────
-
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
+  final String title;
+  final String subtitle;
   final Color accentColor;
-  final bool highlighted;
+  final bool primary;
   final VoidCallback onTap;
 
-  const _QuickAction({
+  const _IntentCard({
     required this.icon,
-    required this.label,
+    required this.title,
+    required this.subtitle,
     required this.accentColor,
-    this.highlighted = false,
     required this.onTap,
+    this.primary = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Material(
       color: AppTheme.transparent,
       child: InkWell(
@@ -455,53 +382,68 @@ class _QuickAction extends StatelessWidget {
         splashColor: accentColor.withValues(alpha: 0.08),
         highlightColor: accentColor.withValues(alpha: 0.04),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color:
-                highlighted
-                    ? AppTheme.primarySoft.withValues(alpha: 0.05)
+                primary
+                    ? AppTheme.brass500.withValues(alpha: 0.12)
                     : AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
               color:
-                  highlighted
-                      ? AppTheme.primarySoft.withValues(alpha: 0.24)
-                      : AppTheme.outlineMuted,
-              width: 0.5,
+                  primary
+                      ? AppTheme.brass500.withValues(alpha: 0.34)
+                      : accentColor.withValues(alpha: 0.22),
+              width: primary ? 0.9 : 0.6,
             ),
           ),
-          child: Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color:
-                      highlighted
-                          ? accentColor.withValues(alpha: 0.14)
-                          : AppTheme.surfaceElevated,
-                  shape: BoxShape.circle,
+                  color: accentColor.withValues(alpha: primary ? 0.18 : 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   border: Border.all(
-                    color:
-                        highlighted
-                            ? accentColor.withValues(alpha: 0.18)
-                            : AppTheme.outlineMuted.withValues(alpha: 0.55),
+                    color: accentColor.withValues(alpha: 0.18),
                   ),
                 ),
-                child: Icon(
-                  icon,
-                  color: highlighted ? accentColor : AppTheme.textSecondary,
-                  size: 22,
+                child: Icon(icon, color: accentColor, size: 21),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: AppTheme.fontSm,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
+              Icon(
+                Icons.chevron_right_rounded,
+                color: accentColor.withValues(alpha: 0.78),
+                size: 20,
               ),
             ],
           ),
@@ -612,13 +554,13 @@ class _EmptyDecksState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppTheme.primarySoft.withValues(alpha: 0.12),
+              color: AppTheme.frost400.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.style_outlined,
               size: 28,
-              color: AppTheme.primarySoft,
+              color: AppTheme.frost400,
             ),
           ),
           const SizedBox(height: 12),
@@ -797,7 +739,7 @@ class _MarketPreviewSectionState extends State<_MarketPreviewSection> {
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: CircularProgressIndicator(
-                    color: AppTheme.manaViolet,
+                    color: AppTheme.brass500,
                     strokeWidth: 2,
                   ),
                 ),

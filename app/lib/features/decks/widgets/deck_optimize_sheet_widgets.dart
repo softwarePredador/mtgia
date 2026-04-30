@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../../../core/theme/app_theme.dart';
 import 'deck_ui_components.dart';
@@ -211,6 +212,16 @@ class OptimizationPreviewDialog extends StatelessWidget {
     return lines;
   }
 
+  String _metric(Map<String, dynamic> source, List<String> keys) {
+    for (final key in keys) {
+      final value = source[key];
+      if (value != null && value.toString().trim().isNotEmpty) {
+        return value.toString();
+      }
+    }
+    return '-';
+  }
+
   @override
   Widget build(BuildContext context) {
     final warningLines = _warningLines();
@@ -229,7 +240,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                 ? 'Completar deck ($archetype)'
                 : 'Sugestões para $archetype',
         subtitle: 'Revise as mudanças antes de aplicar no deck.',
-        accent: mode == 'complete' ? AppTheme.mythicGold : AppTheme.manaViolet,
+        accent: mode == 'complete' ? AppTheme.brass400 : AppTheme.frost400,
       ),
       content: SizedBox(
         width: 560,
@@ -247,8 +258,8 @@ class OptimizationPreviewDialog extends StatelessWidget {
                         mode == 'complete' ? 'Modo Complete' : 'Modo Optimize',
                     color:
                         mode == 'complete'
-                            ? AppTheme.mythicGold
-                            : AppTheme.manaViolet,
+                            ? AppTheme.brass400
+                            : AppTheme.frost400,
                     icon:
                         mode == 'complete'
                             ? Icons.playlist_add_rounded
@@ -257,7 +268,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   if (keepTheme && preservedTheme != null)
                     DeckMetaChip(
                       label: 'Tema: $preservedTheme',
-                      color: AppTheme.primarySoft,
+                      color: AppTheme.frost400,
                       icon: Icons.category_outlined,
                     ),
                 ],
@@ -266,7 +277,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Leitura da IA',
-                  accent: AppTheme.primarySoft,
+                  accent: AppTheme.frost400,
                   icon: Icons.psychology_alt_outlined,
                   child: Text(
                     reasoning,
@@ -282,7 +293,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Aviso de qualidade',
-                  accent: AppTheme.mythicGold,
+                  accent: AppTheme.brass400,
                   icon: Icons.info_outline_rounded,
                   child: Text(
                     qualityWarning!['message'] as String? ??
@@ -294,11 +305,48 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   ),
                 ),
               ],
+              const SizedBox(height: 16),
+              DialogSectionCard(
+                title: 'Controle antes de aplicar',
+                accent: AppTheme.frost400,
+                icon: Icons.fact_check_outlined,
+                child: _TrustSignalGrid(
+                  signals: [
+                    _TrustSignal(
+                      label: 'Plano',
+                      value: mode == 'complete' ? 'Completar' : 'Otimizar',
+                      icon: Icons.route_outlined,
+                    ),
+                    _TrustSignal(
+                      label: 'Mudanças',
+                      value:
+                          '${displayRemovals.length} saem / ${displayAdditions.length} entram',
+                      icon: Icons.swap_horiz_rounded,
+                    ),
+                    _TrustSignal(
+                      label: 'Cartas depois',
+                      value: _metric(postAnalysis, const [
+                        'total_cards',
+                        'card_count',
+                      ]),
+                      icon: Icons.format_list_numbered,
+                    ),
+                    _TrustSignal(
+                      label: 'Terrenos',
+                      value: _metric(postAnalysis, const [
+                        'lands',
+                        'land_count',
+                      ]),
+                      icon: Icons.terrain_outlined,
+                    ),
+                  ],
+                ),
+              ),
               if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Antes vs Depois',
-                  accent: AppTheme.manaViolet,
+                  accent: AppTheme.frost400,
                   icon: Icons.compare_arrows_rounded,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +381,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Avisos',
-                  accent: AppTheme.mythicGold,
+                  accent: AppTheme.brass400,
                   icon: Icons.warning_amber_rounded,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,12 +459,12 @@ class OptimizationPreviewDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(onPressed: onCancel, child: const Text('Cancelar')),
-        if (onCopyDebug != null)
+        if (kDebugMode && onCopyDebug != null)
           TextButton(
             onPressed: () {
               onCopyDebug!();
             },
-            child: const Text('Copiar debug'),
+            child: const Text('Copiar relatório técnico'),
           ),
         ElevatedButton(
           onPressed: onConfirm,
@@ -448,7 +496,7 @@ class OutcomeInfoDialog extends StatelessWidget {
         icon: Icons.info_outline,
         title: title,
         subtitle: 'Resultado da análise do deck',
-        accent: AppTheme.primarySoft,
+        accent: AppTheme.frost400,
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -466,7 +514,7 @@ class OutcomeInfoDialog extends StatelessWidget {
               const SizedBox(height: 16),
               DialogSectionCard(
                 title: 'Motivos',
-                accent: AppTheme.primarySoft,
+                accent: AppTheme.frost400,
                 icon: Icons.rule_folder_outlined,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,6 +582,76 @@ class _MetricDiffRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TrustSignal {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _TrustSignal({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+}
+
+class _TrustSignalGrid extends StatelessWidget {
+  final List<_TrustSignal> signals;
+
+  const _TrustSignalGrid({required this.signals});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children:
+          signals
+              .map(
+                (signal) => Container(
+                  width: 118,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(signal.icon, size: 16, color: AppTheme.frost400),
+                      const SizedBox(height: 6),
+                      Text(
+                        signal.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontSize: AppTheme.fontXs,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        signal.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: AppTheme.fontSm,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
     );
   }
 }

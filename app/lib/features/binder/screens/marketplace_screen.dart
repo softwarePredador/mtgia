@@ -75,6 +75,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     super.build(context);
     return Column(
       children: [
+        const _MarketplaceTrustHeader(),
         // Search bar (local state only — no provider rebuild needed)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -132,20 +133,16 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     setState(() => _onlyTrade = v);
                     _doSearch();
                   },
-                  selectedColor: AppTheme.primarySoft.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
-                        _onlyTrade
-                            ? AppTheme.primarySoft
-                            : AppTheme.textSecondary,
+                        _onlyTrade ? AppTheme.frost400 : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
-                        _onlyTrade
-                            ? AppTheme.primarySoft
-                            : AppTheme.outlineMuted,
+                        _onlyTrade ? AppTheme.frost400 : AppTheme.outlineMuted,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -156,18 +153,16 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
                     setState(() => _onlySale = v);
                     _doSearch();
                   },
-                  selectedColor: AppTheme.mythicGold.withValues(alpha: 0.3),
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
                   backgroundColor: AppTheme.surfaceSlate,
                   labelStyle: TextStyle(
                     color:
-                        _onlySale
-                            ? AppTheme.mythicGold
-                            : AppTheme.textSecondary,
+                        _onlySale ? AppTheme.brass400 : AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
                   ),
                   side: BorderSide(
                     color:
-                        _onlySale ? AppTheme.mythicGold : AppTheme.outlineMuted,
+                        _onlySale ? AppTheme.brass400 : AppTheme.outlineMuted,
                   ),
                 ),
               ],
@@ -185,7 +180,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
   Widget _buildMarketList(BinderProvider provider) {
     if (provider.isLoadingMarket && provider.marketItems.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.manaViolet),
+        child: CircularProgressIndicator(color: AppTheme.frost400),
       );
     }
 
@@ -220,7 +215,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.store,
+              Icons.storefront,
               size: 64,
               color: AppTheme.textSecondary.withValues(alpha: 0.4),
             ),
@@ -234,7 +229,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
             ),
             const SizedBox(height: 8),
             const Text(
-              'Tente outra busca ou filtro',
+              'Tente outro nome, condição ou tipo de negociação.',
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ],
@@ -251,7 +246,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Center(
-              child: CircularProgressIndicator(color: AppTheme.manaViolet),
+              child: CircularProgressIndicator(color: AppTheme.frost400),
             ),
           );
         }
@@ -359,6 +354,59 @@ class _ConditionDropdown extends StatelessWidget {
   }
 }
 
+class _MarketplaceTrustHeader extends StatelessWidget {
+  const _MarketplaceTrustHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.verified_user_outlined,
+            color: AppTheme.frost400,
+            size: 22,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Marketplace verificável',
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontMd,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Confira condição, idioma, quantidade, preço e vendedor antes de propor.',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // =====================================================================
 // Marketplace item card
 // =====================================================================
@@ -420,13 +468,22 @@ class _MarketplaceCard extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      _badge('×${item.quantity}', AppTheme.manaViolet),
+                      _badge('×${item.quantity}', AppTheme.frost400),
                       _badge(item.condition, _condColor(item.condition)),
+                      _badge(
+                        item.language.toUpperCase(),
+                        AppTheme.textSecondary,
+                      ),
+                      if ((item.cardSetCode ?? '').isNotEmpty)
+                        _badge(
+                          item.cardSetCode!.toUpperCase(),
+                          AppTheme.textSecondary,
+                        ),
                       if (item.isFoil)
                         Icon(
                           Icons.auto_awesome,
                           size: 14,
-                          color: AppTheme.mythicGold.withValues(alpha: 0.8),
+                          color: AppTheme.brass400.withValues(alpha: 0.8),
                         ),
                     ],
                   ),
@@ -438,15 +495,13 @@ class _MarketplaceCard extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      if (item.forTrade)
-                        _statusTag('Troca', AppTheme.primarySoft),
-                      if (item.forSale)
-                        _statusTag('Venda', AppTheme.mythicGold),
+                      if (item.forTrade) _statusTag('Troca', AppTheme.frost400),
+                      if (item.forSale) _statusTag('Venda', AppTheme.brass400),
                       if (item.price != null)
                         Text(
                           'R\$ ${item.price!.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            color: AppTheme.mythicGold,
+                            color: AppTheme.brass400,
                             fontSize: AppTheme.fontMd,
                             fontWeight: FontWeight.bold,
                           ),
@@ -462,7 +517,7 @@ class _MarketplaceCard extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 10,
-                          backgroundColor: AppTheme.manaViolet.withValues(
+                          backgroundColor: AppTheme.frost400.withValues(
                             alpha: 0.3,
                           ),
                           backgroundImage:
@@ -479,7 +534,7 @@ class _MarketplaceCard extends StatelessWidget {
                                         : '?',
                                     style: const TextStyle(
                                       fontSize: AppTheme.fontXs,
-                                      color: AppTheme.manaViolet,
+                                      color: AppTheme.frost400,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -490,7 +545,7 @@ class _MarketplaceCard extends StatelessWidget {
                           child: Text(
                             item.ownerDisplayLabel,
                             style: const TextStyle(
-                              color: AppTheme.primarySoft,
+                              color: AppTheme.frost400,
                               fontSize: AppTheme.fontSm,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -564,12 +619,12 @@ class _MarketplaceCard extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           foregroundColor:
                               item.forSale
-                                  ? AppTheme.mythicGold
-                                  : AppTheme.primarySoft,
+                                  ? AppTheme.brass400
+                                  : AppTheme.frost400,
                           side: BorderSide(
                             color: (item.forSale
-                                    ? AppTheme.mythicGold
-                                    : AppTheme.primarySoft)
+                                    ? AppTheme.brass400
+                                    : AppTheme.frost400)
                                 .withValues(alpha: 0.5),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -586,7 +641,11 @@ class _MarketplaceCard extends StatelessWidget {
                           size: 14,
                         ),
                         label: Text(
-                          item.forSale ? 'Quero comprar' : 'Propor troca',
+                          item.forSale && !item.forTrade
+                              ? 'Quero comprar'
+                              : item.forTrade && !item.forSale
+                              ? 'Propor troca'
+                              : 'Propor troca/compra',
                           style: const TextStyle(fontSize: AppTheme.fontSm),
                         ),
                       ),
