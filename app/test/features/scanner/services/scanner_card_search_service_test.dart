@@ -46,25 +46,26 @@ void main() {
     test('maps printings collector number and foil fields', () async {
       final apiClient = _FakeApiClient(
         getResponses: {
-          '/cards/printings?name=Lightning+Bolt&limit=50': ApiResponse(200, {
-            'data': const [
-              {
-                'id': 'card-1',
-                'name': 'Lightning Bolt',
-                'mana_cost': '{R}',
-                'type_line': 'Instant',
-                'oracle_text': 'Deal 3 damage to any target.',
-                'colors': ['R'],
-                'color_identity': ['R'],
-                'set_code': 'blb',
-                'set_name': 'Bloomburrow',
-                'set_release_date': '2024-08-02',
-                'rarity': 'rare',
-                'collector_number': '157',
-                'foil': true,
-              },
-            ],
-          }),
+          '/cards/printings?name=Lightning+Bolt&limit=50&dedupe=false':
+              ApiResponse(200, {
+                'data': const [
+                  {
+                    'id': 'card-1',
+                    'name': 'Lightning Bolt',
+                    'mana_cost': '{R}',
+                    'type_line': 'Instant',
+                    'oracle_text': 'Deal 3 damage to any target.',
+                    'colors': ['R'],
+                    'color_identity': ['R'],
+                    'set_code': 'blb',
+                    'set_name': 'Bloomburrow',
+                    'set_release_date': '2024-08-02',
+                    'rarity': 'rare',
+                    'collector_number': '157',
+                    'foil': true,
+                  },
+                ],
+              }),
         },
       );
       final service = ScannerCardSearchService(apiClient: apiClient);
@@ -77,7 +78,7 @@ void main() {
       expect(printings.single.collectorNumber, '157');
       expect(printings.single.foil, isTrue);
       expect(apiClient.getCalls, [
-        '/cards/printings?name=Lightning+Bolt&limit=50',
+        '/cards/printings?name=Lightning+Bolt&limit=50&dedupe=false',
       ]);
     });
 

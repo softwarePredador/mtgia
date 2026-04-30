@@ -28,6 +28,7 @@ class _FakeScannerCardSearchService extends ScannerCardSearchService {
   Future<List<DeckCardItem>> fetchPrintingsByExactName(
     String name, {
     int limit = 50,
+    bool dedupe = false,
   }) async {
     exactCalls.add(name);
     return _exactByName[name] ?? const [];
@@ -39,6 +40,7 @@ class _FakeScannerCardSearchService extends ScannerCardSearchService {
     int limit = 50,
     int page = 1,
     bool dedupe = true,
+    bool includeTokens = false,
   }) async {
     searchCalls.add(name);
     return _searchByName[name] ?? const [];
@@ -308,5 +310,29 @@ void main() {
         expect(searchService.resolveCalls, isEmpty);
       },
     );
+
+    test('groups close OCR variants as the same live detection', () {
+      expect(
+        ScannerProvider.isSameStableLiveNameForTest(
+          'PuYREXIAN HORROR',
+          'Phyrexian Horror',
+        ),
+        isTrue,
+      );
+      expect(
+        ScannerProvider.isSameStableLiveNameForTest(
+          'Phyrexian',
+          'Phyrexian Horror',
+        ),
+        isFalse,
+      );
+      expect(
+        ScannerProvider.isSameStableLiveNameForTest(
+          'Sedex',
+          'Phyrexian Horror',
+        ),
+        isFalse,
+      );
+    });
   });
 }

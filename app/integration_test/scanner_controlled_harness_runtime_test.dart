@@ -13,6 +13,7 @@ class _HarnessSearchService extends ScannerCardSearchService {
   Future<List<DeckCardItem>> fetchPrintingsByExactName(
     String name, {
     int limit = 50,
+    bool dedupe = false,
   }) async {
     exactCalls.add(name);
     if (name != 'Lightning Bolt') return const [];

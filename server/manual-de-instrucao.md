@@ -1,6 +1,56 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — Scanner OCR fisico Android, token-safe resolution e ROI
+
+### O Porquê
+- A auditoria fisica do Scanner ManaLoom precisava fechar riscos de OCR em camera real: guia visual desalinhado do ROI, contaminacao por texto externo de embalagem/pedido, tokens resolvendo como cartas normais, perda de variantes foil/collector em printings e chamadas repetidas antes de uma confirmacao estavel.
+- O caso critico era `Phyrexian Horror`: quando OCR identifica uma ficha, o fluxo nunca pode cair em `Phyrexian Censor` ou em outra carta normal parecida.
+
+### O Como
+- App scanner:
+  - `ScannerOverlay` ganhou `ScannerGuideGeometry.cardRectForSize`, usado tambem por `CardScannerScreen` para mapear o ROI da camera. Assim o guia desenhado e a area analisada pelo OCR compartilham a mesma geometria.
+  - `CardRecognitionService` passou a filtrar blocos por overlap real com o guia, usando margem menor, e a coletar footer/collector apenas de texto dentro do ROI.
+  - Ranking OCR passou a zerar candidatos com termos externos de pedido/pagamento/SKU/preco/endereco/cidade/frete, reduzindo contaminacao por embalagem.
+  - Type lines de token (`Token Artifact Creature ...`) agora sao descartadas como nomes e preservadas como contexto.
+  - `ScannerOcrParser` deixou de interpretar `1/1` de rules text como collector e prefere numeros plausiveis do rodape; texto normal que menciona criar token segue `isToken=false`.
+  - `ScannerProvider` aumentou confirmacao live para 3 frames e agora agrupa variacoes OCR proximas por similaridade (`PuYREXIAN HORROR` vs `Phyrexian Horror`) sem fazer request antes da confirmacao.
+  - Busca de printings do scanner usa `dedupe=false`; token lookup local usa `include_tokens=true`.
+- Backend cards:
+  - `GET /cards` passou a retornar `collector_number` e `foil`, e aceita `include_tokens=true` para priorizar type lines de token na ordenacao.
+  - `GET /cards/printings` passou a aceitar `dedupe=false`, retornando multiplas printings/variantes em vez de colapsar por set.
+  - `POST /cards/resolve` continuou token-safe com `include_tokens=true` e Scryfall `type:token include:extras`.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/scanner test/features/scanner --no-version-check`: PASS.
+- `cd app && flutter test test/features/scanner --no-version-check`: PASS, `20 passed`.
+- `cd server && dart analyze routes/cards routes/cards/resolve test/card_resolution_support_test.dart`: PASS.
+- `cd server && dart test test/card_resolution_support_test.dart`: PASS, `6 passed`.
+- Backend local:
+  - `cd server && PORT=8082 dart run .dart_frog/server.dart`;
+  - `curl http://127.0.0.1:8082/health`: healthy.
+- Probes reais:
+  - `POST /cards/resolve {"name":"Phyrexian Horror","include_tokens":true}` retornou `Token Artifact Creature — Phyrexian Horror`, `total_returned=3`, sem `Phyrexian Censor`;
+  - `GET /cards?name=Phyrexian%20Horror&dedupe=false&include_tokens=true` retornou token printings com `collector_number`/`foil`;
+  - `GET /cards/printings?name=Phyrexian%20Horror&dedupe=false` retornou token printings com `collector_number`/`foil`.
+- Runtime fisico Android:
+  - device `SM A135M` / `R58T300SREH`, `adb reverse tcp:8082 tcp:8082`;
+  - comando `flutter run -d R58T300SREH --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --no-version-check`;
+  - CameraX abriu a camera traseira, MLKit carregou OCR Latin local, frames OCR foram processados;
+  - candidatos reais incluíram `Phyrexian Horror`, ruido externo (`Sedex`) e fragmentos de footer;
+  - depois do ajuste de estabilidade, o scanner confirmou `Phyrexian Horror` e fez uma unica chamada `GET /cards/printings?name=Phyrexian+Horror&limit=50&dedupe=false`, com resposta `200` em `1587ms`, entao parou o stream.
+- Harness iPhone 15:
+  - `flutter test integration_test/scanner_controlled_harness_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `00:05 +1`.
+
+### Resultado
+- `PARTIAL physical PASS / controlled logic PASS`.
+- Camera/OCR/backend/token path foi provado em device fisico real.
+- A matriz fisica completa ainda requer execucao manual assistida para carta normal bem iluminada, multiplas edicoes fisicas, foil fisico, carta parcialmente fora do guia e baixa luz/reflexo.
+- Evidencias:
+  - `app/doc/runtime_flow_handoffs/scanner_physical_audit_2026-04-30.md`;
+  - `app/doc/runtime_flow_handoffs/scanner_runtime_2026-04-29.md`;
+  - `app/doc/runtime_flow_proofs_2026-04-30_scanner_physical/`.
+
 ## 2026-04-30 — P1 visual fora de Trades com runtime Search/Sets iPhone 15
 
 ### O Porquê

@@ -19,6 +19,7 @@ Future<Response> onRequest(RequestContext context) async {
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
   final safeLimit = limit.clamp(1, 200);
   final syncFromScryfall = params['sync'] == 'true';
+  final deduplicate = params['dedupe']?.toLowerCase() != 'false';
 
   if (name == null || name.isEmpty) {
     return Response.json(
@@ -28,14 +29,26 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   // Busca local
-  var data = await _queryPrintings(pool, name, safeLimit, hasSets);
+  var data = await _queryPrintings(
+    pool,
+    name,
+    safeLimit,
+    hasSets,
+    deduplicate: deduplicate,
+  );
 
   // Se sync=true e encontrou poucas edições, busca do Scryfall
   if (syncFromScryfall && data.length <= 1) {
     try {
       final imported = await _syncPrintingsFromScryfall(pool, name);
       if (imported > 0) {
-        data = await _queryPrintings(pool, name, safeLimit, hasSets);
+        data = await _queryPrintings(
+          pool,
+          name,
+          safeLimit,
+          hasSets,
+          deduplicate: deduplicate,
+        );
       }
     } catch (e) {
       stderr.writeln('[printings/sync] Erro: $e');
@@ -54,16 +67,67 @@ Future<Response> onRequest(RequestContext context) async {
 /// Faz a query de printings no banco local
 /// Usa DISTINCT ON para retornar apenas uma carta por set_code (deduplica variantes)
 Future<List<Map<String, dynamic>>> _queryPrintings(
-  Pool pool,
-  String name,
-  int limit,
-  bool hasSets,
-) async {
+    Pool pool, String name, int limit, bool hasSets,
+    {required bool deduplicate}) async {
   // Usamos DISTINCT ON (LOWER(c.set_code)) para deduplicar variantes do mesmo set
   // Isso garante que cada edição apareça apenas uma vez no seletor
   final String sql;
 
-  if (hasSets) {
+  if (!deduplicate) {
+    sql = hasSets
+        ? '''
+      SELECT
+        c.id::text,
+        c.scryfall_id::text,
+        c.name,
+        c.mana_cost,
+        c.type_line,
+        c.oracle_text,
+        c.colors,
+        c.color_identity,
+        c.image_url,
+        LOWER(c.set_code) AS set_code,
+        s.name AS set_name,
+        s.release_date AS set_release_date,
+        c.rarity,
+        c.price,
+        c.price_updated_at,
+        c.collector_number,
+        c.foil
+      FROM cards c
+      LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
+      WHERE LOWER(c.name) = LOWER(@name)
+      ORDER BY s.release_date DESC NULLS LAST,
+        LOWER(c.set_code) ASC,
+        c.collector_number ASC NULLS LAST,
+        c.foil DESC NULLS LAST
+      LIMIT @limit
+    '''
+        : '''
+      SELECT
+        c.id::text,
+        c.scryfall_id::text,
+        c.name,
+        c.mana_cost,
+        c.type_line,
+        c.oracle_text,
+        c.colors,
+        c.color_identity,
+        c.image_url,
+        LOWER(c.set_code) AS set_code,
+        c.rarity,
+        c.price,
+        c.price_updated_at,
+        c.collector_number,
+        c.foil
+      FROM cards c
+      WHERE LOWER(c.name) = LOWER(@name)
+      ORDER BY LOWER(c.set_code) ASC,
+        c.collector_number ASC NULLS LAST,
+        c.foil DESC NULLS LAST
+      LIMIT @limit
+    ''';
+  } else if (hasSets) {
     sql = '''
       SELECT * FROM (
         SELECT DISTINCT ON (LOWER(c.set_code))

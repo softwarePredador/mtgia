@@ -94,8 +94,38 @@ class ScannerOcrParser {
     'hasbro',
   };
 
+  static const _externalTextKeywords = <String>{
+    'pedido',
+    'order',
+    'pagamento',
+    'payment',
+    'preco',
+    'preço',
+    'price',
+    'sku',
+    'cep',
+    'endereco',
+    'endereço',
+    'address',
+    'rua',
+    'avenida',
+    'bairro',
+    'cidade',
+    'pinhais',
+    'itens',
+    'items',
+    'subtotal',
+    'total',
+    'frete',
+    'shipping',
+    'entrega',
+    'delivery',
+    'quantidade',
+    'quantity',
+  };
+
   static final _typeLinePattern = RegExp(
-    r'^(legendary\s+)?(artifact\s+)?(creature|artifact|enchantment|instant|sorcery|land|planeswalker|battle|basic)\b',
+    r'^(token\s+)?(legendary\s+)?(artifact\s+)?(creature|artifact|enchantment|instant|sorcery|land|planeswalker|battle|basic)\b',
     caseSensitive: false,
   );
 
@@ -208,22 +238,32 @@ class ScannerOcrParser {
       isFoil = false;
     }
 
-    final slashMatch = _collectorSlashPattern.firstMatch(rawBottom);
-    if (slashMatch != null) {
-      collectorNumber = slashMatch.group(1);
-      totalInSet = slashMatch.group(2);
+    for (final match in _collectorSlashPattern.allMatches(rawBottom)) {
+      final number = match.group(1);
+      final total = match.group(2);
+      final numberValue = int.tryParse(number ?? '');
+      final totalValue = int.tryParse(total ?? '');
+      if (numberValue == null || totalValue == null) continue;
+      if (totalValue < 20) continue;
+      if (numberValue > totalValue) continue;
+      collectorNumber = number;
+      totalInSet = total;
+      break;
     }
 
     if (collectorNumber == null) {
+      final soloCandidates = <String>[];
       for (final match in _soloNumberPattern.allMatches(rawBottom)) {
         final num = match.group(1)!;
         final numValue = int.tryParse(num);
         if (numValue != null &&
             (numValue < 1993 || numValue > 2030) &&
             numValue <= 999) {
-          collectorNumber = num;
-          break;
+          soloCandidates.add(num);
         }
+      }
+      if (soloCandidates.isNotEmpty) {
+        collectorNumber = soloCandidates.last;
       }
     }
 
@@ -260,6 +300,7 @@ class ScannerOcrParser {
 
   static CardNameCandidate? _buildNameCandidate(String rawLine, int lineIndex) {
     if (_looksLikeCollectorLine(rawLine)) return null;
+    if (isLikelyExternalText(rawLine)) return null;
 
     final cleaned = _cleanNameText(rawLine);
     if (cleaned.length < 2 || cleaned.length > 55) return null;
@@ -295,6 +336,31 @@ class ScannerOcrParser {
   static bool _looksLikeCollectorLine(String line) {
     return _collectorSlashPattern.hasMatch(line) ||
         RegExp(r'[★✩☆•·*]').hasMatch(line);
+  }
+
+  static bool isLikelyExternalText(String text) {
+    final normalized = text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàâã]'), 'a')
+        .replaceAll(RegExp(r'[éèê]'), 'e')
+        .replaceAll(RegExp(r'[íìî]'), 'i')
+        .replaceAll(RegExp(r'[óòôõ]'), 'o')
+        .replaceAll(RegExp(r'[úùû]'), 'u')
+        .replaceAll('ç', 'c');
+
+    for (final keyword in _externalTextKeywords) {
+      final normalizedKeyword = keyword
+          .replaceAll(RegExp(r'[áàâã]'), 'a')
+          .replaceAll(RegExp(r'[éèê]'), 'e')
+          .replaceAll(RegExp(r'[íìî]'), 'i')
+          .replaceAll(RegExp(r'[óòôõ]'), 'o')
+          .replaceAll(RegExp(r'[úùû]'), 'u')
+          .replaceAll('ç', 'c');
+      if (RegExp('\\b$normalizedKeyword\\b').hasMatch(normalized)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static String _cleanNameText(String text) {

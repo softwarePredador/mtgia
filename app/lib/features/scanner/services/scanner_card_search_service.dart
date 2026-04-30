@@ -13,6 +13,7 @@ class ScannerCardSearchService {
     int limit = 50,
     int page = 1,
     bool dedupe = true,
+    bool includeTokens = false,
   }) async {
     final q = name.trim();
     if (q.isEmpty) return const [];
@@ -20,7 +21,8 @@ class ScannerCardSearchService {
     final encoded = Uri.encodeQueryComponent(q);
     final response = await _apiClient.get(
       '/cards?name=$encoded&limit=$limit&page=$page'
-      '${dedupe ? '' : '&dedupe=false'}',
+      '${dedupe ? '' : '&dedupe=false'}'
+      '${includeTokens ? '&include_tokens=true' : ''}',
     );
 
     if (response.statusCode != 200) {
@@ -41,13 +43,15 @@ class ScannerCardSearchService {
   Future<List<DeckCardItem>> fetchPrintingsByExactName(
     String name, {
     int limit = 50,
+    bool dedupe = false,
   }) async {
     final q = name.trim();
     if (q.isEmpty) return const [];
 
     final encoded = Uri.encodeQueryComponent(q);
     final response = await _apiClient.get(
-      '/cards/printings?name=$encoded&limit=$limit',
+      '/cards/printings?name=$encoded&limit=$limit'
+      '${dedupe ? '' : '&dedupe=false'}',
     );
 
     if (response.statusCode != 200) {

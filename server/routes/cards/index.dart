@@ -17,6 +17,7 @@ Future<Response> onRequest(RequestContext context) async {
   final params = context.request.uri.queryParameters;
   final nameFilter = params['name'];
   final setFilter = normalizeCardSetFilter(params['set']);
+  final includeTokens = params['include_tokens']?.toLowerCase() == 'true';
   // Deduplicar por padrão para evitar variantes duplicadas
   // Use ?dedupe=false para obter todas as variantes
   final deduplicate = params['dedupe']?.toLowerCase() != 'false';
@@ -42,6 +43,7 @@ Future<Response> onRequest(RequestContext context) async {
       offset,
       includeSetInfo: hasSets,
       deduplicate: deduplicate,
+      includeTokens: includeTokens,
     );
 
     final queryResult = await conn.execute(
@@ -71,6 +73,8 @@ Future<Response> onRequest(RequestContext context) async {
               .split('T')
               .first,
         'rarity': map['rarity'],
+        'collector_number': map['collector_number'],
+        'foil': map['foil'],
       };
     }).toList();
 
@@ -101,7 +105,9 @@ class _QueryBuilder {
 
 _QueryBuilder _buildQuery(
     String? nameFilter, String? setFilter, int limit, int offset,
-    {required bool includeSetInfo, bool deduplicate = false}) {
+    {required bool includeSetInfo,
+    bool deduplicate = false,
+    bool includeTokens = false}) {
   final params = <String, dynamic>{};
   final conditions = <String>[];
 
@@ -113,8 +119,11 @@ _QueryBuilder _buildQuery(
     params['name'] = '%$nameFilter%';
     params['exact_name'] = nameFilter;
     // Ordem: 1) match exato (case insensitive), 2) basic lands, 3) startsWith, 4) resto
+    final tokenPriority =
+        includeTokens ? "WHEN c.type_line ILIKE '%Token%' THEN -1" : '';
     orderExpression = '''
       CASE 
+        $tokenPriority
         WHEN LOWER(c.name) = LOWER(@exact_name) THEN 0
         WHEN c.type_line ILIKE 'Basic Land%' AND LOWER(c.name) = LOWER(@exact_name) THEN 1
         WHEN c.type_line ILIKE 'Basic Land%' THEN 2
@@ -145,6 +154,7 @@ _QueryBuilder _buildQuery(
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
               c.oracle_text, c.colors, c.color_identity, c.image_url,
               LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
+              c.collector_number, c.foil,
               s.name AS set_name,
               s.release_date AS set_release_date
             FROM cards c
@@ -154,6 +164,7 @@ _QueryBuilder _buildQuery(
           ) AS deduped
           ORDER BY ${nameFilter != null ? '''
             CASE 
+              ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
               WHEN LOWER(name) = LOWER(@exact_name) THEN 0
               WHEN type_line ILIKE 'Basic Land%' AND LOWER(name) = LOWER(@exact_name) THEN 1
               WHEN type_line ILIKE 'Basic Land%' THEN 2
@@ -168,13 +179,15 @@ _QueryBuilder _buildQuery(
             SELECT DISTINCT ON (c.name, LOWER(c.set_code))
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
               c.oracle_text, c.colors, c.color_identity, c.image_url,
-              LOWER(c.set_code) AS set_code, c.rarity, c.cmc
+              LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
+              c.collector_number, c.foil
             FROM cards c
             $whereClause
             ORDER BY c.name, LOWER(c.set_code)
           ) AS deduped
           ORDER BY ${nameFilter != null ? '''
             CASE 
+              ${includeTokens ? "WHEN type_line ILIKE '%Token%' THEN -1" : ''}
               WHEN LOWER(name) = LOWER(@exact_name) THEN 0
               WHEN type_line ILIKE 'Basic Land%' AND LOWER(name) = LOWER(@exact_name) THEN 1
               WHEN type_line ILIKE 'Basic Land%' THEN 2

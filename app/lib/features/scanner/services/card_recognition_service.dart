@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:ui' show Offset, Rect, Size;
+import 'dart:ui' show Rect, Size;
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -66,6 +66,36 @@ class CardRecognitionService {
     // Texto de rodapé / créditos
     'copyright', 'licensed', 'trademark', 'rights',
     'hasbro', 'coast', 'print', 'printed',
+  };
+
+  static const _externalTextKeywords = <String>{
+    'pedido',
+    'order',
+    'pagamento',
+    'payment',
+    'preco',
+    'preço',
+    'price',
+    'sku',
+    'cep',
+    'endereco',
+    'endereço',
+    'address',
+    'rua',
+    'avenida',
+    'bairro',
+    'cidade',
+    'pinhais',
+    'itens',
+    'items',
+    'subtotal',
+    'total',
+    'frete',
+    'shipping',
+    'entrega',
+    'delivery',
+    'quantidade',
+    'quantity',
   };
 
   /// Padrões que indicam linha de crédito do artista.
@@ -446,15 +476,10 @@ class CardRecognitionService {
   // ══════════════════════════════════════════════════════════════════════════
 
   /// Verifica se um bloco de texto está significativamente dentro do guia.
-  /// Usa overlap de 50% — o centro do bloco deve estar dentro do guia.
+  /// Usa sobreposição real com margem pequena para reduzir contaminação de
+  /// embalagens/pedidos ao redor sem exigir alinhamento perfeito da carta.
   bool _isInsideGuide(Rect textBox, Rect guideRect) {
-    // Centro do bloco de texto
-    final centerX = textBox.left + textBox.width / 2;
-    final centerY = textBox.top + textBox.height / 2;
-
-    // Margem de 10% para tolerar blocos que estão um pouco fora mas são
-    // parte da carta (ex: nome levemente fora do guia)
-    final margin = guideRect.width * 0.10;
+    final margin = guideRect.width * 0.04;
     final expandedGuide = Rect.fromLTRB(
       guideRect.left - margin,
       guideRect.top - margin,
@@ -462,7 +487,15 @@ class CardRecognitionService {
       guideRect.bottom + margin,
     );
 
-    return expandedGuide.contains(Offset(centerX, centerY));
+    final overlap = textBox.intersect(expandedGuide);
+    if (overlap.isEmpty || textBox.width <= 0 || textBox.height <= 0) {
+      return false;
+    }
+
+    final overlapRatio =
+        (overlap.width * overlap.height) / (textBox.width * textBox.height);
+    final center = textBox.center;
+    return overlapRatio >= 0.55 || guideRect.contains(center);
   }
 
   /// Recalcula o bounding box de um bloco de texto para ser relativo ao guia.
@@ -507,6 +540,11 @@ class CardRecognitionService {
     final bottomTexts = <String>[];
 
     for (final block in recognizedText.blocks) {
+      if (cardGuideRect != null &&
+          !_isInsideGuide(block.boundingBox, cardGuideRect)) {
+        continue;
+      }
+
       // Se temos guia, verifica se o bloco está horizontalmente dentro
       final blockCenterX = block.boundingBox.left + block.boundingBox.width / 2;
       if (cardGuideRect != null) {
@@ -521,11 +559,18 @@ class CardRecognitionService {
       if (relTop > 0.80) {
         bottomTexts.add(block.text);
         for (final line in block.lines) {
-          bottomTexts.add(line.text);
+          if (cardGuideRect == null ||
+              _isInsideGuide(line.boundingBox, cardGuideRect)) {
+            bottomTexts.add(line.text);
+          }
         }
       } else {
         // Mesmo em blocos mais altos, linhas individuais podem estar embaixo
         for (final line in block.lines) {
+          if (cardGuideRect != null &&
+              !_isInsideGuide(line.boundingBox, cardGuideRect)) {
+            continue;
+          }
           final lineRelTop = (line.boundingBox.top - refTop) / refHeight;
           if (lineRelTop > 0.80) {
             bottomTexts.add(line.text);
@@ -598,6 +643,10 @@ class CardRecognitionService {
 
     // Apenas números/símbolos
     if (RegExp(r'^[\d\s\W]+$').hasMatch(cleaned)) return 0;
+
+    if (_isLikelyExternalText(original) || _isLikelyExternalText(cleaned)) {
+      return 0;
+    }
 
     // Palavra-chave de regras
     if (_nonNameKeywords.contains(lower)) return 0;
@@ -766,7 +815,7 @@ class CardRecognitionService {
     final patterns = [
       // "Legendary Creature — Human Wizard", "Artifact Creature — Golem"
       RegExp(
-        r'^(legendary\s+)?(artifact\s+)?(creature|artifact|enchantment|instant|sorcery|land|planeswalker|battle)',
+        r'^(token\s+)?(legendary\s+)?(artifact\s+)?(creature|artifact|enchantment|instant|sorcery|land|planeswalker|battle)',
         caseSensitive: false,
       ),
       // "Creature — Turtle" mas NÃO "Turtle-Duck" (nomes hyphenados)
@@ -783,6 +832,31 @@ class CardRecognitionService {
   /// OCR corrompido: "Tla En Sylvain Sarrailh", "IIl by John Avon"
   bool _isArtistLine(String text) {
     return _artistLinePatterns.any((p) => p.hasMatch(text));
+  }
+
+  bool _isLikelyExternalText(String text) {
+    final normalized = text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàâã]'), 'a')
+        .replaceAll(RegExp(r'[éèê]'), 'e')
+        .replaceAll(RegExp(r'[íìî]'), 'i')
+        .replaceAll(RegExp(r'[óòôõ]'), 'o')
+        .replaceAll(RegExp(r'[úùû]'), 'u')
+        .replaceAll('ç', 'c');
+
+    for (final keyword in _externalTextKeywords) {
+      final normalizedKeyword = keyword
+          .replaceAll(RegExp(r'[áàâã]'), 'a')
+          .replaceAll(RegExp(r'[éèê]'), 'e')
+          .replaceAll(RegExp(r'[íìî]'), 'i')
+          .replaceAll(RegExp(r'[óòôõ]'), 'o')
+          .replaceAll(RegExp(r'[úùû]'), 'u')
+          .replaceAll('ç', 'c');
+      if (RegExp('\\b$normalizedKeyword\\b').hasMatch(normalized)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Limpa e normaliza texto

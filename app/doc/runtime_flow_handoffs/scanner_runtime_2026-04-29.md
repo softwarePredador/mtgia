@@ -13,7 +13,25 @@ Verdict: `Parser/provider/backend fallback controlled path approved / camera rea
 
 Date/time: `2026-04-29 09:17-09:33 -03`.
 
-Follow-up 2026-04-30: `Physical Android scanner opened / token resolution fixed / clean token retest pending`.
+Follow-up 2026-04-30 late: `Physical Android scanner PARTIAL PASS / token OCR confirmed / stable requests fixed`.
+
+- Device: `SM A135M` / `R58T300SREH`, Android 14.
+- Backend: `http://127.0.0.1:8082`, with `adb reverse tcp:8082 tcp:8082`.
+- Fresh physical proof: `app/doc/runtime_flow_handoffs/scanner_physical_audit_2026-04-30.md`.
+- Proof logs: `app/doc/runtime_flow_proofs_2026-04-30_scanner_physical/`.
+- App runtime command:
+  - `cd app && flutter run -d R58T300SREH --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --no-version-check`.
+- Physical result after fix:
+  - CameraX opened the back camera, MLKit local Latin OCR loaded, OCR frames processed successfully.
+  - Live candidates included `Phyrexian Horror`, noisy package text (`Sedex`) and footer fragments.
+  - Stable confirmation grouped close OCR variants and confirmed `Phyrexian Horror` at `100%`.
+  - Only after confirmation the app issued `GET /cards/printings?name=Phyrexian+Horror&limit=50&dedupe=false`.
+  - The request returned `200` in `1587ms`; the stream stopped while showing the result.
+- Backend proof:
+  - `POST /cards/resolve {"name":"Phyrexian Horror","include_tokens":true}` returned `Token Artifact Creature — Phyrexian Horror` and not `Phyrexian Censor`.
+  - `GET /cards?name=Phyrexian%20Horror&dedupe=false&include_tokens=true` and `GET /cards/printings?name=Phyrexian%20Horror&dedupe=false` returned token printings with `collector_number` and `foil`.
+- Remaining physical matrix:
+  - Normal well-lit card, multiple normal editions, foil physical card, partially outside-guide card, and low-light/reflection are still not fully proven non-interactively, so the overall physical verdict is `PARTIAL`.
 
 - Device: `SM A135M` / `R58T300SREH`.
 - Backend: `http://127.0.0.1:8082`, with `adb reverse tcp:8082 tcp:8082`.

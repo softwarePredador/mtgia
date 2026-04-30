@@ -126,9 +126,10 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         camera,
         ResolutionPreset.high, // high = boa qualidade OCR sem ser pesado demais
         enableAudio: false,
-        imageFormatGroup: defaultTargetPlatform == TargetPlatform.iOS
-            ? ImageFormatGroup.bgra8888
-            : ImageFormatGroup.nv21,
+        imageFormatGroup:
+            defaultTargetPlatform == TargetPlatform.iOS
+                ? ImageFormatGroup.bgra8888
+                : ImageFormatGroup.nv21,
       );
       await controller.initialize();
 
@@ -142,9 +143,14 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         final maxZoom = await controller.getMaxZoomLevel();
         final minZoom = await controller.getMinZoomLevel();
         // Zoom 1.5x ou o máximo disponível — ideal para ler nome de carta
-        final targetZoom = (minZoom + 0.5).clamp(minZoom, maxZoom.clamp(minZoom, 2.5));
+        final targetZoom = (minZoom + 0.5).clamp(
+          minZoom,
+          maxZoom.clamp(minZoom, 2.5),
+        );
         await controller.setZoomLevel(targetZoom);
-        debugPrint('[📸 Camera] Zoom: $targetZoom (min=$minZoom, max=$maxZoom)');
+        debugPrint(
+          '[📸 Camera] Zoom: $targetZoom (min=$minZoom, max=$maxZoom)',
+        );
       } catch (_) {}
 
       // Ativa exposição automática para condições de luz variadas
@@ -226,19 +232,15 @@ class _CardScannerScreenState extends State<CardScannerScreen>
 
     // Processar em background (não bloqueia UI)
     _scannerProvider
-        .processLiveFrame(
-          image,
-          _cameraDescription!,
-          cardGuideRect: guideRect,
-        )
+        .processLiveFrame(image, _cameraDescription!, cardGuideRect: guideRect)
         .then((detected) {
-      if (detected && mounted) {
-        // Vibração de feedback ao detectar
-        HapticFeedback.mediumImpact();
-        // Para o stream enquanto mostra resultado
-        _stopLiveStream();
-      }
-    });
+          if (detected && mounted) {
+            // Vibração de feedback ao detectar
+            HapticFeedback.mediumImpact();
+            // Para o stream enquanto mostra resultado
+            _stopLiveStream();
+          }
+        });
   }
 
   /// Calcula o retângulo do guia de carta em coordenadas da câmera/ML Kit.
@@ -253,17 +255,13 @@ class _CardScannerScreenState extends State<CardScannerScreen>
     final screenSize = MediaQuery.of(context).size;
     if (screenSize.isEmpty) return null;
 
-    // O guia na tela (mesma math do ScannerOverlay)
-    final screenGuideWidth = screenSize.width * 0.65;
-    final screenGuideHeight = screenGuideWidth * (88.0 / 63.0);
-    final screenGuideLeft = (screenSize.width - screenGuideWidth) / 2;
-    final screenGuideTop = (screenSize.height - screenGuideHeight) / 2 - 30;
+    final screenGuide = ScannerGuideGeometry.cardRectForSize(screenSize);
 
     // Proporções relativas na tela (0.0 a 1.0)
-    final relLeft = screenGuideLeft / screenSize.width;
-    final relTop = screenGuideTop / screenSize.height;
-    final relWidth = screenGuideWidth / screenSize.width;
-    final relHeight = screenGuideHeight / screenSize.height;
+    final relLeft = screenGuide.left / screenSize.width;
+    final relTop = screenGuide.top / screenSize.height;
+    final relWidth = screenGuide.width / screenSize.width;
+    final relHeight = screenGuide.height / screenSize.height;
 
     // O camera preview usa FittedBox(fit: BoxFit.cover) que escala e croppa.
     // Precisamos considerar o aspect ratio da câmera vs tela.
@@ -273,7 +271,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
     // CameraController.previewSize retorna em landscape (width > height)
     // mas o ML Kit bounding boxes são em portrait (após rotação)
     final camW = previewSize.height; // largura em portrait
-    final camH = previewSize.width;  // altura em portrait
+    final camH = previewSize.width; // altura em portrait
 
     final screenAspect = screenSize.width / screenSize.height;
     final cameraAspect = camW / camH;
@@ -494,7 +492,9 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8),
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.primarySoft.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -514,9 +514,10 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                     Text(
                       'Detectando: ${scannerProvider.liveDetectedName}',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: AppTheme.fontMd,
-                          fontWeight: FontWeight.w500),
+                        color: Colors.white,
+                        fontSize: AppTheme.fontMd,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -533,15 +534,20 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             right: 0,
             child: Center(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(AppTheme.radiusXl),
                 ),
                 child: const Text(
                   'Aponte para a carta — detecção automática',
-                  style: TextStyle(color: Colors.white70, fontSize: AppTheme.fontMd),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: AppTheme.fontMd,
+                  ),
                 ),
               ),
             ),
@@ -605,9 +611,7 @@ class _CardScannerScreenState extends State<CardScannerScreen>
         if (scannerProvider.state == ScannerState.found &&
             scannerProvider.lastResult != null) ...[
           // Dark overlay covering the camera
-          Positioned.fill(
-            child: Container(color: AppTheme.backgroundAbyss),
-          ),
+          Positioned.fill(child: Container(color: AppTheme.backgroundAbyss)),
           // Card preview anchored to bottom
           Positioned(
             bottom: 0,
@@ -664,8 +668,9 @@ class _CardScannerScreenState extends State<CardScannerScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            width: 2.5),
+                          color: Colors.white.withValues(alpha: 0.8),
+                          width: 2.5,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.3),
@@ -719,7 +724,10 @@ class _CardScannerScreenState extends State<CardScannerScreen>
             const SizedBox(height: 24),
             Text(
               _permissionError ?? 'Permissão necessária',
-              style: const TextStyle(color: Colors.white, fontSize: AppTheme.fontLg),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: AppTheme.fontLg,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

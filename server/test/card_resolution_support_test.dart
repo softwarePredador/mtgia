@@ -55,5 +55,15 @@ void main() {
       expect(decision.isAmbiguous, isFalse);
       expect(decision.candidateNames, isEmpty);
     });
+
+    test('does not resolve token names to nearby normal Phyrexian cards', () {
+      final decision = resolveCardCandidateNames(
+        'Phyrexian Horror',
+        ['Phyrexian Censor'],
+      );
+
+      expect(decision.isResolved, isFalse);
+      expect(decision.isAmbiguous, isFalse);
+    });
   });
 }

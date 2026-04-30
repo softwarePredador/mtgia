@@ -55,9 +55,38 @@ Instant
         );
 
         expect(collector?.isToken, isFalse);
-        expect(collector?.collectorNumber, '1');
+        expect(collector?.collectorNumber, '125');
       },
     );
+
+    test('penalizes packaging and order text around a real card name', () {
+      final result = ScannerOcrParser.parseControlledText('''
+Itens do pedido
+Metodo de Pagamento
+Phyrexian Horror
+Token Artifact Creature - Phyrexian Horror
+020 ONC EN
+Pinhais PR
+''');
+
+      expect(result.success, isTrue);
+      expect(result.primaryName, 'Phyrexian Horror');
+      expect(result.collectorInfo?.isToken, isTrue);
+      expect(result.collectorInfo?.collectorNumber, '020');
+      expect(result.collectorInfo?.setCode, 'ONC');
+    });
+
+    test('returns failed result when OCR only sees external order text', () {
+      final result = ScannerOcrParser.parseControlledText('''
+Itens do pedido
+Metodo de Pagamento
+SKU 12345
+Pinhais PR
+''');
+
+      expect(result.success, isFalse);
+      expect(result.error, contains('Nenhum nome valido'));
+    });
 
     test('returns failed result for OCR text without a usable card name', () {
       final result = ScannerOcrParser.parseControlledText('''

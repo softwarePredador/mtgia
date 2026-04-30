@@ -7,6 +7,7 @@ import '../services/card_recognition_service.dart';
 import '../services/image_preprocessor.dart';
 import '../services/fuzzy_card_matcher.dart';
 import '../services/scanner_card_search_service.dart';
+import '../services/scanner_ocr_parser.dart';
 import '../../decks/models/deck_card_item.dart';
 
 enum ScannerState {
@@ -34,7 +35,7 @@ class ScannerProvider extends ChangeNotifier {
   String? _liveDetectedName;
   CardRecognitionResult? _liveBestResult;
   int _liveConfirmCount = 0;
-  static const _liveConfirmThreshold = 2; // frames consecutivos para confirmar
+  static const _liveConfirmThreshold = 3; // frames consecutivos para confirmar
 
   ScannerState get state => _state;
   CardRecognitionResult? get lastResult => _lastResult;
@@ -87,12 +88,15 @@ class ScannerProvider extends ChangeNotifier {
     final detected = result.primaryName!.trim();
     if (detected.isEmpty) return false;
 
-    // Mesmo nome detectado novamente → incrementa contagem
-    if (detected == _liveDetectedName) {
+    // Mesmo nome, ou variação OCR muito próxima, incrementa a confirmação.
+    if (_isSameStableLiveName(detected, _liveDetectedName)) {
       _liveConfirmCount++;
       if (_scannerContextScore(result) >
-          _scannerContextScore(_liveBestResult)) {
+              _scannerContextScore(_liveBestResult) ||
+          result.confidence > (_liveBestResult?.confidence ?? 0)) {
         _liveBestResult = result;
+        _liveDetectedName = detected;
+        notifyListeners();
       }
     } else {
       _liveDetectedName = detected;
@@ -163,6 +167,13 @@ class ScannerProvider extends ChangeNotifier {
 
     if (!result.success || result.primaryName == null) {
       _errorMessage = result.error ?? 'Nome não reconhecido';
+      _setState(ScannerState.notFound);
+      return;
+    }
+
+    if (ScannerOcrParser.isLikelyExternalText(result.primaryName!)) {
+      _errorMessage =
+          'Texto fora da carta detectado. Centralize apenas a carta dentro do guia.';
       _setState(ScannerState.notFound);
       return;
     }
@@ -313,6 +324,7 @@ class ScannerProvider extends ChangeNotifier {
       name,
       limit: 100,
       dedupe: false,
+      includeTokens: true,
     );
     final exactTokens =
         cards
@@ -467,6 +479,21 @@ class ScannerProvider extends ChangeNotifier {
     score += result.setCodeCandidates.length;
     score += result.allCandidates.length.clamp(0, 5);
     return score;
+  }
+
+  @visibleForTesting
+  static bool isSameStableLiveNameForTest(String detected, String? previous) {
+    return _isSameStableLiveName(detected, previous);
+  }
+
+  static bool _isSameStableLiveName(String detected, String? previous) {
+    final current = detected.trim();
+    final prior = previous?.trim();
+    if (prior == null || prior.isEmpty) return false;
+    if (current == prior) return true;
+    if (current.length < 6 || prior.length < 6) return false;
+
+    return FuzzyCardMatcher.similarity(current, prior) >= 0.78;
   }
 
   void _setState(ScannerState newState) {
