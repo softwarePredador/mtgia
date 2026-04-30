@@ -732,6 +732,49 @@ TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live
 - Prova de camera/OCR real ainda exige device fisico utilizavel por cabo, permissao de camera e carta/imagem controlada.
 - O warning conhecido de MLKit sem arm64 para simuladores Apple Silicon iOS 26+ apareceu no build do integration test, mas nao bloqueou o harness controlado.
 
+## 2026-04-30 — Scanner fisico Android: correcao de tokens Phyrexian Horror
+
+### O Porquê
+- No teste manual em device fisico Android, `Phyrexian Horror` foi reconhecido como ficha/token, mas podia cair em carta parecida (`Phyrexian Censor`) quando:
+  - a base local ainda nao tinha a ficha;
+  - o frame confirmado perdia a linha `Token Artifact Creature`;
+  - o fallback fuzzy/normal continuava habilitado.
+- Isso e perigoso para scanner porque ficha/token nao deve resolver para carta normal parecida.
+
+### O Como
+- App:
+  - `CollectorInfo` passou a carregar `isToken`;
+  - `ScannerOcrParser` identifica token apenas por padrao de type line (`Token Artifact Creature`, com tolerancias OCR), nao por regras que apenas mencionam criar token;
+  - `ScannerProvider` preserva o melhor frame de OCR durante a confirmacao live, mantendo contexto de token/set/collector;
+  - token OCR usa busca token-only e bloqueia fallback fuzzy/normal quando a ficha nao e encontrada;
+  - `ScannerCardSearchService.resolveToken()` envia `include_tokens=true` para o backend.
+- Backend:
+  - `POST /cards/resolve` aceita `include_tokens=true`;
+  - busca local passa a filtrar `type_line ILIKE '%Token%'`;
+  - fallback Scryfall usa `!"<name>" type:token include:extras`;
+  - import de printings permite layout `token` quando `include_tokens=true`.
+
+### Validacao
+- Backend real:
+  - `PORT=8082 dart run .dart_frog/server.dart`;
+  - `POST /cards/resolve {"name":"Phyrexian Horror","include_tokens":true}` retornou `source=scryfall`, `total_returned=3` e `type_line="Token Artifact Creature — Phyrexian Horror"`.
+- App:
+  - `cd app && flutter analyze lib/features/scanner test/features/scanner --no-version-check`;
+  - `cd app && flutter test test/features/scanner --no-version-check`;
+  - `flutter run -d R58T300SREH --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082`.
+- Server:
+  - `cd server && dart analyze routes/cards/resolve test/card_resolution_support_test.dart`;
+  - `cd server && dart test test/card_resolution_support_test.dart`.
+
+### Resultado
+- A falha semantica `Phyrexian Horror token -> Phyrexian Censor` foi corrigida no caminho app + backend.
+- O device Android fisico abriu camera/MLKit e enviou requests ao backend local via `adb reverse`.
+- O reteste fisico limpo da ficha ainda precisa isolar somente a carta/token dentro do guia. Os logs posteriores ao reinstall mostraram OCR lendo textos externos de embalagem/pedido (`Itens do pedido`, `Metodo de Pagamento`, `Pinhais`) ao redor da carta, entao esse frame nao serve como prova final da ficha.
+
+### Pendencias
+- Retestar `Phyrexian Horror` no Android fisico com fundo limpo e sem textos externos dentro do guia.
+- Se continuar reconhecendo textos externos, ajustar ROI/crop do guia e ranking de candidatos para penalizar texto fora da area de nome da carta.
+
 ## 2026-04-28 — QA release ampla no iPhone 15 Simulator com backend real
 
 ### O Porquê

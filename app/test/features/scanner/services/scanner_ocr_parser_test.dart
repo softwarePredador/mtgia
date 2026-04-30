@@ -36,6 +36,29 @@ Instant
       expect(collector?.language, 'PT');
     });
 
+    test('detects token and does not treat TOKEN as a set code', () {
+      final collector = ScannerOcrParser.extractCollectorInfo(
+        'Token Artifact Creature Phyrexian Horror 020 ONC EN SCOTT CHOU',
+      );
+
+      expect(collector?.isToken, isTrue);
+      expect(collector?.collectorNumber, '020');
+      expect(collector?.setCode, 'ONC');
+      expect(collector?.language, 'EN');
+    });
+
+    test(
+      'does not mark normal rules text that mentions token as token card',
+      () {
+        final collector = ScannerOcrParser.extractCollectorInfo(
+          'Create a 1/1 white Human creature token. Draw a card. 125 TLA EN',
+        );
+
+        expect(collector?.isToken, isFalse);
+        expect(collector?.collectorNumber, '1');
+      },
+    );
+
     test('returns failed result for OCR text without a usable card name', () {
       final result = ScannerOcrParser.parseControlledText('''
 157/274 • BLB • EN

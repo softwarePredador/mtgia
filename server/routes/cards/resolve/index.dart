@@ -15,7 +15,7 @@ import '../../../lib/scryfall_image_url.dart';
 /// carta reconhecida pelo OCR que ainda não esteja na DB é importada
 /// automaticamente na hora.
 ///
-/// Body: { "name": "Lightning Bolt" }
+/// Body: { "name": "Lightning Bolt", "include_tokens": false }
 /// Response 200: { "source": "local"|"scryfall", "data": [...] }
 /// Response 404: { "error": "..." }
 Future<Response> onRequest(RequestContext context) async {
@@ -51,16 +51,56 @@ Future<Response> onRequest(RequestContext context) async {
       body: {'error': 'Campo "name" é obrigatório'},
     );
   }
+  final includeTokens = _parseBool(body['include_tokens']);
 
   try {
     // ─── 1) Busca local (nome exato, case-insensitive) ───
-    final localExact = await _searchLocal(pool, name, exact: true);
+    final localExact = await _searchLocal(
+      pool,
+      name,
+      exact: true,
+      includeTokens: includeTokens,
+    );
     if (localExact.isNotEmpty) {
       return Response.json(body: {
         'source': 'local',
         'name': localExact.first['name'],
         'total_returned': localExact.length,
         'data': localExact,
+      });
+    }
+
+    // Token OCR must not resolve to a normal card with a similar name.
+    if (includeTokens) {
+      final scryfallToken = await _fetchFromScryfall(name, includeTokens: true);
+      if (scryfallToken == null) {
+        return Response.json(
+          statusCode: HttpStatus.notFound,
+          body: {
+            'error': 'Token "$name" não encontrado localmente nem no Scryfall',
+          },
+        );
+      }
+
+      final insertedCards = await _insertScryfallCard(
+        pool,
+        scryfallToken,
+        includeTokens: true,
+      );
+      await _insertLegalities(pool, insertedCards, scryfallToken);
+
+      final freshData = await _searchLocal(
+        pool,
+        scryfallToken['name'] as String,
+        exact: true,
+        includeTokens: true,
+      );
+
+      return Response.json(body: {
+        'source': 'scryfall',
+        'name': scryfallToken['name'],
+        'total_returned': freshData.length,
+        'data': freshData,
       });
     }
 
@@ -97,7 +137,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // ─── 3) Fallback: Scryfall fuzzy search ───
-    final scryfallCard = await _fetchFromScryfall(name);
+    final scryfallCard = await _fetchFromScryfall(name, includeTokens: false);
     if (scryfallCard == null) {
       return Response.json(
         statusCode: HttpStatus.notFound,
@@ -109,7 +149,11 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // ─── 4) Insere a carta no banco ───
-    final insertedCards = await _insertScryfallCard(pool, scryfallCard);
+    final insertedCards = await _insertScryfallCard(
+      pool,
+      scryfallCard,
+      includeTokens: false,
+    );
 
     // ─── 5) Insere legalities ───
     await _insertLegalities(pool, insertedCards, scryfallCard);
@@ -120,6 +164,7 @@ Future<Response> onRequest(RequestContext context) async {
       pool,
       scryfallCard['name'] as String,
       exact: true,
+      includeTokens: false,
     );
 
     return Response.json(body: {
@@ -145,11 +190,14 @@ Future<List<Map<String, dynamic>>> _searchLocal(
   Pool pool,
   String name, {
   required bool exact,
+  bool includeTokens = false,
 }) async {
   final hasSets = await _hasTable(pool, 'sets');
 
   final condition =
       exact ? 'LOWER(c.name) = LOWER(@name)' : 'c.name ILIKE @name';
+  final tokenCondition =
+      includeTokens ? " AND c.type_line ILIKE '%Token%'" : '';
   final paramValue = exact ? name : '%$name%';
 
   final sql = hasSets
@@ -161,7 +209,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
     FROM cards c
     LEFT JOIN sets s ON s.code = c.set_code
-    WHERE $condition
+    WHERE $condition$tokenCondition
     ORDER BY s.release_date DESC NULLS LAST, c.set_code ASC
     LIMIT 50
   '''
@@ -171,7 +219,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
       c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
     FROM cards c
-    WHERE $condition
+    WHERE $condition$tokenCondition
     ORDER BY c.set_code ASC
     LIMIT 50
   ''';
@@ -249,7 +297,14 @@ Future<CardResolutionDecision> _resolveLocalCandidate(
 
 /// Busca a carta na Scryfall usando fuzzy search.
 /// Retorna o JSON completo da Scryfall ou null se não encontrou.
-Future<Map<String, dynamic>?> _fetchFromScryfall(String name) async {
+Future<Map<String, dynamic>?> _fetchFromScryfall(
+  String name, {
+  required bool includeTokens,
+}) async {
+  if (includeTokens) {
+    return _fetchTokenFromScryfallSearch(name);
+  }
+
   // Scryfall rate limit: max 10 req/s — uma chamada por resolve é ok.
   final encoded = Uri.encodeQueryComponent(name);
   final url = 'https://api.scryfall.com/cards/named?fuzzy=$encoded';
@@ -270,6 +325,46 @@ Future<Map<String, dynamic>?> _fetchFromScryfall(String name) async {
     // Se fuzzy não achou com 404, tenta search
     if (response.statusCode == 404) {
       return _fetchFromScryfallSearch(name);
+    }
+
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Busca token exato na Scryfall, incluindo extras/tokens.
+Future<Map<String, dynamic>?> _fetchTokenFromScryfallSearch(String name) async {
+  final escapedName = name.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+  final query = '!"$escapedName" type:token include:extras';
+  final encoded = Uri.encodeQueryComponent(query);
+  final url =
+      'https://api.scryfall.com/cards/search?q=$encoded&order=released&unique=prints';
+
+  try {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'MTGDeckBuilder/1.0'
+      },
+    );
+
+    if (response.statusCode != 200) return null;
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List?;
+    if (data == null || data.isEmpty) return null;
+
+    final lowerName = name.toLowerCase();
+    for (final card in data.whereType<Map<String, dynamic>>()) {
+      final cardName = card['name']?.toString().toLowerCase();
+      final typeLine = card['type_line']?.toString().toLowerCase() ?? '';
+      final layout = card['layout']?.toString().toLowerCase() ?? '';
+      if (cardName == lowerName &&
+          (layout == 'token' || typeLine.contains('token'))) {
+        return card;
+      }
     }
 
     return null;
@@ -316,14 +411,16 @@ Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
 /// A Scryfall retorna UMA printing específica. Também busca todas as
 /// printings da mesma carta (via prints_search_uri) para importar todas.
 Future<List<Map<String, dynamic>>> _insertScryfallCard(
-  Pool pool,
-  Map<String, dynamic> scryfallCard,
-) async {
+    Pool pool, Map<String, dynamic> scryfallCard,
+    {required bool includeTokens}) async {
   final oracleId = scryfallCard['oracle_id'] as String?;
   if (oracleId == null || oracleId.isEmpty) return [];
 
   // Buscar todas as printings desta carta
-  final allPrintings = await _fetchAllPrintings(scryfallCard);
+  final allPrintings = await _fetchAllPrintings(
+    scryfallCard,
+    includeTokens: includeTokens,
+  );
 
   final inserted = <Map<String, dynamic>>[];
 
@@ -443,8 +540,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
 /// Busca todas as printings de uma carta via Scryfall (prints_search_uri).
 /// Retorna no máximo 20 printings para não sobrecarregar.
 Future<List<Map<String, dynamic>>> _fetchAllPrintings(
-  Map<String, dynamic> scryfallCard,
-) async {
+    Map<String, dynamic> scryfallCard,
+    {required bool includeTokens}) async {
   final printsUri = scryfallCard['prints_search_uri'] as String?;
   if (printsUri == null) return [scryfallCard];
 
@@ -472,7 +569,9 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
           final layout = card['layout']?.toString() ?? '';
           final isArtSeries = layout == 'art_series';
           final isToken = layout == 'token';
-          return isPaper && !isArtSeries && !isToken;
+          return isPaper &&
+              !isArtSeries &&
+              (includeTokens ? isToken : !isToken);
         })
         .take(30)
         .toList();
@@ -481,6 +580,12 @@ Future<List<Map<String, dynamic>>> _fetchAllPrintings(
   } catch (_) {
     return [scryfallCard];
   }
+}
+
+bool _parseBool(Object? value) {
+  if (value is bool) return value;
+  final text = value?.toString().trim().toLowerCase();
+  return text == 'true' || text == '1' || text == 'yes';
 }
 
 /// Insere as legalities da carta Scryfall

@@ -13,6 +13,16 @@ Verdict: `Parser/provider/backend fallback controlled path approved / camera rea
 
 Date/time: `2026-04-29 09:17-09:33 -03`.
 
+Follow-up 2026-04-30: `Physical Android scanner opened / token resolution fixed / clean token retest pending`.
+
+- Device: `SM A135M` / `R58T300SREH`.
+- Backend: `http://127.0.0.1:8082`, with `adb reverse tcp:8082 tcp:8082`.
+- App run: `flutter run -d R58T300SREH --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082`.
+- Observed issue: OCR recognized `Phyrexian Horror` token, but the final scanner flow could resolve to a nearby normal card (`Phyrexian Censor`) when the local DB did not have that token and token context was lost across live frames.
+- Fix: token context is now preserved across live confirmation frames, token OCR blocks normal/fuzzy fallback, and `/cards/resolve` supports `include_tokens=true` using Scryfall `type:token include:extras`.
+- Live backend proof: `POST /cards/resolve {"name":"Phyrexian Horror","include_tokens":true}` returned `source=scryfall`, `total_returned=3`, and `type_line="Token Artifact Creature — Phyrexian Horror"`.
+- Follow-up logs after reinstall showed camera/OCR running on the Android device, but the tested frame contained surrounding packaging/order text (`Itens do pedido`, `Método de Pagamento`, `Pinhais`, etc.), so a clean physical retest of only the token inside the guide is still required for final PASS.
+
 ## Device discovery
 
 - iPhone 15 Simulator: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`
@@ -32,7 +42,7 @@ Proof log:
 - `app/lib/features/scanner/models/card_recognition_result.dart`
   - `CardRecognitionResult`
   - `CardNameCandidate`
-  - `CollectorInfo` for `collectorNumber`, `totalInSet`, `setCode`, `isFoil`, `language`, `rawBottomText`
+  - `CollectorInfo` for `collectorNumber`, `totalInSet`, `setCode`, `isFoil`, `language`, `isToken`, `rawBottomText`
 - `app/lib/features/scanner/screens/card_scanner_screen.dart`
   - real camera screen using `camera`, `permission_handler`, live image stream, manual `takePicture`, scanner result preview, deck add, binder callback mode.
 - `app/lib/features/scanner/providers/scanner_provider.dart`
@@ -50,6 +60,7 @@ Proof log:
   - `GET /cards?name=...`
   - `GET /cards/printings?name=...`
   - `POST /cards/resolve`
+  - token fallback through `POST /cards/resolve {"include_tokens": true}`
 - `app/lib/features/scanner/services/scanner_ocr_parser.dart`
   - new pure parser for controlled OCR text and collector metadata harnesses.
 - `app/lib/features/scanner/widgets/scanner_overlay.dart`
@@ -168,6 +179,7 @@ Retry attempted with `--publish-port=0`; `flutter test` returned `Could not find
 | Controlled OCR parser | `passed` | Unit tests validate name, collector number, total, set code, foil/non-foil, language and empty OCR. |
 | ScannerProvider | `passed` | Controlled `CardRecognitionResult` resolves exact printings, auto-selects `collector_number` + `setCode` + `foil`, falls back to resolve, and handles empty state. |
 | Search service mapping | `passed` | Unit tests preserve `collector_number` and `foil` from printings and resolve responses. |
+| Token card resolution | `passed after fix` | Unit/live backend proof for `Phyrexian Horror` uses token-only search and blocks fallback to normal/fuzzy cards. |
 | Backend printings contract | `passed` | Real `GET /cards/printings` exposes `collector_number` and `foil`. |
 | Backend resolve contract | `passed after fix` | Real `POST /cards/resolve` now exposes `collector_number` and `foil`. |
 | iPhone 15 Simulator harness runtime | `passed` | `scanner_controlled_harness_runtime_test.dart` passed on `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`. |
@@ -181,6 +193,10 @@ Retry attempted with `--publish-port=0`; `flutter test` returned `Could not find
 - Controlled OCR parser avoids treating collector/footer lines as card names and extracts collector metadata without requiring MLKit.
 - `POST /cards/resolve` now selects and returns `collector_number` and `foil`.
 - Scryfall import paths in `cards/resolve` and `cards/printings?sync=true` now persist `collector_number` and `foil` when Scryfall provides them.
+- Token OCR now sets `CollectorInfo.isToken` only for token type-line patterns, not for normal rules text that merely mentions creating a token.
+- `ScannerProvider` preserves the best live OCR frame across confirmation, so a frame with `Token Artifact Creature ...` is not overwritten by a later frame that only repeats the name.
+- `ScannerProvider` uses token-only lookup for token OCR and refuses fuzzy/normal fallback if the token cannot be found.
+- `POST /cards/resolve` accepts `include_tokens=true` and imports Scryfall extras/tokens with `type:token include:extras`.
 
 ## What was real vs mocked
 
@@ -199,11 +215,12 @@ Controlled/mocked:
 
 ## Remaining real pendencies
 
-1. Camera/OCR real remains `not proven` until a wired physical iPhone or otherwise testable physical device can run the scanner screen with camera permission and a controlled MTG card/image.
+1. Camera/OCR real is partially proven on Android physical device: camera permission, CameraX, MLKit OCR and backend traffic ran, but the clean `Phyrexian Horror` token retest still needs the card/token isolated inside the guide with no packaging/order text around it.
 2. Physical iPhone `Rafa` was discovered only as wireless; `flutter test` could not start the integration app on that target in this environment.
 3. Simulator warning remains known: Google MLKit transitive pods do not support arm64 for Apple Silicon iOS 26+ simulators, but the controlled harness still built and passed on the iPhone 15 Simulator.
 
 ## Smallest next actions
 
-1. Connect a physical iPhone by cable, unlock it, confirm Developer Mode, and rerun a scanner integration/manual flow against a controlled physical card.
-2. If automated camera proof is required, add a native test seam or fixture-image flow that exercises MLKit on a file without live camera hardware.
+1. Retest `Phyrexian Horror` token on `SM A135M` with only the token inside the scanner guide and no visible package/order labels around it.
+2. Connect a physical iPhone by cable, unlock it, confirm Developer Mode, and rerun a scanner integration/manual flow against a controlled physical card if iOS camera proof is still required.
+3. If automated camera proof is required, add a native test seam or fixture-image flow that exercises MLKit on a file without live camera hardware.

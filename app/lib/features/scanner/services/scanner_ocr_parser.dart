@@ -34,6 +34,12 @@ class ScannerOcrParser {
     'CO',
     'BY',
     'OF',
+    'TOKEN',
+    'ARTIFACT',
+    'CREATURE',
+    'CREAFURE',
+    'CREARURE',
+    'ARTEFACT',
   };
 
   static const _languageCodes = <String>{
@@ -187,6 +193,12 @@ class ScannerOcrParser {
     bool? isFoil;
     String? language;
 
+    final upperBottom = rawBottom.toUpperCase();
+    final normalizedBottom = upperBottom.replaceAll(RegExp(r'[^A-Z0-9]+'), ' ');
+    final isToken = RegExp(
+      r'\bS?(TOKEN|TOK[EO]N|T0KEN)\s+(ARTIFACT\s+|ENCHANTMENT\s+)?(CREATURE|CREAFURE|CREARURE|ARTIFACT)\b',
+    ).hasMatch(normalizedBottom);
+
     if (rawBottom.contains('★') ||
         rawBottom.contains('✩') ||
         rawBottom.contains('☆') ||
@@ -215,7 +227,6 @@ class ScannerOcrParser {
       }
     }
 
-    final upperBottom = rawBottom.toUpperCase();
     final langMatch = _languagePattern.firstMatch(upperBottom);
     if (langMatch != null) {
       language = langMatch.group(1);
@@ -225,6 +236,7 @@ class ScannerOcrParser {
       final candidate = match.group(1)!;
       if (RegExp(r'^\d+$').hasMatch(candidate)) continue;
       if (_setCodeStopwords.contains(candidate)) continue;
+      if (_nonNameKeywords.contains(candidate.toLowerCase())) continue;
       if (_languageCodes.contains(candidate)) continue;
       if (candidate.length < 2 || candidate.length > 5) continue;
       setCode = candidate;
@@ -241,6 +253,7 @@ class ScannerOcrParser {
       setCode: setCode,
       isFoil: isFoil,
       language: language,
+      isToken: isToken,
       rawBottomText: rawBottom,
     );
   }

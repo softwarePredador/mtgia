@@ -32,6 +32,7 @@ class ScannerProvider extends ChangeNotifier {
   String? _errorMessage;
   bool _useFoilMode = false;
   String? _liveDetectedName;
+  CardRecognitionResult? _liveBestResult;
   int _liveConfirmCount = 0;
   static const _liveConfirmThreshold = 2; // frames consecutivos para confirmar
 
@@ -77,6 +78,7 @@ class ScannerProvider extends ChangeNotifier {
       if (_liveDetectedName != null) {
         _liveConfirmCount = 0;
         _liveDetectedName = null;
+        _liveBestResult = null;
         notifyListeners();
       }
       return false;
@@ -88,8 +90,13 @@ class ScannerProvider extends ChangeNotifier {
     // Mesmo nome detectado novamente → incrementa contagem
     if (detected == _liveDetectedName) {
       _liveConfirmCount++;
+      if (_scannerContextScore(result) >
+          _scannerContextScore(_liveBestResult)) {
+        _liveBestResult = result;
+      }
     } else {
       _liveDetectedName = detected;
+      _liveBestResult = result;
       _liveConfirmCount = 1;
       notifyListeners();
     }
@@ -102,9 +109,12 @@ class ScannerProvider extends ChangeNotifier {
       );
       _liveDetectedName = null;
       _liveConfirmCount = 0;
+      final confirmedResult = _liveBestResult ?? result;
+      _liveBestResult = null;
 
-      // Usa o resultado para buscar
-      await processRecognitionResult(result);
+      // Usa o frame com mais contexto de scanner. Em tokens, alguns frames
+      // detectam a linha "Token ..." e frames seguintes só repetem o nome.
+      await processRecognitionResult(confirmedResult);
       return true;
     }
 
@@ -186,6 +196,38 @@ class ScannerProvider extends ChangeNotifier {
     final primary = result.primaryName?.trim();
     if (primary == null || primary.isEmpty) return const [];
 
+    // Tokens share names with generated permanents and can be confused with
+    // regular cards. If OCR saw "Token" in the bottom/type area, prefer token
+    // rows before accepting normal printings or fuzzy matches.
+    if (result.collectorInfo?.isToken == true) {
+      final tokenMatches = await _searchTokenCards(primary);
+      if (tokenMatches.isNotEmpty) return tokenMatches;
+
+      debugPrint(
+        '[🔍 Resolve] Tentando resolver token "$primary" via Scryfall...',
+      );
+      final resolvedTokens = await _searchService.resolveToken(primary);
+      final exactResolvedTokens =
+          resolvedTokens
+              .where((card) => card.name.toLowerCase() == primary.toLowerCase())
+              .where(_isTokenCard)
+              .toList();
+      if (exactResolvedTokens.isNotEmpty) {
+        debugPrint(
+          '[🔍 Resolve] Encontrou token "$primary" via Scryfall '
+          '(${exactResolvedTokens.length} printings)',
+        );
+        return exactResolvedTokens;
+      }
+
+      // Se o OCR indicou Token, não cai em fuzzy/normal card. Isso evita
+      // trocar uma ficha inexistente localmente por carta parecida.
+      debugPrint(
+        '[📸 Token] Token "$primary" não encontrado; bloqueando fallback fuzzy',
+      );
+      return const [];
+    }
+
     // 1) Tenta printings por nome exato (melhor para selecionar edição).
     final exact = await _searchService.fetchPrintingsByExactName(primary);
     if (exact.isNotEmpty) return exact;
@@ -266,6 +308,25 @@ class ScannerProvider extends ChangeNotifier {
     return const [];
   }
 
+  Future<List<DeckCardItem>> _searchTokenCards(String name) async {
+    final cards = await _searchService.searchByName(
+      name,
+      limit: 100,
+      dedupe: false,
+    );
+    final exactTokens =
+        cards
+            .where((card) => card.name.toLowerCase() == name.toLowerCase())
+            .where(_isTokenCard)
+            .toList();
+    if (exactTokens.isNotEmpty) {
+      debugPrint(
+        '[📸 Token] Priorizando token "$name" (${exactTokens.length} resultados)',
+      );
+    }
+    return exactTokens;
+  }
+
   DeckCardItem? _tryAutoSelectEdition({
     required List<DeckCardItem> printings,
     required List<String> setCodeCandidates,
@@ -273,7 +334,13 @@ class ScannerProvider extends ChangeNotifier {
   }) {
     if (printings.isEmpty) return null;
 
-    if (printings.length == 1) return printings.first;
+    final tokenFiltered =
+        collectorInfo?.isToken == true
+            ? printings.where(_isTokenCard).toList()
+            : const <DeckCardItem>[];
+    final selectable = tokenFiltered.isNotEmpty ? tokenFiltered : printings;
+
+    if (selectable.length == 1) return selectable.first;
 
     // ═══════════════════════════════════════════════════════════════════════
     // PRIORIDADE 1: Set code extraído da parte inferior da carta (mais preciso)
@@ -282,7 +349,7 @@ class ScannerProvider extends ChangeNotifier {
     if (collectorInfo?.setCode != null) {
       final bottomSet = collectorInfo!.setCode!.toUpperCase();
       final matches =
-          printings
+          selectable
               .where((p) => p.setCode.trim().isNotEmpty)
               .where((p) => p.setCode.toUpperCase() == bottomSet)
               .toList();
@@ -316,7 +383,7 @@ class ScannerProvider extends ChangeNotifier {
     // ═══════════════════════════════════════════════════════════════════════
     for (final code in setCodeCandidates) {
       final matches =
-          printings
+          selectable
               .where((p) => p.setCode.trim().isNotEmpty)
               .where((p) => p.setCode.toUpperCase() == code.toUpperCase())
               .toList();
@@ -326,7 +393,12 @@ class ScannerProvider extends ChangeNotifier {
     // Se não achou set code exato, auto-seleciona a primeira printing
     // (geralmente a mais recente). Não mostra modal — o usuário quer
     // adicionar a carta, não escolher edição manualmente.
-    return printings.first;
+    return selectable.first;
+  }
+
+  bool _isTokenCard(DeckCardItem card) {
+    final typeLine = card.typeLine.toLowerCase();
+    return typeLine.contains('token');
   }
 
   DeckCardItem? _firstFoilMatch(List<DeckCardItem> cards, bool? isFoil) {
@@ -379,8 +451,22 @@ class ScannerProvider extends ChangeNotifier {
     _autoSelectedCard = null;
     _errorMessage = null;
     _liveDetectedName = null;
+    _liveBestResult = null;
     _liveConfirmCount = 0;
     notifyListeners();
+  }
+
+  int _scannerContextScore(CardRecognitionResult? result) {
+    if (result == null) return -1;
+    var score = 0;
+    final collector = result.collectorInfo;
+    if (collector?.isToken == true) score += 100;
+    if (collector?.collectorNumber?.trim().isNotEmpty == true) score += 20;
+    if (collector?.setCode?.trim().isNotEmpty == true) score += 20;
+    if (collector?.rawBottomText?.trim().isNotEmpty == true) score += 10;
+    score += result.setCodeCandidates.length;
+    score += result.allCandidates.length.clamp(0, 5);
+    return score;
   }
 
   void _setState(ScannerState newState) {

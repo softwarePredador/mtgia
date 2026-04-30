@@ -12,13 +12,15 @@ class ScannerCardSearchService {
     String name, {
     int limit = 50,
     int page = 1,
+    bool dedupe = true,
   }) async {
     final q = name.trim();
     if (q.isEmpty) return const [];
 
     final encoded = Uri.encodeQueryComponent(q);
     final response = await _apiClient.get(
-      '/cards?name=$encoded&limit=$limit&page=$page',
+      '/cards?name=$encoded&limit=$limit&page=$page'
+      '${dedupe ? '' : '&dedupe=false'}',
     );
 
     if (response.statusCode != 200) {
@@ -72,11 +74,25 @@ class ScannerCardSearchService {
   ///
   /// Retorna a lista de printings encontradas ou lista vazia.
   Future<List<DeckCardItem>> resolveCard(String name) async {
+    return _resolveCard(name, includeTokens: false);
+  }
+
+  Future<List<DeckCardItem>> resolveToken(String name) async {
+    return _resolveCard(name, includeTokens: true);
+  }
+
+  Future<List<DeckCardItem>> _resolveCard(
+    String name, {
+    required bool includeTokens,
+  }) async {
     final q = name.trim();
     if (q.isEmpty) return const [];
 
     try {
-      final response = await _apiClient.post('/cards/resolve', {'name': q});
+      final response = await _apiClient.post('/cards/resolve', {
+        'name': q,
+        if (includeTokens) 'include_tokens': true,
+      });
 
       if (response.statusCode != 200) {
         return const [];

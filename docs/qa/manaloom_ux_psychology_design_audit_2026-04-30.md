@@ -28,7 +28,7 @@ Validação executada:
 
 Runtime iPhone 15 provou UI real + backend real para Search/Cards -> Coleções: `GET /cards?name=Black+Lotus 200`, `GET /sets 200`, `GET /sets?q=ECC 200`, `GET /cards?set=ECC 200`. Evidências: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_visual_p1/` e handoff `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
 
-Pendências P2/P3 reais: decisão de produto para Search global e Meta Deck Intelligence surface; prova visual/screenshot de Home/Deck Detail/Generate/Binder/Marketplace em device; auditoria global de aliases legados fora dos módulos tocados; Life Counter/Lotus e Scanner seguem fora de escopo desta sprint.
+Pendências P2/P3 reais: decisão de produto para Search global e Meta Deck Intelligence surface; prova visual/screenshot de Home/Deck Detail/Generate/Binder/Marketplace em device; auditoria global de aliases legados fora dos módulos tocados; Life Counter/Lotus e Scanner seguem fora de escopo desta sprint. Follow-up de Scanner em 2026-04-30 corrigiu a resolução de tokens (`Phyrexian Horror`) no app/backend, mas a prova física final ainda exige reteste com a ficha isolada no guia.
 
 ## Patch status — P1 UX trust/errors/trades — 2026-04-30 12:12 -0300
 
@@ -747,8 +747,8 @@ Evidencias: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_life_coun
 
 ## Not verified
 
-- Prova visual real de Life Counter/Lotus em iPhone 15 Simulator foi executada e passou; scanner/camera e fluxos de IA continuam separados.
-- Câmera real do Scanner não pode ser provada em iOS Simulator; precisa device físico.
+- Prova visual real de Life Counter/Lotus em iPhone 15 Simulator foi executada e passou; fluxos de IA continuam separados.
+- Scanner teve follow-up em device Android físico: câmera/MLKit abriram, token fallback foi corrigido e `Phyrexian Horror` token foi provado via backend live. Clean retest físico ainda precisa ficha isolada dentro do guia, sem textos externos.
 - Contraste/legibilidade real de Life Counter/Lotus foi provado no cenario 4 jogadores; 2/6 jogadores e sheets especificas ficam como regressao P2.
 - Performance de WebView Lotus, blur CSS e assets ainda precisa profiling dedicado se houver relato de jank.
 - Uso real de `app/assets/symbols/logo.png` em runtime não foi confirmado.

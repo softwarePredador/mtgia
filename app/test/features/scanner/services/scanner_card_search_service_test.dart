@@ -13,6 +13,7 @@ class _FakeApiClient extends ApiClient {
   final Map<String, ApiResponse> _postResponses;
   final List<String> getCalls = [];
   final List<String> postCalls = [];
+  final List<Map<String, dynamic>> postBodies = [];
 
   @override
   Future<ApiResponse> get(String endpoint) async {
@@ -31,6 +32,7 @@ class _FakeApiClient extends ApiClient {
     Duration? timeout,
   }) async {
     postCalls.add(endpoint);
+    postBodies.add(body);
     final response = _postResponses[endpoint];
     if (response == null) {
       throw UnimplementedError('No POST response for $endpoint');
@@ -113,5 +115,37 @@ void main() {
         expect(apiClient.postCalls, ['/cards/resolve']);
       },
     );
+
+    test('sends include_tokens flag for token resolve path', () async {
+      final apiClient = _FakeApiClient(
+        postResponses: {
+          '/cards/resolve': ApiResponse(200, {
+            'source': 'scryfall',
+            'data': const [
+              {
+                'id': 'token-1',
+                'name': 'Phyrexian Horror',
+                'type_line': 'Token Artifact Creature — Phyrexian Horror',
+                'colors': [],
+                'color_identity': [],
+                'set_code': 'tmoc',
+                'rarity': 'common',
+                'collector_number': '40',
+              },
+            ],
+          }),
+        },
+      );
+      final service = ScannerCardSearchService(apiClient: apiClient);
+
+      final resolved = await service.resolveToken('Phyrexian Horror');
+
+      expect(resolved, hasLength(1));
+      expect(resolved.single.typeLine, contains('Token'));
+      expect(apiClient.postCalls, ['/cards/resolve']);
+      expect(apiClient.postBodies, [
+        {'name': 'Phyrexian Horror', 'include_tokens': true},
+      ]);
+    });
   });
 }

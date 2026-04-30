@@ -18,6 +18,9 @@ class CollectorInfo {
   /// Idioma detectado (ex: "EN", "PT", "JP")
   final String? language;
 
+  /// Se o OCR indica que a peça física é um token.
+  final bool isToken;
+
   /// Texto bruto da região inferior usado para extração
   final String? rawBottomText;
 
@@ -27,17 +30,19 @@ class CollectorInfo {
     this.setCode,
     this.isFoil,
     this.language,
+    this.isToken = false,
     this.rawBottomText,
   });
 
   /// Verifica se temos informação útil
   bool get hasData =>
-      collectorNumber != null || setCode != null || isFoil != null;
+      collectorNumber != null || setCode != null || isFoil != null || isToken;
 
   @override
   String toString() =>
       'CollectorInfo(#$collectorNumber/$totalInSet '
-      '${isFoil == true ? "★" : "•"} $setCode $language)';
+      '${isFoil == true ? "★" : "•"} $setCode $language'
+      '${isToken ? " TOKEN" : ""})';
 }
 
 /// Resultado do reconhecimento de carta
