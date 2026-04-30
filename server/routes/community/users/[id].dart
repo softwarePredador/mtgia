@@ -3,6 +3,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/auth_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   if (context.request.method != HttpMethod.get) {
@@ -151,8 +153,17 @@ Future<Response> _getUserProfile(RequestContext context, String userId) async {
       'user': user,
       'public_decks': decks,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_user_profile_route',
+      extras: {'operation': 'get_user_profile'},
+    );
+    Log.e(
+      '[community_route] server_error endpoint=GET /community/users/:id error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},

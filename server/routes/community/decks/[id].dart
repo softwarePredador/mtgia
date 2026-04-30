@@ -3,6 +3,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/auth_service.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -166,8 +168,17 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       'main_board': mainBoard,
       'all_cards_flat': cardsList,
     });
-  } catch (e) {
-    print('[ERROR] Failed to get public deck: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_deck_detail_route',
+      extras: {'operation': 'get_public_deck'},
+    );
+    Log.e(
+      '[community_route] server_error endpoint=GET /community/decks/:id error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Failed to get public deck'},
@@ -258,12 +269,21 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
       statusCode: HttpStatus.created,
       body: {'success': true, 'deck': newDeck},
     );
-  } on Exception catch (e) {
-    print('[ERROR] Failed to copy deck: $e');
+  } on Exception catch (e, st) {
+    Log.e(
+      '[community_route] server_error endpoint=POST /community/decks/:id error=$e',
+    );
     final msg = e.toString();
     if (msg.contains('not found') || msg.contains('not public')) {
       return Response.json(statusCode: 404, body: {'error': msg});
     }
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_deck_copy_route',
+      extras: {'operation': 'copy_public_deck'},
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Failed to copy deck'},
@@ -388,8 +408,17 @@ Future<Response> _getFollowingFeed(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_following_feed_route',
+      extras: {'operation': 'get_following_feed'},
+    );
+    Log.e(
+      '[community_route] server_error endpoint=GET /community/decks/following error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},

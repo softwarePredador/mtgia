@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/logger.dart';
+import '../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
@@ -115,8 +117,16 @@ Future<Response> _searchUsers(RequestContext context) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'community_users_route',
+      extras: {'operation': 'search_users'},
+    );
+    Log.e(
+        '[community_route] server_error endpoint=GET /community/users error=$e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},

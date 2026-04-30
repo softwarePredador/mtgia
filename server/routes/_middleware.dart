@@ -143,7 +143,11 @@ void _recordHttpObservability({
   final isSocialEndpoint = path == '/trades' ||
       path.startsWith('/trades/') ||
       path == '/conversations' ||
-      path.startsWith('/conversations/');
+      path.startsWith('/conversations/') ||
+      path == '/users' ||
+      path.startsWith('/users/') ||
+      path == '/community' ||
+      path.startsWith('/community/');
   final isSlow = isSocialEndpoint && latencyMs >= _socialSlowRequestThresholdMs;
   final isErrorStatus = isSocialEndpoint && response.statusCode >= 400;
 

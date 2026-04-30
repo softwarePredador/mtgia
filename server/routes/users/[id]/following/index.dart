@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   if (context.request.method != HttpMethod.get) {
@@ -64,8 +66,17 @@ Future<Response> _getFollowing(RequestContext context, String userId) async {
       'limit': limit,
       'total': total,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'user_following_route',
+      extras: {'operation': 'get_following'},
+    );
+    Log.e(
+      '[social_route] server_error endpoint=GET /users/:id/following error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},

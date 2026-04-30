@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../../lib/logger.dart';
 import '../../../../lib/notification_service.dart';
+import '../../../../lib/observability.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   switch (context.request.method) {
@@ -79,8 +81,16 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
         ...counts,
       },
     );
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'user_follow_route',
+      extras: {'operation': 'follow_user'},
+    );
+    Log.e(
+        '[social_route] server_error endpoint=POST /users/:id/follow error=$e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
@@ -109,8 +119,17 @@ Future<Response> _unfollowUser(RequestContext context, String targetId) async {
       'is_following': false,
       ...counts,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'user_follow_route',
+      extras: {'operation': 'unfollow_user'},
+    );
+    Log.e(
+      '[social_route] server_error endpoint=DELETE /users/:id/follow error=$e',
+    );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
@@ -139,8 +158,16 @@ Future<Response> _checkFollowing(
       'is_following': result.isNotEmpty,
       ...counts,
     });
-  } catch (e) {
-    print('[ERROR] Internal server error: $e');
+  } catch (e, st) {
+    await captureRouteException(
+      context,
+      e,
+      stackTrace: st,
+      source: 'user_follow_route',
+      extras: {'operation': 'check_following'},
+    );
+    Log.e(
+        '[social_route] server_error endpoint=GET /users/:id/follow error=$e');
     return Response.json(
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
@@ -148,8 +175,7 @@ Future<Response> _checkFollowing(
   }
 }
 
-Future<Map<String, dynamic>> _getFollowCounts(
-    Pool conn, String userId) async {
+Future<Map<String, dynamic>> _getFollowCounts(Pool conn, String userId) async {
   final result = await conn.execute(
     Sql.named('''
       SELECT
