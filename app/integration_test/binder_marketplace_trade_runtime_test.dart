@@ -580,9 +580,9 @@ void main() {
       await tester.ensureVisible(find.text('Marcar como Enviado'));
       await tester.tap(find.text('Marcar como Enviado'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Informar envio'));
+      await _pumpUntilFound(tester, find.text('Confirmar envio'));
       await tester.enterText(find.byType(TextField).last, 'QA$marker');
-      await tester.tap(find.text('Confirmar Envio'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar envio'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Enviado'));
       expect(

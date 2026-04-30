@@ -1,2 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+// MLImage 1.0.0-beta8 ships arm64 as an iOS-device slice, so simulator builds
+// must use x86_64 to avoid linking a device object into the iOS Simulator app.
+EXCLUDED_ARCHS[sdk=iphonesimulator*]=arm64 i386

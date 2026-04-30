@@ -1,6 +1,64 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — iPhone 15 PASS Social Trading UX trust apos dialogs
+
+### O Porquê
+- O runtime anterior do harness `app/integration_test/binder_marketplace_trade_runtime_test.dart` estava bloqueado antes do app abrir por link iOS Simulator: `Building for iOS-simulator, but linking MLImage.framework built for iOS`.
+- A sprint P1 UX trust precisava provar em UI real os novos dialogs de Social Trading (`Revisar proposta`, `Aceitar trade?`, `Confirmar envio`, `Confirmar entrega?`, `Finalizar trade?`) contra backend local real.
+- Durante a primeira rodada apos desbloquear o build, apareceu um crash real: `A TextEditingController was used after being disposed` no dialog de envio em `TradeDetailScreen`.
+
+### O Como
+- Investigacao iOS:
+  - `google_mlkit_text_recognition -> MLKitVision -> MLImage 1.0.0-beta8`;
+  - `MLImage.framework` possui slices `x86_64 arm64`, mas o slice `arm64` instalado e de device iOS, nao de iOS Simulator;
+  - `ios/Flutter/Generated.xcconfig` sobrescrevia a exclusao dos Pods com `EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386`, fazendo o Runner voltar a compilar `arm64`.
+- Patch aplicado no app iOS:
+  - `app/ios/Flutter/Debug.xcconfig` e `app/ios/Flutter/Release.xcconfig` agora definem `EXCLUDED_ARCHS[sdk=iphonesimulator*]=arm64 i386` depois do include gerado;
+  - `app/ios/Podfile` reforca a mesma exclusao nos targets e xcconfigs de Pods durante `pod install`;
+  - o efeito fica restrito a `iphonesimulator*`, preservando build para device iOS fisico.
+- Patch aplicado no harness:
+  - texto de envio alinhado para o dialog atual `Confirmar envio`;
+  - tap passa a mirar `ElevatedButton` com `Confirmar envio`, evitando ambiguidade com o titulo.
+- Patch aplicado no app:
+  - o dialog de envio saiu de `StatefulBuilder` com controller local descartado manualmente;
+  - foi criado um widget stateful privado para o dialog, deixando o `TextEditingController` ser descartado somente no `dispose` do proprio dialog.
+- Nenhum endpoint, schema, contrato JSON ou regra de backend foi alterado.
+
+### Validacao executada
+- Device discovery:
+  - `flutter devices`: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+  - `xcrun simctl list devices available | grep -E "iPhone 15|Booted"`: iPhone 15 bootado.
+- Backend:
+  - `cd server && PORT=8082 dart run .dart_frog/server.dart`;
+  - `curl -sS --max-time 5 http://127.0.0.1:8082/health`: healthy.
+- App:
+  - `cd app && flutter analyze integration_test/binder_marketplace_trade_runtime_test.dart --no-version-check`: PASS;
+  - `cd app && flutter analyze lib/features/trades/screens/trade_detail_screen.dart integration_test/binder_marketplace_trade_runtime_test.dart --no-version-check`: PASS;
+  - `cd app && flutter test test/features/trades/screens/trade_confirmation_flow_test.dart --no-version-check`: PASS;
+  - `cd app && flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `01:44 +2: All tests passed!`.
+
+### Resultado
+- Runtime real iPhone 15 comprovou:
+  - Binder create/edit/delete;
+  - Marketplace search;
+  - Review de proposta antes de `POST /trades`;
+  - Criacao de trade `201`;
+  - Seller aceitar `PUT /trades/:id/respond 200`;
+  - Chat de trade `POST /trades/:id/messages 201`;
+  - Seller enviar `PUT /trades/:id/status 200`;
+  - Buyer confirmar entrega `PUT /trades/:id/status 200`;
+  - Buyer finalizar `PUT /trades/:id/status 200`;
+  - Notificacoes list/read/read-all;
+  - Mensagens diretas send/read/unread.
+- Sem 4xx/5xx inesperado, timeout, overflow ou crash na rodada final.
+- O Flutter ainda imprime aviso de que os pods nao suportam `arm64` simulator em Apple Silicon/iOS 26+; no iPhone 15 iOS 17.4 desta prova, a execucao via `x86_64` passou.
+
+### Evidencias
+- Handoff: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+- Auditoria app: `app/doc/APP_AUDIT_2026-04-29.md`.
+- Proof folder: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_trading_ux_trust/`.
+
 ## 2026-04-30 — App P1 UX trust, erros amigaveis e confirmacoes de trade
 
 ### O Porquê

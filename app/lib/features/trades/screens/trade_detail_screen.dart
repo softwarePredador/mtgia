@@ -768,99 +768,13 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   }
 
   Future<void> _showShipDialog(TradeProvider provider, TradeOffer trade) async {
-    final trackingController = TextEditingController();
-    String method = 'correios';
-
     final shipment = await showDialog<_ShipmentConfirmation>(
       context: context,
       builder:
-          (ctx) => StatefulBuilder(
-            builder:
-                (ctx, setDialogState) => AlertDialog(
-                  backgroundColor: AppTheme.surfaceSlate,
-                  title: const Text(
-                    'Confirmar envio',
-                    style: TextStyle(color: AppTheme.textPrimary),
-                  ),
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildTradeDialogSummary(trade),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Ao confirmar, o trade passa para “Enviado” e a outra pessoa poderá acompanhar a entrega.',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: AppTheme.fontMd,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextField(
-                          controller: trackingController,
-                          style: const TextStyle(color: AppTheme.textPrimary),
-                          decoration: const InputDecoration(
-                            labelText: 'Código de rastreio (opcional)',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          initialValue: method,
-                          decoration: const InputDecoration(
-                            labelText: 'Método de envio',
-                          ),
-                          dropdownColor: AppTheme.surfaceSlate,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'correios',
-                              child: Text('Correios'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'motoboy',
-                              child: Text('Motoboy'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'pessoalmente',
-                              child: Text('Pessoalmente'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'outro',
-                              child: Text('Outro'),
-                            ),
-                          ],
-                          onChanged:
-                              (v) => setDialogState(() => method = v ?? method),
-                        ),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Voltar'),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(
-                          ctx,
-                          _ShipmentConfirmation(
-                            trackingCode:
-                                trackingController.text.trim().isNotEmpty
-                                    ? trackingController.text.trim()
-                                    : null,
-                            deliveryMethod: method,
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.local_shipping),
-                      label: const Text('Confirmar envio'),
-                    ),
-                  ],
-                ),
+          (_) => _ShipmentConfirmationDialog(
+            summary: _buildTradeDialogSummary(trade),
           ),
     );
-    trackingController.dispose();
 
     if (shipment == null || !mounted) return;
     final success = await provider.updateTradeStatus(
@@ -1037,6 +951,100 @@ class _ShipmentConfirmation {
 
   final String deliveryMethod;
   final String? trackingCode;
+}
+
+class _ShipmentConfirmationDialog extends StatefulWidget {
+  const _ShipmentConfirmationDialog({required this.summary});
+
+  final Widget summary;
+
+  @override
+  State<_ShipmentConfirmationDialog> createState() =>
+      _ShipmentConfirmationDialogState();
+}
+
+class _ShipmentConfirmationDialogState
+    extends State<_ShipmentConfirmationDialog> {
+  final _trackingController = TextEditingController();
+  String _method = 'correios';
+
+  @override
+  void dispose() {
+    _trackingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppTheme.surfaceSlate,
+      title: const Text(
+        'Confirmar envio',
+        style: TextStyle(color: AppTheme.textPrimary),
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            widget.summary,
+            const SizedBox(height: 12),
+            const Text(
+              'Ao confirmar, o trade passa para “Enviado” e a outra pessoa poderá acompanhar a entrega.',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontMd,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _trackingController,
+              style: const TextStyle(color: AppTheme.textPrimary),
+              decoration: const InputDecoration(
+                labelText: 'Código de rastreio (opcional)',
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _method,
+              decoration: const InputDecoration(labelText: 'Método de envio'),
+              dropdownColor: AppTheme.surfaceSlate,
+              items: const [
+                DropdownMenuItem(value: 'correios', child: Text('Correios')),
+                DropdownMenuItem(value: 'motoboy', child: Text('Motoboy')),
+                DropdownMenuItem(
+                  value: 'pessoalmente',
+                  child: Text('Pessoalmente'),
+                ),
+                DropdownMenuItem(value: 'outro', child: Text('Outro')),
+              ],
+              onChanged: (value) => setState(() => _method = value ?? _method),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Voltar'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            final trackingCode = _trackingController.text.trim();
+            Navigator.pop(
+              context,
+              _ShipmentConfirmation(
+                trackingCode: trackingCode.isNotEmpty ? trackingCode : null,
+                deliveryMethod: _method,
+              ),
+            );
+          },
+          icon: const Icon(Icons.local_shipping),
+          label: const Text('Confirmar envio'),
+        ),
+      ],
+    );
+  }
 }
 
 class _TradeActionSpec {
