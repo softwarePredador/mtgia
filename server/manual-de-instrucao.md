@@ -10222,3 +10222,92 @@ flutter test integration_test/sets_catalog_runtime_test.dart -d "iPhone 15" --da
 ```
 
 Resultado: todos passaram. O teste `sets_search_catalog_runtime_test.dart` tambem busca `Black Lotus` na aba `Cartas`, cobrindo ausencia de regressao no fluxo de busca de cartas.
+
+## 96. Sprint funcional Profile e Community Social - 2026-04-30
+
+### 96.1 Objetivo
+
+Fechar as pendencias funcionais restantes de Profile e Community Social no iPhone 15 Simulator com backend real, sem tocar nos fluxos Life Counter, Sets, meta pipeline, optimize/generate, scanner ou FCM.
+
+### 96.2 Auditoria executada
+
+Foram revisados os documentos `app/doc/APP_AUDIT_2026-04-29.md`, `server/doc/APP_BACKEND_CONTRACT_AUDIT_2026-04-29.md`, este manual e os handoffs recentes. O escopo tecnico auditado incluiu:
+
+- App: `ProfileScreen`, `UserProfileScreen`, `CommunityScreen`, `CommunityDeckDetailScreen`, `UserSearchScreen`, `AuthProvider`, `SocialProvider`, `CommunityProvider`.
+- Backend: `/users/me`, `/community/users/:id`, `/community/users`, `/users/:id/follow`, `/users/:id/followers`, `/users/:id/following`, `/community/decks`, `/community/decks/following`, `/community/decks/:id`.
+
+### 96.3 Correcoes aplicadas
+
+- `GET /users/me` agora retorna `location_state`, `location_city` e `trade_notes`, alinhando o contrato com os campos editaveis suportados pelo app.
+- Rotas `/users` e `/community` passaram a ser classificadas no middleware de observabilidade HTTP para slow request e 4xx/5xx.
+- Rotas tocadas de Profile/Community usam `captureRouteException` em 5xx e logs sanitizados, sem token/email/body sensivel.
+- `PATCH /users/me` registra `invalid_payload` sanitizado para JSON invalido, avatar URL invalida, UF invalida, campos grandes e payload sem campos.
+- `AuthProvider`, `SocialProvider` e `CommunityProvider` classificam 4xx/5xx, erros de contrato e excecoes/timeout de provider com eventos sanitizados.
+- `UserProfileScreen` exibe falha de follow/unfollow e estados de erro/retry em seguidores/seguindo.
+- `CommunityScreen` exibe erro/retry no feed `Seguindo`.
+- `CommunityScreen` e `CommunityDeckDetailScreen` foram ajustados para evitar overflow com usernames longos em owner rows.
+
+### 96.4 Testes adicionados
+
+- `server/test/profile_community_live_test.dart`: teste live de contrato para Profile/Community, incluindo `401`, `403`, `404`, profile edit/reload, busca, follow/unfollow, followers/following, decks publicos e feed seguindo.
+- `app/test/features/profile/profile_screen_test.dart`: widget test do Profile proprio com campos editaveis e reload.
+- `app/test/features/community/providers/community_provider_test.dart`: estados loading/empty/error, detalhe `404`, contrato invalido e query encoding.
+- `app/test/features/community/providers/social_provider_test.dart`: estados loading/empty/error para busca/perfil/follow/feed/followers, incluindo `401`, `403`, `404`.
+- `app/integration_test/profile_community_runtime_test.dart`: runtime iPhone 15 com backend real para Profile proprio, perfil publico, busca, follow/unfollow, Community tabs e deck publico.
+
+### 96.5 Validacao executada
+
+Backend:
+
+```bash
+cd server
+dart analyze routes/users routes/community lib test
+dart test -r expanded
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded
+```
+
+App:
+
+```bash
+cd app
+flutter analyze lib/features/profile lib/features/community lib/features/auth integration_test --no-version-check
+flutter test test/features/profile test/features/community test/features/auth --no-version-check
+flutter test integration_test/profile_community_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado do runtime final: `00:57 +1: All tests passed!`.
+
+### 96.6 Evidencias e metricas
+
+- Handoff: `app/doc/runtime_flow_handoffs/profile_community_iphone15_2026-04-30.md`.
+- Provas locais: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_profile_community/`.
+- iPhone 15 Simulator: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend: `http://127.0.0.1:8082`.
+- Runtime final: `profile_community_runtime_pass3.log`.
+
+Latencias observadas no runtime final:
+
+| Endpoint | Resultado |
+| --- | --- |
+| `GET /users/me` | `200 (678ms)` e `200 (616ms)` |
+| `PATCH /users/me` | `200 (599ms)` |
+| `GET /community/users/:id` | `200 (~1712ms-1722ms)` |
+| `POST /users/:id/follow` | `200 (2841ms)`, classificado como slow request |
+| `GET /users/:id/followers` | `200 (1135ms)` |
+| `DELETE /users/:id/follow` | `200 (1152ms)` |
+| `GET /community/users?q=...` | `200 (~1166ms-1179ms)` |
+| `GET /community/decks` | `200 (1178ms)` |
+| `GET /community/decks/:id` | `200 (1233ms)` |
+| `GET /community/decks/following` | `200 (1164ms)` |
+
+### 96.7 Pendencias reais
+
+- `POST /users/:id/follow` permanece lento no backend real remoto, ainda que classificado por app/backend; deve virar item de performance se for priorizado.
+- Leituras de perfil publico ficam perto de `1.7s`, tambem classificadas como latencia real de backend remoto.
+- Nao houve 4xx/5xx inesperado, timeout, overflow ou crash no runtime final.

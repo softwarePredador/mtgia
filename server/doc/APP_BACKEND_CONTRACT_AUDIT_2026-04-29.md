@@ -1,5 +1,43 @@
 # App Backend Contract Audit - 2026-04-29
 
+## Atualizacao - Profile e Community Social runtime - 2026-04-30
+
+Backend real em `http://127.0.0.1:8082`, iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. Contratos JSON/status codes/autenticacao/permissoes preservados para Profile e Community Social.
+
+### Contratos auditados e resultado
+
+| Endpoint | Status |
+| --- | --- |
+| `GET/PATCH /users/me` | `PASS`; `GET` agora inclui `location_state`, `location_city`, `trade_notes`, alinhando o reload do Profile com os campos suportados pelo app |
+| `GET /community/users/:id` | `PASS`; perfil publico, contadores e estado `is_following` mantidos |
+| `GET /community/users` | `PASS`; busca por username/display name com query codificada pelo provider |
+| `POST/DELETE /users/:id/follow` | `PASS`; follow/unfollow preservam `401/404` e resposta social existente |
+| `GET /users/:id/followers` | `PASS`; paginacao e erro classificados no provider |
+| `GET /users/:id/following` | `PASS`; paginacao e erro classificados no provider |
+| `GET /community/decks` | `PASS`; lista publica preservada e contrato validado no provider |
+| `GET /community/decks/following` | `PASS`; feed de seguidos preservado |
+| `GET /community/decks/:id` | `PASS`; detalhe publico preservado |
+
+### Observabilidade e tratamento de erro
+
+- Middleware raiz passou a classificar `/users` e `/community` em `[http_observability]` para slow request e 4xx/5xx, com Sentry/log sanitizados.
+- Rotas tocadas usam `captureRouteException` em 5xx, sem logar token/email/body sensivel.
+- `PATCH /users/me` registra `invalid_payload` sanitizado para JSON invalido, URL de avatar invalida, UF invalida, campos grandes e ausencia de campos.
+- Providers de Profile/Community/Social registram eventos sanitizados para 4xx/5xx, timeout/excecao e erro de contrato; nenhum evento inclui token, email completo ou payload sensivel.
+
+### Validacao
+
+| Comando | Resultado |
+| --- | --- |
+| `cd server && dart analyze routes/users routes/community lib test && dart test -r expanded` | `PASS` |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded` | `PASS` |
+| `cd app && flutter analyze lib/features/profile lib/features/community lib/features/auth integration_test --no-version-check && flutter test test/features/profile test/features/community test/features/auth --no-version-check` | `PASS` |
+| `cd app && flutter test integration_test/profile_community_runtime_test.dart -d "iPhone 15" ...` | `PASS`: `00:57 +1: All tests passed!` |
+
+Runtime final observou `GET/PATCH /users/me`, `GET /community/users`, `GET /community/users/:id`, follow/unfollow, followers, `GET /community/decks`, `GET /community/decks/following` e `GET /community/decks/:id` retornando `200`. Os 4xx obrigatorios (`401`, `403`, `404`) ficam cobertos pelos testes de provider/live e classificados; nao houve 5xx/timeout no runtime final.
+
+Pendencia backend: latencia de escrita social `POST /users/:id/follow` ficou em `~2841ms` e deve ser candidata a P1 se entrar no criterio de performance; leituras de perfil publico ficam em `~1.7s` por DB remoto. Sem DDL/migration runtime nova.
+
 ## Atualizacao - P1 performance PUT /trades/:id/respond - 2026-04-30
 
 Backend real em `http://127.0.0.1:8082`, iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. Contrato JSON/status codes/autenticacao/permissoes preservados para `PUT /trades/:id/respond`.
