@@ -76,7 +76,9 @@ class AuthProvider extends ChangeNotifier {
 
   /// Login
   Future<bool> login(String email, String password) async {
-    debugPrint('[🔑 Auth] login() chamado com email=$email');
+    debugPrint(
+      '[🔑 Auth] login() chamado email_domain=${_safeEmailDomain(email)}',
+    );
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -90,14 +92,13 @@ class AuthProvider extends ChangeNotifier {
       debugPrint(
         '[🔑 Auth] resposta recebida: statusCode=${response.statusCode}',
       );
-      debugPrint('[🔑 Auth] resposta body: ${response.data}');
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         _token = data['token'] as String?;
         ApiClient.setToken(_token);
         debugPrint(
-          '[🔑 Auth] token recebido: ${_token != null ? "sim (${_token!.substring(0, 20)}...)" : "NÃO"}',
+          '[🔑 Auth] token recebido: ${_token != null ? "sim" : "NÃO"}',
         );
         _user = User.fromJson(data['user'] as Map<String, dynamic>);
         debugPrint('[🔑 Auth] user parsed: ${_user?.username}');
