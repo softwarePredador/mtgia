@@ -1,5 +1,51 @@
 # App Backend Contract Audit - 2026-04-29
 
+## Atualizacao - P1 performance PUT /trades/:id/respond - 2026-04-30
+
+Backend real em `http://127.0.0.1:8082`, iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. Contrato JSON/status codes/autenticacao/permissoes preservados para `PUT /trades/:id/respond`.
+
+### Baseline vs depois
+
+Medicao com probe HTTP real e 5 amostras por action contra `TEST_API_BASE_URL=http://127.0.0.1:8082`.
+
+| Endpoint/action | Baseline p50 | Baseline p95 | Baseline p99 | Depois p50 | Depois p95 | Depois p99 | Melhora p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `PUT /trades/:id/respond` `accept` | `3099ms` | `3902ms` | `3902ms` | `565ms` | `1394ms` | `1394ms` | `64.3%` |
+| `PUT /trades/:id/respond` `decline` | `3018ms` | `3028ms` | `3028ms` | `564ms` | `591ms` | `591ms` | `80.5%` |
+
+### Hipoteses tecnicas investigadas
+
+| Area | Achado |
+| --- | --- |
+| DB remoto | Latencia por round-trip continuou dominante e estavel; uma query extra custava ~560ms-1200ms no caminho observado. |
+| Round-trips transacionais | Confirmado: a rota fazia `UPDATE`, `INSERT history`, busca de nome do responder e `INSERT notifications`/FCM antes de responder. |
+| Ownership/receiver | Mantido receiver-only dentro do CTE com `FOR UPDATE`; sem permissao continua `403`. |
+| Lock/status transition | `status = pending` e double respond/not pending sao validados no mesmo statement atomico; double respond continua `400` e nao altera estado aceito/recusado. |
+| Status history | Preservado no mesmo statement do update, com `old_status='pending'`, novo status e `changed_by`. |
+| Notificacoes | `trade_accepted`/`trade_declined` preservadas e deferidas via `NotificationService.createFromActorDeferred`, com log `slow_deferred`/Sentry sanitizado fora do caminho critico. |
+| Indices/N+1 | Nenhum DDL novo; acesso por `trade_offers.id` usa PK e a melhoria veio de reduzir viagens e side effects sincronos, nao de indice novo. |
+| DDL/runtime work | Nenhum DDL ou migration runtime adicionados. |
+
+### Mudancas de implementacao
+
+- `PUT /trades/:id/respond`: um unico statement CTE faz lock, validacao `not_found`/`forbidden`/`not_pending`, update de `trade_offers` e insert em `trade_status_history`.
+- Notificacao de resposta mudou de `NotificationService.create` sincrono para `NotificationService.createFromActorDeferred`, mantendo titulo com nome do responder, tipo `trade_accepted`/`trade_declined`, `reference_id` e logs/Sentry sanitizados.
+- Observabilidade de payload invalido adicionada para action invalida: `[social_write] invalid_payload endpoint=PUT /trades/:id/respond`.
+- `server/test/social_trading_live_test.dart` agora cobre teto live de regressao (`PUT /trades/:id/respond < 2000ms`), response shape, accept, decline, action invalida `400`, sem token `401`, inexistente `404`, receiver-only `403`, double respond `400` sem corromper estado e notificacoes essenciais.
+
+### Validacao
+
+| Comando | Resultado |
+| --- | --- |
+| `dart analyze routes/trades routes/notifications lib test && dart test -r expanded` | PASS: `No issues found!`, `00:08 +555: All tests passed!` |
+| `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded` | PASS: `02:48 +166 ~3: All tests passed!` |
+| `flutter analyze ... && flutter test ...` | PASS app focado |
+| `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...` | PASS: `01:39 +2: All tests passed!` |
+
+Runtime UI real confirmou `PUT /trades/:id/respond 200 (590ms)`, `POST /trades 201 (1742ms)` e `PUT /trades/:id/status 200 (602ms, 608ms, 593ms)`.
+
+Pendencia backend: leituras de detalhe/mensagens sociais ainda aparecem em ~1.1s-1.7s no runtime por DB remoto. FCM real segue `not_proven` no simulador.
+
 ## Atualizacao - fechamento performance Social Trading P1 - 2026-04-30
 
 Backend real em `http://127.0.0.1:8082`, iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. Contrato JSON/status codes/autenticacao/permissoes preservados para `POST /trades` e `PUT /trades/:id/status`.

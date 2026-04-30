@@ -1,6 +1,74 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — P1 performance PUT /trades/:id/respond
+
+### O Porquê
+- O runtime iPhone 15 ainda mostrava `PUT /trades/:id/respond` em torno de `3203ms`, apesar das melhorias anteriores em `POST /trades` e `PUT /trades/:id/status`.
+- A entrega precisava reduzir e provar a latencia sem alterar contrato JSON, autenticacao, permissao receiver-only, status codes, status final, `trade_status_history`, notificacoes `trade_accepted`/`trade_declined`, logs/Sentry sanitizados ou UX aprovada.
+- Tambem era obrigatorio classificar 4xx/timeout/slow request e provar accept/decline, action invalida, sem token, trade inexistente, sem permissao e double respond.
+
+### O Como
+- Baseline novo em backend real `http://127.0.0.1:8082`, com 5 amostras por action:
+  - `accept`: p50 `3099ms`, p95 `3902ms`, p99 `3902ms`;
+  - `decline`: p50 `3018ms`, p95 `3028ms`, p99 `3028ms`.
+- Confirmado que a latencia era dominada por round-trips remotos e side effect sincrono:
+  - `UPDATE trade_offers`;
+  - `INSERT trade_status_history`;
+  - `SELECT users` para nome do responder;
+  - `INSERT notifications`/FCM iniciado antes da resposta.
+- `PUT /trades/:id/respond` passou a usar um unico statement CTE com:
+  - `FOR UPDATE` em `trade_offers`;
+  - validacao `not_found`, `forbidden` receiver-only e `not_pending`;
+  - update atomico para `accepted`/`declined`;
+  - insert de `trade_status_history` no mesmo statement.
+- Notificacoes essenciais foram preservadas via `NotificationService.createFromActorDeferred`, igual ao padrao ja usado em `POST /trades` e `PUT /trades/:id/status`, com timeout/log/Sentry fora do caminho critico.
+- Observabilidade sanitizada foi mantida/adicionada:
+  - `invalid_action` registra `[social_write] invalid_payload endpoint=PUT /trades/:id/respond`;
+  - `slow_deferred` registra tipo, request id e ids tecnicos sem token/email/payload/mensagem completa;
+  - excecoes continuam em `captureRouteException`.
+- `server/test/social_trading_live_test.dart` foi ampliado para cobrir:
+  - response shape (`id`, `status`, `message`);
+  - accept com teto live `< 2000ms`;
+  - decline;
+  - action invalida `400`;
+  - sem token `401`;
+  - trade inexistente `404`;
+  - receiver-only `403`;
+  - double respond `400` sem corromper estado;
+  - notificacoes `trade_accepted` e `trade_declined`.
+
+### Resultado
+| Endpoint/action | Baseline p50/p95/p99 | Depois p50/p95/p99 | Melhora |
+| --- | ---: | ---: | ---: |
+| `PUT /trades/:id/respond` `accept` | `3099/3902/3902ms` | `565/1394/1394ms` | p95 `64.3%` |
+| `PUT /trades/:id/respond` `decline` | `3018/3028/3028ms` | `564/591/591ms` | p95 `80.5%` |
+
+Runtime iPhone 15 Simulator:
+- device `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+- backend `http://127.0.0.1:8082`, health healthy;
+- `PUT /trades/:id/respond`: `200 (590ms)`;
+- `POST /trades`: `201 (1742ms)`;
+- `PUT /trades/:id/status`: `200 (602ms, 608ms, 593ms)`;
+- resultado `01:39 +2: All tests passed!`.
+
+### Validacao executada
+- `dart analyze routes/trades routes/notifications lib test && dart test -r expanded`: `No issues found!`, `00:08 +555: All tests passed!`.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: `02:48 +166 ~3: All tests passed!`.
+- `flutter analyze lib/features/trades lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check`: sem issues.
+- `flutter test test/features/trades test/features/notifications test/features/binder --no-version-check`: `00:03 +12: All tests passed!`.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=${SENTRY_DSN:-} --reporter expanded --no-version-check`: passou.
+
+### Evidencias
+- Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
+- Auditoria app: `app/doc/APP_AUDIT_2026-04-29.md`.
+- Auditoria contrato backend: `server/doc/APP_BACKEND_CONTRACT_AUDIT_2026-04-29.md`.
+- Logs locais: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_trade_respond_p1/`.
+
+### Pendencias
+- FCM/APNS real segue `not_proven` no simulador; requer device/config de push real.
+- Leituras sociais de detalhe/mensagens ainda aparecem em ~1.1s-1.7s no runtime por DB remoto e devem continuar monitoradas.
+
 ## 2026-04-30 — Fechamento performance Social Trading P1
 
 ### O Porquê
