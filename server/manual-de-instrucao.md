@@ -1,6 +1,68 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — Fechamento performance Social Trading P1
+
+### O Porquê
+- A sprint anterior reduziu parte da latencia social, mas `POST /trades` e `PUT /trades/:id/status` ainda ficavam com p95/p99 em segundos.
+- O objetivo era reduzir e provar essa latencia restante sem alterar contrato JSON, UX, autenticacao, permissoes, notificacoes ou estado final do trade.
+- A investigacao precisava separar causa real de DB remoto/round-trips de side effects deferidos e manter logs/Sentry sanitizados.
+
+### O Como
+- Baseline novo em backend real `http://127.0.0.1:8082` com `OBS_SAMPLE_COUNT=5`:
+  - `POST /trades`: p50 `3976ms`, p95 `3991ms`, p99 `3991ms`;
+  - `PUT /trades/:id/status`: p50 `2782ms`, p95 `2787ms`, p99 `2787ms`.
+- Confirmado que a latencia era dominada por round-trips ao PostgreSQL remoto:
+  - `POST /trades` fazia validacao de receiver, ownership/disponibilidade e inserts em passos separados;
+  - `PUT /trades/:id/status` fazia `SELECT FOR UPDATE`, `UPDATE` e insert em `trade_status_history` em round-trips distintos.
+- `POST /trades` passou a:
+  - validar itens em memoria com `400` classificado para payload invalido previsivel;
+  - verificar receiver, ownership e disponibilidade em uma unica query batch;
+  - criar `trade_offers`, `trade_items` e `trade_status_history` com CTE unica usando `jsonb_to_recordset` para remover loop/N+1 de inserts.
+- `PUT /trades/:id/status` passou a usar um unico statement com:
+  - `FOR UPDATE`;
+  - validacao de participante, transicao e regra sale;
+  - update de `trade_offers`;
+  - insert em `trade_status_history`.
+- Side effects essenciais foram preservados:
+  - notificacoes continuam via `NotificationService.createFromActorDeferred`, fora do caminho critico, com timeout/log/Sentry;
+  - status codes e shape de sucesso continuam iguais;
+  - `trade_status_history` permanece consistente no mesmo statement do update.
+- Observabilidade sanitizada mantida:
+  - `slow_request`, `client_error`, `invalid_payload`, `impossible_state` e excecoes registram endpoint, duracao, request id, user id tecnico e ids seguros;
+  - logs/provas nao imprimem token, email, payload completo nem mensagem completa.
+- `server/test/social_trading_live_test.dart` passou a verificar notificacao `trade_shipped` e tetos live de regressao: `POST /trades < 3500ms`, `PUT /trades/:id/status < 2000ms`.
+
+### Resultado
+| Endpoint | Baseline p50/p95/p99 | Depois p50/p95/p99 | Melhora |
+| --- | ---: | ---: | ---: |
+| `POST /trades` | `3976/3991/3991ms` | `1788/1818/1818ms` | p95/p99 `54.4%` |
+| `PUT /trades/:id/status` | `2782/2787/2787ms` | `600/621/621ms` | p95/p99 `77.7%` |
+
+Runtime iPhone 15 Simulator:
+- device `iPhone 15`, id `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`;
+- backend `http://127.0.0.1:8082`, health healthy;
+- `POST /trades`: `201 (1826ms)`;
+- `PUT /trades/:id/status`: `200 (636ms)`, `200 (647ms)`, `200 (635ms)`;
+- resultado `01:43 +2: All tests passed!`.
+
+### Validacao executada
+- `dart analyze routes/trades routes/notifications lib test && dart test -r expanded`: `No issues found!`, `00:05 +555: All tests passed!`.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: primeira rodada falhou fora do escopo social em `ai_generate_create_optimize_flow_test.dart` por prompts com `422`; rerun imediato passou com `02:52 +165 ~3: All tests passed!`.
+- `flutter analyze lib/features/trades lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check`: sem issues.
+- `flutter test test/features/trades test/features/notifications test/features/binder --no-version-check`: `00:00 +12: All tests passed!`.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=${SENTRY_DSN:-} --reporter expanded --no-version-check`: passou.
+
+### Evidencias
+- Handoff: `app/doc/runtime_flow_handoffs/binder_marketplace_trade_iphone15_2026-04-29.md`.
+- Auditoria app: `app/doc/APP_AUDIT_2026-04-29.md`.
+- Auditoria contrato backend: `server/doc/APP_BACKEND_CONTRACT_AUDIT_2026-04-29.md`.
+- Logs locais: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_trading_p1/`.
+
+### Pendencias
+- `PUT /trades/:id/respond` ainda ficou em `~3203ms` no runtime e deve ser o proximo alvo de consolidacao de round-trips se entrar em criterio P1.
+- FCM/APNS real segue `not_proven` no simulador; requer device/config de push real.
+
 ## 2026-04-30 — Staging observability Social Trading no iPhone 15
 
 ### O Porquê

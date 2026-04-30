@@ -1,5 +1,52 @@
 # App Backend Contract Audit - 2026-04-29
 
+## Atualizacao - fechamento performance Social Trading P1 - 2026-04-30
+
+Backend real em `http://127.0.0.1:8082`, iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`. Contrato JSON/status codes/autenticacao/permissoes preservados para `POST /trades` e `PUT /trades/:id/status`.
+
+### Baseline vs depois
+
+Medição com `OBS_SAMPLE_COUNT=5 TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/qa/social_trading_observability_probe.dart`.
+
+| Endpoint | Baseline p50 | Baseline p95 | Baseline p99 | Depois p50 | Depois p95 | Depois p99 | Melhora p95/p99 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `POST /trades` | `3976ms` | `3991ms` | `3991ms` | `1788ms` | `1818ms` | `1818ms` | `54.4%` |
+| `PUT /trades/:id/status` | `2782ms` | `2787ms` | `2787ms` | `600ms` | `621ms` | `621ms` | `77.7%` |
+
+### Hipoteses tecnicas investigadas
+
+| Area | Achado |
+| --- | --- |
+| DB remoto | Latencia por round-trip dominante e muito estavel; cada query adicional custava ~600ms-1200ms no caminho observado. |
+| Round-trips transacionais | Confirmado: `POST /trades` fazia validacoes separadas e inserts seriais; `PUT /status` fazia `SELECT FOR UPDATE`, `UPDATE` e `INSERT history` separados. |
+| Queries ownership | Mantidas, mas reunidas em validacao batch com contagem por owner/disponibilidade. |
+| Status history | Preservado, agora inserido no mesmo statement/CTE do update de status. |
+| Notificacoes | Permanecem essenciais e deferidas via `NotificationService.createFromActorDeferred`, com timeout/log/Sentry. Logs `slow_deferred` seguem fora do caminho critico. |
+| Locks | `PUT /status` manteve lock atomico via CTE com `FOR UPDATE`, reduzindo tempo de lock e janela transacional. |
+| Indices | Indices sociais existentes continuam adequados; a melhoria veio de reduzir viagens ao DB, nao de DDL nova. |
+| N+1 | Removido do insert de `trade_items`: JSONB recordset insere todos os itens de offering/requesting em batch. |
+| DDL/runtime work | Nenhum DDL novo no caminho critico; nenhuma migration runtime adicionada. |
+
+### Mudancas de implementacao
+
+- `POST /trades`: parse/validacao de itens antes do DB, query batch para receiver/ownership/disponibilidade e CTE unica para `trade_offers`, `trade_items` e `trade_status_history`.
+- `PUT /trades/:id/status`: um unico statement com lock, validacao de permissao/transicao, update e history.
+- Observabilidade sanitizada mantida para `slow_request`, `client_error`, `invalid_payload`, `impossible_state` e excecoes via middleware/Sentry/logs sem token/email/payload sensivel.
+- `server/test/social_trading_live_test.dart` agora verifica teto live de regressao (`POST /trades < 3500ms`, `PUT /status < 2000ms`) e notificacao `trade_shipped`.
+
+### Validacao
+
+| Comando | Resultado |
+| --- | --- |
+| `dart analyze routes/trades routes/notifications lib test && dart test -r expanded` | PASS: `No issues found!`, `00:05 +555: All tests passed!` |
+| `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded` | Primeira rodada: falha nao-social em `ai_generate_create_optimize_flow_test.dart` por 422 nos prompts; rerun imediato PASS: `02:52 +165 ~3: All tests passed!` |
+| `flutter analyze ... && flutter test ...` | PASS app focado |
+| `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...` | PASS: `01:43 +2: All tests passed!` |
+
+Runtime UI real confirmou `POST /trades 201 (1826ms)` e `PUT /trades/:id/status 200 (636ms, 647ms, 635ms)`.
+
+Pendencia backend: `PUT /trades/:id/respond` ainda ficou lento no runtime (`~3203ms`) e deve receber a mesma consolidacao de round-trips em sprint posterior. FCM real segue `not_proven` no simulador.
+
 ## Atualizacao - staging observability Social Trading - 2026-04-30
 
 Validacao executada com backend real em `http://127.0.0.1:8082`, Sentry staging carregado via `.env` local e service account Firebase local presente sem expor segredos. Contrato JSON/status codes preservados.

@@ -1,5 +1,71 @@
 # Binder / Marketplace / Trades Runtime - iPhone 15 Simulator - 2026-04-29
 
+## Atualizacao - fechamento performance Social Trading P1 - 2026-04-30 10:10 -0300
+
+Resultado: `Approved for POST /trades and PUT /trades/:id/status P1 latency closure on iPhone 15 Simulator`.
+
+| Item | Evidencia |
+| --- | --- |
+| Device primario | `iPhone 15` |
+| Simulator id | `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| Estado | `Booted` |
+| Backend URL usado pelo app | `http://127.0.0.1:8082` |
+| Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
+| Evidencias locais | `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_trading_p1/` |
+| Runtime iPhone 15 | PASS: `01:43 +2: All tests passed!` |
+
+Baseline novo em backend real, 5 amostras por endpoint, antes da alteracao:
+
+| Endpoint | p50 | p95 | p99 | Min | Max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `POST /trades` | `3976ms` | `3991ms` | `3991ms` | `3970ms` | `3991ms` |
+| `PUT /trades/:id/status` | `2782ms` | `2787ms` | `2787ms` | `2777ms` | `2787ms` |
+
+Depois da otimizacao, mesma amostra:
+
+| Endpoint | p50 | p95 | p99 | Min | Max | Melhora p95/p99 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `POST /trades` | `1788ms` | `1818ms` | `1818ms` | `1784ms` | `1818ms` | `54.4%` |
+| `PUT /trades/:id/status` | `600ms` | `621ms` | `621ms` | `599ms` | `621ms` | `77.7%` |
+
+Hipotese tecnica confirmada: a latencia residual era dominada por round-trips ao PostgreSQL remoto. `POST /trades` fazia validacao de receiver/ownership mais inserts transacionais em passos seriais; agora valida receiver, ownership e disponibilidade em uma query batch e cria offer/items/history com CTE em um unico round-trip transacional. `PUT /trades/:id/status` fazia `SELECT FOR UPDATE`, `UPDATE` e `INSERT history` separados; agora lock, validacao de permissao/transicao, update e status history rodam em um unico statement atomico.
+
+Side effects essenciais preservados: contrato JSON/status codes, JWT/permissoes, `trade_items`, `trade_status_history`, estado final e notificacoes. Notificacoes continuam via `NotificationService.createFromActorDeferred`, fora do caminho critico, com timeout/log/Sentry; o log sanitizado registrou `slow_deferred` sem token/email/mensagem completa.
+
+Comandos principais executados:
+
+```bash
+cd server
+OBS_SAMPLE_COUNT=5 TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/qa/social_trading_observability_probe.dart
+dart analyze routes/trades routes/notifications lib test && dart test -r expanded
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded
+```
+
+```bash
+cd app
+flutter analyze lib/features/trades lib/features/notifications lib/features/binder lib/features/market integration_test --no-version-check
+flutter test test/features/trades test/features/notifications test/features/binder --no-version-check
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=SENTRY_DSN=${SENTRY_DSN:-} \
+  --reporter expanded \
+  --no-version-check
+```
+
+Validacoes:
+
+- Server offline: `No issues found!`, `00:05 +555: All tests passed!`.
+- Server live: primeira rodada classificou falha nao-social em `ai_generate_create_optimize_flow_test.dart` (`422 Generated deck failed validation` nos prompts); rerun imediato passou: `02:52 +165 ~3: All tests passed!`.
+- App focado: `No issues found!`, `00:00 +12: All tests passed!`.
+- Runtime iPhone 15: `POST /trades -> 201 (1826ms)` e `PUT /trades/:id/status -> 200 (636ms, 647ms, 635ms)`.
+
+Mocked/controlado: nenhum backend mockado; setup de usuarios/binder/trades foi por API real. `SENTRY_DSN` foi passado por dart-define com fallback vazio e nenhum segredo foi registrado.
+
+Pendencias reais: `PUT /trades/:id/respond` ainda aparece lento no runtime (`~3203ms`) e deve virar proximo P1 se o fluxo de aceite/recusa entrar no mesmo criterio de p95/p99. FCM/APNS real permanece fora da prova do simulador.
+
 ## Atualizacao - staging observability Social Trading - 2026-04-30 08:52 -0300
 
 Resultado: `Approved for Sentry/log structured staging observability on simulator; FCM real remains not_proven on iPhone 15 Simulator`.
