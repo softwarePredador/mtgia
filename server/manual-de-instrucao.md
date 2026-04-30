@@ -114,8 +114,8 @@ Runtime iPhone 15 Simulator:
 - `flutter test integration_test/fcm_staging_smoke_test.dart -d "iPhone 15" ...`: passou como harness, resultado funcional `not_proven`.
 
 ### Pendencias
-- `POST /trades` segue com p95/p99 acima de 4s; investigar plano/round-trips transacionais e dependencias remotas.
-- `PUT /trades/:id/status` segue com p95/p99 acima de 3s; investigar status history/notificacoes/queries de ownership.
+- `PUT /trades/:id/respond` segue como proximo alvo P1, com `~3203ms` no runtime e padrao antigo de round-trips.
+- Manter p95/p99 persistente para `POST /trades` e `PUT /trades/:id/status`, que foram reduzidos para `1818ms` e `621ms` de p95/p99 na sprint seguinte.
 - FCM PASS exige device fisico ou simulador/config APNS que entregue token FCM, alem de evidencia de recebimento foreground/background.
 
 ## 2026-04-29 — Sprint final de performance e observabilidade Social Trading

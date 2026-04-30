@@ -385,6 +385,6 @@ Runtime UI final no iPhone 15 confirmou os ganhos em fluxo real:
 
 | Prioridade | Item | Owner |
 | --- | --- | --- |
-| P1 | Reduzir a latencia remanescente de `POST /trades` e `PUT /trades/:id/status`, agora dominada por DB remoto/round-trips transacionais e validacoes de ownership/status | Backend social/trades |
+| P1 | Reduzir a latencia remanescente de `PUT /trades/:id/respond`, ainda observada em `~3203ms` e com padrao antigo de round-trips | Backend social/trades |
 | P2 | Criar metricas p95/p99 persistentes para social trading e alertas por endpoint | Backend observability |
 | P2 | Provar FCM real em device/config staging; nao foi escopo do simulador sem Firebase inicializado | App notifications |
