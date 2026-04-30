@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 
 // =====================================================================
 // Models
@@ -87,14 +88,13 @@ class TradeItem {
       binderItemId: json['binder_item_id'] as String? ?? '',
       direction: json['direction'] as String? ?? 'offering',
       quantity: json['quantity'] as int? ?? 1,
-      agreedPrice: json['agreed_price'] != null
-          ? (json['agreed_price'] as num).toDouble()
-          : null,
+      agreedPrice:
+          json['agreed_price'] != null
+              ? (json['agreed_price'] as num).toDouble()
+              : null,
       condition: json['condition'] as String?,
       isFoil: json['is_foil'] as bool?,
-      card: TradeItemCard.fromJson(
-        json['card'] as Map<String, dynamic>? ?? {},
-      ),
+      card: TradeItemCard.fromJson(json['card'] as Map<String, dynamic>? ?? {}),
     );
   }
 }
@@ -132,7 +132,8 @@ class TradeMessage {
       message: json['message'] as String?,
       attachmentUrl: json['attachment_url'] as String?,
       attachmentType: json['attachment_type'] as String?,
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -162,7 +163,8 @@ class TradeStatusEntry {
       newStatus: json['new_status'] as String,
       notes: json['notes'] as String?,
       changedByUsername: json['changed_by_username'] as String?,
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -224,17 +226,20 @@ class TradeOffer {
       status: json['status'] as String? ?? 'pending',
       type: json['type'] as String? ?? 'trade',
       message: json['message'] as String?,
-      paymentAmount: json['payment_amount'] != null
-          ? (json['payment_amount'] as num).toDouble()
-          : null,
+      paymentAmount:
+          json['payment_amount'] != null
+              ? (json['payment_amount'] as num).toDouble()
+              : null,
       paymentCurrency: json['payment_currency'] as String?,
       trackingCode: json['tracking_code'] as String?,
       deliveryMethod: json['delivery_method'] as String?,
       sender: TradeUser.fromJson(json['sender'] as Map<String, dynamic>),
       receiver: TradeUser.fromJson(json['receiver'] as Map<String, dynamic>),
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updatedAt:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       offeringCount: json['offering_count'] as int?,
       requestingCount: json['requesting_count'] as int?,
@@ -249,32 +254,39 @@ class TradeOffer {
       status: json['status'] as String? ?? 'pending',
       type: json['type'] as String? ?? 'trade',
       message: json['message'] as String?,
-      paymentAmount: json['payment_amount'] != null
-          ? (json['payment_amount'] as num).toDouble()
-          : null,
+      paymentAmount:
+          json['payment_amount'] != null
+              ? (json['payment_amount'] as num).toDouble()
+              : null,
       paymentCurrency: json['payment_currency'] as String?,
       paymentMethod: json['payment_method'] as String?,
       deliveryMethod: json['delivery_method'] as String?,
       trackingCode: json['tracking_code'] as String?,
       sender: TradeUser.fromJson(json['sender'] as Map<String, dynamic>),
       receiver: TradeUser.fromJson(json['receiver'] as Map<String, dynamic>),
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updatedAt:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
-      myItems: (json['my_items'] as List<dynamic>?)
+      myItems:
+          (json['my_items'] as List<dynamic>?)
               ?.map((e) => TradeItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      theirItems: (json['their_items'] as List<dynamic>?)
+      theirItems:
+          (json['their_items'] as List<dynamic>?)
               ?.map((e) => TradeItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      messages: (json['messages'] as List<dynamic>?)
+      messages:
+          (json['messages'] as List<dynamic>?)
               ?.map((e) => TradeMessage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      statusHistory: (json['status_history'] as List<dynamic>?)
+      statusHistory:
+          (json['status_history'] as List<dynamic>?)
               ?.map((e) => TradeStatusEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -290,11 +302,11 @@ class TradeStatusHelper {
   static Color color(String status) {
     switch (status) {
       case 'pending':
-        return AppTheme.mythicGold;
+        return AppTheme.brass400;
       case 'accepted':
-        return AppTheme.primarySoft;
+        return AppTheme.frost400;
       case 'shipped':
-        return AppTheme.manaViolet;
+        return AppTheme.frost400;
       case 'delivered':
         return AppTheme.success;
       case 'completed':
@@ -362,7 +374,9 @@ class TradeStatusHelper {
 // =====================================================================
 
 class TradeProvider extends ChangeNotifier {
-  final ApiClient _api = ApiClient();
+  final ApiClient _api;
+
+  TradeProvider({ApiClient? apiClient}) : _api = apiClient ?? ApiClient();
 
   // ─── State ──────────────────────────────────────────────────
   List<TradeOffer> _trades = [];
@@ -398,11 +412,7 @@ class TradeProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final queryParts = <String>[
-        'page=$page',
-        'limit=$limit',
-        'role=$role',
-      ];
+      final queryParts = <String>['page=$page', 'limit=$limit', 'role=$role'];
       if (status != null && status.isNotEmpty) {
         queryParts.add('status=$status');
       }
@@ -412,18 +422,23 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        _trades = list
-            .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
-            .toList();
+        _trades =
+            list
+                .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
+                .toList();
         _totalTrades = data['total'] as int? ?? _trades.length;
         _currentPage = data['page'] as int? ?? page;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao carregar trades';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeList,
+        );
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeList,
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -457,9 +472,10 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        final newTrades = list
-            .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
-            .toList();
+        final newTrades =
+            list
+                .map((e) => TradeOffer.fromListJson(e as Map<String, dynamic>))
+                .toList();
         _trades.addAll(newTrades);
         _totalTrades = data['total'] as int? ?? _trades.length;
         _currentPage = data['page'] as int? ?? nextPage;
@@ -489,12 +505,16 @@ class TradeProvider extends ChangeNotifier {
         _chatMessages = _selectedTrade!.messages;
         _chatTotal = _chatMessages.length;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao carregar trade';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeDetail,
+        );
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeDetail,
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -533,13 +553,17 @@ class TradeProvider extends ChangeNotifier {
         await fetchTrades();
         return true;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao criar trade';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeCreate,
+        );
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeCreate,
+      );
       return false;
     } finally {
       _isLoading = false;
@@ -563,13 +587,17 @@ class TradeProvider extends ChangeNotifier {
         await fetchTradeDetail(tradeId);
         return true;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao responder trade';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeAction,
+        );
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeAction,
+      );
       return false;
     } finally {
       _isLoading = false;
@@ -601,13 +629,17 @@ class TradeProvider extends ChangeNotifier {
         await fetchTradeDetail(tradeId);
         return true;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao atualizar status';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeAction,
+        );
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeAction,
+      );
       return false;
     } finally {
       _isLoading = false;
@@ -616,23 +648,32 @@ class TradeProvider extends ChangeNotifier {
   }
 
   // ─── Fetch chat messages ────────────────────────────────────
-  Future<void> fetchMessages(String tradeId, {int page = 1, int limit = 50}) async {
+  Future<void> fetchMessages(
+    String tradeId, {
+    int page = 1,
+    int limit = 50,
+  }) async {
     try {
-      final res = await _api.get('/trades/$tradeId/messages?page=$page&limit=$limit');
+      final res = await _api.get(
+        '/trades/$tradeId/messages?page=$page&limit=$limit',
+      );
 
       if (res.statusCode == 200) {
         final data = res.data as Map<String, dynamic>;
         final list = (data['data'] as List<dynamic>?) ?? [];
-        final nextMessages = list
-            .map((e) => TradeMessage.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final nextMessages =
+            list
+                .map((e) => TradeMessage.fromJson(e as Map<String, dynamic>))
+                .toList();
         final nextTotal = data['total'] as int? ?? nextMessages.length;
 
         final currentIds = _chatMessages.map((m) => m.id).toList();
         final nextIds = nextMessages.map((m) => m.id).toList();
         final sameMessages =
             currentIds.length == nextIds.length &&
-            currentIds.asMap().entries.every((entry) => nextIds[entry.key] == entry.value);
+            currentIds.asMap().entries.every(
+              (entry) => nextIds[entry.key] == entry.value,
+            );
 
         if (!sameMessages || _chatTotal != nextTotal) {
           _chatMessages = nextMessages;
@@ -662,22 +703,23 @@ class TradeProvider extends ChangeNotifier {
       if (res.statusCode == 201) {
         // Adicionar localmente para feedback imediato
         final msgData = res.data as Map<String, dynamic>;
-        _chatMessages = [
-          ..._chatMessages,
-          TradeMessage.fromJson(msgData),
-        ];
+        _chatMessages = [..._chatMessages, TradeMessage.fromJson(msgData)];
         _chatTotal++;
         notifyListeners();
         return true;
       } else {
-        _errorMessage = (res.data is Map)
-            ? res.data['error']?.toString()
-            : 'Erro ao enviar mensagem';
+        _errorMessage = FriendlyErrorMapper.fromApiResponse(
+          res,
+          context: FriendlyErrorContext.tradeMessage,
+        );
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Erro de conexão: $e';
+      _errorMessage = FriendlyErrorMapper.fromException(
+        e,
+        context: FriendlyErrorContext.tradeMessage,
+      );
       notifyListeners();
       return false;
     }
