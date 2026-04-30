@@ -1,5 +1,45 @@
 # App Backend Contract Audit - 2026-04-29
 
+## Atualizacao - staging observability Social Trading - 2026-04-30
+
+Validacao executada com backend real em `http://127.0.0.1:8082`, Sentry staging carregado via `.env` local e service account Firebase local presente sem expor segredos. Contrato JSON/status codes preservados.
+
+Resultados:
+
+- `dart run bin/sentry_smoke.dart`: PASS, `SENTRY_SMOKE_EVENT_ID=fa3497bfe71248f99d0217b3ba964816`, `smoke_id:mtgia-smoke-19dde2fade1`.
+- `OBS_SAMPLE_COUNT=5 TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/qa/social_trading_observability_probe.dart`: PASS.
+- Logs backend provaram `[http_observability] classification=slow_request`, `client_error`, `[social_write] invalid_payload` e `[social_notification] slow_deferred`.
+- FCM backend carregou `firebase-service-account.json`, mas entrega real nao foi comprovada porque o iPhone 15 Simulator nao gerou APNS/FCM token.
+
+Metricas medidas:
+
+| Endpoint | p50 | p95 | p99 | Status |
+| --- | ---: | ---: | ---: | --- |
+| `GET /community/marketplace` | `611ms` | `1485ms` | `1485ms` | `200` |
+| `POST /trades` | `3979ms` | `4258ms` | `4258ms` | `201` |
+| `PUT /trades/:id/status` | `2783ms` | `3299ms` | `3299ms` | `200` |
+| `GET /trades` | `630ms` | `1484ms` | `1484ms` | `200` |
+| `GET /trades/:id` | `1300ms` | `1346ms` | `1346ms` | `200` |
+| `POST /trades/:id/messages` | `1227ms` | `1400ms` | `1400ms` | `201` |
+| `POST /conversations/:id/messages` | `1195ms` | `1341ms` | `1341ms` | `201` |
+
+Classificacoes obrigatorias:
+
+| Caso | Evidencia |
+| --- | --- |
+| Slow request | `POST /trades`, `PUT /trades/:id/status`, mensagens e detalhes geraram `slow_request` |
+| 4xx esperado | `GET /trades/00000000-0000-0000-0000-000000000000` retornou `404` e `client_error` |
+| Payload invalido | `payment_method=wire` retornou `400` e `[social_write] invalid_payload` |
+| Timeout | Probe cliente gerou `OBS_EVENT client_timeout status=triggered timeout_us=1` |
+| Erro de contrato | Probe validou keys obrigatorias; `contract_error status=not_triggered` |
+| 5xx/excecao controlada | Nao houve harness seguro novo para forcar 5xx sem alterar contrato; cobertura existente permanece via middleware/captureRouteException e Sentry smoke controlado |
+
+Validacao final:
+
+- `dart analyze routes/trades routes/market routes/binder routes/conversations routes/notifications lib test`: sem issues.
+- `dart test -r expanded`: `555` testes passaram.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: passou.
+
 ## Resumo executivo
 
 Auditoria dos contratos backend consumidos pelo app ManaLoom em `2026-04-29`, cruzando providers/telas do app com `server/routes`, validacao automatizada e runtime iPhone 15 com backend real em `http://127.0.0.1:8082`.

@@ -1,5 +1,78 @@
 # Binder / Marketplace / Trades Runtime - iPhone 15 Simulator - 2026-04-29
 
+## Atualizacao - staging observability Social Trading - 2026-04-30 08:52 -0300
+
+Resultado: `Approved for Sentry/log structured staging observability on simulator; FCM real remains not_proven on iPhone 15 Simulator`.
+
+| Item | Evidencia |
+| --- | --- |
+| Device primario | `iPhone 15` |
+| Simulator id | `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| Backend URL usado pelo app | `http://127.0.0.1:8082` |
+| Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
+| Sentry backend | PASS: `SENTRY_SMOKE_EVENT_ID=fa3497bfe71248f99d0217b3ba964816`, env `staging`, release `4edfbdf` |
+| Sentry mobile | PASS: `SENTRY_MOBILE_EVENT_ID=08cc80c92ae446b89e8179e842a368e3`, tag `mtgia-mobile-smoke-19dde342848` |
+| Runtime Social Trading | PASS: `02:12 +2: All tests passed!` com `--dart-define=SENTRY_DSN=<staging>` |
+| FCM simulador | `not_proven`: `FCM_PERMISSION status=denied`, `FCM_APNS_TOKEN_PRESENT=false`, erro `firebase_messaging/apns-token-not-set` |
+| Evidencias locais | `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_observability/` |
+
+Comandos principais executados:
+
+```bash
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+curl -sS http://127.0.0.1:8082/health
+dart run bin/sentry_smoke.dart
+OBS_SAMPLE_COUNT=5 TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/qa/social_trading_observability_probe.dart
+```
+
+```bash
+cd app
+flutter test integration_test/mobile_sentry_smoke_test.dart -d "iPhone 15" --dart-define=SENTRY_DSN=<staging> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
+flutter test integration_test/fcm_staging_smoke_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --dart-define=SENTRY_DSN=<staging> --dart-define=SENTRY_ENVIRONMENT=staging --reporter expanded --no-version-check
+```
+
+Metricas do probe backend real, 5 amostras por endpoint:
+
+| Endpoint | p50 | p95 | p99 | Min | Max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `GET /community/marketplace` | `611ms` | `1485ms` | `1485ms` | `610ms` | `1485ms` |
+| `POST /trades` | `3979ms` | `4258ms` | `4258ms` | `3976ms` | `4258ms` |
+| `PUT /trades/:id/status` | `2783ms` | `3299ms` | `3299ms` | `2777ms` | `3299ms` |
+| `GET /trades` | `630ms` | `1484ms` | `1484ms` | `610ms` | `1484ms` |
+| `GET /trades/:id` | `1300ms` | `1346ms` | `1346ms` | `1210ms` | `1346ms` |
+| `POST /trades/:id/messages` | `1227ms` | `1400ms` | `1400ms` | `1194ms` | `1400ms` |
+| `POST /conversations/:id/messages` | `1195ms` | `1341ms` | `1341ms` | `1189ms` | `1341ms` |
+
+Observabilidade provada:
+
+- Backend Sentry real/staging inicializou e enviou smoke controlado.
+- App Sentry real/staging enviou smoke controlado no iPhone 15 Simulator.
+- Slow requests sociais geraram `api_slow_request` no app e `[http_observability] classification=slow_request` no backend.
+- `400` esperado de payload invalido e `404` esperado de detalhe inexistente foram classificados como `client_error`.
+- Timeout foi provado como `client_timeout` no probe cliente sem derrubar backend.
+- Contrato JSON foi validado no probe; `contract_error status=not_triggered`.
+- Logs finais foram varridos contra padroes obvios de JWT/email/body de auth; sem achados no runtime sanitizado.
+
+Correcoes pequenas aplicadas nesta sprint:
+
+- `AppObservability` mobile deixou de anexar email ao `SentryUser`.
+- `PushNotificationService` mobile deixou de imprimir prefixo do FCM token.
+- `AuthProvider` deixou de imprimir email completo, token e body de resposta de login.
+- `server/lib/log_sanitizer.dart` passou a redigir email e `fcm_token`.
+- Novo probe backend: `server/bin/qa/social_trading_observability_probe.dart`.
+- Novo smoke iPhone: `app/integration_test/fcm_staging_smoke_test.dart`.
+
+Pendencias:
+
+| Prioridade | Item | Evidencia/Hipotese |
+| --- | --- | --- |
+| P1 | `POST /trades` p95/p99 `4258ms` | Ainda dominado por DB remoto/round-trips de trade + side effects diferidos |
+| P1 | `PUT /trades/:id/status` p95/p99 `3299ms` | Validacoes transacionais/status e notificacoes diferidas ainda aparecem no caminho observado |
+| P2 | FCM real entrega/recebimento | iPhone 15 Simulator nao obteve APNS token; requer device fisico/permissao APNS ou simulador com suporte/config validos |
+
 ## Resultado
 
 Verdict: `Approved for BinderItemEditor CRUD + marketplace sale + full trade lifecycle + trade chat + notifications + direct messages runtime`

@@ -1,6 +1,61 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — Staging observability Social Trading no iPhone 15
+
+### O Porquê
+- A sprint anterior provou Binder/Marketplace/Trades, mas Sentry/FCM ainda estavam sem prova real de staging e as metricas sociais estavam em amostra curta frio/quente.
+- O criterio novo exigia Sentry/log estruturado real e sanitizado para slow request, 4xx esperado, payload invalido, timeout e contrato, alem de p50/p95/p99 dos endpoints sociais.
+- Tambem era necessario impedir vazamento de token, email, mensagem completa ou payload sensivel nos logs/evidencias.
+
+### O Como
+- Backend real em `http://127.0.0.1:8082`, Sentry staging via `.env`, sem imprimir DSN.
+- `server/bin/sentry_smoke.dart` enviou evento controlado para Sentry.
+- Criado `server/bin/qa/social_trading_observability_probe.dart`:
+  - cria usuarios QA, binder item e trades reais;
+  - mede p50/p95/p99;
+  - dispara `400` esperado, `404` esperado, timeout cliente e validacao de contrato;
+  - nao imprime token/email/payload sensivel.
+- App iPhone 15 rodou `mobile_sentry_smoke_test.dart` e `binder_marketplace_trade_runtime_test.dart` com `--dart-define=SENTRY_DSN=<staging>`.
+- Criado `app/integration_test/fcm_staging_smoke_test.dart` para tentar inicializar Firebase Messaging, solicitar permissao e registrar token sem imprimir o token.
+- Hardening aplicado:
+  - `AppObservability.sentryUserFor` nao anexa email ao `SentryUser`;
+  - `PushNotificationService` mobile nao imprime prefixo de token;
+  - `AuthProvider` nao imprime email completo, token nem response body de login;
+  - `server/lib/log_sanitizer.dart` redige email e `fcm_token`.
+
+### Resultado
+- Backend Sentry PASS: `SENTRY_SMOKE_EVENT_ID=fa3497bfe71248f99d0217b3ba964816`.
+- Mobile Sentry PASS: `SENTRY_MOBILE_EVENT_ID=08cc80c92ae446b89e8179e842a368e3`.
+- Runtime Social Trading PASS no iPhone 15: `02:12 +2: All tests passed!`.
+- FCM real no simulador: `not_proven`; `FCM_PERMISSION status=denied`, `FCM_APNS_TOKEN_PRESENT=false`, erro `firebase_messaging/apns-token-not-set`. Backend carregou service account, mas nao houve token/entrega/recebimento real.
+- Evidencias locais: `app/doc/runtime_flow_proofs_2026-04-30_iphone15_simulator_social_observability/`.
+
+### Metricas
+| Endpoint | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: |
+| `GET /community/marketplace` | `611ms` | `1485ms` | `1485ms` |
+| `POST /trades` | `3979ms` | `4258ms` | `4258ms` |
+| `PUT /trades/:id/status` | `2783ms` | `3299ms` | `3299ms` |
+| `GET /trades` | `630ms` | `1484ms` | `1484ms` |
+| `GET /trades/:id` | `1300ms` | `1346ms` | `1346ms` |
+| `POST /trades/:id/messages` | `1227ms` | `1400ms` | `1400ms` |
+| `POST /conversations/:id/messages` | `1195ms` | `1341ms` | `1341ms` |
+
+### Validacao executada
+- `dart analyze routes/trades routes/market routes/binder routes/conversations routes/notifications lib test`: sem issues.
+- `dart test -r expanded`: `555` testes passaram.
+- `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: passou.
+- `flutter analyze lib/features/binder lib/features/market lib/features/trades lib/features/messages lib/features/notifications integration_test --no-version-check`: sem issues.
+- `flutter test test/features/binder test/features/trades test/features/messages test/features/notifications --no-version-check`: passou.
+- `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ... --dart-define=SENTRY_DSN=<staging>`: passou.
+- `flutter test integration_test/fcm_staging_smoke_test.dart -d "iPhone 15" ...`: passou como harness, resultado funcional `not_proven`.
+
+### Pendencias
+- `POST /trades` segue com p95/p99 acima de 4s; investigar plano/round-trips transacionais e dependencias remotas.
+- `PUT /trades/:id/status` segue com p95/p99 acima de 3s; investigar status history/notificacoes/queries de ownership.
+- FCM PASS exige device fisico ou simulador/config APNS que entregue token FCM, alem de evidencia de recebimento foreground/background.
+
 ## 2026-04-29 — Sprint final de performance e observabilidade Social Trading
 
 ### O Porquê
