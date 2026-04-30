@@ -158,8 +158,8 @@ Separacao de testes aplicada em 2026-04-29:
 | --- | --- | --- | --- |
 | P0/P1 | `GET /market/movers?limit=5&min_price=1.0` | Corrigido em 2026-04-29: `200` em `1.918091s` frio e `0.005164s` quente | Risco imediato removido; manter observabilidade de p95/p99 |
 | P1 | Test infra live em `localhost:8080` | Corrigido em 2026-04-29 com `dart_test.yaml`, tags live e preset `live` | Risco removido; manter inventario em `server/test/README.md` atualizado |
-| P1 | Social/trades/messages full contracts | Rotas existem e error contract cobre parte, mas runtime end-to-end nao foi fresco | Risco funcional antes de release social/trades |
-| P2 | Observability live | Sentry/Firebase presentes, mas DSN/config real nao provados nesta auditoria | Falta visibilidade de producao/staging |
+| P1 | Social/trades/messages write latency | Runtime end-to-end e contratos live foram provados, mas `POST /trades` e `PUT /trades/:id/status` ainda têm p95/p99 em segundos | Risco de UX/performance antes de release social/trades amplo |
+| P2 | FCM delivery live | Sentry staging foi provado no app/backend; FCM real ficou `not_proven` no iPhone 15 Simulator por ausência de APNS token | Falta prova de entrega push em device/config staging |
 
 ## Hipoteses tecnicas para `/market/movers`
 
