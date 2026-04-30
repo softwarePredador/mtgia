@@ -44,7 +44,9 @@ class PushNotificationService {
   Future<void> init() async {
     try {
       if (kIsWeb) {
-        debugPrint('[Push] Web detectado: push Firebase desabilitado neste build.');
+        debugPrint(
+          '[Push] Web detectado: push Firebase desabilitado neste build.',
+        );
         return;
       }
 
@@ -55,7 +57,8 @@ class PushNotificationService {
 
       // Handler de background (top-level function)
       FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler);
+        _firebaseMessagingBackgroundHandler,
+      );
 
       // Handler de foreground
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -100,8 +103,7 @@ class PushNotificationService {
         return;
       }
 
-      debugPrint(
-          '[Push] Permissão: ${settings.authorizationStatus}');
+      debugPrint('[Push] Permissão: ${settings.authorizationStatus}');
 
       // Obtém FCM token
       final token = await _messaging!.getToken();
@@ -129,9 +131,13 @@ class PushNotificationService {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         debugPrint('[Push] Token removido do server');
       } else if (response.statusCode == 401) {
-        debugPrint('[Push] Logout sem sessão ativa no server (401 ao remover token)');
+        debugPrint(
+          '[Push] Logout sem sessão ativa no server (401 ao remover token)',
+        );
       } else {
-        debugPrint('[Push] Falha ao remover token no server (status=${response.statusCode})');
+        debugPrint(
+          '[Push] Falha ao remover token no server (status=${response.statusCode})',
+        );
       }
     } catch (e) {
       debugPrint('[Push] Erro ao remover token: $e');
@@ -142,21 +148,19 @@ class PushNotificationService {
   Future<void> _sendTokenToServer(String token) async {
     try {
       await _api.put('/users/me/fcm-token', {'token': token});
-      debugPrint('[Push] Token registrado: ${token.substring(0, 20)}...');
+      debugPrint('[Push] Token registrado no server');
     } catch (e) {
       debugPrint('[Push] Erro ao enviar token: $e');
     }
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
-    debugPrint(
-        '[Push] Foreground: ${message.notification?.title}');
+    debugPrint('[Push] Foreground: ${message.notification?.title}');
     onForegroundMessage?.call(message);
   }
 
   void _handleMessageTap(RemoteMessage message) {
-    debugPrint(
-        '[Push] Tap: ${message.data}');
+    debugPrint('[Push] Tap: ${message.data}');
     onMessageTap?.call(message);
   }
 

@@ -113,20 +113,22 @@ class AppObservability {
         return;
       }
 
-      scope.setUser(
-        SentryUser(
-          id: user.id,
-          username:
-              user.displayName?.trim().isNotEmpty == true
-                  ? user.displayName
-                  : user.username,
-          email: user.email,
-        ),
-      );
+      scope.setUser(sentryUserFor(user));
     });
   }
 
   Future<void> clearUserContext() => setUserContext(null);
+
+  @visibleForTesting
+  SentryUser sentryUserFor(User user) {
+    return SentryUser(
+      id: user.id,
+      username:
+          user.displayName?.trim().isNotEmpty == true
+              ? user.displayName
+              : user.username,
+    );
+  }
 
   Future<void> recordEvent(
     String message, {

@@ -29,10 +29,19 @@ String sanitizeLogMessage(String message) {
       r'$1[REDACTED]',
     ),
     MapEntry(
+      RegExp(r'(fcm[_-]?token\s*[=:]\s*)[^\s,;]+', caseSensitive: false),
+      r'$1[REDACTED]',
+    ),
+    MapEntry(
       RegExp(r'(db[_-]?pass\s*[=:]\s*)[^\s,;]+', caseSensitive: false),
       r'$1[REDACTED]',
     ),
     MapEntry(RegExp(r'\bsk-[A-Za-z0-9_-]{10,}\b'), '[REDACTED_OPENAI_KEY]'),
+    MapEntry(
+      RegExp(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b',
+          caseSensitive: false),
+      '[REDACTED_EMAIL]',
+    ),
   ];
 
   for (final entry in patterns) {
