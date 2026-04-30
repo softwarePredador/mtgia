@@ -1,5 +1,31 @@
 # ManaLoom UX Psychology Design Audit — 2026-04-30
 
+## Patch status — Deck Detail / Validate / Meta Intelligence — 2026-04-30 17:24 -0300
+
+Sprint de produto aplicada em Deck Detail, Validate Deck, Generate/Optimize e Meta Intelligence UI. Contratos JSON foram preservados; o app passou a consumir campos opcionais ja existentes (`meta_reference_context`) e a tratar o contrato atual de validacao (`ok: true`) como sucesso.
+
+| Finding | Status | Evidência |
+| --- | --- | --- |
+| UX-014 Optimize AI explainability | `resolvido` | Preview mostra plano (`Completar lista`, `Ajuste leve`, `Ajuste competitivo guiado`), quantidade de mudancas, cartas depois, terrenos, impacto e referencias meta quando presentes. |
+| Meta Intelligence surface | `resolvido` | `OptimizationPreviewDialog` exibe fonte, escopo/subformat, shell/arquetipo, motivo estrategico, cartas influenciadas e aviso de que meta e referencia, nao copia cega. |
+| Validate user-facing errors | `resolvido` | Deck Detail transforma falhas de comandante, identidade de cor, contagem, singleton/quantidade e legalidade em cards com explicacao e acao sugerida. |
+| Commander deck confidence | `resolvido` | Overview mostra comandante, identidade de cor, contagem 100, preco/curva e CTA de validar/otimizar sem competir visualmente. |
+| Optimize empty strategy state | `resolvido` | Quando `/ai/archetypes` nao traz opcoes, o sheet mostra fallback `midrange` como ajuste leve com preview obrigatorio; runtime iPhone 15 deixou de travar nesse ponto. |
+| Raw technical UI errors | `mantido sob controle` | Nao houve erro user-facing cru, crash, overflow ou 4xx/5xx no runtime final; logs mostram apenas slow-request breadcrumbs e warning local de plugins arm64 simulador. |
+
+Validação executada:
+
+| comando | resultado |
+| --- | --- |
+| `cd app && flutter analyze lib/features/decks lib/features/cards test/features/decks test/features/cards --no-version-check` | `PASS`, sem issues. |
+| `cd app && flutter test test/features/decks test/features/cards --no-version-check` | `PASS`, `00:17 +137: All tests passed!`. |
+| `cd server && dart analyze routes/decks routes/ai lib/ai lib/meta test` | `PASS`, sem issues. |
+| `cd server && dart test -r expanded` | `PASS`, `00:04 +556: All tests passed!`. |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run` | `PASS`, 19 candidatos dry-run. |
+| `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | `PASS`, `01:13 +1: All tests passed!`. |
+
+Runtime iPhone 15 provou UI real + backend real para registro, criacao de Commander, import de comandante, abertura de Deck Detail, sheet de Optimize, complete async, preview, apply, bulk update e validate final. Evidencias persistidas em `app/doc/runtime_flow_proofs_2026-04-30_deck_meta_validate/` e handoff `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`.
+
 ## Patch status — P1 visual fora de Trades — 2026-04-30 14:58 -0300
 
 Sprint visual P1 aplicada fora de Trades, preservando contratos JSON, rotas backend, meta pipeline, scanner/OCR, Life Counter/Lotus, secrets, assets oficiais de MTG e release builds.

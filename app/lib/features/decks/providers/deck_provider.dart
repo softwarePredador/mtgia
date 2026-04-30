@@ -694,7 +694,7 @@ class DeckProvider extends ChangeNotifier {
     AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
 
     try {
-      final isValid = result.validation['valid'] as bool? ?? false;
+      final isValid = isDeckValidationOk(result.validation);
       if (!isValid) {
         final errors = (result.validation['errors'] as List?)?.join(', ') ?? '';
         AppLogger.warning(

@@ -40,6 +40,10 @@ void main() {
     expect(preview.displayAdditions.first['card_id'], 'add-1');
     expect(preview.displayRemovals.first['card_id'], 'remove-1');
     expect(preview.qualityWarning?['message'], 'partial');
+    expect(
+      preview.metaReferenceContext['priority_source'],
+      'competitive_meta_exact_shell_match',
+    );
   });
 
   test('buildOptimizeDebugJson keeps request and response payloads', () {

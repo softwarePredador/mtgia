@@ -304,6 +304,14 @@ class DeckDetailsOverviewTab extends StatelessWidget {
           else ...[
             _OverviewQuickActions(onOptimize: onShowOptimizationOptions),
             const SizedBox(height: 16),
+            _CommanderDeckSummaryGrid(
+              deck: deck,
+              totalCards: totalCards,
+              maxCards: maxCards,
+              hasCommander: deck.commander.isNotEmpty,
+              pricing: pricing,
+            ),
+            const SizedBox(height: 16),
             _LegalityConfidenceCard(
               isCommanderFormat: isCommanderFormat,
               isValidating: isValidating,
@@ -313,6 +321,8 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               hasCommander: deck.commander.isNotEmpty,
               onValidateNow: onValidateNow,
               onValidationTap: onValidationTap,
+              onOpenCards: onOpenCards,
+              onSelectCommander: onSelectCommander,
             ),
             const SizedBox(height: 16),
             DeckProgressIndicator(
@@ -510,6 +520,169 @@ class _CommanderSection extends StatelessWidget {
   }
 }
 
+class _CommanderDeckSummaryGrid extends StatelessWidget {
+  final DeckDetails deck;
+  final int totalCards;
+  final int? maxCards;
+  final bool hasCommander;
+  final Map<String, dynamic>? pricing;
+
+  const _CommanderDeckSummaryGrid({
+    required this.deck,
+    required this.totalCards,
+    required this.maxCards,
+    required this.hasCommander,
+    required this.pricing,
+  });
+
+  String get _identityLabel {
+    if (deck.colorIdentity.isEmpty) return 'Incolor/pendente';
+    return deck.colorIdentity.join('');
+  }
+
+  String get _countLabel =>
+      maxCards == null ? '$totalCards cartas' : '$totalCards/$maxCards cartas';
+
+  String get _priceLabel {
+    final rawTotal = pricing?['estimated_total_usd'] ?? deck.pricingTotal;
+    final total = rawTotal is num ? rawTotal.toDouble() : null;
+    if (total == null) return 'Pendente';
+    final currency =
+        pricing?['currency']?.toString() ?? deck.pricingCurrency ?? 'USD';
+    return '$currency ${total.toStringAsFixed(2)}';
+  }
+
+  String get _curveLabel {
+    final raw =
+        deck.stats['average_cmc'] ??
+        deck.stats['avg_cmc'] ??
+        deck.stats['average_mana_value'];
+    final value = raw is num ? raw.toDouble() : double.tryParse('$raw');
+    if (value == null) return 'Aba Análise';
+    return 'CMC ${value.toStringAsFixed(1)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cardsOk = maxCards == null || totalCards == maxCards;
+    final commanderOk = !isCommanderFormat(deck.format) || hasCommander;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns =
+            constraints.maxWidth < 360
+                ? 2
+                : (constraints.maxWidth < 720 ? 4 : 4);
+        const spacing = 8.0;
+        final itemWidth =
+            (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            SizedBox(
+              width: itemWidth,
+              child: _SummaryTile(
+                label: 'Commander',
+                value: hasCommander ? 'Definido' : 'Ausente',
+                icon: Icons.workspace_premium_outlined,
+                accent: commanderOk ? AppTheme.success : AppTheme.warning,
+              ),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _SummaryTile(
+                label: 'Identidade',
+                value: _identityLabel,
+                icon: Icons.palette_outlined,
+                accent: AppTheme.identityColor(deck.colorIdentity.toSet()),
+              ),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _SummaryTile(
+                label: 'Contagem',
+                value: _countLabel,
+                icon: Icons.format_list_numbered,
+                accent: cardsOk ? AppTheme.success : AppTheme.frost400,
+              ),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _SummaryTile(
+                label: _priceLabel == 'Pendente' ? 'Curva' : 'Preço',
+                value: _priceLabel == 'Pendente' ? _curveLabel : _priceLabel,
+                icon:
+                    _priceLabel == 'Pendente'
+                        ? Icons.show_chart_rounded
+                        : Icons.attach_money_rounded,
+                accent: AppTheme.mythicGold,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+bool isCommanderFormat(String format) {
+  final normalized = format.toLowerCase();
+  return normalized == 'commander' || normalized == 'brawl';
+}
+
+class _SummaryTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color accent;
+
+  const _SummaryTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: accent, size: 18),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LegalityConfidenceCard extends StatelessWidget {
   final bool isCommanderFormat;
   final bool isValidating;
@@ -519,6 +692,8 @@ class _LegalityConfidenceCard extends StatelessWidget {
   final bool hasCommander;
   final VoidCallback onValidateNow;
   final VoidCallback onValidationTap;
+  final VoidCallback onOpenCards;
+  final VoidCallback onSelectCommander;
 
   const _LegalityConfidenceCard({
     required this.isCommanderFormat,
@@ -529,7 +704,136 @@ class _LegalityConfidenceCard extends StatelessWidget {
     required this.hasCommander,
     required this.onValidateNow,
     required this.onValidationTap,
+    required this.onOpenCards,
+    required this.onSelectCommander,
   });
+
+  List<_ValidationIssue> _issues() {
+    final issues = <_ValidationIssue>[];
+    void add(_ValidationIssue issue) {
+      if (issues.any((existing) => existing.title == issue.title)) return;
+      issues.add(issue);
+    }
+
+    if (isCommanderFormat && !hasCommander) {
+      add(
+        _ValidationIssue(
+          title: 'Comandante ausente',
+          message:
+              'Escolha o comandante antes de validar identidade de cor e singleton.',
+          actionLabel: 'Selecionar comandante',
+          onAction: onSelectCommander,
+          icon: Icons.person_search_outlined,
+          accent: AppTheme.warning,
+        ),
+      );
+    }
+
+    if (maxCards != null && totalCards < maxCards!) {
+      final missing = maxCards! - totalCards;
+      add(
+        _ValidationIssue(
+          title: 'Deck abaixo de $maxCards cartas',
+          message:
+              'Faltam $missing carta${missing == 1 ? '' : 's'} para fechar a lista do formato.',
+          actionLabel: 'Abrir cartas',
+          onAction: onOpenCards,
+          icon: Icons.playlist_add_outlined,
+          accent: AppTheme.frost400,
+        ),
+      );
+    } else if (maxCards != null && totalCards > maxCards!) {
+      final excess = totalCards - maxCards!;
+      add(
+        _ValidationIssue(
+          title: 'Quantidade acima do limite',
+          message:
+              'Remova $excess carta${excess == 1 ? '' : 's'} para voltar ao tamanho correto.',
+          actionLabel: 'Ver cartas',
+          onAction: onOpenCards,
+          icon: Icons.remove_circle_outline,
+          accent: AppTheme.error,
+        ),
+      );
+    }
+
+    final rawError = validationResult?['error']?.toString().trim() ?? '';
+    if (validationResult != null &&
+        validationResult?['ok'] != true &&
+        rawError.isNotEmpty) {
+      final lower = rawError.toLowerCase();
+      if (lower.contains('identidade') || lower.contains('color identity')) {
+        add(
+          _ValidationIssue(
+            title: 'Carta fora da identidade de cor',
+            message:
+                'Uma carta usa cor que o comandante não permite. Troque ou remova a carta sinalizada.',
+            actionLabel: 'Ver cartas',
+            onAction: onOpenCards,
+            icon: Icons.palette_outlined,
+            accent: AppTheme.error,
+          ),
+        );
+      } else if (lower.contains('ban') ||
+          lower.contains('not legal') ||
+          lower.contains('não legal') ||
+          lower.contains('nao legal')) {
+        add(
+          _ValidationIssue(
+            title: 'Carta banida ou não legal',
+            message:
+                'Substitua a carta por uma opção permitida no formato selecionado.',
+            actionLabel: 'Ver cartas',
+            onAction: onOpenCards,
+            icon: Icons.gavel_outlined,
+            accent: AppTheme.error,
+          ),
+        );
+      } else if (lower.contains('quantidade') ||
+          lower.contains('copy') ||
+          lower.contains('cópia') ||
+          lower.contains('copia') ||
+          lower.contains('singleton')) {
+        add(
+          _ValidationIssue(
+            title: 'Quantidade inválida',
+            message:
+                'Commander permite 1 cópia de carta não-básica. Ajuste a quantidade da carta sinalizada.',
+            actionLabel: 'Ver cartas',
+            onAction: onOpenCards,
+            icon: Icons.exposure_outlined,
+            accent: AppTheme.error,
+          ),
+        );
+      } else if (lower.contains('commander') || lower.contains('comandante')) {
+        add(
+          _ValidationIssue(
+            title: 'Problema com comandante',
+            message:
+                'Revise se o comandante foi marcado corretamente e se é elegível.',
+            actionLabel: 'Selecionar comandante',
+            onAction: onSelectCommander,
+            icon: Icons.workspace_premium_outlined,
+            accent: AppTheme.warning,
+          ),
+        );
+      } else {
+        add(
+          _ValidationIssue(
+            title: 'Regra do formato não atendida',
+            message:
+                'A validação encontrou um ponto de regra. Abra as cartas sinalizadas e ajuste a lista.',
+            actionLabel: 'Ver status',
+            onAction: onValidationTap,
+            icon: Icons.rule_folder_outlined,
+            accent: AppTheme.warning,
+          ),
+        );
+      }
+    }
+
+    return issues;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -552,14 +856,16 @@ class _LegalityConfidenceCard extends StatelessWidget {
         maxCards == null
             ? '$totalCards cartas'
             : '$totalCards/$maxCards cartas';
+    final issues = _issues();
     final message =
         isValidating
             ? 'Checando formato, comandante, contagem e identidade de cor.'
             : hasResult
             ? (ok
                 ? 'A lista passou nas regras conhecidas do app. Revise preço e estratégia antes da mesa.'
-                : (validationResult?['error']?.toString() ??
-                    'Revise as cartas sinalizadas antes de jogar.'))
+                : issues.isNotEmpty
+                ? 'Encontramos ${issues.length} ponto${issues.length == 1 ? '' : 's'} para corrigir antes da mesa.'
+                : 'Revise as cartas sinalizadas antes de jogar.')
             : isCommanderFormat
             ? 'Commander precisa de 100 cartas, 1 comandante e identidade de cor consistente. Valide antes de otimizar ou jogar.'
             : 'Valide a lista antes de exportar, compartilhar ou jogar.';
@@ -657,10 +963,119 @@ class _LegalityConfidenceCard extends StatelessWidget {
                       ),
                   ],
                 ),
+                if (issues.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  ...issues
+                      .take(3)
+                      .map(
+                        (issue) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: _ValidationIssueRow(issue: issue),
+                        ),
+                      ),
+                ],
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ValidationIssue {
+  final String title;
+  final String message;
+  final String actionLabel;
+  final VoidCallback onAction;
+  final IconData icon;
+  final Color accent;
+
+  const _ValidationIssue({
+    required this.title,
+    required this.message,
+    required this.actionLabel,
+    required this.onAction,
+    required this.icon,
+    required this.accent,
+  });
+}
+
+class _ValidationIssueRow extends StatelessWidget {
+  final _ValidationIssue issue;
+
+  const _ValidationIssueRow({required this.issue});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: issue.accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: issue.accent.withValues(alpha: 0.22)),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textBlock = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(issue.icon, color: issue.accent, size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      issue.title,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      issue.message,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.32,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          if (constraints.maxWidth < 280) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                textBlock,
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: issue.onAction,
+                    child: Text(issue.actionLabel),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: textBlock),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: issue.onAction,
+                child: Text(issue.actionLabel),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

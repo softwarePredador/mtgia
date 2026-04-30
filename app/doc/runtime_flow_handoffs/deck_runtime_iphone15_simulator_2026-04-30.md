@@ -1,5 +1,116 @@
 # Deck runtime iPhone 15 Simulator — 2026-04-30
 
+## Atualizacao — Deck Detail Validate Meta Intelligence runtime
+
+### Resultado
+
+- Verdict: `PASS`
+- Date/time: `2026-04-30T17:24-03:00`
+- Task: Sprint Deck Detail + Validate Deck + Meta Intelligence UI.
+- Runtime target: iPhone 15 Simulator.
+- Backend used by app: `http://127.0.0.1:8082` via `API_BASE_URL` and `PUBLIC_API_BASE_URL`.
+- Test target: `app/integration_test/deck_runtime_m2006_test.dart`.
+
+### Backend health
+
+Command:
+
+```bash
+curl -s http://127.0.0.1:8082/health
+```
+
+Result:
+
+```json
+{"status":"healthy","service":"mtgia-server","timestamp":"2026-04-30T17:23:28.284841","environment":"development","version":"1.0.0","git_sha":null,"checks":{"process":{"status":"healthy"}}}
+```
+
+### Commands executed
+
+```bash
+cd app
+flutter analyze lib/features/decks lib/features/cards test/features/decks test/features/cards --no-version-check
+```
+
+Result: `PASS`, no issues.
+
+```bash
+cd app
+flutter test test/features/decks test/features/cards --no-version-check
+```
+
+Result: `PASS`, `00:17 +137: All tests passed!`.
+
+```bash
+cd server
+dart analyze routes/decks routes/ai lib/ai lib/meta test
+dart test -r expanded
+```
+
+Result: analyze `PASS`; tests `PASS`, `00:04 +556: All tests passed!`.
+
+```bash
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run
+```
+
+Result: backend temporary process served health and runtime traffic; dry-run `PASS` with 19 candidates.
+
+```bash
+cd app
+flutter test integration_test/deck_runtime_m2006_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `PASS`, `01:13 +1: All tests passed!`.
+
+### What was proven
+
+UI/runtime real on iPhone 15 Simulator against live local backend:
+
+- register and authenticated navigation worked;
+- Commander deck was created and opened in Deck Detail;
+- commander import added `Talrand, Sky Summoner`;
+- Optimize sheet rendered a visible strategy action after `/ai/archetypes -> 200`;
+- complete mode used async optimize job: `POST /ai/optimize -> 202`, then 4 successful job polls;
+- preview opened before apply;
+- bulk/apply persisted deck changes;
+- final validation path reached screenshot `10_complete_validated`.
+
+Captured backend contract visibility:
+
+- `POST /auth/register -> 201 (2600ms)`;
+- `POST /import/to-deck -> 200 (5268ms)`;
+- `POST /ai/archetypes -> 200 (8591ms)`;
+- `POST /ai/optimize -> 202 (5502ms)`;
+- `GET /ai/optimize/jobs/<id> -> 200` x4;
+- `POST /decks/<id>/cards/bulk -> 200 (4944ms)`;
+- `POST /decks/<id>/validate` reached during final validation.
+
+### What was real vs mocked
+
+- Real: iPhone 15 Simulator UI, Flutter integration harness, local Dart Frog backend on `127.0.0.1:8082`, PostgreSQL-backed auth/decks/import/AI/validate flow, screenshot capture.
+- Mocked: no API/provider mocks in the runtime path.
+- Not touched: Life Counter/Lotus, Scanner camera/OCR, FCM, secrets, release build and official MTG assets.
+
+### Evidence paths
+
+- Proof folder: `app/doc/runtime_flow_proofs_2026-04-30_deck_meta_validate/`
+- Backend health: `backend_health_8082.json`
+- Runtime log: `deck_runtime_m2006_iphone15.log` (screenshot chunks omitted)
+- Validation tails: `app_validation_tail.log`, `server_validation_tail.log`
+
+### Blockers and next actions
+
+- No crash, overflow, timeout, user-facing raw error, 4xx or 5xx remained in the passing runtime.
+- Expected local warning remains: several pods do not support `arm64` simulator for Apple Silicon iOS 26+; this iPhone 15 run still built and passed.
+- Backend 8082 was stopped after validation.
+
 ## Atualizacao — Life Counter/Lotus visual runtime proof
 
 ### Resultado

@@ -1,7 +1,7 @@
 # Dry-run Commander-Only Optimization - 2026-04-27
 
 - Mode: `dry_run`
-- API base: `http://127.0.0.1:8080`
+- API base: `http://127.0.0.1:8082`
 - Corpus: `test/fixtures/optimization_resolution_corpus.json`
 - Total: `19`
 - Passed: `0`
@@ -11,7 +11,7 @@
 
 > Dry-run: nenhuma autenticacao, criacao de deck, optimize, bulk save ou validate foi executado.
 > Use `--apply` para executar o runtime E2E com escrita real.
-> Health check pulado: `true`.
+> Health check pulado: `false`.
 
 ## Auntie Ool, Cursewretch
 

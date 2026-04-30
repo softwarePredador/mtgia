@@ -73,6 +73,51 @@ class OptimizationConfigSection extends StatelessWidget {
               onChanged: onKeepThemeChanged,
             ),
           ),
+          const SizedBox(height: 12),
+          _OptimizationModeGuide(selectedBracket: selectedBracket),
+        ],
+      ),
+    );
+  }
+}
+
+class _OptimizationModeGuide extends StatelessWidget {
+  final int selectedBracket;
+
+  const _OptimizationModeGuide({required this.selectedBracket});
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompetitive = selectedBracket >= 4;
+    final accent = isCompetitive ? AppTheme.mythicGold : AppTheme.frost400;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accent.withValues(alpha: 0.24)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isCompetitive ? Icons.emoji_events_outlined : Icons.tune_outlined,
+            color: accent,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              isCompetitive
+                  ? 'Competitivo/cEDH: usa referências meta quando existirem, mas ainda filtra por identidade, bracket e segurança.'
+                  : 'Ajuste leve: troca poucas cartas. Se a lista estiver muito fora da faixa, o app oferece rebuild guiado em vez de aplicar mudanças arriscadas.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -196,14 +241,25 @@ class OptimizationOptionsSection extends StatelessWidget {
         showAllStrategies ? options : const <Map<String, dynamic>>[];
 
     if (visibleOptions.isEmpty) {
-      return DialogSectionCard(
-        title: 'Estratégias alternativas ocultas',
-        accent: AppTheme.textSecondary,
-        icon: Icons.visibility_off_outlined,
-        child: const Text(
-          'Você pode seguir com a estratégia atual ou exibir novamente as demais opções para comparar.',
-          style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
-        ),
+      if (!showAllStrategies) {
+        return DialogSectionCard(
+          title: 'Estratégias alternativas ocultas',
+          accent: AppTheme.textSecondary,
+          icon: Icons.visibility_off_outlined,
+          child: const Text(
+            'Você pode seguir com a estratégia atual ou exibir novamente as demais opções para comparar.',
+            style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
+          ),
+        );
+      }
+
+      return StrategyOptionCard(
+        title: 'midrange',
+        description:
+            'Ajuste leve padrão quando o detector não encontra uma estratégia automática. O preview continua obrigatório antes de aplicar.',
+        difficulty: 'fallback seguro',
+        accent: accent,
+        onTap: () => onSelectArchetype('midrange'),
       );
     }
 
@@ -284,18 +340,10 @@ class OptimizationSheetBody extends StatelessWidget {
           icon: Icons.tune_rounded,
           title: 'Otimizar Deck',
           subtitle:
-              'Escolha a direção da IA e aplique apenas mudanças seguras para este deck.',
+              'Escolha entre ajuste leve, rebuild guiado quando necessário e sinal competitivo/cEDH sem aplicar nada antes do preview.',
           accent: accent,
         ),
         const SizedBox(height: 16),
-        OptimizationConfigSection(
-          selectedBracket: selectedBracket,
-          keepTheme: keepTheme,
-          accent: accent,
-          onBracketChanged: onBracketChanged,
-          onKeepThemeChanged: onKeepThemeChanged,
-        ),
-        const SizedBox(height: 12),
         if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
           CurrentStrategySection(
             savedArchetype: savedArchetype!,
@@ -315,6 +363,14 @@ class OptimizationSheetBody extends StatelessWidget {
                 onRetry: onRetryOptions,
                 onSelectArchetype: onApplyArchetype,
               ),
+        ),
+        const SizedBox(height: 16),
+        OptimizationConfigSection(
+          selectedBracket: selectedBracket,
+          keepTheme: keepTheme,
+          accent: accent,
+          onBracketChanged: onBracketChanged,
+          onKeepThemeChanged: onKeepThemeChanged,
         ),
       ],
     );

@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-04-27T14:23:05.930884",
-  "run_started_at": "2026-04-27T14:23:05.929905",
+  "generated_at": "2026-04-30T17:09:34.572266",
+  "run_started_at": "2026-04-30T17:09:34.569730",
   "mode": "dry_run",
-  "api_base_url": "http://127.0.0.1:8080",
+  "api_base_url": "http://127.0.0.1:8082",
   "artifact_dir": "test/artifacts/commander_only_optimization_validation",
   "corpus_path": "test/fixtures/optimization_resolution_corpus.json",
   "validation_limit": 19,
@@ -12,7 +12,7 @@
   "failed": 0,
   "completed": 0,
   "protected_rejections": 0,
-  "api_health_check_skipped": true,
+  "api_health_check_skipped": false,
   "writes_blocked_by_default": true,
   "requires_apply_for_writes": true,
   "blocked_operations": [

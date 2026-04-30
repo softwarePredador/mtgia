@@ -715,7 +715,7 @@ class _AiTrustPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Commander pode levar alguns segundos. O resultado mostra avisos de validação e só é salvo após seu review.',
+                  'Gerar cria uma proposta revisável; otimizar depois faz ajuste leve ou rebuild guiado. Meta pode orientar escolhas, mas nunca substitui validação e review.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
                     height: 1.35,

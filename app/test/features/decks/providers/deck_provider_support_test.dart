@@ -187,7 +187,7 @@ void main() {
   test(
     'buildNamedOptimizationApplyResult applies removals/additions and tracks identity skips',
     () {
-    final deck = DeckDetails(
+      final deck = DeckDetails(
         id: 'deck-1',
         name: 'Deck',
         format: 'commander',
@@ -195,8 +195,8 @@ void main() {
         createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
         colorIdentity: const ['U'],
         stats: const {'total_cards': 3},
-      commander: [
-        DeckCardItem(
+        commander: [
+          DeckCardItem(
             id: 'cmd-1',
             name: 'Talrand',
             manaCost: '{2}{U}{U}',
@@ -210,9 +210,9 @@ void main() {
             isCommander: true,
           ),
         ],
-      mainBoard: {
-        'Artifacts': [
-          DeckCardItem(
+        mainBoard: {
+          'Artifacts': [
+            DeckCardItem(
               id: 'remove-1',
               name: 'Mind Stone',
               manaCost: '{2}',
@@ -262,21 +262,27 @@ void main() {
     () async {
       final apiClient = _FakeApiClient(
         getHandlers: {
-          '/cards?name=Mind+Stone&limit=1': () => ApiResponse(200, {
-            'data': [
-              {'id': 'remove-1', 'name': 'Mind Stone', 'type_line': 'Artifact'},
-            ],
-          }),
-          '/cards?name=Arcane+Signet&limit=1': () => ApiResponse(200, {
-            'data': [
-              {
-                'id': 'add-1',
-                'name': 'Arcane Signet',
-                'type_line': 'Artifact',
-                'color_identity': const <String>[],
-              },
-            ],
-          }),
+          '/cards?name=Mind+Stone&limit=1':
+              () => ApiResponse(200, {
+                'data': [
+                  {
+                    'id': 'remove-1',
+                    'name': 'Mind Stone',
+                    'type_line': 'Artifact',
+                  },
+                ],
+              }),
+          '/cards?name=Arcane+Signet&limit=1':
+              () => ApiResponse(200, {
+                'data': [
+                  {
+                    'id': 'add-1',
+                    'name': 'Arcane Signet',
+                    'type_line': 'Artifact',
+                    'color_identity': const <String>[],
+                  },
+                ],
+              }),
         },
       );
 
@@ -414,39 +420,42 @@ void main() {
     expect(updatedList.last.isPublic, isFalse);
   });
 
-  test('applyDeckDeletionToState removes deck from list and clears selection', () {
-    final selected = DeckDetails(
-      id: 'deck-1',
-      name: 'Deck',
-      format: 'commander',
-      isPublic: false,
-      createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-      stats: const {},
-      commander: const <DeckCardItem>[],
-      mainBoard: const <String, List<DeckCardItem>>{},
-    );
-    final decks = <Deck>[
-      Deck(
+  test(
+    'applyDeckDeletionToState removes deck from list and clears selection',
+    () {
+      final selected = DeckDetails(
         id: 'deck-1',
         name: 'Deck',
         format: 'commander',
         isPublic: false,
         createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-      ),
-      Deck(
-        id: 'deck-2',
-        name: 'Other',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-      ),
-    ];
+        stats: const {},
+        commander: const <DeckCardItem>[],
+        mainBoard: const <String, List<DeckCardItem>>{},
+      );
+      final decks = <Deck>[
+        Deck(
+          id: 'deck-1',
+          name: 'Deck',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+        ),
+        Deck(
+          id: 'deck-2',
+          name: 'Other',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+        ),
+      ];
 
-    final nextState = applyDeckDeletionToState(decks, selected, 'deck-1');
+      final nextState = applyDeckDeletionToState(decks, selected, 'deck-1');
 
-    expect(nextState.decks.map((deck) => deck.id), ['deck-2']);
-    expect(nextState.selectedDeck, isNull);
-  });
+      expect(nextState.decks.map((deck) => deck.id), ['deck-2']);
+      expect(nextState.selectedDeck, isNull);
+    },
+  );
 
   test('color identity list helpers enrich only missing decks', () {
     final decks = <Deck>[
@@ -491,59 +500,29 @@ void main() {
     expect(missing, isEmpty);
   });
 
-  test('buildDeckListHydrationResult hydrates cache and exposes missing decks', () {
-    final fetchedDecks = <Deck>[
-      Deck(
-        id: 'deck-1',
-        name: 'No Color',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        cardCount: 99,
-      ),
-      Deck(
-        id: 'deck-2',
-        name: 'Has Color',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        colorIdentity: const ['G'],
-        cardCount: 99,
-      ),
-    ];
-    final cache = {
-      'deck-1': DeckDetails(
-        id: 'deck-1',
-        name: 'No Color',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        colorIdentity: const ['U'],
-        stats: const {},
-        commander: const <DeckCardItem>[],
-        mainBoard: const <String, List<DeckCardItem>>{},
-      ),
-    };
-
-    final result = buildDeckListHydrationResult(fetchedDecks, cache);
-
-    expect(result.decks.first.colorIdentity, const ['U']);
-    expect(result.missingColorIdentityDecks, isEmpty);
-  });
-
-  test('applyDeckColorIdentityEnrichment returns updated decks and cache details', () {
-    final decks = <Deck>[
-      Deck(
-        id: 'deck-1',
-        name: 'No Color',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        cardCount: 99,
-      ),
-    ];
-    final result = DeckColorIdentityEnrichmentResult(
-      detailsByDeckId: {
+  test(
+    'buildDeckListHydrationResult hydrates cache and exposes missing decks',
+    () {
+      final fetchedDecks = <Deck>[
+        Deck(
+          id: 'deck-1',
+          name: 'No Color',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+          cardCount: 99,
+        ),
+        Deck(
+          id: 'deck-2',
+          name: 'Has Color',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+          colorIdentity: const ['G'],
+          cardCount: 99,
+        ),
+      ];
+      final cache = {
         'deck-1': DeckDetails(
           id: 'deck-1',
           name: 'No Color',
@@ -555,58 +534,98 @@ void main() {
           commander: const <DeckCardItem>[],
           mainBoard: const <String, List<DeckCardItem>>{},
         ),
-      },
-      failedDeckIds: const [],
-    );
+      };
 
-    final applyResult = applyDeckColorIdentityEnrichment(decks, result);
+      final result = buildDeckListHydrationResult(fetchedDecks, cache);
 
-    expect(applyResult.decks.single.colorIdentity, const ['U']);
-    expect(applyResult.cachedDetails.single.id, 'deck-1');
-    expect(applyResult.enrichedCount, 1);
-  });
+      expect(result.decks.first.colorIdentity, const ['U']);
+      expect(result.missingColorIdentityDecks, isEmpty);
+    },
+  );
 
-  test('fetchMissingDeckColorIdentities returns only enriched details', () async {
-    final apiClient = _FakeApiClient(
-      getHandlers: {
-        '/decks/deck-1': () => ApiResponse(200, {
-          'id': 'deck-1',
-          'name': 'Blue Deck',
-          'format': 'commander',
-          'is_public': false,
-          'created_at': '2026-03-24T00:00:00.000Z',
-          'color_identity': const ['U'],
-          'stats': const <String, dynamic>{},
-          'commander': const <dynamic>[],
-          'main_board': const <String, List<dynamic>>{},
-        }),
-        '/decks/deck-2': () => ApiResponse(500, {'error': 'boom'}),
-      },
-    );
+  test(
+    'applyDeckColorIdentityEnrichment returns updated decks and cache details',
+    () {
+      final decks = <Deck>[
+        Deck(
+          id: 'deck-1',
+          name: 'No Color',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+          cardCount: 99,
+        ),
+      ];
+      final result = DeckColorIdentityEnrichmentResult(
+        detailsByDeckId: {
+          'deck-1': DeckDetails(
+            id: 'deck-1',
+            name: 'No Color',
+            format: 'commander',
+            isPublic: false,
+            createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+            colorIdentity: const ['U'],
+            stats: const {},
+            commander: const <DeckCardItem>[],
+            mainBoard: const <String, List<DeckCardItem>>{},
+          ),
+        },
+        failedDeckIds: const [],
+      );
 
-    final result = await fetchMissingDeckColorIdentities(apiClient, [
-      Deck(
-        id: 'deck-1',
-        name: 'Blue Deck',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        cardCount: 99,
-      ),
-      Deck(
-        id: 'deck-2',
-        name: 'Broken Deck',
-        format: 'commander',
-        isPublic: false,
-        createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
-        cardCount: 99,
-      ),
-    ]);
+      final applyResult = applyDeckColorIdentityEnrichment(decks, result);
 
-    expect(result.detailsByDeckId.keys, ['deck-1']);
-    expect(result.detailsByDeckId['deck-1']?.colorIdentity, ['U']);
-    expect(result.failedDeckIds, isEmpty);
-  });
+      expect(applyResult.decks.single.colorIdentity, const ['U']);
+      expect(applyResult.cachedDetails.single.id, 'deck-1');
+      expect(applyResult.enrichedCount, 1);
+    },
+  );
+
+  test(
+    'fetchMissingDeckColorIdentities returns only enriched details',
+    () async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1':
+              () => ApiResponse(200, {
+                'id': 'deck-1',
+                'name': 'Blue Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-24T00:00:00.000Z',
+                'color_identity': const ['U'],
+                'stats': const <String, dynamic>{},
+                'commander': const <dynamic>[],
+                'main_board': const <String, List<dynamic>>{},
+              }),
+          '/decks/deck-2': () => ApiResponse(500, {'error': 'boom'}),
+        },
+      );
+
+      final result = await fetchMissingDeckColorIdentities(apiClient, [
+        Deck(
+          id: 'deck-1',
+          name: 'Blue Deck',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+          cardCount: 99,
+        ),
+        Deck(
+          id: 'deck-2',
+          name: 'Broken Deck',
+          format: 'commander',
+          isPublic: false,
+          createdAt: DateTime.parse('2026-03-24T00:00:00.000Z'),
+          cardCount: 99,
+        ),
+      ]);
+
+      expect(result.detailsByDeckId.keys, ['deck-1']);
+      expect(result.detailsByDeckId['deck-1']?.colorIdentity, ['U']);
+      expect(result.failedDeckIds, isEmpty);
+    },
+  );
 
   test('parse deck response helpers map success and unauthorized states', () {
     final detailsState = parseDeckDetailsResponse(
@@ -734,6 +753,10 @@ void main() {
 
     expect(options.single['id'], 'control');
     expect(validation['ok'], isFalse);
+    expect(isDeckValidationOk({'ok': true}), isTrue);
+    expect(isDeckValidationOk({'valid': true}), isTrue);
+    expect(isDeckValidationOk({'is_valid': true}), isTrue);
+    expect(isDeckValidationOk({'ok': false}), isFalse);
     expect(pricing['currency'], 'USD');
     expect(
       () => ensureSuccessfulDeckMutationResponse(
@@ -770,11 +793,12 @@ void main() {
 
       final asyncClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize': (_) => ApiResponse(202, {
-            'job_id': 'job-1',
-            'poll_interval_ms': 2500,
-            'total_stages': 7,
-          }),
+          '/ai/optimize':
+              (_) => ApiResponse(202, {
+                'job_id': 'job-1',
+                'poll_interval_ms': 2500,
+                'total_stages': 7,
+              }),
         },
       );
       final asyncResult = await requestOptimizeDeck(
@@ -790,11 +814,12 @@ void main() {
 
       final failureClient = _FakeApiClient(
         postHandlers: {
-          '/ai/optimize': (_) => ApiResponse(422, {
-            'error': 'Precisa de reparo',
-            'quality_error': {'code': 'OPTIMIZE_NEEDS_REPAIR'},
-            'outcome_code': 'needs_repair',
-          }),
+          '/ai/optimize':
+              (_) => ApiResponse(422, {
+                'error': 'Precisa de reparo',
+                'quality_error': {'code': 'OPTIMIZE_NEEDS_REPAIR'},
+                'outcome_code': 'needs_repair',
+              }),
         },
       );
       await expectLater(
@@ -823,10 +848,9 @@ void main() {
               'rebuild_scope_selected': 'full_non_commander_rebuild',
             });
           },
-          '/decks/deck-1/validate': (_) => ApiResponse(200, {
-            'valid': true,
-            'errors': const <String>[],
-          }),
+          '/decks/deck-1/validate':
+              (_) =>
+                  ApiResponse(200, {'valid': true, 'errors': const <String>[]}),
         },
         putHandlers: {
           '/decks/deck-1': (body) {
@@ -858,10 +882,11 @@ void main() {
 
       final failureClient = _FakeApiClient(
         postHandlers: {
-          '/ai/rebuild': (_) => ApiResponse(422, {
-            'error': 'Rebuild falhou',
-            'quality_error': {'code': 'REBUILD_FAILED'},
-          }),
+          '/ai/rebuild':
+              (_) => ApiResponse(422, {
+                'error': 'Rebuild falhou',
+                'quality_error': {'code': 'REBUILD_FAILED'},
+              }),
         },
       );
       await expectLater(
@@ -883,12 +908,13 @@ void main() {
     () async {
       final pendingClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-1': () => ApiResponse(200, {
-            'status': 'processing',
-            'stage': 'Analisando',
-            'stage_number': 2,
-            'total_stages': 6,
-          }),
+          '/ai/optimize/jobs/job-1':
+              () => ApiResponse(200, {
+                'status': 'processing',
+                'stage': 'Analisando',
+                'stage_number': 2,
+                'total_stages': 6,
+              }),
         },
       );
       final pending = await pollOptimizeJobRequest(pendingClient, 'job-1');
@@ -898,10 +924,11 @@ void main() {
 
       final completedClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-2': () => ApiResponse(200, {
-            'status': 'completed',
-            'result': {'mode': 'optimize'},
-          }),
+          '/ai/optimize/jobs/job-2':
+              () => ApiResponse(200, {
+                'status': 'completed',
+                'result': {'mode': 'optimize'},
+              }),
         },
       );
       final completed = await pollOptimizeJobRequest(completedClient, 'job-2');
@@ -910,11 +937,12 @@ void main() {
 
       final failedClient = _FakeApiClient(
         getHandlers: {
-          '/ai/optimize/jobs/job-3': () => ApiResponse(200, {
-            'status': 'failed',
-            'error': 'Falhou',
-            'quality_error': {'code': 'OPTIMIZE_JOB_FAILED'},
-          }),
+          '/ai/optimize/jobs/job-3':
+              () => ApiResponse(200, {
+                'status': 'failed',
+                'error': 'Falhou',
+                'quality_error': {'code': 'OPTIMIZE_JOB_FAILED'},
+              }),
         },
       );
       await expectLater(
@@ -1047,227 +1075,237 @@ void main() {
     },
   );
 
-  test('request helpers dispatch expected endpoints and parse responses', () async {
-    final apiClient = _FakeApiClient(
-      postHandlers: {
-        '/decks': (body) {
-          expect(body['name'], 'Deck');
-          expect(body['format'], 'commander');
-          return ApiResponse(201, {'id': 'deck-1'});
-        },
-        '/decks/deck-1/cards': (body) {
-          expect(body['card_id'], 'card-1');
-          return ApiResponse(200, const {});
-        },
-        '/decks/deck-1/cards/bulk': (body) {
-          expect(body['cards'], isA<List>());
-          return ApiResponse(200, const {});
-        },
-        '/decks/deck-1/cards/set': (body) {
-          expect(body['card_id'], 'card-1');
-          expect(body['replace_same_name'], isFalse);
-          return ApiResponse(200, const {});
-        },
-        '/ai/archetypes': (body) {
-          expect(body['deck_id'], 'deck-1');
-          return ApiResponse(200, {
-            'options': [
-              {'id': 'control'},
-            ],
-          });
-        },
-        '/decks/deck-1/validate': (_) => ApiResponse(200, {'valid': true}),
-        '/decks/deck-1/pricing': (body) {
-          expect(body['force'], isTrue);
-          return ApiResponse(200, {'total': 42});
-        },
-        '/decks/deck-1/ai-analysis': (body) {
-          expect(body['force'], isFalse);
-          return ApiResponse(200, {'synergy_score': 77});
-        },
-        '/decks/deck-1/cards/replace': (body) {
-          expect(body['old_card_id'], 'old');
-          expect(body['new_card_id'], 'new');
-          return ApiResponse(200, const {});
-        },
-        '/import': (body) {
-          expect(body['name'], 'Deck');
-          return ApiResponse(200, {'deck': {'id': 'deck-1'}});
-        },
-        '/import/validate': (body) {
-          expect(body['format'], 'commander');
-          return ApiResponse(200, {'found_cards': []});
-        },
-        '/import/to-deck': (body) {
-          expect(body['replace_all'], isTrue);
-          return ApiResponse(200, {'cards_imported': 99});
-        },
-        '/community/decks/deck-1': (_) => ApiResponse(201, {
-          'deck': {'id': 'copied'},
-        }),
-      },
-      getHandlers: {
-        '/decks/deck-1': () => ApiResponse(200, {
-          'id': 'deck-1',
-          'name': 'Deck',
-          'format': 'commander',
-          'is_public': false,
-          'created_at': '2026-03-24T00:00:00.000Z',
-          'stats': const <String, dynamic>{},
-          'commander': const <dynamic>[],
-          'main_board': const <String, List<dynamic>>{},
-        }),
-        '/decks': () => ApiResponse(200, [
-          {
-            'id': 'deck-1',
-            'name': 'Deck',
-            'format': 'commander',
-            'is_public': false,
-            'created_at': '2026-03-24T00:00:00.000Z',
+  test(
+    'request helpers dispatch expected endpoints and parse responses',
+    () async {
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/decks': (body) {
+            expect(body['name'], 'Deck');
+            expect(body['format'], 'commander');
+            return ApiResponse(201, {'id': 'deck-1'});
           },
-        ]),
-        '/decks/deck-1/export': () => ApiResponse(200, {'text': '1 Sol Ring'}),
-      },
-      putHandlers: {
-        '/decks/deck-1': (body) {
-          if (body.containsKey('is_public')) {
+          '/decks/deck-1/cards': (body) {
+            expect(body['card_id'], 'card-1');
             return ApiResponse(200, const {});
-          }
-          if (body.containsKey('cards')) {
+          },
+          '/decks/deck-1/cards/bulk': (body) {
+            expect(body['cards'], isA<List>());
             return ApiResponse(200, const {});
-          }
-          if (body.containsKey('description')) {
+          },
+          '/decks/deck-1/cards/set': (body) {
+            expect(body['card_id'], 'card-1');
+            expect(body['replace_same_name'], isFalse);
             return ApiResponse(200, const {});
-          }
-          if (body.containsKey('archetype')) {
+          },
+          '/ai/archetypes': (body) {
+            expect(body['deck_id'], 'deck-1');
+            return ApiResponse(200, {
+              'options': [
+                {'id': 'control'},
+              ],
+            });
+          },
+          '/decks/deck-1/validate': (_) => ApiResponse(200, {'valid': true}),
+          '/decks/deck-1/pricing': (body) {
+            expect(body['force'], isTrue);
+            return ApiResponse(200, {'total': 42});
+          },
+          '/decks/deck-1/ai-analysis': (body) {
+            expect(body['force'], isFalse);
+            return ApiResponse(200, {'synergy_score': 77});
+          },
+          '/decks/deck-1/cards/replace': (body) {
+            expect(body['old_card_id'], 'old');
+            expect(body['new_card_id'], 'new');
             return ApiResponse(200, const {});
-          }
-          throw StateError('unexpected PUT body: $body');
+          },
+          '/import': (body) {
+            expect(body['name'], 'Deck');
+            return ApiResponse(200, {
+              'deck': {'id': 'deck-1'},
+            });
+          },
+          '/import/validate': (body) {
+            expect(body['format'], 'commander');
+            return ApiResponse(200, {'found_cards': []});
+          },
+          '/import/to-deck': (body) {
+            expect(body['replace_all'], isTrue);
+            return ApiResponse(200, {'cards_imported': 99});
+          },
+          '/community/decks/deck-1':
+              (_) => ApiResponse(201, {
+                'deck': {'id': 'copied'},
+              }),
         },
-      },
-      deleteHandlers: {
-        '/decks/deck-1': () => ApiResponse(204, const {}),
-      },
-    );
+        getHandlers: {
+          '/decks/deck-1':
+              () => ApiResponse(200, {
+                'id': 'deck-1',
+                'name': 'Deck',
+                'format': 'commander',
+                'is_public': false,
+                'created_at': '2026-03-24T00:00:00.000Z',
+                'stats': const <String, dynamic>{},
+                'commander': const <dynamic>[],
+                'main_board': const <String, List<dynamic>>{},
+              }),
+          '/decks':
+              () => ApiResponse(200, [
+                {
+                  'id': 'deck-1',
+                  'name': 'Deck',
+                  'format': 'commander',
+                  'is_public': false,
+                  'created_at': '2026-03-24T00:00:00.000Z',
+                },
+              ]),
+          '/decks/deck-1/export':
+              () => ApiResponse(200, {'text': '1 Sol Ring'}),
+        },
+        putHandlers: {
+          '/decks/deck-1': (body) {
+            if (body.containsKey('is_public')) {
+              return ApiResponse(200, const {});
+            }
+            if (body.containsKey('cards')) {
+              return ApiResponse(200, const {});
+            }
+            if (body.containsKey('description')) {
+              return ApiResponse(200, const {});
+            }
+            if (body.containsKey('archetype')) {
+              return ApiResponse(200, const {});
+            }
+            throw StateError('unexpected PUT body: $body');
+          },
+        },
+        deleteHandlers: {'/decks/deck-1': () => ApiResponse(204, const {})},
+      );
 
-    final detailsState = await fetchDeckDetailsRequest(apiClient, 'deck-1');
-    final listState = await fetchDeckListRequest(apiClient);
-    final createResult = await createDeckRequest(
-      apiClient,
-      name: 'Deck',
-      format: 'commander',
-      isPublic: false,
-      cards: const [],
-    );
-    final addResult = await addCardToDeckRequest(
-      apiClient,
-      deckId: 'deck-1',
-      cardId: 'card-1',
-      quantity: 1,
-      isCommander: false,
-      condition: 'NM',
-    );
-    final bulkResult = await addCardsBulkRequest(
-      apiClient,
-      deckId: 'deck-1',
-      cards: const [
-        {'card_id': 'card-1', 'quantity': 1, 'is_commander': false},
-      ],
-    );
-    final options = await fetchOptimizationOptionsRequest(apiClient, 'deck-1');
-    final validation = await validateDeckRequest(apiClient, 'deck-1');
-    final pricing = await fetchDeckPricingRequest(
-      apiClient,
-      'deck-1',
-      force: true,
-    );
-    final deleteResult = await deleteDeckRequest(apiClient, 'deck-1');
-    final removeResult = await removeCardFromDeckRequest(
-      apiClient,
-      deckId: 'deck-1',
-      cardsPayload: const [
-        {'card_id': 'card-2', 'quantity': 1, 'is_commander': false},
-      ],
-    );
-    final analysis = await refreshAiAnalysisRequest(
-      apiClient,
-      'deck-1',
-      force: false,
-    );
-    await updateDeckDescriptionRequest(
-      apiClient,
-      deckId: 'deck-1',
-      description: 'nova',
-    );
-    await updateDeckStrategyRequest(
-      apiClient,
-      deckId: 'deck-1',
-      archetype: 'control',
-      bracket: 3,
-    );
-    await replaceCardEditionRequest(
-      apiClient,
-      deckId: 'deck-1',
-      oldCardId: 'old',
-      newCardId: 'new',
-    );
-    final setQuantityResult = await setDeckCardQuantityRequest(
-      apiClient,
-      deckId: 'deck-1',
-      cardId: 'card-1',
-      quantity: 2,
-      replaceSameName: false,
-      condition: 'NM',
-    );
-    final importResult = await importDeckFromListRequest(
-      apiClient,
-      name: 'Deck',
-      format: 'commander',
-      list: '1 Sol Ring',
-    );
-    final validateImportResult = await validateImportListRequest(
-      apiClient,
-      format: 'commander',
-      list: '1 Sol Ring',
-    );
-    final importToDeckResult = await importListToDeckRequest(
-      apiClient,
-      deckId: 'deck-1',
-      list: '1 Sol Ring',
-      replaceAll: true,
-    );
-    final toggled = await togglePublicRequest(
-      apiClient,
-      deckId: 'deck-1',
-      isPublic: true,
-    );
-    final export = await exportDeckAsTextRequest(apiClient, 'deck-1');
-    final copied = await copyPublicDeckRequest(apiClient, 'deck-1');
-    await persistDeckCardsPayloadRequest(
-      apiClient,
-      deckId: 'deck-1',
-      cardsPayload: const [
-        {'card_id': 'card-1', 'quantity': 1, 'is_commander': false},
-      ],
-    );
+      final detailsState = await fetchDeckDetailsRequest(apiClient, 'deck-1');
+      final listState = await fetchDeckListRequest(apiClient);
+      final createResult = await createDeckRequest(
+        apiClient,
+        name: 'Deck',
+        format: 'commander',
+        isPublic: false,
+        cards: const [],
+      );
+      final addResult = await addCardToDeckRequest(
+        apiClient,
+        deckId: 'deck-1',
+        cardId: 'card-1',
+        quantity: 1,
+        isCommander: false,
+        condition: 'NM',
+      );
+      final bulkResult = await addCardsBulkRequest(
+        apiClient,
+        deckId: 'deck-1',
+        cards: const [
+          {'card_id': 'card-1', 'quantity': 1, 'is_commander': false},
+        ],
+      );
+      final options = await fetchOptimizationOptionsRequest(
+        apiClient,
+        'deck-1',
+      );
+      final validation = await validateDeckRequest(apiClient, 'deck-1');
+      final pricing = await fetchDeckPricingRequest(
+        apiClient,
+        'deck-1',
+        force: true,
+      );
+      final deleteResult = await deleteDeckRequest(apiClient, 'deck-1');
+      final removeResult = await removeCardFromDeckRequest(
+        apiClient,
+        deckId: 'deck-1',
+        cardsPayload: const [
+          {'card_id': 'card-2', 'quantity': 1, 'is_commander': false},
+        ],
+      );
+      final analysis = await refreshAiAnalysisRequest(
+        apiClient,
+        'deck-1',
+        force: false,
+      );
+      await updateDeckDescriptionRequest(
+        apiClient,
+        deckId: 'deck-1',
+        description: 'nova',
+      );
+      await updateDeckStrategyRequest(
+        apiClient,
+        deckId: 'deck-1',
+        archetype: 'control',
+        bracket: 3,
+      );
+      await replaceCardEditionRequest(
+        apiClient,
+        deckId: 'deck-1',
+        oldCardId: 'old',
+        newCardId: 'new',
+      );
+      final setQuantityResult = await setDeckCardQuantityRequest(
+        apiClient,
+        deckId: 'deck-1',
+        cardId: 'card-1',
+        quantity: 2,
+        replaceSameName: false,
+        condition: 'NM',
+      );
+      final importResult = await importDeckFromListRequest(
+        apiClient,
+        name: 'Deck',
+        format: 'commander',
+        list: '1 Sol Ring',
+      );
+      final validateImportResult = await validateImportListRequest(
+        apiClient,
+        format: 'commander',
+        list: '1 Sol Ring',
+      );
+      final importToDeckResult = await importListToDeckRequest(
+        apiClient,
+        deckId: 'deck-1',
+        list: '1 Sol Ring',
+        replaceAll: true,
+      );
+      final toggled = await togglePublicRequest(
+        apiClient,
+        deckId: 'deck-1',
+        isPublic: true,
+      );
+      final export = await exportDeckAsTextRequest(apiClient, 'deck-1');
+      final copied = await copyPublicDeckRequest(apiClient, 'deck-1');
+      await persistDeckCardsPayloadRequest(
+        apiClient,
+        deckId: 'deck-1',
+        cardsPayload: const [
+          {'card_id': 'card-1', 'quantity': 1, 'is_commander': false},
+        ],
+      );
 
-    expect(detailsState.statusCode, 200);
-    expect(listState.decks, isNotNull);
-    expect(createResult.isSuccess, isTrue);
-    expect(addResult.isSuccess, isTrue);
-    expect(bulkResult.isSuccess, isTrue);
-    expect(options.single['id'], 'control');
-    expect(validation['valid'], isTrue);
-    expect(pricing['total'], 42);
-    expect(deleteResult.isSuccess, isTrue);
-    expect(removeResult.isSuccess, isTrue);
-    expect(analysis.synergyScore, 77);
-    expect(setQuantityResult.isSuccess, isTrue);
-    expect(importResult['success'], isTrue);
-    expect(validateImportResult['success'], isTrue);
-    expect(importToDeckResult['success'], isTrue);
-    expect(toggled, isTrue);
-    expect(export['text'], '1 Sol Ring');
-    expect(copied['success'], isTrue);
-  });
+      expect(detailsState.statusCode, 200);
+      expect(listState.decks, isNotNull);
+      expect(createResult.isSuccess, isTrue);
+      expect(addResult.isSuccess, isTrue);
+      expect(bulkResult.isSuccess, isTrue);
+      expect(options.single['id'], 'control');
+      expect(validation['valid'], isTrue);
+      expect(pricing['total'], 42);
+      expect(deleteResult.isSuccess, isTrue);
+      expect(removeResult.isSuccess, isTrue);
+      expect(analysis.synergyScore, 77);
+      expect(setQuantityResult.isSuccess, isTrue);
+      expect(importResult['success'], isTrue);
+      expect(validateImportResult['success'], isTrue);
+      expect(importToDeckResult['success'], isTrue);
+      expect(toggled, isTrue);
+      expect(export['text'], '1 Sol Ring');
+      expect(copied['success'], isTrue);
+    },
+  );
 }

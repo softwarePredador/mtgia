@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_dialogs.dart';
+import 'package:manaloom/features/decks/widgets/deck_optimize_sections.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_ui_support.dart';
 
 void main() {
   testWidgets('guided rebuild dialog renders expected copy', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: GuidedRebuildLoadingDialog()),
-      ),
+      const MaterialApp(home: Scaffold(body: GuidedRebuildLoadingDialog())),
     );
 
     expect(find.text('Criando versão reconstruída...'), findsOneWidget);
@@ -158,4 +157,99 @@ void main() {
 
     expect(find.text('Erro genérico'), findsOneWidget);
   });
+
+  testWidgets('optimization preview explains meta references before apply', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed:
+                    () => showOptimizationPreviewDialog(
+                      context,
+                      mode: 'optimize',
+                      archetype: 'control',
+                      keepTheme: true,
+                      preservedTheme: 'spellslinger',
+                      reasoning: 'Ajuste leve com referência meta.',
+                      qualityWarning: null,
+                      deckAnalysis: const {'average_cmc': 3.2},
+                      postAnalysis: const {'average_cmc': 3.0},
+                      warnings: const <String, dynamic>{},
+                      metaReferenceContext: const {
+                        'meta_scope': {'label': 'Competitive Commander / cEDH'},
+                        'selection_reason': 'Exact shell match',
+                        'priority_source': 'competitive_meta_exact_shell_match',
+                        'references': [
+                          {
+                            'selection_rank': 1,
+                            'shell_label': 'Talrand Tempo',
+                            'source': 'EDHTop16',
+                            'meta_scope': 'Competitive Commander / cEDH',
+                            'strategy_archetype': 'Tempo',
+                          },
+                        ],
+                        'suggested_cards_influenced': [
+                          {'name': 'Mystic Remora', 'reference_count': 2},
+                        ],
+                      },
+                      displayRemovals: const [
+                        {'name': 'Cancel'},
+                      ],
+                      displayAdditions: const [
+                        {'name': 'Mystic Remora'},
+                      ],
+                    ),
+                child: const Text('preview'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('preview'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Referências meta usadas'), findsOneWidget);
+    expect(find.textContaining('não como cópia cega'), findsOneWidget);
+    expect(find.text('#1 Talrand Tempo'), findsOneWidget);
+    expect(find.text('Mystic Remora'), findsAtLeastNWidgets(1));
+    expect(find.text('Ajuste competitivo guiado'), findsOneWidget);
+  });
+
+  testWidgets(
+    'optimization options exposes fallback when archetypes are empty',
+    (tester) async {
+      String? selected;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: OptimizationOptionsSection(
+              snapshot: const AsyncSnapshot.withData(
+                ConnectionState.done,
+                <Map<String, dynamic>>[],
+              ),
+              showAllStrategies: true,
+              accent: Colors.blue,
+              onRetry: () {},
+              onSelectArchetype: (value) => selected = value,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('midrange'), findsOneWidget);
+      expect(find.textContaining('Ajuste leve padrão'), findsOneWidget);
+
+      await tester.tap(find.text('Ver sugestões'));
+      await tester.pumpAndSettle();
+
+      expect(selected, 'midrange');
+    },
+  );
 }

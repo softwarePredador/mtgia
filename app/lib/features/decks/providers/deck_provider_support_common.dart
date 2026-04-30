@@ -372,6 +372,12 @@ Map<String, dynamic> buildConnectionFailureResult(Object error) {
   };
 }
 
+bool isDeckValidationOk(Map<String, dynamic> validation) {
+  return validation['ok'] == true ||
+      validation['valid'] == true ||
+      validation['is_valid'] == true;
+}
+
 Map<String, dynamic> buildExportConnectionFailureResult(Object error) {
   return {'error': FriendlyErrorMapper.fromException(error)};
 }

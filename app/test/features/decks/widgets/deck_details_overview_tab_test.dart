@@ -137,10 +137,12 @@ void main() {
 
     expect(find.text('Boros Tokens'), findsOneWidget);
     expect(find.text('99 cartas'), findsOneWidget);
-    expect(find.text('Abrir cartas'), findsNothing);
+    expect(find.text('Abrir cartas'), findsOneWidget);
     expect(find.text('Abrir análise'), findsNothing);
     expect(find.text('Otimizar com IA'), findsOneWidget);
     expect(find.text('Atenção na legalidade'), findsOneWidget);
+    expect(find.text('Comandante ausente'), findsOneWidget);
+    expect(find.text('Deck abaixo de 100 cartas'), findsOneWidget);
     expect(find.text('Descrição'), findsOneWidget);
     expect(find.text('Estratégia'), findsOneWidget);
     expect(find.text('Selecionar'), findsOneWidget);
@@ -252,6 +254,9 @@ void main() {
     expect(find.text('Talrand Tempo'), findsOneWidget);
     expect(find.text('Comandante: Talrand, Sky Summoner'), findsOneWidget);
     expect(find.text('100 cartas • Bracket 2 • tempo'), findsOneWidget);
+    expect(find.text('Commander'), findsOneWidget);
+    expect(find.text('Definido'), findsOneWidget);
+    expect(find.text('Identidade'), findsOneWidget);
     expect(find.text('Público'), findsOneWidget);
     expect(find.text('Válido'), findsOneWidget);
 

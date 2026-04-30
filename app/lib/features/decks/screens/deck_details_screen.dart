@@ -1402,6 +1402,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           deckAnalysis: preview.deckAnalysis,
           postAnalysis: preview.postAnalysis,
           warnings: preview.warnings,
+          metaReferenceContext: preview.metaReferenceContext,
           displayRemovals: preview.displayRemovals,
           displayAdditions: preview.displayAdditions,
           onCopyDebug:

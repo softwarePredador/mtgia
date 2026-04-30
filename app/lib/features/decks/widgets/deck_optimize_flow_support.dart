@@ -141,6 +141,7 @@ class OptimizePreviewData {
   final Map<String, dynamic> deckAnalysis;
   final Map<String, dynamic> postAnalysis;
   final Map<String, dynamic>? qualityWarning;
+  final Map<String, dynamic> metaReferenceContext;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
 
@@ -157,6 +158,7 @@ class OptimizePreviewData {
     required this.deckAnalysis,
     required this.postAnalysis,
     required this.qualityWarning,
+    required this.metaReferenceContext,
     required this.displayRemovals,
     required this.displayAdditions,
   });
@@ -208,6 +210,11 @@ class OptimizePreviewData {
           (result['quality_warning'] is Map)
               ? (result['quality_warning'] as Map).cast<String, dynamic>()
               : null,
+      metaReferenceContext:
+          (result['meta_reference_context'] is Map)
+              ? (result['meta_reference_context'] as Map)
+                  .cast<String, dynamic>()
+              : const <String, dynamic>{},
       displayRemovals:
           removalsDetailed.isNotEmpty
               ? removalsDetailed

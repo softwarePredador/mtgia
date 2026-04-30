@@ -1,6 +1,41 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-04-30 — Deck Detail Validate Meta Intelligence UI
+
+### O Porquê
+- O pipeline Commander/meta/IA ja estava provado tecnicamente, mas o usuario ainda precisava entender rapidamente se o deck era valido, por que falhou, quais referencias meta influenciaram sugestoes e qual era a diferenca entre ajuste leve, rebuild guiado e competitivo/cEDH.
+- O objetivo foi aumentar confianca no fluxo Deck Detail -> Validate -> Optimize/Generate sem alterar contratos JSON, rotas backend, secrets, Life Counter/Lotus, Scanner, FCM, release build ou assets oficiais de MTG.
+
+### O Como
+- Deck Detail:
+  - `DeckDetailsOverviewTab` ganhou grid de resumo Commander com status de comandante, identidade de cor, contagem `atual/100` e preco/curva quando disponivel.
+  - O card de legalidade agora transforma erros de validacao em problemas amigaveis com acao sugerida, cobrindo comandante ausente, menos/mais de 100 cartas, identidade de cor, quantidade/singleton e carta banida/nao legal.
+  - A linha de problema ficou responsiva para evitar overflow em larguras estreitas.
+- Validate/apply:
+  - `isDeckValidationOk()` centraliza a interpretacao de `ok`, `valid` e `is_valid`, corrigindo falso negativo apos apply quando o backend retorna `{"ok": true}`.
+- Optimize/Generate:
+  - `OptimizePreviewData` preserva `meta_reference_context` ja retornado pelo backend.
+  - O preview mostra referencias meta usadas, fonte, escopo/subformat, shell/arquetipo, motivo estrategico, cartas influenciadas e aviso de que meta e referencia, nao copia cega.
+  - O sheet de otimizacao diferencia ajuste leve, rebuild guiado e competitivo/cEDH; quando `/ai/archetypes` retorna vazio, mostra fallback `midrange` como ajuste leve com preview obrigatorio.
+  - Generate passou a explicar que a geracao e proposta revisavel e que Optimize pode atuar como ajuste leve, rebuild guiado ou guia competitivo.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/decks lib/features/cards test/features/decks test/features/cards --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks test/features/cards --no-version-check`: PASS, `00:17 +137`.
+- `cd server && dart analyze routes/decks routes/ai lib/ai lib/meta test`: PASS.
+- `cd server && dart test -r expanded`: PASS, `00:04 +556`.
+- Backend temporario `PORT=8082 dart run .dart_frog/server.dart` respondeu `/health` healthy.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS, 19 candidatos.
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `01:13 +1`, screenshot final `10_complete_validated`.
+
+### Resultado
+- Usuario passa a ver status Commander/legalidade, comandante, identidade de cor, contagem, problemas principais, preco/curva e CTAs de validacao/otimizacao com hierarquia clara.
+- Falhas de Validate deixam de aparecer como erro tecnico cru e viram explicacao + proxima acao.
+- Meta Intelligence fica visivel quando o backend envia contexto, sem mudar schema.
+- Runtime iPhone 15 com backend real validou register -> create commander -> import commander -> complete async -> preview -> apply -> validate.
+- Evidencias: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-04-30.md`, `app/doc/runtime_flow_proofs_2026-04-30_deck_meta_validate/`, `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_2026-04-30.md`.
+
 ## 2026-04-30 — Scanner OCR fisico Android, token-safe resolution e ROI
 
 ### O Porquê

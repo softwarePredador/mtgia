@@ -116,11 +116,8 @@ Future<void> showOutcomeInfoDialog(
   return showDialog<void>(
     context: context,
     builder:
-        (_) => OutcomeInfoDialog(
-          title: title,
-          message: message,
-          reasons: reasons,
-        ),
+        (_) =>
+            OutcomeInfoDialog(title: title, message: message, reasons: reasons),
   );
 }
 
@@ -135,6 +132,7 @@ Future<bool?> showOptimizationPreviewDialog(
   required Map<String, dynamic> deckAnalysis,
   required Map<String, dynamic> postAnalysis,
   required Map<String, dynamic> warnings,
+  required Map<String, dynamic> metaReferenceContext,
   required List<Map<String, dynamic>> displayRemovals,
   required List<Map<String, dynamic>> displayAdditions,
   Future<void> Function()? onCopyDebug,
@@ -152,6 +150,7 @@ Future<bool?> showOptimizationPreviewDialog(
           deckAnalysis: deckAnalysis,
           postAnalysis: postAnalysis,
           warnings: warnings,
+          metaReferenceContext: metaReferenceContext,
           displayRemovals: displayRemovals,
           displayAdditions: displayAdditions,
           onCancel: () => Navigator.pop(ctx, false),
@@ -163,16 +162,14 @@ Future<bool?> showOptimizationPreviewDialog(
 
 void showOptimizeNoChangesSnackBar(BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Nenhuma mudança sugerida para aplicar.'),
-    ),
+    const SnackBar(content: Text('Nenhuma mudança sugerida para aplicar.')),
   );
 }
 
 void showOptimizeDebugCopiedSnackBar(BuildContext context) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Debug copiado')),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(const SnackBar(content: Text('Debug copiado')));
 }
 
 void showOptimizeSuccessSnackBar(BuildContext context) {
@@ -241,9 +238,6 @@ void showGuidedRebuildErrorSnackBar(BuildContext context, Object error) {
 
 void showDeckAiErrorSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      backgroundColor: AppTheme.error,
-    ),
+    SnackBar(content: Text(message), backgroundColor: AppTheme.error),
   );
 }

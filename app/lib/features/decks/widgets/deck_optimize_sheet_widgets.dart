@@ -168,6 +168,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
   final Map<String, dynamic> deckAnalysis;
   final Map<String, dynamic> postAnalysis;
   final Map<String, dynamic> warnings;
+  final Map<String, dynamic> metaReferenceContext;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
   final VoidCallback onCancel;
@@ -185,6 +186,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
     required this.deckAnalysis,
     required this.postAnalysis,
     required this.warnings,
+    required this.metaReferenceContext,
     required this.displayRemovals,
     required this.displayAdditions,
     required this.onCancel,
@@ -220,6 +222,12 @@ class OptimizationPreviewDialog extends StatelessWidget {
       }
     }
     return '-';
+  }
+
+  String get _planLabel {
+    if (mode == 'complete') return 'Completar lista';
+    if (metaReferenceContext.isNotEmpty) return 'Ajuste competitivo guiado';
+    return 'Ajuste leve';
   }
 
   @override
@@ -314,7 +322,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   signals: [
                     _TrustSignal(
                       label: 'Plano',
-                      value: mode == 'complete' ? 'Completar' : 'Otimizar',
+                      value: _planLabel,
                       icon: Icons.route_outlined,
                     ),
                     _TrustSignal(
@@ -342,6 +350,10 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   ],
                 ),
               ),
+              if (metaReferenceContext.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _MetaReferenceSection(contextData: metaReferenceContext),
+              ],
               if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
@@ -471,6 +483,180 @@ class OptimizationPreviewDialog extends StatelessWidget {
           child: const Text('Aplicar mudanças'),
         ),
       ],
+    );
+  }
+}
+
+class _MetaReferenceSection extends StatelessWidget {
+  final Map<String, dynamic> contextData;
+
+  const _MetaReferenceSection({required this.contextData});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final metaScope =
+        (contextData['meta_scope'] is Map)
+            ? (contextData['meta_scope'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final references =
+        (contextData['references'] as List?)
+            ?.whereType<Map>()
+            .map((entry) => entry.cast<String, dynamic>())
+            .toList() ??
+        const <Map<String, dynamic>>[];
+    final influenced =
+        (contextData['suggested_cards_influenced'] as List?)
+            ?.whereType<Map>()
+            .map((entry) => entry.cast<String, dynamic>())
+            .toList() ??
+        const <Map<String, dynamic>>[];
+    final prioritySource = contextData['priority_source']?.toString() ?? '';
+    final selectionReason = contextData['selection_reason']?.toString() ?? '';
+    final scopeLabel = metaScope['label']?.toString() ?? '';
+
+    return DialogSectionCard(
+      title: 'Referências meta usadas',
+      accent: AppTheme.mythicGold,
+      icon: Icons.travel_explore_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Meta entra como referência estratégica, não como cópia cega. A lista final ainda passa por identidade de cor, bracket e preview antes de aplicar.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (scopeLabel.isNotEmpty)
+                DeckMetaChip(
+                  label: scopeLabel,
+                  color: AppTheme.mythicGold,
+                  icon: Icons.shield_outlined,
+                ),
+              if (selectionReason.isNotEmpty)
+                DeckMetaChip(
+                  label: selectionReason,
+                  color: AppTheme.frost400,
+                  icon: Icons.filter_alt_outlined,
+                ),
+              if (prioritySource.isNotEmpty)
+                DeckMetaChip(
+                  label: prioritySource,
+                  color: AppTheme.textSecondary,
+                  icon: Icons.source_outlined,
+                ),
+            ],
+          ),
+          if (references.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              'Shells de referência',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...references.take(3).map((reference) {
+              final shell =
+                  reference['shell_label']?.toString() ?? 'Shell meta';
+              final source = reference['source']?.toString() ?? 'fonte meta';
+              final scope = reference['meta_scope']?.toString() ?? '';
+              final strategy =
+                  reference['strategy_archetype']?.toString().trim() ?? '';
+              final rank = reference['selection_rank']?.toString();
+              final lineParts = [
+                source,
+                if (scope.isNotEmpty) scope,
+                if (strategy.isNotEmpty) strategy,
+              ];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _MetaReferenceRow(
+                  title: rank == null ? shell : '#$rank $shell',
+                  subtitle: lineParts.join(' • '),
+                ),
+              );
+            }),
+          ],
+          if (influenced.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Sugestões com evidência meta',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...influenced.take(5).map((entry) {
+              final name = entry['name']?.toString() ?? '';
+              final count = entry['reference_count']?.toString();
+              return _MetaReferenceRow(
+                title: name,
+                subtitle:
+                    count == null
+                        ? 'Aparece nas referências selecionadas.'
+                        : 'Aparece em $count referência(s) selecionada(s).',
+              );
+            }),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaReferenceRow extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _MetaReferenceRow({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (subtitle.trim().isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
