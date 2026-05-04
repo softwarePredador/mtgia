@@ -1,6 +1,45 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-05-04 — Binder/Fichario Dashboard de valor da colecao
+
+### O Porquê
+- O fichario ja permitia cadastrar cartas, wishlist e flags de troca/venda, mas a tela ainda comunicava pouco valor de colecao: o usuario precisava inferir total, duplicadas, progresso por set, faltantes, distribuicoes e preco.
+- A sprint focou em transformar o fichario em dashboard acionavel sem quebrar contratos existentes e sem tocar Life Counter/Lotus, Scanner, meta pipeline, optimize/generate core, FCM, secrets, release build ou assets oficiais de MTG.
+
+### O Como
+- Backend:
+  - `GET /binder` manteve o contrato atual e adicionou filtros opcionais por `set`, `rarity`, `language`, `foil/is_foil`, `min_price`, `max_price`, alem de `sort`/`order`.
+  - Ordenacao suportada: `name`, `set`, `rarity`, `condition`, `language`, `foil`, `quantity`, `price`, `updated_at`.
+  - Cada item agora pode trazer `card.market_price`, `deck_count`, `deck_quantity`, `used_in_decks`, `created_at` e `updated_at`.
+  - `GET /binder/stats` passou a retornar resumo rico: `total_items`, `unique_cards`, `duplicate_copies`, `estimated_value`, wishlist/faltantes, itens sem preco, cards usados em decks, progresso por set, wishlist detalhada e distribuicoes por raridade/condicao/idioma/foil.
+- App:
+  - `BinderStats` ganhou models tipados para distribuicoes, progresso por set e wishlist.
+  - `BinderTabContent` ganhou dashboard compacto e rolavel com valor estimado, total, unicas, duplicadas, troca/venda, wishlist, usados em decks, progresso por colecao e distribuicoes.
+  - A barra de filtros passou a expor set, raridade, idioma, foil/non-foil, troca/venda e ordenacao; os filtros continuam opcionais para preservar compatibilidade.
+  - Empty/loading/error states seguem amigaveis; falhas diretas usam texto de usuario em vez de erro tecnico cru.
+- QA:
+  - Criado `app/integration_test/binder_dashboard_runtime_test.dart` para provar Collection -> Fichario -> dashboard -> add/edit/delete -> filtro por set -> stats atualizados com backend real.
+
+### Validacao executada
+- `cd server && dart analyze routes/binder routes/cards routes/sets lib test`: PASS.
+- `cd server && dart test -r expanded`: PASS, `00:04 +556`.
+- `cd app && flutter analyze lib/features/binder lib/features/collection lib/features/cards test/features/binder test/features/collection test/features/cards --no-version-check`: PASS.
+- `cd app && flutter test test/features/binder test/features/collection test/features/cards --no-version-check`: PASS, `00:03 +11`.
+- Backend temporario `PORT=8082 dart run .dart_frog/server.dart` respondeu `/health` healthy.
+- Probes reais:
+  - `GET /binder` com filtros novos retornou item esperado.
+  - `GET /binder/stats` retornou `total_items=2`, `unique_cards=1`, `duplicate_copies=1`, `estimated_value=21.0`, progresso por set e distribuicoes.
+  - `GET /sets?limit=2&page=1` e `GET /cards?set=ECC&limit=2&page=1` retornaram `200`.
+- `cd app && flutter test integration_test/binder_dashboard_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `00:36 +1`.
+
+### Resultado
+- Usuario entende valor/progresso da colecao, duplicadas, wishlist/faltantes e distribuicoes principais sem sair do fichario.
+- Filtros/ordenacao ficam suportados quando o backend atual e usado; contratos antigos continuam validos porque os campos novos sao opcionais.
+- Runtime iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` com backend real `http://127.0.0.1:8082` passou.
+- Android fisico opcional ficou `not proven`: `adb` nao encontrou `R58T300SREH`.
+- Evidencia: `app/doc/runtime_flow_handoffs/binder_dashboard_runtime_2026-05-04.md`.
+
 ## 2026-04-30 — Deck Detail Validate Meta Intelligence UI
 
 ### O Porquê

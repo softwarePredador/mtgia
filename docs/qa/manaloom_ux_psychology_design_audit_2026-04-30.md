@@ -1,5 +1,26 @@
 # ManaLoom UX Psychology Design Audit — 2026-04-30
 
+## Patch status — Binder/Fichario Dashboard — 2026-05-04
+
+| Finding | Status | Evidencia |
+| --- | --- | --- |
+| UX-017 Binder collection progress | `resolvido` | Dashboard do fichario mostra total, unicas, duplicadas, valor estimado, wishlist/faltantes, progresso por set e distribuicoes por raridade, foil/non-foil, condicao e idioma. |
+| Binder filters/sorting clarity | `resolvido` | `/binder` e UI aceitam filtros por nome, set, raridade, condicao, idioma, foil/non-foil, troca/venda e ordenacao por nome, set, raridade, condicao, idioma, foil, quantidade, preco e atualizacao. |
+| Binder raw technical UI errors | `mantido sob controle` | Estados de loading/empty/error continuam amigaveis; runtime iPhone 15 PASS nao apresentou erro tecnico cru, crash, overflow fatal, timeout ou 4xx/5xx inesperado. |
+| Collection value psychology | `resolvido` | O usuario passa a ver valor/progresso da colecao e gaps acionaveis em vez de apenas uma lista de cartas. |
+
+Validacao executada:
+
+| comando | resultado |
+| --- | --- |
+| `cd server && dart analyze routes/binder routes/cards routes/sets lib test` | `PASS`, sem issues. |
+| `cd server && dart test -r expanded` | `PASS`, `00:04 +556`. |
+| `cd app && flutter analyze lib/features/binder lib/features/collection lib/features/cards test/features/binder test/features/collection test/features/cards --no-version-check` | `PASS`, sem issues. |
+| `cd app && flutter test test/features/binder test/features/collection test/features/cards --no-version-check` | `PASS`, `00:03 +11`. |
+| `cd app && flutter test integration_test/binder_dashboard_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | `PASS`, `00:36 +1`. |
+
+Runtime iPhone 15 provou UI real + backend real para Collection -> Fichario -> dashboard -> busca/add -> edit -> filtro por set -> delete -> stats atualizados. Evidencia: `app/doc/runtime_flow_handoffs/binder_dashboard_runtime_2026-05-04.md`.
+
 ## Patch status — Deck Detail / Validate / Meta Intelligence — 2026-04-30 17:24 -0300
 
 Sprint de produto aplicada em Deck Detail, Validate Deck, Generate/Optimize e Meta Intelligence UI. Contratos JSON foram preservados; o app passou a consumir campos opcionais ja existentes (`meta_reference_context`) e a tratar o contrato atual de validacao (`ok: true`) como sucesso.

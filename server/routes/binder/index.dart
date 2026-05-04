@@ -28,6 +28,14 @@ Future<Response> _listBinder(RequestContext context) async {
     final forSale = params['for_sale'];
     final search = params['search'];
     final listType = params['list_type']; // 'have' or 'want'
+    final setCode = params['set'];
+    final rarity = params['rarity'];
+    final language = params['language'];
+    final foil = params['foil'] ?? params['is_foil'];
+    final minPrice = double.tryParse(params['min_price'] ?? '');
+    final maxPrice = double.tryParse(params['max_price'] ?? '');
+    final sort = _normalizeSort(params['sort']);
+    final direction = _normalizeDirection(params['order']);
 
     // Build dynamic WHERE
     final whereClauses = <String>['bi.user_id = @userId'];
@@ -52,8 +60,35 @@ Future<Response> _listBinder(RequestContext context) async {
       whereClauses.add('LOWER(c.name) LIKE LOWER(@search)');
       sqlParams['search'] = '%$search%';
     }
+    if (setCode != null && setCode.isNotEmpty) {
+      whereClauses.add('LOWER(c.set_code) = LOWER(@setCode)');
+      sqlParams['setCode'] = setCode;
+    }
+    if (rarity != null && rarity.isNotEmpty) {
+      whereClauses.add('LOWER(c.rarity) = LOWER(@rarity)');
+      sqlParams['rarity'] = rarity;
+    }
+    if (language != null && language.isNotEmpty) {
+      whereClauses.add('LOWER(bi.language) = LOWER(@language)');
+      sqlParams['language'] = language;
+    }
+    if (foil == 'true' || foil == 'false') {
+      whereClauses.add('bi.is_foil = @isFoil');
+      sqlParams['isFoil'] = foil == 'true';
+    }
+    if (minPrice != null) {
+      whereClauses
+          .add('COALESCE(bi.price, c.price_usd, c.price, 0) >= @minPrice');
+      sqlParams['minPrice'] = minPrice;
+    }
+    if (maxPrice != null) {
+      whereClauses
+          .add('COALESCE(bi.price, c.price_usd, c.price, 0) <= @maxPrice');
+      sqlParams['maxPrice'] = maxPrice;
+    }
 
     final where = whereClauses.join(' AND ');
+    final orderBy = _orderBySql(sort, direction);
 
     // Count total
     final countFuture = pool.execute(Sql.named('''
@@ -65,16 +100,31 @@ Future<Response> _listBinder(RequestContext context) async {
 
     // Fetch items
     final itemsFuture = pool.execute(Sql.named('''
+      WITH deck_usage AS (
+        SELECT
+          dc.card_id,
+          COUNT(DISTINCT d.id)::int AS deck_count,
+          COALESCE(SUM(dc.quantity), 0)::int AS deck_quantity
+        FROM deck_cards dc
+        JOIN decks d ON d.id = dc.deck_id
+        WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
+        GROUP BY dc.card_id
+      )
       SELECT bi.id, bi.card_id, bi.quantity, bi.condition, bi.is_foil,
-             bi.for_trade, bi.for_sale, bi.price, bi.currency,
-             bi.notes, bi.language, bi.list_type, bi.created_at, bi.updated_at,
-             c.name AS card_name, c.image_url AS card_image_url,
-             c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
-             c.type_line AS card_type_line, c.rarity AS card_rarity
+              bi.for_trade, bi.for_sale, bi.price, bi.currency,
+              bi.notes, bi.language, bi.list_type, bi.created_at, bi.updated_at,
+              c.name AS card_name, c.image_url AS card_image_url,
+              c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
+              c.type_line AS card_type_line, c.rarity AS card_rarity,
+              c.price_usd AS card_market_price,
+              COALESCE(du.deck_count, 0)::int AS deck_count,
+              COALESCE(du.deck_quantity, 0)::int AS deck_quantity
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
+      LEFT JOIN deck_usage du ON du.card_id = bi.card_id
       WHERE $where
-      ORDER BY c.name ASC, bi.condition ASC
+      ORDER BY $orderBy
       LIMIT @limit OFFSET @offset
     '''), parameters: {...sqlParams, 'limit': limit, 'offset': offset});
 
@@ -95,19 +145,27 @@ Future<Response> _listBinder(RequestContext context) async {
           'mana_cost': cols['card_mana_cost'],
           'type_line': cols['card_type_line'],
           'rarity': cols['card_rarity'],
+          'market_price': cols['card_market_price'] != null
+              ? double.tryParse(cols['card_market_price'].toString())
+              : null,
         },
         'quantity': cols['quantity'],
         'condition': cols['condition'],
         'is_foil': cols['is_foil'],
         'for_trade': cols['for_trade'],
         'for_sale': cols['for_sale'],
-        'price': cols['price'] != null ? double.tryParse(cols['price'].toString()) : null,
+        'price': cols['price'] != null
+            ? double.tryParse(cols['price'].toString())
+            : null,
         'currency': cols['currency'],
         'notes': cols['notes'],
         'language': cols['language'],
         'list_type': cols['list_type'] ?? 'have',
         'created_at': cols['created_at']?.toString(),
         'updated_at': cols['updated_at']?.toString(),
+        'deck_count': cols['deck_count'] ?? 0,
+        'deck_quantity': cols['deck_quantity'] ?? 0,
+        'used_in_decks': (cols['deck_count'] as int? ?? 0) > 0,
       };
     }).toList();
 
@@ -133,6 +191,42 @@ Future<Response> _listBinder(RequestContext context) async {
   }
 }
 
+String _normalizeSort(String? value) {
+  const supported = {
+    'name',
+    'set',
+    'rarity',
+    'condition',
+    'language',
+    'foil',
+    'quantity',
+    'price',
+    'updated_at',
+  };
+  final normalized = value?.trim().toLowerCase();
+  return supported.contains(normalized) ? normalized! : 'name';
+}
+
+String _normalizeDirection(String? value) {
+  final normalized = value?.trim().toLowerCase();
+  return normalized == 'desc' ? 'DESC' : 'ASC';
+}
+
+String _orderBySql(String sort, String direction) {
+  final expression = switch (sort) {
+    'set' => 'LOWER(c.set_code)',
+    'rarity' => 'LOWER(c.rarity)',
+    'condition' => 'bi.condition',
+    'language' => 'LOWER(bi.language)',
+    'foil' => 'bi.is_foil',
+    'quantity' => 'bi.quantity',
+    'price' => 'COALESCE(bi.price, c.price_usd, c.price, 0)',
+    'updated_at' => 'bi.updated_at',
+    _ => 'LOWER(c.name)',
+  };
+  return '$expression $direction, LOWER(c.name) ASC, bi.condition ASC';
+}
+
 /// POST /binder
 /// Body: { card_id, quantity?, condition?, is_foil?, for_trade?, for_sale?, price?, notes?, language? }
 Future<Response> _addToBinder(RequestContext context) async {
@@ -150,8 +244,8 @@ Future<Response> _addToBinder(RequestContext context) async {
     }
 
     // Verifica que a carta existe
-    final cardCheck = await pool.execute(Sql.named(
-        'SELECT id FROM cards WHERE id = @cardId'),
+    final cardCheck = await pool.execute(
+        Sql.named('SELECT id FROM cards WHERE id = @cardId'),
         parameters: {'cardId': cardId});
     if (cardCheck.isEmpty) {
       return Response.json(
@@ -200,8 +294,10 @@ Future<Response> _addToBinder(RequestContext context) async {
         AND condition = @condition AND is_foil = @isFoil
         AND list_type = @listType
     '''), parameters: {
-      'userId': userId, 'cardId': cardId,
-      'condition': condition, 'isFoil': isFoil,
+      'userId': userId,
+      'cardId': cardId,
+      'condition': condition,
+      'isFoil': isFoil,
       'listType': listType,
     });
 
@@ -209,7 +305,8 @@ Future<Response> _addToBinder(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.conflict,
         body: {
-          'error': 'Item já existe no binder com mesma condição e foil. Use PUT para atualizar.',
+          'error':
+              'Item já existe no binder com mesma condição e foil. Use PUT para atualizar.',
           'existing_id': dupCheck.first[0],
         },
       );
@@ -223,11 +320,17 @@ Future<Response> _addToBinder(RequestContext context) async {
         (@userId, @cardId, @quantity, @condition, @isFoil, @forTrade, @forSale, @price, @notes, @language, @listType)
       RETURNING id
     '''), parameters: {
-      'userId': userId, 'cardId': cardId, 'quantity': quantity,
-      'condition': condition, 'isFoil': isFoil,
-      'forTrade': forTrade, 'forSale': forSale,
+      'userId': userId,
+      'cardId': cardId,
+      'quantity': quantity,
+      'condition': condition,
+      'isFoil': isFoil,
+      'forTrade': forTrade,
+      'forSale': forSale,
       'price': price != null ? double.tryParse(price.toString()) : null,
-      'notes': notes, 'language': language, 'listType': listType,
+      'notes': notes,
+      'language': language,
+      'listType': listType,
     });
 
     final newId = insertResult.first[0];

@@ -113,9 +113,15 @@ class _BinderListViewState extends State<_BinderListView>
     with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
+  final _setController = TextEditingController();
   String? _conditionFilter;
+  String? _rarityFilter;
+  String? _languageFilter;
+  bool? _foilFilter;
   bool? _tradeFilter;
   bool? _saleFilter;
+  String _sortBy = 'name';
+  String _sortOrder = 'asc';
 
   // Each list_type has its own items, pagination, and loading state
   List<BinderItem> _items = [];
@@ -143,6 +149,7 @@ class _BinderListViewState extends State<_BinderListView>
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
+    _setController.dispose();
     super.dispose();
   }
 
@@ -179,6 +186,12 @@ class _BinderListViewState extends State<_BinderListView>
         search: _searchController.text.trim(),
         forTrade: _tradeFilter,
         forSale: _saleFilter,
+        setCode: _setController.text.trim(),
+        rarity: _rarityFilter,
+        language: _languageFilter,
+        foil: _foilFilter,
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
       );
       if (res != null) {
         _items.addAll(res);
@@ -186,7 +199,7 @@ class _BinderListViewState extends State<_BinderListView>
         _page++;
         _error = null;
       } else {
-        _error = 'Erro ao carregar';
+        _error = 'Não conseguimos carregar seu fichário agora.';
       }
     } catch (e) {
       debugPrint('[❌ BinderList] fetchItems (${widget.listType}): $e');
@@ -337,12 +350,41 @@ class _BinderListViewState extends State<_BinderListView>
             // Search + filters
             _SearchFilterBar(
               searchController: _searchController,
+              setController: _setController,
               conditionFilter: _conditionFilter,
+              rarityFilter: _rarityFilter,
+              languageFilter: _languageFilter,
+              foilFilter: _foilFilter,
               tradeFilter: _tradeFilter,
               saleFilter: _saleFilter,
+              sortBy: _sortBy,
+              sortOrder: _sortOrder,
               onSearch: _applyFilters,
               onConditionChanged: (v) {
                 setState(() => _conditionFilter = v);
+                _applyFilters();
+              },
+              onRarityChanged: (v) {
+                setState(() => _rarityFilter = v);
+                _applyFilters();
+              },
+              onLanguageChanged: (v) {
+                setState(() => _languageFilter = v);
+                _applyFilters();
+              },
+              onFoilChanged: (v) {
+                setState(() => _foilFilter = v);
+                _applyFilters();
+              },
+              onSortChanged: (v) {
+                if (v == null) return;
+                setState(() => _sortBy = v);
+                _applyFilters();
+              },
+              onSortOrderToggle: () {
+                setState(() {
+                  _sortOrder = _sortOrder == 'asc' ? 'desc' : 'asc';
+                });
                 _applyFilters();
               },
               onTradeToggle: () {
@@ -514,86 +556,402 @@ class _StatsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duplicateCopies =
-        stats.totalItems > stats.uniqueCards
+        stats.duplicateCopies > 0
+            ? stats.duplicateCopies
+            : stats.totalItems > stats.uniqueCards
             ? stats.totalItems - stats.uniqueCards
             : 0;
     return Container(
+      constraints: const BoxConstraints(maxHeight: 300),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
       color: AppTheme.surfaceElevated,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Resumo da coleção',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontSm,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _StatCard(
+                    icon: Icons.collections_bookmark,
+                    label: 'Total',
+                    value: '${stats.totalItems}',
+                    tooltip: 'Cartas cadastradas no fichário',
+                  ),
+                  _StatCard(
+                    icon: Icons.style,
+                    label: 'Únicas',
+                    value: '${stats.uniqueCards}',
+                    tooltip: 'Cartas únicas',
+                  ),
+                  _StatCard(
+                    icon: Icons.library_add_check_outlined,
+                    label: 'Duplicadas',
+                    value: '$duplicateCopies',
+                    tooltip: 'Cópias além da primeira',
+                    color: AppTheme.frost400,
+                  ),
+                  _StatCard(
+                    icon: Icons.swap_horiz,
+                    label: 'Troca',
+                    value: '${stats.forTradeCount}',
+                    tooltip: 'Itens marcados para troca',
+                    color: AppTheme.frost400,
+                  ),
+                  _StatCard(
+                    icon: Icons.sell,
+                    label: 'Venda',
+                    value: '${stats.forSaleCount}',
+                    tooltip: 'Itens marcados para venda',
+                    color: AppTheme.brass400,
+                  ),
+                  _StatCard(
+                    icon: Icons.attach_money,
+                    label: 'Valor',
+                    value: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
+                    tooltip: 'Valor estimado',
+                    color: AppTheme.brass400,
+                  ),
+                  _StatCard(
+                    icon: Icons.favorite_border,
+                    label: 'Wishlist',
+                    value: '${stats.wishlistCount}',
+                    tooltip: 'Cartas na lista Quero',
+                    color: AppTheme.brass400,
+                  ),
+                  _StatCard(
+                    icon: Icons.extension_outlined,
+                    label: 'Em decks',
+                    value: '${stats.cardsUsedInDecks}',
+                    tooltip: 'Cartas do fichário usadas em decks',
+                    color: AppTheme.frost400,
+                  ),
+                  _StatCard(
+                    icon: Icons.price_check_outlined,
+                    label: 'Sem preço',
+                    value: '${stats.priceMissingCount}',
+                    tooltip: 'Itens sem preço próprio ou de mercado',
+                  ),
+                  if (onScan != null)
+                    _ActionIconButton(
+                      icon: Icons.camera_alt,
+                      tooltip: 'Escanear carta',
+                      onPressed: onScan!,
+                      color: AppTheme.frost400,
+                    ),
+                  if (onAdd != null)
+                    _ActionIconButton(
+                      icon: Icons.add,
+                      tooltip: 'Adicionar carta',
+                      onPressed: onAdd!,
+                      color: AppTheme.brass500,
+                    ),
+                ],
+              ),
+            ),
+            if (stats.setProgress.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _DashboardSection(
+                title: 'Progresso por coleção',
+                children:
+                    stats.setProgress.take(4).map((set) {
+                      final percent = (set.completionRatio * 100).clamp(0, 100);
+                      final title =
+                          set.setName == null || set.setName!.isEmpty
+                              ? set.setCode
+                              : '${set.setCode} • ${set.setName}';
+                      return _ProgressRow(
+                        title: title,
+                        subtitle:
+                            '${set.uniqueOwned}/${set.totalCards} únicas • ${set.quantityOwned} cópias',
+                        value: set.completionRatio,
+                        trailing: '${percent.toStringAsFixed(0)}%',
+                      );
+                    }).toList(),
+              ),
+            ],
+            if (stats.wishlist.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _DashboardSection(
+                title: 'Wishlist e faltantes',
+                children:
+                    stats.wishlist.take(4).map((wish) {
+                      return _CompactInsightRow(
+                        icon: Icons.favorite_border,
+                        title: wish.cardName,
+                        value:
+                            wish.missingQuantity > 0
+                                ? 'faltam ${wish.missingQuantity}'
+                                : 'já possui',
+                        subtitle:
+                            '${wish.wantQuantity} desejada(s) • ${wish.setCode?.toUpperCase() ?? 'set -'}',
+                        color:
+                            wish.missingQuantity > 0
+                                ? AppTheme.brass400
+                                : AppTheme.success,
+                      );
+                    }).toList(),
+              ),
+            ],
+            if (stats.distributions.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _DistributionWrap(distributions: stats.distributions),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DashboardSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  const _DashboardSection({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Resumo da coleção',
-            style: TextStyle(
+          Text(
+            title,
+            style: const TextStyle(
               color: AppTheme.textPrimary,
               fontSize: AppTheme.fontSm,
               fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _StatCard(
-                  icon: Icons.collections_bookmark,
-                  label: 'Total',
-                  value: '${stats.totalItems}',
-                  tooltip: 'Cartas cadastradas no fichário',
-                ),
-                _StatCard(
-                  icon: Icons.style,
-                  label: 'Únicas',
-                  value: '${stats.uniqueCards}',
-                  tooltip: 'Cartas únicas',
-                ),
-                _StatCard(
-                  icon: Icons.library_add_check_outlined,
-                  label: 'Duplicadas',
-                  value: '$duplicateCopies',
-                  tooltip: 'Cópias além da primeira',
-                  color: AppTheme.frost400,
-                ),
-                _StatCard(
-                  icon: Icons.swap_horiz,
-                  label: 'Troca',
-                  value: '${stats.forTradeCount}',
-                  tooltip: 'Itens marcados para troca',
-                  color: AppTheme.frost400,
-                ),
-                _StatCard(
-                  icon: Icons.sell,
-                  label: 'Venda',
-                  value: '${stats.forSaleCount}',
-                  tooltip: 'Itens marcados para venda',
-                  color: AppTheme.brass400,
-                ),
-                _StatCard(
-                  icon: Icons.attach_money,
-                  label: 'Valor',
-                  value: 'R\$ ${stats.estimatedValue.toStringAsFixed(0)}',
-                  tooltip: 'Valor estimado',
-                  color: AppTheme.brass400,
-                ),
-                if (onScan != null)
-                  _ActionIconButton(
-                    icon: Icons.camera_alt,
-                    tooltip: 'Escanear carta',
-                    onPressed: onScan!,
-                    color: AppTheme.frost400,
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressRow extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final double value;
+  final String trailing;
+
+  const _ProgressRow({
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontSm,
+                    fontWeight: FontWeight.w700,
                   ),
-                if (onAdd != null)
-                  _ActionIconButton(
-                    icon: Icons.add,
-                    tooltip: 'Adicionar carta',
-                    onPressed: onAdd!,
-                    color: AppTheme.brass500,
-                  ),
-              ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                trailing,
+                style: const TextStyle(
+                  color: AppTheme.frost400,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+            child: LinearProgressIndicator(
+              minHeight: 5,
+              value: value.clamp(0, 1),
+              backgroundColor: AppTheme.outlineMuted.withValues(alpha: 0.55),
+              valueColor: const AlwaysStoppedAnimation(AppTheme.frost400),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CompactInsightRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final String subtitle;
+  final Color color;
+
+  const _CompactInsightRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.subtitle,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: AppTheme.fontSm,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontXs,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: AppTheme.fontXs,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DistributionWrap extends StatelessWidget {
+  final Map<String, List<BinderDistributionEntry>> distributions;
+
+  const _DistributionWrap({required this.distributions});
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = <String, List<BinderDistributionEntry>>{
+      'Raridade': distributions['rarity'] ?? const [],
+      'Condição': distributions['condition'] ?? const [],
+      'Idioma': distributions['language'] ?? const [],
+      'Foil': distributions['foil'] ?? const [],
+    };
+
+    return _DashboardSection(
+      title: 'Distribuição da coleção',
+      children: [
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children:
+              entries.entries.expand((entry) {
+                return entry.value.take(4).map((item) {
+                  return _DistributionChip(
+                    label: '${entry.key}: ${_humanizeDistribution(item.label)}',
+                    value: item.quantity,
+                  );
+                });
+              }).toList(),
+        ),
+      ],
+    );
+  }
+
+  String _humanizeDistribution(String label) {
+    return switch (label) {
+      'non_foil' => 'normal',
+      'foil' => 'foil',
+      'unknown' => '-',
+      _ => label.toUpperCase(),
+    };
+  }
+}
+
+class _DistributionChip extends StatelessWidget {
+  final String label;
+  final int value;
+
+  const _DistributionChip({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+      ),
+      child: Text(
+        '$label • $value',
+        style: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -697,21 +1055,43 @@ class _ActionIconButton extends StatelessWidget {
 
 class _SearchFilterBar extends StatelessWidget {
   final TextEditingController searchController;
+  final TextEditingController setController;
   final String? conditionFilter;
+  final String? rarityFilter;
+  final String? languageFilter;
+  final bool? foilFilter;
   final bool? tradeFilter;
   final bool? saleFilter;
+  final String sortBy;
+  final String sortOrder;
   final VoidCallback onSearch;
   final ValueChanged<String?> onConditionChanged;
+  final ValueChanged<String?> onRarityChanged;
+  final ValueChanged<String?> onLanguageChanged;
+  final ValueChanged<bool?> onFoilChanged;
+  final ValueChanged<String?> onSortChanged;
+  final VoidCallback onSortOrderToggle;
   final VoidCallback onTradeToggle;
   final VoidCallback onSaleToggle;
 
   const _SearchFilterBar({
     required this.searchController,
+    required this.setController,
     required this.conditionFilter,
+    required this.rarityFilter,
+    required this.languageFilter,
+    required this.foilFilter,
     required this.tradeFilter,
     required this.saleFilter,
+    required this.sortBy,
+    required this.sortOrder,
     required this.onSearch,
     required this.onConditionChanged,
+    required this.onRarityChanged,
+    required this.onLanguageChanged,
+    required this.onFoilChanged,
+    required this.onSortChanged,
+    required this.onSortOrderToggle,
     required this.onTradeToggle,
     required this.onSaleToggle,
   });
@@ -764,6 +1144,116 @@ class _SearchFilterBar extends StatelessWidget {
                   items: const ['NM', 'LP', 'MP', 'HP', 'DMG'],
                   hint: 'Condição',
                   onChanged: onConditionChanged,
+                ),
+                const SizedBox(width: 8),
+                _FilterDropdown(
+                  value: rarityFilter,
+                  items: const ['common', 'uncommon', 'rare', 'mythic'],
+                  hint: 'Raridade',
+                  onChanged: onRarityChanged,
+                ),
+                const SizedBox(width: 8),
+                _FilterDropdown(
+                  value: languageFilter,
+                  items: const ['en', 'pt', 'es', 'ja'],
+                  hint: 'Idioma',
+                  onChanged: onLanguageChanged,
+                ),
+                const SizedBox(width: 8),
+                _SetCodeFilterField(
+                  controller: setController,
+                  onSubmitted: onSearch,
+                ),
+                const SizedBox(width: 8),
+                _FilterDropdown(
+                  value: sortBy,
+                  items: const [
+                    'name',
+                    'set',
+                    'rarity',
+                    'condition',
+                    'language',
+                    'foil',
+                    'quantity',
+                    'price',
+                    'updated_at',
+                  ],
+                  hint: 'Ordenar',
+                  onChanged: onSortChanged,
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: Text(sortOrder == 'asc' ? 'A-Z' : 'Z-A'),
+                  selected: sortOrder == 'desc',
+                  onSelected: (_) => onSortOrderToggle(),
+                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  backgroundColor: AppTheme.surfaceSlate,
+                  labelStyle: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  side: const BorderSide(color: AppTheme.outlineMuted),
+                  avatar: Icon(
+                    sortOrder == 'asc'
+                        ? Icons.arrow_upward
+                        : Icons.arrow_downward,
+                    size: 14,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Foil'),
+                  selected: foilFilter == true,
+                  onSelected: (_) {
+                    onFoilChanged(foilFilter == true ? null : true);
+                  },
+                  selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                  backgroundColor: AppTheme.surfaceSlate,
+                  labelStyle: TextStyle(
+                    color:
+                        foilFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  side: BorderSide(
+                    color:
+                        foilFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.outlineMuted,
+                  ),
+                  avatar: Icon(
+                    Icons.auto_awesome,
+                    size: 14,
+                    color:
+                        foilFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Normal'),
+                  selected: foilFilter == false,
+                  onSelected: (_) {
+                    onFoilChanged(foilFilter == false ? null : false);
+                  },
+                  selectedColor: AppTheme.frost400.withValues(alpha: 0.22),
+                  backgroundColor: AppTheme.surfaceSlate,
+                  labelStyle: TextStyle(
+                    color:
+                        foilFilter == false
+                            ? AppTheme.frost400
+                            : AppTheme.textSecondary,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                  side: BorderSide(
+                    color:
+                        foilFilter == false
+                            ? AppTheme.frost400
+                            : AppTheme.outlineMuted,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -827,6 +1317,56 @@ class _SearchFilterBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SetCodeFilterField extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onSubmitted;
+
+  const _SetCodeFilterField({
+    required this.controller,
+    required this.onSubmitted,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 88,
+      height: 34,
+      child: TextField(
+        key: const Key('binderSetFilterField'),
+        controller: controller,
+        onSubmitted: (_) => onSubmitted(),
+        textCapitalization: TextCapitalization.characters,
+        style: const TextStyle(
+          color: AppTheme.textPrimary,
+          fontSize: AppTheme.fontSm,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Set',
+          hintStyle: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: AppTheme.fontSm,
+          ),
+          filled: true,
+          fillColor: AppTheme.surfaceSlate,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            borderSide: const BorderSide(color: AppTheme.outlineMuted),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            borderSide: const BorderSide(color: AppTheme.outlineMuted),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            borderSide: const BorderSide(color: AppTheme.frost400),
+          ),
+        ),
       ),
     );
   }

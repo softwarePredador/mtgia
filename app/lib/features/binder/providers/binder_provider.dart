@@ -15,6 +15,11 @@ class BinderItem {
   final String? cardManaCost;
   final String? cardRarity;
   final String? cardTypeLine;
+  final double? cardMarketPrice;
+  final String? createdAt;
+  final String? updatedAt;
+  final int deckCount;
+  final int deckQuantity;
   int quantity;
   String condition; // NM, LP, MP, HP, DMG
   bool isFoil;
@@ -35,6 +40,11 @@ class BinderItem {
     this.cardManaCost,
     this.cardRarity,
     this.cardTypeLine,
+    this.cardMarketPrice,
+    this.createdAt,
+    this.updatedAt,
+    this.deckCount = 0,
+    this.deckQuantity = 0,
     this.quantity = 1,
     this.condition = 'NM',
     this.isFoil = false,
@@ -62,6 +72,14 @@ class BinderItem {
       cardRarity: card?['rarity'] as String? ?? json['card_rarity'] as String?,
       cardTypeLine:
           card?['type_line'] as String? ?? json['card_type_line'] as String?,
+      cardMarketPrice:
+          card?['market_price'] != null
+              ? (card?['market_price'] as num).toDouble()
+              : null,
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
+      deckCount: json['deck_count'] as int? ?? 0,
+      deckQuantity: json['deck_quantity'] as int? ?? 0,
       quantity: json['quantity'] as int? ?? 1,
       condition: json['condition'] as String? ?? 'NM',
       isFoil: json['is_foil'] as bool? ?? false,
@@ -76,6 +94,90 @@ class BinderItem {
   }
 }
 
+class BinderDistributionEntry {
+  final String label;
+  final int quantity;
+
+  const BinderDistributionEntry({required this.label, required this.quantity});
+
+  factory BinderDistributionEntry.fromJson(Map<String, dynamic> json) {
+    return BinderDistributionEntry(
+      label: json['label']?.toString() ?? 'unknown',
+      quantity: json['quantity'] as int? ?? 0,
+    );
+  }
+}
+
+class BinderSetProgress {
+  final String setCode;
+  final String? setName;
+  final int uniqueOwned;
+  final int quantityOwned;
+  final int totalCards;
+  final double completionRatio;
+  final double estimatedValue;
+
+  const BinderSetProgress({
+    required this.setCode,
+    this.setName,
+    this.uniqueOwned = 0,
+    this.quantityOwned = 0,
+    this.totalCards = 0,
+    this.completionRatio = 0.0,
+    this.estimatedValue = 0.0,
+  });
+
+  factory BinderSetProgress.fromJson(Map<String, dynamic> json) {
+    return BinderSetProgress(
+      setCode: json['set_code']?.toString() ?? '',
+      setName: json['set_name']?.toString(),
+      uniqueOwned: json['unique_owned'] as int? ?? 0,
+      quantityOwned: json['quantity_owned'] as int? ?? 0,
+      totalCards: json['total_cards'] as int? ?? 0,
+      completionRatio:
+          json['completion_ratio'] != null
+              ? (json['completion_ratio'] as num).toDouble()
+              : 0.0,
+      estimatedValue:
+          json['estimated_value'] != null
+              ? (json['estimated_value'] as num).toDouble()
+              : 0.0,
+    );
+  }
+}
+
+class BinderWishlistEntry {
+  final String cardId;
+  final String cardName;
+  final String? setCode;
+  final String? rarity;
+  final int wantQuantity;
+  final int haveQuantity;
+  final int missingQuantity;
+
+  const BinderWishlistEntry({
+    required this.cardId,
+    required this.cardName,
+    this.setCode,
+    this.rarity,
+    this.wantQuantity = 0,
+    this.haveQuantity = 0,
+    this.missingQuantity = 0,
+  });
+
+  factory BinderWishlistEntry.fromJson(Map<String, dynamic> json) {
+    return BinderWishlistEntry(
+      cardId: json['card_id']?.toString() ?? '',
+      cardName: json['card_name']?.toString() ?? 'Carta',
+      setCode: json['set_code']?.toString(),
+      rarity: json['rarity']?.toString(),
+      wantQuantity: json['want_quantity'] as int? ?? 0,
+      haveQuantity: json['have_quantity'] as int? ?? 0,
+      missingQuantity: json['missing_quantity'] as int? ?? 0,
+    );
+  }
+}
+
 // =====================================================================
 // Model: BinderStats
 // =====================================================================
@@ -83,28 +185,77 @@ class BinderItem {
 class BinderStats {
   final int totalItems;
   final int uniqueCards;
+  final int duplicateCopies;
   final int forTradeCount;
   final int forSaleCount;
   final double estimatedValue;
+  final int wishlistCount;
+  final int wishlistUniqueCards;
+  final int missingCardsCount;
+  final int priceMissingCount;
+  final int cardsUsedInDecks;
+  final int decksUsingBinderCards;
+  final List<BinderSetProgress> setProgress;
+  final List<BinderWishlistEntry> wishlist;
+  final Map<String, List<BinderDistributionEntry>> distributions;
 
   BinderStats({
     this.totalItems = 0,
     this.uniqueCards = 0,
+    this.duplicateCopies = 0,
     this.forTradeCount = 0,
     this.forSaleCount = 0,
     this.estimatedValue = 0.0,
+    this.wishlistCount = 0,
+    this.wishlistUniqueCards = 0,
+    this.missingCardsCount = 0,
+    this.priceMissingCount = 0,
+    this.cardsUsedInDecks = 0,
+    this.decksUsingBinderCards = 0,
+    this.setProgress = const [],
+    this.wishlist = const [],
+    this.distributions = const {},
   });
 
   factory BinderStats.fromJson(Map<String, dynamic> json) {
+    final distributionsJson =
+        json['distributions'] as Map<String, dynamic>? ?? const {};
+    final distributions = <String, List<BinderDistributionEntry>>{};
+    for (final entry in distributionsJson.entries) {
+      distributions[entry.key] =
+          (entry.value as List<dynamic>? ?? const [])
+              .whereType<Map>()
+              .map((e) => BinderDistributionEntry.fromJson(e.cast()))
+              .toList();
+    }
+
     return BinderStats(
       totalItems: json['total_items'] as int? ?? 0,
       uniqueCards: json['unique_cards'] as int? ?? 0,
+      duplicateCopies: json['duplicate_copies'] as int? ?? 0,
       forTradeCount: json['for_trade_count'] as int? ?? 0,
       forSaleCount: json['for_sale_count'] as int? ?? 0,
       estimatedValue:
           json['estimated_value'] != null
               ? (json['estimated_value'] as num).toDouble()
               : 0.0,
+      wishlistCount: json['wishlist_count'] as int? ?? 0,
+      wishlistUniqueCards: json['wishlist_unique_cards'] as int? ?? 0,
+      missingCardsCount: json['missing_cards_count'] as int? ?? 0,
+      priceMissingCount: json['price_missing_count'] as int? ?? 0,
+      cardsUsedInDecks: json['cards_used_in_decks'] as int? ?? 0,
+      decksUsingBinderCards: json['decks_using_binder_cards'] as int? ?? 0,
+      setProgress:
+          (json['set_progress'] as List<dynamic>? ?? const [])
+              .whereType<Map>()
+              .map((e) => BinderSetProgress.fromJson(e.cast()))
+              .toList(),
+      wishlist:
+          (json['wishlist'] as List<dynamic>? ?? const [])
+              .whereType<Map>()
+              .map((e) => BinderWishlistEntry.fromJson(e.cast()))
+              .toList(),
+      distributions: distributions,
     );
   }
 }
@@ -215,6 +366,12 @@ class BinderProvider extends ChangeNotifier {
   bool? _filterForTrade;
   bool? _filterForSale;
   String? _currentListType; // 'have', 'want', or null (all)
+  String? _currentSet;
+  String? _currentRarity;
+  String? _currentLanguage;
+  bool? _filterFoil;
+  String _sortBy = 'name';
+  String _sortOrder = 'asc';
 
   List<BinderItem> get items => _items;
   BinderStats? get stats => _stats;
@@ -276,6 +433,13 @@ class BinderProvider extends ChangeNotifier {
       }
       if (_filterForTrade == true) endpoint += '&for_trade=true';
       if (_filterForSale == true) endpoint += '&for_sale=true';
+      if (_currentSet != null && _currentSet!.isNotEmpty) {
+        endpoint += '&set=${Uri.encodeComponent(_currentSet!)}';
+      }
+      if (_currentRarity != null) endpoint += '&rarity=$_currentRarity';
+      if (_currentLanguage != null) endpoint += '&language=$_currentLanguage';
+      if (_filterFoil != null) endpoint += '&foil=$_filterFoil';
+      endpoint += '&sort=$_sortBy&order=$_sortOrder';
 
       final res = await _api.get(endpoint);
       if (res.statusCode == 200 && res.data is Map) {
@@ -313,12 +477,24 @@ class BinderProvider extends ChangeNotifier {
     bool? forTrade,
     bool? forSale,
     String? listType,
+    String? setCode,
+    String? rarity,
+    String? language,
+    bool? foil,
+    String? sortBy,
+    String? sortOrder,
   }) {
     _currentFilter = condition;
     _currentSearch = search;
     _filterForTrade = forTrade;
     _filterForSale = forSale;
     _currentListType = listType;
+    _currentSet = setCode;
+    _currentRarity = rarity;
+    _currentLanguage = language;
+    _filterFoil = foil;
+    _sortBy = sortBy ?? _sortBy;
+    _sortOrder = sortOrder ?? _sortOrder;
     fetchMyBinder(reset: true);
   }
 
@@ -333,9 +509,16 @@ class BinderProvider extends ChangeNotifier {
             current == null ||
             current.totalItems != next.totalItems ||
             current.uniqueCards != next.uniqueCards ||
+            current.duplicateCopies != next.duplicateCopies ||
             current.forTradeCount != next.forTradeCount ||
             current.forSaleCount != next.forSaleCount ||
-            current.estimatedValue != next.estimatedValue;
+            current.estimatedValue != next.estimatedValue ||
+            current.wishlistCount != next.wishlistCount ||
+            current.missingCardsCount != next.missingCardsCount ||
+            current.priceMissingCount != next.priceMissingCount ||
+            current.cardsUsedInDecks != next.cardsUsedInDecks ||
+            current.setProgress.length != next.setProgress.length ||
+            current.wishlist.length != next.wishlist.length;
 
         if (changed) {
           _stats = next;
@@ -501,6 +684,12 @@ class BinderProvider extends ChangeNotifier {
     String? search,
     bool? forTrade,
     bool? forSale,
+    String? setCode,
+    String? rarity,
+    String? language,
+    bool? foil,
+    String sortBy = 'name',
+    String sortOrder = 'asc',
   }) async {
     try {
       var endpoint = '/binder?page=$page&limit=$limit&list_type=$listType';
@@ -510,6 +699,13 @@ class BinderProvider extends ChangeNotifier {
       }
       if (forTrade == true) endpoint += '&for_trade=true';
       if (forSale == true) endpoint += '&for_sale=true';
+      if (setCode != null && setCode.isNotEmpty) {
+        endpoint += '&set=${Uri.encodeComponent(setCode)}';
+      }
+      if (rarity != null) endpoint += '&rarity=$rarity';
+      if (language != null) endpoint += '&language=$language';
+      if (foil != null) endpoint += '&foil=$foil';
+      endpoint += '&sort=$sortBy&order=$sortOrder';
 
       final res = await _api.get(endpoint);
       if (res.statusCode == 200 && res.data is Map) {
@@ -683,6 +879,12 @@ class BinderProvider extends ChangeNotifier {
         _filterForTrade == null &&
         _filterForSale == null &&
         _currentListType == null &&
+        _currentSet == null &&
+        _currentRarity == null &&
+        _currentLanguage == null &&
+        _filterFoil == null &&
+        _sortBy == 'name' &&
+        _sortOrder == 'asc' &&
         _marketItems.isEmpty &&
         !_isLoadingMarket &&
         _marketError == null &&
@@ -708,6 +910,12 @@ class BinderProvider extends ChangeNotifier {
     _filterForTrade = null;
     _filterForSale = null;
     _currentListType = null;
+    _currentSet = null;
+    _currentRarity = null;
+    _currentLanguage = null;
+    _filterFoil = null;
+    _sortBy = 'name';
+    _sortOrder = 'asc';
     _marketItems = [];
     _isLoadingMarket = false;
     _marketError = null;
