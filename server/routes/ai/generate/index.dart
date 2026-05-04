@@ -6,6 +6,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
+import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
@@ -28,10 +29,45 @@ Future<Response> onRequest(RequestContext context) async {
       return badRequest('Prompt is required');
     }
 
+    final totalStopwatch = Stopwatch()..start();
+    final timings = <String, int>{};
+    final bracket = body['bracket'];
+    final cacheKey = buildAiGenerateCacheKey(
+      prompt: prompt,
+      format: format,
+      bracket: bracket,
+    );
+
+    final cacheLookupStopwatch = Stopwatch()..start();
+    final cachedBody = readAiGenerateCache(cacheKey);
+    timings['cache_lookup_ms'] = cacheLookupStopwatch.elapsedMilliseconds;
+    if (cachedBody != null) {
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      return Response.json(
+        body: withAiGenerateRuntimeMetadata(
+          payload: cachedBody,
+          cacheKey: cacheKey,
+          cacheHit: true,
+          timings: timings,
+        ),
+      );
+    }
+
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
     final pool = context.read<Pool>();
+    final cacheTtl = Duration(
+      seconds: aiConfig.intFor(
+        key: 'AI_GENERATE_CACHE_TTL_SECONDS',
+        fallback: 600,
+        devFallback: 600,
+        stagingFallback: 900,
+        prodFallback: 600,
+        min: 30,
+        max: 3600,
+      ),
+    );
 
     if (apiKey == null || apiKey.isEmpty) {
       final mockBody = await _buildMockGenerateResponse(
@@ -42,12 +78,25 @@ Future<Response> onRequest(RequestContext context) async {
         warningMessage:
             'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
       );
-      return Response.json(body: mockBody);
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      final responseBody = withAiGenerateRuntimeMetadata(
+        payload: mockBody,
+        cacheKey: cacheKey,
+        cacheHit: false,
+        timings: timings,
+      );
+      writeAiGenerateCache(
+        cacheKey: cacheKey,
+        payload: responseBody,
+        ttl: const Duration(seconds: 120),
+      );
+      return Response.json(body: responseBody);
     }
 
     var metaContext = '';
     Map<String, dynamic>? metaReferenceContext;
 
+    final metaStopwatch = Stopwatch()..start();
     try {
       final metaKeywordPatterns = prompt
           .split(' ')
@@ -106,6 +155,8 @@ Future<Response> onRequest(RequestContext context) async {
     } catch (error) {
       print('[ERROR] handler: $error');
       Log.w('Erro ao buscar contexto do meta: $error');
+    } finally {
+      timings['meta_context_ms'] = metaStopwatch.elapsedMilliseconds;
     }
 
     const systemPromptPrefix = '''
@@ -169,7 +220,28 @@ Format: $format.
 $metaContext
 ''';
 
+    final normalizedFormat = normalizeAiGenerateFormat(format);
+    final openAiTimeout = aiConfig.timeoutFor(
+      key: 'OPENAI_TIMEOUT_GENERATE_SECONDS',
+      fallback: const Duration(seconds: 8),
+      devFallback: const Duration(seconds: 8),
+      stagingFallback: const Duration(seconds: 8),
+      prodFallback: const Duration(seconds: 12),
+      min: const Duration(seconds: 3),
+      max: const Duration(seconds: 90),
+    );
+    final maxTokens = aiConfig.intFor(
+      key: 'OPENAI_MAX_TOKENS_GENERATE',
+      fallback: normalizedFormat == 'commander' ? 3400 : 2200,
+      devFallback: normalizedFormat == 'commander' ? 3400 : 2200,
+      stagingFallback: normalizedFormat == 'commander' ? 3400 : 2200,
+      prodFallback: normalizedFormat == 'commander' ? 3800 : 2600,
+      min: 800,
+      max: 6000,
+    );
+
     http.Response response;
+    final openAiStopwatch = Stopwatch()..start();
     try {
       response = await http
           .post(
@@ -200,12 +272,56 @@ $metaContext
                 stagingFallback: 0.4,
                 prodFallback: 0.35,
               ),
+              'max_tokens': maxTokens,
               'response_format': {'type': 'json_object'},
             }),
           )
-          .timeout(const Duration(seconds: 90));
+          .timeout(openAiTimeout);
     } on TimeoutException {
-      return apiError(504, 'OpenAI request timed out');
+      timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
+      Log.w(
+        'AI generate OpenAI timeout; using deterministic fallback. '
+        'format=$format timeout_ms=${openAiTimeout.inMilliseconds}',
+      );
+      final fallbackBody = await _buildMockGenerateResponse(
+        pool: pool,
+        prompt: prompt,
+        format: format,
+        warningCode: 'openai_timeout_deterministic_fallback',
+        warningMessage:
+            'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
+      );
+      final fallbackValidation =
+          fallbackBody['validation'] as Map<String, dynamic>?;
+      timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+      final responseBody = withAiGenerateRuntimeMetadata(
+        payload: {
+          ...fallbackBody,
+          'ai_generation_timed_out': true,
+        },
+        cacheKey: cacheKey,
+        cacheHit: false,
+        timings: timings,
+      );
+
+      if (fallbackValidation?['is_valid'] == true) {
+        writeAiGenerateCache(
+          cacheKey: cacheKey,
+          payload: responseBody,
+          ttl: const Duration(seconds: 120),
+        );
+        return Response.json(body: responseBody);
+      }
+
+      return Response.json(
+        statusCode: 422,
+        body: {
+          'error': 'Generated fallback deck failed validation',
+          ...responseBody,
+        },
+      );
+    } finally {
+      timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
     }
 
     if (response.statusCode != 200) {
@@ -221,7 +337,19 @@ $metaContext
           warningMessage:
               'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
         );
-        return Response.json(body: mockBody);
+        timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+        final responseBody = withAiGenerateRuntimeMetadata(
+          payload: mockBody,
+          cacheKey: cacheKey,
+          cacheHit: false,
+          timings: timings,
+        );
+        writeAiGenerateCache(
+          cacheKey: cacheKey,
+          payload: responseBody,
+          ttl: const Duration(seconds: 120),
+        );
+        return Response.json(body: responseBody);
       }
 
       return apiError(
@@ -230,11 +358,14 @@ $metaContext
       );
     }
 
+    final decodeStopwatch = Stopwatch()..start();
     dynamic aiData;
     try {
       aiData = jsonDecode(utf8.decode(response.bodyBytes));
     } catch (e) {
       return apiError(502, 'OpenAI returned invalid JSON');
+    } finally {
+      timings['decode_ms'] = decodeStopwatch.elapsedMilliseconds;
     }
 
     if (aiData is! Map ||
@@ -273,11 +404,13 @@ $metaContext
     final validationService = GeneratedDeckValidationService(
       PostgresGeneratedDeckRepository(pool, preferredFormat: format),
     );
+    final validationStopwatch = Stopwatch()..start();
     final validation = await validationService.validate(
       format: format,
       cards: cards,
       commanderName: commanderName,
     );
+    timings['validation_ms'] = validationStopwatch.elapsedMilliseconds;
 
     final generatedCardNames = cards
         .map((card) => card['name']?.toString().trim() ?? '')
@@ -333,7 +466,19 @@ $metaContext
       if (fallbackValidation?['is_valid'] == true) {
         fallbackBody['ai_generation_repaired_by_fallback'] = true;
         fallbackBody['original_validation_errors'] = validation.errors;
-        return Response.json(body: fallbackBody);
+        timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+        final validFallbackBody = withAiGenerateRuntimeMetadata(
+          payload: fallbackBody,
+          cacheKey: cacheKey,
+          cacheHit: false,
+          timings: timings,
+        );
+        writeAiGenerateCache(
+          cacheKey: cacheKey,
+          payload: validFallbackBody,
+          ttl: const Duration(seconds: 120),
+        );
+        return Response.json(body: validFallbackBody);
       }
 
       return Response.json(
@@ -345,7 +490,19 @@ $metaContext
       );
     }
 
-    return Response.json(body: responseBody);
+    timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+    final finalBody = withAiGenerateRuntimeMetadata(
+      payload: responseBody,
+      cacheKey: cacheKey,
+      cacheHit: false,
+      timings: timings,
+    );
+    writeAiGenerateCache(
+      cacheKey: cacheKey,
+      payload: finalBody,
+      ttl: cacheTtl,
+    );
+    return Response.json(body: finalBody);
   } catch (error, stackTrace) {
     print('[ERROR] Failed to generate deck: $error');
     await captureRouteException(

@@ -89,6 +89,58 @@ class OpenAiRuntimeConfig {
     return _clampTemp(parsed);
   }
 
+  Duration timeoutFor({
+    required String key,
+    required Duration fallback,
+    Duration? devFallback,
+    Duration? stagingFallback,
+    Duration? prodFallback,
+    Duration min = const Duration(seconds: 1),
+    Duration max = const Duration(seconds: 120),
+  }) {
+    final raw = env[key]?.trim();
+    final selectedFallback = switch (_profile) {
+      'dev' => devFallback ?? fallback,
+      'staging' => stagingFallback ?? fallback,
+      'prod' => prodFallback ?? fallback,
+      _ => fallback,
+    };
+
+    final parsedSeconds =
+        raw == null || raw.isEmpty ? null : num.tryParse(raw)?.round();
+    final duration = parsedSeconds == null
+        ? selectedFallback
+        : Duration(seconds: parsedSeconds);
+
+    if (duration < min) return min;
+    if (duration > max) return max;
+    return duration;
+  }
+
+  int intFor({
+    required String key,
+    required int fallback,
+    int? devFallback,
+    int? stagingFallback,
+    int? prodFallback,
+    int? min,
+    int? max,
+  }) {
+    final raw = env[key]?.trim();
+    final selectedFallback = switch (_profile) {
+      'dev' => devFallback ?? fallback,
+      'staging' => stagingFallback ?? fallback,
+      'prod' => prodFallback ?? fallback,
+      _ => fallback,
+    };
+
+    final parsed = raw == null || raw.isEmpty ? null : int.tryParse(raw);
+    var value = parsed ?? selectedFallback;
+    if (min != null && value < min) value = min;
+    if (max != null && value > max) value = max;
+    return value;
+  }
+
   double _clampTemp(double value) {
     if (value < 0) return 0;
     if (value > 1) return 1;

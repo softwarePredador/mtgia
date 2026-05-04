@@ -8,6 +8,17 @@ The validated non-scanner scope passed on `master` at commit `85b4200` with a re
 
 This is not a production/broad-rollout approval because the fresh 5-sample `/ai/generate` latency regressed beyond the previously accepted risk threshold. All `/ai/generate` samples returned `200`, but p95/p99 reached `44756ms`.
 
+### 2026-05-04 P1 addendum - `/ai/generate` latency reduction
+
+After the handoff commit `d93d847`, `/ai/generate` received a focused latency patch that keeps the app-facing JSON contract backward-compatible and additive only:
+
+1. In-memory cache by normalized prompt, format and bracket, with hashed `cache_key`.
+2. Configurable early OpenAI timeout for generate (`OPENAI_TIMEOUT_GENERATE_SECONDS`, default 8s in dev/staging) followed by deterministic validated fallback.
+3. Controlled `OPENAI_MAX_TOKENS_GENERATE`.
+4. Sanitized optional `cache`, `timings`, and `ai_generation_timed_out` response fields.
+
+Fresh 5-sample cold measurement against local backend `8082` after the patch returned `200x5`, p50 `10433ms`, p95/p99 `13005ms`; cache probe returned `200` in `3ms` with `cache.hit=true`. This meets the sprint P1 target of p95 below `15000ms` for local/staging, but it remains **PASS WITH RISKS** rather than production "100%" because slow prompts can now trade quality for deterministic fallback and remote DB validation still consumed up to `6205ms` in the measured set.
+
 ## Scope
 
 In scope for this internal/staging handoff:
@@ -148,6 +159,7 @@ Sentry/log status:
 | Endpoint | Statuses | p50 | p95 | p99 | Release interpretation |
 |---|---:|---:|---:|---:|---|
 | `POST /ai/generate` | `200x5` | `24293ms` | `44756ms` | `44756ms` | **Outside accepted risk.** Internal/staging can proceed only with explicit warning; not production-ready. |
+| `POST /ai/generate` after P1 patch | `200x5` | `10433ms` | `13005ms` | `13005ms` | **Improved / PASS WITH RISKS.** Meets sprint target `<15000ms`; fallback quality and DB validation latency remain watch items. |
 | `POST /ai/optimize` | `202x5` | `4786ms` | `5029ms` | `5029ms` | Inside previous accepted risk; all async jobs completed. |
 
 Previous accepted-risk reference was `/ai/generate` p95 around `10203ms` and release threshold `<=12000ms` for this cycle. The fresh p95/p99 now exceeds that threshold by a wide margin. Treat as P1 before any broader rollout, and as no-go for production/broad staging if repeated.
@@ -157,7 +169,7 @@ Previous accepted-risk reference was `/ai/generate` p95 around `10203ms` and rel
 | Risk | Decision |
 |---|---|
 | Scanner physical camera/OCR not proven | Accepted only because scanner is excluded from this release scope. |
-| `/ai/generate` p95/p99 `44756ms` | Accepted only for narrow internal/staging with clear loading expectations and monitoring; no-go for production/broad rollout until reduced or made async/resilient. |
+| `/ai/generate` p95/p99 `44756ms` before P1 patch; `13005ms` after patch | Reduced below sprint target for local/staging. Still accepted only with monitoring because timeout fallback can be less useful than full OpenAI output and DB validation remains a measurable latency source. |
 | Firebase Performance unavailable in integration tests | Accepted for internal/staging because app breadcrumbs and backend logs provide basic visibility; must be fixed before relying on Firebase Performance. |
 | Push server credentials missing locally | Accepted for this non-push runtime gate; required before claiming FCM delivery readiness. |
 | Local release signing/export not configured | Accepted for runtime handoff; build/upload needs CI or local signing configuration before distribution. |

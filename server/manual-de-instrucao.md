@@ -2,6 +2,43 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — P1 reducao de latencia do `POST /ai/generate`
+
+### O Porquê
+- O handoff interno/staging no commit `d93d847` marcou `READY WITH RISKS`, mas registrou `/ai/generate` com `200x5` e p95/p99 `44756ms`, acima do risco aceito para qualquer rollout amplo.
+- A reproducao local antes do patch confirmou o problema em menor escala: `200x5`, p50 `10528ms`, p95/p99 `22820ms`; Commander concentrou o pior caso.
+
+### O Como
+- `server/routes/ai/generate/index.dart` passou a:
+  - consultar cache em memoria antes de buscar meta/OpenAI;
+  - usar cache por prompt normalizado + formato + bracket, com `cache_key` SHA-256 sem texto do prompt;
+  - aplicar timeout OpenAI configuravel por `OPENAI_TIMEOUT_GENERATE_SECONDS` (default dev/staging 8s, prod 12s) e retornar fallback deterministico validado quando excedido;
+  - limitar tokens via `OPENAI_MAX_TOKENS_GENERATE`;
+  - expor campos opcionais e sanitizados `cache`, `timings` e `ai_generation_timed_out`.
+- Foi criado `server/lib/ai_generate_performance_support.dart` para concentrar normalizacao, cache key, clone de payload JSON e metadados de runtime.
+- `server/lib/openai_runtime_config.dart` ganhou helpers tipados `timeoutFor` e `intFor`.
+- O contrato app/backend foi mantido por adicao de campos opcionais; o app continua usando `generated_deck` como fonte de verdade.
+
+### Validacao executada
+- `cd server && dart analyze lib routes test`: PASS.
+- `cd server && dart test test/generated_deck_validation_service_test.dart test/ai_generate_performance_support_test.dart test/openai_runtime_config_test.dart -r expanded`: PASS, `+13`.
+- `cd server && dart test test/generated_deck_validation_service_test.dart test/ai_generate_create_optimize_flow_test.dart test/openai_runtime_config_test.dart -r expanded`: PASS, `+13`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded`: PASS, `+2`.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart --no-version-check`: PASS, `+32`.
+
+### Metricas
+- Baseline handoff: `POST /ai/generate` `200x5`, p50 `24293ms`, p95/p99 `44756ms`.
+- Baseline reproduzido antes do patch: `200x5`, p50 `10528ms`, p95/p99 `22820ms`.
+- Pos-patch final frio: `200x5`, p50 `10433ms`, p95/p99 `13005ms`.
+- Prova de cache: `200`, `3ms`, `cache.hit=true`.
+- Gargalos finais observados: OpenAI ate `7783ms` quando nao caiu em fallback; validacao DB ate `6205ms`; meta context em formatos construidos ~`560ms`.
+
+### Resultado
+- Resultado da sprint: **PASS WITH RISKS** para local/staging, com p95/p99 abaixo do alvo minimo de `15000ms`.
+- Risco remanescente: prompts lentos podem receber fallback deterministico valido (`is_mock=true`, `ai_generation_timed_out=true`) em vez de deck criativo completo; validacao DB remota ainda pesa no caminho sincrono.
+- Rollback: reverter o commit ou aumentar `OPENAI_TIMEOUT_GENERATE_SECONDS` via ambiente; reduzir `AI_GENERATE_CACHE_TTL_SECONDS` se for necessario desabilitar quase todo reaproveitamento de cache sem alterar codigo.
+
 ## 2026-05-04 — Handoff release interno/staging ManaLoom sem scanner fisico
 
 ### O Porquê

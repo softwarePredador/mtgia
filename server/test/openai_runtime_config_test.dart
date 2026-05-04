@@ -43,5 +43,40 @@ void main() {
         isFalse,
       );
     });
+
+    test('uses bounded generate timeout override', () {
+      final env = DotEnv()
+        ..addAll({
+          'ENVIRONMENT': 'staging',
+          'OPENAI_TIMEOUT_GENERATE_SECONDS': '1',
+        });
+      final config = OpenAiRuntimeConfig(env);
+
+      expect(
+        config.timeoutFor(
+          key: 'OPENAI_TIMEOUT_GENERATE_SECONDS',
+          fallback: const Duration(seconds: 20),
+          stagingFallback: const Duration(seconds: 10),
+          min: const Duration(seconds: 3),
+          max: const Duration(seconds: 90),
+        ),
+        equals(const Duration(seconds: 3)),
+      );
+    });
+
+    test('uses profile fallback for integer limits', () {
+      final env = DotEnv()..addAll({'ENVIRONMENT': 'production'});
+      final config = OpenAiRuntimeConfig(env);
+
+      expect(
+        config.intFor(
+          key: 'OPENAI_MAX_TOKENS_GENERATE',
+          fallback: 2200,
+          prodFallback: 3800,
+          max: 6000,
+        ),
+        equals(3800),
+      );
+    });
   });
 }
