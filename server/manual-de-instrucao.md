@@ -1,5 +1,6 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
+> **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
 ## 2026-05-04 — Marketplace/Trades Trust Intelligence com dados internos
 
@@ -4068,11 +4069,8 @@ Future<Response> onRequest(RequestContext context) async {
 - ⚠️ **TODO:** HTTPS obrigatório em produção
 - ⚠️ **TODO:** Refresh tokens (renovar sem pedir senha novamente)
 
-**Variável de Ambiente Crítica:**
-```env
-# .env
-JWT_SECRET=uma_chave_super_secreta_e_longa_aleatoria_123456789
-```
+**Variavel de ambiente critica:**
+- Configure `JWT_SECRET` somente no ambiente seguro. Nao documente valores, exemplos com segredo, tokens ou chaves privadas no repositorio.
 
 **Geração de Chave Segura:**
 ```bash
