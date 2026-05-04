@@ -2,6 +2,38 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — Estabilizacao live do fluxo AI generate -> create -> validate/optimize
+
+### O Porquê
+- O teste live `ai_generate_create_optimize_flow_test.dart` reproduziu 422 em `/ai/generate` para prompts Standard como mono red aggro quando a IA retornava menos de 60 cartas validas.
+- O fluxo app/backend esperado e que o backend normalize a sugestao antes de entregar `generated_deck`, para que o app consiga criar, validar e seguir para optimize sem mascarar erros reais nem fazer reparo no cliente.
+
+### O Como
+- `GeneratedDeckValidationService` passou a reparar decks de formatos construidos antes da resposta:
+  - limita cartas nao-basicas a no maximo 4 copias;
+  - adiciona terrenos basicos escolhidos pela demanda de cor ate atingir 60 cartas;
+  - em falhas posteriores de limite/restricao, ajusta ou remove a carta ofensora e refecha o minimo.
+- `POST /ai/generate` agora usa fallback deterministico valido somente quando a geracao principal continua invalida apos validacao/reparo, expondo metadados opcionais `ai_generation_repaired_by_fallback` e `original_validation_errors`.
+- A resolucao de nomes em `resolveImportCardNames` e em `POST /decks` passou a preferir uma impressao legal/restrita no formato solicitado, reduzindo divergencia entre deck gerado por nome e deck criado por nome.
+- Nenhum contrato de Social Trading, Scanner, Sets, Binder ou Life Counter foi alterado.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai routes/ai bin test`: PASS.
+- `cd server && dart test test/generated_deck_validation_service_test.dart -r expanded`: PASS.
+- `cd server && dart analyze lib routes test`: PASS.
+- Backend local `PORT=8082 dart run .dart_frog/server.dart` respondeu `/health`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded`: PASS.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: PASS.
+- `cd server && dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart -r expanded`: PASS.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check`: PASS.
+
+### Resultado
+- O fluxo live focado `/ai/generate -> POST /decks -> /decks/:id/validate -> /ai/optimize` voltou a passar para mono red aggro, mono black midrange e azorius control sem skips indevidos.
+- O backend continua retornando 422 quando nao consegue produzir nem reparar um deck valido, mas defeitos recuperaveis de tamanho/quantidade em formatos construidos sao corrigidos antes de responder.
+- Evidencia: `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_2026-05-04.md`.
+
 ## 2026-05-04 — Revisao documental do mapa Marketplace/Trades Trust
 
 ### O Porquê

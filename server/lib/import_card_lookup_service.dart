@@ -10,9 +10,13 @@ String cleanImportLookupKey(String value) =>
 /// 2) fallback para split cards via pattern `<nome> // %`
 Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   Pool pool,
-  List<Map<String, dynamic>> parsedItems,
-) async {
+  List<Map<String, dynamic>> parsedItems, {
+  String? preferredFormat,
+}) async {
   final foundCardsMap = <String, Map<String, dynamic>>{};
+  final normalizedPreferredFormat = preferredFormat?.trim().toLowerCase();
+  final hasPreferredFormat =
+      normalizedPreferredFormat != null && normalizedPreferredFormat.isNotEmpty;
 
   final exactKeys = <String>{};
   for (final item in parsedItems) {
@@ -27,14 +31,38 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   }
 
   if (exactKeys.isNotEmpty) {
+    final exactSql = hasPreferredFormat
+        ? '''
+        SELECT DISTINCT ON (lower(c.name))
+          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
+          c.oracle_text, c.mana_cost
+        FROM cards c
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id
+         AND cl.format = @preferredFormat
+        WHERE lower(c.name) = ANY(@names)
+        ORDER BY lower(c.name),
+          CASE
+            WHEN cl.status = 'legal' THEN 0
+            WHEN cl.status = 'restricted' THEN 1
+            WHEN cl.status IS NULL THEN 2
+            ELSE 3
+          END,
+          c.id::text
+      '''
+        : '''
+        SELECT DISTINCT ON (lower(c.name))
+          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
+          c.oracle_text, c.mana_cost
+        FROM cards c
+        WHERE lower(c.name) = ANY(@names)
+        ORDER BY lower(c.name), c.id::text
+      ''';
     final exactResult = await pool.execute(
-      Sql.named('''
-        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text, mana_cost
-        FROM cards
-        WHERE lower(name) = ANY(@names)
-      '''),
+      Sql.named(exactSql),
       parameters: {
         'names': TypedValue(Type.textArray, exactKeys.toList()),
+        if (hasPreferredFormat) 'preferredFormat': normalizedPreferredFormat,
       },
     );
 
@@ -77,14 +105,37 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   }
 
   if (splitPatternsToQuery.isNotEmpty) {
-    final splitResult = await pool.execute(
-      Sql.named('''
-        SELECT id, name, type_line, image_url, color_identity, colors, oracle_text, mana_cost
+    final splitSql = hasPreferredFormat
+        ? '''
+        SELECT c.id, c.name, c.type_line, c.image_url, c.color_identity,
+          c.colors, c.oracle_text, c.mana_cost
+        FROM cards c
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id
+         AND cl.format = @preferredFormat
+        WHERE lower(c.name) LIKE ANY(@patterns)
+        ORDER BY
+          CASE
+            WHEN cl.status = 'legal' THEN 0
+            WHEN cl.status = 'restricted' THEN 1
+            WHEN cl.status IS NULL THEN 2
+            ELSE 3
+          END,
+          lower(c.name),
+          c.id::text
+      '''
+        : '''
+        SELECT id, name, type_line, image_url, color_identity, colors,
+          oracle_text, mana_cost
         FROM cards
         WHERE lower(name) LIKE ANY(@patterns)
-      '''),
+        ORDER BY lower(name), id::text
+      ''';
+    final splitResult = await pool.execute(
+      Sql.named(splitSql),
       parameters: {
         'patterns': TypedValue(Type.textArray, splitPatternsToQuery),
+        if (hasPreferredFormat) 'preferredFormat': normalizedPreferredFormat,
       },
     );
 

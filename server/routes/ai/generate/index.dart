@@ -271,7 +271,7 @@ $metaContext
     }
 
     final validationService = GeneratedDeckValidationService(
-      PostgresGeneratedDeckRepository(pool),
+      PostgresGeneratedDeckRepository(pool, preferredFormat: format),
     );
     final validation = await validationService.validate(
       format: format,
@@ -314,6 +314,28 @@ $metaContext
     }
 
     if (!validation.isValid) {
+      Log.w(
+        'AI generate returned invalid deck; using deterministic fallback. '
+        'format=$format errors=${validation.errors.join(' | ')}',
+      );
+
+      final fallbackBody = await _buildMockGenerateResponse(
+        pool: pool,
+        prompt: prompt,
+        format: format,
+        warningCode: 'ai_generate_validation_fallback',
+        warningMessage:
+            'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
+      );
+
+      final fallbackValidation =
+          fallbackBody['validation'] as Map<String, dynamic>?;
+      if (fallbackValidation?['is_valid'] == true) {
+        fallbackBody['ai_generation_repaired_by_fallback'] = true;
+        fallbackBody['original_validation_errors'] = validation.errors;
+        return Response.json(body: fallbackBody);
+      }
+
       return Response.json(
         statusCode: 422,
         body: {
@@ -361,7 +383,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
 
   try {
     final validationService = GeneratedDeckValidationService(
-      PostgresGeneratedDeckRepository(pool),
+      PostgresGeneratedDeckRepository(pool, preferredFormat: format),
     );
 
     final validation = await validationService.validate(

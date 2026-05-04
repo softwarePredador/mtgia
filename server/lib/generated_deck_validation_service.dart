@@ -19,11 +19,13 @@ abstract class GeneratedDeckRepository {
 }
 
 class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
-  PostgresGeneratedDeckRepository(this._pool)
-      : _cardValidationService = CardValidationService(_pool);
+  PostgresGeneratedDeckRepository(this._pool, {String? preferredFormat})
+      : _preferredFormat = preferredFormat?.trim().toLowerCase(),
+        _cardValidationService = CardValidationService(_pool);
 
   final Pool _pool;
   final CardValidationService _cardValidationService;
+  final String? _preferredFormat;
 
   @override
   Future<Map<String, List<String>>> findSuggestions(List<String> names) async {
@@ -35,7 +37,11 @@ class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
     List<Map<String, dynamic>> parsedItems,
   ) {
-    return resolveImportCardNames(_pool, parsedItems);
+    return resolveImportCardNames(
+      _pool,
+      parsedItems,
+      preferredFormat: _preferredFormat,
+    );
   }
 
   @override
@@ -162,6 +168,7 @@ class GeneratedDeckValidationService {
         'color_identity': resolved['color_identity'],
         'colors': resolved['colors'],
         'oracle_text': resolved['oracle_text'],
+        'mana_cost': resolved['mana_cost'],
         'quantity': card['quantity'],
         'is_commander': false,
       });
@@ -181,6 +188,7 @@ class GeneratedDeckValidationService {
           'color_identity': commanderCard['color_identity'],
           'colors': commanderCard['colors'],
           'oracle_text': commanderCard['oracle_text'],
+          'mana_cost': commanderCard['mana_cost'],
           'quantity': 1,
           'is_commander': true,
         };
@@ -198,6 +206,14 @@ class GeneratedDeckValidationService {
       ...resolvedCards,
       if (resolvedCommander != null) resolvedCommander,
     ]);
+
+    if (!requiresCommander && consolidatedCards.isNotEmpty) {
+      consolidatedCards = await _tryAutoRepairConstructed(
+        format: normalizedFormat,
+        cards: consolidatedCards,
+        warnings: warnings,
+      );
+    }
 
     final errors = <String>[];
     if (requiresCommander && resolvedCommander == null) {
@@ -239,6 +255,28 @@ class GeneratedDeckValidationService {
             errors.add(e2.message);
           } catch (e2) {
             errors.add(e2.toString());
+          }
+        } else if (!requiresCommander) {
+          final constructedRepair = await _tryAutoRepairConstructedAfterFailure(
+            format: normalizedFormat,
+            cards: consolidatedCards,
+            failure: e,
+            warnings: warnings,
+          );
+          if (constructedRepair != null) {
+            consolidatedCards = constructedRepair;
+            try {
+              await _repository.validateDeck(
+                format: normalizedFormat,
+                cards: consolidatedCards,
+              );
+            } on DeckRulesException catch (e2) {
+              errors.add(e2.message);
+            } catch (e2) {
+              errors.add(e2.toString());
+            }
+          } else {
+            errors.add(e.message);
           }
         } else {
           errors.add(e.message);
@@ -510,6 +548,226 @@ class GeneratedDeckValidationService {
     }
 
     return consolidated;
+  }
+
+  Future<List<Map<String, dynamic>>> _tryAutoRepairConstructed({
+    required String format,
+    required List<Map<String, dynamic>> cards,
+    required List<String> warnings,
+  }) async {
+    var repaired = <Map<String, dynamic>>[];
+    var reducedExtraCopies = 0;
+
+    for (final card in cards) {
+      if (card['is_commander'] == true) continue;
+
+      final copy = Map<String, dynamic>.from(card)..['is_commander'] = false;
+      final qtyRaw = copy['quantity'];
+      var quantity =
+          qtyRaw is int ? qtyRaw : int.tryParse(qtyRaw?.toString() ?? '') ?? 1;
+      if (quantity <= 0) continue;
+
+      if (!_isBasicLandCard(copy) && quantity > 4) {
+        reducedExtraCopies += quantity - 4;
+        quantity = 4;
+      }
+
+      copy['quantity'] = quantity;
+      repaired.add(copy);
+    }
+
+    repaired = _consolidateResolvedCards(repaired);
+
+    if (reducedExtraCopies > 0) {
+      warnings.add(
+        'Auto-reparo: reduzidas $reducedExtraCopies copia(s) extras em cartas nao-basicas para respeitar o limite do formato $format.',
+      );
+    }
+
+    repaired = await _fillConstructedDeckToMinimum(
+      cards: repaired,
+      minTotal: 60,
+      warnings: warnings,
+    );
+
+    return repaired;
+  }
+
+  Future<List<Map<String, dynamic>>?> _tryAutoRepairConstructedAfterFailure({
+    required String format,
+    required List<Map<String, dynamic>> cards,
+    required DeckRulesException failure,
+    required List<String> warnings,
+  }) async {
+    final offendingName = failure.cardName?.trim().toLowerCase();
+    if (offendingName == null || offendingName.isEmpty) return null;
+
+    var changed = false;
+    final repaired = <Map<String, dynamic>>[];
+
+    for (final card in cards) {
+      final cardName = (card['name'] ?? '').toString().trim().toLowerCase();
+      final copy = Map<String, dynamic>.from(card);
+      if (cardName != offendingName) {
+        repaired.add(copy);
+        continue;
+      }
+
+      changed = true;
+      if (failure.message.contains('excede o limite')) {
+        copy['quantity'] = _isBasicLandCard(copy) ? copy['quantity'] : 4;
+        repaired.add(copy);
+      } else if (failure.message.contains('RESTRITA')) {
+        copy['quantity'] = 1;
+        repaired.add(copy);
+      }
+    }
+
+    if (!changed) return null;
+
+    warnings.add(
+      'Auto-reparo: ajustada/removida a carta "${failure.cardName}" apos falha de legalidade do formato $format.',
+    );
+
+    return _fillConstructedDeckToMinimum(
+      cards: _consolidateResolvedCards(repaired),
+      minTotal: 60,
+      warnings: warnings,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> _fillConstructedDeckToMinimum({
+    required List<Map<String, dynamic>> cards,
+    required int minTotal,
+    required List<String> warnings,
+  }) async {
+    final currentTotal = cards.fold<int>(
+      0,
+      (sum, card) => sum + ((card['quantity'] as int?) ?? 1),
+    );
+    if (currentTotal >= minTotal) return cards;
+
+    final toAdd = minTotal - currentTotal;
+    final basicNames = _basicLandNamesForConstructedDeck(cards);
+    final resolvedBasics = await _repository.resolveCardNames([
+      for (final name in basicNames) {'name': name}
+    ]);
+
+    final quantitiesByName = <String, int>{};
+    for (var i = 0; i < toAdd; i++) {
+      final name = basicNames[i % basicNames.length];
+      quantitiesByName[name] = (quantitiesByName[name] ?? 0) + 1;
+    }
+
+    final additions = <Map<String, dynamic>>[];
+    for (final entry in quantitiesByName.entries) {
+      final resolved = resolvedBasics[_lookupKey(entry.key, resolvedBasics)];
+      if (resolved == null) continue;
+      additions.add({
+        'card_id': resolved['id'],
+        'name': resolved['name'],
+        'type_line': resolved['type_line'],
+        'color_identity': resolved['color_identity'],
+        'colors': resolved['colors'],
+        'oracle_text': resolved['oracle_text'],
+        'mana_cost': resolved['mana_cost'],
+        'quantity': entry.value,
+        'is_commander': false,
+      });
+    }
+
+    if (additions.isEmpty) return cards;
+
+    warnings.add(
+      'Auto-reparo: adicionados $toAdd terreno(s) basico(s) para atingir o minimo de $minTotal cartas.',
+    );
+
+    return _consolidateResolvedCards([...cards, ...additions]);
+  }
+
+  static List<String> _basicLandNamesForConstructedDeck(
+    List<Map<String, dynamic>> cards,
+  ) {
+    final colorOrder = ['W', 'U', 'B', 'R', 'G'];
+    final demand = {for (final color in colorOrder) color: 0};
+
+    for (final card in cards) {
+      if (_isBasicLandCard(card)) continue;
+
+      final identity = _identityOf(card);
+      for (final color in identity) {
+        if (demand.containsKey(color)) {
+          demand[color] = demand[color]! + ((card['quantity'] as int?) ?? 1);
+        }
+      }
+
+      final manaCost = (card['mana_cost'] ?? '').toString();
+      for (final color in colorOrder) {
+        final symbolCount = RegExp(
+          '\\{${color.toLowerCase()}\\}',
+          caseSensitive: false,
+        ).allMatches(manaCost).length;
+        if (symbolCount > 0) {
+          demand[color] = demand[color]! +
+              (symbolCount * ((card['quantity'] as int?) ?? 1));
+        }
+      }
+    }
+
+    final selectedColors = demand.entries
+        .where((entry) => entry.value > 0)
+        .map((entry) => entry.key)
+        .toList(growable: false);
+
+    final colorToBasic = <String, String>{
+      'W': 'Plains',
+      'U': 'Island',
+      'B': 'Swamp',
+      'R': 'Mountain',
+      'G': 'Forest',
+    };
+
+    final names = [
+      for (final color in selectedColors) colorToBasic[color]!,
+    ];
+    return names.isEmpty ? const ['Wastes'] : names;
+  }
+
+  static bool _isBasicLandCard(Map<String, dynamic> card) {
+    final typeLine = (card['type_line'] ?? '').toString().toLowerCase();
+    final name = (card['name'] ?? '').toString().trim().toLowerCase();
+    return typeLine.contains('basic land') ||
+        typeLine.contains('basic snow land') ||
+        _isBasicLandName(name);
+  }
+
+  static bool _isBasicLandName(String nameLower) {
+    return nameLower == 'plains' ||
+        nameLower == 'island' ||
+        nameLower == 'swamp' ||
+        nameLower == 'mountain' ||
+        nameLower == 'forest' ||
+        nameLower == 'wastes' ||
+        nameLower.startsWith('snow-covered plains') ||
+        nameLower.startsWith('snow-covered island') ||
+        nameLower.startsWith('snow-covered swamp') ||
+        nameLower.startsWith('snow-covered mountain') ||
+        nameLower.startsWith('snow-covered forest');
+  }
+
+  static Set<String> _identityOf(Map<String, dynamic> card) {
+    Iterable<String> toStrings(dynamic raw) {
+      if (raw == null) return const <String>[];
+      if (raw is Iterable) return raw.map((e) => e.toString());
+      return [raw.toString()];
+    }
+
+    final oracleText = card['oracle_text'];
+    return resolveCardColorIdentity(
+      colorIdentity: toStrings(card['color_identity']),
+      colors: toStrings(card['colors']),
+      oracleText: oracleText == null ? null : oracleText.toString(),
+    );
   }
 
   static List<Map<String, dynamic>> _consolidateResolvedCards(

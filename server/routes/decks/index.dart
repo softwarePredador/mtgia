@@ -341,8 +341,28 @@ Future<Response> _createDeck(RequestContext context) async {
         if (cardId == null || cardId.isEmpty) {
           final lookup = await session.execute(
             Sql.named(
-                'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1'),
-            parameters: {'name': cardName!.trim()},
+              '''
+              SELECT c.id::text
+              FROM cards c
+              LEFT JOIN card_legalities cl
+                ON cl.card_id = c.id
+               AND cl.format = @format
+              WHERE LOWER(c.name) = LOWER(@name)
+              ORDER BY
+                CASE
+                  WHEN cl.status = 'legal' THEN 0
+                  WHEN cl.status = 'restricted' THEN 1
+                  WHEN cl.status IS NULL THEN 2
+                  ELSE 3
+                END,
+                c.id::text
+              LIMIT 1
+              ''',
+            ),
+            parameters: {
+              'name': cardName!.trim(),
+              'format': format.toLowerCase(),
+            },
           );
           if (lookup.isEmpty) {
             throw Exception('Card not found: ${cardName.trim()}');
