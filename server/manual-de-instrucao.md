@@ -2,6 +2,40 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — Rodada final de regressao ManaLoom app/backend
+
+### O Porquê
+- Depois das ultimas mudancas em AI generate/optimize, decks, binder, trades, sets, scanner e Life Counter, era necessario provar a regressao completa com backend local real e runtime iPhone 15 Simulator, sem expor secrets e sem tratar scanner fisico como aprovado por simulador.
+
+### O Como
+- Backend temporario iniciado em `PORT=8082` e validado por `/health` em `http://127.0.0.1:8082`.
+- Suítes executadas:
+  - backend offline: `dart analyze lib routes bin test && dart test -r expanded`;
+  - backend live: `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`;
+  - app: `flutter analyze lib test integration_test --no-version-check && flutter test test --no-version-check`;
+  - runtimes iPhone 15: sets/search, deck runtime, binder dashboard, marketplace/trades/direct messages e Life Counter/Lotus.
+- Device provado: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Evidencias e screenshots foram persistidos em proof folder local ignorado por git: `app/doc/runtime_flow_proofs_2026-05-04_iphone15_simulator/`.
+
+### Validacao executada
+- `cd server && dart analyze lib routes bin test && dart test -r expanded`: PASS, analyze sem issues e `00:04 +558`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: PASS, `02:49 +167 ~3`.
+- `cd app && flutter analyze lib test integration_test --no-version-check && flutter test test --no-version-check`: PASS, analyze sem issues e `00:41 +530`.
+- `cd app && flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" ...`: PASS, `00:25 +1`.
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...`: PASS, `01:24 +1`, com screenshot final `10_complete_validated`.
+- `cd app && flutter test integration_test/binder_dashboard_runtime_test.dart -d "iPhone 15" ...`: PASS, `00:37 +1`.
+- `cd app && flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" ...`: PASS, `01:47 +2`.
+- `cd app && flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart -d "iPhone 15" ...`: PASS, `00:29 +1`.
+
+### Resultado
+- Classificacao final:
+  - Backend, AI generate/optimize, decks, sets, binder, trades/direct messages, notifications e Life Counter/Lotus: PASS.
+  - Scanner controlado: PASS indireto dentro da suite app.
+  - Scanner fisico/camera: NOT PROVEN, pois nao houve execucao com camera/OCR em device fisico.
+- Nenhum 4xx/5xx, timeout, overflow ou crash permaneceu nos runtimes iPhone 15 aprovados.
+- Relatorio completo: `server/doc/RELATORIO_FINAL_REGRESSION_2026-05-04.md`.
+- Handoff runtime deck: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-05-04.md`.
+
 ## 2026-05-04 — Estabilizacao live do fluxo AI generate -> create -> validate/optimize
 
 ### O Porquê
