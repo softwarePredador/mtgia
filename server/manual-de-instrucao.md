@@ -2,6 +2,21 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — Checklist release go/no-go ManaLoom
+
+### O Porquê
+- Depois da regressao final e do pre-release QA em `master`, era necessario consolidar um criterio unico de release/go-no-go sem executar scanner fisico, mantendo riscos aceitos e itens deferred claros.
+
+### O Como
+- Foi criado `server/doc/RELEASE_GO_NO_GO_CHECKLIST_2026-05-04.md`.
+- O checklist consolida os relatorios `RELATORIO_FINAL_REGRESSION_2026-05-04.md`, `RELATORIO_PRE_RELEASE_QA_2026-05-04.md`, `APP_AUDIT_2026-04-29.md`, handoff iPhone 15, mapa de contratos e relatorios de Meta/Commander.
+- O veredito ficou `GO WITH RISKS` para `master` no commit `784a44d`, com scanner fisico/camera/OCR marcado como `DEFERRED / NOT PROVEN` e nao blocker enquanto scanner nao fizer parte do escopo do release.
+- `/ai/generate` p95 `10203ms`, `/ai/optimize` p95 `4825ms`, `/trades/:id` p95 `1227ms` e Firebase Performance indisponivel em integration test foram documentados como riscos aceitos com criterios de follow-up/no-go.
+
+### Resultado
+- Checklist operacional de release criado com escopo, tabela por modulo, riscos aceitos, itens deferred, comandos finais reproduziveis, devices exigidos, observabilidade, contratos API/data, thresholds de performance, rollback, criterios de go/no-go e recomendacao final.
+- Nenhum codigo runtime foi alterado.
+
 ## 2026-05-04 — QA pre-release ManaLoom sem scanner fisico
 
 ### O Porquê
