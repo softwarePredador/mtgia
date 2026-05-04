@@ -1,5 +1,18 @@
 # Deck runtime iPhone 15 Simulator — 2026-05-04
 
+## Atualizacao internal release/staging — 2026-05-04T17:14-03:00
+
+- Verdict: `READY WITH RISKS for internal/staging only`.
+- Backend usado pelo app: `http://127.0.0.1:8082`.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend health: `healthy`.
+- Scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`; nenhum fluxo fisico de scanner foi executado.
+- Runtimes iPhone 15 desta rodada: Sets catalog `00:17 +1`, Search/Sets `00:28 +1`, Deck generate/create/detail/optimize/apply/validate `01:38 +1`, Binder dashboard `00:43 +1`, Marketplace/Trades/Messages/Notifications `01:50 +2`, Life Counter/Lotus `00:28 +1`, visual non-scanner `01:02 +1`.
+- Performance nova: `/ai/generate` `200x5` p95/p99 `44756ms` fora do risco aceito anterior; `/ai/optimize` `202x5` p95/p99 `5029ms` com jobs concluidos.
+- Handoff completo: `server/doc/INTERNAL_RELEASE_STAGING_HANDOFF_2026-05-04.md`.
+- Proof folder local ignorado: `app/doc/runtime_flow_proofs_2026-05-04_iphone15_simulator/`.
+
 ## Atualizacao pre-release — 2026-05-04T15:29-03:00
 
 - Verdict: `PASS WITH RISKS` para QA pre-release sem scanner fisico.

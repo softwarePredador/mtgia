@@ -2,6 +2,52 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — Handoff release interno/staging ManaLoom sem scanner fisico
+
+### O Porquê
+- O checklist anterior estava `GO WITH RISKS` no commit `85b4200`, e era necessario preparar um handoff final para release interno/staging cobrindo todo o escopo restante fora Scanner fisico, sem executar camera/OCR e sem expor secrets.
+
+### O Como
+- Foi criado `server/doc/INTERNAL_RELEASE_STAGING_HANDOFF_2026-05-04.md`.
+- A revisao confirmou que Scanner fisico/camera/OCR segue `DEFERRED / NOT PROVEN` e fora do escopo.
+- Configuracao app/backend foi auditada somente por status `PRESENT/MISSING/NOT CONFIGURED`, sem valores sensiveis:
+  - `API_BASE_URL` e `PUBLIC_API_BASE_URL` sao obrigatorios por `--dart-define` em release/profile;
+  - server `.env`, `DATABASE_URL`, `JWT_SECRET`, `OPENAI_API_KEY` e server `SENTRY_DSN` estavam `PRESENT`;
+  - app Firebase iOS/Android estava `PRESENT`;
+  - server FCM env estava `MISSING`;
+  - app Sentry por dart-define ficou `NOT CONFIGURED` na rodada;
+  - flavors explicitos ficaram `NOT CONFIGURED`;
+  - Android release signing local e iOS export/signing local ficaram `NOT CONFIGURED` para upload, exigindo CI/local seguro antes da distribuicao.
+- Backend temporario `PORT=8082` respondeu `/health` em `http://127.0.0.1:8082`.
+- Device primario usado: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+
+### Validacao executada
+- `cd server && dart analyze lib routes bin test && dart test -r expanded`: PASS, `+558`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live -r expanded`: PASS, `+167 ~3`.
+- `cd app && flutter analyze lib test integration_test --no-version-check && flutter test test --no-version-check`: PASS, `+530`.
+- Runtimes iPhone 15 Simulator contra `8082`:
+  - `sets_catalog_runtime_test.dart`: PASS, `00:17 +1`;
+  - `sets_search_catalog_runtime_test.dart`: PASS, `00:28 +1`;
+  - `deck_runtime_m2006_test.dart`: PASS, `01:38 +1`, final `10_complete_validated`;
+  - `binder_dashboard_runtime_test.dart`: PASS, `00:43 +1`;
+  - `binder_marketplace_trade_runtime_test.dart`: PASS, `01:50 +2`;
+  - `life_counter_lotus_visual_runtime_proof_test.dart`: PASS, `00:28 +1`;
+  - `app_full_non_life_counter_visual_capture_smoke_test.dart`: PASS, `01:02 +1`.
+- Logs dos runtimes iPhone 15 ficaram limpos para exception Flutter, overflow, timeout/socket e `500` residual.
+
+### Performance e riscos
+- Nova medicao com 5 amostras:
+  - `POST /ai/generate`: statuses `200x5`, p50 `24293ms`, p95/p99 `44756ms`;
+  - `POST /ai/optimize`: statuses `202x5`, p50 `4786ms`, p95/p99 `5029ms`, jobs concluidos.
+- `/ai/optimize` segue dentro do risco aceito.
+- `/ai/generate` saiu do risco aceito anterior e fica P1 antes de qualquer rollout amplo/producao; para interno/staging estreito, o veredito ficou `READY WITH RISKS`.
+
+### Resultado
+- Veredito final: `READY WITH RISKS for internal/staging only`.
+- Scanner fisico/camera/OCR segue `DEFERRED / NOT PROVEN`.
+- Builds internos recomendados devem passar staging API real por dart-define, Sentry por segredo de CI e signing/export configurados fora do repositorio.
+- Backend 8082 foi encerrado ao final da sessao, a porta ficou livre e o artefato live `source_deck_optimize_latest.json` foi restaurado para manter worktree limpo.
+
 ## 2026-05-04 — Checklist release go/no-go ManaLoom
 
 ### O Porquê
