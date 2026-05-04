@@ -1,6 +1,6 @@
 ---
 name: API Contracts Data Map
-description: Audita e mantém a documentação operacional dos contratos app/backend do ManaLoom: rotas, payloads, consumidores mobile, fontes de dados, tabelas principais, compatibilidade e testes.
+description: "Audita e mantém a documentação operacional dos contratos app/backend do ManaLoom: rotas, payloads, consumidores mobile, fontes de dados, tabelas principais, compatibilidade e testes."
 user-invocable: true
 disable-model-invocation: false
 model: gpt-5.5
