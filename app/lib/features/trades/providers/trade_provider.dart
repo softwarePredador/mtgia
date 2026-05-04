@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 
@@ -12,12 +13,14 @@ class TradeUser {
   final String username;
   final String? displayName;
   final String? avatarUrl;
+  final UserTrustInsight trust;
 
   TradeUser({
     required this.id,
     required this.username,
     this.displayName,
     this.avatarUrl,
+    this.trust = const UserTrustInsight(),
   });
 
   String get label => displayName ?? username;
@@ -28,6 +31,7 @@ class TradeUser {
       username: json['username'] as String? ?? '',
       displayName: json['display_name'] as String?,
       avatarUrl: json['avatar_url'] as String?,
+      trust: UserTrustInsight.fromJson(json['trust'] as Map<String, dynamic>?),
     );
   }
 }
@@ -184,6 +188,7 @@ class TradeOffer {
   final TradeUser receiver;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final TradeValueSummary? valueSummary;
 
   // Preenchido no detail
   final List<TradeItem> myItems;
@@ -210,6 +215,7 @@ class TradeOffer {
     required this.receiver,
     required this.createdAt,
     required this.updatedAt,
+    this.valueSummary,
     this.myItems = const [],
     this.theirItems = const [],
     this.messages = const [],
@@ -241,6 +247,9 @@ class TradeOffer {
       updatedAt:
           DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
+      valueSummary: TradeValueSummary.fromJson(
+        json['value_summary'] as Map<String, dynamic>?,
+      ),
       offeringCount: json['offering_count'] as int?,
       requestingCount: json['requesting_count'] as int?,
       messageCount: json['message_count'] as int?,
@@ -270,6 +279,9 @@ class TradeOffer {
       updatedAt:
           DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
+      valueSummary: TradeValueSummary.fromJson(
+        json['value_summary'] as Map<String, dynamic>?,
+      ),
       myItems:
           (json['my_items'] as List<dynamic>?)
               ?.map((e) => TradeItem.fromJson(e as Map<String, dynamic>))
@@ -292,6 +304,54 @@ class TradeOffer {
           [],
     );
   }
+}
+
+class TradeValueSummary {
+  final double offeredValue;
+  final double requestedValue;
+  final double paymentAmount;
+  final double totalOfferedValue;
+  final double differenceAbs;
+  final double differencePct;
+  final String direction;
+  final double thresholdPct;
+  final double thresholdAbs;
+  final bool hasWarning;
+  final String? message;
+
+  const TradeValueSummary({
+    this.offeredValue = 0,
+    this.requestedValue = 0,
+    this.paymentAmount = 0,
+    this.totalOfferedValue = 0,
+    this.differenceAbs = 0,
+    this.differencePct = 0,
+    this.direction = 'balanced',
+    this.thresholdPct = 20,
+    this.thresholdAbs = 25,
+    this.hasWarning = false,
+    this.message,
+  });
+
+  factory TradeValueSummary.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const TradeValueSummary();
+    return TradeValueSummary(
+      offeredValue: (json['offered_value'] as num?)?.toDouble() ?? 0,
+      requestedValue: (json['requested_value'] as num?)?.toDouble() ?? 0,
+      paymentAmount: (json['payment_amount'] as num?)?.toDouble() ?? 0,
+      totalOfferedValue: (json['total_offered_value'] as num?)?.toDouble() ?? 0,
+      differenceAbs: (json['difference_abs'] as num?)?.toDouble() ?? 0,
+      differencePct: (json['difference_pct'] as num?)?.toDouble() ?? 0,
+      direction: json['direction'] as String? ?? 'balanced',
+      thresholdPct: (json['threshold_pct'] as num?)?.toDouble() ?? 20,
+      thresholdAbs: (json['threshold_abs'] as num?)?.toDouble() ?? 25,
+      hasWarning: json['has_warning'] as bool? ?? false,
+      message: json['message'] as String?,
+    );
+  }
+
+  bool get hasValues =>
+      offeredValue > 0 || requestedValue > 0 || paymentAmount > 0;
 }
 
 // =====================================================================

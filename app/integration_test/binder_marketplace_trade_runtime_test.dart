@@ -340,10 +340,15 @@ void main() {
         marketplaceItems.cast<Map<String, dynamic>>().any(
           (item) =>
               item['id'] == sellerBinderItemId &&
-              (item['owner'] as Map<String, dynamic>)['id'] == seller.id,
+              (item['owner'] as Map<String, dynamic>)['id'] == seller.id &&
+              item['price_insight'] is Map &&
+              ((item['owner'] as Map<String, dynamic>)['trust'] as Map?)
+                      ?.containsKey('completed_trades') ==
+                  true,
         ),
         isTrue,
-        reason: 'seller binder item must be visible in marketplace API',
+        reason:
+            'seller binder item must be visible with price/trust intelligence',
       );
 
       final auth = AuthProvider();
@@ -481,6 +486,11 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
       await _pumpUntilFound(tester, find.text(seller.username));
+      await _pumpUntilFound(tester, find.textContaining('Ref. interna'));
+      await _pumpUntilFound(
+        tester,
+        find.textContaining('histórico insuficiente'),
+      );
 
       final sellerCard = find.ancestor(
         of: find.text(seller.username),
@@ -491,6 +501,8 @@ void main() {
         of: sellerCard,
         matching: find.widgetWithText(OutlinedButton, 'Quero comprar'),
       );
+      await tester.ensureVisible(buyButton);
+      await tester.pump();
       await tester.tap(buyButton);
       await tester.pump();
 
@@ -551,6 +563,7 @@ void main() {
       );
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Pendente'));
+      await _pumpUntilFound(tester, find.text('Equilíbrio de valor'));
       await tester.tap(find.text('Aceitar'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Aceitar trade?'));
@@ -563,7 +576,12 @@ void main() {
       );
 
       final tradeChatMessage = '$marker seller chat ui';
-      await tester.ensureVisible(find.text('Chat (0)'));
+      await tester.scrollUntilVisible(
+        find.textContaining('Mensagens deste trade'),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
       await tester.enterText(find.byType(TextField).last, tradeChatMessage);
       await tester.testTextInput.receiveAction(TextInputAction.send);
       await tester.pump();
@@ -619,20 +637,30 @@ void main() {
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Enviado'));
       await tester.scrollUntilVisible(
-        find.textContaining('Chat ('),
+        find.textContaining('Mensagens deste trade'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pump();
       await _pumpUntilFound(tester, find.text(tradeChatMessage));
-      await tester.ensureVisible(find.text('Confirmar Entrega'));
+      await tester.scrollUntilVisible(
+        find.text('Confirmar Entrega'),
+        -250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
       await tester.tap(find.text('Confirmar Entrega'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Confirmar entrega?'));
       await tester.tap(find.text('Confirmar entrega'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Entregue'));
-      await tester.ensureVisible(find.text('Finalizar'));
+      await tester.scrollUntilVisible(
+        find.text('Finalizar'),
+        -250,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
       await tester.tap(find.text('Finalizar'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Finalizar trade?'));

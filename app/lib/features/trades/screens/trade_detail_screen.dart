@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -96,6 +97,12 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                     _buildStatusHeader(trade),
                     const SizedBox(height: 16),
                     _buildParticipants(trade, isSender),
+                    if (trade.valueSummary?.hasValues == true) ...[
+                      const SizedBox(height: 12),
+                      _buildValueSummary(trade.valueSummary!),
+                    ],
+                    const SizedBox(height: 16),
+                    _buildActions(trade, isSender, isReceiver, provider),
                     const SizedBox(height: 16),
                     _buildItems(
                       'Itens oferecidos',
@@ -117,9 +124,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                       _buildTracking(trade),
                     ],
                     const SizedBox(height: 16),
-                    _buildTimeline(trade.statusHistory),
-                    const SizedBox(height: 16),
-                    _buildActions(trade, isSender, isReceiver, provider),
+                    _buildTimeline(trade),
                     const SizedBox(height: 16),
                     // Chat section — isolated rebuild via its own Selector
                     _TradeChat(tradeId: widget.tradeId),
@@ -193,17 +198,18 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   Widget _buildParticipants(TradeOffer trade, bool isSender) {
     return Row(
       children: [
-        _userChip(trade.sender.label, isSender ? 'Você' : 'Remetente'),
+        _userChip(trade.sender, isSender ? 'Você' : 'Remetente'),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Icon(Icons.swap_horiz, color: AppTheme.textSecondary),
         ),
-        _userChip(trade.receiver.label, !isSender ? 'Você' : 'Destinatário'),
+        _userChip(trade.receiver, !isSender ? 'Você' : 'Destinatário'),
       ],
     );
   }
 
-  Widget _userChip(String name, String role) {
+  Widget _userChip(TradeUser user, String role) {
+    final name = user.label;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -240,8 +246,113 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 fontSize: AppTheme.fontSm,
               ),
             ),
+            const SizedBox(height: 4),
+            _compactTrust(user.trust),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _compactTrust(UserTrustInsight trust) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 4,
+      runSpacing: 3,
+      children: [
+        _trustPill('${trust.completedTrades} concl.', AppTheme.success),
+        if (trust.cancelledTrades > 0)
+          _trustPill('${trust.cancelledTrades} canc.', AppTheme.warning),
+        if (trust.isNewAccount) _trustPill('nova', AppTheme.warning),
+        if (trust.profileIncomplete)
+          _trustPill('perfil inc.', AppTheme.warning),
+        if (trust.hasInsufficientHistory)
+          _trustPill('hist. insuf.', AppTheme.textSecondary),
+      ],
+    );
+  }
+
+  Widget _trustPill(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: AppTheme.fontXs,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildValueSummary(TradeValueSummary summary) {
+    final color = summary.hasWarning ? AppTheme.warning : AppTheme.frost400;
+    final directionText = switch (summary.direction) {
+      'offer_higher' => 'oferta acima do pedido',
+      'request_higher' => 'pedido acima da oferta',
+      _ => 'valores próximos',
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.balance_outlined, color: color, size: 18),
+              const SizedBox(width: 6),
+              const Text(
+                'Equilíbrio de valor',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Oferta: R\$ ${summary.totalOfferedValue.toStringAsFixed(2)}'
+            ' • Pedido: R\$ ${summary.requestedValue.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontSm,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Diferença: R\$ ${summary.differenceAbs.toStringAsFixed(2)}'
+            ' (${summary.differencePct.toStringAsFixed(1)}%) • $directionText',
+            style: TextStyle(
+              color: color,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (summary.message != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              summary.message!,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.fontSm,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -412,8 +523,32 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   }
 
   // ─── Timeline ───────────────────────────────────────────────
-  Widget _buildTimeline(List<TradeStatusEntry> history) {
+  Widget _buildTimeline(TradeOffer trade) {
+    final history = trade.statusHistory;
     if (history.isEmpty) return const SizedBox.shrink();
+    final completedStatuses = history.map((h) => h.newStatus).toSet();
+    final terminal = [
+      'declined',
+      'cancelled',
+      'disputed',
+    ].contains(trade.status);
+    final steps = <_TimelineStep>[
+      const _TimelineStep('pending', 'Criada', Icons.flag_outlined),
+      const _TimelineStep('accepted', 'Aceita', Icons.handshake_outlined),
+      const _TimelineStep('shipped', 'Enviada', Icons.local_shipping_outlined),
+      const _TimelineStep('delivered', 'Entregue', Icons.inventory_2_outlined),
+      const _TimelineStep(
+        'completed',
+        'Finalizada',
+        Icons.check_circle_outline,
+      ),
+      if (terminal)
+        _TimelineStep(
+          trade.status,
+          TradeStatusHelper.label(trade.status),
+          TradeStatusHelper.icon(trade.status),
+        ),
+    ];
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -438,6 +573,47 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
             ],
           ),
           const Divider(color: AppTheme.outlineMuted),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children:
+                steps.map((step) {
+                  final isCurrent = step.status == trade.status;
+                  final isDone = completedStatuses.contains(step.status);
+                  final color =
+                      isCurrent || isDone
+                          ? TradeStatusHelper.color(step.status)
+                          : AppTheme.textSecondary;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: isDone ? 0.14 : 0.06),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(color: color.withValues(alpha: 0.25)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(step.icon, size: 13, color: color),
+                        const SizedBox(width: 4),
+                        Text(
+                          step.label,
+                          style: TextStyle(
+                            color: color,
+                            fontSize: AppTheme.fontXs,
+                            fontWeight:
+                                isCurrent ? FontWeight.w800 : FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+          ),
+          const SizedBox(height: 10),
           ...history.asMap().entries.map((entry) {
             final idx = entry.key;
             final h = entry.value;
@@ -893,7 +1069,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => sendCurrentMessage(),
                 decoration: InputDecoration(
-                  hintText: 'Escrever mensagem...',
+                  hintText: 'Mensagem sobre este trade...',
                   hintStyle: const TextStyle(color: AppTheme.textHint),
                   filled: true,
                   fillColor: AppTheme.surfaceElevated,
@@ -1139,6 +1315,14 @@ class _TradeActionSpec {
   }
 }
 
+class _TimelineStep {
+  const _TimelineStep(this.status, this.label, this.icon);
+
+  final String status;
+  final String label;
+  final IconData icon;
+}
+
 /// Widget isolado para o chat do trade — só reconstrói quando chatMessages mudam.
 /// Evita reconstruir status/items/timeline a cada polling de 10s.
 class _TradeChat extends StatelessWidget {
@@ -1165,13 +1349,22 @@ class _TradeChat extends StatelessWidget {
               const Icon(Icons.chat, size: 16, color: AppTheme.textSecondary),
               const SizedBox(width: 6),
               Text(
-                'Chat (${messages.length})',
+                'Mensagens deste trade (${messages.length})',
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Use este espaço para combinar envio, entrega, comprovantes e dúvidas do acordo.',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: AppTheme.fontXs,
+              height: 1.3,
+            ),
           ),
           if (messages.isNotEmpty) ...[
             const Divider(color: AppTheme.outlineMuted),

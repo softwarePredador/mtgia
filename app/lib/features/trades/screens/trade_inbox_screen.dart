@@ -379,6 +379,8 @@ class _TradeCard extends StatelessWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: 8),
+              _TradeTrustLine(user: otherUser),
               if (trade.message != null && trade.message!.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Text(
@@ -433,5 +435,38 @@ class _InfoChip extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _TradeTrustLine extends StatelessWidget {
+  const _TradeTrustLine({required this.user});
+
+  final TradeUser user;
+
+  @override
+  Widget build(BuildContext context) {
+    final trust = user.trust;
+    final chips = <Widget>[
+      _InfoChip(
+        icon: Icons.check_circle_outline,
+        label: '${trust.completedTrades} concluídos',
+      ),
+      if (trust.cancelledTrades > 0)
+        _InfoChip(icon: Icons.block, label: '${trust.cancelledTrades} canc.'),
+      if (trust.isNewAccount)
+        const _InfoChip(icon: Icons.fiber_new, label: 'conta nova'),
+      if (trust.profileIncomplete)
+        const _InfoChip(
+          icon: Icons.person_off_outlined,
+          label: 'perfil incompleto',
+        ),
+      if (trust.hasInsufficientHistory)
+        const _InfoChip(
+          icon: Icons.info_outline,
+          label: 'histórico insuficiente',
+        ),
+    ];
+
+    return Wrap(spacing: 10, runSpacing: 4, children: chips);
   }
 }

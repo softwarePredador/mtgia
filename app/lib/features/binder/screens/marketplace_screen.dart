@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/models/user_trust_insight.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../trades/screens/create_trade_screen.dart';
@@ -508,6 +509,10 @@ class _MarketplaceCard extends StatelessWidget {
                         ),
                     ],
                   ),
+                  if (item.priceInsight != null) ...[
+                    const SizedBox(height: 6),
+                    _priceInsight(item.priceInsight!),
+                  ],
                   const SizedBox(height: 6),
 
                   // Owner + location
@@ -577,6 +582,8 @@ class _MarketplaceCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  _trustSignals(item.ownerTrust),
                   // Trade notes
                   if (item.ownerTradeNotes != null &&
                       item.ownerTradeNotes!.isNotEmpty) ...[
@@ -694,6 +701,168 @@ class _MarketplaceCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _priceInsight(MarketplacePriceInsight insight) {
+    final reference =
+        insight.referencePrice != null
+            ? 'Ref. interna ${insight.referenceCurrency} ${insight.referencePrice!.toStringAsFixed(2)}'
+            : 'Ref. interna indisponível';
+    final trend =
+        insight.trend.hasTrend
+            ? '${insight.trend.direction == 'up'
+                ? '↑'
+                : insight.trend.direction == 'down'
+                ? '↓'
+                : '→'} ${insight.trend.changePct!.toStringAsFixed(1)}%'
+            : 'tendência: dados insuficientes';
+    final comparison = insight.comparison;
+    final color =
+        comparison.hasAlert
+            ? AppTheme.warning
+            : insight.trend.hasTrend
+            ? AppTheme.frost400
+            : AppTheme.textSecondary;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              Text(
+                reference,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                trend,
+                style: TextStyle(
+                  color: color,
+                  fontSize: AppTheme.fontXs,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          if (comparison.message != null) ...[
+            const SizedBox(height: 3),
+            Text(
+              comparison.message!,
+              style: TextStyle(
+                color:
+                    comparison.hasAlert
+                        ? AppTheme.warning
+                        : AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+                height: 1.25,
+              ),
+            ),
+          ] else if (insight.trend.message != null) ...[
+            const SizedBox(height: 3),
+            Text(
+              insight.trend.message!,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: AppTheme.fontXs,
+                height: 1.25,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _trustSignals(UserTrustInsight trust) {
+    final chips = <Widget>[
+      _miniTrustChip(
+        Icons.check_circle_outline,
+        '${trust.completedTrades} concluídos',
+        AppTheme.success,
+      ),
+      if (trust.cancelledTrades > 0)
+        _miniTrustChip(
+          Icons.block,
+          '${trust.cancelledTrades} cancelamentos',
+          AppTheme.warning,
+        ),
+      if (trust.avgResponseHours != null)
+        _miniTrustChip(
+          Icons.schedule,
+          'responde ~${_formatHours(trust.avgResponseHours!)}',
+          AppTheme.frost400,
+        ),
+      if (trust.avgShippingHours != null)
+        _miniTrustChip(
+          Icons.local_shipping_outlined,
+          'envia ~${_formatHours(trust.avgShippingHours!)}',
+          AppTheme.frost400,
+        ),
+      if (trust.isNewAccount)
+        _miniTrustChip(Icons.fiber_new, 'conta nova', AppTheme.warning),
+      if (trust.profileIncomplete)
+        _miniTrustChip(
+          Icons.person_off_outlined,
+          'perfil incompleto',
+          AppTheme.warning,
+        ),
+      if (trust.hasInsufficientHistory)
+        _miniTrustChip(
+          Icons.info_outline,
+          'histórico insuficiente',
+          AppTheme.textSecondary,
+        ),
+    ];
+
+    return Wrap(spacing: 6, runSpacing: 4, children: chips);
+  }
+
+  Widget _miniTrustChip(IconData icon, String label, Color color) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontSize: AppTheme.fontXs,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatHours(double hours) {
+    if (hours < 24) return '${hours.toStringAsFixed(1)}h';
+    return '${(hours / 24).toStringAsFixed(1)}d';
   }
 
   Color _condColor(String c) {

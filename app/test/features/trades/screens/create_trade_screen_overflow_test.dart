@@ -15,6 +15,12 @@ class _FakeTradeBinderProvider extends BinderProvider {
     String? search,
     bool? forTrade,
     bool? forSale,
+    String? setCode,
+    String? rarity,
+    String? language,
+    bool? foil,
+    String sortBy = 'name',
+    String sortOrder = 'asc',
   }) async {
     return [];
   }

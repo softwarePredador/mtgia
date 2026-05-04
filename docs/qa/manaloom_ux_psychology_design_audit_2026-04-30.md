@@ -1,5 +1,28 @@
 # ManaLoom UX Psychology Design Audit — 2026-04-30
 
+## Patch status — Marketplace/Trades Trust Intelligence — 2026-05-04
+
+| Finding | Status | Evidencia |
+| --- | --- | --- |
+| UX-018 Marketplace trust hierarchy | `resolvido` | Marketplace passou a mostrar referencia interna, tendencia/dados insuficientes, alerta de preco anunciado e sinais honestos de confianca do dono do item. |
+| Trade value imbalance clarity | `resolvido` | Criacao e detalhe de trade exibem diferenca absoluta/percentual entre oferta e pedido, com aviso quando o limite configurado e ultrapassado. |
+| Trust without fake score | `resolvido` | UI mostra fatos internos (`trades concluidos`, cancelamentos, resposta/envio medio quando disponivel, conta nova, perfil incompleto, historico insuficiente), sem score artificial. |
+| Trade timeline comprehension | `resolvido` | Timeline passou a separar criada, aceita, enviada, entregue, concluida e estados negativos, reduzindo ambiguidade no fluxo. |
+| Trade-scoped messaging context | `resolvido` | Chat agora se apresenta como `Mensagens deste trade`, com hint contextual, para evitar confusao com DM geral. |
+| Raw technical UI errors | `mantido sob controle` | Runtime iPhone 15 PASS nao apresentou crash, overflow fatal, timeout de fluxo, erro tecnico cru ou 4xx/5xx inesperado nos endpoints internos usados. |
+
+Validacao executada:
+
+| comando | resultado |
+| --- | --- |
+| `cd server && dart analyze routes/market routes/trades routes/community routes/users lib test` | `PASS`, sem issues. |
+| `cd server && dart test -r expanded` | `PASS`. |
+| `cd app && flutter analyze lib/features/market lib/features/trades lib/features/binder lib/features/profile test/features/market test/features/trades test/features/binder --no-version-check` | `PASS`, sem issues. |
+| `cd app && flutter test test/features/market test/features/trades test/features/binder --no-version-check` | `PASS`, `00:05 +18`. |
+| `cd app && flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | `PASS`, `01:45 +2`. |
+
+Runtime iPhone 15 provou UI real + backend real para Marketplace -> item com trend/confianca -> criar proposta -> revisar desequilibrio -> seller aceitar/enviar -> buyer confirmar/finalizar -> timeline/mensagens/notificacoes. Evidencia: `app/doc/runtime_flow_handoffs/marketplace_trades_trust_runtime_2026-05-04.md`.
+
 ## Patch status — Binder/Fichario Dashboard — 2026-05-04
 
 | Finding | Status | Evidencia |

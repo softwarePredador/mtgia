@@ -458,13 +458,33 @@ Future<Response> _listTrades(RequestContext context) async {
         t.tracking_code, t.delivery_method,
         t.created_at, t.updated_at,
         s.id as sender_id, s.username as sender_username, s.display_name as sender_display_name,
+        s.location_state as sender_location_state, s.location_city as sender_location_city, s.trade_notes as sender_trade_notes, s.created_at as sender_created_at,
         r.id as receiver_id, r.username as receiver_username, r.display_name as receiver_display_name,
+        r.location_state as receiver_location_state, r.location_city as receiver_location_city, r.trade_notes as receiver_trade_notes, r.created_at as receiver_created_at,
+        sender_trust.completed_trades as sender_completed_trades,
+        sender_trust.cancelled_trades as sender_cancelled_trades,
+        sender_trust.declined_trades as sender_declined_trades,
+        sender_trust.disputed_trades as sender_disputed_trades,
+        sender_response.avg_response_hours as sender_avg_response_hours,
+        sender_shipping.avg_shipping_hours as sender_avg_shipping_hours,
+        receiver_trust.completed_trades as receiver_completed_trades,
+        receiver_trust.cancelled_trades as receiver_cancelled_trades,
+        receiver_trust.declined_trades as receiver_declined_trades,
+        receiver_trust.disputed_trades as receiver_disputed_trades,
+        receiver_response.avg_response_hours as receiver_avg_response_hours,
+        receiver_shipping.avg_shipping_hours as receiver_avg_shipping_hours,
         (SELECT COUNT(*) FROM trade_items ti WHERE ti.trade_offer_id = t.id AND ti.direction = 'offering')::int as offering_count,
         (SELECT COUNT(*) FROM trade_items ti WHERE ti.trade_offer_id = t.id AND ti.direction = 'requesting')::int as requesting_count,
         (SELECT COUNT(*) FROM trade_messages tm WHERE tm.trade_offer_id = t.id)::int as message_count
       FROM trade_offers t
       JOIN users s ON s.id = t.sender_id
       JOIN users r ON r.id = t.receiver_id
+      LEFT JOIN LATERAL ${_trustStatsSql('s.id')} sender_trust ON TRUE
+      LEFT JOIN LATERAL ${_responseTimeSql('s.id')} sender_response ON TRUE
+      LEFT JOIN LATERAL ${_shippingTimeSql('s.id')} sender_shipping ON TRUE
+      LEFT JOIN LATERAL ${_trustStatsSql('r.id')} receiver_trust ON TRUE
+      LEFT JOIN LATERAL ${_responseTimeSql('r.id')} receiver_response ON TRUE
+      LEFT JOIN LATERAL ${_shippingTimeSql('r.id')} receiver_shipping ON TRUE
       WHERE $where
       ORDER BY t.updated_at DESC
       LIMIT @lim OFFSET @off
@@ -496,11 +516,13 @@ Future<Response> _listTrades(RequestContext context) async {
           'id': m['sender_id'],
           'username': m['sender_username'],
           'display_name': m['sender_display_name'],
+          'trust': _buildTrustInsight(m, 'sender_'),
         },
         'receiver': {
           'id': m['receiver_id'],
           'username': m['receiver_username'],
           'display_name': m['receiver_display_name'],
+          'trust': _buildTrustInsight(m, 'receiver_'),
         },
         'offering_count': m['offering_count'],
         'requesting_count': m['requesting_count'],
@@ -530,4 +552,97 @@ Future<Response> _listTrades(RequestContext context) async {
       body: {'error': 'Erro interno ao listar trades'},
     );
   }
+}
+
+String _trustStatsSql(String userSql) => '''
+(
+  SELECT
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_trades,
+    COUNT(*) FILTER (WHERE status = 'cancelled')::int AS cancelled_trades,
+    COUNT(*) FILTER (WHERE status = 'declined')::int AS declined_trades,
+    COUNT(*) FILTER (WHERE status = 'disputed')::int AS disputed_trades
+  FROM trade_offers t2
+  WHERE t2.sender_id = $userSql OR t2.receiver_id = $userSql
+)
+''';
+
+String _responseTimeSql(String userSql) => '''
+(
+  SELECT ROUND(
+    AVG(EXTRACT(EPOCH FROM (first_response.created_at - t2.created_at)) / 3600)::numeric,
+    1
+  ) AS avg_response_hours
+  FROM trade_offers t2
+  JOIN LATERAL (
+    SELECT created_at
+    FROM trade_status_history h
+    WHERE h.trade_offer_id = t2.id
+      AND h.new_status IN ('accepted', 'declined')
+    ORDER BY h.created_at ASC
+    LIMIT 1
+  ) first_response ON TRUE
+  WHERE t2.receiver_id = $userSql
+)
+''';
+
+String _shippingTimeSql(String userSql) => '''
+(
+  SELECT ROUND(
+    AVG(EXTRACT(EPOCH FROM (shipped.created_at - accepted.created_at)) / 3600)::numeric,
+    1
+  ) AS avg_shipping_hours
+  FROM trade_status_history shipped
+  JOIN trade_status_history accepted
+    ON accepted.trade_offer_id = shipped.trade_offer_id
+   AND accepted.new_status = 'accepted'
+  WHERE shipped.changed_by = $userSql
+    AND shipped.new_status = 'shipped'
+)
+''';
+
+Map<String, dynamic> _buildTrustInsight(
+  Map<String, dynamic> cols,
+  String prefix,
+) {
+  final completed = _toInt(cols['${prefix}completed_trades']);
+  final cancelled = _toInt(cols['${prefix}cancelled_trades']);
+  final declined = _toInt(cols['${prefix}declined_trades']);
+  final disputed = _toInt(cols['${prefix}disputed_trades']);
+  final totalSignals = completed + cancelled + declined + disputed;
+  final createdAt = cols['${prefix}created_at'];
+  final isNewAccount = createdAt is DateTime &&
+      DateTime.now().toUtc().difference(createdAt.toUtc()).inDays < 30;
+  final profileIncomplete = (cols['${prefix}display_name'] == null ||
+          cols['${prefix}display_name'].toString().trim().isEmpty) ||
+      (cols['${prefix}location_state'] == null ||
+          cols['${prefix}location_state'].toString().trim().isEmpty) ||
+      (cols['${prefix}location_city'] == null ||
+          cols['${prefix}location_city'].toString().trim().isEmpty) ||
+      (cols['${prefix}trade_notes'] == null ||
+          cols['${prefix}trade_notes'].toString().trim().isEmpty);
+
+  return {
+    'completed_trades': completed,
+    'cancelled_trades': cancelled,
+    'declined_trades': declined,
+    'disputed_trades': disputed,
+    'avg_response_hours': _toDouble(cols['${prefix}avg_response_hours']),
+    'avg_shipping_hours': _toDouble(cols['${prefix}avg_shipping_hours']),
+    'is_new_account': isNewAccount,
+    'profile_incomplete': profileIncomplete,
+    'has_insufficient_history': totalSignals < 3,
+  };
+}
+
+double? _toDouble(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
+}
+
+int _toInt(Object? value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString()) ?? 0;
 }

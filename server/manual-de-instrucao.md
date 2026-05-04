@@ -1,6 +1,45 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 
+## 2026-05-04 — Marketplace/Trades Trust Intelligence com dados internos
+
+### O Porquê
+- Marketplace e trades ja tinham fluxo funcional, mas faltava contexto confiavel para decisao: preco anunciado vs referencia, tendencia de preco, historico real do usuario e desequilibrio de troca.
+- A sprint explicitamente evita score falso e evita chamadas externas no mobile. Para MVP, todo sinal vem do backend interno: `price_history`, `cards.price`, precos do binder/trade items, `trade_offers`, `trade_status_history` e `users`.
+
+### O Como
+- Backend:
+  - `GET /community/marketplace` manteve o contrato atual e adicionou campos opcionais `price_insight` e `owner.trust`.
+  - `price_insight.reference_price` usa `cards.price`; `trend` usa os dois pontos mais recentes de `price_history` quando existentes; quando falta base, retorna `insufficient_data` com mensagem amigavel.
+  - `price_insight.comparison` compara o preco anunciado do binder com a referencia interna e marca `alert_high`, `alert_low`, `within_range` ou `insufficient_data`.
+  - `trust` usa estatisticas internas de trades concluidos/cancelados/recusados/disputados, tempos medios calculaveis por `trade_status_history`, idade da conta e completude do perfil.
+  - `GET /trades` e `GET /trades/:id` passaram a incluir `sender.trust` e `receiver.trust`.
+  - `GET /trades/:id` adicionou `value_summary`, calculando `offered_value`, `requested_value`, `payment_amount`, diferenca absoluta/percentual, direcao e `has_warning` usando apenas valores reais (`trade_items.agreed_price` e pagamento).
+- App:
+  - Criado `UserTrustInsight` compartilhado para parsear e exibir sinais de confianca sem score artificial.
+  - Marketplace mostra referencia interna, tendencia/dados insuficientes, comparacao com preco anunciado e chips de confianca do dono.
+  - CreateTrade exibe revisao de desequilibrio antes do envio da proposta.
+  - TradeDetail mostra resumo de valor, confianca dos participantes, timeline mais clara e mensagens contextualizadas como mensagens do trade.
+  - TradeInbox mostra sinais resumidos de confianca do outro participante.
+- QA:
+  - O harness `binder_marketplace_trade_runtime_test.dart` passou a validar `price_insight`, `trust`, proposta, aceite, envio, entrega, finalizacao, timeline, mensagens e notificacoes contra backend real.
+
+### Validacao executada
+- `cd server && dart analyze routes/market routes/trades routes/community routes/users lib test`: PASS.
+- `cd server && dart test -r expanded`: PASS.
+- `cd app && flutter analyze lib/features/market lib/features/trades lib/features/binder lib/features/profile test/features/market test/features/trades test/features/binder --no-version-check`: PASS.
+- `cd app && flutter test test/features/market test/features/trades test/features/binder --no-version-check`: PASS, `00:05 +18`.
+- Backend temporario `PORT=8082 dart run .dart_frog/server.dart` respondeu `/health` healthy.
+- Probes reais confirmaram `price_insight`, `owner.trust`, `sender.trust`, `receiver.trust`, `value_summary` e mensagens por endpoints internos.
+- `cd app && flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `01:45 +2`.
+
+### Resultado
+- Marketplace comunica valor e incerteza sem inventar dados: se `cards.price` ou `price_history` nao sustentam o insight, a UI mostra dados insuficientes.
+- Trades comunicam desequilibrio com valores reais disponiveis e destacam risco apenas quando o limite configurado e ultrapassado.
+- Indicadores de confianca sao fatos auditaveis do historico interno, sem percentual de confianca falso.
+- Runtime iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` com backend real `http://127.0.0.1:8082` passou.
+- Evidencia: `app/doc/runtime_flow_handoffs/marketplace_trades_trust_runtime_2026-05-04.md`.
+
 ## 2026-05-04 — Binder/Fichario Dashboard de valor da colecao
 
 ### O Porquê

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/models/user_trust_insight.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 
 // =====================================================================
@@ -272,6 +273,8 @@ class MarketplaceItem extends BinderItem {
   final String? ownerLocationState;
   final String? ownerLocationCity;
   final String? ownerTradeNotes;
+  final MarketplacePriceInsight? priceInsight;
+  final UserTrustInsight ownerTrust;
 
   MarketplaceItem({
     required super.id,
@@ -299,6 +302,8 @@ class MarketplaceItem extends BinderItem {
     this.ownerLocationState,
     this.ownerLocationCity,
     this.ownerTradeNotes,
+    this.priceInsight,
+    this.ownerTrust = const UserTrustInsight(),
   });
 
   factory MarketplaceItem.fromJson(Map<String, dynamic> json) {
@@ -330,6 +335,12 @@ class MarketplaceItem extends BinderItem {
       ownerLocationState: owner?['location_state'] as String?,
       ownerLocationCity: owner?['location_city'] as String?,
       ownerTradeNotes: owner?['trade_notes'] as String?,
+      priceInsight: MarketplacePriceInsight.fromJson(
+        json['price_insight'] as Map<String, dynamic>?,
+      ),
+      ownerTrust: UserTrustInsight.fromJson(
+        owner?['trust'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -343,6 +354,140 @@ class MarketplaceItem extends BinderItem {
     if (ownerLocationState != null) return ownerLocationState;
     return null;
   }
+}
+
+class MarketplacePriceInsight {
+  final double? referencePrice;
+  final String referenceCurrency;
+  final int historyPoints;
+  final MarketplacePriceTrend trend;
+  final MarketplacePriceComparison comparison;
+
+  const MarketplacePriceInsight({
+    this.referencePrice,
+    this.referenceCurrency = 'USD',
+    this.historyPoints = 0,
+    this.trend = const MarketplacePriceTrend(),
+    this.comparison = const MarketplacePriceComparison(),
+  });
+
+  factory MarketplacePriceInsight.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const MarketplacePriceInsight();
+    return MarketplacePriceInsight(
+      referencePrice:
+          json['reference_price'] != null
+              ? (json['reference_price'] as num).toDouble()
+              : null,
+      referenceCurrency: json['reference_currency'] as String? ?? 'USD',
+      historyPoints: json['history_points'] as int? ?? 0,
+      trend: MarketplacePriceTrend.fromJson(
+        json['trend'] as Map<String, dynamic>?,
+      ),
+      comparison: MarketplacePriceComparison.fromJson(
+        json['comparison'] as Map<String, dynamic>?,
+      ),
+    );
+  }
+}
+
+class MarketplacePriceTrend {
+  final String status;
+  final String direction;
+  final double? latestPrice;
+  final double? previousPrice;
+  final double? changeAbs;
+  final double? changePct;
+  final String? latestDate;
+  final String? previousDate;
+  final String? message;
+
+  const MarketplacePriceTrend({
+    this.status = 'insufficient_data',
+    this.direction = 'flat',
+    this.latestPrice,
+    this.previousPrice,
+    this.changeAbs,
+    this.changePct,
+    this.latestDate,
+    this.previousDate,
+    this.message,
+  });
+
+  factory MarketplacePriceTrend.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const MarketplacePriceTrend();
+    return MarketplacePriceTrend(
+      status: json['status'] as String? ?? 'insufficient_data',
+      direction: json['direction'] as String? ?? 'flat',
+      latestPrice:
+          json['latest_price'] != null
+              ? (json['latest_price'] as num).toDouble()
+              : null,
+      previousPrice:
+          json['previous_price'] != null
+              ? (json['previous_price'] as num).toDouble()
+              : null,
+      changeAbs:
+          json['change_abs'] != null
+              ? (json['change_abs'] as num).toDouble()
+              : null,
+      changePct:
+          json['change_pct'] != null
+              ? (json['change_pct'] as num).toDouble()
+              : null,
+      latestDate: json['latest_date'] as String?,
+      previousDate: json['previous_date'] as String?,
+      message: json['message'] as String?,
+    );
+  }
+
+  bool get hasTrend => status == 'available' && changePct != null;
+}
+
+class MarketplacePriceComparison {
+  final String status;
+  final String direction;
+  final double? differenceAbs;
+  final double? differencePct;
+  final double thresholdPct;
+  final double thresholdAbs;
+  final String? message;
+
+  const MarketplacePriceComparison({
+    this.status = 'insufficient_data',
+    this.direction = 'unknown',
+    this.differenceAbs,
+    this.differencePct,
+    this.thresholdPct = 35,
+    this.thresholdAbs = 5,
+    this.message,
+  });
+
+  factory MarketplacePriceComparison.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const MarketplacePriceComparison();
+    return MarketplacePriceComparison(
+      status: json['status'] as String? ?? 'insufficient_data',
+      direction: json['direction'] as String? ?? 'unknown',
+      differenceAbs:
+          json['difference_abs'] != null
+              ? (json['difference_abs'] as num).toDouble()
+              : null,
+      differencePct:
+          json['difference_pct'] != null
+              ? (json['difference_pct'] as num).toDouble()
+              : null,
+      thresholdPct:
+          json['threshold_pct'] != null
+              ? (json['threshold_pct'] as num).toDouble()
+              : 35,
+      thresholdAbs:
+          json['threshold_abs'] != null
+              ? (json['threshold_abs'] as num).toDouble()
+              : 5,
+      message: json['message'] as String?,
+    );
+  }
+
+  bool get hasAlert => status == 'alert_high' || status == 'alert_low';
 }
 
 // =====================================================================

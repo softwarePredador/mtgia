@@ -163,6 +163,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     final difference = offeredTotal - requestedTotal;
     final biggest =
         requestedTotal > offeredTotal ? requestedTotal : offeredTotal;
+    final differencePct = biggest > 0 ? (difference / biggest) * 100 : 0.0;
     final relevantDifference =
         biggest > 0 &&
         difference.abs() >= biggest * 0.2 &&
@@ -222,6 +223,19 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                         'Pedido: R\$ ${requestedTotal.toStringAsFixed(2)} • Oferta: R\$ ${offeredTotal.toStringAsFixed(2)}',
                     accent: AppTheme.frost400,
                   ),
+                  if (biggest > 0) ...[
+                    const SizedBox(height: 8),
+                    _reviewLine(
+                      icon: Icons.compare_arrows,
+                      label: 'Diferença',
+                      value:
+                          'R\$ ${difference.abs().toStringAsFixed(2)} (${differencePct.abs().toStringAsFixed(1)}%) ${difference >= 0 ? 'a favor da oferta' : 'a favor do pedido'}',
+                      accent:
+                          relevantDifference
+                              ? AppTheme.warning
+                              : AppTheme.textSecondary,
+                    ),
+                  ],
                   if (relevantDifference) ...[
                     const SizedBox(height: 10),
                     Container(

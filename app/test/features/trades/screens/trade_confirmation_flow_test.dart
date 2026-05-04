@@ -22,6 +22,12 @@ class _FakeBinderProvider extends BinderProvider {
     String? search,
     bool? forTrade,
     bool? forSale,
+    String? setCode,
+    String? rarity,
+    String? language,
+    bool? foil,
+    String sortBy = 'name',
+    String sortOrder = 'asc',
   }) async {
     return [];
   }
@@ -175,6 +181,7 @@ void main() {
 
     await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
 
+    await tester.ensureVisible(find.text('Aceitar'));
     await tester.tap(find.text('Aceitar'));
     await tester.pumpAndSettle();
 
@@ -198,6 +205,7 @@ void main() {
 
     await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
 
+    await tester.ensureVisible(find.text('Confirmar Entrega'));
     await tester.tap(find.text('Confirmar Entrega'));
     await tester.pumpAndSettle();
 

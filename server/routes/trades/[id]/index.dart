@@ -29,10 +29,30 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         t.delivery_method, t.payment_method,
         t.tracking_code, t.created_at, t.updated_at,
         s.id as sender_id, s.username as sender_username, s.display_name as sender_display_name, s.avatar_url as sender_avatar,
-        r.id as receiver_id, r.username as receiver_username, r.display_name as receiver_display_name, r.avatar_url as receiver_avatar
+        s.location_state as sender_location_state, s.location_city as sender_location_city, s.trade_notes as sender_trade_notes, s.created_at as sender_created_at,
+        r.id as receiver_id, r.username as receiver_username, r.display_name as receiver_display_name, r.avatar_url as receiver_avatar,
+        r.location_state as receiver_location_state, r.location_city as receiver_location_city, r.trade_notes as receiver_trade_notes, r.created_at as receiver_created_at,
+        sender_trust.completed_trades as sender_completed_trades,
+        sender_trust.cancelled_trades as sender_cancelled_trades,
+        sender_trust.declined_trades as sender_declined_trades,
+        sender_trust.disputed_trades as sender_disputed_trades,
+        sender_response.avg_response_hours as sender_avg_response_hours,
+        sender_shipping.avg_shipping_hours as sender_avg_shipping_hours,
+        receiver_trust.completed_trades as receiver_completed_trades,
+        receiver_trust.cancelled_trades as receiver_cancelled_trades,
+        receiver_trust.declined_trades as receiver_declined_trades,
+        receiver_trust.disputed_trades as receiver_disputed_trades,
+        receiver_response.avg_response_hours as receiver_avg_response_hours,
+        receiver_shipping.avg_shipping_hours as receiver_avg_shipping_hours
       FROM trade_offers t
       JOIN users s ON s.id = t.sender_id
       JOIN users r ON r.id = t.receiver_id
+      LEFT JOIN LATERAL ${_trustStatsSql('s.id')} sender_trust ON TRUE
+      LEFT JOIN LATERAL ${_responseTimeSql('s.id')} sender_response ON TRUE
+      LEFT JOIN LATERAL ${_shippingTimeSql('s.id')} sender_shipping ON TRUE
+      LEFT JOIN LATERAL ${_trustStatsSql('r.id')} receiver_trust ON TRUE
+      LEFT JOIN LATERAL ${_responseTimeSql('r.id')} receiver_response ON TRUE
+      LEFT JOIN LATERAL ${_shippingTimeSql('r.id')} receiver_shipping ON TRUE
       WHERE t.id = @tradeId
     '''), parameters: {'tradeId': id});
 
@@ -103,6 +123,8 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
 
     final myItems = <Map<String, dynamic>>[];
     final theirItems = <Map<String, dynamic>>[];
+    var offeringValue = 0.0;
+    var requestingValue = 0.0;
 
     for (final row in itemsResult) {
       final m = row.toColumnMap();
@@ -125,6 +147,14 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
           'rarity': m['card_rarity'],
         },
       };
+
+      final itemValue = (item['agreed_price'] as double? ?? 0) *
+          ((item['quantity'] as int?) ?? 1);
+      if (m['direction'] == 'offering') {
+        offeringValue += itemValue;
+      } else if (m['direction'] == 'requesting') {
+        requestingValue += itemValue;
+      }
 
       // Organizar pela perspectiva do viewer
       if (m['owner_id'] == userId) {
@@ -167,10 +197,12 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
 
     // Montar response
     for (final k in ['created_at', 'updated_at']) {
-      if (trade[k] is DateTime) trade[k] = (trade[k] as DateTime).toIso8601String();
+      if (trade[k] is DateTime)
+        trade[k] = (trade[k] as DateTime).toIso8601String();
     }
     if (trade['payment_amount'] != null) {
-      trade['payment_amount'] = double.tryParse(trade['payment_amount'].toString());
+      trade['payment_amount'] =
+          double.tryParse(trade['payment_amount'].toString());
     }
 
     return Response.json(body: {
@@ -188,13 +220,20 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
         'username': trade['sender_username'],
         'display_name': trade['sender_display_name'],
         'avatar_url': trade['sender_avatar'],
+        'trust': _buildTrustInsight(trade, 'sender_'),
       },
       'receiver': {
         'id': trade['receiver_id'],
         'username': trade['receiver_username'],
         'display_name': trade['receiver_display_name'],
         'avatar_url': trade['receiver_avatar'],
+        'trust': _buildTrustInsight(trade, 'receiver_'),
       },
+      'value_summary': _buildValueSummary(
+        offeredValue: offeringValue,
+        requestedValue: requestingValue,
+        paymentAmount: trade['payment_amount'] as double?,
+      ),
       'my_items': myItems,
       'their_items': theirItems,
       'messages': messages,
@@ -217,3 +256,136 @@ Future<Response> _getTradeDetail(RequestContext context, String id) async {
     );
   }
 }
+
+String _trustStatsSql(String userSql) => '''
+(
+  SELECT
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_trades,
+    COUNT(*) FILTER (WHERE status = 'cancelled')::int AS cancelled_trades,
+    COUNT(*) FILTER (WHERE status = 'declined')::int AS declined_trades,
+    COUNT(*) FILTER (WHERE status = 'disputed')::int AS disputed_trades
+  FROM trade_offers t2
+  WHERE t2.sender_id = $userSql OR t2.receiver_id = $userSql
+)
+''';
+
+String _responseTimeSql(String userSql) => '''
+(
+  SELECT ROUND(
+    AVG(EXTRACT(EPOCH FROM (first_response.created_at - t2.created_at)) / 3600)::numeric,
+    1
+  ) AS avg_response_hours
+  FROM trade_offers t2
+  JOIN LATERAL (
+    SELECT created_at
+    FROM trade_status_history h
+    WHERE h.trade_offer_id = t2.id
+      AND h.new_status IN ('accepted', 'declined')
+    ORDER BY h.created_at ASC
+    LIMIT 1
+  ) first_response ON TRUE
+  WHERE t2.receiver_id = $userSql
+)
+''';
+
+String _shippingTimeSql(String userSql) => '''
+(
+  SELECT ROUND(
+    AVG(EXTRACT(EPOCH FROM (shipped.created_at - accepted.created_at)) / 3600)::numeric,
+    1
+  ) AS avg_shipping_hours
+  FROM trade_status_history shipped
+  JOIN trade_status_history accepted
+    ON accepted.trade_offer_id = shipped.trade_offer_id
+   AND accepted.new_status = 'accepted'
+  WHERE shipped.changed_by = $userSql
+    AND shipped.new_status = 'shipped'
+)
+''';
+
+Map<String, dynamic> _buildTrustInsight(
+  Map<String, dynamic> cols,
+  String prefix,
+) {
+  final completed = _toInt(cols['${prefix}completed_trades']);
+  final cancelled = _toInt(cols['${prefix}cancelled_trades']);
+  final declined = _toInt(cols['${prefix}declined_trades']);
+  final disputed = _toInt(cols['${prefix}disputed_trades']);
+  final totalSignals = completed + cancelled + declined + disputed;
+  final createdAt = cols['${prefix}created_at'];
+  final isNewAccount = createdAt is DateTime &&
+      DateTime.now().toUtc().difference(createdAt.toUtc()).inDays < 30;
+  final profileIncomplete = (cols['${prefix}display_name'] == null ||
+          cols['${prefix}display_name'].toString().trim().isEmpty) ||
+      (cols['${prefix}location_state'] == null ||
+          cols['${prefix}location_state'].toString().trim().isEmpty) ||
+      (cols['${prefix}location_city'] == null ||
+          cols['${prefix}location_city'].toString().trim().isEmpty) ||
+      (cols['${prefix}trade_notes'] == null ||
+          cols['${prefix}trade_notes'].toString().trim().isEmpty);
+
+  return {
+    'completed_trades': completed,
+    'cancelled_trades': cancelled,
+    'declined_trades': declined,
+    'disputed_trades': disputed,
+    'avg_response_hours': _toDouble(cols['${prefix}avg_response_hours']),
+    'avg_shipping_hours': _toDouble(cols['${prefix}avg_shipping_hours']),
+    'is_new_account': isNewAccount,
+    'profile_incomplete': profileIncomplete,
+    'has_insufficient_history': totalSignals < 3,
+  };
+}
+
+Map<String, dynamic> _buildValueSummary({
+  required double offeredValue,
+  required double requestedValue,
+  required double? paymentAmount,
+}) {
+  const thresholdPct = 20.0;
+  const thresholdAbs = 25.0;
+  final payment = paymentAmount ?? 0;
+  final totalOffered = offeredValue + payment;
+  final diff = totalOffered - requestedValue;
+  final biggest = totalOffered > requestedValue ? totalOffered : requestedValue;
+  final pct = biggest > 0 ? (diff.abs() / biggest) * 100 : 0.0;
+  final hasWarning =
+      biggest > 0 && diff.abs() >= thresholdAbs && pct >= thresholdPct;
+
+  return {
+    'offered_value': _round2(offeredValue),
+    'requested_value': _round2(requestedValue),
+    'payment_amount': _round2(payment),
+    'total_offered_value': _round2(totalOffered),
+    'difference_abs': _round2(diff.abs()),
+    'difference_pct': _round2(pct),
+    'direction': diff > 0
+        ? 'offer_higher'
+        : diff < 0
+            ? 'request_higher'
+            : 'balanced',
+    'threshold_pct': thresholdPct,
+    'threshold_abs': thresholdAbs,
+    'has_warning': hasWarning,
+    'message': hasWarning
+        ? (diff > 0
+            ? 'A oferta total está acima do pedido. Confirme se o bônus/pagamento é intencional.'
+            : 'O pedido está acima da oferta total. Combine a diferença antes de avançar.')
+        : 'Resumo calculado com preços acordados dos itens e pagamento informado.',
+  };
+}
+
+double? _toDouble(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
+}
+
+int _toInt(Object? value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString()) ?? 0;
+}
+
+double _round2(double value) => double.parse(value.toStringAsFixed(2));
