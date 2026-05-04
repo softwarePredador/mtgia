@@ -199,9 +199,8 @@ void main() {
       await _capture(binding, tester, '04a_create_deck_dialog');
 
       createdName = 'QA Deck $unique';
-      final nameField = find
-          .descendant(of: dialog, matching: find.byType(TextField))
-          .first;
+      final nameField =
+          find.descendant(of: dialog, matching: find.byType(TextField)).first;
       await tester.enterText(nameField, createdName);
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -223,14 +222,21 @@ void main() {
 
     if (createdName != null) {
       final createdText = find.text(createdName);
-      final tappable = find.ancestor(of: createdText, matching: find.byType(InkWell));
+      final tappable = find.ancestor(
+        of: createdText,
+        matching: find.byType(InkWell),
+      );
       if (tappable.evaluate().isNotEmpty) {
         await tester.tap(tappable.first);
       } else {
         await tester.tap(createdText.first);
       }
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Detalhes do Deck'), attempts: 90);
+      await _pumpUntilFound(
+        tester,
+        find.text('Detalhes do Deck'),
+        attempts: 90,
+      );
       await tester.pump(const Duration(seconds: 2));
       await _capture(binding, tester, '04b_deck_details');
 
@@ -284,11 +290,16 @@ void main() {
       find.byType(TextField).first,
       'Deck agressivo de goblins vermelhos com curva baixa e muito burn.',
     );
-    final generateButtonLabel = find.text('Gerar Deck').last;
+    final generateButtonLabel = find.text('Gerar proposta');
     await tester.ensureVisible(generateButtonLabel);
-    await tester.tap(generateButtonLabel);
+    final generateButton = find.ancestor(
+      of: generateButtonLabel,
+      matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+    );
+    expect(generateButton, findsOneWidget);
+    await tester.tap(generateButton);
     await tester.pump();
-    final previewTitle = find.text('Preview do Deck');
+    final previewTitle = find.text('Preview antes de salvar');
     await _pumpUntilFound(tester, previewTitle, attempts: 120);
     await tester.ensureVisible(previewTitle);
     await tester.pump(const Duration(seconds: 1));

@@ -2,6 +2,53 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — QA pre-release ManaLoom sem scanner fisico
+
+### O Porquê
+- Antes do go/no-go pre-release, era necessario provar os fluxos app/backend core com backend local real, device iOS primario, observabilidade minima, metricas p50/p95/p99 e status honesto para scanner fisico fora do escopo.
+
+### O Como
+- Backend temporario iniciado em `PORT=8082` e validado por `GET /health`.
+- Device primario: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Device fisico `Rafa (wireless)` foi detectado, mas ficou `NOT PROVEN` porque os fluxos sem scanner foram cobertos no simulador.
+- Runtimes executados no iPhone 15 contra `http://127.0.0.1:8082`:
+  - Search/Sets: `sets_catalog_runtime_test.dart` e `sets_search_catalog_runtime_test.dart`;
+  - Deck core: `deck_runtime_m2006_test.dart`;
+  - Binder: `binder_dashboard_runtime_test.dart`;
+  - Marketplace/Trades/Messages/Notifications: `binder_marketplace_trade_runtime_test.dart`;
+  - Life Counter/Lotus: `life_counter_lotus_visual_runtime_proof_test.dart`;
+  - Visual P2/P3: `app_full_non_life_counter_visual_capture_smoke_test.dart`.
+- O harness visual foi ajustado para os labels atuais da UI (`Gerar proposta` e `Preview antes de salvar`) e validado por analyze + runtime.
+- Metricas foram coletadas com 5 amostras por endpoint para `/ai/generate`, `/ai/optimize`, `/ai/optimize/jobs/:id`, `/community/marketplace`, `/trades`, `/trades/:id`, `/binder`, `/cards` e `/sets`.
+
+### Validacao executada
+- Deck focused tests: PASS, `67 passed`.
+- Cards/Colecoes analyze/test: PASS, `7 passed`.
+- iPhone 15 runtimes:
+  - sets catalog: PASS, `00:32 +1`;
+  - sets search: PASS, `00:35 +1`;
+  - deck runtime: PASS, `01:38 +1`;
+  - binder dashboard: PASS, `00:59 +1`;
+  - marketplace/trades/messages/notifications: PASS, `01:51 +2`;
+  - Life Counter/Lotus: PASS no retry, `00:27 +1`;
+  - visual capture: PASS apos patch, `01:05 +1`.
+- Patched harness analyze: PASS.
+
+### Performance e riscos
+- `/ai/generate`: p95 `10203ms` — P2 aceito para pre-release.
+- `/ai/optimize`: p95 `4825ms`; polling `/ai/optimize/jobs/:id`: p95 `1199ms` — P2/P3.
+- `/community/marketplace`: p95 `629ms`; `/trades`: p95 `602ms`; `/trades/:id`: p95 `1227ms`.
+- `/binder`: p95 `603ms`; `/cards`: p95 `1126ms`; `/sets`: p95 `702ms`.
+- Smoke legado indicou gargalos P2 em `POST /decks/:id/cards` carta-a-carta, `/market/movers` e alguns cold-ish `/binder/stats`.
+- Foi observado um 500 em `GET /trades/None` gerado por script temporario de QA com id invalido; nao ocorreu nos runtimes app PASS. Backlog P3: validar UUID e retornar 400.
+
+### Resultado
+- Classificacao final: `PASS WITH RISKS`.
+- Scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`.
+- Observabilidade: PASS com breadcrumbs app `api_slow_request`, backend `http_observability` e `social_notification slow_deferred`; Firebase Performance ficou indisponivel no integration test por falta de Firebase default app.
+- Relatorio completo: `server/doc/RELATORIO_PRE_RELEASE_QA_2026-05-04.md`.
+- Evidencias locais ignoradas por git: `app/doc/runtime_flow_proofs_2026-05-04_iphone15_simulator/`.
+
 ## 2026-05-04 — Rodada final de regressao ManaLoom app/backend
 
 ### O Porquê

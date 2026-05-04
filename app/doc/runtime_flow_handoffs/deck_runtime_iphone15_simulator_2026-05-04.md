@@ -1,5 +1,45 @@
 # Deck runtime iPhone 15 Simulator — 2026-05-04
 
+## Atualizacao pre-release — 2026-05-04T15:29-03:00
+
+- Verdict: `PASS WITH RISKS` para QA pre-release sem scanner fisico.
+- Backend usado pelo app: `http://127.0.0.1:8082`.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- `flutter devices` tambem listou iPhone fisico `Rafa (wireless)`, mas ele ficou `NOT PROVEN` porque nao foi necessario para os fluxos sem scanner.
+- Scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`.
+
+Comandos adicionais executados contra iPhone 15 Simulator:
+
+```bash
+cd app
+flutter test integration_test/sets_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/sets_search_catalog_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/binder_dashboard_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check
+```
+
+Resultados adicionais:
+
+| Fluxo | Resultado |
+| --- | --- |
+| Search/Sets/Colecoes | PASS: sets catalog `00:32 +1`, search catalog `00:35 +1` |
+| Deck create/detail/optimize/apply/validate | PASS: `01:38 +1`, final `10_complete_validated` |
+| Binder dashboard | PASS: `00:59 +1` |
+| Marketplace/Trades/Messages/Notifications | PASS: `01:51 +2` |
+| Life Counter/Lotus | PASS no retry: `00:27 +1`; primeira tentativa falhou por build/DDS concorrente |
+| Visual Home/Deck/IA/Collection/Profile | PASS apos patch do harness: `01:05 +1` |
+
+Evidencias adicionais:
+
+- Relatorio: `server/doc/RELATORIO_PRE_RELEASE_QA_2026-05-04.md`.
+- Proof folder local ignorado: `app/doc/runtime_flow_proofs_2026-05-04_iphone15_simulator/`.
+- Logs sanitizados: `iphone15_*runtime*.log`, `pre_release_endpoint_metrics*.log`.
+- Screenshots extraidos: `03_home.png`, `04_decks.png`, `04b_deck_details.png`, `05_generate.png`, `06_generate_preview.png`, `08_optimize_sheet.png`, `09_preview.png`, `10_complete_validated.png`, `life_counter_lotus_runtime_initial.png`, `life_counter_lotus_runtime_after_plus.png`.
+
 ## Resultado
 
 - Verdict: `PASS` para deck runtime no iPhone 15 Simulator contra backend local real.
