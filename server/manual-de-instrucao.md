@@ -2,6 +2,22 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-04 — Revisao documental do mapa Marketplace/Trades Trust
+
+### O Porquê
+- O mapa operacional precisava refletir com precisao o shape app/backend entregue na sprint Marketplace/Trades Trust, principalmente a posicao de `price_insight`, `owner.trust`, `sender.trust`, `receiver.trust` e `value_summary`.
+
+### O Como
+- Revisado `server/doc/API_CONTRACTS_AND_DATA_MAP.md` contra os handlers `GET /community/marketplace`, `GET/POST /trades`, `GET /trades/:id`, `PUT /trades/:id/respond`, `PUT /trades/:id/status` e `GET/POST /trades/:id/messages`, alem dos consumers Flutter de binder/marketplace/trades.
+- Documentado que marketplace retorna `price_insight` na raiz do item e `trust` dentro de `owner.trust`, sem `trust` na raiz.
+- Documentado que `GET /trades` retorna `sender.trust` e `receiver.trust`, mas nao retorna `value_summary` no handler atual.
+- Documentado que `GET /trades/:id` retorna `value_summary` na raiz do detalhe e `trust` apenas dentro de `sender`/`receiver`.
+- Mantido o principio de dados internos: trust, price insight e value summary sao calculados no backend a partir de DB interno; o app nao chama APIs externas para esses sinais.
+
+### Resultado
+- Nenhum codigo runtime foi alterado.
+- Campos opcionais/evolutivos e pontos `not proven` ficaram explicitados para evitar regressao de contrato em alteracoes futuras.
+
 ## 2026-05-04 — Marketplace/Trades Trust Intelligence com dados internos
 
 ### O Porquê
@@ -8922,8 +8938,8 @@ Fechamento operacional aplicado para evitar hardcode e manter governança por am
 - admin de telemetria agora é **somente por configuração**:
   - `TELEMETRY_ADMIN_USER_IDS`
   - `TELEMETRY_ADMIN_EMAILS`
-- exemplo configurado no `.env` local:
-  - `TELEMETRY_ADMIN_EMAILS=rafaelhalder@gmail.com`
+- exemplo local sanitizado:
+  - `TELEMETRY_ADMIN_EMAILS=<admin-email>`
 
 Retenção automática de telemetria adicionada:
 
