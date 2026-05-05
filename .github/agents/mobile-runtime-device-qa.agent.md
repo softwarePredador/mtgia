@@ -36,6 +36,14 @@ Primary deck target flow:
 - preview/apply suggestions
 - validate final deck
 
+When assigned to **Optimize Intensity v2**, own the mobile/runtime side of the sprint:
+
+- consume the backend `intensity` contract without breaking legacy optimize responses;
+- expose intensity choices clearly in the optimize UI;
+- prove preview selection and partial apply behavior;
+- make `rebuild_guided` understandable as a product action, not a raw backend error;
+- validate the final flow on iPhone 15 Simulator with the live local backend.
+
 General app QA target flows:
 
 - search cards
@@ -85,6 +93,41 @@ Read before running device validation:
 - Capture logs with `flutter test -d <deviceId> ... --reporter expanded` or `flutter run -d <deviceId> ...` output.
 - If screenshots are requested or possible, save them under `app/doc/runtime_flow_proofs_<date>_iphone15_simulator/`.
 
+## Optimize Intensity v2 App Rules
+
+Use these product semantics unless the task explicitly overrides them:
+
+- `light`: ajuste leve, 3-5 trocas seguras.
+- `focused`: melhoria equilibrada/padrao, 6-10 trocas seguras.
+- `aggressive`: otimizacao forte, 10-20 trocas seguras, com aviso de impacto.
+- `rebuild`: reconstrucao guiada quando o deck esta estruturalmente ruim ou quando o usuario escolhe rebuild.
+
+Mobile requirements:
+
+- Keep fallback for old backend responses that do not include `intensity`.
+- Do not apply all suggestions blindly when the task requires selectable preview.
+- If partial apply is implemented, the app must apply only selected swaps and preserve commanders.
+- Explain every suggestion using backend metadata when available: reason, role/function, priority, impact/risk.
+- For `aggressive`, show clear copy that the deck may change more substantially.
+- For `rebuild_guided`, show a clear CTA and explanation: the deck needs structural rebuild before safe point upgrades.
+- Avoid raw backend errors in the UI. Map 4xx/5xx/timeouts to friendly Portuguese copy and log/Sentry breadcrumbs without secrets.
+- Do not use scanner/camera/OCR as part of Optimize Intensity v2 unless explicitly requested.
+
+## Optimize Intensity v2 Runtime Proof
+
+When validating this sprint, prove at least:
+
+- backend health on the configured local port;
+- app opens deck details for a complete deck;
+- user selects `light`, `focused`, and `aggressive` when available, or at minimum `aggressive`;
+- optimize returns preview with multiple suggestions;
+- user deselects at least one suggestion when selectable preview exists;
+- apply uses only selected suggestions;
+- final validate succeeds or returns a clear product explanation;
+- no crash, overflow, raw 4xx/5xx copy, modal stuck state, or unexpected timeout.
+
+If the app cannot prove all intensities in one runtime, document what passed and what remains `NOT PROVEN`.
+
 ## Required Runtime Command Shape
 
 Use this sequence as the baseline:
@@ -128,6 +171,12 @@ If no integration test exists yet for the deck runtime, implement the smallest v
 Create or update:
 
 - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_<date>.md`
+
+For Optimize Intensity v2, also update:
+
+- `app/doc/APP_AUDIT_<date-or-current>.md` when UX/product status changes.
+- `server/doc/RELATORIO_OPTIMIZE_INTENSITY_V2_<date>.md` if runtime evidence is part of the same sprint.
+- `server/manual-de-instrucao.md`.
 
 The handoff must include:
 
@@ -177,6 +226,14 @@ flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart tes
 ```
 
 If device/integration test was created or changed, run that test on iPhone 15 Simulator or document why it could not run.
+
+For Optimize Intensity v2 mobile changes, also run focused deck optimize tests that cover:
+
+- intensity selector state;
+- preview selectable suggestions;
+- partial apply payload/filtering;
+- fallback for legacy optimize response;
+- `needs_repair`/`rebuild_guided` friendly copy.
 
 ## Commit Policy
 

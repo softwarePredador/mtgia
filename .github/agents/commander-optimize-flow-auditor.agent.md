@@ -29,6 +29,15 @@ Audit the full ManaLoom Commander optimization flow after the latest meta, runti
 
 The goal is to prove how optimization currently behaves, where time is spent, what logic path is selected, and whether the output is safe, useful, legal, explainable, and app-consumable.
 
+When assigned to **Optimize Intensity v2**, own the backend/API side of the sprint:
+
+- add and validate the `intensity` contract for `/ai/optimize`;
+- map intensity to real suggestion scope without weakening quality gates;
+- keep backward compatibility when older app versions omit `intensity`;
+- preserve legality, commander color identity, bracket and final validation;
+- make `rebuild_guided` an explicit outcome, not a hidden failure;
+- produce API docs, focused tests, and timing/quality evidence before mobile consumes the contract.
+
 ## Scope
 
 Operate primarily in:
@@ -75,9 +84,12 @@ Then inspect the current code paths:
 Answer with evidence:
 
 - Which path is selected for each request: deterministic, complete, needs_repair, async job, AI fallback, cache hit, or rebuild-guided?
+- Which optimize intensity is selected: `light`, `focused`, `aggressive`, or `rebuild`?
+- Does the intensity produce the expected number of *safe* suggestions, or does quality gate reduce/reject unsafe swaps?
 - How long does each stage take, and where is latency concentrated?
 - Are `timings`, `stage_telemetry`, job polling, cache, and progress messages coherent?
 - Are suggestions legal for Commander and within commander color identity?
+- Are generated swaps useful and explainable: role, reason, impact, risk, price/budget when available?
 - Does complete mode avoid bad filler behavior and excessive basics?
 - Are meta deck references used only when appropriate for competitive Commander?
 - Does the app preview/apply exactly what the backend returned?
@@ -85,6 +97,37 @@ Answer with evidence:
 - Does validate confirm the final deck state after apply?
 - Are errors captured by Sentry or at least tagged/logged with enough context?
 - Are user-facing messages clear when optimization returns `needs_repair` or incomplete suggestions?
+
+## Optimize Intensity v2 Contract
+
+Use these product semantics unless the task explicitly overrides them:
+
+- `light`: conservative tune-up, target 3-5 safe swaps.
+- `focused`: default balanced improvement, target 6-10 safe swaps.
+- `aggressive`: strong optimization, target 10-20 safe swaps, still preserving commander legality, theme constraints, bracket and budget signals.
+- `rebuild`: guided rebuild/reconstruction when the deck is structurally invalid or the user explicitly chooses rebuild.
+
+Rules:
+
+- Missing `intensity` must preserve compatibility; use the current/default behavior or map to `focused` only after proving no app regression.
+- Never force the exact count if quality gate says a swap is unsafe. It is acceptable to return fewer suggestions with a clear reason.
+- `aggressive` must mean "more safe suggestions", not "ignore legal/color/bracket/quality".
+- `rebuild_guided` must include a clear `next_action` and user-facing explanation.
+- The backend must return enough metadata for the app preview: remove, add, reason, role/function, priority, risk/impact where available.
+- If partial apply is supported app-side, backend response should remain stable enough for the app to filter selected swaps before apply.
+
+## Optimize Intensity v2 Required Tests
+
+For backend/API changes, add or update focused tests proving:
+
+- omitted `intensity` remains backward-compatible;
+- `light` returns a small set of valid swaps or a clear no-safe-upgrade outcome;
+- `focused` returns a medium set of valid swaps when enough safe candidates exist;
+- `aggressive` can return more valid swaps than `light` on the same deck when safe candidates exist;
+- `rebuild` returns or routes to `rebuild_guided` with a clear next action;
+- color identity, legality, commander preservation and bracket restrictions still block unsafe suggestions;
+- quality gate can reduce the requested scope without turning the response into a false success;
+- docs in `server/doc/API_CONTRACTS_AND_DATA_MAP.md` match the final response shape.
 
 ## Required Commands
 
@@ -123,6 +166,12 @@ Create or update:
 
 - `server/doc/RELATORIO_COMMANDER_OPTIMIZE_FLOW_AUDIT_<date>.md`
 
+For Optimize Intensity v2, create or update:
+
+- `server/doc/RELATORIO_OPTIMIZE_INTENSITY_V2_<date>.md`
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+- `server/manual-de-instrucao.md`
+
 If app runtime is also executed, update:
 
 - `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_<date>.md`
@@ -144,7 +193,7 @@ The report must include:
 
 - If a defect is proven and the fix is small, implement it.
 - Add focused tests for every code fix.
-- Do not rewrite optimization architecture during audit.
+- Do not rewrite optimization architecture during audit unless the task is explicitly Optimize Intensity v2; even then keep changes incremental and contract-first.
 - Do not mask an unsafe suggestion by changing only the app; fix backend legality if backend produced illegal output.
 - Do not claim "100%" unless backend tests, app contract tests, and live iPhone 15 runtime evidence all pass.
 
