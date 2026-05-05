@@ -4,6 +4,20 @@
 
 **PASS WITH RISKS.** Optimize Intensity v2 foi provado no app contra backend local real em `http://127.0.0.1:8082`: usuario escolheu `Agressivo`, o app enviou `intensity=aggressive`, exibiu preview selecionavel, desmarcou ao menos uma sugestao, aplicou somente a selecao e validou o deck final preservando o comandante.
 
+## Atualizacao - Aggressive Candidate Quality v2 etapa 3 - 2026-05-05
+
+**PASS WITH RISKS.** A etapa 3 alterou apenas backend/contrato aditivo: o app nao precisou mudar para consumir `optimize_diagnostics.aggressive_candidate_quality`, porque campos novos sao opcionais e a UI continua usando `removals`, `additions`, `*_detailed`, `quality_error`, `outcome_code` e polling existentes. Nao foi executada nova rodada iPhone 15 nesta etapa; a evidencia mobile anterior de aggressive preview/apply/validate permanece valida, e os testes app-side de contrato de decks passaram contra a nova forma de resposta.
+
+| Marco | Evidencia |
+| --- | --- |
+| Backend 8082 vivo | `curl http://127.0.0.1:8082/health` retornou healthy. |
+| Backend live optimize | `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test ...ai_optimize_flow_test.dart...` PASS `02:44 +77 ~1`. |
+| App contract analyze | `flutter analyze lib/features/decks test/features/decks --no-version-check` PASS. |
+| App deck tests | `flutter test deck_details_screen_smoke_test.dart deck_provider_test.dart deck_optimize_flow_support_test.dart --no-version-check` PASS `00:07 +46`. |
+| iPhone 15 runtime | Nao rerodado nesta etapa por ausencia de mudanca app/UI; blocker/risco documentado como runtime nao revalidado para os novos campos diagnosticos opcionais. |
+
+Leitura: o app preview/apply nao depende dos novos diagnosticos; se o backend retornar menos swaps ou safe no-op, o fluxo app ja validado continua mostrando o branch seguro existente.
+
 ## Atualizacao - aggressive async UX - 2026-05-05
 
 **PASS WITH RISKS.** A nova rodada iPhone 15 contra backend 8082 provou que `aggressive` nao bloqueia mais a UI esperando a resposta HTTP: `/ai/optimize` retornou `202` e o app fez polling com progresso. Nesta rodada especifica, o quality gate final rejeitou as trocas e o app exibiu o branch seguro "Nenhuma melhoria segura encontrada"; portanto nao houve preview/apply nesse rerun. A prova anterior de preview parcial/apply/validate permanece registrada abaixo para o contrato Intensity v2 sync.

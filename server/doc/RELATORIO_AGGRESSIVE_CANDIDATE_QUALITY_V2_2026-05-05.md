@@ -1,4 +1,4 @@
-# Relatorio Aggressive Candidate Quality v2 - Etapas 1 e 2
+# Relatorio Aggressive Candidate Quality v2 - Etapas 1, 2 e 3
 
 Data: 2026-05-05
 
@@ -10,7 +10,11 @@ Data: 2026-05-05
 
 **PASS WITH RISKS.** A etapa 2 extraiu sinais consumiveis de meta/sinergia para pools aggressive, materializou rows idempotentes com `source='aggressive_meta_signal_v1'` em `commander_card_synergy` e `card_role_scores`, e gerou artefatos nao sensiveis em `server/test/artifacts/aggressive_candidate_quality_2026-05-05/`.
 
-Os riscos restantes sao explicitos: o runtime do `/ai/optimize` ainda nao consome esses sinais, a classificacao de role continua heuristica, preco/budget segue majoritariamente `not_proven`, e 34 decks Commander/cEDH ficaram fora da persistencia por identidade de comandante nao resolvida.
+## Resultado etapa 3
+
+**PASS WITH RISKS.** O runtime do `/ai/optimize` passou a consumir os sinais locais no caminho deterministic-first de `intensity=aggressive`: gera uma reserva maior que o alvo nominal, ranqueia pares por role score, function tags, commander synergy, bracket/budget advisory e penalidades historicas antes do quality gate, e expoe diagnosticos agregados sem relaxar legalidade, color identity, bracket, preservacao de comandante ou validacao final.
+
+Riscos restantes: a prova live depende de backend local e dados atuais; quando o pool e fraco ou o gate final rejeita, o resultado correto continua sendo safe no-op/low coverage. Budget tier ainda pode ser `unknown` para parte relevante dos dados e os sinais sao advisory, nao autorizacao.
 
 ## Escopo entregue
 
@@ -25,6 +29,90 @@ Os riscos restantes sao explicitos: o runtime do `/ai/optimize` ainda nao consom
 - Nova view aditiva:
   - `optimize_candidate_quality_summary`
 - Indices para lookup por tag/role/commander/penalidade.
+
+## Etapa 3 - Consumo runtime pelo aggressive
+
+### Mudanca implementada
+
+- `server/lib/ai/optimize_runtime_support.dart`
+  - Novo carregador `loadAggressiveCandidateQualitySignals` para `card_role_scores`, `card_function_tags`, `commander_card_synergy` e `optimize_rejection_penalties`.
+  - Novo ranking `rankAggressiveCandidateQualityPairs` com score advisory por:
+    - alinhamento entre role removido e role do candidato;
+    - `source='aggressive_meta_signal_v1'`;
+    - `role_score`, `function_confidence`, `synergy_score` e `evidence_count`;
+    - penalidade historica de rejeicao;
+    - penalidade advisory para bracket/budget incompatíveis.
+  - O `aggressive` gera ate 3x o target como pool interno, ranqueia antes do quality gate e entrega ate 2x o target para o gate usar como reserva; a resposta final e capada pelo target de intensidade.
+- `server/routes/ai/optimize/index.dart`
+  - Passa `intensity=aggressive` para a shortlist deterministica.
+  - Mantem `filterUnsafeOptimizeSwapsByCardData`, color identity, bracket policy e `OptimizationValidator` como gate final.
+  - Expoe `optimize_diagnostics.aggressive_candidate_quality` com:
+    - `requested_target_swaps`;
+    - `removal_candidates`;
+    - `replacement_candidates`;
+    - `pairs_generated`;
+    - `rejected_reason_buckets`;
+    - `returned_swaps`;
+    - `safety_reduced_scope`;
+    - `low_candidate_coverage`;
+    - `ranked_before_quality_gate`;
+    - `candidate_sources`.
+
+### Reason buckets
+
+Os motivos do gate sao agregados sem expor payload sensivel:
+
+| Bucket | Significado |
+|---|---|
+| `incomplete_card_data` | dados insuficientes para validar o par |
+| `role_mismatch` | troca muda papel funcional de forma insegura |
+| `curve_or_role_mismatch` | delta de CMC/role torna a troca arriscada |
+| `mana_or_land_safety` | protecao de mana/terreno bloqueou |
+| `quality_gate_rejected` | rejeicao geral do gate |
+| `scope_cap` | candidatos excedentes ficaram como reserva apos cap de intensidade |
+
+### Testes adicionados
+
+- `server/test/optimize_runtime_support_test.dart`
+  - prova que ranking aggressive usa role/synergy/meta signals antes do gate;
+  - prova que aggressive consegue expor mais swaps seguros aprovados que focused quando ha 12 oportunidades seguras;
+  - prova safe no-op com reason buckets quando o gate rejeita todos os pares.
+
+### Validacao etapa 3
+
+```bash
+cd server && dart analyze lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_runtime_support_test.dart
+cd server && dart test test/optimize_runtime_support_test.dart test/optimization_quality_gate_test.dart
+cd server && dart format lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_runtime_support_test.dart && dart analyze lib routes test
+cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart test/optimize_runtime_support_test.dart
+cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run
+cd app && flutter analyze lib/features/decks test/features/decks --no-version-check
+cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check
+```
+
+Resultado:
+
+| Comando | Resultado |
+|---|---|
+| Analyzer focado backend | PASS |
+| Testes focados `optimize_runtime_support` + `optimization_quality_gate` | PASS |
+| `dart analyze lib routes test` | PASS |
+| Suite backend live em 8082 | PASS, `02:44 +77 ~1`, skip preexistente/esperado no teste parametrizado |
+| Commander-only dry-run em 8082 | PASS, 19 candidatos seriam validados; sem mutacao |
+| App analyze decks | PASS |
+| App tests decks focados | PASS, `00:07 +46` |
+
+Baseline observado antes de subir backend: `ai_optimize_flow_test.dart` falhava com `Connection refused` em `127.0.0.1:8082`, igual ao comportamento esperado quando a suite live roda sem servidor. Apos subir backend 8082, a suite passou.
+
+### Evidencia de qualidade
+
+| Pergunta | Evidencia |
+|---|---|
+| Usa tags/scores/meta signals? | `rankAggressiveCandidateQualityPairs` promove candidato com `source='aggressive_meta_signal_v1'`, `role_score`, `function_confidence`, `synergy_score` e `evidence_count`; teste unitario cobre o ranking. |
+| Gera mais candidatos que o target? | `intensity=aggressive` usa ate 3x o target para busca e ate 2x como reserva antes do gate, com cap final no target. |
+| Quality gate intacto? | `filterUnsafeOptimizeSwapsByCardData`, bracket policy, color identity e `OptimizationValidator` permanecem depois do ranking; teste cobre safe no-op quando o gate rejeita tudo. |
+| Rejection buckets expostos? | `optimize_diagnostics.aggressive_candidate_quality.rejected_reason_buckets` agrega motivos sem payload sensivel. |
+| Legalidade/color identity/bracket preservados? | As queries continuam partindo de candidatos ja filtrados por legalidade/identidade/bracket, e o endpoint revalida antes de responder. |
 
 ## Guardrails
 
@@ -191,7 +279,7 @@ Nenhum rollback toca em `cards`, `card_legalities`, `sets`, `decks` ou dados de 
 
 ## Gaps e proximas etapas
 
-- Historico da etapa 1: consumo runtime pelo `/ai/optimize` nao foi ligado naquela etapa. A etapa 2 abaixo adiciona sinais meta, mas o runtime ainda nao os consome.
+- Historico: o consumo runtime pelo `/ai/optimize` nao foi ligado nas etapas 1/2; a etapa 3 conectou os sinais ao caminho `intensity=aggressive` sem transformar sinais em bypass de gate.
 - Budget tier ficou `unknown` por falta de preco confiavel na selecao canonica atual.
 - Tags sao heuristicas deterministicamente inferidas, nao revisadas manualmente; `source` e `confidence` permitem auditoria posterior.
 - Duplicate set-code cleanup permanece fora desta etapa; contagem atual e 82 grupos.

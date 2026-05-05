@@ -1,6 +1,8 @@
 import 'package:test/test.dart';
 
 import '../lib/edh_bracket_policy.dart';
+import '../lib/ai/aggressive_candidate_meta_signal_support.dart';
+import '../lib/ai/optimization_quality_gate.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
@@ -284,4 +286,162 @@ void main() {
       );
     });
   });
+
+  group('aggressive candidate quality ranking', () {
+    test('uses role, synergy and meta signal scores before quality gate', () {
+      final pairs = [
+        {
+          'remove': 'Expensive Draw Spell',
+          'add': 'Generic Draw Spell',
+          'remove_role': 'draw',
+          'remove_score': 120,
+        },
+        {
+          'remove': 'Clunky Draw Engine',
+          'add': 'Proven Commander Draw',
+          'remove_role': 'draw',
+          'remove_score': 80,
+        },
+      ];
+      final ranked = rankAggressiveCandidateQualityPairs(
+        pairs: pairs,
+        bracket: 3,
+        signalsByName: {
+          'proven commander draw': AggressiveCandidateQualitySignal(
+            cardName: 'Proven Commander Draw',
+            roles: const {'draw'},
+            roleScore: 88,
+            functionConfidence: 0.9,
+            synergyScore: 92,
+            synergyEvidenceCount: 9,
+            rejectionPenalty: 0,
+            budgetTier: 'accessible',
+            bracketScope: 'bracket_2_4',
+            sources: const {aggressiveCandidateMetaSignalSource},
+          ),
+        },
+      );
+
+      expect(ranked.first['add'], equals('Proven Commander Draw'));
+      expect(
+        ranked.first['candidate_quality_sources'],
+        contains(aggressiveCandidateMetaSignalSource),
+      );
+      expect(
+        ranked.first['candidate_quality_score'],
+        greaterThan(ranked.last['candidate_quality_score'] as int),
+      );
+    });
+
+    test('aggressive can expose more safe approved swaps than focused scope',
+        () {
+      final removals = List.generate(12, (i) => 'Slow Ramp Rock $i');
+      final additions = List.generate(12, (i) => 'Efficient Ramp Rock $i');
+      final originalDeck = [
+        for (final name in removals)
+          _qualityCard(
+            name: name,
+            typeLine: 'Artifact',
+            manaCost: '{3}',
+            cmc: 3,
+            oracleText: '{T}: Add one mana of any color.',
+          ),
+      ];
+      final additionsData = [
+        for (final name in additions)
+          _qualityCard(
+            name: name,
+            typeLine: 'Artifact',
+            manaCost: '{2}',
+            cmc: 2,
+            oracleText: '{T}: Add one mana of any color.',
+          ),
+      ];
+
+      final focused = filterUnsafeOptimizeSwapsByCardData(
+        removals: removals.take(5).toList(),
+        additions: additions.take(5).toList(),
+        originalDeck: originalDeck,
+        additionsData: additionsData,
+        archetype: 'midrange',
+      );
+      final aggressive = filterUnsafeOptimizeSwapsByCardData(
+        removals: removals,
+        additions: additions,
+        originalDeck: originalDeck,
+        additionsData: additionsData,
+        archetype: 'midrange',
+      );
+
+      expect(focused.removals, hasLength(5));
+      expect(aggressive.removals, hasLength(12));
+      expect(aggressive.removals.length, greaterThan(focused.removals.length));
+    });
+
+    test('exposes safe no-op diagnostics when quality gate rejects all pairs',
+        () {
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Aggro Creature A', 'Aggro Creature B'],
+        additions: const ['Slow Engine A', 'Slow Engine B'],
+        originalDeck: [
+          _qualityCard(
+            name: 'Aggro Creature A',
+            typeLine: 'Creature - Goblin',
+            manaCost: '{1}{R}',
+            cmc: 2,
+            oracleText: 'Haste.',
+          ),
+          _qualityCard(
+            name: 'Aggro Creature B',
+            typeLine: 'Creature - Goblin',
+            manaCost: '{1}{R}',
+            cmc: 2,
+            oracleText: 'Haste.',
+          ),
+        ],
+        additionsData: [
+          _qualityCard(
+            name: 'Slow Engine A',
+            typeLine: 'Artifact',
+            manaCost: '{6}',
+            cmc: 6,
+            oracleText: 'At the beginning of your upkeep, draw a card.',
+          ),
+          _qualityCard(
+            name: 'Slow Engine B',
+            typeLine: 'Artifact',
+            manaCost: '{6}',
+            cmc: 6,
+            oracleText: 'At the beginning of your upkeep, draw a card.',
+          ),
+        ],
+        archetype: 'aggro',
+      );
+      final buckets =
+          bucketOptimizeQualityGateDroppedReasons(result.droppedReasons);
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(
+          buckets.values.fold<int>(0, (sum, count) => sum + count), equals(2));
+      expect(buckets, contains('curve_or_role_mismatch'));
+    });
+  });
+}
+
+Map<String, dynamic> _qualityCard({
+  required String name,
+  required String typeLine,
+  required String manaCost,
+  required num cmc,
+  required String oracleText,
+}) {
+  return {
+    'name': name,
+    'type_line': typeLine,
+    'mana_cost': manaCost,
+    'cmc': cmc,
+    'oracle_text': oracleText,
+    'quantity': 1,
+  };
 }

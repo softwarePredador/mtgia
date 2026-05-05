@@ -172,6 +172,8 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
   int swapLimit = 6,
+  String intensity = 'focused',
+  Map<String, dynamic>? diagnosticsOut,
 }) =>
     optimize_support.buildDeterministicOptimizeSwapCandidates(
       pool: pool,
@@ -185,6 +187,8 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       coreCards: coreCards,
       commanderPriorityNames: commanderPriorityNames,
       swapLimit: swapLimit,
+      intensity: intensity,
+      diagnosticsOut: diagnosticsOut,
     );
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
@@ -668,6 +672,48 @@ Future<Response> onRequest(RequestContext context) async {
     String? optimizeMetaEvidenceContext;
     Map<String, dynamic>? optimizeMetaReferenceContext;
     final deterministicSwapCandidates = <Map<String, dynamic>>[];
+    final aggressiveCandidateQualityDiagnostics = <String, dynamic>{};
+    final aggressiveRejectionReasonBuckets = <String, int>{};
+
+    void mergeAggressiveRejectionBuckets(Map<String, int> buckets) {
+      for (final entry in buckets.entries) {
+        aggressiveRejectionReasonBuckets[entry.key] =
+            (aggressiveRejectionReasonBuckets[entry.key] ?? 0) + entry.value;
+      }
+    }
+
+    Map<String, dynamic> buildAggressiveCandidateQualityDiagnostics({
+      int? returnedSwaps,
+    }) {
+      final requested =
+          (aggressiveCandidateQualityDiagnostics['requested_target_swaps']
+                  as int?) ??
+              intensity.targetMax;
+      final returned = returnedSwaps ?? 0;
+      return {
+        'requested_target_swaps': requested,
+        'removal_candidates':
+            aggressiveCandidateQualityDiagnostics['removal_candidates'] ?? 0,
+        'replacement_candidates':
+            aggressiveCandidateQualityDiagnostics['replacement_candidates'] ??
+                0,
+        'pairs_generated':
+            aggressiveCandidateQualityDiagnostics['pairs_generated'] ?? 0,
+        'rejected_reason_buckets': aggressiveRejectionReasonBuckets,
+        'returned_swaps': returned,
+        'safety_reduced_scope':
+            returned < requested || aggressiveRejectionReasonBuckets.isNotEmpty,
+        'low_candidate_coverage':
+            aggressiveCandidateQualityDiagnostics['low_candidate_coverage'] ??
+                false,
+        'ranked_before_quality_gate': aggressiveCandidateQualityDiagnostics[
+                'ranked_before_quality_gate'] ??
+            false,
+        'candidate_sources':
+            aggressiveCandidateQualityDiagnostics['candidate_sources'] ??
+                const <String>[],
+      };
+    }
 
     Future<Response> respondWithOptimizeTelemetry({
       required int statusCode,
@@ -687,6 +733,19 @@ Future<Response> onRequest(RequestContext context) async {
         candidateSwaps: deterministicSwapCandidates.length,
         returnedSwaps: responseSwapCount(responseBody),
       );
+      if (intensity.selected == 'aggressive') {
+        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
+            ? (responseBody['optimize_diagnostics'] as Map)
+                .cast<String, dynamic>()
+            : <String, dynamic>{};
+        responseBody['optimize_diagnostics'] = {
+          ...existingDiagnostics,
+          'aggressive_candidate_quality':
+              buildAggressiveCandidateQualityDiagnostics(
+            returnedSwaps: responseSwapCount(responseBody),
+          ),
+        };
+      }
       responseBody['outcome_code'] ??= deriveOptimizeOutcomeCode(
         statusCode: statusCode,
         body: responseBody,
@@ -914,6 +973,8 @@ Future<Response> onRequest(RequestContext context) async {
           coreCards: themeProfile.coreCards,
           commanderPriorityNames: optimizeCommanderPriorityNames,
           swapLimit: intensity.targetMax,
+          intensity: intensity.selected,
+          diagnosticsOut: aggressiveCandidateQualityDiagnostics,
         ),
       ));
       if (deterministicSwapCandidates.isNotEmpty) {
@@ -2017,6 +2078,13 @@ Future<Response> onRequest(RequestContext context) async {
               validRemovals = gateResult.removals;
               validAdditions = gateResult.additions;
               qualityGateDroppedCount += gateResult.droppedReasons.length;
+              if (intensity.selected == 'aggressive') {
+                mergeAggressiveRejectionBuckets(
+                  bucketOptimizeQualityGateDroppedReasons(
+                    gateResult.droppedReasons,
+                  ),
+                );
+              }
               qualityGateWarnings.add(
                 '🔒 Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
               );
@@ -2024,6 +2092,24 @@ Future<Response> onRequest(RequestContext context) async {
                 gateResult.droppedReasons.map((reason) => '🔒 $reason'),
               );
 
+              final safeAdditionNames =
+                  validAdditions.map((name) => name.toLowerCase()).toSet();
+              additionsData = additionsData.where((card) {
+                final name = (card['name'] as String?)?.toLowerCase() ?? '';
+                return safeAdditionNames.contains(name);
+              }).toList();
+            }
+
+            if (intensity.selected == 'aggressive' &&
+                validRemovals.length > intensity.targetMax) {
+              final overflow = validRemovals.length - intensity.targetMax;
+              mergeAggressiveRejectionBuckets({'scope_cap': overflow});
+              validRemovals = validRemovals.take(intensity.targetMax).toList();
+              validAdditions =
+                  validAdditions.take(intensity.targetMax).toList();
+              qualityGateWarnings.add(
+                '🔒 Escopo aggressive limitado a ${intensity.targetMax} troca(s) após ranking e gate; $overflow candidata(s) excedentes ficaram como reserva.',
+              );
               final safeAdditionNames =
                   validAdditions.map((name) => name.toLowerCase()).toSet();
               additionsData = additionsData.where((card) {
@@ -2742,6 +2828,19 @@ Future<Response> onRequest(RequestContext context) async {
         returnedSwaps: responseSwapCount(responseBody),
         qualityGateDropped: qualityGateDroppedCount,
       );
+      if (intensity.selected == 'aggressive') {
+        final existingDiagnostics = responseBody['optimize_diagnostics'] is Map
+            ? (responseBody['optimize_diagnostics'] as Map)
+                .cast<String, dynamic>()
+            : <String, dynamic>{};
+        responseBody['optimize_diagnostics'] = {
+          ...existingDiagnostics,
+          'aggressive_candidate_quality':
+              buildAggressiveCandidateQualityDiagnostics(
+            returnedSwaps: responseSwapCount(responseBody),
+          ),
+        };
+      }
 
       final warnings = <String, dynamic>{};
 

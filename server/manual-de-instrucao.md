@@ -2,6 +2,52 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Aggressive Candidate Quality v2 etapa 3: consumo runtime
+
+### O Porquê
+- As etapas 1/2 criaram `card_function_tags`, `card_role_scores`, `commander_card_synergy` e `optimize_rejection_penalties`, mas o `/ai/optimize` ainda escolhia candidatos aggressive sem consumir esses sinais.
+- O objetivo era aumentar recall de swaps seguros no modo `aggressive` sem baixar thresholds nem enfraquecer legalidade, identidade de cor, bracket, preservacao de comandante ou quality gate.
+- Produto precisa diferenciar "sem upgrade seguro" de falha oculta, expondo contadores de pool e buckets de rejeicao.
+
+### O Como
+- `server/lib/ai/optimize_runtime_support.dart`
+  - adicionou `loadAggressiveCandidateQualitySignals` para ler tags/scores/synergy/penalties locais;
+  - adicionou `rankAggressiveCandidateQualityPairs` para ranquear pares por role alignment, `aggressive_meta_signal_v1`, role score, function confidence, synergy score/evidence, budget/bracket advisory e penalidade historica;
+  - adicionou `bucketOptimizeQualityGateDroppedReasons` para diagnostico agregado sem payload sensivel;
+  - `buildDeterministicOptimizeSwapCandidates` agora, somente em `intensity=aggressive`, gera uma reserva maior que o alvo, ranqueia antes do gate e entrega candidatos extras para o gate final escolher com segurança.
+- `server/routes/ai/optimize/index.dart`
+  - passa a intensidade e um mapa de diagnostico para a shortlist deterministica;
+  - preserva `CardValidationService`, filtro de color identity, bracket policy, `filterUnsafeOptimizeSwapsByCardData` e `OptimizationValidator` como julgadores finais;
+  - capa a resposta final de aggressive no target da intensidade e registra excedentes como `scope_cap`;
+  - expõe `optimize_diagnostics.aggressive_candidate_quality` com target, contagens de remoção/substituição/pares, buckets rejeitados, swaps retornados, low coverage e fontes usadas.
+
+### Contrato
+- Campo aditivo em `/ai/optimize`:
+  - `optimize_diagnostics.aggressive_candidate_quality.requested_target_swaps`
+  - `removal_candidates`
+  - `replacement_candidates`
+  - `pairs_generated`
+  - `rejected_reason_buckets`
+  - `returned_swaps`
+  - `safety_reduced_scope`
+  - `low_candidate_coverage`
+  - `ranked_before_quality_gate`
+  - `candidate_sources`
+- Campos opcionais por swap deterministic-first:
+  - `candidate_quality_score`
+  - `candidate_quality_signal`
+  - `candidate_quality_sources`
+- App antigo continua compatível: todos os campos sao opcionais/aditivos e `intensity` omitido permanece `focused`.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_runtime_support_test.dart`: PASS.
+- `cd server && dart test test/optimize_runtime_support_test.dart test/optimization_quality_gate_test.dart`: PASS.
+- `cd server && dart analyze lib routes test`: PASS.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart test/optimize_runtime_support_test.dart`: PASS (`02:44 +77 ~1`).
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check`: PASS.
+
 ## 2026-05-05 — Aggressive Candidate Quality v2 etapa 2: sinais meta
 
 ### O Porquê
