@@ -73,6 +73,42 @@ void main() {
       expect(result.droppedReasons, hasLength(2));
     });
 
+    test('can reduce aggressive requested scope without false success', () {
+      final originalDeck = [
+        for (var i = 0; i < 12; i++)
+          _card(
+            name: 'Aggro Creature $i',
+            typeLine: 'Creature — Goblin',
+            manaCost: '{1}{R}',
+            cmc: 2,
+            oracleText: 'Haste.',
+          ),
+      ];
+      final additions = [
+        for (var i = 0; i < 12; i++)
+          _card(
+            name: 'Slow Value Engine $i',
+            typeLine: 'Artifact',
+            manaCost: '{6}',
+            cmc: 6,
+            oracleText: 'At the beginning of your upkeep, draw a card.',
+          ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: List.generate(12, (i) => 'Aggro Creature $i'),
+        additions: List.generate(12, (i) => 'Slow Value Engine $i'),
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'aggro',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons, hasLength(12));
+      expect(result.changed, isTrue);
+    });
+
     test('builds rejection reasons for reprovado midrange optimization', () {
       final validation = ValidationReport(
         score: 25,

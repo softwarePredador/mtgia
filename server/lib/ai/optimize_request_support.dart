@@ -55,6 +55,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required String deckId,
   required String targetArchetype,
   required String requestMode,
+  required String intensity,
   required int? bracket,
   required bool keepTheme,
   OptimizeStageTelemetry? telemetry,
@@ -151,6 +152,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     bracket: bracket,
     keepTheme: keepTheme,
     deckSignature: deckSignature,
+    intensity: intensity,
   );
 
   final commanders = <String>[];

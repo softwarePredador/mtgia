@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-04-30T17:09:34.572266",
-  "run_started_at": "2026-04-30T17:09:34.569730",
+  "generated_at": "2026-05-05T12:02:11.696249",
+  "run_started_at": "2026-05-05T12:02:11.695123",
   "mode": "dry_run",
-  "api_base_url": "http://127.0.0.1:8082",
+  "api_base_url": "http://127.0.0.1:8080",
   "artifact_dir": "test/artifacts/commander_only_optimization_validation",
   "corpus_path": "test/fixtures/optimization_resolution_corpus.json",
   "validation_limit": 19,

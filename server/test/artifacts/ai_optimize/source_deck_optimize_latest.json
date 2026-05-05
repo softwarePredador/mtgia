@@ -12,9 +12,9 @@
       "error": "Deck not found or is not public."
     }
   },
-  "cloned_deck_id": "79ffd7ab-85a0-4c39-bb65-63cb41f9207a",
+  "cloned_deck_id": "149a3239-cdcf-4dff-8a8d-58def8b869db",
   "optimize_request": {
-    "deck_id": "79ffd7ab-85a0-4c39-bb65-63cb41f9207a",
+    "deck_id": "149a3239-cdcf-4dff-8a8d-58def8b869db",
     "archetype": "Control",
     "bracket": 2,
     "keep_theme": true
@@ -24,7 +24,7 @@
     "mode": "complete",
     "cache": {
       "hit": false,
-      "cache_key": "v6:37dd779"
+      "cache_key": "v7:cafb719e"
     },
     "theme": {
       "theme": "counters",
@@ -36,13 +36,13 @@
     },
     "bracket": 2,
     "timings": {
-      "job_id": "efa82e645f6cd450204af351ecf30c60",
-      "deck_id": "79ffd7ab-85a0-4c39-bb65-63cb41f9207a",
-      "total_ms": 9444,
+      "job_id": "dd31d38a58dbc32f8732e8d82c680d87",
+      "deck_id": "149a3239-cdcf-4dff-8a8d-58def8b869db",
+      "total_ms": 9648,
       "stages_ms": {
-        "complete.fill_remainder": 3191,
-        "complete.ai_suggestion_loop": 1788,
-        "complete.build_final_response": 1122,
+        "complete.fill_remainder": 3408,
+        "complete.ai_suggestion_loop": 1771,
+        "complete.build_final_response": 1114,
         "complete.prepare_commander_seed": 556,
         "complete.rebalance_land_deficit": 0,
         "complete.build_intermediate_payload": 0
@@ -128,6 +128,7 @@
       "Plains",
       "Swamp"
     ],
+    "intensity": "focused",
     "reasoning": "Deck completado com cartas sinérgicas ao arquétipo Control, priorizando sinergia com o Commander e a proporção ideal de terrenos/spells.",
     "iterations": 0,
     "constraints": {
@@ -185,6 +186,20 @@
       "average_deck_seed_stage_used": true,
       "competitive_model_stage_used": false,
       "guaranteed_basics_stage_used": false
+    },
+    "stage_telemetry": {
+      "job_id": "dd31d38a58dbc32f8732e8d82c680d87",
+      "deck_id": "149a3239-cdcf-4dff-8a8d-58def8b869db",
+      "total_ms": 9648,
+      "stages_ms": {
+        "complete.fill_remainder": 3408,
+        "complete.ai_suggestion_loop": 1771,
+        "complete.build_final_response": 1114,
+        "complete.prepare_commander_seed": 556,
+        "complete.rebalance_land_deficit": 0,
+        "complete.build_intermediate_payload": 0
+      },
+      "request_mode": "complete_async"
     },
     "target_additions": 99,
     "removals_detailed": [],
@@ -646,6 +661,19 @@
         "is_basic_land": true
       }
     ],
+    "optimize_intensity": {
+      "source": "omitted_default",
+      "selected": "focused",
+      "requested": null,
+      "quality_gate": {
+        "can_reduce_scope": true
+      },
+      "target_swaps": {
+        "max": 10,
+        "min": 6
+      },
+      "returned_swaps": 76
+    },
     "validation_warnings": []
   },
   "bulk_status": 200,

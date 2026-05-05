@@ -1,7 +1,7 @@
 # Dry-run Commander-Only Optimization - 2026-04-27
 
 - Mode: `dry_run`
-- API base: `http://127.0.0.1:8082`
+- API base: `http://127.0.0.1:8080`
 - Corpus: `test/fixtures/optimization_resolution_corpus.json`
 - Total: `19`
 - Passed: `0`

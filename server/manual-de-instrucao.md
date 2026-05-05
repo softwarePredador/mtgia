@@ -2,6 +2,37 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Sprint 1 Optimize Intensity v2 no backend/API
+
+### O Porquê
+- O fluxo `/ai/optimize` precisava permitir "trocar tudo que fizer sentido" sem transformar agressividade em bypass de legalidade, identidade de cor, bracket ou quality gate.
+- O app precisava de contrato explicito para escolher `light`, `focused`, `aggressive` ou `rebuild`, mantendo compatibilidade para clientes antigos que ainda omitem `intensity`.
+- `needs_repair` precisava deixar de parecer falha opaca: o backend deve declarar `rebuild_guided` e orientar a proxima acao.
+
+### O Como
+- `server/lib/ai/optimize_runtime_support.dart` ganhou `OptimizeIntensityConfig` e `resolveOptimizeIntensity`.
+  - `light`: alvo 3-5 swaps.
+  - `focused`: alvo 6-10 swaps e default quando `intensity` vem ausente (`source=omitted_default`).
+  - `aggressive`: alvo 10-20 swaps.
+  - `rebuild`: outcome `rebuild_guided`, sem aplicar mudancas automaticamente.
+- O cache de optimize passou para chave `v7` incluindo `intensity`, evitando misturar resposta `light` com `aggressive` para o mesmo deck/arquetipo.
+- O shortlist deterministico agora recebe `swapLimit` derivado da intensidade. `aggressive` pode expor mais candidatos quando existem candidatos seguros; `light` continua limitado mesmo em recuperacao estrutural.
+- O quality gate segue autoritativo: filtros de identidade de cor, bracket, protecao de comandante, preservacao de tema e validação final continuam podendo reduzir ou rejeitar swaps.
+- Respostas de optimize/complete/cache/job agora incluem `intensity`, `optimize_intensity`, `timings` e `stage_telemetry` de forma app-facing.
+- `needs_repair` retorna `mode=rebuild_guided`, `outcome_code=rebuild_guided`, `next_action.endpoint=/ai/rebuild` e mantem `quality_error.code=OPTIMIZE_NEEDS_REPAIR` para diagnostico/backward compatibility.
+- Recomendações detalhadas foram enriquecidas com `role`/`function`, `priority`, `risk` e `impact_estimate` quando disponivel.
+
+### Validacao executada
+- `cd server && dart analyze lib routes test`: PASS.
+- `cd server && dart test test/optimize_runtime_support_test.dart test/optimize_learning_pipeline_test.dart test/optimization_quality_gate_test.dart test/optimize_complete_support_test.dart test/optimization_pipeline_integration_test.dart`: PASS, `+62`.
+- `cd server && dart test test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart && RUN_INTEGRATION_TESTS=0 dart test test/ai_optimize_flow_test.dart -r expanded`: PASS; live suite skipped offline by env.
+- Backend local `PORT=8082`; `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded`: PASS, `+10 ~1`, tempo total `02:46`.
+- Backend local `PORT=8080`; `cd server && dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS, 19 candidatos planejados, escrita bloqueada por default.
+
+### Resultado
+- Resultado final: **PASS**.
+- Risco residual: o app ainda precisa consumir explicitamente o novo campo `intensity`; clientes antigos continuam compativeis porque a omissao cai em `focused` e os novos campos sao aditivos.
+
 ## 2026-05-05 — App mobile passa a usar `/ai/generate` async por padrao
 
 ### O Porquê

@@ -236,6 +236,32 @@ void main() {
       expect(parsed['removals'], equals(['Cancel', 'Divination']));
       expect(parsed['additions'], equals(['Force of Will', 'Mystic Remora']));
     });
+
+    test('includes intensity metadata and swap risk fields', () {
+      final intensity = optimize_route.resolveOptimizeIntensity('aggressive');
+      final payload = optimize_route.buildDeterministicOptimizeResponse(
+        deterministicSwapCandidates: const [
+          {
+            'remove': 'Cancel',
+            'add': 'Force of Will',
+            'remove_role': 'interaction',
+            'reason': 'upgrade interaction',
+          },
+        ],
+        targetArchetype: 'control',
+        intensity: intensity,
+      );
+
+      final swaps = payload['swaps'] as List;
+      final firstSwap = swaps.single as Map;
+      expect(payload['intensity'], equals('aggressive'));
+      expect(
+          (payload['optimize_intensity'] as Map)['returned_swaps'], equals(1));
+      expect(firstSwap['role'], equals('interaction'));
+      expect(firstSwap['function'], equals('interaction'));
+      expect(firstSwap['risk'], equals('medium'));
+      expect(firstSwap['impact'], isNotEmpty);
+    });
   });
 
   group('resolveOptimizeArchetype', () {
@@ -407,6 +433,60 @@ void main() {
       expect(removals, isNotEmpty);
       expect(removals.first['role'], equals('land'));
       expect(removals.first['name'], equals('Wastes'));
+    });
+
+    test('aggressive can expose more removal candidates than light', () {
+      final cards = <Map<String, dynamic>>[
+        {
+          'name': 'Commander Card',
+          'type_line': 'Legendary Creature',
+          'oracle_text': 'Flying',
+          'quantity': 1,
+          'cmc': 3.0,
+        },
+        {
+          'name': 'Island',
+          'type_line': 'Basic Land - Island',
+          'oracle_text': '({T}: Add {U}.)',
+          'quantity': 36,
+          'cmc': 0.0,
+        },
+        for (var i = 0; i < 16; i++)
+          {
+            'name': 'Clunky Artifact $i',
+            'type_line': 'Artifact',
+            'oracle_text': 'A slow artifact with no immediate impact.',
+            'quantity': 1,
+            'cmc': 6.0 + (i % 3),
+          },
+      ];
+
+      final light = optimize_route.buildDeterministicOptimizeRemovalCandidates(
+        allCardData: cards,
+        commanders: const ['Commander Card'],
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'midrange',
+        keepTheme: true,
+        coreCards: const [],
+        commanderPriorityNames: const [],
+        swapLimit: optimize_route.resolveOptimizeIntensity('light').targetMax,
+      );
+      final aggressive =
+          optimize_route.buildDeterministicOptimizeRemovalCandidates(
+        allCardData: cards,
+        commanders: const ['Commander Card'],
+        commanderColorIdentity: const {'U'},
+        targetArchetype: 'midrange',
+        keepTheme: true,
+        coreCards: const [],
+        commanderPriorityNames: const [],
+        swapLimit:
+            optimize_route.resolveOptimizeIntensity('aggressive').targetMax,
+      );
+
+      expect(light, hasLength(5));
+      expect(aggressive.length, greaterThan(light.length));
+      expect(aggressive.length, lessThanOrEqualTo(20));
     });
   });
 

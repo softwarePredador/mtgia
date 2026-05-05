@@ -45,6 +45,123 @@ String resolveOptimizeMode(Map<String, dynamic> payload, String defaultMode) {
   return defaultMode;
 }
 
+class OptimizeIntensityConfig {
+  const OptimizeIntensityConfig({
+    required this.selected,
+    required this.requested,
+    required this.source,
+    required this.targetMin,
+    required this.targetMax,
+    this.valid = true,
+  });
+
+  final String selected;
+  final String? requested;
+  final String source;
+  final int targetMin;
+  final int targetMax;
+  final bool valid;
+
+  bool get isRebuild => selected == 'rebuild';
+  bool get wasOmitted => source == 'omitted_default';
+
+  int clampRequestedSwapCount(int count) {
+    if (targetMax <= 0) return 0;
+    return count.clamp(0, targetMax);
+  }
+
+  Map<String, dynamic> toJson({
+    int? candidateSwaps,
+    int? returnedSwaps,
+    int? qualityGateDropped,
+  }) {
+    final returned = returnedSwaps;
+    final dropped = qualityGateDropped ?? 0;
+    return {
+      'selected': selected,
+      'requested': requested,
+      'source': source,
+      'target_swaps': {
+        'min': targetMin,
+        'max': targetMax,
+      },
+      'quality_gate': {
+        'can_reduce_scope': true,
+        if (dropped > 0) 'dropped_swaps': dropped,
+        if (returned != null && returned < targetMin && selected != 'rebuild')
+          'reduced_below_target': true,
+      },
+      if (candidateSwaps != null) 'candidate_swaps': candidateSwaps,
+      if (returned != null) 'returned_swaps': returned,
+    };
+  }
+}
+
+OptimizeIntensityConfig resolveOptimizeIntensity(dynamic raw) {
+  if (raw == null || raw.toString().trim().isEmpty) {
+    return const OptimizeIntensityConfig(
+      selected: 'focused',
+      requested: null,
+      source: 'omitted_default',
+      targetMin: 6,
+      targetMax: 10,
+    );
+  }
+
+  final requested = raw.toString().trim().toLowerCase();
+  final normalized = switch (requested) {
+    'conservative' || 'safe' || 'leve' => 'light',
+    'default' || 'balanced' || 'balanceado' => 'focused',
+    'strong' || 'hard' || 'alta' => 'aggressive',
+    'reconstruct' || 'reconstruction' || 'full_rebuild' => 'rebuild',
+    _ => requested,
+  };
+
+  switch (normalized) {
+    case 'light':
+      return OptimizeIntensityConfig(
+        selected: 'light',
+        requested: requested,
+        source: 'explicit',
+        targetMin: 3,
+        targetMax: 5,
+      );
+    case 'focused':
+      return OptimizeIntensityConfig(
+        selected: 'focused',
+        requested: requested,
+        source: 'explicit',
+        targetMin: 6,
+        targetMax: 10,
+      );
+    case 'aggressive':
+      return OptimizeIntensityConfig(
+        selected: 'aggressive',
+        requested: requested,
+        source: 'explicit',
+        targetMin: 10,
+        targetMax: 20,
+      );
+    case 'rebuild':
+      return OptimizeIntensityConfig(
+        selected: 'rebuild',
+        requested: requested,
+        source: 'explicit',
+        targetMin: 0,
+        targetMax: 0,
+      );
+    default:
+      return OptimizeIntensityConfig(
+        selected: 'focused',
+        requested: requested,
+        source: 'invalid',
+        targetMin: 6,
+        targetMax: 10,
+        valid: false,
+      );
+  }
+}
+
 Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) {
   final removals = <String>[];
   final additions = <String>[];
@@ -2306,7 +2423,10 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required bool keepTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int swapLimit = 6,
 }) {
+  final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
+
   List<Map<String, dynamic>> buildCandidates({
     required bool allowCoreTradeoffs,
   }) {
@@ -2424,7 +2544,9 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
           1,
           excessLands.clamp(
             1,
-            structuralRecoveryScenario ? structuralRecoverySwapTarget : 6,
+            structuralRecoveryScenario
+                ? structuralRecoverySwapTarget
+                : effectiveSwapLimit,
           ),
         );
 
@@ -2447,7 +2569,8 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     // fora de papéis críticos para abrir espaço a upgrades mais baratos.
     final nonLandRemovalCount =
         removalCandidates.where((c) => (c['role'] as String?) != 'land').length;
-    if (!structuralRecoveryScenario && nonLandRemovalCount < 2) {
+    if (!structuralRecoveryScenario &&
+        nonLandRemovalCount < effectiveSwapLimit) {
       final criticalRoles = switch (targetArchetype.trim().toLowerCase()) {
         'aggro' => {'creature', 'ramp', 'removal', 'protection'},
         'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection'},
@@ -2509,7 +2632,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
         if (removalCandidates
                 .where((c) => (c['role'] as String?) != 'land')
                 .length >=
-            2) {
+            effectiveSwapLimit) {
           break;
         }
         final lower =
@@ -2526,9 +2649,14 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       return ((a['name'] as String)).compareTo(b['name'] as String);
     });
 
+    final takeLimit = structuralRecoveryScenario
+        ? (structuralRecoverySwapTarget < effectiveSwapLimit
+            ? structuralRecoverySwapTarget
+            : effectiveSwapLimit)
+        : effectiveSwapLimit;
     return removalCandidates
         .where((candidate) => (candidate['score'] as int) > 0)
-        .take(structuralRecoveryScenario ? structuralRecoverySwapTarget : 6)
+        .take(takeLimit)
         .toList();
   }
 
@@ -2556,20 +2684,23 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
     if (!isLand && lowerName.isNotEmpty) {
       seenNonLandNames.add(lowerName);
     }
-    if (merged.length >= 6) break;
+    if (merged.length >= effectiveSwapLimit) break;
   }
 
   final structuralRecoveryScenario = isOptimizeStructuralRecoveryScenario(
     allCardData: allCardData,
     commanderColorIdentity: commanderColorIdentity,
   );
-  final takeCount = structuralRecoveryScenario
+  final structuralTakeCount = structuralRecoveryScenario
       ? computeOptimizeStructuralRecoverySwapTarget(
           allCardData: allCardData,
           commanderColorIdentity: commanderColorIdentity,
           targetArchetype: targetArchetype,
         )
-      : 6;
+      : effectiveSwapLimit;
+  final takeCount = structuralTakeCount < effectiveSwapLimit
+      ? structuralTakeCount
+      : effectiveSwapLimit;
   return merged.take(takeCount).toList();
 }
 
@@ -2584,8 +2715,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   required String? detectedTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int swapLimit = 6,
 }) async {
   if (allCardData.isEmpty) return const [];
+  final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
 
   final preferredNames =
       commanderPriorityNames.map((name) => name.toLowerCase()).toSet();
@@ -2601,6 +2734,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     keepTheme: keepTheme,
     coreCards: coreCards,
     commanderPriorityNames: commanderPriorityNames,
+    swapLimit: effectiveSwapLimit,
   );
   final removalList = removalCandidates
       .map((candidate) => candidate['name'] as String)
@@ -2693,8 +2827,8 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
           allCardData: allCardData,
           commanderColorIdentity: commanderColorIdentity,
           targetArchetype: targetArchetype,
-        )
-      : 2;
+        ).clamp(1, effectiveSwapLimit).toInt()
+      : effectiveSwapLimit;
 
   return pairs.take(maxPairs).toList();
 }
@@ -2702,6 +2836,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
 Map<String, dynamic> buildDeterministicOptimizeResponse({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String targetArchetype,
+  OptimizeIntensityConfig? intensity,
 }) {
   final swaps = deterministicSwapCandidates
       .where((candidate) =>
@@ -2711,13 +2846,26 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
             'out': candidate['remove'],
             'in': candidate['add'],
             if (candidate['reason'] != null) 'reason': candidate['reason'],
-            'priority': 'High',
+            'role': candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+            'function':
+                candidate['remove_role'] ?? candidate['role'] ?? 'utility',
+            'priority': intensity?.selected == 'light' ? 'Medium' : 'High',
+            'impact': intensity?.selected == 'aggressive'
+                ? 'maior escopo de melhoria preservando gates'
+                : 'melhoria segura de consistencia',
+            'risk': intensity?.selected == 'aggressive' ? 'medium' : 'low',
           })
       .toList();
 
   return {
     'mode': 'optimize',
     'strategy_source': 'deterministic_first',
+    if (intensity != null) 'intensity': intensity.selected,
+    if (intensity != null)
+      'optimize_intensity': intensity.toJson(
+        candidateSwaps: deterministicSwapCandidates.length,
+        returnedSwaps: swaps.length,
+      ),
     'reasoning':
         'O backend priorizou swaps determinísticos para $targetArchetype antes da IA, usando função das cartas, prioridade competitiva do comandante e histórico de rejeição.',
     'swaps': swaps,
@@ -2781,17 +2929,19 @@ String buildOptimizeCacheKey({
   required int? bracket,
   required bool keepTheme,
   required String deckSignature,
+  String intensity = 'focused',
 }) {
   final base = [
     'optimize',
     mode.toLowerCase().trim(),
+    intensity.toLowerCase().trim(),
     deckId,
     archetype.toLowerCase().trim(),
     '${bracket ?? 'none'}',
     keepTheme ? 'keep' : 'free',
     deckSignature,
   ].join('::');
-  return 'v6:${_stableHash(base)}';
+  return 'v7:${_stableHash(base)}';
 }
 
 String _stableHash(String value) {
@@ -3343,11 +3493,17 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   required double cmcBefore,
   required double cmcAfter,
   required bool keepTheme,
+  String? functionalRole,
+  String? priority,
+  String? risk,
 }) {
   final confidenceScore = _confidenceScoreFromLevel(confidenceLevel);
   final action = type == 'add' ? 'entrada' : 'saída';
   final curveDelta = (cmcAfter - cmcBefore).toStringAsFixed(2);
   final isBasicLand = _isBasicLandName(name);
+  final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
+      ? 'utility'
+      : functionalRole.trim();
 
   return {
     'type': type,
@@ -3355,6 +3511,10 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
     'card_id': cardId,
     'quantity': quantity,
     'is_basic_land': isBasicLand,
+    'role': resolvedRole,
+    'function': resolvedRole,
+    'priority': priority ?? (type == 'add' ? 'High' : 'Medium'),
+    'risk': risk ?? (keepTheme ? 'low' : 'medium'),
     'reason':
         'Sugestão de $action para alinhar o deck ao plano ${targetArchetype.toLowerCase()} e melhorar consistência geral.',
     'confidence': {
@@ -3366,6 +3526,7 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
       'consistency': keepTheme ? 'alta' : 'média',
       'synergy': type == 'add' ? 'melhora' : 'ajuste',
       'legality': 'mantida',
+      'risk': risk ?? (keepTheme ? 'low' : 'medium'),
     },
   };
 }

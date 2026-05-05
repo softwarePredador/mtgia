@@ -36,11 +36,16 @@ Map<String, dynamic> parseOptimizeSuggestions(Map<String, dynamic> payload) =>
 Map<String, dynamic> buildDeterministicOptimizeResponse({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String targetArchetype,
+  OptimizeIntensityConfig? intensity,
 }) =>
     optimize_support.buildDeterministicOptimizeResponse(
       deterministicSwapCandidates: deterministicSwapCandidates,
       targetArchetype: targetArchetype,
+      intensity: intensity,
     );
+
+OptimizeIntensityConfig resolveOptimizeIntensity(dynamic raw) =>
+    optimize_support.resolveOptimizeIntensity(raw);
 
 String resolveOptimizeArchetype({
   required String requestedArchetype,
@@ -139,6 +144,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
   required bool keepTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int swapLimit = 6,
 }) =>
     optimize_support.buildDeterministicOptimizeRemovalCandidates(
       allCardData: allCardData,
@@ -148,6 +154,7 @@ List<Map<String, dynamic>> buildDeterministicOptimizeRemovalCandidates({
       keepTheme: keepTheme,
       coreCards: coreCards,
       commanderPriorityNames: commanderPriorityNames,
+      swapLimit: swapLimit,
     );
 
 Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
@@ -161,6 +168,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   required String? detectedTheme,
   required List<String>? coreCards,
   required List<String> commanderPriorityNames,
+  int swapLimit = 6,
 }) =>
     optimize_support.buildDeterministicOptimizeSwapCandidates(
       pool: pool,
@@ -173,6 +181,7 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       detectedTheme: detectedTheme,
       coreCards: coreCards,
       commanderPriorityNames: commanderPriorityNames,
+      swapLimit: swapLimit,
     );
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
@@ -321,6 +330,7 @@ String deriveOptimizeOutcomeCode({
 }) {
   if (statusCode >= 200 && statusCode < 300) {
     final mode = body['mode']?.toString() ?? 'optimize';
+    if (mode == 'rebuild_guided') return 'rebuild_guided';
     return mode == 'complete' ? 'deck_completed' : 'optimized';
   }
 
@@ -395,6 +405,12 @@ Future<Response> onRequest(RequestContext context) async {
         body['mode']?.toString().trim().toLowerCase() ?? '';
     final requestMode =
         requestedModeRaw.contains('complete') ? 'complete' : 'optimize';
+    final intensity = resolveOptimizeIntensity(body['intensity']);
+    if (!intensity.valid) {
+      return badRequest(
+        'intensity must be light, focused, aggressive or rebuild.',
+      );
+    }
     final requestStopwatch = Stopwatch()..start();
     final telemetry = OptimizeStageTelemetry(
       deckId: deckId ?? 'unknown',
@@ -437,6 +453,7 @@ Future<Response> onRequest(RequestContext context) async {
           deckId: deckId,
           targetArchetype: archetype,
           requestMode: requestMode,
+          intensity: intensity.selected,
           bracket: bracket,
           keepTheme: keepTheme,
           telemetry: telemetry,
@@ -457,6 +474,18 @@ Future<Response> onRequest(RequestContext context) async {
     final deckSignature = deckContext.deckSignature;
     final cacheKey = deckContext.cacheKey;
 
+    int responseSwapCount(Map<String, dynamic> responseBody) {
+      final mode = responseBody['mode']?.toString() ?? effectiveMode;
+      if (mode == 'complete') {
+        return (responseBody['additions_detailed'] as List?)?.length ??
+            (responseBody['additions'] as List?)?.length ??
+            0;
+      }
+      final removalsCount = (responseBody['removals'] as List?)?.length ?? 0;
+      final additionsCount = (responseBody['additions'] as List?)?.length ?? 0;
+      return removalsCount < additionsCount ? removalsCount : additionsCount;
+    }
+
     final cachedResponse = await telemetry.trackAsync(
       'request.cache_lookup',
       () => loadOptimizeCache(
@@ -469,7 +498,12 @@ Future<Response> onRequest(RequestContext context) async {
         'hit': true,
         'cache_key': cacheKey,
       };
+      cachedResponse['intensity'] ??= intensity.selected;
+      cachedResponse['optimize_intensity'] ??= intensity.toJson(
+        returnedSwaps: responseSwapCount(cachedResponse),
+      );
       cachedResponse['timings'] = telemetry.snapshot();
+      cachedResponse['stage_telemetry'] = cachedResponse['timings'];
       telemetry.logSummary();
       cachedResponse['preferences'] = {
         'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
@@ -504,6 +538,44 @@ Future<Response> onRequest(RequestContext context) async {
     final targetArchetype = archetype;
     final effectiveOptimizeArchetype = deckContext.effectiveOptimizeArchetype;
 
+    Map<String, dynamic> buildRebuildGuidedOutcome({
+      required String explanation,
+      required String trigger,
+      String qualityCode = 'OPTIMIZE_REBUILD_GUIDED',
+    }) {
+      return {
+        'mode': 'rebuild_guided',
+        'outcome_code': 'rebuild_guided',
+        'intensity': intensity.selected,
+        'optimize_intensity': intensity.toJson(returnedSwaps: 0),
+        'message': explanation,
+        'quality_error': {
+          'code': qualityCode,
+          'message': explanation,
+          'trigger': trigger,
+          'reasons': deckState.reasons,
+          'recommended_mode': deckState.recommendedMode,
+          'repair_plan': deckState.repairPlan,
+        },
+        'next_action': {
+          'type': 'rebuild_guided',
+          'endpoint': '/ai/rebuild',
+          'explanation':
+              'Revise uma reconstrução guiada em draft antes de aplicar ao deck original.',
+          'payload': {
+            'deck_id': deckId,
+            'bracket': bracket,
+            'archetype': effectiveOptimizeArchetype,
+            'theme': themeProfile.theme,
+            'rebuild_scope': 'auto',
+            'save_mode': 'draft_clone',
+          },
+        },
+        'deck_analysis': deckAnalysis,
+        'theme': themeProfile.toJson(),
+      };
+    }
+
     final commanderNameForLogs =
         commanders.isNotEmpty ? commanders.first.trim() : 'unknown';
     var optimizeCommanderPrioritySource = 'none';
@@ -525,6 +597,11 @@ Future<Response> onRequest(RequestContext context) async {
     }) async {
       final responseBody = Map<String, dynamic>.from(body);
       responseBody['deck_state'] ??= deckState.toJson();
+      responseBody['intensity'] ??= intensity.selected;
+      responseBody['optimize_intensity'] ??= intensity.toJson(
+        candidateSwaps: deterministicSwapCandidates.length,
+        returnedSwaps: responseSwapCount(responseBody),
+      );
       responseBody['outcome_code'] ??= deriveOptimizeOutcomeCode(
         statusCode: statusCode,
         body: responseBody,
@@ -532,6 +609,7 @@ Future<Response> onRequest(RequestContext context) async {
         validationReport: validationReport,
       );
       responseBody['timings'] ??= telemetry.snapshot();
+      responseBody['stage_telemetry'] ??= responseBody['timings'];
 
       await _recordOptimizeAnalysisOutcome(
         pool: pool,
@@ -575,35 +653,29 @@ Future<Response> onRequest(RequestContext context) async {
       return Response.json(statusCode: statusCode, body: responseBody);
     }
 
+    if (intensity.isRebuild) {
+      return respondWithOptimizeTelemetry(
+        statusCode: HttpStatus.ok,
+        body: buildRebuildGuidedOutcome(
+          explanation:
+              'Intensidade rebuild selecionada: o backend retornou uma reconstrucao guiada para revisao em draft, sem aplicar mudancas automaticamente.',
+          trigger: 'explicit_intensity',
+        ),
+      );
+    }
+
     if (deckState.status == 'needs_repair') {
       return respondWithOptimizeTelemetry(
         statusCode: HttpStatus.unprocessableEntity,
         body: {
           'error':
-              'O deck precisa de reparo estrutural antes de uma micro-otimizacao segura.',
-          'quality_error': {
-            'code': 'OPTIMIZE_NEEDS_REPAIR',
-            'message':
-                'O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem.',
-            'reasons': deckState.reasons,
-            'recommended_mode': deckState.recommendedMode,
-            'repair_plan': deckState.repairPlan,
-          },
-          'next_action': {
-            'type': 'rebuild_guided',
-            'endpoint': '/ai/rebuild',
-            'payload': {
-              'deck_id': deckId,
-              'bracket': bracket,
-              'archetype': effectiveOptimizeArchetype,
-              'theme': themeProfile.theme,
-              'rebuild_scope': 'auto',
-              'save_mode': 'draft_clone',
-            },
-          },
-          'mode': 'optimize',
-          'deck_analysis': deckAnalysis,
-          'theme': themeProfile.toJson(),
+              'O deck precisa de rebuild_guided antes de uma micro-otimizacao segura.',
+          ...buildRebuildGuidedOutcome(
+            explanation:
+                'O deck atual esta fora da faixa em que optimize por swaps pontuais funciona bem. Use rebuild_guided para revisar uma reconstrucao segura.',
+            trigger: 'deck_state_needs_repair',
+            qualityCode: 'OPTIMIZE_NEEDS_REPAIR',
+          ),
         },
       );
     }
@@ -756,6 +828,7 @@ Future<Response> onRequest(RequestContext context) async {
           detectedTheme: themeProfile.theme,
           coreCards: themeProfile.coreCards,
           commanderPriorityNames: optimizeCommanderPriorityNames,
+          swapLimit: intensity.targetMax,
         ),
       ));
       if (deterministicSwapCandidates.isNotEmpty) {
@@ -824,6 +897,7 @@ Future<Response> onRequest(RequestContext context) async {
             userId: userId,
             deckSignature: deckSignature,
             cacheKey: cacheKey,
+            intensity: intensity,
             userPreferences: userPreferences,
             hasBracketOverride: hasBracketOverride,
             hasKeepThemeOverride: hasKeepThemeOverride,
@@ -848,7 +922,10 @@ Future<Response> onRequest(RequestContext context) async {
           'poll_url': '/ai/optimize/jobs/$jobId',
           'poll_interval_ms': 2000,
           'total_stages': 6,
+          'intensity': intensity.selected,
+          'optimize_intensity': intensity.toJson(returnedSwaps: 0),
           'timings': telemetry.snapshot(),
+          'stage_telemetry': telemetry.snapshot(),
         },
       );
     }
@@ -858,19 +935,24 @@ Future<Response> onRequest(RequestContext context) async {
     // ================================================================
     if (deckOptimizer == null) {
       // Mock response for development (optimize-only).
-      return Response.json(body: {
-        'removals': ['Basic Land', 'Weak Card'],
-        'additions': ['Sol Ring', 'Arcane Signet'],
-        'reasoning':
-            'Mock optimization (No API Key): Adicionando staples recomendados.',
-        'deck_analysis': deckAnalysis,
-        'constraints': {
-          'keep_theme': keepTheme,
+      return respondWithOptimizeTelemetry(
+        statusCode: HttpStatus.ok,
+        body: {
+          'removals':
+              ['Basic Land', 'Weak Card'].take(intensity.targetMax).toList(),
+          'additions':
+              ['Sol Ring', 'Arcane Signet'].take(intensity.targetMax).toList(),
+          'reasoning':
+              'Mock optimization (No API Key): Adicionando staples recomendados.',
+          'deck_analysis': deckAnalysis,
+          'constraints': {
+            'keep_theme': keepTheme,
+          },
+          'theme': themeProfile.toJson(),
+          'mode': 'optimize',
+          'is_mock': true
         },
-        'theme': themeProfile.toJson(),
-        'mode': 'optimize',
-        'is_mock': true
-      });
+      );
     }
 
     final optimizer = deckOptimizer;
@@ -914,6 +996,7 @@ Future<Response> onRequest(RequestContext context) async {
       jsonResponse = buildDeterministicOptimizeResponse(
         deterministicSwapCandidates: deterministicSwapCandidates,
         targetArchetype: effectiveOptimizeArchetype,
+        intensity: intensity,
       );
       Log.i(
         'Optimize deterministic-first ativado com ${deterministicSwapCandidates.length} swap(s) candidatos.',
@@ -1124,6 +1207,10 @@ Future<Response> onRequest(RequestContext context) async {
 
         final responseBody = {
           'mode': 'complete',
+          'intensity': intensity.selected,
+          'optimize_intensity': intensity.toJson(
+            returnedSwaps: additionsDetailed.length,
+          ),
           'constraints': {
             'keep_theme': keepTheme,
           },
@@ -1168,6 +1255,9 @@ Future<Response> onRequest(RequestContext context) async {
         if (slo is Map) {
           responseBody['consistency_slo'] = slo;
         }
+
+        responseBody['timings'] = telemetry.snapshot();
+        responseBody['stage_telemetry'] = responseBody['timings'];
 
         return Response.json(body: responseBody);
       }
@@ -1782,6 +1872,7 @@ Future<Response> onRequest(RequestContext context) async {
 
       ValidationReport? optimizationValidationReport;
       final qualityGateWarnings = <String>[];
+      var qualityGateDroppedCount = 0;
 
       if (validAdditions.isNotEmpty) {
         try {
@@ -1840,6 +1931,7 @@ Future<Response> onRequest(RequestContext context) async {
             if (gateResult.changed) {
               validRemovals = gateResult.removals;
               validAdditions = gateResult.additions;
+              qualityGateDroppedCount += gateResult.droppedReasons.length;
               qualityGateWarnings.add(
                 '🔒 Gate de qualidade removeu ${gateResult.droppedReasons.length} troca(s) insegura(s) antes da resposta final.',
               );
@@ -1888,6 +1980,11 @@ Future<Response> onRequest(RequestContext context) async {
                     'dropped_swaps': qualityGateWarnings,
                   },
                   'mode': 'optimize',
+                  'optimize_intensity': intensity.toJson(
+                    candidateSwaps: deterministicSwapCandidates.length,
+                    returnedSwaps: 0,
+                    qualityGateDropped: qualityGateDroppedCount,
+                  ),
                   'removals': validRemovals,
                   'additions': validAdditions,
                 },
@@ -2241,6 +2338,12 @@ Future<Response> onRequest(RequestContext context) async {
           ? preCmc
           : (double.tryParse('${postAnalysis['average_cmc'] ?? preCmc}') ??
               preCmc);
+      final originalCardByName = <String, Map<String, dynamic>>{
+        for (final card in allCardData)
+          (((card['name'] as String?) ?? '').trim().toLowerCase()): card,
+      }..removeWhere((key, value) => key.isEmpty);
+      final detailRisk = intensity.selected == 'aggressive' ? 'medium' : 'low';
+      final detailPriority = intensity.selected == 'light' ? 'Medium' : 'High';
 
       final responseBody = {
         'mode': jsonResponse['mode'],
@@ -2314,6 +2417,8 @@ Future<Response> onRequest(RequestContext context) async {
                   cmcBefore: preCmc,
                   cmcAfter: postCmc,
                   keepTheme: keepTheme,
+                  priority: detailPriority,
+                  risk: detailRisk,
                 );
               })
               .where((e) => e != null)
@@ -2332,6 +2437,8 @@ Future<Response> onRequest(RequestContext context) async {
                   cmcBefore: preCmc,
                   cmcAfter: postCmc,
                   keepTheme: keepTheme,
+                  priority: detailPriority,
+                  risk: detailRisk,
                 );
               })
               .where((e) => e != null)
@@ -2352,6 +2459,18 @@ Future<Response> onRequest(RequestContext context) async {
               cmcBefore: preCmc,
               cmcAfter: postCmc,
               keepTheme: keepTheme,
+              functionalRole: inferFunctionalRole(
+                name: name,
+                typeLine: originalCardByName[name.toLowerCase()]?['type_line']
+                        ?.toString() ??
+                    '',
+                oracleText: originalCardByName[name.toLowerCase()]
+                            ?['oracle_text']
+                        ?.toString() ??
+                    '',
+              ),
+              priority: detailPriority,
+              risk: detailRisk,
             );
           })
           .where((e) => e != null)
@@ -2531,6 +2650,13 @@ Future<Response> onRequest(RequestContext context) async {
           }
         }
       }
+
+      responseBody['intensity'] = intensity.selected;
+      responseBody['optimize_intensity'] = intensity.toJson(
+        candidateSwaps: deterministicSwapCandidates.length,
+        returnedSwaps: responseSwapCount(responseBody),
+        qualityGateDropped: qualityGateDroppedCount,
+      );
 
       final warnings = <String, dynamic>{};
 
@@ -2718,6 +2844,7 @@ Future<void> _processCompleteModeAsync({
   required String? userId,
   required String deckSignature,
   required String? cacheKey,
+  required OptimizeIntensityConfig intensity,
   required Map<String, dynamic> userPreferences,
   required bool hasBracketOverride,
   required bool hasKeepThemeOverride,
@@ -2851,6 +2978,11 @@ Future<void> _processCompleteModeAsync({
           'hit': false,
           'cache_key': cacheKey,
         };
+        responseBody['intensity'] = intensity.selected;
+        responseBody['optimize_intensity'] = intensity.toJson(
+          returnedSwaps:
+              (responseBody['additions_detailed'] as List?)?.length ?? 0,
+        );
         responseBody['preferences'] = {
           'memory_applied': !hasBracketOverride || !hasKeepThemeOverride,
           'keep_theme': keepTheme,
@@ -2858,6 +2990,7 @@ Future<void> _processCompleteModeAsync({
         };
       }
       responseBody['timings'] = telemetry.snapshot();
+      responseBody['stage_telemetry'] = responseBody['timings'];
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(
@@ -2878,7 +3011,14 @@ Future<void> _processCompleteModeAsync({
           'cache_key': cacheKey,
         };
       }
+      jsonResponse['intensity'] = intensity.selected;
+      jsonResponse['optimize_intensity'] = intensity.toJson(
+        returnedSwaps: (jsonResponse['additions_detailed'] as List?)?.length ??
+            (jsonResponse['additions'] as List?)?.length ??
+            0,
+      );
       jsonResponse['timings'] = telemetry.snapshot();
+      jsonResponse['stage_telemetry'] = jsonResponse['timings'];
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(

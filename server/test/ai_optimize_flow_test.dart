@@ -530,9 +530,11 @@ void main() {
             (body['quality_error'] as Map?)?.cast<String, dynamic>();
         final deckState = (body['deck_state'] as Map?)?.cast<String, dynamic>();
 
-        expect(body['mode'], equals('optimize'), reason: response.body);
-        expect(body['outcome_code'], equals('needs_repair'),
+        expect(body['mode'], equals('rebuild_guided'), reason: response.body);
+        expect(body['outcome_code'], equals('rebuild_guided'),
             reason: response.body);
+        expect(body['intensity'], equals('focused'), reason: response.body);
+        expect(body['optimize_intensity'], isA<Map>(), reason: response.body);
         expect(qualityError, isNotNull, reason: response.body);
         expect(
           qualityError!['code'],

@@ -1,8 +1,71 @@
 import 'package:test/test.dart';
 
+import '../lib/edh_bracket_policy.dart';
 import '../lib/ai/optimize_runtime_support.dart';
 
 void main() {
+  group('resolveOptimizeIntensity', () {
+    test('omitted intensity remains backward-compatible focused default', () {
+      final config = resolveOptimizeIntensity(null);
+
+      expect(config.selected, equals('focused'));
+      expect(config.wasOmitted, isTrue);
+      expect(config.targetMin, equals(6));
+      expect(config.targetMax, equals(10));
+      expect(config.toJson()['source'], equals('omitted_default'));
+    });
+
+    test('maps official intensities to target swap scopes', () {
+      final light = resolveOptimizeIntensity('light');
+      final focused = resolveOptimizeIntensity('focused');
+      final aggressive = resolveOptimizeIntensity('aggressive');
+      final rebuild = resolveOptimizeIntensity('rebuild');
+
+      expect(light.targetMin, equals(3));
+      expect(light.targetMax, equals(5));
+      expect(focused.targetMin, equals(6));
+      expect(focused.targetMax, equals(10));
+      expect(aggressive.targetMin, equals(10));
+      expect(aggressive.targetMax, equals(20));
+      expect(rebuild.isRebuild, isTrue);
+      expect(rebuild.targetMax, equals(0));
+    });
+
+    test('rejects unknown intensity values', () {
+      final config = resolveOptimizeIntensity('reckless');
+
+      expect(config.valid, isFalse);
+      expect(config.source, equals('invalid'));
+    });
+  });
+
+  group('buildOptimizeCacheKey', () {
+    test('separates cache entries by intensity', () {
+      final light = buildOptimizeCacheKey(
+        deckId: 'deck-1',
+        archetype: 'midrange',
+        mode: 'optimize',
+        bracket: 2,
+        keepTheme: true,
+        deckSignature: 'a:1|b:1',
+        intensity: 'light',
+      );
+      final aggressive = buildOptimizeCacheKey(
+        deckId: 'deck-1',
+        archetype: 'midrange',
+        mode: 'optimize',
+        bracket: 2,
+        keepTheme: true,
+        deckSignature: 'a:1|b:1',
+        intensity: 'aggressive',
+      );
+
+      expect(light, isNot(equals(aggressive)));
+      expect(light, startsWith('v7:'));
+      expect(aggressive, startsWith('v7:'));
+    });
+  });
+
   group('landFixesCommanderColors', () {
     test('accepts five-color fixing lands', () {
       expect(
@@ -68,6 +131,51 @@ void main() {
         ),
         isFalse,
       );
+    });
+
+    test('rejects additions outside commander color identity', () {
+      expect(
+        shouldKeepCommanderFillerCandidate(
+          candidate: {
+            'name': 'Swords to Plowshares',
+            'mana_cost': '{W}',
+            'oracle_text': 'Exile target creature.',
+            'colors': const ['W'],
+            'color_identity': const ['W'],
+          },
+          excludeNames: const <String>{},
+          commanderColorIdentity: const {'U'},
+          enforceCommanderIdentity: true,
+        ),
+        isFalse,
+      );
+    });
+  });
+
+  group('bracket safety', () {
+    test('blocks power additions above low bracket budgets', () {
+      final decision = applyBracketPolicyToAdditions(
+        bracket: 1,
+        currentDeckCards: const [
+          {
+            'name': 'Sol Ring',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}.',
+            'quantity': 1,
+          }
+        ],
+        additionsCardsData: const [
+          {
+            'name': 'Mana Crypt',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}.',
+            'quantity': 1,
+          }
+        ],
+      );
+
+      expect(decision.allowed, isEmpty);
+      expect(decision.blocked.single['name'], equals('Mana Crypt'));
     });
   });
 
