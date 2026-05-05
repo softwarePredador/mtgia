@@ -38,6 +38,14 @@ When assigned to **Optimize Intensity v2**, own the backend/API side of the spri
 - make `rebuild_guided` an explicit outcome, not a hidden failure;
 - produce API docs, focused tests, and timing/quality evidence before mobile consumes the contract.
 
+When assigned to **Aggressive Candidate Quality v2**, own the optimize-consumption side:
+
+- use enriched candidate pools/tags/meta signals to find more safe swaps for `aggressive`;
+- keep quality gate as the final judge;
+- explain why candidates were accepted or rejected;
+- improve candidate recall before asking the AI to invent replacements;
+- never lower legality, color identity, bracket, commander preservation, or quality thresholds just to increase swap count.
+
 ## Scope
 
 Operate primarily in:
@@ -129,6 +137,42 @@ For backend/API changes, add or update focused tests proving:
 - quality gate can reduce the requested scope without turning the response into a false success;
 - docs in `server/doc/API_CONTRACTS_AND_DATA_MAP.md` match the final response shape.
 
+## Aggressive Candidate Quality v2 Rules
+
+The objective is to increase the number and quality of safe swaps that pass quality gate, not to bypass quality gate.
+
+Preferred candidate-source order:
+
+1. Local DB legality/color identity/bracket filters.
+2. Functional tags and role scores.
+3. Commander/card synergy from meta decks and stored commander profiles.
+4. Budget/premium alternatives where price data exists.
+5. OpenAI as selector/explainer, not sole source of truth.
+
+For each aggressive run, report:
+
+- requested target swap count;
+- number of removal candidates;
+- number of replacement candidates;
+- number of candidate pairs generated;
+- number rejected by quality gate and reason buckets;
+- number returned to app;
+- whether fewer swaps were returned because safety blocked the rest.
+
+Do not call a safe no-op a failure. Do document it as low candidate coverage if the user expected aggressive changes.
+
+## Aggressive Candidate Quality v2 Required Tests
+
+Add or update focused tests proving:
+
+- aggressive uses role/synergy candidate pools when available;
+- aggressive can return more approved swaps than focused for a deck with sufficient safe opportunities;
+- rejection reason buckets are exposed without secrets;
+- weak candidate pools result in clear safe no-op/low-coverage diagnostics;
+- legal/color/bracket violations remain blocked;
+- budget/bracket signals do not force expensive or competitive cards into casual decks;
+- deterministic candidates are stable enough for repeatable tests.
+
 ## Required Commands
 
 Run the smallest useful set first, then expand if failures appear:
@@ -171,6 +215,11 @@ For Optimize Intensity v2, create or update:
 - `server/doc/RELATORIO_OPTIMIZE_INTENSITY_V2_<date>.md`
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
 - `server/manual-de-instrucao.md`
+
+For Aggressive Candidate Quality v2, create or update:
+
+- `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_<date>.md`
+- `server/test/artifacts/aggressive_candidate_quality_<date>/` when artifacts are useful and non-sensitive.
 
 If app runtime is also executed, update:
 

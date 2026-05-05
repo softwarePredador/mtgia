@@ -28,12 +28,20 @@ Do not reuse assumptions from booster_new, revendas, carMatch, carMatch backend,
 
 Keep ManaLoom's MTG card/set database consistent, queryable, and safe for app features, Commander legality, collection browsing, card search, deck generation, and optimization.
 
+When assigned to **Aggressive Candidate Quality v2**, own the database/data-health side:
+
+- design or validate safe storage for card functional tags and candidate-quality signals;
+- avoid adding duplicate card rows when the real need is metadata enrichment;
+- keep all enrichment idempotent, explainable, and reversible where practical;
+- prove that new tables/materialized views/indexes improve optimize candidate selection without weakening legality.
+
 Primary current backlog:
 
 - audit and safely fix duplicate `sets.code` values that differ only by casing
 - audit and safely backfill `cards.color_identity IS NULL`
 - document and harden `sync_cards.dart` behavior for future/new sets
 - add DB-backed reports and tests that prevent regressions
+- support functional card metadata needed by optimization, such as role tags, role scores, budget tiers, bracket suitability, and rejection penalties
 
 ## Scope
 
@@ -72,6 +80,30 @@ Read before changing code:
 - Do not rely on live web calls in request paths.
 - Do not change Commander legality logic unless the data issue is proven to affect it.
 - If a fix mutates data, create a rollback note or explain why it is safe/idempotent.
+- For candidate-quality enrichment, do not insert new cards when cards already exist. Add metadata, scores, tags, or derived views instead.
+- Keep generated/heuristic tags separated from source-of-truth card data; record confidence/source fields when possible.
+- Never let tags override legalities, color identity, or bracket restrictions.
+
+## Aggressive Candidate Quality v2 Data Model Guidance
+
+Prefer additive structures such as:
+
+- `card_function_tags`: card id/name, tag, confidence, source, updated_at.
+- `card_role_scores`: card id/name, role, score, format/subformat/bracket scope, source.
+- `commander_card_synergy`: commander, card, role, score, source, evidence_count.
+- `optimize_rejection_penalties`: card/swap/function penalty from quality-gate history.
+
+Acceptable tag examples:
+
+- `ramp`, `draw`, `removal`, `board_wipe`, `protection`, `tutor`, `wincon`, `combo_piece`, `mana_fixing`, `graveyard`, `token`, `aristocrats`, `counterspell`, `stax`, `sacrifice`, `recursion`.
+
+Rules:
+
+- First implement dry-run/report tooling showing coverage and unresolved rows.
+- Use deterministic heuristics and existing DB/meta signals before any AI-generated enrichment.
+- If AI-generated offline enrichment is proposed, mark it separately and require human approval before applying broadly.
+- Add indexes for optimize lookup paths only after measuring query needs.
+- Update `server/doc/API_CONTRACTS_AND_DATA_MAP.md` only when app/backend contracts or data dependencies change.
 
 ## Required Audits
 
@@ -120,6 +152,24 @@ Expected output:
 - document official refresh command
 - optionally add a dry-run/report command for future sets and data health
 
+### Candidate-quality enrichment
+
+Measure:
+
+- how many cards have deterministic functional tags
+- how many meta/Commander staples have role scores
+- how many commanders/shells have usable synergy candidates
+- whether optimize candidate queries can filter by role, color identity, legality, bracket and budget
+- whether quality-gate rejection history can be summarized without leaking prompts or user data
+
+Expected output:
+
+- report current coverage
+- propose additive schema or view changes
+- dry-run sample candidate pools for at least 3 commanders/archetypes
+- prove no legal/color-identity bypass
+- document unresolved gaps
+
 ## Validation Commands
 
 Run focused checks before commit:
@@ -146,6 +196,11 @@ Create or update:
 
 - `server/doc/RELATORIO_MTG_DATA_INTEGRITY_<date>.md`
 - `server/manual-de-instrucao.md`
+
+For Aggressive Candidate Quality v2, create or update:
+
+- `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_<date>.md`
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` if route/data dependencies change
 
 The report must include:
 

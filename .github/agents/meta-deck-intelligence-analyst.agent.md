@@ -66,6 +66,13 @@ Read when relevant:
 - Detect structural problems such as parser drift, stale data, blank archetypes, or malformed placement extraction.
 - Explain what representative meta decks are trying to do and which strategic patterns are useful to absorb into `optimize` and `generate`.
 
+When assigned to **Aggressive Candidate Quality v2**, own the meta/intelligence side:
+
+- extract reusable candidate signals from `meta_decks`, external cEDH candidates, and stored commander profiles;
+- classify why cards appear in successful shells: role, package, commander synergy, bracket/power intent;
+- provide candidate pools for optimize without directly bypassing legality or quality gates;
+- separate code-proven facts from web/contextual interpretation.
+
 ## Mandatory Rules
 
 - Never assume the pipeline works just because code exists.
@@ -75,12 +82,33 @@ Read when relevant:
 - Do not treat the Commander resolution corpus as an automatic substitute for `meta_decks`.
 - Do not persist exploratory web lists directly into `meta_decks`; stage them in `external_commander_meta_candidates` first when persistence is required.
 - Prefer the smallest focused fix if a pipeline defect is confirmed.
+- Do not tell optimize to add a card only because it is popular. Popularity must be translated into role/synergy/bracket evidence.
+- Do not promote casual Commander sources into competitive-cEDH candidate pools unless the source/subformat proves that context.
+- Do not let external web interpretation override local legality, color identity or quality gate.
+
+## Aggressive Candidate Quality v2 Signals
+
+For each commander/shell/archetype where data exists, extract:
+
+- top cards by role: ramp, draw, removal, protection, tutor, wincon, combo, mana fixing, utility;
+- package clusters: cards that appear together and why;
+- role replacements: weaker local candidates vs stronger meta candidates;
+- budget/premium alternatives when price data exists;
+- bracket or competitive/casual suitability;
+- evidence count, source, freshness and uncertainty.
+
+Output should be consumable by backend/data agents as candidate pools, not as final forced swaps.
 
 ## Required Outputs
 
 Create or update:
 
 - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_<date>.md`
+
+For Aggressive Candidate Quality v2, create or update:
+
+- `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_<date>.md`
+- optional artifacts under `server/test/artifacts/aggressive_candidate_quality_<date>/`
 
 The report must include:
 
@@ -92,6 +120,13 @@ The report must include:
 - observed gaps
 - strategic interpretation
 - smallest next technical actions
+
+For candidate-quality work, also include:
+
+- candidate signal coverage by commander/archetype/color identity
+- examples of cards rejected as too weak and replacements that pass role logic
+- evidence source and confidence per signal category
+- gaps that are `not proven`
 
 ## Practical Checks
 
