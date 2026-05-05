@@ -1262,6 +1262,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   int _selectedBracket = 2;
   bool _showAllStrategies = true;
   bool _keepTheme = true;
+  OptimizeIntensity _selectedIntensity = OptimizeIntensity.focused;
 
   String? get _currentArchetype {
     final deck = context.read<DeckProvider>().selectedDeck;
@@ -1272,6 +1273,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     required String deckId,
     required String archetype,
     required int bracket,
+    required OptimizeIntensity intensity,
     required Map<String, dynamic> result,
   }) async {
     await Clipboard.setData(
@@ -1281,6 +1283,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           archetype: archetype,
           bracket: bracket,
           keepTheme: _keepTheme,
+          intensity: intensity,
           result: result,
         ),
       ),
@@ -1303,6 +1306,19 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         closeRootLoadingDialog(context);
         loadingOpen = false;
       }
+    }
+
+    final presentation = describeDeckAiFailure(
+      error,
+      extractDeckAiReasons(error),
+    );
+    if (presentation.kind == DeckAiFailureKind.needsRepair) {
+      final shouldRebuild = await showGuidedRebuildActionDialog(
+        context,
+        message: presentation.message,
+        reasons: presentation.reasons,
+      );
+      if (!shouldRebuild) return;
     }
 
     await executeOptimizeFailureFlow(
@@ -1381,23 +1397,26 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       archetype: archetype,
       bracket: _selectedBracket,
       keepTheme: _keepTheme,
+      intensity: _selectedIntensity,
       executeRequest: deckProvider.optimizeDeck,
       onProgressUpdate: (state) {
         progressState.value = state;
       },
       confirmPreview: (optimizeOutcome) async {
         closeLoadingDialog();
-        if (!context.mounted) return false;
+        if (!context.mounted) return null;
         final result = optimizeOutcome.result;
         final preview = optimizeOutcome.preview;
 
-        return showOptimizationPreviewDialog(
+        final selection = await showOptimizationPreviewDialog(
           context,
           mode: preview.mode,
           archetype: archetype,
           keepTheme: preview.constraints['keep_theme'] == true,
           preservedTheme: preview.themeInfo['theme']?.toString(),
           reasoning: preview.reasoning,
+          intensity: preview.intensity,
+          optimizeIntensity: preview.optimizeIntensity,
           qualityWarning: preview.qualityWarning,
           deckAnalysis: preview.deckAnalysis,
           postAnalysis: preview.postAnalysis,
@@ -1412,6 +1431,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                       deckId: widget.deckId,
                       archetype: archetype,
                       bracket: _selectedBracket,
+                      intensity: _selectedIntensity,
                       result: result,
                     );
                     if (!context.mounted) return;
@@ -1419,6 +1439,8 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                   }
                   : null,
         );
+        if (selection == null) return null;
+        return buildOptimizeApplyPlan(preview, selection: selection);
       },
       onApplyStart: () {
         if (!context.mounted) return;
@@ -1490,12 +1512,14 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       savedArchetype: savedArchetype,
       selectedBracket: _selectedBracket,
       keepTheme: _keepTheme,
+      selectedIntensity: _selectedIntensity,
       showAllStrategies: _showAllStrategies,
       optionsFuture: _optionsFuture,
       scrollController: widget.scrollController,
       accent: theme.colorScheme.primary,
       onBracketChanged: (value) => setState(() => _selectedBracket = value),
       onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
+      onIntensityChanged: (value) => setState(() => _selectedIntensity = value),
       onToggleStrategyVisibility:
           () => setState(() => _showAllStrategies = !_showAllStrategies),
       onRetryOptions: () {

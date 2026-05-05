@@ -621,6 +621,10 @@ void main() {
       await tester.tap(rebuildStrategyCard);
       await tester.pumpAndSettle();
 
+      expect(find.text('Reconstrução guiada recomendada'), findsOneWidget);
+      await tester.tap(find.text('Criar reconstrução guiada'));
+      await tester.pumpAndSettle();
+
       expect(find.text('Draft Deck'), findsOneWidget);
       expect(apiClient.postCalls, contains('/ai/rebuild'));
       expect(apiClient.getCalls, contains('/decks/draft-1'));

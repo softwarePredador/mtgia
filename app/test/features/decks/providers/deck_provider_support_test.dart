@@ -777,6 +777,7 @@ void main() {
             expect(body['archetype'], 'control');
             expect(body['bracket'], 2);
             expect(body['keep_theme'], isTrue);
+            expect(body['intensity'], 'focused');
             return ApiResponse(200, {'mode': 'optimize'});
           },
         },
@@ -830,6 +831,34 @@ void main() {
           keepTheme: true,
         ),
         throwsA(isA<DeckAiFlowException>()),
+      );
+
+      final rebuildClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/optimize':
+              (_) => ApiResponse(200, {
+                'mode': 'rebuild_guided',
+                'outcome_code': 'rebuild_guided',
+                'message': 'Reconstrua a estrutura antes de upgrades pontuais.',
+                'next_action': {'type': 'rebuild_guided'},
+              }),
+        },
+      );
+      await expectLater(
+        () => requestOptimizeDeck(
+          rebuildClient,
+          deckId: 'deck-1',
+          archetype: 'control',
+          keepTheme: true,
+          intensity: OptimizeIntensity.rebuild,
+        ),
+        throwsA(
+          isA<DeckAiFlowException>().having(
+            (e) => e.isNeedsRepair,
+            'isNeedsRepair',
+            isTrue,
+          ),
+        ),
       );
     },
   );

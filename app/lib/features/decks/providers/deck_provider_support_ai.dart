@@ -1,4 +1,6 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/observability/app_observability.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
 import 'deck_provider_support_common.dart';
 
@@ -7,12 +9,14 @@ Map<String, dynamic> buildOptimizeRequestPayload({
   required String archetype,
   int? bracket,
   required bool keepTheme,
+  OptimizeIntensity intensity = OptimizeIntensity.focused,
 }) {
   return <String, dynamic>{
     'deck_id': deckId,
     'archetype': archetype,
     if (bracket != null) 'bracket': bracket,
     'keep_theme': keepTheme,
+    'intensity': intensity.apiValue,
   };
 }
 
@@ -22,16 +26,29 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
   required String archetype,
   int? bracket,
   required bool keepTheme,
+  OptimizeIntensity intensity = OptimizeIntensity.focused,
 }) async {
   final payload = buildOptimizeRequestPayload(
     deckId: deckId,
     archetype: archetype,
     bracket: bracket,
     keepTheme: keepTheme,
+    intensity: intensity,
   );
 
   await saveOptimizeDebugSnapshot(request: payload);
   AppLogger.debug('🧪 [AI Optimize] request=$payload');
+  await AppObservability.instance.recordEvent(
+    'ai_optimize_requested',
+    category: 'deck_optimize',
+    data: {
+      'deck_id': deckId,
+      'archetype': archetype,
+      if (bracket != null) 'bracket': bracket,
+      'keep_theme': keepTheme,
+      'intensity': intensity.apiValue,
+    },
+  );
 
   final response = await apiClient.post('/ai/optimize', payload);
 
@@ -39,6 +56,15 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     final data = asDynamicMap(response.data);
     await saveOptimizeDebugSnapshot(response: data);
     AppLogger.debug('🧪 [AI Optimize] response=$data');
+    if (data['mode'] == 'rebuild_guided' ||
+        data['outcome_code'] == 'rebuild_guided') {
+      throw buildDeckAiFlowException(
+        data,
+        fallbackMessage:
+            'Este deck precisa de reconstrução guiada antes de upgrades pontuais.',
+        fallbackCode: 'OPTIMIZE_REBUILD_GUIDED',
+      );
+    }
     return OptimizeDeckRequestResult.completed(data);
   }
 
@@ -80,7 +106,12 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
   await saveOptimizeDebugSnapshot(
     response: {'statusCode': response.statusCode, 'data': response.data},
   );
-  throw Exception('Falha ao otimizar deck: ${response.statusCode}');
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+    ),
+  );
 }
 
 Map<String, dynamic> buildRebuildDeckRequestPayload({
@@ -165,6 +196,15 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
     if (status == 'completed') {
       final resultMap = asDynamicMap(data['result']);
       await saveOptimizeDebugSnapshot(response: resultMap);
+      if (resultMap['mode'] == 'rebuild_guided' ||
+          resultMap['outcome_code'] == 'rebuild_guided') {
+        throw buildDeckAiFlowException(
+          resultMap,
+          fallbackMessage:
+              'Este deck precisa de reconstrução guiada antes de upgrades pontuais.',
+          fallbackCode: 'OPTIMIZE_REBUILD_GUIDED',
+        );
+      }
       return OptimizeJobPollResult.completed(resultMap);
     }
     if (status == 'failed') {
@@ -192,6 +232,9 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
   }
 
   throw Exception(
-    'Falha ao consultar job de otimização: ${response.statusCode}',
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckOptimize,
+    ),
   );
 }

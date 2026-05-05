@@ -44,6 +44,7 @@ void main() {
       preview.metaReferenceContext['priority_source'],
       'competitive_meta_exact_shell_match',
     );
+    expect(preview.intensity, OptimizeIntensity.focused);
   });
 
   test('buildOptimizeDebugJson keeps request and response payloads', () {
@@ -52,6 +53,7 @@ void main() {
       archetype: 'control',
       bracket: 2,
       keepTheme: true,
+      intensity: OptimizeIntensity.aggressive,
       result: const {
         'mode': 'optimize',
         'meta_reference_context': {
@@ -63,6 +65,7 @@ void main() {
     expect(text, contains('"deck_id": "deck-1"'));
     expect(text, contains('"archetype": "control"'));
     expect(text, contains('"keep_theme": true'));
+    expect(text, contains('"intensity": "aggressive"'));
     expect(text, contains('"mode": "optimize"'));
     expect(text, contains('"meta_reference_context"'));
     expect(text, contains('"priority_source"'));
@@ -83,6 +86,25 @@ void main() {
     expect(presentation.kind, DeckAiFailureKind.needsRepair);
     expect(presentation.title, 'Deck precisa de reconstrução');
     expect(presentation.reasons, contains('Pouca base'));
+  });
+
+  test('describeDeckAiFailure treats quality rejection as safe no-op', () {
+    final error = DeckAiFlowException(
+      message: 'A otimização sugerida não passou no gate final de qualidade.',
+      code: 'OPTIMIZE_QUALITY_REJECTED',
+      payload: const {
+        'quality_error': {
+          'code': 'OPTIMIZE_QUALITY_REJECTED',
+          'message': 'A otimização sugerida não passou no gate final.',
+        },
+      },
+    );
+
+    final presentation = describeDeckAiFailure(error, const ['Gate final']);
+
+    expect(presentation.kind, DeckAiFailureKind.noSafeUpgradeFound);
+    expect(presentation.title, 'Nenhuma melhoria segura encontrada');
+    expect(presentation.reasons, contains('Gate final'));
   });
 
   test('buildGuidedRebuildRequest resolves payload and fallbacks', () {
@@ -157,6 +179,35 @@ void main() {
     expect(namesPlan.mode, OptimizeApplyMode.applyByNames);
     expect(namesPlan.removals, ['Mind Stone']);
     expect(namesPlan.additions, ['Arcane Signet']);
+  });
+
+  test('buildOptimizeApplyPlan applies only selected preview swaps', () {
+    final preview = OptimizePreviewData.fromResult({
+      'mode': 'optimize',
+      'intensity': 'aggressive',
+      'removals': const ['Mind Stone', 'Cancel'],
+      'additions': const ['Arcane Signet', 'Counterspell'],
+      'removals_detailed': const [
+        {'card_id': 'remove-1', 'name': 'Mind Stone'},
+        {'card_id': 'remove-2', 'name': 'Cancel'},
+      ],
+      'additions_detailed': const [
+        {'card_id': 'add-1', 'name': 'Arcane Signet'},
+        {'card_id': 'add-2', 'name': 'Counterspell'},
+      ],
+    });
+
+    final plan = buildOptimizeApplyPlan(
+      preview,
+      selection: const OptimizePreviewSelection(
+        selectedRemovalIndexes: {0},
+        selectedAdditionIndexes: {1},
+      ),
+    );
+
+    expect(plan.mode, OptimizeApplyMode.applyWithIds);
+    expect(plan.removalsDetailed.single['card_id'], 'remove-1');
+    expect(plan.additionsDetailed.single['card_id'], 'add-2');
   });
 
   test('executeOptimizeApplyPlan dispatches to correct executor', () async {
@@ -333,11 +384,13 @@ void main() {
         archetype: 'control',
         bracket: 2,
         keepTheme: true,
+        intensity: OptimizeIntensity.focused,
         executeRequest: (
           _,
           __, {
           required bracket,
           required keepTheme,
+          required intensity,
           required onProgress,
         }) async {
           onProgress('Gerando sugestões...', 2, 5);
@@ -372,11 +425,13 @@ void main() {
       archetype: 'control',
       bracket: 2,
       keepTheme: true,
+      intensity: OptimizeIntensity.focused,
       executeRequest: (
         _,
         __, {
         required bracket,
         required keepTheme,
+        required intensity,
         required onProgress,
       }) async {
         onProgress('Gerando sugestões...', 3, 5);
@@ -389,7 +444,7 @@ void main() {
       onProgressUpdate: progress.add,
       confirmPreview: (outcome) async {
         calls.add('preview:${outcome.preview.mode}');
-        return true;
+        return outcome.applyPlan;
       },
       onApplyStart: () => calls.add('apply-start'),
       onNoChanges: () => calls.add('no-changes'),

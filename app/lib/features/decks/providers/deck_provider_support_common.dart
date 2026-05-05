@@ -36,17 +36,41 @@ class DeckAiFlowException implements Exception {
           : const <String, dynamic>{};
 
   bool get isNeedsRepair =>
-      outcomeCode == 'needs_repair' || code == 'OPTIMIZE_NEEDS_REPAIR';
+      outcomeCode == 'needs_repair' ||
+      outcomeCode == 'rebuild_guided' ||
+      code == 'OPTIMIZE_NEEDS_REPAIR' ||
+      code == 'OPTIMIZE_REBUILD_GUIDED' ||
+      nextAction['type'] == 'rebuild_guided';
 
   bool get isNearPeak => outcomeCode == 'near_peak';
 
   bool get isNoSafeUpgradeFound =>
       outcomeCode == 'no_safe_upgrade_found' ||
       code == 'OPTIMIZE_NO_SAFE_SWAPS' ||
-      code == 'OPTIMIZE_NO_ACTIONABLE_SWAPS';
+      code == 'OPTIMIZE_NO_ACTIONABLE_SWAPS' ||
+      code == 'OPTIMIZE_QUALITY_REJECTED';
 
   @override
   String toString() => message;
+}
+
+enum OptimizeIntensity {
+  light('light'),
+  focused('focused'),
+  aggressive('aggressive'),
+  rebuild('rebuild');
+
+  const OptimizeIntensity(this.apiValue);
+
+  final String apiValue;
+
+  static OptimizeIntensity fromApiValue(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    for (final intensity in OptimizeIntensity.values) {
+      if (intensity.apiValue == normalized) return intensity;
+    }
+    return OptimizeIntensity.focused;
+  }
 }
 
 class DeckDetailsFetchState {
@@ -305,11 +329,18 @@ DeckAiFlowException buildDeckAiFlowException(
 }) {
   final payload = asDynamicMap(data);
   final qualityError = asDynamicMap(payload['quality_error']);
+  final nextAction = asDynamicMap(payload['next_action']);
   final message =
       payload['error']?.toString() ??
+      payload['message']?.toString() ??
       qualityError['message']?.toString() ??
+      nextAction['explanation']?.toString() ??
       fallbackMessage;
-  final code = qualityError['code']?.toString() ?? fallbackCode;
+  final code =
+      qualityError['code']?.toString() ??
+      (payload['outcome_code'] == 'rebuild_guided'
+          ? 'OPTIMIZE_REBUILD_GUIDED'
+          : fallbackCode);
   final outcomeCode = payload['outcome_code']?.toString();
   return DeckAiFlowException(
     message: message,

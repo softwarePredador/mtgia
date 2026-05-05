@@ -104,6 +104,7 @@ typedef OptimizeRequestExecutor =
       String archetype, {
       required int bracket,
       required bool keepTheme,
+      required OptimizeIntensity intensity,
       required void Function(String, int?, int?) onProgress,
     });
 typedef DeckStrategyUpdateExecutor =
@@ -118,7 +119,7 @@ typedef GuidedRebuildAiErrorHandler =
     Future<void> Function(DeckAiFlowException error);
 typedef GuidedRebuildErrorHandler = void Function(Object error);
 typedef OptimizePreviewConfirmationPresenter =
-    Future<bool?> Function(OptimizeRequestOutcome outcome);
+    Future<OptimizeApplyPlan?> Function(OptimizeRequestOutcome outcome);
 typedef OptimizeApplyStartHandler = void Function();
 typedef OptimizeNoChangesHandler = void Function();
 typedef OptimizeSuccessHandler = void Function();
@@ -144,6 +145,9 @@ class OptimizePreviewData {
   final Map<String, dynamic> metaReferenceContext;
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
+  final OptimizeIntensity intensity;
+  final Map<String, dynamic> optimizeIntensity;
+  final String? outcomeCode;
 
   const OptimizePreviewData({
     required this.removals,
@@ -161,13 +165,31 @@ class OptimizePreviewData {
     required this.metaReferenceContext,
     required this.displayRemovals,
     required this.displayAdditions,
+    required this.intensity,
+    required this.optimizeIntensity,
+    required this.outcomeCode,
   });
 
   bool get hasChanges => removals.isNotEmpty || additions.isNotEmpty;
 
   factory OptimizePreviewData.fromResult(Map<String, dynamic> result) {
-    final removals = (result['removals'] as List).cast<String>();
-    final additions = (result['additions'] as List).cast<String>();
+    final optimizeIntensity =
+        (result['optimize_intensity'] is Map)
+            ? (result['optimize_intensity'] as Map).cast<String, dynamic>()
+            : const <String, dynamic>{};
+    final selectedIntensity =
+        result['intensity']?.toString() ??
+        optimizeIntensity['selected']?.toString();
+    final removals =
+        (result['removals'] as List?)
+            ?.map((entry) => entry.toString())
+            .toList() ??
+        const <String>[];
+    final additions =
+        (result['additions'] as List?)
+            ?.map((entry) => entry.toString())
+            .toList() ??
+        const <String>[];
     final additionsDetailed =
         (result['additions_detailed'] as List?)
             ?.whereType<Map>()
@@ -223,8 +245,24 @@ class OptimizePreviewData {
           additionsDetailed.isNotEmpty
               ? additionsDetailed
               : additions.map((name) => {'name': name}).toList(),
+      intensity: OptimizeIntensity.fromApiValue(selectedIntensity),
+      optimizeIntensity: optimizeIntensity,
+      outcomeCode: result['outcome_code']?.toString(),
     );
   }
+}
+
+class OptimizePreviewSelection {
+  final Set<int> selectedRemovalIndexes;
+  final Set<int> selectedAdditionIndexes;
+
+  const OptimizePreviewSelection({
+    required this.selectedRemovalIndexes,
+    required this.selectedAdditionIndexes,
+  });
+
+  int get selectedCount =>
+      selectedRemovalIndexes.length + selectedAdditionIndexes.length;
 }
 
 class OptimizeRequestOutcome {
@@ -244,6 +282,7 @@ String buildOptimizeDebugJson({
   required String archetype,
   required int bracket,
   required bool keepTheme,
+  required OptimizeIntensity intensity,
   required Map<String, dynamic> result,
 }) {
   final debugJson = {
@@ -252,6 +291,7 @@ String buildOptimizeDebugJson({
       'archetype': archetype,
       'bracket': bracket,
       'keep_theme': keepTheme,
+      'intensity': intensity.apiValue,
     },
     'response': result,
   };
@@ -271,6 +311,7 @@ Future<OptimizeRequestOutcome> requestOptimizePreview({
   required String archetype,
   required int bracket,
   required bool keepTheme,
+  required OptimizeIntensity intensity,
   required OptimizeRequestExecutor executeRequest,
   required void Function(FlowProgressState) onProgressUpdate,
 }) async {
@@ -279,6 +320,7 @@ Future<OptimizeRequestOutcome> requestOptimizePreview({
     archetype,
     bracket: bracket,
     keepTheme: keepTheme,
+    intensity: intensity,
     onProgress: (stage, stageNumber, totalStages) {
       onProgressUpdate(
         FlowProgressState(
@@ -369,16 +411,53 @@ GuidedRebuildRequest buildGuidedRebuildRequest({
   );
 }
 
-OptimizeApplyPlan buildOptimizeApplyPlan(OptimizePreviewData preview) {
+List<T> _selectByIndexes<T>(List<T> values, Set<int>? selectedIndexes) {
+  if (selectedIndexes == null) return values;
+  return [
+    for (var index = 0; index < values.length; index++)
+      if (selectedIndexes.contains(index)) values[index],
+  ];
+}
+
+OptimizeApplyPlan buildOptimizeApplyPlan(
+  OptimizePreviewData preview, {
+  OptimizePreviewSelection? selection,
+}) {
   if (!preview.hasChanges) {
     return const OptimizeApplyPlan(mode: OptimizeApplyMode.none);
   }
 
-  if (preview.mode == 'complete' && preview.additionsDetailed.isNotEmpty) {
+  final selectedAdditionsDetailed = _selectByIndexes(
+    preview.additionsDetailed,
+    selection?.selectedAdditionIndexes,
+  );
+  final selectedRemovalsDetailed = _selectByIndexes(
+    preview.removalsDetailed,
+    selection?.selectedRemovalIndexes,
+  );
+  final selectedAdditions = _selectByIndexes(
+    preview.additions,
+    selection?.selectedAdditionIndexes,
+  );
+  final selectedRemovals = _selectByIndexes(
+    preview.removals,
+    selection?.selectedRemovalIndexes,
+  );
+
+  final hasSelectedChanges =
+      selectedAdditionsDetailed.isNotEmpty ||
+      selectedRemovalsDetailed.isNotEmpty ||
+      selectedAdditions.isNotEmpty ||
+      selectedRemovals.isNotEmpty;
+  if (!hasSelectedChanges) {
+    return const OptimizeApplyPlan(mode: OptimizeApplyMode.none);
+  }
+
+  if (preview.mode == 'complete' && selectedAdditionsDetailed.isNotEmpty) {
     return OptimizeApplyPlan(
       mode: OptimizeApplyMode.addBulk,
       bulkCards:
-          preview.additionsDetailed
+          selectedAdditionsDetailed
               .where((m) => m['card_id'] != null)
               .map(
                 (m) => {
@@ -391,19 +470,19 @@ OptimizeApplyPlan buildOptimizeApplyPlan(OptimizePreviewData preview) {
     );
   }
 
-  if (preview.removalsDetailed.isNotEmpty ||
-      preview.additionsDetailed.isNotEmpty) {
+  if (selectedRemovalsDetailed.isNotEmpty ||
+      selectedAdditionsDetailed.isNotEmpty) {
     return OptimizeApplyPlan(
       mode: OptimizeApplyMode.applyWithIds,
-      removalsDetailed: preview.removalsDetailed,
-      additionsDetailed: preview.additionsDetailed,
+      removalsDetailed: selectedRemovalsDetailed,
+      additionsDetailed: selectedAdditionsDetailed,
     );
   }
 
   return OptimizeApplyPlan(
     mode: OptimizeApplyMode.applyByNames,
-    removals: preview.removals,
-    additions: preview.additions,
+    removals: selectedRemovals,
+    additions: selectedAdditions,
   );
 }
 
@@ -459,6 +538,7 @@ Future<void> executeOptimizeFlow({
   required String archetype,
   required int bracket,
   required bool keepTheme,
+  required OptimizeIntensity intensity,
   required OptimizeRequestExecutor executeRequest,
   required void Function(FlowProgressState) onProgressUpdate,
   required OptimizePreviewConfirmationPresenter confirmPreview,
@@ -478,6 +558,7 @@ Future<void> executeOptimizeFlow({
       archetype: archetype,
       bracket: bracket,
       keepTheme: keepTheme,
+      intensity: intensity,
       executeRequest: executeRequest,
       onProgressUpdate: onProgressUpdate,
     );
@@ -487,8 +568,12 @@ Future<void> executeOptimizeFlow({
       return;
     }
 
-    final confirmed = await confirmPreview(optimizeOutcome);
-    if (confirmed != true) return;
+    final confirmedPlan = await confirmPreview(optimizeOutcome);
+    if (confirmedPlan == null) return;
+    if (confirmedPlan.mode == OptimizeApplyMode.none) {
+      onNoChanges();
+      return;
+    }
 
     onApplyStart();
 
@@ -496,7 +581,7 @@ Future<void> executeOptimizeFlow({
       deckId: deckId,
       archetype: archetype,
       bracket: bracket,
-      plan: optimizeOutcome.applyPlan,
+      plan: confirmedPlan,
       addBulk: addBulk,
       applyWithIds: applyWithIds,
       applyByNames: applyByNames,

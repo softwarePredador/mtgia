@@ -8,7 +8,71 @@ import 'package:manaloom/features/decks/widgets/deck_optimize_sheet_widgets.dart
 import 'package:manaloom/main.dart' as app;
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _commanderImportLine = '1x Talrand, Sky Summoner [Commander]';
+const _completeCommanderImportList = '''
+1x Talrand, Sky Summoner [Commander]
+38x Island
+1x Sol Ring
+1x Arcane Signet
+1x Mind Stone
+1x Thought Vessel
+1x Sky Diamond
+1x Sapphire Medallion
+1x Wayfarer's Bauble
+1x Prismatic Lens
+1x Worn Powerstone
+1x Midnight Clock
+1x Brainstorm
+1x Ponder
+1x Preordain
+1x Opt
+1x Consider
+1x Serum Visions
+1x Gitaxian Probe
+1x Frantic Search
+1x Impulse
+1x Chart a Course
+1x Strategic Planning
+1x Treasure Cruise
+1x Dig Through Time
+1x Fact or Fiction
+1x Blue Sun's Zenith
+1x Counterspell
+1x Negate
+1x Arcane Denial
+1x Mana Leak
+1x Swan Song
+1x Dispel
+1x Spell Pierce
+1x Essence Scatter
+1x Delay
+1x Dissolve
+1x Dissipate
+1x Rewind
+1x Sinister Sabotage
+1x Unwind
+1x Cancel
+1x Rapid Hybridization
+1x Pongify
+1x Reality Shift
+1x Cyclonic Rift
+1x Into the Roil
+1x Blink of an Eye
+1x Resculpt
+1x Aetherize
+1x Whelming Wave
+1x Evacuation
+1x Murmuring Mystic
+1x Docent of Perfection
+1x Baral, Chief of Compliance
+1x Metallurgic Summonings
+1x Shark Typhoon
+1x Talrand's Invocation
+1x Archmage Emeritus
+1x Deekah, Fractal Theorist
+1x Octavia, Living Thesis
+1x Haughty Djinn
+1x Ominous Seas
+''';
 
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
@@ -318,7 +382,7 @@ void main() {
       await _pumpUntilFound(tester, importDialogTitle, attempts: 30);
 
       final importListField = find.byType(TextField).last;
-      await tester.enterText(importListField, _commanderImportLine);
+      await tester.enterText(importListField, _completeCommanderImportList);
       await tester.pump(const Duration(milliseconds: 300));
       await _capture(binding, tester, '06_import_commander');
 
@@ -349,23 +413,23 @@ void main() {
       ], attempts: 240);
       await _capture(binding, tester, '08_optimize_sheet');
 
-      final bracketDropdown = find.byType(DropdownButton<int>);
-      if (bracketDropdown.evaluate().isNotEmpty) {
-        await tester.ensureVisible(bracketDropdown.first);
-        await tester.tap(bracketDropdown.first);
-        await tester.pump();
-        final cedhOption = find.text('4 - cEDH');
-        await _pumpUntilFound(tester, cedhOption.last, attempts: 60);
-        await tester.tap(cedhOption.last);
-        await tester.pump();
-        await _capture(binding, tester, '08b_optimize_sheet_cedh');
-      }
+      final optimizeScrollable = find.byType(Scrollable).last;
+      await tester.scrollUntilVisible(
+        find.text('Intensidade'),
+        220,
+        scrollable: optimizeScrollable,
+      );
+      await tester.pump();
+      final aggressiveChoice = find.text('Agressivo');
+      await _pumpUntilFound(tester, aggressiveChoice, attempts: 30);
+      await tester.tap(aggressiveChoice.first);
+      await tester.pump();
+      await _capture(binding, tester, '08c_optimize_sheet_aggressive');
 
       if (applyCurrentStrategy.evaluate().isNotEmpty) {
         await tester.ensureVisible(applyCurrentStrategy.first);
         await tester.tap(applyCurrentStrategy.first);
       } else if (strategyCards.evaluate().isNotEmpty) {
-        final optimizeScrollable = find.byType(Scrollable).last;
         final strategyTapTarget = find.descendant(
           of: strategyCards.first,
           matching: find.byType(Text),
@@ -385,8 +449,34 @@ void main() {
       await _pumpUntilAny(tester, [
         find.textContaining('Completar deck ('),
         find.textContaining('Sugestões para '),
+        find.text('Criar reconstrução guiada'),
+        find.text('Nenhuma melhoria segura encontrada'),
       ], attempts: 240);
+
+      if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
+        await _capture(binding, tester, '09_rebuild_guided_blocker');
+        return;
+      }
+
+      if (find
+          .text('Nenhuma melhoria segura encontrada')
+          .evaluate()
+          .isNotEmpty) {
+        await _capture(binding, tester, '09_quality_rejected_blocker');
+        return;
+      }
+
       await _capture(binding, tester, '09_preview');
+
+      final canDeselectWithoutBreakingCompletion =
+          find.textContaining('Sugestões para ').evaluate().isNotEmpty;
+      if (!canDeselectWithoutBreakingCompletion ||
+          find.byType(Checkbox).evaluate().length < 2) {
+        fail('Runtime preview did not expose selectable swap suggestions');
+      }
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump();
+      await _capture(binding, tester, '09b_preview_partial_selection');
 
       final applyChangesButton = find.text('Aplicar mudanças');
       await tester.ensureVisible(applyChangesButton);

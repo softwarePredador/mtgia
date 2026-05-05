@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../providers/deck_provider_support.dart';
 import 'deck_optimize_sheet_widgets.dart';
 import 'deck_ui_components.dart';
 
 class OptimizationConfigSection extends StatelessWidget {
   final int selectedBracket;
   final bool keepTheme;
+  final OptimizeIntensity selectedIntensity;
   final ValueChanged<int> onBracketChanged;
   final ValueChanged<bool> onKeepThemeChanged;
+  final ValueChanged<OptimizeIntensity> onIntensityChanged;
   final Color accent;
 
   const OptimizationConfigSection({
     super.key,
     required this.selectedBracket,
     required this.keepTheme,
+    required this.selectedIntensity,
     required this.onBracketChanged,
     required this.onKeepThemeChanged,
+    required this.onIntensityChanged,
     required this.accent,
   });
 
@@ -51,6 +56,11 @@ class OptimizationConfigSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          _OptimizationIntensitySelector(
+            selected: selectedIntensity,
+            onChanged: onIntensityChanged,
+          ),
+          const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: AppTheme.surfaceSlate,
@@ -77,6 +87,118 @@ class OptimizationConfigSection extends StatelessWidget {
           _OptimizationModeGuide(selectedBracket: selectedBracket),
         ],
       ),
+    );
+  }
+}
+
+class _OptimizationIntensitySelector extends StatelessWidget {
+  final OptimizeIntensity selected;
+  final ValueChanged<OptimizeIntensity> onChanged;
+
+  const _OptimizationIntensitySelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  String _title(OptimizeIntensity intensity) {
+    return switch (intensity) {
+      OptimizeIntensity.light => 'Leve',
+      OptimizeIntensity.focused => 'Focado',
+      OptimizeIntensity.aggressive => 'Agressivo',
+      OptimizeIntensity.rebuild => 'Rebuild',
+    };
+  }
+
+  String _description(OptimizeIntensity intensity) {
+    return switch (intensity) {
+      OptimizeIntensity.light => '3-5 trocas seguras, mantendo o plano.',
+      OptimizeIntensity.focused => '6-10 trocas seguras; padrão equilibrado.',
+      OptimizeIntensity.aggressive =>
+        '10-20 trocas seguras. Pode mudar mais cartas do deck.',
+      OptimizeIntensity.rebuild =>
+        'Reconstrução guiada quando a estrutura precisa ser refeita.',
+    };
+  }
+
+  Color _accent(OptimizeIntensity intensity) {
+    return switch (intensity) {
+      OptimizeIntensity.light => AppTheme.success,
+      OptimizeIntensity.focused => AppTheme.frost400,
+      OptimizeIntensity.aggressive => AppTheme.mythicGold,
+      OptimizeIntensity.rebuild => AppTheme.brass400,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Intensidade',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children:
+              OptimizeIntensity.values.map((intensity) {
+                final isSelected = selected == intensity;
+                final accent = _accent(intensity);
+                return ChoiceChip(
+                  label: Text(_title(intensity)),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(intensity),
+                  selectedColor: accent.withValues(alpha: 0.22),
+                  side: BorderSide(
+                    color:
+                        isSelected
+                            ? accent
+                            : AppTheme.outlineMuted.withValues(alpha: 0.7),
+                  ),
+                );
+              }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _accent(selected).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: _accent(selected).withValues(alpha: 0.24),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                selected == OptimizeIntensity.rebuild
+                    ? Icons.construction_rounded
+                    : Icons.tune_rounded,
+                color: _accent(selected),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _description(selected),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -293,12 +415,14 @@ class OptimizationSheetBody extends StatelessWidget {
   final String? savedArchetype;
   final int selectedBracket;
   final bool keepTheme;
+  final OptimizeIntensity selectedIntensity;
   final bool showAllStrategies;
   final Future<List<Map<String, dynamic>>> optionsFuture;
   final ScrollController scrollController;
   final Color accent;
   final ValueChanged<int> onBracketChanged;
   final ValueChanged<bool> onKeepThemeChanged;
+  final ValueChanged<OptimizeIntensity> onIntensityChanged;
   final VoidCallback onToggleStrategyVisibility;
   final VoidCallback onRetryOptions;
   final ValueChanged<String> onApplyArchetype;
@@ -308,12 +432,14 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.savedArchetype,
     required this.selectedBracket,
     required this.keepTheme,
+    required this.selectedIntensity,
     required this.showAllStrategies,
     required this.optionsFuture,
     required this.scrollController,
     required this.accent,
     required this.onBracketChanged,
     required this.onKeepThemeChanged,
+    required this.onIntensityChanged,
     required this.onToggleStrategyVisibility,
     required this.onRetryOptions,
     required this.onApplyArchetype,
@@ -368,9 +494,11 @@ class OptimizationSheetBody extends StatelessWidget {
         OptimizationConfigSection(
           selectedBracket: selectedBracket,
           keepTheme: keepTheme,
+          selectedIntensity: selectedIntensity,
           accent: accent,
           onBracketChanged: onBracketChanged,
           onKeepThemeChanged: onKeepThemeChanged,
+          onIntensityChanged: onIntensityChanged,
         ),
       ],
     );

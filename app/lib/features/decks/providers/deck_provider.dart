@@ -15,6 +15,7 @@ import 'deck_provider_support.dart';
 export 'deck_provider_support.dart'
     show
         DeckAiFlowException,
+        OptimizeIntensity,
         GenerateDeckCancellation,
         GenerateDeckCancelledException,
         GenerateDeckProgressCallback,
@@ -462,6 +463,7 @@ class DeckProvider extends ChangeNotifier {
     String archetype, {
     int? bracket,
     bool keepTheme = true,
+    OptimizeIntensity intensity = OptimizeIntensity.focused,
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
     onProgress?.call('Preparando análise do deck...', 0, 5);
@@ -472,6 +474,7 @@ class DeckProvider extends ChangeNotifier {
       archetype: archetype,
       bracket: bracket,
       keepTheme: keepTheme,
+      intensity: intensity,
     );
 
     if (requestResult.isAsync) {
@@ -495,6 +498,7 @@ class DeckProvider extends ChangeNotifier {
         'archetype': archetype,
         if (bracket != null) 'bracket': bracket,
         'keep_theme': keepTheme,
+        'intensity': intensity.apiValue,
       },
     );
     return requestResult.result!;

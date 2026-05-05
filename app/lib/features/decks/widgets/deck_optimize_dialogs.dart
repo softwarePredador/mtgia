@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/friendly_error_mapper.dart';
+import '../providers/deck_provider_support.dart';
+import 'deck_optimize_flow_support.dart';
 import 'deck_optimize_sheet_widgets.dart';
 import 'deck_optimize_ui_support.dart';
 import 'deck_ui_components.dart';
@@ -121,13 +124,15 @@ Future<void> showOutcomeInfoDialog(
   );
 }
 
-Future<bool?> showOptimizationPreviewDialog(
+Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
   BuildContext context, {
   required String mode,
   required String archetype,
   required bool keepTheme,
   required String? preservedTheme,
   required String reasoning,
+  required OptimizeIntensity intensity,
+  required Map<String, dynamic> optimizeIntensity,
   required Map<String, dynamic>? qualityWarning,
   required Map<String, dynamic> deckAnalysis,
   required Map<String, dynamic> postAnalysis,
@@ -137,7 +142,7 @@ Future<bool?> showOptimizationPreviewDialog(
   required List<Map<String, dynamic>> displayAdditions,
   Future<void> Function()? onCopyDebug,
 }) {
-  return showDialog<bool>(
+  return showDialog<OptimizePreviewSelection>(
     context: context,
     builder:
         (ctx) => OptimizationPreviewDialog(
@@ -146,6 +151,8 @@ Future<bool?> showOptimizationPreviewDialog(
           keepTheme: keepTheme,
           preservedTheme: preservedTheme,
           reasoning: reasoning,
+          intensity: intensity,
+          optimizeIntensity: optimizeIntensity,
           qualityWarning: qualityWarning,
           deckAnalysis: deckAnalysis,
           postAnalysis: postAnalysis,
@@ -153,8 +160,8 @@ Future<bool?> showOptimizationPreviewDialog(
           metaReferenceContext: metaReferenceContext,
           displayRemovals: displayRemovals,
           displayAdditions: displayAdditions,
-          onCancel: () => Navigator.pop(ctx, false),
-          onConfirm: () => Navigator.pop(ctx, true),
+          onCancel: () => Navigator.pop(ctx),
+          onConfirm: (selection) => Navigator.pop(ctx, selection),
           onCopyDebug: onCopyDebug,
         ),
   );
@@ -187,11 +194,12 @@ void closeOptimizeSheetAndShowSuccess(BuildContext context) {
 }
 
 void showOptimizeApplyErrorSnackBar(BuildContext context, Object error) {
+  final message = FriendlyErrorMapper.fromException(
+    error,
+    context: FriendlyErrorContext.deckOptimize,
+  );
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('Erro ao aplicar: $error'),
-      backgroundColor: AppTheme.error,
-    ),
+    SnackBar(content: Text(message), backgroundColor: AppTheme.error),
   );
 }
 
@@ -202,6 +210,19 @@ Future<void> showGuidedRebuildPreviewInfoDialog(BuildContext context) {
     message:
         'A reconstrução foi gerada em preview, mas nenhum draft salvo foi retornado.',
   );
+}
+
+Future<bool> showGuidedRebuildActionDialog(
+  BuildContext context, {
+  required String message,
+  List<String> reasons = const <String>[],
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder:
+        (_) => GuidedRebuildActionDialog(message: message, reasons: reasons),
+  );
+  return result == true;
 }
 
 Future<void> showGuidedRebuildFailureDialog(

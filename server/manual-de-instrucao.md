@@ -2,6 +2,39 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Sprint 2 Optimize Intensity v2 no app/mobile
+
+### O Porquê
+- O backend ja publicava `intensity` para `/ai/optimize`, mas o app ainda nao permitia ao usuario escolher o nivel de intervencao.
+- O preview precisava deixar de ser "tudo ou nada": o usuario deve revisar e desmarcar sugestoes antes de aplicar.
+- Outcomes de seguranca (`rebuild_guided`, quality rejection, 4xx/5xx/timeouts) precisavam aparecer como decisao de produto ou mensagem amigavel, nao erro cru.
+
+### O Como
+- `OptimizeIntensity` foi adicionado ao suporte do provider com valores `light`, `focused`, `aggressive` e `rebuild`; resposta legacy sem `intensity` cai em `focused`.
+- `DeckProvider.optimizeDeck` agora envia `intensity` explicitamente e registra breadcrumb sanitizado `ai_optimize_requested` sem prompt completo, JWT, SENTRY_DSN, DATABASE_URL ou payload sensivel.
+- O bottom sheet de optimize ganhou selector de intensidade:
+  - `light`: ajuste leve 3-5.
+  - `focused`: ajuste equilibrado 6-10, default.
+  - `aggressive`: 10-20 quando houver swaps seguros, com aviso de mudanca maior.
+  - `rebuild`: reconstrucao guiada como CTA.
+- `OptimizationPreviewDialog` virou stateful e agora permite marcar/desmarcar remocoes/adicoes. `OptimizePreviewSelection` filtra o `OptimizeApplyPlan`; o apply usa somente swaps selecionados.
+- `rebuild_guided` e `OPTIMIZE_NEEDS_REPAIR` abrem `GuidedRebuildActionDialog` antes de chamar `/ai/rebuild`.
+- `OPTIMIZE_QUALITY_REJECTED` foi classificado como "nenhuma melhoria segura encontrada", evitando raw error quando o gate final rejeita sugestoes.
+- Erros genericos de optimize/apply usam `FriendlyErrorMapper` para mensagens amigaveis.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS, `00:12 +145`.
+- Backend local `PORT=8082`; `curl http://127.0.0.1:8082/health`: PASS.
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, backend `http://127.0.0.1:8082`:
+  - `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `02:41 +1`.
+  - Runtime enviou `intensity=aggressive`, recebeu `POST /ai/optimize -> 200`, abriu preview, desmarcou uma sugestao, aplicou selecionadas e validou `10_complete_validated`.
+
+### Resultado
+- Resultado final: **PASS WITH RISKS**.
+- Risco residual: optimize agressivo live levou ~108s e o quality gate reduziu retorno para 6 swaps apesar do alvo nominal 10-20. A reducao e correta por seguranca, mas merece monitoramento/UX copy.
+- Scanner fisico/camera/OCR ficou fora do escopo e nao foi executado.
+
 ## 2026-05-05 — Sprint 1 Optimize Intensity v2 no backend/API
 
 ### O Porquê

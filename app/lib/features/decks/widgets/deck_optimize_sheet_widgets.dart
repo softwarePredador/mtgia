@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../../../core/theme/app_theme.dart';
+import '../providers/deck_provider_support.dart';
+import 'deck_optimize_flow_support.dart';
 import 'deck_ui_components.dart';
 
 class SheetHeroCard extends StatelessWidget {
@@ -158,12 +160,14 @@ class StrategyOptionCard extends StatelessWidget {
   }
 }
 
-class OptimizationPreviewDialog extends StatelessWidget {
+class OptimizationPreviewDialog extends StatefulWidget {
   final String mode;
   final String archetype;
   final bool keepTheme;
   final String? preservedTheme;
   final String reasoning;
+  final OptimizeIntensity intensity;
+  final Map<String, dynamic> optimizeIntensity;
   final Map<String, dynamic>? qualityWarning;
   final Map<String, dynamic> deckAnalysis;
   final Map<String, dynamic> postAnalysis;
@@ -172,7 +176,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
   final List<Map<String, dynamic>> displayRemovals;
   final List<Map<String, dynamic>> displayAdditions;
   final VoidCallback onCancel;
-  final VoidCallback onConfirm;
+  final ValueChanged<OptimizePreviewSelection> onConfirm;
   final Future<void> Function()? onCopyDebug;
 
   const OptimizationPreviewDialog({
@@ -182,6 +186,8 @@ class OptimizationPreviewDialog extends StatelessWidget {
     required this.keepTheme,
     required this.preservedTheme,
     required this.reasoning,
+    required this.intensity,
+    required this.optimizeIntensity,
     required this.qualityWarning,
     required this.deckAnalysis,
     required this.postAnalysis,
@@ -194,19 +200,40 @@ class OptimizationPreviewDialog extends StatelessWidget {
     this.onCopyDebug,
   });
 
+  @override
+  State<OptimizationPreviewDialog> createState() =>
+      _OptimizationPreviewDialogState();
+}
+
+class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
+  late final Set<int> _selectedRemovalIndexes;
+  late final Set<int> _selectedAdditionIndexes;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedRemovalIndexes = {
+      for (var index = 0; index < widget.displayRemovals.length; index++) index,
+    };
+    _selectedAdditionIndexes = {
+      for (var index = 0; index < widget.displayAdditions.length; index++)
+        index,
+    };
+  }
+
   List<String> _warningLines() {
     final lines = <String>[];
-    if (warnings['filtered_by_color_identity'] is Map) {
+    if (widget.warnings['filtered_by_color_identity'] is Map) {
       lines.add(
         'Algumas adições foram removidas por estarem fora da identidade do comandante.',
       );
     }
-    if (warnings['blocked_by_bracket'] is Map) {
+    if (widget.warnings['blocked_by_bracket'] is Map) {
       lines.add(
         'Algumas adições foram bloqueadas por exceder limites do bracket.',
       );
     }
-    if (warnings['invalid_cards'] != null) {
+    if (widget.warnings['invalid_cards'] != null) {
       lines.add(
         'Algumas cartas sugeridas não foram encontradas e foram removidas.',
       );
@@ -225,9 +252,97 @@ class OptimizationPreviewDialog extends StatelessWidget {
   }
 
   String get _planLabel {
-    if (mode == 'complete') return 'Completar lista';
-    if (metaReferenceContext.isNotEmpty) return 'Ajuste competitivo guiado';
-    return 'Ajuste leve';
+    if (widget.mode == 'complete') return 'Completar lista';
+    if (widget.metaReferenceContext.isNotEmpty) {
+      return 'Ajuste competitivo guiado';
+    }
+    return switch (widget.intensity) {
+      OptimizeIntensity.light => 'Ajuste leve',
+      OptimizeIntensity.focused => 'Ajuste focado',
+      OptimizeIntensity.aggressive => 'Ajuste agressivo',
+      OptimizeIntensity.rebuild => 'Reconstrução guiada',
+    };
+  }
+
+  String get _intensityLabel {
+    return switch (widget.intensity) {
+      OptimizeIntensity.light => 'Leve: 3-5 trocas seguras',
+      OptimizeIntensity.focused => 'Focado: 6-10 trocas seguras',
+      OptimizeIntensity.aggressive => 'Agressivo: 10-20 trocas seguras',
+      OptimizeIntensity.rebuild => 'Rebuild guiado',
+    };
+  }
+
+  int get _selectedChangeCount =>
+      _selectedRemovalIndexes.length + _selectedAdditionIndexes.length;
+
+  void _toggleRemoval(int index, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedRemovalIndexes.add(index);
+      } else {
+        _selectedRemovalIndexes.remove(index);
+      }
+    });
+  }
+
+  void _toggleAddition(int index, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedAdditionIndexes.add(index);
+      } else {
+        _selectedAdditionIndexes.remove(index);
+      }
+    });
+  }
+
+  void _confirmSelected() {
+    widget.onConfirm(
+      OptimizePreviewSelection(
+        selectedRemovalIndexes: Set<int>.from(_selectedRemovalIndexes),
+        selectedAdditionIndexes: Set<int>.from(_selectedAdditionIndexes),
+      ),
+    );
+  }
+
+  Widget _selectableSuggestionList({
+    required List<Map<String, dynamic>> items,
+    required Set<int> selectedIndexes,
+    required Color accent,
+    required ValueChanged<int> onToggleOff,
+    required ValueChanged<int> onToggleOn,
+    int limit = 30,
+  }) {
+    return Column(
+      children: [
+        for (var index = 0; index < items.take(limit).length; index++)
+          _SelectableSuggestionLineItem(
+            item: items[index],
+            accent: accent,
+            selected: selectedIndexes.contains(index),
+            onChanged: (value) {
+              if (value) {
+                onToggleOn(index);
+              } else {
+                onToggleOff(index);
+              }
+            },
+          ),
+      ],
+    );
+  }
+
+  Map<String, dynamic> get _targetSwaps {
+    final value = widget.optimizeIntensity['target_swaps'];
+    return value is Map ? value.cast<String, dynamic>() : const {};
+  }
+
+  String get _targetSwapText {
+    final min = _targetSwaps['min']?.toString();
+    final max = _targetSwaps['max']?.toString();
+    if (min != null && max != null) return '$min-$max';
+    if (max != null) return 'até $max';
+    return '-';
   }
 
   @override
@@ -240,15 +355,16 @@ class OptimizationPreviewDialog extends StatelessWidget {
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       title: DialogTitleBlock(
         icon:
-            mode == 'complete'
+            widget.mode == 'complete'
                 ? Icons.playlist_add_check_circle_outlined
                 : Icons.auto_awesome_rounded,
         title:
-            mode == 'complete'
-                ? 'Completar deck ($archetype)'
-                : 'Sugestões para $archetype',
+            widget.mode == 'complete'
+                ? 'Completar deck (${widget.archetype})'
+                : 'Sugestões para ${widget.archetype}',
         subtitle: 'Revise as mudanças antes de aplicar no deck.',
-        accent: mode == 'complete' ? AppTheme.brass400 : AppTheme.frost400,
+        accent:
+            widget.mode == 'complete' ? AppTheme.brass400 : AppTheme.frost400,
       ),
       content: SizedBox(
         width: 560,
@@ -263,32 +379,57 @@ class OptimizationPreviewDialog extends StatelessWidget {
                 children: [
                   DeckMetaChip(
                     label:
-                        mode == 'complete' ? 'Modo Complete' : 'Modo Optimize',
+                        widget.mode == 'complete'
+                            ? 'Modo Complete'
+                            : 'Modo Optimize',
                     color:
-                        mode == 'complete'
+                        widget.mode == 'complete'
                             ? AppTheme.brass400
                             : AppTheme.frost400,
                     icon:
-                        mode == 'complete'
+                        widget.mode == 'complete'
                             ? Icons.playlist_add_rounded
                             : Icons.auto_fix_high_rounded,
                   ),
-                  if (keepTheme && preservedTheme != null)
+                  DeckMetaChip(
+                    label: _intensityLabel,
+                    color:
+                        widget.intensity == OptimizeIntensity.aggressive
+                            ? AppTheme.mythicGold
+                            : AppTheme.frost400,
+                    icon: Icons.speed_rounded,
+                  ),
+                  if (widget.keepTheme && widget.preservedTheme != null)
                     DeckMetaChip(
-                      label: 'Tema: $preservedTheme',
+                      label: 'Tema: ${widget.preservedTheme}',
                       color: AppTheme.frost400,
                       icon: Icons.category_outlined,
                     ),
                 ],
               ),
-              if (reasoning.isNotEmpty) ...[
+              if (widget.intensity == OptimizeIntensity.aggressive) ...[
+                const SizedBox(height: 16),
+                DialogSectionCard(
+                  title: 'Atenção ao ajuste agressivo',
+                  accent: AppTheme.mythicGold,
+                  icon: Icons.warning_amber_rounded,
+                  child: const Text(
+                    'Este modo pode trocar mais cartas. Desmarque qualquer sugestão que você queira preservar antes de aplicar.',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+              if (widget.reasoning.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Leitura da IA',
                   accent: AppTheme.frost400,
                   icon: Icons.psychology_alt_outlined,
                   child: Text(
-                    reasoning,
+                    widget.reasoning,
                     style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       color: AppTheme.textSecondary,
@@ -297,14 +438,14 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   ),
                 ),
               ],
-              if (qualityWarning != null) ...[
+              if (widget.qualityWarning != null) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Aviso de qualidade',
                   accent: AppTheme.brass400,
                   icon: Icons.info_outline_rounded,
                   child: Text(
-                    qualityWarning!['message'] as String? ??
+                    widget.qualityWarning!['message'] as String? ??
                         'Otimização parcial.',
                     style: const TextStyle(
                       color: AppTheme.textSecondary,
@@ -327,13 +468,17 @@ class OptimizationPreviewDialog extends StatelessWidget {
                     ),
                     _TrustSignal(
                       label: 'Mudanças',
-                      value:
-                          '${displayRemovals.length} saem / ${displayAdditions.length} entram',
+                      value: '$_selectedChangeCount selecionadas',
                       icon: Icons.swap_horiz_rounded,
                     ),
                     _TrustSignal(
+                      label: 'Alvo',
+                      value: _targetSwapText,
+                      icon: Icons.flag_outlined,
+                    ),
+                    _TrustSignal(
                       label: 'Cartas depois',
-                      value: _metric(postAnalysis, const [
+                      value: _metric(widget.postAnalysis, const [
                         'total_cards',
                         'card_count',
                       ]),
@@ -341,7 +486,7 @@ class OptimizationPreviewDialog extends StatelessWidget {
                     ),
                     _TrustSignal(
                       label: 'Terrenos',
-                      value: _metric(postAnalysis, const [
+                      value: _metric(widget.postAnalysis, const [
                         'lands',
                         'land_count',
                       ]),
@@ -350,11 +495,12 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   ],
                 ),
               ),
-              if (metaReferenceContext.isNotEmpty) ...[
+              if (widget.metaReferenceContext.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _MetaReferenceSection(contextData: metaReferenceContext),
+                _MetaReferenceSection(contextData: widget.metaReferenceContext),
               ],
-              if (deckAnalysis.isNotEmpty && postAnalysis.isNotEmpty) ...[
+              if (widget.deckAnalysis.isNotEmpty &&
+                  widget.postAnalysis.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
                   title: 'Antes vs Depois',
@@ -365,20 +511,21 @@ class OptimizationPreviewDialog extends StatelessWidget {
                     children: [
                       _MetricDiffRow(
                         label: 'CMC médio',
-                        before: '${deckAnalysis['average_cmc'] ?? '-'}',
-                        after: '${postAnalysis['average_cmc'] ?? '-'}',
+                        before: '${widget.deckAnalysis['average_cmc'] ?? '-'}',
+                        after: '${widget.postAnalysis['average_cmc'] ?? '-'}',
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Curva: ${deckAnalysis['mana_curve_assessment'] ?? '-'}',
+                        'Curva: ${widget.deckAnalysis['mana_curve_assessment'] ?? '-'}',
                         style: const TextStyle(color: AppTheme.textSecondary),
                       ),
-                      if (postAnalysis['improvements'] is List &&
-                          (postAnalysis['improvements'] as List).isNotEmpty)
+                      if (widget.postAnalysis['improvements'] is List &&
+                          (widget.postAnalysis['improvements'] as List)
+                              .isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            'Ganhos: ${(postAnalysis['improvements'] as List).take(2).join(' • ')}',
+                            'Ganhos: ${(widget.postAnalysis['improvements'] as List).take(2).join(' • ')}',
                             style: const TextStyle(
                               color: AppTheme.textSecondary,
                               height: 1.35,
@@ -415,47 +562,48 @@ class OptimizationPreviewDialog extends StatelessWidget {
                   ),
                 ),
               ],
-              if (displayRemovals.isNotEmpty) ...[
+              if (widget.displayRemovals.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
-                  title: 'Remover',
+                  title:
+                      'Remover (${_selectedRemovalIndexes.length}/${widget.displayRemovals.length})',
                   accent: AppTheme.error,
                   icon: Icons.remove_circle_outline_rounded,
                   child: Column(
-                    children:
-                        displayRemovals
-                            .take(20)
-                            .map(
-                              (item) => _SuggestionLineItem(
-                                item: item,
-                                accent: AppTheme.error,
-                              ),
-                            )
-                            .toList(),
+                    children: [
+                      _selectableSuggestionList(
+                        items: widget.displayRemovals,
+                        selectedIndexes: _selectedRemovalIndexes,
+                        accent: AppTheme.error,
+                        onToggleOff: (index) => _toggleRemoval(index, false),
+                        onToggleOn: (index) => _toggleRemoval(index, true),
+                        limit: 20,
+                      ),
+                    ],
                   ),
                 ),
               ],
-              if (displayAdditions.isNotEmpty) ...[
+              if (widget.displayAdditions.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 DialogSectionCard(
-                  title: 'Adicionar',
+                  title:
+                      'Adicionar (${_selectedAdditionIndexes.length}/${widget.displayAdditions.length})',
                   accent: AppTheme.success,
                   icon: Icons.add_circle_outline_rounded,
                   child: Column(
                     children: [
-                      ...displayAdditions
-                          .take(30)
-                          .map(
-                            (item) => _SuggestionLineItem(
-                              item: item,
-                              accent: AppTheme.success,
-                            ),
-                          ),
-                      if (displayAdditions.length > 30)
+                      _selectableSuggestionList(
+                        items: widget.displayAdditions,
+                        selectedIndexes: _selectedAdditionIndexes,
+                        accent: AppTheme.success,
+                        onToggleOff: (index) => _toggleAddition(index, false),
+                        onToggleOn: (index) => _toggleAddition(index, true),
+                      ),
+                      if (widget.displayAdditions.length > 30)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            '+ ${displayAdditions.length - 30} cartas…',
+                            '+ ${widget.displayAdditions.length - 30} cartas…',
                             style: const TextStyle(
                               color: AppTheme.textSecondary,
                             ),
@@ -470,16 +618,16 @@ class OptimizationPreviewDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        TextButton(onPressed: onCancel, child: const Text('Cancelar')),
-        if (kDebugMode && onCopyDebug != null)
+        TextButton(onPressed: widget.onCancel, child: const Text('Cancelar')),
+        if (kDebugMode && widget.onCopyDebug != null)
           TextButton(
             onPressed: () {
-              onCopyDebug!();
+              widget.onCopyDebug!();
             },
             child: const Text('Copiar relatório técnico'),
           ),
         ElevatedButton(
-          onPressed: onConfirm,
+          onPressed: _selectedChangeCount == 0 ? null : _confirmSelected,
           child: const Text('Aplicar mudanças'),
         ),
       ],
@@ -736,6 +884,90 @@ class OutcomeInfoDialog extends StatelessWidget {
   }
 }
 
+class GuidedRebuildActionDialog extends StatelessWidget {
+  final String message;
+  final List<String> reasons;
+
+  const GuidedRebuildActionDialog({
+    super.key,
+    required this.message,
+    this.reasons = const <String>[],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      title: DialogTitleBlock(
+        icon: Icons.construction_rounded,
+        title: 'Reconstrução guiada recomendada',
+        subtitle:
+            'A lista precisa de ajuste estrutural antes de upgrades seguros.',
+        accent: AppTheme.mythicGold,
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'O ManaLoom pode criar um rascunho reconstruído sem alterar o deck original.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            ),
+            if (reasons.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              DialogSectionCard(
+                title: 'Por que rebuild?',
+                accent: AppTheme.mythicGold,
+                icon: Icons.rule_folder_outlined,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:
+                      reasons
+                          .take(6)
+                          .map(
+                            (reason) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                '• $reason',
+                                style: const TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Agora não'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () => Navigator.pop(context, true),
+          icon: const Icon(Icons.auto_fix_high_rounded),
+          label: const Text('Criar reconstrução guiada'),
+        ),
+      ],
+    );
+  }
+}
+
 class _MetricDiffRow extends StatelessWidget {
   final String label;
   final String before;
@@ -842,11 +1074,18 @@ class _TrustSignalGrid extends StatelessWidget {
   }
 }
 
-class _SuggestionLineItem extends StatelessWidget {
+class _SelectableSuggestionLineItem extends StatelessWidget {
   final Map<String, dynamic> item;
   final Color accent;
+  final bool selected;
+  final ValueChanged<bool> onChanged;
 
-  const _SuggestionLineItem({required this.item, required this.accent});
+  const _SelectableSuggestionLineItem({
+    required this.item,
+    required this.accent,
+    required this.selected,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -858,6 +1097,17 @@ class _SuggestionLineItem extends StatelessWidget {
     final confidenceLevel = confidenceMap['level']?.toString() ?? '';
     final score = (confidenceMap['score'] as num?)?.toDouble();
     final reason = item['reason']?.toString() ?? '';
+    final role = item['role']?.toString() ?? item['function']?.toString() ?? '';
+    final priority = item['priority']?.toString() ?? '';
+    final risk = item['risk']?.toString() ?? '';
+    final impact =
+        item['impact']?.toString() ?? item['impact_estimate']?.toString() ?? '';
+    final metadata = [
+      if (role.isNotEmpty) role,
+      if (priority.isNotEmpty) 'prioridade $priority',
+      if (risk.isNotEmpty) 'risco $risk',
+      if (impact.isNotEmpty) impact,
+    ].join(' • ');
 
     String suffix = '';
     if (confidenceLevel.isNotEmpty && score != null) {
@@ -869,29 +1119,79 @@ class _SuggestionLineItem extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '• $name$suffix',
-            style: TextStyle(color: accent, fontWeight: FontWeight.w700),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        onTap: () => onChanged(!selected),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color:
+                selected
+                    ? accent.withValues(alpha: 0.08)
+                    : AppTheme.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            border: Border.all(
+              color:
+                  selected
+                      ? accent.withValues(alpha: 0.35)
+                      : AppTheme.outlineMuted.withValues(alpha: 0.45),
+            ),
           ),
-          if (reason.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 3),
-              child: Text(
-                reason,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 12,
-                  height: 1.35,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Checkbox(
+                value: selected,
+                onChanged: (value) => onChanged(value ?? false),
+                visualDensity: VisualDensity.compact,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$name$suffix',
+                      style: TextStyle(
+                        color: selected ? accent : AppTheme.textSecondary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (metadata.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Text(
+                          metadata,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: 12,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    if (reason.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Text(
+                          reason,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: 12,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

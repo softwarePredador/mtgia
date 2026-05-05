@@ -4,6 +4,30 @@
 
 **PASS.** Sprint 1 backend/API implementado para `/ai/optimize` com contrato `intensity`, escopo real de sugestoes por intensidade, cache separado por intensidade, `rebuild_guided` explicito e quality gate preservado.
 
+## Sprint 2 mobile/runtime - 2026-05-05
+
+**PASS WITH RISKS.** O app Flutter agora consome explicitamente `intensity` no fluxo de optimize, preservando compatibilidade com backend antigo sem esse campo. A UI adicionou selector `Leve`/`Focado`/`Agressivo`/`Rebuild`, copy de escopo por modo, preview selecionavel, apply parcial e CTA de `rebuild_guided`.
+
+| Area | Evidencia |
+|---|---|
+| Request app | `DeckProvider.optimizeDeck` envia `intensity`; breadcrumbs sao sanitizados e nao incluem prompt completo, JWT, SENTRY_DSN, DATABASE_URL ou payload sensivel. |
+| Legacy fallback | Resposta sem `intensity` resolve para `focused` no app. |
+| Preview/apply | Selecionar/desmarcar sugestoes filtra `additions_detailed`/`removals_detailed`; apply parcial preserva comandante pelo fluxo existente. |
+| Erros | 4xx/5xx/timeouts passam por `FriendlyErrorMapper`; `OPTIMIZE_QUALITY_REJECTED` vira safe no-op; `rebuild_guided` abre CTA de reconstrucao. |
+| Testes app | `flutter analyze lib/features/decks test/features/decks --no-version-check` PASS; `flutter test test/features/decks --no-version-check` PASS `00:12 +145`. |
+| Runtime iPhone 15 | `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` PASS `02:41 +1`. |
+
+Runtime final em iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` (`com.apple.CoreSimulator.SimRuntime.iOS-17-4`) contra backend real `http://127.0.0.1:8082`:
+
+- Backend health: `status=healthy`, `service=mtgia-server`, `environment=development`, `version=1.0.0`.
+- UI selecionou `Agressivo`; screenshot `08c_optimize_sheet_aggressive`.
+- Log sanitizado: `intensity: aggressive`, `bracket: 2`, `keep_theme: true`.
+- Backend respondeu `POST /ai/optimize -> 200 (108490ms)`, `mode=optimize`, `outcome_code=optimized`, `optimize_intensity.selected=aggressive`.
+- Quality gate reduziu o escopo agressivo para 6 swaps retornados; isso preservou seguranca, mas fica como risco de produto/performance.
+- Preview exibiu sugestoes, uma checkbox foi desmarcada (`09b_preview_partial_selection`) e o apply concluiu com `10_complete_validated`, deck 100/100 e comandante preservado.
+
+Risco residual Sprint 2: latencia live agressiva alta (~108s) e retorno abaixo do alvo nominal 10-20 quando o quality gate reduz escopo. Scanner fisico/camera/OCR permaneceu fora do escopo e nao foi executado.
+
 ## Commits inspecionados
 
 | Ref | Commit | Nota |

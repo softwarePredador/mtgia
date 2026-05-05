@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/decks/providers/deck_provider_support.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_dialogs.dart';
+import 'package:manaloom/features/decks/widgets/deck_optimize_flow_support.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_sections.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_ui_support.dart';
 
@@ -175,6 +177,10 @@ void main() {
                       keepTheme: true,
                       preservedTheme: 'spellslinger',
                       reasoning: 'Ajuste leve com referência meta.',
+                      intensity: OptimizeIntensity.aggressive,
+                      optimizeIntensity: const {
+                        'target_swaps': {'min': 10, 'max': 20},
+                      },
                       qualityWarning: null,
                       deckAnalysis: const {'average_cmc': 3.2},
                       postAnalysis: const {'average_cmc': 3.0},
@@ -215,10 +221,78 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Referências meta usadas'), findsOneWidget);
+    expect(find.textContaining('Agressivo'), findsOneWidget);
+    expect(find.text('Atenção ao ajuste agressivo'), findsOneWidget);
     expect(find.textContaining('não como cópia cega'), findsOneWidget);
     expect(find.text('#1 Talrand Tempo'), findsOneWidget);
     expect(find.text('Mystic Remora'), findsAtLeastNWidgets(1));
     expect(find.text('Ajuste competitivo guiado'), findsOneWidget);
+  });
+
+  testWidgets('optimization preview allows deselecting suggestions', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    OptimizePreviewSelection? selection;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  selection = await showOptimizationPreviewDialog(
+                    context,
+                    mode: 'optimize',
+                    archetype: 'control',
+                    keepTheme: true,
+                    preservedTheme: null,
+                    reasoning: 'Trocas seguras.',
+                    intensity: OptimizeIntensity.focused,
+                    optimizeIntensity: const {
+                      'target_swaps': {'min': 6, 'max': 10},
+                    },
+                    qualityWarning: null,
+                    deckAnalysis: const <String, dynamic>{},
+                    postAnalysis: const <String, dynamic>{},
+                    warnings: const <String, dynamic>{},
+                    metaReferenceContext: const <String, dynamic>{},
+                    displayRemovals: const [
+                      {'name': 'Mind Stone'},
+                      {'name': 'Cancel'},
+                    ],
+                    displayAdditions: const [
+                      {'name': 'Arcane Signet'},
+                      {'name': 'Counterspell'},
+                    ],
+                  );
+                },
+                child: const Text('preview-selectable'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('preview-selectable'));
+    await tester.pumpAndSettle();
+
+    final checkboxes = find.byType(Checkbox);
+    expect(checkboxes, findsNWidgets(4));
+    await tester.tap(checkboxes.first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Aplicar mudanças'));
+    await tester.pumpAndSettle();
+
+    expect(selection, isNotNull);
+    expect(selection!.selectedRemovalIndexes, isNot(contains(0)));
+    expect(selection!.selectedRemovalIndexes, contains(1));
+    expect(selection!.selectedAdditionIndexes.length, 2);
   });
 
   testWidgets(

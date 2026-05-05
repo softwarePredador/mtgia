@@ -9,6 +9,7 @@ enum FriendlyErrorContext {
   deckGenerate,
   deckSave,
   deckDetails,
+  deckOptimize,
   deckValidate,
   deckPricing,
   setsCatalog,
@@ -57,6 +58,8 @@ class FriendlyErrorMapper {
           'Não conseguimos gerar um deck válido com essa descrição. Ajuste o pedido e tente novamente.',
         FriendlyErrorContext.deckSave =>
           'Não foi possível salvar este deck. Revise a lista e tente novamente.',
+        FriendlyErrorContext.deckOptimize =>
+          'Não foi possível otimizar este deck agora. Revise a lista e tente novamente.',
         FriendlyErrorContext.deckValidate =>
           'Não foi possível validar este deck agora. Revise a lista e tente novamente.',
         FriendlyErrorContext.tradeCreate =>
@@ -200,6 +203,8 @@ class FriendlyErrorMapper {
         'Não foi possível salvar o deck agora. Tente novamente em instantes.',
       FriendlyErrorContext.deckDetails =>
         'Não foi possível carregar este deck. Tente novamente.',
+      FriendlyErrorContext.deckOptimize =>
+        'Não foi possível otimizar este deck agora. Tente novamente em instantes.',
       FriendlyErrorContext.deckValidate =>
         'Não foi possível validar este deck agora. Tente novamente.',
       FriendlyErrorContext.setsCatalog =>
