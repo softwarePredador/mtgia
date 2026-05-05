@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/card_validation_service.dart';
@@ -19,6 +21,7 @@ import '../../../lib/ai/optimization_validator.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/ai/optimize_job.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/edh_bracket_policy.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
@@ -412,6 +415,10 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
     final requestStopwatch = Stopwatch()..start();
+    final forceSyncExecutor =
+        body['_force_sync'] == true || body['force_sync'] == true;
+    final asyncRequested =
+        body.containsKey('async') ? body['async'] == true : null;
     final telemetry = OptimizeStageTelemetry(
       deckId: deckId ?? 'unknown',
       requestMode: requestMode,
@@ -427,6 +434,84 @@ Future<Response> onRequest(RequestContext context) async {
 
     // 1. Fetch Deck Data
     final pool = context.read<Pool>();
+
+    if (shouldUseAsyncOptimizeExecutor(
+      intensity: intensity,
+      requestMode: requestMode,
+      forceSync: forceSyncExecutor,
+      asyncRequested: asyncRequested,
+    )) {
+      final jobId = await telemetry.trackAsync(
+        'request.async_job_create',
+        () => OptimizeJobStore.create(
+          pool: pool,
+          deckId: deckId,
+          archetype: archetype,
+          userId: userId,
+        ),
+      );
+      final syncPayload = Map<String, dynamic>.from(body)
+        ..['_force_sync'] = true
+        ..['async'] = false;
+      final authorization = context.request.headers['Authorization'];
+      final internalOptimizeUrl = _resolveInternalOptimizeUrl(context.request);
+
+      unawaited(
+        runZonedGuarded(
+          () => _processOptimizeModeAsync(
+            pool: pool,
+            jobId: jobId,
+            internalOptimizeUrl: internalOptimizeUrl,
+            syncPayload: syncPayload,
+            authorization: authorization,
+          ),
+          (error, stackTrace) {
+            Log.e(
+              'Background optimize job $jobId crashed: $error\n$stackTrace',
+            );
+            unawaited(
+              OptimizeJobStore.fail(
+                pool,
+                jobId,
+                error: 'Falha interna ao processar optimize async.',
+              ),
+            );
+          },
+        ),
+      );
+
+      final timings = {
+        'deck_id': deckId,
+        'request_mode': requestMode,
+        'job_id': jobId,
+        'total_ms': requestStopwatch.elapsedMilliseconds,
+        'accepted_ms': requestStopwatch.elapsedMilliseconds,
+        'stages_ms': telemetry.snapshot()['stages_ms'],
+      };
+
+      telemetry.logSummary();
+      return Response.json(
+        statusCode: HttpStatus.accepted,
+        body: {
+          'job_id': jobId,
+          'status': 'pending',
+          'mode': 'optimize',
+          'message':
+              'Optimize agressivo iniciado em background. Acompanhe o progresso via polling.',
+          'poll_url': '/ai/optimize/jobs/$jobId',
+          'poll_interval_ms': 1000,
+          'total_stages': 6,
+          'intensity': intensity.selected,
+          'optimize_intensity': intensity.toJson(returnedSwaps: 0),
+          'async': {
+            'accepted_ms': requestStopwatch.elapsedMilliseconds,
+            'executor': 'optimize_async_job',
+          },
+          'timings': timings,
+          'stage_telemetry': timings,
+        },
+      );
+    }
 
     // Memória de preferências do usuário (se autenticado):
     // aplica default somente quando o request não enviar override explícito.
@@ -2765,6 +2850,130 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return internalServerError('Failed to optimize deck', details: e);
   }
+}
+
+Future<void> _processOptimizeModeAsync({
+  required Pool pool,
+  required String jobId,
+  required Uri internalOptimizeUrl,
+  required Map<String, dynamic> syncPayload,
+  required String? authorization,
+}) async {
+  await OptimizeJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Preparando optimize agressivo...',
+    stageNumber: 1,
+  );
+
+  final stopwatch = Stopwatch()..start();
+  await OptimizeJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Gerando preview seguro...',
+    stageNumber: 2,
+  );
+
+  final headers = <String, String>{
+    'Content-Type': 'application/json',
+    'X-Internal-AI-Request-Token': InternalAiRequestToken.value,
+    if (authorization != null && authorization.trim().isNotEmpty)
+      'Authorization': authorization,
+  };
+
+  late final http.Response response;
+  try {
+    response = await http
+        .post(
+          internalOptimizeUrl,
+          headers: headers,
+          body: jsonEncode(syncPayload),
+        )
+        .timeout(const Duration(minutes: 3));
+  } on TimeoutException {
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: 'Tempo limite excedido ao otimizar deck async.',
+    );
+    return;
+  }
+
+  await OptimizeJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Persistindo resultado...',
+    stageNumber: 5,
+  );
+
+  Map<String, dynamic> resultBody;
+  try {
+    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+    resultBody = decoded is Map<String, dynamic>
+        ? decoded
+        : decoded is Map
+            ? decoded.cast<String, dynamic>()
+            : <String, dynamic>{'value': decoded};
+  } catch (_) {
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: 'Optimize async recebeu resposta invalida do executor interno.',
+    );
+    return;
+  }
+
+  resultBody['async'] = {
+    'job_id': jobId,
+    'completed_ms': stopwatch.elapsedMilliseconds,
+    'result_status_code': response.statusCode,
+    'executor': 'optimize_async_job',
+  };
+
+  if (response.statusCode == HttpStatus.ok) {
+    await OptimizeJobStore.complete(pool, jobId, result: resultBody);
+    return;
+  }
+
+  if (response.statusCode == HttpStatus.unprocessableEntity) {
+    await OptimizeJobStore.fail(
+      pool,
+      jobId,
+      error: resultBody['error']?.toString() ??
+          'Optimize async nao produziu preview seguro.',
+      qualityError: resultBody['quality_error'] is Map
+          ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
+          : {
+              'code': resultBody['outcome_code']?.toString() ??
+                  'OPTIMIZE_ASYNC_QUALITY_REJECTED',
+              'message': resultBody['error']?.toString() ??
+                  'Optimize async foi bloqueado pelo gate de qualidade.',
+              'response': resultBody,
+            },
+    );
+    return;
+  }
+
+  await OptimizeJobStore.fail(
+    pool,
+    jobId,
+    error: resultBody['error']?.toString() ?? 'Falha ao otimizar deck async.',
+  );
+}
+
+Uri _resolveInternalOptimizeUrl(Request request) {
+  final configured = Platform.environment['AI_OPTIMIZE_INTERNAL_BASE_URL'];
+  if (configured != null && configured.trim().isNotEmpty) {
+    final base = configured.trim().replaceFirst(RegExp(r'/$'), '');
+    return Uri.parse('$base/ai/optimize');
+  }
+
+  final host = request.headers['host']?.trim();
+  final fallbackPort = Platform.environment['PORT']?.trim();
+  final resolvedHost = host != null && host.isNotEmpty
+      ? host
+      : '127.0.0.1:${fallbackPort?.isNotEmpty == true ? fallbackPort : '8080'}';
+  return Uri.parse('http://$resolvedHost/ai/optimize');
 }
 
 Future<void> _recordOptimizeAnalysisOutcome({

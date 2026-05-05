@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:postgres/postgres.dart';
+
+import '../logger.dart';
 
 /// Gerenciador de jobs assíncronos de otimização de deck.
 ///
@@ -14,6 +17,9 @@ class OptimizeJobStore {
   OptimizeJobStore._();
 
   static const _jobTtl = Duration(minutes: 30);
+  static const _cleanupInterval = Duration(minutes: 5);
+  static final Map<String, OptimizeJob> _memoryJobs = <String, OptimizeJob>{};
+  static DateTime? _lastCleanupAt;
 
   /// Cria um novo job e retorna seu ID.
   static Future<String> create({
@@ -22,7 +28,11 @@ class OptimizeJobStore {
     required String archetype,
     String? userId,
   }) async {
-    await _cleanup(pool);
+    unawaited(
+      _cleanupIfDue(pool).catchError(
+        (Object error) => Log.w('Optimize job cleanup failed: $error'),
+      ),
+    );
     final id = _generateId();
     final job = OptimizeJob(
       id: id,
@@ -30,34 +40,52 @@ class OptimizeJobStore {
       archetype: archetype,
       userId: userId,
     );
-    await pool.execute(
-      Sql.named('''
+    _memoryJobs[id] = job;
+    unawaited(
+      () async {
+        try {
+          await pool.execute(
+            Sql.named('''
         INSERT INTO ai_optimize_jobs (
           id, deck_id, archetype, user_id, status, stage, stage_number,
-          total_stages, created_at, updated_at
+          total_stages, result, error, quality_error, created_at, updated_at
         )
         VALUES (
           @id, CAST(@deck_id AS uuid), @archetype, CAST(@user_id AS uuid),
-          @status, @stage, @stage_number, @total_stages, NOW(), NOW()
+          @status, @stage, @stage_number, @total_stages,
+          @result::jsonb, @error, @quality_error::jsonb, NOW(), NOW()
         )
       '''),
-      parameters: {
-        'id': job.id,
-        'deck_id': job.deckId,
-        'archetype': job.archetype,
-        'user_id': job.userId,
-        'status': job.status,
-        'stage': job.stage,
-        'stage_number': job.stageNumber,
-        'total_stages': job.totalStages,
-      },
+            parameters: {
+              'id': job.id,
+              'deck_id': job.deckId,
+              'archetype': job.archetype,
+              'user_id': job.userId,
+              'status': job.status,
+              'stage': job.stage,
+              'stage_number': job.stageNumber,
+              'total_stages': job.totalStages,
+              'result': job.result == null ? null : jsonEncode(job.result),
+              'error': job.error,
+              'quality_error': job.qualityError == null
+                  ? null
+                  : jsonEncode(job.qualityError),
+            },
+          );
+        } catch (error) {
+          Log.w('Optimize job ${job.id} initial persistence failed: $error');
+          // Memory-backed polling remains available for the current process.
+        }
+      }(),
     );
     return id;
   }
 
   /// Busca um job pelo ID.
   static Future<OptimizeJob?> get(Pool pool, String id) async {
-    await _cleanup(pool);
+    await _cleanupIfDue(pool);
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) return memoryJob;
     final result = await pool.execute(
       Sql.named('''
         SELECT
@@ -91,8 +119,17 @@ class OptimizeJobStore {
     required String stage,
     required int stageNumber,
   }) async {
-    await pool.execute(
-      Sql.named('''
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob
+        ..status = 'processing'
+        ..stage = stage
+        ..stageNumber = stageNumber
+        ..updatedAt = DateTime.now();
+    }
+    try {
+      await pool.execute(
+        Sql.named('''
         UPDATE ai_optimize_jobs
         SET
           status = 'processing',
@@ -101,12 +138,16 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-      parameters: {
-        'id': id,
-        'stage': stage,
-        'stage_number': stageNumber,
-      },
-    );
+        parameters: {
+          'id': id,
+          'stage': stage,
+          'stage_number': stageNumber,
+        },
+      );
+    } catch (error) {
+      Log.w('Optimize job $id progress persistence failed: $error');
+      if (memoryJob == null) rethrow;
+    }
   }
 
   /// Marca o job como concluído com o resultado.
@@ -115,8 +156,19 @@ class OptimizeJobStore {
     String id, {
     required Map<String, dynamic> result,
   }) async {
-    await pool.execute(
-      Sql.named('''
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob
+        ..status = 'completed'
+        ..stage = 'Concluído'
+        ..result = result
+        ..error = null
+        ..qualityError = null
+        ..updatedAt = DateTime.now();
+    }
+    try {
+      await pool.execute(
+        Sql.named('''
         UPDATE ai_optimize_jobs
         SET
           status = 'completed',
@@ -127,11 +179,15 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-      parameters: {
-        'id': id,
-        'result': jsonEncode(result),
-      },
-    );
+        parameters: {
+          'id': id,
+          'result': jsonEncode(result),
+        },
+      );
+    } catch (error) {
+      Log.w('Optimize job $id completion persistence failed: $error');
+      if (memoryJob == null) rethrow;
+    }
   }
 
   /// Marca o job como falho.
@@ -141,8 +197,18 @@ class OptimizeJobStore {
     required String error,
     Map<String, dynamic>? qualityError,
   }) async {
-    await pool.execute(
-      Sql.named('''
+    final memoryJob = _memoryJobs[id];
+    if (memoryJob != null) {
+      memoryJob
+        ..status = 'failed'
+        ..stage = 'Erro'
+        ..error = error
+        ..qualityError = qualityError
+        ..updatedAt = DateTime.now();
+    }
+    try {
+      await pool.execute(
+        Sql.named('''
         UPDATE ai_optimize_jobs
         SET
           status = 'failed',
@@ -152,15 +218,33 @@ class OptimizeJobStore {
           updated_at = NOW()
         WHERE id = @id
       '''),
-      parameters: {
-        'id': id,
-        'error': error,
-        'quality_error': qualityError == null ? null : jsonEncode(qualityError),
-      },
-    );
+        parameters: {
+          'id': id,
+          'error': error,
+          'quality_error':
+              qualityError == null ? null : jsonEncode(qualityError),
+        },
+      );
+    } catch (error) {
+      Log.w('Optimize job $id failure persistence failed: $error');
+      if (memoryJob == null) rethrow;
+    }
   }
 
   /// Remove jobs com mais de 30 minutos para não vazar memória.
+  static Future<void> _cleanupIfDue(Pool pool) async {
+    final now = DateTime.now();
+    final last = _lastCleanupAt;
+    if (last != null && now.difference(last) < _cleanupInterval) {
+      return;
+    }
+    _lastCleanupAt = now;
+    _memoryJobs.removeWhere(
+      (_, job) => job.createdAt.isBefore(now.subtract(_jobTtl)),
+    );
+    await _cleanup(pool);
+  }
+
   static Future<void> _cleanup(Pool pool) async {
     await pool.execute(
       Sql.named('''

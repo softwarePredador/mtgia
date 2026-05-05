@@ -97,6 +97,19 @@ class OptimizeIntensityConfig {
   }
 }
 
+bool shouldUseAsyncOptimizeExecutor({
+  required OptimizeIntensityConfig intensity,
+  required String requestMode,
+  required bool forceSync,
+  bool? asyncRequested,
+}) {
+  if (forceSync) return false;
+  if (requestMode != 'optimize') return false;
+  if (intensity.isRebuild) return false;
+  if (asyncRequested == false) return false;
+  return asyncRequested == true || intensity.selected == 'aggressive';
+}
+
 OptimizeIntensityConfig resolveOptimizeIntensity(dynamic raw) {
   if (raw == null || raw.toString().trim().isEmpty) {
     return const OptimizeIntensityConfig(

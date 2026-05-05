@@ -39,6 +39,76 @@ void main() {
     });
   });
 
+  group('shouldUseAsyncOptimizeExecutor', () {
+    test('routes aggressive optimize to async by default', () {
+      final aggressive = resolveOptimizeIntensity('aggressive');
+
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: aggressive,
+          requestMode: 'optimize',
+          forceSync: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('preserves focused sync compatibility when async is omitted', () {
+      final focused = resolveOptimizeIntensity(null);
+
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: focused,
+          requestMode: 'optimize',
+          forceSync: false,
+        ),
+        isFalse,
+      );
+    });
+
+    test('honors internal force sync and explicit async opt-out', () {
+      final aggressive = resolveOptimizeIntensity('aggressive');
+
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: aggressive,
+          requestMode: 'optimize',
+          forceSync: true,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: aggressive,
+          requestMode: 'optimize',
+          forceSync: false,
+          asyncRequested: false,
+        ),
+        isFalse,
+      );
+    });
+
+    test('does not turn complete or rebuild into optimize async jobs', () {
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: resolveOptimizeIntensity('aggressive'),
+          requestMode: 'complete',
+          forceSync: false,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldUseAsyncOptimizeExecutor(
+          intensity: resolveOptimizeIntensity('rebuild'),
+          requestMode: 'optimize',
+          forceSync: false,
+          asyncRequested: true,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('buildOptimizeCacheKey', () {
     test('separates cache entries by intensity', () {
       final light = buildOptimizeCacheKey(

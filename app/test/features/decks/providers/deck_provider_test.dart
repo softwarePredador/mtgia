@@ -628,6 +628,115 @@ void main() {
       },
     );
 
+    test(
+      'optimizeDeck shows aggressive async progress and returns polled result',
+      () async {
+        var pollCount = 0;
+        final progress = <String>[];
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/optimize': (body) {
+              expect(body['intensity'], 'aggressive');
+              return ApiResponse(202, {
+                'job_id': 'job-aggressive',
+                'status': 'pending',
+                'poll_interval_ms': 1,
+                'total_stages': 6,
+              });
+            },
+          },
+          getHandlers: {
+            '/ai/optimize/jobs/job-aggressive': () {
+              pollCount += 1;
+              if (pollCount == 1) {
+                return ApiResponse(200, {
+                  'status': 'processing',
+                  'stage': 'Gerando preview seguro...',
+                  'stage_number': 2,
+                  'total_stages': 6,
+                });
+              }
+              return ApiResponse(200, {
+                'status': 'completed',
+                'result': {
+                  'mode': 'optimize',
+                  'intensity': 'aggressive',
+                  'removals': const ['Mind Stone'],
+                  'additions': const ['Arcane Signet'],
+                },
+              });
+            },
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        final result = await provider.optimizeDeck(
+          'deck-1',
+          'control',
+          intensity: OptimizeIntensity.aggressive,
+          onProgress: (stage, _, __) => progress.add(stage),
+        );
+
+        expect(result['intensity'], 'aggressive');
+        expect(progress, contains('Optimize agressivo em background...'));
+        expect(progress, contains('Gerando preview seguro...'));
+        expect(apiClient.getCalls, [
+          '/ai/optimize/jobs/job-aggressive',
+          '/ai/optimize/jobs/job-aggressive',
+        ]);
+      },
+    );
+
+    test(
+      'optimizeDeck polling timeout remains five minutes for one-second intervals',
+      () async {
+        var pollCount = 0;
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/optimize':
+                (_) => ApiResponse(202, {
+                  'job_id': 'job-long-aggressive',
+                  'status': 'pending',
+                  'poll_interval_ms': 1,
+                  'total_stages': 6,
+                }),
+          },
+          getHandlers: {
+            '/ai/optimize/jobs/job-long-aggressive': () {
+              pollCount += 1;
+              if (pollCount < 65) {
+                return ApiResponse(200, {
+                  'status': 'processing',
+                  'stage': 'Gerando preview seguro...',
+                  'stage_number': 2,
+                  'total_stages': 6,
+                });
+              }
+              return ApiResponse(200, {
+                'status': 'completed',
+                'result': {
+                  'mode': 'optimize',
+                  'intensity': 'aggressive',
+                  'removals': const ['Mind Stone'],
+                  'additions': const ['Arcane Signet'],
+                },
+              });
+            },
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        final result = await provider.optimizeDeck(
+          'deck-1',
+          'control',
+          intensity: OptimizeIntensity.aggressive,
+        );
+
+        expect(result['intensity'], 'aggressive');
+        expect(pollCount, 65);
+      },
+    );
+
     test('rebuildDeck returns saved draft payload on success', () async {
       final apiClient = _FakeApiClient(
         postHandlers: {

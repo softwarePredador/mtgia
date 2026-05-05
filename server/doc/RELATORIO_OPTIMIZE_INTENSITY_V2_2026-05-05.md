@@ -28,6 +28,40 @@ Runtime final em iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` (`co
 
 Risco residual Sprint 2: latencia live agressiva alta (~108s) e retorno abaixo do alvo nominal 10-20 quando o quality gate reduz escopo. Scanner fisico/camera/OCR permaneceu fora do escopo e nao foi executado.
 
+## Sprint 3 aggressive performance + async UX - 2026-05-05
+
+**PASS WITH RISKS.** O modo `aggressive` de `/ai/optimize` agora retorna `202 + job_id` por padrao para `mode=optimize`, mantendo o executor pesado em background. A qualidade nao foi relaxada: o job interno chama o mesmo caminho sync com `_force_sync=true`, portanto preserva legalidade Commander, identidade de cor, bracket, filtros de comandante/tema, quality gate, validação final, cache e shape de resposta.
+
+| Area | Evidencia |
+|---|---|
+| Accepted latency | Probe API healthy Talrand seed: `POST /ai/optimize` aggressive retornou `202` em `9ms` no cliente, `accepted_ms_server=2ms`; probe needs-repair retornou `202` em `25ms`, `accepted_ms_server=6ms`. |
+| Completion latency | O trabalho completo continuou longo em background: healthy seed completou em `101726ms`; maior stage `request.ai_optimize_call=36187ms`, seguido de `request.deterministic_shortlist=2227ms` e `request.deck_context=1837ms`. |
+| Quality gate | Healthy seed finalizou `mode=optimize`, `outcome_code=optimized`, `intensity=aggressive`, `returned_swaps=6`; `quality_gate.dropped_swaps=1`, `reduced_below_target=true`. Isso confirma reducao segura abaixo do alvo nominal 10-20 sem falso sucesso. |
+| Needs repair | Probe estruturalmente ruim (Atraxa + 99 Islands) tambem retornou `202` rapido, mas o job terminou `failed` com `quality_code=OPTIMIZE_NEEDS_REPAIR`, mantendo rebuild/repair explicito. |
+| App polling | `DeckProvider` agora mostra "Optimize agressivo em background..." e calcula timeout por duracao real de 5 minutos; antes, `poll_interval_ms=1000` reduzia o timeout efetivo para 60s. |
+| iPhone 15 runtime | Rerun contra `http://127.0.0.1:8082` retornou `POST /ai/optimize -> 202 (181ms)`, fez polling em `/ai/optimize/jobs/:id` e terminou como safe no-op: `OPTIMIZE_QUALITY_REJECTED`, screenshot `09_quality_rejected_blocker`, `All tests passed` em `02:22 +1`. |
+
+Mudancas tecnicas:
+
+- `shouldUseAsyncOptimizeExecutor` roteia `aggressive` optimize para job async por default; `focused/light/rebuild`, `complete` e chamadas internas `_force_sync=true` preservam comportamento anterior.
+- `OptimizeJobStore` passou a registrar jobs em memoria imediatamente e persistir o insert no banco em background. Isso remove o round-trip remoto do caminho critico de aceite; polling no mesmo processo consulta memoria primeiro e cai para DB se necessario.
+- `POST /ai/optimize` aceito async retorna `mode=optimize`, `status=pending`, `poll_url`, `poll_interval_ms=1000`, `intensity`, `optimize_intensity`, `timings.accepted_ms` e `async.executor=optimize_async_job`.
+- O executor async usa `X-Internal-AI-Request-Token` e Authorization original, mas nao loga JWT, secrets, prompts completos ou payload sensivel.
+
+Comandos adicionais executados nesta sprint:
+
+| Comando | Resultado |
+|---|---|
+| `cd server && dart analyze lib routes test` | PASS |
+| `cd server && dart test test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart && RUN_INTEGRATION_TESTS=0 dart test test/ai_optimize_flow_test.dart -r expanded` | PASS |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded` | PASS, `+10 ~1`, `02:48` |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run` | PASS, 19 candidatos planejados |
+| `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check` | PASS |
+| `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check` | PASS, `+46` |
+| `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` | PASS WITH RISKS, `02:22 +1`; async UX provada, apply nao executado porque o quality gate rejeitou as trocas. |
+
+Risco residual Sprint 3: o usuario nao fica mais bloqueado esperando a resposta HTTP, mas a conclusão do job aggressive ainda pode levar ~100s quando OpenAI/critic/validação entram no caminho. O menor proximo ganho backend e reduzir ou cachear a etapa `request.ai_optimize_call` sem enfraquecer o gate final.
+
 ## Commits inspecionados
 
 | Ref | Commit | Nota |

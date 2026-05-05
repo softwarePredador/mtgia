@@ -4,6 +4,20 @@
 
 **PASS WITH RISKS.** Optimize Intensity v2 foi provado no app contra backend local real em `http://127.0.0.1:8082`: usuario escolheu `Agressivo`, o app enviou `intensity=aggressive`, exibiu preview selecionavel, desmarcou ao menos uma sugestao, aplicou somente a selecao e validou o deck final preservando o comandante.
 
+## Atualizacao - aggressive async UX - 2026-05-05
+
+**PASS WITH RISKS.** A nova rodada iPhone 15 contra backend 8082 provou que `aggressive` nao bloqueia mais a UI esperando a resposta HTTP: `/ai/optimize` retornou `202` e o app fez polling com progresso. Nesta rodada especifica, o quality gate final rejeitou as trocas e o app exibiu o branch seguro "Nenhuma melhoria segura encontrada"; portanto nao houve preview/apply nesse rerun. A prova anterior de preview parcial/apply/validate permanece registrada abaixo para o contrato Intensity v2 sync.
+
+| Marco | Evidencia |
+| --- | --- |
+| Backend accepted async | `POST /ai/optimize -> 202 (181ms)` no iPhone 15 runtime. |
+| Polling app | Varios `GET /ai/optimize/jobs/:id -> 200` durante o processamento; app manteve progresso em vez de travar a request inicial. |
+| Gate preservado | Job terminou com `OPTIMIZE_QUALITY_REJECTED`; screenshot `09_quality_rejected_blocker`; sem apply inseguro. |
+| Harness ajustado | `DeckProvider` agora calcula timeout por duracao real de 5 minutos, mesmo com `poll_interval_ms=1000`. |
+| Resultado runtime | `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` PASS `02:22 +1`. |
+
+Leitura: o alvo de performance para preview/accepted foi atendido no app (`202` em <1s). O completion completo continuou dependente do job background e do quality gate; quando o gate rejeita, o app apresenta safe no-op em vez de aplicar swaps.
+
 ## Ambiente
 
 | Item | Valor |

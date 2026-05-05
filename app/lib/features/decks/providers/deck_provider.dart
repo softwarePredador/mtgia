@@ -479,7 +479,9 @@ class DeckProvider extends ChangeNotifier {
 
     if (requestResult.isAsync) {
       onProgress?.call(
-        'Preparando referências do commander...',
+        intensity == OptimizeIntensity.aggressive
+            ? 'Optimize agressivo em background...'
+            : 'Preparando referências do commander...',
         1,
         requestResult.totalStages ?? 6,
       );
@@ -549,9 +551,12 @@ class DeckProvider extends ChangeNotifier {
     int pollInterval = 5000,
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
-    const maxPolls = 60; // 60 × 5s = 5 min timeout
+    const maxPollingDuration = Duration(minutes: 5);
+    final safePollInterval = pollInterval <= 0 ? 1000 : pollInterval;
+    final maxPolls =
+        (maxPollingDuration.inMilliseconds / safePollInterval).ceil();
     for (var i = 0; i < maxPolls; i++) {
-      await Future.delayed(Duration(milliseconds: pollInterval));
+      await Future.delayed(Duration(milliseconds: safePollInterval));
       final result = await pollOptimizeJobRequest(_apiClient, jobId);
       if (result.isCompleted) {
         AppLogger.debug(

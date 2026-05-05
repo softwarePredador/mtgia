@@ -2,6 +2,44 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Sprint 3 Optimize aggressive performance + async UX
+
+### O Porquê
+- O runtime iPhone 15 da Sprint 2 provou `intensity=aggressive`, preview parcial, apply selecionado e validate final, mas a request live ficou bloqueada por ~108s.
+- O quality gate reduziu corretamente o retorno para 6 swaps seguros, abaixo do alvo nominal 10-20; a meta era reduzir latencia percebida sem aceitar swaps inseguros.
+- O modo aggressive tem mais chance de acionar OpenAI/critic/retries, entao o app precisa progresso claro enquanto o backend preserva legalidade, identidade de cor, bracket, tema e validação final.
+
+### O Como
+- `server/lib/ai/optimize_runtime_support.dart` ganhou `shouldUseAsyncOptimizeExecutor`.
+  - `aggressive` + `mode=optimize` usa job async por default.
+  - `light`, `focused`, `rebuild`, `complete`, `_force_sync=true`, `force_sync=true` e `async=false` preservam comportamento sync/legado.
+- `server/routes/ai/optimize/index.dart` agora responde `202 + job_id` para aggressive optimize e dispara `_processOptimizeModeAsync`.
+  - O job interno chama o mesmo `/ai/optimize` com Authorization original, `X-Internal-AI-Request-Token`, `_force_sync=true` e `async=false`.
+  - Assim, o caminho pesado continua passando por shortlist deterministico, OpenAI, validação de cartas, color identity, bracket, proteção do comandante, quality gate, cache, post-analysis e validação final.
+- `server/lib/ai/optimize_job.dart` passou a ser memory-first:
+  - cria o job em memoria antes de retornar;
+  - faz cleanup e insert inicial no DB em background;
+  - `progress`, `complete` e `fail` atualizam memoria primeiro e persistem depois.
+  - Isso removeu o round-trip remoto do caminho critico de aceite.
+- `app/lib/features/decks/providers/deck_provider.dart` mostra progresso inicial especifico para aggressive async e calcula timeout de polling por 5 minutos reais com base em `poll_interval_ms`.
+  - Antes, `maxPolls=60` transformava `poll_interval_ms=1000` em timeout efetivo de ~60s.
+
+### Validacao executada
+- `cd server && dart analyze lib routes test`: PASS.
+- `cd server && dart test test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart`: PASS.
+- `cd server && RUN_INTEGRATION_TESTS=0 dart test test/ai_optimize_flow_test.dart -r expanded`: PASS offline.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded`: PASS live, `+10 ~1`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check`: PASS, `+46`.
+- iPhone 15 Simulator contra `http://127.0.0.1:8082`: PASS WITH RISKS, `POST /ai/optimize -> 202 (181ms)`, polling OK, quality gate rejeitou swaps e o app mostrou safe no-op.
+
+### Resultado
+- Accepted latency aggressive caiu de request bloqueante ~108s para `202` em milissegundos: probe API healthy `9ms` cliente / `2ms` servidor; runtime iPhone `181ms`.
+- Completion completo ainda levou ~101s em background no seed healthy, com stage dominante `request.ai_optimize_call=36187ms`.
+- Quality gate preservado: seed healthy retornou 6 swaps, derrubou 1 sugestao, marcou `reduced_below_target=true`; seed inseguro terminou `OPTIMIZE_NEEDS_REPAIR`; runtime iPhone terminou `OPTIMIZE_QUALITY_REJECTED` sem apply inseguro.
+- Risco residual: job store memory-first melhora o mesmo processo; em deploy multi-processo, primeira leitura imediata pode depender de sticky routing ou do insert async no DB ja ter concluido.
+
 ## 2026-05-05 — Sprint 2 Optimize Intensity v2 no app/mobile
 
 ### O Porquê
