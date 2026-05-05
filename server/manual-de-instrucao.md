@@ -2,6 +2,40 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — AI Generate v2 performance path async opt-in
+
+### O Porquê
+- `/ai/generate` seguia `READY WITH RISKS`: p95/p99 anteriores abaixo de 15s, mas ainda dependentes de OpenAI/rede/cache em memoria e sem progresso para o usuario.
+- O objetivo da sprint foi reduzir latencia percebida sem migrar de OpenAI agora, mantendo o contrato sync atual para o app.
+
+### O Como
+- `server/routes/ai/generate/index.dart` passou a aceitar opt-in async por `async=true`, `profile=async`, `response_mode=background` ou `mode=async`.
+- Novo polling `GET /ai/generate/jobs/:id` retorna lifecycle do job e, quando completo, `result` com o mesmo corpo do sync.
+- Novo `server/lib/ai_generate_job.dart` e migration `014` criam `ai_generate_jobs` para persistir lifecycle/result de jobs.
+- `server/lib/internal_ai_request_token.dart` permite self-call interna sem consumir o rate limit publico de IA.
+- `server/lib/generated_deck_validation_service.dart` deduplica nomes antes de resolver cartas, reduzindo lookup repetido sem alterar o output.
+- `OPENAI_MODEL_GENERATE` permanece configuravel; teste cobre `gpt-5.4-mini` via env em staging, mas o default nao foi trocado sem evidencia comparativa.
+- Cache persistente de payload generate ficou **pendente**: mantido `EndpointCache` in-memory porque nao ha infraestrutura segura compartilhavel ja existente para `/ai/generate`.
+
+### Validacao executada
+- `cd server && dart analyze .dart_frog/server.dart lib routes test`: PASS.
+- `cd server && dart analyze lib routes test`: PASS.
+- `cd server && dart test test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/openai_runtime_config_test.dart -r expanded`: PASS, `+18`.
+- `cd server && dart test test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/openai_runtime_config_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart -r expanded`: PASS, `+44`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded`: PASS, `01:41 +2`.
+
+### Metricas
+- Baseline v2 sync frio: `200x10`, p50 `11149ms`, p95/p99 `12271ms`.
+- Pos-patch sync frio: `200x10`, p50 `10033ms`, p95/p99 `11212ms`.
+- Pos-patch cache hit: `200x10`, p50 `2ms`, p95/p99 `7ms`.
+- Pos-patch async accepted: `202x10`, p50 `558ms`, p95/p99 `562ms`.
+- Async completion interna: `12089ms` em proof detalhado; polling observado ficou ~`15620ms` p95 por intervalo/custo do endpoint de job.
+
+### Resultado
+- Resultado final: **PASS WITH RISKS**.
+- Criterio minimo atendido pela via async (`accepted_p95 < 1000ms`); sync ainda nao atingiu p95 `<10000ms`.
+- Proximos fixes: cache persistente seguro, reduzir custo de polling, testar `OPENAI_MODEL_GENERATE=gpt-5.4-mini` em staging e otimizar validacao DB.
+
 ## 2026-05-05 — Refresh release interno/TestFlight apos melhoria de `/ai/generate`
 
 ### O Porquê

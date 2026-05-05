@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
+import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
@@ -27,6 +30,15 @@ Future<Response> onRequest(RequestContext context) async {
 
     if (prompt == null || prompt.isEmpty) {
       return badRequest('Prompt is required');
+    }
+
+    if (isAiGenerateAsyncRequested(body)) {
+      return _startAiGenerateAsyncJob(
+        context: context,
+        body: body,
+        prompt: prompt,
+        format: format,
+      );
     }
 
     final totalStopwatch = Stopwatch()..start();
@@ -513,6 +525,190 @@ $metaContext
     );
     return internalServerError('Failed to generate deck');
   }
+}
+
+Future<Response> _startAiGenerateAsyncJob({
+  required RequestContext context,
+  required Map<String, dynamic> body,
+  required String prompt,
+  required String format,
+}) async {
+  final pool = context.read<Pool>();
+  String? userId;
+  try {
+    userId = context.read<String>();
+  } catch (_) {
+    userId = null;
+  }
+
+  final requestStopwatch = Stopwatch()..start();
+  final cacheKey = buildAiGenerateCacheKey(
+    prompt: prompt,
+    format: format,
+    bracket: body['bracket'],
+  );
+  final jobId = await AiGenerateJobStore.create(
+    pool: pool,
+    cacheKey: cacheKey,
+    format: format,
+    userId: userId,
+  );
+
+  final syncPayload = buildAiGenerateSyncPayloadForAsyncJob(body);
+  final authorization = context.request.headers['authorization'];
+  final internalGenerateUrl = _resolveInternalGenerateUrl(context.request);
+
+  unawaited(
+    runZonedGuarded(
+      () => _processAiGenerateAsyncJob(
+        pool: pool,
+        jobId: jobId,
+        internalGenerateUrl: internalGenerateUrl,
+        syncPayload: syncPayload,
+        authorization: authorization,
+      ),
+      (error, stackTrace) {
+        Log.e('Background ai_generate job $jobId crashed: $error\n$stackTrace');
+        unawaited(
+          AiGenerateJobStore.fail(
+            pool,
+            jobId,
+            error: 'Falha interna ao processar geracao async.',
+          ),
+        );
+      },
+    ),
+  );
+
+  return Response.json(
+    statusCode: HttpStatus.accepted,
+    body: {
+      'job_id': jobId,
+      'status': 'pending',
+      'message':
+          'Geracao iniciada em background. Consulte o progresso via polling.',
+      'poll_url': '/ai/generate/jobs/$jobId',
+      'poll_interval_ms': 1000,
+      'total_stages': 4,
+      'cache': {
+        'hit': false,
+        'cache_key': cacheKey,
+      },
+      'timings': {
+        'accepted_ms': requestStopwatch.elapsedMilliseconds,
+      },
+    },
+  );
+}
+
+Future<void> _processAiGenerateAsyncJob({
+  required Pool pool,
+  required String jobId,
+  required Uri internalGenerateUrl,
+  required Map<String, dynamic> syncPayload,
+  required String? authorization,
+}) async {
+  await AiGenerateJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Preparando geracao',
+    stageNumber: 1,
+  );
+
+  final stopwatch = Stopwatch()..start();
+  await AiGenerateJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Gerando e validando deck',
+    stageNumber: 2,
+  );
+
+  final headers = <String, String>{
+    'Content-Type': 'application/json',
+    'X-Internal-AI-Request-Token': InternalAiRequestToken.value,
+    if (authorization != null && authorization.trim().isNotEmpty)
+      'Authorization': authorization,
+  };
+
+  late final http.Response response;
+  try {
+    response = await http
+        .post(
+          internalGenerateUrl,
+          headers: headers,
+          body: jsonEncode(syncPayload),
+        )
+        .timeout(const Duration(minutes: 3));
+  } on TimeoutException {
+    await AiGenerateJobStore.fail(
+      pool,
+      jobId,
+      error: 'Tempo limite excedido ao gerar deck async.',
+    );
+    return;
+  }
+
+  await AiGenerateJobStore.progress(
+    pool,
+    jobId,
+    stage: 'Persistindo resultado',
+    stageNumber: 3,
+  );
+
+  Map<String, dynamic> resultBody;
+  try {
+    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+    resultBody = decoded is Map<String, dynamic>
+        ? decoded
+        : decoded is Map
+            ? decoded.cast<String, dynamic>()
+            : <String, dynamic>{'value': decoded};
+  } catch (_) {
+    await AiGenerateJobStore.fail(
+      pool,
+      jobId,
+      error: 'Generate async recebeu resposta invalida do executor interno.',
+    );
+    return;
+  }
+
+  resultBody['async'] = {
+    'job_id': jobId,
+    'completed_ms': stopwatch.elapsedMilliseconds,
+    'result_status_code': response.statusCode,
+  };
+
+  if (response.statusCode == HttpStatus.ok ||
+      response.statusCode == HttpStatus.unprocessableEntity) {
+    await AiGenerateJobStore.complete(
+      pool,
+      jobId,
+      statusCode: response.statusCode,
+      result: resultBody,
+    );
+    return;
+  }
+
+  await AiGenerateJobStore.fail(
+    pool,
+    jobId,
+    error: resultBody['error']?.toString() ?? 'Falha ao gerar deck async.',
+  );
+}
+
+Uri _resolveInternalGenerateUrl(Request request) {
+  final configured = Platform.environment['AI_GENERATE_INTERNAL_BASE_URL'];
+  if (configured != null && configured.trim().isNotEmpty) {
+    final base = configured.trim().replaceFirst(RegExp(r'/$'), '');
+    return Uri.parse('$base/ai/generate');
+  }
+
+  final host = request.headers['host']?.trim();
+  final fallbackPort = Platform.environment['PORT']?.trim();
+  final resolvedHost = host != null && host.isNotEmpty
+      ? host
+      : '127.0.0.1:${fallbackPort?.isNotEmpty == true ? fallbackPort : '8080'}';
+  return Uri.parse('http://$resolvedHost/ai/generate');
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

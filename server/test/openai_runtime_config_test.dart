@@ -78,5 +78,24 @@ void main() {
         equals(3800),
       );
     });
+
+    test('keeps generate model configurable for staging experiments', () {
+      final env = DotEnv()
+        ..addAll({
+          'ENVIRONMENT': 'staging',
+          'OPENAI_MODEL_GENERATE': 'gpt-5.4-mini',
+        });
+      final config = OpenAiRuntimeConfig(env);
+
+      expect(
+        config.modelFor(
+          key: 'OPENAI_MODEL_GENERATE',
+          fallback: 'gpt-4o-mini',
+          stagingFallback: 'gpt-4o-mini',
+          prodFallback: 'gpt-4o-mini',
+        ),
+        equals('gpt-5.4-mini'),
+      );
+    });
   });
 }

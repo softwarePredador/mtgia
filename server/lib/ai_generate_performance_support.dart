@@ -34,6 +34,35 @@ String buildAiGenerateCacheKey({
   return 'ai_generate:v1:$digest';
 }
 
+bool isAiGenerateAsyncRequested(Map<String, dynamic> body) {
+  final asyncValue = body['async'];
+  if (asyncValue == true) return true;
+  if (asyncValue is String && asyncValue.trim().toLowerCase() == 'true') {
+    return true;
+  }
+
+  for (final key in const ['profile', 'response_mode', 'mode']) {
+    final value = body[key]?.toString().trim().toLowerCase();
+    if (value == 'async' || value == 'background') return true;
+  }
+
+  return false;
+}
+
+Map<String, dynamic> buildAiGenerateSyncPayloadForAsyncJob(
+  Map<String, dynamic> body,
+) {
+  final payload = Map<String, dynamic>.from(body);
+  payload.remove('async');
+  for (final key in const ['profile', 'response_mode', 'mode']) {
+    final value = payload[key]?.toString().trim().toLowerCase();
+    if (value == 'async' || value == 'background') {
+      payload.remove(key);
+    }
+  }
+  return payload;
+}
+
 Map<String, dynamic> cloneAiGenerateJsonMap(Map<String, dynamic> payload) {
   return (jsonDecode(jsonEncode(payload)) as Map).cast<String, dynamic>();
 }

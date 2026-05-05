@@ -181,6 +181,21 @@ void main() async {
         'created_at',
         'updated_at'
       ],
+      'ai_generate_jobs': [
+        'id',
+        'user_id',
+        'cache_key',
+        'format',
+        'status',
+        'stage',
+        'stage_number',
+        'total_stages',
+        'result_status_code',
+        'result',
+        'error',
+        'created_at',
+        'updated_at'
+      ],
       'ai_user_preferences': [
         'user_id',
         'preferred_archetype',

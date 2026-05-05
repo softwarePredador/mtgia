@@ -1,5 +1,21 @@
 # ManaLoom Release Go/No-Go Checklist - 2026-05-04
 
+## 2026-05-05 refresh after AI Generate v2 async path
+
+ManaLoom remains **READY WITH RISKS** for the internal/TestFlight candidate scope, with `/ai/generate` improved to **PASS WITH RISKS** through an opt-in async path. The sync API remains preserved for the current app.
+
+Fresh backend evidence on `http://127.0.0.1:8082`:
+
+| Area | Result |
+|---|---|
+| Sync `/ai/generate` cold after v2 | `200x10`, p50 `10033ms`, p95/p99 `11212ms` |
+| Sync `/ai/generate` cache hit | `200x10`, p50 `2ms`, p95/p99 `7ms` |
+| Async `/ai/generate` accepted response | `202x10`, accepted p50 `558ms`, p95/p99 `562ms` |
+| Async completion | `completedx10`; internal completion proof `12089ms`; observed polling p95 `15620ms` including poll interval/middleware |
+| Live create/validate/optimize | PASS: `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded` -> `01:41 +2` |
+
+Release interpretation: sync p95 is still above the desired `<10000ms`, so broad rollout remains watchlisted. The accepted internal/TestFlight path is the async/progress-capable contract: `POST /ai/generate` with async opt-in returns `202` below 1s p95 and clients poll `/ai/generate/jobs/:id` for the same result body as sync.
+
 ## 2026-05-05 refresh after `/ai/generate` latency patch
 
 ManaLoom is **READY WITH RISKS** for the internal/TestFlight candidate scope validated from `master` base commit `40fe6ab` plus the release-checklist quality-gate fix in this update.
@@ -228,7 +244,9 @@ These thresholds gate the final pre-release command set. Local development measu
 | `GET /community/marketplace?search=Sol Ring` | 629 ms | <= 1500 ms | PASS |
 | `GET /trades?page=1&limit=20&role=all` | 602 ms | <= 1500 ms | PASS |
 | `GET /trades/:id` | 1227 ms | <= 1500 ms for release; P1 if > 2000 ms | PASS WITH WATCH |
-| `POST /ai/generate` | 13005 ms | <= 15000 ms for internal/TestFlight; monitor external AI/fallback quality | PASS WITH MONITORED RISK |
+| `POST /ai/generate` sync v2 | 11212 ms | <= 15000 ms for internal/TestFlight; desired <= 10000 ms before broad rollout | PASS WITH MONITORED RISK |
+| `POST /ai/generate` async accepted v2 | 562 ms | <= 1000 ms | PASS |
+| `GET /ai/generate/jobs/:id` async completion v2 | internal `12089 ms`; observed polling p95 `15620 ms` | internal <= 15000 ms; optimize poll endpoint separately if observed p95 must include polling overhead | PASS WITH WATCH |
 | `POST /ai/optimize` | 4825 ms | <= 6000 ms | ACCEPTED RISK |
 | `GET /ai/optimize/jobs/:id` | 1199 ms | <= 2000 ms | PASS WITH WATCH |
 

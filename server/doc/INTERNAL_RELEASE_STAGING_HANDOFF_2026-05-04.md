@@ -1,5 +1,36 @@
 # ManaLoom Internal Release / Staging Handoff - 2026-05-04
 
+## 2026-05-05 refresh - AI Generate v2 performance path
+
+**PASS WITH RISKS** for `/ai/generate` v2 on backend `8082`. The sync contract remains default/backward-compatible; a new async opt-in path now returns `202` with `job_id` and polling at `/ai/generate/jobs/:id`.
+
+Evidence from sanitized local backend probes:
+
+| Scenario | Statuses | p50 | p95 | p99 | Decision |
+|---|---:|---:|---:|---:|---|
+| Sync cold baseline before v2 | `200x10` | `11149ms` | `12271ms` | `12271ms` | Too slow for no-progress UX. |
+| Sync cold after v2 | `200x10` | `10033ms` | `11212ms` | `11212ms` | Improved, but still above desired `<10000ms`. |
+| Cache hit after v2 | `200x10` | `2ms` | `7ms` | `7ms` | PASS; cache remains in-memory only. |
+| Async accepted after v2 | `202x10` | `558ms` | `562ms` | `562ms` | PASS; below `<1000ms`. |
+| Async internal completion proof | `completed` | `12089ms` | `12089ms` | `12089ms` | PASS; below `<15000ms` internally. |
+
+Validation:
+
+| Command | Result |
+|---|---|
+| `cd server && dart analyze .dart_frog/server.dart lib routes test` | PASS |
+| `cd server && dart analyze lib routes test` | PASS |
+| `cd server && dart test test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/openai_runtime_config_test.dart -r expanded` | PASS: `+18` |
+| `cd server && dart test test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/openai_runtime_config_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart -r expanded` | PASS: `+44` |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded` | PASS: `01:41 +2` |
+
+Implementation notes:
+
+1. `OPENAI_MODEL_GENERATE` remains configurable and reversible; staging can test `gpt-5.4-mini`, but default was not changed without comparative evidence.
+2. `ai_generate_jobs` persists async lifecycle/results; generate response cache is still `EndpointCache` in-memory only.
+3. Name lookup in generated deck validation now deduplicates names before DB resolution.
+4. Scanner/social/binder/sets/life counter were not touched.
+
 ## 2026-05-05 refresh - internal/TestFlight sanity after `40fe6ab`
 
 **READY WITH RISKS** for internal/TestFlight. The release-blocking interpretation of `/ai/generate` latency was downgraded to monitored risk after the `Optimize AI generate latency` patch: cold p95/p99 `13005ms`, cache hit `3ms`, all measured samples 200. This remains PASS WITH RISKS because OpenAI/fallback quality and remote DB validation latency are variable.

@@ -4,6 +4,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import 'distributed_rate_limiter.dart';
+import 'internal_ai_request_token.dart';
 
 /// Rate Limiter Middleware para prevenir abuso de endpoints
 ///
@@ -292,6 +293,10 @@ Middleware authRateLimit() {
 Middleware aiRateLimit() {
   return (handler) {
     return (context) async {
+      if (InternalAiRequestToken.matches(context.request.headers)) {
+        return handler(context);
+      }
+
       final limiter = _isProduction() ? _aiRateLimiter : _aiRateLimiterDev;
       final clientId = RateLimiter._defaultIdentifier(context);
 

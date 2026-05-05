@@ -182,6 +182,28 @@ void main() {
       });
     });
 
+    test('deduplicates card name lookup before validation', () async {
+      final repository = _FakeGeneratedDeckRepository(
+        cardsByName: {
+          'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+        },
+      );
+      final service = GeneratedDeckValidationService(repository);
+
+      final result = await service.validate(
+        format: 'standard',
+        cards: [
+          {'name': 'Mountain', 'quantity': 20},
+          {'name': ' mountain ', 'quantity': 20},
+          {'name': 'MOUNTAIN', 'quantity': 20},
+        ],
+      );
+
+      expect(result.isValid, isTrue);
+      expect(repository.lastResolvedItems, hasLength(1));
+      expect(repository.lastResolvedItems.single['name'], equals('Mountain'));
+    });
+
     test(
         'fails commander generation when unresolved cards break exact deck size',
         () async {
@@ -249,6 +271,7 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
 
   final Map<String, Map<String, dynamic>> cardsByName;
   final Map<String, List<String>> suggestionsByName;
+  List<Map<String, dynamic>> lastResolvedItems = const [];
 
   @override
   Future<Map<String, List<String>>> findSuggestions(List<String> names) async {
@@ -262,6 +285,9 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
     List<Map<String, dynamic>> parsedItems,
   ) async {
+    lastResolvedItems = [
+      for (final item in parsedItems) Map<String, dynamic>.from(item),
+    ];
     final resolved = <String, Map<String, dynamic>>{};
 
     for (final item in parsedItems) {

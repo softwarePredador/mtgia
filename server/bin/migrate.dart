@@ -335,6 +335,40 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS ai_optimize_jobs CASCADE;
     ''',
   ),
+  Migration(
+    version: '014',
+    name: 'create_ai_generate_jobs',
+    up: '''
+      CREATE TABLE IF NOT EXISTS ai_generate_jobs (
+        id TEXT PRIMARY KEY,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        cache_key TEXT NOT NULL,
+        format TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        stage TEXT NOT NULL DEFAULT 'Iniciando...',
+        stage_number INTEGER NOT NULL DEFAULT 0,
+        total_stages INTEGER NOT NULL DEFAULT 4,
+        result_status_code INTEGER,
+        result JSONB,
+        error TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_ai_generate_jobs_status
+          CHECK (status IN ('pending', 'processing', 'completed', 'failed'))
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_updated
+      ON ai_generate_jobs (user_id, updated_at DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_created
+      ON ai_generate_jobs (created_at DESC);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_ai_generate_jobs_created;
+      DROP INDEX IF EXISTS idx_ai_generate_jobs_user_updated;
+      DROP TABLE IF EXISTS ai_generate_jobs CASCADE;
+    ''',
+  ),
 ];
 
 class Migration {

@@ -140,11 +140,19 @@ class GeneratedDeckValidationService {
         ? null
         : CardValidationService.sanitizeCardName(commanderName);
 
-    final parsedItems = [
-      for (final card in sanitizedCards) {'name': card['name']},
-      if (sanitizedCommander != null && sanitizedCommander.isNotEmpty)
-        {'name': sanitizedCommander},
-    ];
+    final seenLookupNames = <String>{};
+    final parsedItems = <Map<String, dynamic>>[];
+    void addLookupName(String? name) {
+      final normalizedName = name?.trim();
+      if (normalizedName == null || normalizedName.isEmpty) return;
+      if (!seenLookupNames.add(normalizedName.toLowerCase())) return;
+      parsedItems.add({'name': normalizedName});
+    }
+
+    for (final card in sanitizedCards) {
+      addLookupName(card['name'] as String?);
+    }
+    addLookupName(sanitizedCommander);
 
     final foundCardsMap = await _repository.resolveCardNames(parsedItems);
 
