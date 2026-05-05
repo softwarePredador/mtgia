@@ -1,12 +1,40 @@
 # ManaLoom Internal Release / Staging Handoff - 2026-05-04
 
+## 2026-05-05 refresh - internal/TestFlight sanity after `40fe6ab`
+
+**READY WITH RISKS** for internal/TestFlight. The release-blocking interpretation of `/ai/generate` latency was downgraded to monitored risk after the `Optimize AI generate latency` patch: cold p95/p99 `13005ms`, cache hit `3ms`, all measured samples 200. This remains PASS WITH RISKS because OpenAI/fallback quality and remote DB validation latency are variable.
+
+Fresh short sanity used:
+
+| Item | Value |
+|---|---|
+| Date/time | `2026-05-05T09:16-03:00` to `2026-05-05T09:24-03:00` |
+| Branch/base commit | `master`, `40fe6ab` |
+| Backend URL | `http://127.0.0.1:8082` |
+| Backend health | `healthy` |
+| Backend final state | Stopped after validation; port `8082` free. |
+| iPhone 15 Simulator | `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| iOS runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| Scanner physical camera/OCR | `DEFERRED / NOT PROVEN` |
+
+Commands/results:
+
+| Area | Result |
+|---|---|
+| `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded` | PASS after gate fix: `01:59 +2` |
+| `flutter analyze lib/features/decks test/features/decks --no-version-check` | PASS, no issues |
+| `flutter test test/features/decks --no-version-check` | PASS: `00:09 +135` |
+| `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` | PASS: `01:16 +1`, final marker `10_complete_validated` |
+
+The first backend focused attempt found `/ai/optimize` returning success with `validation_score=68`; the release fix now treats optimize score `<70` as quality rejection/retry. Runtime log review after the fix found zero Flutter exceptions, zero RenderFlex overflows, zero timeout/socket failures, and zero residual runtime `4xx/5xx`. Local proof logs: `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/`.
+
 ## Release verdict
 
 **READY WITH RISKS for internal/staging only.**
 
 The validated non-scanner scope passed on `master` at commit `85b4200` with a real local backend on `http://127.0.0.1:8082` and iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` (`com.apple.CoreSimulator.SimRuntime.iOS-17-4`).
 
-This is not a production/broad-rollout approval because the fresh 5-sample `/ai/generate` latency regressed beyond the previously accepted risk threshold. All `/ai/generate` samples returned `200`, but p95/p99 reached `44756ms`.
+This is not a production/broad-rollout approval. The pre-P1 5-sample `/ai/generate` baseline had regressed to p95/p99 `44756ms`; after the latency patch, the accepted internal/TestFlight measurement is p95/p99 `13005ms` with a `3ms` cache hit, still monitored because the flow depends on external AI/fallback quality and remote DB validation latency.
 
 ### 2026-05-04 P1 addendum - `/ai/generate` latency reduction
 
@@ -127,7 +155,7 @@ Backend health:
 | Marketplace/Trades/Messages/Notifications | `cd app && flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | PASS; `01:50 +2`. |
 | Life Counter/Lotus runtime | `cd app && flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | PASS; `00:28 +1`. |
 | Visual non-scanner smoke | `cd app && flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` | PASS; `01:02 +1`. |
-| AI performance | 5 samples each for `POST /ai/generate` and `POST /ai/optimize` using synthetic QA data | PASS for HTTP status, but `/ai/generate` latency is outside accepted risk. |
+| AI performance | 5 samples each for `POST /ai/generate` and `POST /ai/optimize` using synthetic QA data | PASS for HTTP status. Pre-P1 `/ai/generate` was outside accepted risk; post-patch p95/p99 `13005ms` plus cache hit `3ms` is accepted as monitored risk for internal/TestFlight. |
 | Cleanup | Stop backend `8082`, confirm `lsof -nP -iTCP:8082 -sTCP:LISTEN` has no listener, restore generated live optimize artifact | PASS; port free and generated latest artifact restored. |
 
 ## Runtime/log visibility
@@ -159,10 +187,10 @@ Sentry/log status:
 | Endpoint | Statuses | p50 | p95 | p99 | Release interpretation |
 |---|---:|---:|---:|---:|---|
 | `POST /ai/generate` | `200x5` | `24293ms` | `44756ms` | `44756ms` | **Outside accepted risk.** Internal/staging can proceed only with explicit warning; not production-ready. |
-| `POST /ai/generate` after P1 patch | `200x5` | `10433ms` | `13005ms` | `13005ms` | **Improved / PASS WITH RISKS.** Meets sprint target `<15000ms`; fallback quality and DB validation latency remain watch items. |
+| `POST /ai/generate` after P1 patch | `200x5` | `10433ms` | `13005ms` | `13005ms` | **Improved / PASS WITH RISKS.** Meets sprint target `<15000ms`; cache hit probe returned `3ms`; fallback quality and DB validation latency remain watch items. |
 | `POST /ai/optimize` | `202x5` | `4786ms` | `5029ms` | `5029ms` | Inside previous accepted risk; all async jobs completed. |
 
-Previous accepted-risk reference was `/ai/generate` p95 around `10203ms` and release threshold `<=12000ms` for this cycle. The fresh p95/p99 now exceeds that threshold by a wide margin. Treat as P1 before any broader rollout, and as no-go for production/broad staging if repeated.
+The previous pre-P1 accepted-risk reference was `/ai/generate` p95 around `10203ms` and the old cycle threshold `<=12000ms`. The post-patch p95/p99 `13005ms` is accepted for internal/TestFlight under the newer `<15000ms` sprint target, but it remains a monitored risk and should be improved before broad rollout.
 
 ## Accepted risks for internal/staging
 
@@ -235,7 +263,7 @@ Build prerequisites before upload:
 
 ## Next sprint
 
-1. P1: reduce `/ai/generate` p95 or make the flow async/progress-resilient before broad rollout.
+1. Monitor `/ai/generate` p95/p99 after the latency patch; keep async/progress-resilient work before broad rollout even though internal/TestFlight is no longer blocked.
 2. P1: configure internal build signing/export in CI and record a signed build proof.
 3. P2: initialize/validate Firebase Performance in staging builds if it is required for release observability.
 4. P2: configure server FCM credentials and run a push smoke if notifications delivery is release-critical.

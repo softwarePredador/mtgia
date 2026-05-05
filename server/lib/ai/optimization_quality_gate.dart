@@ -76,7 +76,8 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
         (((removedCard['type_line'] as String?) ?? '')
             .toLowerCase()
             .contains('land'));
-    final removedLandColorProducing = removedIsLand && _landLooksColorProducing(removedCard);
+    final removedLandColorProducing =
+        removedIsLand && _landLooksColorProducing(removedCard);
 
     // Permitir swaps "land -> spell" quando o deck está claramente acima do alvo de terrenos.
     // Isso evita o gate bloquear ajustes reais de flood/mana base em decks saudáveis.
@@ -283,7 +284,7 @@ List<String> buildOptimizationRejectionReasons({
     );
   }
 
-  if (validationReport.verdict != 'aprovado' && validationReport.score < 70) {
+  if (validationReport.score < 70) {
     reasons.add(
       'Score final abaixo do mínimo para aceitar a otimização com sucesso (${validationReport.score}/100; mínimo 70).',
     );

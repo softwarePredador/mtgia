@@ -228,6 +228,54 @@ void main() {
       expect(reasons, isEmpty);
     });
 
+    test('rejects approved verdict when score is below success threshold', () {
+      final validation = ValidationReport(
+        score: 68,
+        verdict: 'aprovado',
+        monteCarlo: MonteCarloComparison(
+          before: _goldfish(
+            keepableRate: 0.91,
+            turn2PlayRate: 0.96,
+            screwRate: 0.07,
+          ),
+          after: _goldfish(
+            keepableRate: 0.89,
+            turn2PlayRate: 0.97,
+            screwRate: 0.08,
+          ),
+          beforeMulligan: _mulligan(keepAt7Rate: 0.89),
+          afterMulligan: _mulligan(keepAt7Rate: 0.90),
+        ),
+        functional: FunctionalReport(
+          swaps: const [],
+          upgrades: 0,
+          sidegrades: 0,
+          tradeoffs: 1,
+          questionable: 0,
+          roleDelta: const {'removal': -1, 'ramp': 1, 'draw': 0},
+        ),
+        critic: const {
+          'approval_score': 60,
+          'verdict': 'reprovado',
+        },
+        warnings: const [],
+      );
+
+      final reasons = buildOptimizationRejectionReasons(
+        validationReport: validation,
+        archetype: 'aggro',
+        preCurve: 1.73,
+        postCurve: 1.67,
+        preManaAssessment: 'Base de mana equilibrada',
+        postManaAssessment: 'Base de mana equilibrada',
+      );
+
+      expect(
+        reasons.any((reason) => reason.contains('mínimo 70')),
+        isTrue,
+      );
+    });
+
     test('keeps structural recovery swaps for degenerate mana bases', () {
       final originalDeck = [
         _card(

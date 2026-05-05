@@ -1,5 +1,56 @@
 # Deck runtime iPhone 15 Simulator — 2026-05-04
 
+## Atualizacao TestFlight/internal sanity — 2026-05-05T09:24-03:00
+
+- Verdict: `READY WITH RISKS` para release interno/TestFlight sem scanner fisico.
+- Backend usado pelo app: `http://127.0.0.1:8082`.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- `flutter devices`: iPhone 15 Simulator bootado; macOS/Chrome disponiveis; iPhone fisico wireless `Rafa` detectado mas `NOT PROVEN`.
+- Backend health: `healthy`.
+- Backend final state: stopped after validation; port `8082` free.
+- Scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`; nenhum fluxo fisico de scanner foi executado.
+- `/ai/generate`: p95/p99 pos-patch `13005ms`, cache hit `3ms`; risco rebaixado de blocker para monitorado por dependencia de IA externa/fallback.
+
+Comandos executados:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+git status --short
+flutter devices
+xcrun simctl list devices available | grep -E "iPhone 15|Booted"
+
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+curl -sS http://127.0.0.1:8082/health
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded
+
+cd app
+flutter analyze lib/features/decks test/features/decks --no-version-check
+flutter test test/features/decks --no-version-check
+flutter test integration_test/deck_runtime_m2006_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultados:
+
+| Area | Resultado |
+| --- | --- |
+| Backend focused live | PASS apos fix de gate: `01:59 +2` |
+| App deck analyze | PASS: no issues |
+| App deck tests | PASS: `00:09 +135` |
+| Deck runtime iPhone 15 | PASS: `01:16 +1`, final `10_complete_validated` |
+
+O fluxo real cobriu register/login, create/generate, deck detail, optimize async, preview, apply/bulk e validate contra backend local real. O log runtime nao teve Flutter exception, RenderFlex overflow, timeout/socket, `status=4xx`, `status=5xx` ou `Some tests failed`. Warnings observados foram slow-request breadcrumbs bem-sucedidos (`/ai/optimize` 202 em `5040ms`; bulk apply 200 em `5393ms`) e avisos ambientais de simulator/plugins.
+
+Evidencias locais ignoradas por git: `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/` com `backend_health_8082.json`, `backend_ai_generate_create_optimize_flow.log`, `app_decks_analyze.log`, `app_decks_tests.log` e `deck_runtime_iphone15_2026-05-05.log`.
+
+Blockers: nenhum para deck runtime. O primeiro backend sanity encontrou `/ai/optimize` 200 com `validation_score=68`; foi corrigido no gate final para score `<70` virar rejeicao/retry, e a sanity live passou em seguida.
+
 ## Atualizacao internal release/staging — 2026-05-04T17:14-03:00
 
 - Verdict: `READY WITH RISKS for internal/staging only`.

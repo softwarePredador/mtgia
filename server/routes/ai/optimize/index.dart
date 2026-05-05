@@ -2072,11 +2072,9 @@ Future<Response> onRequest(RequestContext context) async {
 
       if (!isComplete && optimizationValidationReport != null) {
         final hardQualityRejected =
-            optimizationValidationReport.verdict != 'aprovado';
+            optimizationValidationReport.verdict != 'aprovado' ||
+                optimizationValidationReport.score < 70;
 
-        // Quando a validação já fechou como "aprovado", confiamos no validador
-        // como fonte de verdade e não reprovamos novamente via reasons derivadas.
-        // Isso evita inconsistência (veredito aprovado + reasons não-vazias).
         final effectiveRejectionReasons = hardQualityRejected
             ? buildOptimizationRejectionReasons(
                 validationReport: optimizationValidationReport,
@@ -2154,7 +2152,8 @@ Future<Response> onRequest(RequestContext context) async {
         final responseValidationVerdict =
             responseValidationJson['verdict']?.toString() ?? '';
 
-        if (responseValidationVerdict != 'aprovado') {
+        if (responseValidationVerdict != 'aprovado' ||
+            responseValidationScore < 70) {
           final serializedValidationReasons = optimizationValidationReport !=
                   null
               ? buildOptimizationRejectionReasons(

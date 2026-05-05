@@ -2,6 +2,40 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Refresh release interno/TestFlight apos melhoria de `/ai/generate`
+
+### O Porquê
+- O commit `40fe6ab` reduziu a latencia de `/ai/generate`, e o checklist de release precisava deixar claro que p95/p99 `13005ms` e cache hit `3ms` sairam de blocker para risco monitorado.
+- A sanity curta antes de build interno/TestFlight precisava provar novamente Deck Generate/Optimize no iPhone 15 Simulator com backend local real, mantendo scanner fisico/camera/OCR como `DEFERRED / NOT PROVEN`.
+- A primeira rodada live encontrou uma inconsistencia de contrato em `/ai/optimize`: o backend podia retornar 200 com `verdict=aprovado`, mas `validation_score=68`, abaixo do minimo aceito pelo teste e pela regra de qualidade.
+
+### O Como
+- `server/lib/ai/optimization_quality_gate.dart` agora gera motivo de rejeicao sempre que `validation_score < 70`, mesmo se o texto do validador vier como `aprovado`.
+- `server/routes/ai/optimize/index.dart` passou a tratar `score < 70` como `hardQualityRejected`, acionando retry/fallback ou 422 em vez de sucesso 200 com qualidade insuficiente.
+- `server/test/optimization_quality_gate_test.dart` ganhou cobertura para o caso `verdict=aprovado` com score abaixo do threshold.
+- Documentos atualizados: checklist go/no-go, staging handoff, handoff iPhone 15, app audit, mapa de contratos e este manual.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai/optimization_quality_gate.dart routes/ai/optimize/index.dart test/optimization_quality_gate_test.dart`: PASS.
+- `cd server && dart test test/optimization_quality_gate_test.dart -r expanded`: PASS, `+9`.
+- Backend temporario `PORT=8082 dart run .dart_frog/server.dart` respondeu `/health` em `http://127.0.0.1:8082`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded`: PASS apos fix, `01:59 +2`.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS, `00:09 +135`.
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS, `01:16 +1`, final `10_complete_validated`.
+
+### Evidencia runtime
+- Device primario: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Fluxo real provado: register/login, generate/create, deck detail, optimize async job, preview, bulk apply e validate.
+- Logs runtime revisados sem Flutter exception, RenderFlex overflow, timeout/socket, `status=4xx`, `status=5xx` ou falha de teste.
+- Evidencias locais ignoradas por git: `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/`.
+
+### Resultado
+- Resultado final: `READY WITH RISKS` para release interno/TestFlight sem scanner fisico.
+- `/ai/generate`: PASS WITH RISKS monitorado, p95/p99 `13005ms`, cache hit `3ms`; ainda depende de OpenAI/fallback deterministico e validacao DB remota.
+- `/ai/optimize`: contrato endurecido para nao retornar sucesso quando o score final fica abaixo de 70.
+- Scanner fisico/camera/OCR segue `DEFERRED / NOT PROVEN` e nao pode ser promovido por prova de simulador.
+
 ## 2026-05-04 — P1 reducao de latencia do `POST /ai/generate`
 
 ### O Porquê
