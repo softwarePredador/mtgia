@@ -12,7 +12,14 @@ import '../models/deck_details.dart';
 import '../models/deck_card_item.dart';
 import 'deck_provider_support.dart';
 
-export 'deck_provider_support.dart' show DeckAiFlowException;
+export 'deck_provider_support.dart'
+    show
+        DeckAiFlowException,
+        GenerateDeckCancellation,
+        GenerateDeckCancelledException,
+        GenerateDeckProgressCallback,
+        GenerateDeckProgressSnapshot,
+        GenerateDeckTimeoutException;
 
 typedef ActivationEventTracker =
     Future<void> Function(
@@ -666,7 +673,19 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> generateDeck({
     required String prompt,
     required String format,
-  }) => generateDeckFromPrompt(_apiClient, prompt: prompt, format: format);
+    GenerateDeckProgressCallback? onProgress,
+    GenerateDeckCancellation? cancellation,
+    Duration pollTimeout = const Duration(seconds: 90),
+    Duration? pollInterval,
+  }) => generateDeckFromPrompt(
+    _apiClient,
+    prompt: prompt,
+    format: format,
+    onProgress: onProgress,
+    cancellation: cancellation,
+    pollTimeout: pollTimeout,
+    pollInterval: pollInterval,
+  );
 
   Future<DeckDetails> _ensureDeckLoadedForOptimization(String deckId) async {
     final deck = await _ensureDeckLoadedForMutation(deckId);

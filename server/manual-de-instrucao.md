@@ -2,6 +2,34 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — App mobile passa a usar `/ai/generate` async por padrao
+
+### O Porquê
+- O backend v2 ja provava `202 + job_id` com accepted p95 abaixo de 1s, mas o app ainda bloqueava a UX no caminho sync.
+- O fluxo de Generate precisava mostrar progresso real, preservar compatibilidade com backend legacy e nao expor prompt completo, JWT, DSN, database URL ou payload sensivel em logs.
+
+### O Como
+- `app/lib/features/decks/providers/deck_provider_support_generation.dart` agora envia `async=true`, trata `202`, registra breadcrumbs sanitizados, faz polling tolerante em `GET /ai/generate/jobs/:id` e consome `result` com o mesmo shape do sync.
+- `DeckProvider.generateDeck` ganhou callback de progresso, token de cancelamento, timeout e poll interval opcionais para testes.
+- Fallback sync preservado:
+  - `200/422` direto continua aceito como contrato legacy;
+  - backend sem async/polling (`400/404/405/501` com sinal de async/mode/polling) faz retry sem `async`.
+- `DeckGenerateScreen` mostra progresso com as etapas "Pedido aceito", "Tecendo lista", "Validando legalidade", "Ajustando mana" e "Pronto para revisar".
+- `DeckGenerateScreen.dispose()` cancela polling ao sair da tela.
+- O dialog de salvamento do Generate passou a fechar pelo root navigator para nao deixar barreira modal residual apos criar deck.
+
+### Testes e runtime
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS, `+142`.
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded`: PASS, `01:45 +2`.
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, backend `http://127.0.0.1:8082`:
+  - Generate async focado: UI feedback `547ms`, `POST /ai/generate -> 202` em `802ms`, polling completed `result_status=200` em `15849ms`, save/detail/validate reais.
+  - Optimize/apply/validate existente: `integration_test/deck_runtime_m2006_test.dart` PASS `01:27 +1`, final `10_complete_validated`.
+
+### Resultado
+- Resultado final: **PASS WITH RISKS**.
+- Risco residual: optimize direto do deck gerado no harness focado retornou `422 needs_repair` e acionou `/ai/rebuild` em vez de sugestoes aplicaveis. O preview/apply/validate segue provado pelo harness existente; menor proximo ajuste e aceitar o branch rebuild ou selecionar uma estrategia mais aderente ao deck gerado.
+
 ## 2026-05-05 — AI Generate v2 performance path async opt-in
 
 ### O Porquê

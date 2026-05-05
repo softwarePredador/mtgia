@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../../core/utils/logger.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
@@ -25,6 +26,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   String _selectedFormat = 'Commander';
   bool _isGenerating = false;
   Map<String, dynamic>? _generatedDeck;
+  GenerateDeckCancellation? _generateCancellation;
+  String _generationProgressMessage = 'Enviando pedido para a IA...';
+  int _generationProgressStep = 0;
 
   @override
   void initState() {
@@ -69,6 +73,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
   @override
   void dispose() {
+    _generateCancellation?.cancel();
     _promptController.dispose();
     _deckNameController.dispose();
     _scrollController.dispose();
@@ -85,22 +90,48 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return;
     }
 
+    _generateCancellation?.cancel();
+    final cancellation = GenerateDeckCancellation();
+    final feedbackStopwatch = Stopwatch()..start();
+    _generateCancellation = cancellation;
+
     setState(() {
       _isGenerating = true;
       _generatedDeck = null;
+      _generationProgressMessage = 'Enviando pedido para a IA...';
+      _generationProgressStep = 0;
     });
 
     try {
       final result = await context.read<DeckProvider>().generateDeck(
         prompt: _promptController.text.trim(),
         format: _selectedFormat,
+        cancellation: cancellation,
+        onProgress: (progress) {
+          if (!mounted || _generateCancellation != cancellation) return;
+          if (progress.step == 1) {
+            AppLogger.info(
+              '[DeckGenerate] initial async feedback after '
+              '${feedbackStopwatch.elapsedMilliseconds}ms',
+            );
+          }
+          setState(() {
+            _generationProgressStep = progress.step;
+            _generationProgressMessage = progress.message;
+          });
+        },
       );
 
       if (!mounted) return;
       setState(() {
         _generatedDeck = result;
         _isGenerating = false;
+        _generationProgressStep = 4;
+        _generationProgressMessage = 'Pronto para revisar.';
       });
+      if (_generateCancellation == cancellation) {
+        _generateCancellation = null;
+      }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ctx = _previewKey.currentContext;
@@ -113,10 +144,16 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         }
       });
     } catch (e) {
+      if (e is GenerateDeckCancelledException) {
+        return;
+      }
       if (!mounted) return;
       setState(() {
         _isGenerating = false;
       });
+      if (_generateCancellation == cancellation) {
+        _generateCancellation = null;
+      }
 
       if (mounted) {
         final message = FriendlyErrorMapper.fromException(
@@ -208,7 +245,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context); // Close loading
+      Navigator.of(context, rootNavigator: true).pop(); // Close loading
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -229,7 +266,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       }
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context); // Close loading
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
         final message = FriendlyErrorMapper.fromException(
           e,
           context: FriendlyErrorContext.deckSave,
@@ -363,6 +400,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            if (_isGenerating) ...[
+              _GenerateProgressPanel(
+                currentStep: _generationProgressStep,
+                message: _generationProgressMessage,
+              ),
+              const SizedBox(height: 20),
+            ],
 
             if (_generatedDeck == null) ...[
               // Example Prompts
@@ -663,6 +707,118 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             );
           }),
         ],
+      ),
+    );
+  }
+}
+
+class _GenerateProgressPanel extends StatelessWidget {
+  const _GenerateProgressPanel({
+    required this.currentStep,
+    required this.message,
+  });
+
+  static const _steps = [
+    'Pedido aceito',
+    'Tecendo lista',
+    'Validando legalidade',
+    'Ajustando mana',
+    'Pronto para revisar',
+  ];
+
+  final int currentStep;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final clampedStep = currentStep.clamp(0, _steps.length - 1).toInt();
+    final progress =
+        ((clampedStep + 1) / _steps.length).clamp(0.1, 1.0).toDouble();
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.brass500.withValues(alpha: 0.28),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          LinearProgressIndicator(value: progress),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var i = 0; i < _steps.length; i += 1)
+                _GenerateProgressChip(
+                  label: _steps[i],
+                  isActive: i <= clampedStep,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GenerateProgressChip extends StatelessWidget {
+  const _GenerateProgressChip({required this.label, required this.isActive});
+
+  final String label;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color:
+            isActive
+                ? AppTheme.brass500.withValues(alpha: 0.16)
+                : AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color:
+              isActive
+                  ? AppTheme.brass500.withValues(alpha: 0.44)
+                  : AppTheme.outlineMuted,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: isActive ? AppTheme.brass500 : AppTheme.textSecondary,
+            fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

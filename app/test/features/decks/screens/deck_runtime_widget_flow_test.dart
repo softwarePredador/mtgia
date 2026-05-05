@@ -219,6 +219,7 @@ void main() {
     'runtime widget flow: register -> generate -> save -> details -> optimize -> apply -> validate',
     (tester) async {
       var deckCreated = false;
+      var generatePollCount = 0;
       final currentCards = <String, int>{
         'remove-1': 1,
         'spell-1': 1,
@@ -277,6 +278,33 @@ void main() {
                   },
                 ],
               }),
+          '/ai/generate/jobs/runtime-generate-job': () {
+            generatePollCount += 1;
+            if (generatePollCount == 1) {
+              return ApiResponse(200, {
+                'job_id': 'runtime-generate-job',
+                'status': 'processing',
+                'stage': 'validation',
+                'stage_number': 2,
+                'total_stages': 4,
+              });
+            }
+            return ApiResponse(200, {
+              'job_id': 'runtime-generate-job',
+              'status': 'completed',
+              'result_status_code': 200,
+              'result': {
+                'generated_deck': {
+                  'commander': {'name': 'Talrand, Sky Summoner'},
+                  'cards': const [
+                    {'name': 'Opt', 'quantity': 1},
+                    {'name': 'Mind Stone', 'quantity': 1},
+                  ],
+                },
+                'validation': const {'is_valid': true, 'errors': <String>[]},
+              },
+            });
+          },
         },
         postHandlers: {
           '/auth/register': (body) {
@@ -294,19 +322,16 @@ void main() {
           },
           '/ai/generate': (body) {
             expect(body['format'], 'commander');
+            expect(body['async'], isTrue);
             expect(
               body['prompt'],
               'Talrand commander de spellslinger azul com instants baratos',
             );
-            return ApiResponse(200, {
-              'generated_deck': {
-                'commander': {'name': 'Talrand, Sky Summoner'},
-                'cards': const [
-                  {'name': 'Opt', 'quantity': 1},
-                  {'name': 'Mind Stone', 'quantity': 1},
-                ],
-              },
-              'validation': const {'is_valid': true, 'errors': <String>[]},
+            return ApiResponse(202, {
+              'job_id': 'runtime-generate-job',
+              'status': 'pending',
+              'poll_url': '/ai/generate/jobs/runtime-generate-job',
+              'poll_interval_ms': 1,
             });
           },
           '/cards/resolve/batch': (body) {
@@ -518,6 +543,9 @@ void main() {
       );
       await tester.ensureVisible(generateProposalButton);
       await tester.tap(generateProposalButton);
+      await tester.pump();
+      expect(find.text('Pedido aceito'), findsOneWidget);
+      expect(find.text('Tecendo lista'), findsOneWidget);
       await tester.pumpAndSettle();
 
       expect(find.text('Preview antes de salvar'), findsOneWidget);

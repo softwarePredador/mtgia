@@ -134,7 +134,29 @@ Correcoes aplicadas depois da tentativa inicial:
 
 ## Contrato app/backend
 
-O app atual continua consumindo o caminho sync por `deck_provider_support_generation.dart`; nenhum ajuste app foi necessario porque async e opt-in.
+Atualizacao mobile 2026-05-05: o app passou a consumir async por padrao em `deck_provider_support_generation.dart`, mantendo fallback sync para backend legacy/sem polling.
+
+Contrato mobile atual:
+
+1. `POST /ai/generate` envia `async=true`.
+2. `202` com `job_id` e `poll_url` e tratado como sucesso inicial; o app mostra progresso e faz polling.
+3. `200/422` direto continua sendo aceito como contrato legacy/sync.
+4. Se async/polling nao for suportado por status compativel (`400/404/405/501` com sinal de async/mode/polling), o app repete a chamada sem `async`.
+5. `result.generated_deck` continua fonte de verdade para criar/salvar deck.
+6. Logs/breadcrumbs mobile registram status, endpoint, job id e timings, sem prompt completo, JWT, DSN, database URL ou payload sensivel.
+
+Evidencia iPhone 15 Simulator (`F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, backend `8082`):
+
+| Cenario | Resultado |
+| --- | --- |
+| Feedback inicial da UI | `547ms` ate "Pedido aceito" |
+| Accepted async app | `POST /ai/generate -> 202` em `802ms` |
+| Polling app | `GET /ai/generate/jobs/:id -> 200` ate completed |
+| Completion app | `result_status=200` em `15849ms` observado pelo app |
+| Save/detail/validate | PASS no harness `deck_generate_async_runtime_test.dart` |
+| Optimize/apply/validate | PASS no harness existente `deck_runtime_m2006_test.dart`: `01:27 +1`, final `10_complete_validated` |
+
+Risco: optimize direto do deck gerado no harness focado retornou `422 needs_repair` e acionou `/ai/rebuild`; o fluxo preview/apply permanece provado pelo runtime existente, mas o harness focado deve aceitar o branch rebuild ou selecionar estrategia mais aderente.
 
 Contrato sync preservado:
 

@@ -1,5 +1,91 @@
 # Deck runtime iPhone 15 Simulator — 2026-05-04
 
+## Atualizacao Generate async app default — 2026-05-05T10:42-03:00 a 2026-05-05T11:35-03:00
+
+- Verdict: `PASS WITH RISKS`.
+- Backend usado pelo app: `http://127.0.0.1:8082`.
+- Concrete simulator id: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`.
+- Runtime: `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend health: `healthy`.
+- Backend final state: stopped after validation; port `8082` free.
+- Scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`.
+
+Device discovery summary:
+
+```text
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)
+```
+
+Backend health:
+
+```json
+{"status":"healthy","service":"mtgia-server","environment":"development","checks":{"process":{"status":"healthy"}}}
+```
+
+Commands executed:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+git status --short
+flutter devices
+xcrun simctl list devices available | grep -E "iPhone 15|Booted"
+
+cd server
+PORT=8082 dart run .dart_frog/server.dart
+curl -sS http://127.0.0.1:8082/health
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_generate_create_optimize_flow_test.dart --tags live -r expanded
+
+cd app
+flutter analyze lib/features/decks test/features/decks --no-version-check
+flutter test test/features/decks --no-version-check
+flutter test integration_test/deck_generate_async_runtime_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+flutter test integration_test/deck_runtime_m2006_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --reporter expanded \
+  --no-version-check
+```
+
+Results:
+
+| Area | Resultado |
+| --- | --- |
+| App deck analyze | PASS: no issues |
+| App deck tests | PASS: `+142` |
+| Backend live generate/create/optimize | PASS: `01:45 +2` |
+| Generate async iPhone 15 | PASS parcial: `202/job_id`, feedback UI `547ms`, polling completed `result_status=200`, save/detail/validate reais; optimize direto caiu em `422 needs_repair` e seguiu para rebuild. |
+| Optimize/apply iPhone 15 | PASS no harness existente: `01:27 +1`, final `10_complete_validated`. |
+
+What was real:
+
+- Real iPhone 15 Simulator UI, real local Dart Frog backend, real auth/register, real `/ai/generate` async job, real polling, real generated deck save, real deck details, real validation, real optimize/apply runtime in the existing deck harness.
+
+What was mocked:
+
+- Nothing in the iPhone 15 runtime paths. Provider/widget tests use controlled `ApiClient` fakes only for unit/widget coverage.
+
+Evidence paths:
+
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/device_discovery_async_generate.txt`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/backend_health_8082_async_generate.json`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/backend_ai_generate_create_optimize_flow_async.log`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/app_decks_analyze_after_async_generate.log`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/app_decks_tests_after_async_generate.log`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/deck_generate_async_iphone15_2026-05-05_retry3.log`
+- `app/doc/runtime_flow_proofs_2026-05-05_iphone15_simulator/deck_runtime_m2006_after_async_generate_iphone15.log`
+
+Blockers / risks:
+
+- `deck_generate_async_runtime_test.dart` proved Generate async UX and save/detail/validate, but direct optimize of that generated deck returned expected quality gate `422 needs_repair` and used rebuild instead of preview/apply suggestions. Owner: Commander Optimize flow/harness strategy selection. Smallest next action: prefer a strategy matching the generated deck theme or extend the harness to accept the rebuild-guided branch.
+- No secrets, JWT, DSN, database URL, prompt payload, or sensitive payload were documented.
+
 ## Atualizacao TestFlight/internal sanity — 2026-05-05T09:24-03:00
 
 - Verdict: `READY WITH RISKS` para release interno/TestFlight sem scanner fisico.
