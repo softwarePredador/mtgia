@@ -1,0 +1,4383 @@
+[
+  {
+    "shell_label": "Kinnan, Bonder Prodigy",
+    "subformat": "competitive_commander",
+    "commander_identity": [
+      "U",
+      "G"
+    ],
+    "strategy_archetype": "combo",
+    "signal_row_count": 107,
+    "top_cards_by_role": {
+      "ramp": [
+        {
+          "card_name": "Chrome Mox",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Elvish Mystic",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Enduring Vitality",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Llanowar Elves",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Mana Vault",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Mox Amber",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Mox Diamond",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Mox Opal",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "removal": [
+        {
+          "card_name": "Fierce Guardianship",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Flusterstorm",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Force of Will",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Mental Misstep",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Pact of Negation",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Force of Negation",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Swan Song",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Chain of Vapor",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 17,
+          "deck_count": 17,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "tutor": [
+        {
+          "card_name": "Finale of Devastation",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Nature's Rhythm",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Chord of Calling",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 19,
+          "deck_count": 19,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Transmute Artifact",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 19,
+          "deck_count": 19,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Green Sun's Zenith",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Worldly Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 9,
+          "deck_count": 9,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:29.783716Z"
+        },
+        {
+          "card_name": "Formidable Speaker",
+          "role": "tutor",
+          "score": 98,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Whir of Invention",
+          "role": "tutor",
+          "score": 95,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "combo_piece": [
+        {
+          "card_name": "Mana Vault",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Grim Monolith",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Springleaf Drum",
+          "role": "combo_piece",
+          "score": 96,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "The Cabbage Merchant",
+          "role": "combo_piece",
+          "score": 96,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Gene Pollinator",
+          "role": "combo_piece",
+          "score": 91,
+          "evidence_count": 9,
+          "deck_count": 9,
+          "confidence": "medium_high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Basalt Monolith",
+          "role": "combo_piece",
+          "score": 90,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Dramatic Reversal",
+          "role": "combo_piece",
+          "score": 87,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "graveyard": [
+        {
+          "card_name": "Mox Diamond",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Endurance",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Force of Negation",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Finale of Devastation",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Nature's Rhythm",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Transmute Artifact",
+          "role": "graveyard",
+          "score": 95,
+          "evidence_count": 19,
+          "deck_count": 19,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Agatha's Soul Cauldron",
+          "role": "graveyard",
+          "score": 82,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Colossal Skyturtle",
+          "role": "graveyard",
+          "score": 81,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        }
+      ],
+      "draw": [
+        {
+          "card_name": "Mystic Remora",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Rhystic Study",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Wan Shi Tong, Librarian",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Faerie Mastermind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "The One Ring",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 18,
+          "deck_count": 18,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Borne Upon a Wind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Veil of Summer",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Thrasios, Triton Hero",
+          "role": "draw",
+          "score": 94,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "token": [
+        {
+          "card_name": "Swan Song",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "The Cabbage Merchant",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Into the Flood Maw",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "An Offer You Can't Refuse",
+          "role": "token",
+          "score": 97,
+          "evidence_count": 7,
+          "deck_count": 7,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:00:51.071014Z"
+        },
+        {
+          "card_name": "Flash Photography",
+          "role": "token",
+          "score": 95,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        }
+      ],
+      "protection": [
+        {
+          "card_name": "The One Ring",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 18,
+          "deck_count": 18,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Veil of Summer",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "The Unagi of Kyoshi Island",
+          "role": "protection",
+          "score": 94,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T20:12:47.676332Z"
+        },
+        {
+          "card_name": "Colossal Skyturtle",
+          "role": "protection",
+          "score": 87,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Volatile Stormdrake",
+          "role": "protection",
+          "score": 79,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:04.252987Z"
+        }
+      ],
+      "recursion": [
+        {
+          "card_name": "Colossal Skyturtle",
+          "role": "recursion",
+          "score": 88,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:04.992512Z"
+        },
+        {
+          "card_name": "Eternal Witness",
+          "role": "recursion",
+          "score": 83,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:04.252987Z"
+        },
+        {
+          "card_name": "Scour for Scrap",
+          "role": "recursion",
+          "score": 74,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:00:07.419056Z"
+        }
+      ],
+      "stax": [
+        {
+          "card_name": "Void Winnower",
+          "role": "stax",
+          "score": 63,
+          "evidence_count": 4,
+          "deck_count": 4,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:01:04.252987Z"
+        }
+      ]
+    },
+    "guardrails": [
+      "legal_status already filtered to legal/restricted/not-listed",
+      "color_identity is subset of commander_identity",
+      "source/confidence/evidence_count must be consumed as advisory"
+    ]
+  },
+  {
+    "shell_label": "Kraum, Ludevic's Opus + Tymna the Weaver",
+    "subformat": "competitive_commander",
+    "commander_identity": [
+      "W",
+      "U",
+      "B",
+      "R"
+    ],
+    "strategy_archetype": "combo",
+    "signal_row_count": 100,
+    "top_cards_by_role": {
+      "tutor": [
+        {
+          "card_name": "Demonic Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Imperial Seal",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Vampiric Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Intuition",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mystical Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Wishclaw Talisman",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "draw": [
+        {
+          "card_name": "Esper Sentinel",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Faerie Mastermind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mystic Remora",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Rhystic Study",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Borne Upon a Wind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Gitaxian Probe",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Wan Shi Tong, Librarian",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 6,
+          "deck_count": 6,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:00:38.767413Z"
+        },
+        {
+          "card_name": "Tataru Taru",
+          "role": "draw",
+          "score": 99,
+          "evidence_count": 18,
+          "deck_count": 18,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "removal": [
+        {
+          "card_name": "Flusterstorm",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Force of Negation",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Force of Will",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mental Misstep",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Pact of Negation",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "An Offer You Can't Refuse",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Chain of Vapor",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Swan Song",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "graveyard": [
+        {
+          "card_name": "Force of Negation",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mox Diamond",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Intuition",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Cabal Ritual",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Dragon's Rage Channeler",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:39.732572Z"
+        },
+        {
+          "card_name": "Brain Freeze",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Rite of Flame",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Underworld Breach",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "ramp": [
+        {
+          "card_name": "Lion's Eye Diamond",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Lotho, Corrupt Shirriff",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mana Vault",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mox Diamond",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Rite of Flame",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "An Offer You Can't Refuse",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "token": [
+        {
+          "card_name": "Lotho, Corrupt Shirriff",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Swan Song",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Voice of Victory",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Into the Flood Maw",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 19,
+          "deck_count": 19,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Tataru Taru",
+          "role": "token",
+          "score": 99,
+          "evidence_count": 18,
+          "deck_count": 18,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "role": "token",
+          "score": 98,
+          "evidence_count": 17,
+          "deck_count": 17,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "combo_piece": [
+        {
+          "card_name": "Mana Vault",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "recursion": [
+        {
+          "card_name": "Sevinne's Reclamation",
+          "role": "recursion",
+          "score": 100,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "wipe": [
+        {
+          "card_name": "Demonic Consultation",
+          "role": "wipe",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Mnemonic Betrayal",
+          "role": "wipe",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "wincon": [
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "wincon",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ],
+      "protection": [
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Hexing Squelcher",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 18,
+          "deck_count": 18,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "The One Ring",
+          "role": "protection",
+          "score": 86,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:36.289054Z"
+        }
+      ],
+      "stax": [
+        {
+          "card_name": "Voice of Victory",
+          "role": "stax",
+          "score": 100,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "role": "stax",
+          "score": 97,
+          "evidence_count": 22,
+          "deck_count": 22,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Silence",
+          "role": "stax",
+          "score": 92,
+          "evidence_count": 23,
+          "deck_count": 23,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        },
+        {
+          "card_name": "Grand Abolisher",
+          "role": "stax",
+          "score": 92,
+          "evidence_count": 21,
+          "deck_count": 21,
+          "confidence": "high",
+          "source_categories": [
+            "external",
+            "external:EDHTop16",
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-27T19:32:47.975640Z"
+        }
+      ]
+    },
+    "guardrails": [
+      "legal_status already filtered to legal/restricted/not-listed",
+      "color_identity is subset of commander_identity",
+      "source/confidence/evidence_count must be consumed as advisory"
+    ]
+  },
+  {
+    "shell_label": "Thrasios, Triton Hero + Tymna the Weaver",
+    "subformat": "competitive_commander",
+    "commander_identity": [
+      "W",
+      "U",
+      "B",
+      "G"
+    ],
+    "strategy_archetype": "combo",
+    "signal_row_count": 120,
+    "top_cards_by_role": {
+      "ramp": [
+        {
+          "card_name": "Chrome Mox",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Crop Rotation",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Devoted Druid",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mana Vault",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mox Amber",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mox Diamond",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Lotho, Corrupt Shirriff",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Noble Hierarch",
+          "role": "ramp",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W",
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        }
+      ],
+      "tutor": [
+        {
+          "card_name": "Demonic Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Vampiric Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Chord of Calling",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Eldritch Evolution",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Finale of Devastation",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Imperial Seal",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 10,
+          "deck_count": 10,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        }
+      ],
+      "draw": [
+        {
+          "card_name": "Esper Sentinel",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mystic Remora",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Rhystic Study",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Veil of Summer",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Faerie Mastermind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Borne Upon a Wind",
+          "role": "draw",
+          "score": 100,
+          "evidence_count": 7,
+          "deck_count": 7,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Tataru Taru",
+          "role": "draw",
+          "score": 99,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        },
+        {
+          "card_name": "Wan Shi Tong, Librarian",
+          "role": "draw",
+          "score": 96,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        }
+      ],
+      "removal": [
+        {
+          "card_name": "Fierce Guardianship",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Flusterstorm",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Force of Will",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mental Misstep",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Pact of Negation",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Swan Song",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Deathrite Shaman",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Deadly Rollick",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 10,
+          "deck_count": 10,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        }
+      ],
+      "combo_piece": [
+        {
+          "card_name": "Mana Vault",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "combo_piece",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Devoted Druid",
+          "role": "combo_piece",
+          "score": 96,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "The Cabbage Merchant",
+          "role": "combo_piece",
+          "score": 96,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        }
+      ],
+      "wincon": [
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "wincon",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Deathrite Shaman",
+          "role": "wincon",
+          "score": 100,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        }
+      ],
+      "protection": [
+        {
+          "card_name": "Thassa's Oracle",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Veil of Summer",
+          "role": "protection",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "The One Ring",
+          "role": "protection",
+          "score": 86,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Colossal Skyturtle",
+          "role": "protection",
+          "score": 67,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        }
+      ],
+      "token": [
+        {
+          "card_name": "Voice of Victory",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Swan Song",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Lotho, Corrupt Shirriff",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:27.243897Z"
+        },
+        {
+          "card_name": "The Cabbage Merchant",
+          "role": "token",
+          "score": 100,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Tataru Taru",
+          "role": "token",
+          "score": 99,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        },
+        {
+          "card_name": "An Offer You Can't Refuse",
+          "role": "token",
+          "score": 97,
+          "evidence_count": 7,
+          "deck_count": 7,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Hazel's Brewmaster",
+          "role": "token",
+          "score": 95,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        }
+      ],
+      "stax": [
+        {
+          "card_name": "Voice of Victory",
+          "role": "stax",
+          "score": 100,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "role": "stax",
+          "score": 97,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Silence",
+          "role": "stax",
+          "score": 92,
+          "evidence_count": 15,
+          "deck_count": 15,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Grand Abolisher",
+          "role": "stax",
+          "score": 92,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Calamity's Wake",
+          "role": "stax",
+          "score": 67,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:27.243897Z"
+        }
+      ],
+      "graveyard": [
+        {
+          "card_name": "Mox Diamond",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Deathrite Shaman",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Force of Negation",
+          "role": "graveyard",
+          "score": 100,
+          "evidence_count": 9,
+          "deck_count": 9,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Finale of Devastation",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Nature's Rhythm",
+          "role": "graveyard",
+          "score": 96,
+          "evidence_count": 9,
+          "deck_count": 9,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Eternal Witness",
+          "role": "graveyard",
+          "score": 95,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:27.243897Z"
+        },
+        {
+          "card_name": "Hazel's Brewmaster",
+          "role": "graveyard",
+          "score": 90,
+          "evidence_count": 12,
+          "deck_count": 12,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:39.635205Z"
+        },
+        {
+          "card_name": "Mnemonic Betrayal",
+          "role": "graveyard",
+          "score": 86,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        }
+      ],
+      "wipe": [
+        {
+          "card_name": "Demonic Consultation",
+          "role": "wipe",
+          "score": 100,
+          "evidence_count": 13,
+          "deck_count": 13,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:42.938910Z"
+        },
+        {
+          "card_name": "Mnemonic Betrayal",
+          "role": "wipe",
+          "score": 96,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "B"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        },
+        {
+          "card_name": "Calamity's Wake",
+          "role": "wipe",
+          "score": 76,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "W"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:27.243897Z"
+        }
+      ],
+      "recursion": [
+        {
+          "card_name": "Eternal Witness",
+          "role": "recursion",
+          "score": 100,
+          "evidence_count": 8,
+          "deck_count": 8,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:02:27.243897Z"
+        },
+        {
+          "card_name": "Colossal Skyturtle",
+          "role": "recursion",
+          "score": 68,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U",
+            "G"
+          ],
+          "freshness": "local_seen_at=2026-04-23T20:01:34.755406Z"
+        }
+      ]
+    },
+    "guardrails": [
+      "legal_status already filtered to legal/restricted/not-listed",
+      "color_identity is subset of commander_identity",
+      "source/confidence/evidence_count must be consumed as advisory"
+    ]
+  },
+  {
+    "shell_label": "Spider-Man 2099",
+    "subformat": "duel_commander",
+    "commander_identity": [
+      "U",
+      "R"
+    ],
+    "strategy_archetype": "control",
+    "signal_row_count": 101,
+    "top_cards_by_role": {
+      "removal": [
+        {
+          "card_name": "Spell Snare",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 29,
+          "deck_count": 29,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Mental Misstep",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Remand",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Stern Scolding",
+          "role": "removal",
+          "score": 100,
+          "evidence_count": 26,
+          "deck_count": 26,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Force Spike",
+          "role": "removal",
+          "score": 99,
+          "evidence_count": 29,
+          "deck_count": 29,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Mana Leak",
+          "role": "removal",
+          "score": 99,
+          "evidence_count": 29,
+          "deck_count": 29,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Daze",
+          "role": "removal",
+          "score": 99,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Memory Lapse",
+          "role": "removal",
+          "score": 99,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ],
+      "tutor": [
+        {
+          "card_name": "Intuition",
+          "role": "tutor",
+          "score": 100,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:57:48.776432Z"
+        },
+        {
+          "card_name": "Oliphaunt",
+          "role": "tutor",
+          "score": 90,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ],
+      "draw": [
+        {
+          "card_name": "Gitaxian Probe",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Remand",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Peek",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 27,
+          "deck_count": 27,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Ponder",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 27,
+          "deck_count": 27,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Preordain",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 27,
+          "deck_count": 27,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Wan Shi Tong, Librarian",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 19,
+          "deck_count": 19,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Consider",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:57:48.776432Z"
+        },
+        {
+          "card_name": "Faerie Mastermind",
+          "role": "draw",
+          "score": 98,
+          "evidence_count": 11,
+          "deck_count": 11,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ],
+      "token": [
+        {
+          "card_name": "Cori-Steel Cutter",
+          "role": "token",
+          "score": 98,
+          "evidence_count": 10,
+          "deck_count": 10,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Monstrous Rage",
+          "role": "token",
+          "score": 81,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "any",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:57:19.133139Z"
+        },
+        {
+          "card_name": "Prismari Command",
+          "role": "token",
+          "score": 73,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U",
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:56:15.436781Z"
+        },
+        {
+          "card_name": "Malcolm, the Eyes",
+          "role": "token",
+          "score": 66,
+          "evidence_count": 3,
+          "deck_count": 3,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "any",
+          "color_identity": [
+            "U",
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:52:29.094320Z"
+        }
+      ],
+      "wipe": [
+        {
+          "card_name": "Fiery Confluence",
+          "role": "wipe",
+          "score": 93,
+          "evidence_count": 7,
+          "deck_count": 7,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:56:17.103619Z"
+        },
+        {
+          "card_name": "Fire Magic",
+          "role": "wipe",
+          "score": 73,
+          "evidence_count": 4,
+          "deck_count": 4,
+          "confidence": "medium",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "any",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:56:15.436781Z"
+        }
+      ],
+      "protection": [
+        {
+          "card_name": "Clout of the Dominus",
+          "role": "protection",
+          "score": 92,
+          "evidence_count": 29,
+          "deck_count": 29,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U",
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Hexing Squelcher",
+          "role": "protection",
+          "score": 88,
+          "evidence_count": 5,
+          "deck_count": 5,
+          "confidence": "medium_high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ],
+      "graveyard": [
+        {
+          "card_name": "Detective's Phoenix",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 29,
+          "deck_count": 29,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Memory Lapse",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Remand",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Snapcaster Mage",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 28,
+          "deck_count": 28,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Unholy Heat",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 26,
+          "deck_count": 26,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Force of Negation",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 25,
+          "deck_count": 25,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_3_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        },
+        {
+          "card_name": "Intuition",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "U"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:57:48.776432Z"
+        },
+        {
+          "card_name": "Pyrogoyf",
+          "role": "graveyard",
+          "score": 92,
+          "evidence_count": 14,
+          "deck_count": 14,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ],
+      "ramp": [
+        {
+          "card_name": "Oliphaunt",
+          "role": "ramp",
+          "score": 90,
+          "evidence_count": 20,
+          "deck_count": 20,
+          "confidence": "high",
+          "source_categories": [
+            "mtgtop8"
+          ],
+          "budget_tier": "unknown",
+          "reference_price_usd": null,
+          "bracket_scope": "bracket_2_4",
+          "color_identity": [
+            "R"
+          ],
+          "freshness": "local_seen_at=2026-04-23T19:58:07.075968Z"
+        }
+      ]
+    },
+    "guardrails": [
+      "legal_status already filtered to legal/restricted/not-listed",
+      "color_identity is subset of commander_identity",
+      "source/confidence/evidence_count must be consumed as advisory"
+    ]
+  }
+]

@@ -1,10 +1,16 @@
-# Relatorio Aggressive Candidate Quality v2 - Etapa 1
+# Relatorio Aggressive Candidate Quality v2 - Etapas 1 e 2
 
 Data: 2026-05-05
 
 ## Resultado
 
 **PASS.** Foi criada uma base de dados aditiva, idempotente e DB-backed para melhorar candidatos do `optimize` aggressive sem inserir novas cartas e sem alterar `cards`, `card_legalities`, `cards.color_identity` ou regras de bracket/legalidade.
+
+## Resultado etapa 2
+
+**PASS WITH RISKS.** A etapa 2 extraiu sinais consumiveis de meta/sinergia para pools aggressive, materializou rows idempotentes com `source='aggressive_meta_signal_v1'` em `commander_card_synergy` e `card_role_scores`, e gerou artefatos nao sensiveis em `server/test/artifacts/aggressive_candidate_quality_2026-05-05/`.
+
+Os riscos restantes sao explicitos: o runtime do `/ai/optimize` ainda nao consome esses sinais, a classificacao de role continua heuristica, preco/budget segue majoritariamente `not_proven`, e 34 decks Commander/cEDH ficaram fora da persistencia por identidade de comandante nao resolvida.
 
 ## Escopo entregue
 
@@ -185,7 +191,244 @@ Nenhum rollback toca em `cards`, `card_legalities`, `sets`, `decks` ou dados de 
 
 ## Gaps e proximas etapas
 
-- Consumo runtime pelo `/ai/optimize` ainda nao foi ligado nesta etapa; os dados estao prontos para etapa 2.
+- Historico da etapa 1: consumo runtime pelo `/ai/optimize` nao foi ligado naquela etapa. A etapa 2 abaixo adiciona sinais meta, mas o runtime ainda nao os consome.
 - Budget tier ficou `unknown` por falta de preco confiavel na selecao canonica atual.
 - Tags sao heuristicas deterministicamente inferidas, nao revisadas manualmente; `source` e `confidence` permitem auditoria posterior.
 - Duplicate set-code cleanup permanece fora desta etapa; contagem atual e 82 grupos.
+
+---
+
+## Etapa 2 - Extracao de sinais meta/sinergia
+
+### Pipeline resumido
+
+O novo comando `server/bin/candidate_quality_meta_signals.dart` roda sobre dados locais ja aceitos pelo pipeline:
+
+1. `meta_decks` Commander/cEDH aceitos.
+2. `external_commander_meta_candidates` apenas quando `subformat=competitive_commander`, `validation_status IN ('validated','staged','promoted')` e `legal_status IN ('legal','valid','warning_reviewed')`.
+3. `commander_reference_profiles` apenas como enriquecimento EDHREC/cache local, nunca como prova cEDH.
+4. `card_role_scores` e `card_function_tags` da etapa 1 para role/sinal funcional.
+5. `optimize_rejection_penalties` como democao historica, nao como banimento absoluto.
+
+O comando exclui lands dos sinais de candidato aggressive, exige legalidade Commander `legal/restricted/null`, exige `cards.color_identity` subset da identidade resolvida do comandante/shell, e nao grava qualquer payload de usuario, JWT, prompt, secret ou URL privada.
+
+### Comandos executados
+
+```bash
+cd server && dart format lib/ai/aggressive_candidate_meta_signal_support.dart bin/candidate_quality_meta_signals.dart test/aggressive_candidate_meta_signal_support_test.dart
+cd server && dart analyze lib/ai/aggressive_candidate_meta_signal_support.dart bin/candidate_quality_meta_signals.dart test/aggressive_candidate_meta_signal_support_test.dart
+cd server && dart test test/aggressive_candidate_meta_signal_support_test.dart
+cd server && dart run bin/candidate_quality_meta_signals.dart --dry-run --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/dry_run
+cd server && dart run bin/candidate_quality_meta_signals.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/apply
+cd server && dart run bin/candidate_quality_meta_signals.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/idempotence
+cd server && dart analyze bin/candidate_quality_meta_signals.dart lib/ai/aggressive_candidate_meta_signal_support.dart test/aggressive_candidate_meta_signal_support_test.dart
+cd server && dart test test/aggressive_candidate_meta_signal_support_test.dart test/candidate_quality_data_support_test.dart
+cd server && dart analyze bin lib routes test
+cd server && dart test
+```
+
+### Artefatos gerados
+
+Diretorio principal:
+
+- `server/test/artifacts/aggressive_candidate_quality_2026-05-05/dry_run/`
+- `server/test/artifacts/aggressive_candidate_quality_2026-05-05/apply/`
+- `server/test/artifacts/aggressive_candidate_quality_2026-05-05/idempotence/`
+
+Arquivos principais:
+
+- `summary_dry_run.json`
+- `summary_apply.json`
+- `coverage_summary.json`
+- `candidate_signals.json`
+- `package_clusters.json`
+- `role_replacements.json`
+- `budget_premium_alternatives.json`
+- `commander_profile_enrichment.json`
+- `commander_signal_rows.csv`
+
+### Cobertura real medida
+
+Fonte: `server/test/artifacts/aggressive_candidate_quality_2026-05-05/idempotence/summary_apply.json`.
+
+| Metrica | Valor |
+|---|---:|
+| `meta_decks` totais | 650 |
+| `meta_decks` Commander/cEDH escaneados | 385 |
+| candidatos externos confiaveis escaneados | 9 |
+| `commander_reference_profiles` escaneados | 18 |
+| decks com identidade de comandante resolvida | 360 |
+| decks com identidade desconhecida | 34 |
+| decks com sinais candidatos | 360 |
+| rows planejadas/aplicadas em `commander_card_synergy` | 2179 |
+| rows planejadas/aplicadas em `card_role_scores` | 910 |
+| stale rows antes do apply idempotente | 0 |
+
+Cobertura por formato/subformato:
+
+| Formato | Decks |
+|---|---:|
+| cEDH / `competitive_commander` | 232 |
+| EDH / `duel_commander` | 162 |
+
+Cobertura por fonte/formato:
+
+| Fonte/formato | Decks |
+|---|---:|
+| `mtgtop8|cEDH` | 214 |
+| `mtgtop8|EDH` | 162 |
+| `external|cEDH` | 9 |
+| `external:EDHTop16|cEDH` | 9 |
+
+Top identidades de cor resolvidas:
+
+| Identidade | Decks |
+|---|---:|
+| UR | 34 |
+| WUBRG | 28 |
+| UBR | 25 |
+| WUBR | 25 |
+| UG | 23 |
+| WUB | 18 |
+| WUBG | 16 |
+| BR | 15 |
+| G | 15 |
+| UBG | 15 |
+
+Principais gaps de identidade (`not_proven` para persistencia): `Kefka, Court Mage`, `Ral, Monsoon Mage`, `Terra, Magical Adept`, `Brigid, Clachan's Heart`, `Etali, Primal Conqueror`, `Aang, at the Crossroads` e outros comandantes novos/UB ainda nao resolvidos localmente.
+
+### Sinais por commander/archetype/color identity
+
+Representantes provados em `candidate_signals.json`:
+
+| Shell | Subformato | Identidade | Linhas de sinal | Leitura estrategica |
+|---|---|---|---:|---|
+| Kinnan, Bonder Prodigy | competitive_commander | UG | 107 | ramp/combo de mana positiva, dorks/fast mana, tutor e protecao de combo |
+| Kraum, Ludevic's Opus + Tymna the Weaver | competitive_commander | WUBR | 94 | shell blue farm/consultation-breach: draw barato, tutor density, stack interaction e janelas de protecao |
+| Thrasios, Triton Hero + Tymna the Weaver | competitive_commander | WUBG | 143 | partner goodstuff/combo-control: ramp eficiente, tutor, draw, stack interaction e stax/protecao |
+| Spider-Man 2099 | duel_commander | UR | 126 | aggro/tempo Duel Commander; separado de cEDH para nao contaminar multiplayer |
+
+Exemplos de top cards por role, todos advisory e ainda sujeitos aos gates finais:
+
+| Shell | Role | Exemplos com evidencia alta |
+|---|---|---|
+| Kinnan | ramp | Chrome Mox, Elvish Mystic, Mana Vault, Mox Amber, Mox Diamond, Mox Opal |
+| Kinnan | removal/stack | Fierce Guardianship, Flusterstorm, Force of Will, Mental Misstep |
+| Kraum + Tymna | tutor/draw | Demonic Tutor, Enlightened Tutor, Esper Sentinel, Mystic Remora, Rhystic Study |
+| Thrasios + Tymna | tutor/protection | Demonic Tutor, Vampiric Tutor, Silence, Grand Abolisher, Veil of Summer |
+| Spider-Man 2099 | tempo/removal | Force Spike, Galvanic Discharge, Ghostfire Slice, Spell Snare |
+
+### Package clusters
+
+`package_clusters.json` guarda pares que coocorrem por shell, com `evidence_count`, `confidence`, subformato e freshness local. A leitura util para optimize/generate e por pacote, nao por popularidade isolada:
+
+- Kinnan: fast mana/dork + tutor/untap/protecao.
+- Kraum/Tymna: draw engine + tutor + free/cheap interaction + breach/consultation protection window.
+- Thrasios/Tymna: partner goodstuff com ramp, tutor, stax/protecao e draw persistente.
+- Spider-Man 2099: pacote UR tempo/aggro de Duel Commander; deve ficar fora de pools cEDH multiplayer.
+
+### Role replacements
+
+`role_replacements.json` cruza penalidades historicas de qualidade com candidatos de mesmo role e evidencia meta. Exemplos gerados:
+
+| Rejeitado/demovido | Role | Substituto sinalizado | Evidencia |
+|---|---|---|---|
+| Brainstorm | draw | Esper Sentinel | high, evidence_count 23 |
+| Lotus Petal | ramp | Lion's Eye Diamond | high, evidence_count 23 |
+| Vandalblast | removal | Spell Snare | high, evidence_count 29 |
+| Blasphemous Act | wipe | Demonic Consultation | high, evidence_count 22 |
+
+Interpretacao: esses exemplos nao significam que a carta rejeitada e sempre fraca; significam que ela apareceu em historico de rejeicao/quality gate neste contexto agregado. O consumo correto e democao contextual + substituto de mesmo role, nunca banimento global.
+
+### Budget/premium
+
+`budget_premium_alternatives.json` foi gerado, mas a maioria dos roles retornou `price_gap=not_proven_price_data_sparse` porque os campos canonicos `price_usd/price_usd_foil` continuam sem cobertura confiavel para esses printings. Portanto nenhum sinal de budget/premium deve ser promovido como decisao de produto nesta etapa.
+
+### Evidencia e confianca
+
+Cada row persistida por `aggressive_meta_signal_v1` inclui em `evidence`:
+
+- `source`
+- `subformat`
+- `confidence`
+- `evidence_count`
+- `deck_count`
+- `freshness`
+- `forced_swap=false`
+
+Categorias de confianca:
+
+- `high`: evidencia alta/fresca ou fonte competitiva forte.
+- `medium_high`/`medium`: evidencia suficiente, mas menos robusta.
+- `low`: evidencia limitada ou stale.
+- `not_proven`: nao persistido quando identidade do comandante nao resolve ou evidencia nao passa o minimo.
+
+### Dry-run/apply/idempotencia
+
+Dry-run:
+
+- `db_mutations=false`
+- `card_role_scores`: 30988 antes/depois
+- `commander_card_synergy`: 5000 antes/depois
+- `commander_signal_rows_planned`: 2179
+- `role_score_rows_planned`: 910
+
+Apply:
+
+| Tabela | Pre | Post |
+|---|---:|---:|
+| `card_role_scores` | 30988 | 31898 |
+| `commander_card_synergy` | 5000 | 7179 |
+| `meta_decks` | 650 | 650 |
+| `external_commander_meta_candidates` | 10 | 10 |
+| `commander_reference_profiles` | 18 | 18 |
+| `optimize_rejection_penalties` | 358 | 358 |
+
+Idempotencia:
+
+| Tabela | Pre | Post |
+|---|---:|---:|
+| `card_role_scores` | 31898 | 31898 |
+| `commander_card_synergy` | 7179 | 7179 |
+| `stale_generated_rows_before_apply.card_role_scores` | 0 | 0 |
+| `stale_generated_rows_before_apply.commander_card_synergy` | 0 | 0 |
+
+### Rollback parcial da etapa 2
+
+```sql
+DELETE FROM card_role_scores WHERE source = 'aggressive_meta_signal_v1';
+DELETE FROM commander_card_synergy WHERE source = 'aggressive_meta_signal_v1';
+```
+
+Nenhum rollback parcial toca em `cards`, `card_legalities`, `sets`, `decks`, `meta_decks`, `external_commander_meta_candidates`, `commander_reference_profiles` ou dados de usuario.
+
+### Fatos provados vs interpretacao
+
+Fatos provados por codigo/banco:
+
+- Existem 650 `meta_decks`, 10 `external_commander_meta_candidates`, 18 `commander_reference_profiles`.
+- 385 decks Commander/cEDH locais foram escaneados.
+- 9 candidatos externos passaram o filtro local de confianca.
+- 2179 rows foram aplicadas em `commander_card_synergy` e 910 em `card_role_scores` com `source='aggressive_meta_signal_v1'`.
+- Os dados aplicados sao idempotentes.
+
+Interpretacao estrategica:
+
+- Kinnan deve alimentar pools de ramp/combo, nao generic GU value.
+- Kraum/Tymna e Thrasios/Tymna devem alimentar pools cEDH de draw/tutor/interaction/protection por pacote.
+- Spider-Man 2099 deve alimentar apenas Duel Commander/tempo UR.
+
+`not_proven`:
+
+- Nenhuma pesquisa web nova foi usada nesta etapa.
+- `commander_reference_profiles` nao prova contexto cEDH.
+- `created_at/updated_at` local nao e data real do evento externo.
+- Budget/premium ainda nao e confiavel.
+
+### Menores proximas acoes tecnicas
+
+1. Ligar um provider read-only no runtime do optimize que leia `aggressive_meta_signal_v1` apenas como bonus/democao, nunca como bypass de legalidade/cor/bracket.
+2. Corrigir/validar identidades dos comandantes novos que ficaram em `unknown_commander_labels`.
+3. Melhorar role classifier para evitar mislabels conhecidos, especialmente roles genericos em cartas de combo.
+4. Separar package clusters multi-card no runtime em vez de promover cartas isoladas por popularidade.
+5. Reprocessar preco canonico antes de usar budget/premium como criterio real.

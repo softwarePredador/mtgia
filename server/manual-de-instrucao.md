@@ -2,6 +2,78 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Aggressive Candidate Quality v2 etapa 2: sinais meta
+
+### O Porquê
+- A etapa 1 criou a base de metadata, mas os pools aggressive ainda precisavam de sinais de meta/sinergia por comandante, shell e role.
+- Popularidade bruta nao basta: o optimize precisa entender role, pacote, subformato, confianca, evidencia, freshness e penalidades historicas sem pular legalidade, identidade de cor, bracket ou quality gate.
+- A etapa tambem precisava provar cobertura real por Commander/cEDH/Duel Commander e separar fatos DB-backed de interpretacao estrategica.
+
+### O Como
+- Novo helper testavel: `server/lib/ai/aggressive_candidate_meta_signal_support.dart`.
+  - Define `aggressive_meta_signal_v1`.
+  - Calcula confianca (`high`, `medium_high`, `medium`, `low`, `not_proven`).
+  - Calcula score advisory por evidencia, role score, function confidence, subformato competitivo, freshness e penalidade historica.
+  - Valida candidatos externos apenas com `competitive_commander` + status confiavel.
+  - Gera exemplos de replacement por mesmo role sem escolher a propria carta rejeitada.
+- Novo comando operacional: `server/bin/candidate_quality_meta_signals.dart`.
+  - `--dry-run` e default.
+  - `--apply` grava somente rows com `source='aggressive_meta_signal_v1'`.
+  - Artefatos ficam em `server/test/artifacts/aggressive_candidate_quality_2026-05-05/`.
+  - Usa `meta_decks`, `external_commander_meta_candidates`, `commander_reference_profiles`, `card_role_scores`, `card_function_tags` e `optimize_rejection_penalties`.
+  - Exclui lands dos sinais aggressive de candidato para nao contaminar roles como `ramp`.
+  - Exige Commander legality `legal/restricted/null` e color identity subset da identidade resolvida do comandante/shell.
+  - Nao grava secrets, JWT, prompt payload, user id ou dados sensiveis.
+- Novo teste: `server/test/aggressive_candidate_meta_signal_support_test.dart`.
+- Relatorio atualizado: `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_2026-05-05.md`.
+
+### DB e cobertura
+- Dry-run:
+  - `meta_decks` Commander/cEDH escaneados: 385.
+  - candidatos externos confiaveis escaneados: 9.
+  - `commander_reference_profiles` escaneados: 18.
+  - rows planejadas: 2179 em `commander_card_synergy`, 910 em `card_role_scores`.
+  - sem mutacao no banco.
+- Apply:
+  - `card_role_scores`: 30988 -> 31898.
+  - `commander_card_synergy`: 5000 -> 7179.
+  - `meta_decks`, `external_commander_meta_candidates`, `commander_reference_profiles` e `optimize_rejection_penalties` mantiveram contadores.
+- Idempotencia:
+  - `card_role_scores`: 31898 -> 31898.
+  - `commander_card_synergy`: 7179 -> 7179.
+  - stale generated rows = 0.
+- Cobertura por subformato:
+  - `competitive_commander`: 232 decks.
+  - `duel_commander`: 162 decks.
+- Identidade resolvida:
+  - 360 decks com identidade resolvida.
+  - 34 decks com identidade desconhecida ficaram `not_proven` para persistencia.
+
+### Sinais estrategicos
+- Kinnan, Bonder Prodigy: UG cEDH ramp/combo, fast mana/dorks, tutor e protecao.
+- Kraum, Ludevic's Opus + Tymna the Weaver: WUBR cEDH draw/tutor/interaction/protection window.
+- Thrasios, Triton Hero + Tymna the Weaver: WUBG cEDH partner goodstuff/combo-control.
+- Spider-Man 2099: UR Duel Commander aggro/tempo; separado de cEDH para evitar contaminacao de multiplayer.
+- `commander_reference_profiles` entra apenas como enrichment EDHREC/cache local, nao como prova competitiva.
+- Budget/premium continua `not_proven` por sparsidade de preco canonico.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai/aggressive_candidate_meta_signal_support.dart bin/candidate_quality_meta_signals.dart test/aggressive_candidate_meta_signal_support_test.dart`: PASS.
+- `cd server && dart test test/aggressive_candidate_meta_signal_support_test.dart`: PASS.
+- `cd server && dart run bin/candidate_quality_meta_signals.dart --dry-run --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/dry_run`: PASS.
+- `cd server && dart run bin/candidate_quality_meta_signals.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/apply`: PASS.
+- `cd server && dart run bin/candidate_quality_meta_signals.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_2026-05-05/idempotence`: PASS.
+- `cd server && dart analyze bin/candidate_quality_meta_signals.dart lib/ai/aggressive_candidate_meta_signal_support.dart test/aggressive_candidate_meta_signal_support_test.dart`: PASS.
+- `cd server && dart test test/aggressive_candidate_meta_signal_support_test.dart test/candidate_quality_data_support_test.dart`: PASS.
+- `cd server && dart analyze bin lib routes test`: PASS.
+- `cd server && dart test`: PASS.
+
+### Rollback
+- Parcial da etapa 2:
+  - `DELETE FROM card_role_scores WHERE source = 'aggressive_meta_signal_v1';`
+  - `DELETE FROM commander_card_synergy WHERE source = 'aggressive_meta_signal_v1';`
+- O rollback parcial nao toca em `cards`, `card_legalities`, `sets`, `decks`, `meta_decks`, `external_commander_meta_candidates`, `commander_reference_profiles` ou dados de usuario.
+
 ## 2026-05-05 — Aggressive Candidate Quality v2 etapa 1: base de dados
 
 ### O Porquê

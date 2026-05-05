@@ -1,0 +1,1001 @@
+shell_label,subformat,card_name,role,score,evidence_count,confidence,budget_tier,bracket_scope
+Spider-Man 2099,duel_commander,Spell Snare,removal,100,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Mental Misstep,removal,100,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Remand,removal,100,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Stern Scolding,removal,100,26,high,unknown,bracket_2_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Demonic Tutor,tutor,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Enlightened Tutor,tutor,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Esper Sentinel,draw,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Faerie Mastermind,draw,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Flusterstorm,removal,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Force of Negation,removal,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Force of Negation,graveyard,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Force of Will,removal,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Imperial Seal,tutor,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Lion's Eye Diamond,ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,"Lotho, Corrupt Shirriff",ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,"Lotho, Corrupt Shirriff",token,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mana Vault,combo_piece,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mana Vault,ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mental Misstep,removal,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mox Diamond,graveyard,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mox Diamond,ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mystic Remora,draw,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Pact of Negation,removal,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,"Ragavan, Nimble Pilferer",ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,"Ragavan, Nimble Pilferer",token,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Rhystic Study,draw,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Rite of Flame,ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Sevinne's Reclamation,recursion,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Smothering Tithe,ramp,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Smothering Tithe,token,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Vampiric Tutor,tutor,100,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,ramp,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,removal,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Borne Upon a Wind,draw,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Chain of Vapor,removal,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Chrome Mox,ramp,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Chrome Mox,ramp,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Demonic Consultation,wipe,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Elvish Mystic,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Enduring Vitality,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Fierce Guardianship,removal,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Finale of Devastation,tutor,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Flusterstorm,removal,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Force of Will,removal,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Intuition,graveyard,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Intuition,tutor,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Llanowar Elves,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mana Vault,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mana Vault,combo_piece,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mental Misstep,removal,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mox Amber,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mox Diamond,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mox Diamond,graveyard,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mox Opal,ramp,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mox Opal,ramp,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mystical Tutor,tutor,100,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Pact of Negation,removal,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Ranger-Captain of Eos,tutor,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Swan Song,token,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Swan Song,removal,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Thassa's Oracle,combo_piece,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Thassa's Oracle,wincon,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Thassa's Oracle,protection,100,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Cabal Ritual,graveyard,100,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Cabal Ritual,ramp,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Endurance,graveyard,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Force of Negation,graveyard,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Force of Negation,removal,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Grim Monolith,ramp,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Grim Monolith,combo_piece,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mystic Remora,draw,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Nature's Rhythm,tutor,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Rhystic Study,draw,100,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Simian Spirit Guide,ramp,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Springleaf Drum,ramp,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Swan Song,removal,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Swan Song,token,100,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Voice of Victory,stax,100,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Voice of Victory,token,100,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,"Wan Shi Tong, Librarian",draw,100,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Culling the Weak,ramp,100,20,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Faerie Mastermind,draw,100,20,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Fierce Guardianship,removal,100,20,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Intuition,tutor,100,20,high,unknown,bracket_2_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Wishclaw Talisman,tutor,100,20,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Wishclaw Talisman,ramp,100,20,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Chord of Calling,tutor,100,19,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Elvish Spirit Guide,ramp,100,19,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Fyndhorn Elves,ramp,100,19,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Into the Flood Maw,removal,100,19,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Into the Flood Maw,token,100,19,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mox Amber,ramp,100,19,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Red Elemental Blast,removal,100,19,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Transmute Artifact,tutor,100,19,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Hexing Squelcher,protection,100,18,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The One Ring,draw,100,18,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The One Ring,protection,100,18,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Chain of Vapor,removal,100,17,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Delighted Halfling,ramp,100,16,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Chrome Mox,ramp,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Crop Rotation,ramp,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Demonic Tutor,tutor,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Devoted Druid,ramp,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Esper Sentinel,draw,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Fierce Guardianship,removal,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Flusterstorm,removal,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Force of Will,removal,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mana Vault,combo_piece,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mana Vault,ramp,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mox Amber,ramp,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mystic Remora,draw,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Rhystic Study,draw,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Thassa's Oracle,combo_piece,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Thassa's Oracle,wincon,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Thassa's Oracle,protection,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Vampiric Tutor,tutor,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Voice of Victory,token,100,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Voice of Victory,stax,100,15,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Beseech the Mirror,tutor,100,14,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Beseech the Mirror,tutor,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Borne Upon a Wind,draw,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Cabal Ritual,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Cabal Ritual,graveyard,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Chain of Vapor,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Chrome Mox,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Culling the Weak,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Demonic Consultation,wipe,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Demonic Tutor,tutor,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Enlightened Tutor,tutor,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Fierce Guardianship,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Flusterstorm,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Force of Will,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Hexing Squelcher,protection,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Imperial Seal,tutor,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Lion's Eye Diamond,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mana Vault,combo_piece,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mana Vault,ramp,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mental Misstep,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mental Misstep,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mox Amber,ramp,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mox Diamond,ramp,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mox Diamond,graveyard,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mox Diamond,graveyard,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mox Diamond,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mox Opal,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mystic Remora,draw,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mystical Tutor,tutor,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Pact of Negation,removal,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Pact of Negation,removal,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Paradise Mantle,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,"Ragavan, Nimble Pilferer",token,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,"Ragavan, Nimble Pilferer",ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Rhystic Study,draw,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Rite of Flame,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Simian Spirit Guide,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Springleaf Drum,ramp,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Swan Song,removal,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Swan Song,token,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Thassa's Oracle,protection,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Thassa's Oracle,wincon,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Thassa's Oracle,combo_piece,100,14,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The Cabbage Merchant,token,100,14,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The Cabbage Merchant,ramp,100,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Vampiric Tutor,tutor,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Veil of Summer,protection,100,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Veil of Summer,draw,100,14,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Agatha's Soul Cauldron,ramp,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Chord of Calling,tutor,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Chrome Mox,ramp,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Demonic Consultation,wipe,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Demonic Tutor,tutor,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Eldritch Evolution,tutor,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Esper Sentinel,draw,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Fierce Guardianship,removal,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Finale of Devastation,tutor,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Ignoble Hierarch,ramp,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,"Lotho, Corrupt Shirriff",ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Lotho, Corrupt Shirriff",ramp,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,"Lotho, Corrupt Shirriff",token,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Lotho, Corrupt Shirriff",token,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mana Vault,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mana Vault,combo_piece,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mental Misstep,removal,100,13,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mnemonic Betrayal,ramp,100,13,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mnemonic Betrayal,wipe,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mox Amber,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mox Diamond,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mox Diamond,graveyard,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Noble Hierarch,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Noble Hierarch,ramp,100,13,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Pyroblast,removal,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Ragavan, Nimble Pilferer",token,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Ragavan, Nimble Pilferer",ramp,100,13,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Red Elemental Blast,removal,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Smothering Tithe,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Smothering Tithe,ramp,100,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Smothering Tithe,token,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Smothering Tithe,token,100,13,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Talisman of Dominance,ramp,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Teferi, Time Raveler",draw,100,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Vampiric Tutor,tutor,100,13,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Borne Upon a Wind,draw,100,12,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Crop Rotation,ramp,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Culling Ritual,ramp,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Daze,removal,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Deathrite Shaman,graveyard,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Deathrite Shaman,ramp,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Deathrite Shaman,ramp,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Deathrite Shaman,removal,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Deathrite Shaman,removal,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Deathrite Shaman,graveyard,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Deathrite Shaman,wincon,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Deathrite Shaman,wincon,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Force of Will,removal,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mnemonic Betrayal,wipe,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mnemonic Betrayal,ramp,100,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mystic Remora,draw,100,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Ranger-Captain of Eos,tutor,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Wishclaw Talisman,ramp,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Wishclaw Talisman,tutor,100,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,An Offer You Can't Refuse,ramp,100,11,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,An Offer You Can't Refuse,removal,100,11,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Dragon's Rage Channeler,graveyard,100,11,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Elvish Spirit Guide,ramp,100,11,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Faerie Mastermind,draw,100,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Flusterstorm,removal,100,11,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Green Sun's Zenith,tutor,100,11,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Grim Monolith,ramp,100,11,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Grim Monolith,combo_piece,100,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Swan Song,removal,100,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Swan Song,token,100,11,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,The Cabbage Merchant,token,100,11,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,The Cabbage Merchant,ramp,100,11,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Veil of Summer,draw,100,11,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Veil of Summer,protection,100,11,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Deadly Rollick,removal,100,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Elvish Spirit Guide,ramp,100,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Enlightened Tutor,tutor,100,10,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Imperial Seal,tutor,100,10,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Infernal Plunge,ramp,100,10,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Orcish Bowmasters,removal,100,10,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Orcish Bowmasters,removal,100,10,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Pyroblast,removal,100,10,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Survival of the Fittest,tutor,100,10,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Swan Song,token,100,10,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Swan Song,removal,100,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,The Cabbage Merchant,ramp,100,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,The Cabbage Merchant,token,100,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Abrupt Decay,removal,100,9,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Avacyn's Pilgrim,ramp,100,9,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Delighted Halfling,ramp,100,9,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Demonic Consultation,wipe,100,9,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Force of Negation,removal,100,9,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Force of Negation,graveyard,100,9,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Gene Pollinator,ramp,100,9,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Mental Misstep,removal,100,9,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Nature's Rhythm,tutor,100,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Orcish Bowmasters,removal,100,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Rhystic Study,draw,100,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Wan Shi Tong, Librarian",draw,100,9,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Worldly Tutor,tutor,100,9,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Deathrite Shaman,ramp,100,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Delighted Halfling,ramp,100,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Elvish Mystic,ramp,100,8,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Enduring Vitality,ramp,100,8,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Eternal Witness,recursion,100,8,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Gitaxian Probe,draw,100,8,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Gitaxian Probe,draw,100,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Ignoble Hierarch,ramp,100,8,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Into the Flood Maw,removal,100,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Into the Flood Maw,token,100,8,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Pact of Negation,removal,100,8,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Remand,removal,100,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Spell Snare,removal,100,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Unearth,recursion,100,8,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Vexing Bauble,draw,100,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,An Offer You Can't Refuse,removal,100,7,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,removal,100,7,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,ramp,100,7,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,An Offer You Can't Refuse,ramp,100,7,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Borne Upon a Wind,draw,100,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Crop Rotation,ramp,100,7,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Delighted Halfling,ramp,100,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Delighted Halfling,ramp,100,7,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Dispel,removal,100,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Elvish Mystic,ramp,100,7,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Elvish Spirit Guide,ramp,100,7,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Enduring Vitality,ramp,100,7,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Force of Negation,removal,100,7,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Force of Negation,graveyard,100,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Green Sun's Zenith,tutor,100,7,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Into the Flood Maw,removal,100,7,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Into the Flood Maw,token,100,7,medium_high,unknown,bracket_3_4
+"Deadpool, Trading Card",duel_commander,Opposition Agent,ramp,100,7,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Opposition Agent,ramp,100,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Simian Spirit Guide,ramp,100,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Stern Scolding,removal,100,7,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Survival of the Fittest,tutor,100,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Unearth,recursion,100,7,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Wishclaw Talisman,ramp,100,7,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Wishclaw Talisman,tutor,100,7,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Crop Rotation,ramp,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Mana Vault,ramp,100,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mana Vault,ramp,100,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mox Amber,ramp,100,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mox Diamond,ramp,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Mox Opal,ramp,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Simian Spirit Guide,ramp,100,6,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Simian Spirit Guide,ramp,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Springleaf Drum,ramp,100,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Springleaf Drum,ramp,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,"Tezzeret, Cruel Captain",tutor,100,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Vexing Bauble,draw,100,6,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,"Wan Shi Tong, Librarian",draw,100,6,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Demonic Consultation,wipe,100,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Flusterstorm,removal,100,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Flusterstorm,removal,100,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mental Misstep,removal,100,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mental Misstep,removal,100,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Pact of Negation,removal,100,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Pact of Negation,removal,100,5,medium_high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Force Spike,removal,99,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Mana Leak,removal,99,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Daze,removal,99,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Memory Lapse,removal,99,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Lose Focus,removal,99,27,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Tale's End,removal,99,26,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Force of Negation,removal,99,25,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Gamble,tutor,99,20,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Diabolic Intent,tutor,99,18,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Tataru Taru,token,99,18,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Tataru Taru,draw,99,18,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Professional Face-Breaker,ramp,99,17,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Spell Pierce,removal,99,16,high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Diabolic Intent,tutor,99,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Gamble,tutor,99,14,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Snapback,removal,99,14,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Kinnan, Bonder Prodigy",ramp,99,13,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Hidden Strings,removal,99,12,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Snapback,removal,99,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Neoform,tutor,99,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Tataru Taru,draw,99,11,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Tataru Taru,token,99,11,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,"Kinnan, Bonder Prodigy",ramp,99,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Legolas's Quick Reflexes,protection,99,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Legolas's Quick Reflexes,removal,99,9,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Ertai Resurrected,removal,99,8,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Force Spike,removal,99,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Force of Negation,removal,99,8,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Lose Focus,removal,99,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Mana Leak,removal,99,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Memory Lapse,removal,99,8,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Snapback,removal,99,8,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Tale's End,removal,99,8,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Tataru Taru,token,99,8,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Tataru Taru,draw,99,8,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Daze,removal,99,7,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Chrome Mox,ramp,99,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Chrome Mox,ramp,99,6,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Ranger-Captain of Eos,tutor,99,6,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mox Diamond,ramp,99,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mox Opal,ramp,99,5,medium_high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Galvanic Discharge,removal,98,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Fury,removal,98,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Gitaxian Probe,draw,98,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Remand,draw,98,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Peek,draw,98,27,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Ponder,draw,98,27,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Preordain,draw,98,27,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Unholy Heat,removal,98,26,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Flame Slash,removal,98,25,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Chain Lightning,removal,98,24,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Talisman of Curiosity,ramp,98,22,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,"Wan Shi Tong, Librarian",draw,98,19,high,unknown,bracket_2_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Professional Face-Breaker,token,98,17,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Jeska's Will,ramp,98,14,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Pyrogoyf,removal,98,14,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Archmage's Charm,removal,98,12,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Consider,draw,98,11,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Faerie Mastermind,draw,98,11,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Cori-Steel Cutter,token,98,10,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Stifle,removal,98,10,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Abrupt Decay,removal,98,9,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Gitaxian Probe,draw,98,9,medium_high,unknown,bracket_2_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Jeska's Will,ramp,98,9,medium_high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Lava Dart,removal,98,9,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Ponder,draw,98,9,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Psychic Frog,draw,98,9,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Simic Signet,ramp,98,9,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Abrupt Decay,removal,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Broadside Bombardiers,removal,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Deathrite Shaman,removal,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Fatal Push,removal,98,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Fatal Push,removal,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Fury,removal,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Keen-Eyed Curator,removal,98,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Ocelot Pride,token,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Orcish Bowmasters,removal,98,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Preordain,draw,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Pyrogoyf,removal,98,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Remand,draw,98,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Springleaf Drum,ramp,98,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Toxic Deluge,wipe,98,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Unearth,draw,98,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Voice of Victory,token,98,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Archmage's Charm,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Broadside Bombardiers,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Fatal Push,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Fury,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Orcish Bowmasters,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Pyrogoyf,removal,98,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Unearth,draw,98,7,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Bloodfire Dwarf,wipe,98,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Bottle-Cap Blast,ramp,98,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Eternal Witness,recursion,98,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Guild Artisan,ramp,98,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Liquimetal Torque,ramp,98,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Three Tree Mascot,ramp,98,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Vibrance,ramp,98,6,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Crop Rotation,ramp,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Enlightened Tutor,tutor,98,5,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Formidable Speaker,tutor,98,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Formidable Speaker,tutor,98,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Formidable Speaker,tutor,98,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Green Sun's Zenith,tutor,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Grim Monolith,ramp,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Imperial Seal,tutor,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mana Vault,ramp,98,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,"Ragavan, Nimble Pilferer",ramp,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Vampiric Tutor,tutor,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Wishclaw Talisman,tutor,98,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Wishclaw Talisman,ramp,98,5,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,token,97,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Basalt Monolith,ramp,97,22,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Ranger-Captain of Eos,stax,97,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Fellwar Stone,ramp,97,21,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Cryptic Command,removal,97,20,high,unknown,bracket_2_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Fellwar Stone,ramp,97,20,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Agatha's Soul Cauldron,removal,97,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Ranger-Captain of Eos,stax,97,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,An Offer You Can't Refuse,token,97,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Tyvar, Jubilant Brawler",recursion,97,10,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Cryptic Command,removal,97,8,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Fellwar Stone,ramp,97,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,An Offer You Can't Refuse,token,97,7,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,An Offer You Can't Refuse,token,97,7,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Firdoch Core,ramp,97,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Red Elemental Blast,removal,97,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Fierce Guardianship,removal,97,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Force of Negation,removal,97,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Force of Negation,removal,97,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Force of Will,removal,97,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Force of Will,removal,97,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Swan Song,removal,97,5,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Brain Freeze,graveyard,96,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Rite of Flame,graveyard,96,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Underworld Breach,graveyard,96,23,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Finale of Devastation,graveyard,96,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Nature's Rhythm,graveyard,96,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Springleaf Drum,combo_piece,96,21,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Necropotence,graveyard,96,19,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Devoted Druid,combo_piece,96,15,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Brain Freeze,graveyard,96,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Necropotence,graveyard,96,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Rite of Flame,graveyard,96,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Springleaf Drum,combo_piece,96,14,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The Cabbage Merchant,combo_piece,96,14,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Underworld Breach,graveyard,96,14,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Finale of Devastation,graveyard,96,13,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Mnemonic Betrayal,graveyard,96,13,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Mnemonic Betrayal,graveyard,96,12,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,The Cabbage Merchant,combo_piece,96,11,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Yawgmoth's Will,graveyard,96,11,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,The Cabbage Merchant,combo_piece,96,10,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Demonic Tutor,tutor,96,9,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Nature's Rhythm,graveyard,96,9,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Demonic Tutor,tutor,96,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Disrupting Shoal,removal,96,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Llanowar Elves,ramp,96,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Ranger-Captain of Eos,tutor,96,8,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Demonic Tutor,tutor,96,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Llanowar Elves,ramp,96,7,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Abrade,removal,96,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Delighted Halfling,ramp,96,6,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Mana Vault,combo_piece,96,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mana Vault,combo_piece,96,6,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Snap,removal,96,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Snap,removal,96,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Vibrance,removal,96,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Xorn,token,96,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Faerie Mastermind,draw,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Into the Flood Maw,token,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Into the Flood Maw,removal,96,5,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Into the Flood Maw,token,96,5,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Into the Flood Maw,removal,96,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mnemonic Betrayal,wipe,96,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Mox Amber,ramp,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mystic Remora,draw,96,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mystic Remora,draw,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Orcish Bowmasters,removal,96,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,"Ragavan, Nimble Pilferer",token,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Rhystic Study,draw,96,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Rhystic Study,draw,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Smothering Tithe,ramp,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Swan Song,token,96,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Thassa's Oracle,protection,96,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,The One Ring,draw,96,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,The One Ring,protection,96,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Veil of Summer,protection,96,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Veil of Summer,draw,96,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,"Wan Shi Tong, Librarian",draw,96,5,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Sevinne's Reclamation,graveyard,95,23,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Transmute Artifact,graveyard,95,19,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Whir of Invention,tutor,95,15,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Flash Photography,token,95,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Hazel's Brewmaster,token,95,12,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,"Derevi, Empyrial Tactician",removal,95,11,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Logic Knot,removal,95,11,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,"Selvala, Heart of the Wilds",draw,95,10,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Tezzeret the Seeker,tutor,95,10,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Birthing Pod,tutor,95,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Deathrite Shaman,wincon,95,8,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Dizzy Spell,tutor,95,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Eldritch Evolution,tutor,95,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Elves of Deep Shadow,ramp,95,8,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Eternal Witness,graveyard,95,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Fyndhorn Elves,ramp,95,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Stoneforge Mystic,tutor,95,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Wight of the Reliquary,ramp,95,8,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Flash Photography,token,95,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Fyndhorn Elves,ramp,95,7,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Worldly Tutor,tutor,95,7,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Crop Rotation,ramp,95,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Formidable Speaker,tutor,95,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Green Sun's Zenith,tutor,95,6,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Icetill Explorer,ramp,95,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Icetill Explorer,ramp,95,6,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Mox Diamond,graveyard,95,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,"Tezzeret, Cruel Captain",tutor,95,6,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Enduring Vitality,ramp,95,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,"Lotho, Corrupt Shirriff",ramp,95,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Pyroblast,removal,95,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,The Cabbage Merchant,ramp,95,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Deathrite Shaman,ramp,95,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Deathrite Shaman,ramp,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Demonic Consultation,wipe,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Flusterstorm,removal,95,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Flusterstorm,removal,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mental Misstep,removal,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Mental Misstep,removal,95,4,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Opposition Agent,ramp,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Opposition Agent,ramp,95,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Opposition Agent,ramp,95,4,medium,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Opposition Agent,ramp,95,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Pact of Negation,removal,95,4,medium,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,"Thrasios, Triton Hero",draw,94,22,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,"Malcolm, Alluring Scoundrel",draw,94,21,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Cryptic Command,draw,94,20,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Trophy Mage,tutor,94,18,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Drift of Phantasms,tutor,94,16,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Rain of Filth,ramp,94,14,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The Unagi of Kyoshi Island,draw,94,12,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,The Unagi of Kyoshi Island,protection,94,12,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Rain of Filth,ramp,94,11,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Moonsilver Key,ramp,94,10,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Relic of Legends,ramp,94,9,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Cling to Dust,draw,94,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Cryptic Command,draw,94,8,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Demonic Counsel,tutor,94,8,medium_high,unknown,bracket_3_4
+"Cloud, Midgar Mercenary",duel_commander,Esper Sentinel,draw,94,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Mental Note,draw,94,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Pre-War Formalwear,recursion,94,8,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Touch the Spirit Realm,removal,94,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Walking Ballista,removal,94,8,medium_high,unknown,bracket_3_4
+"Deadpool, Trading Card",duel_commander,Cling to Dust,draw,94,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Fear of Missing Out,draw,94,7,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Bottle-Cap Blast,removal,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Bottle-Cap Blast,token,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Clown Car,token,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Dwarven Scorcher,removal,94,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Guild Artisan,token,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Maskwood Nexus,token,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Sudden Shock,removal,94,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Twinshot Sniper,removal,94,6,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Chrome Mox,ramp,94,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Demonic Tutor,tutor,94,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Plundering Barbarian,ramp,94,5,medium_high,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Delighted Halfling,ramp,94,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mox Diamond,ramp,94,4,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Mox Opal,ramp,94,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mox Opal,ramp,94,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mox Opal,ramp,94,4,medium,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Ghostfire Slice,removal,93,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Wash Away,removal,93,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Flame of Anor,removal,93,23,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Change the Equation,removal,93,18,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Abrade,removal,93,9,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Legolas's Quick Reflexes,stax,93,9,medium_high,unknown,bracket_3_4
+"Tasigur, the Golden Fang",duel_commander,Cling to Dust,removal,93,8,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Exclude,removal,93,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Mawloc,draw,93,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,"Minsc & Boo, Timeless Heroes",draw,93,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Parallax Wave,removal,93,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Portable Hole,removal,93,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Skyclave Apparition,token,93,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Voice of Victory,stax,93,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Wash Away,removal,93,8,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,"Ashiok, Dream Render",graveyard,93,7,medium_high,unknown,bracket_3_4
+"Deadpool, Trading Card",duel_commander,Cling to Dust,removal,93,7,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Cyclonic Rift,removal,93,7,medium_high,unknown,bracket_3_4
+Tifa Lockhart,duel_commander,Elvish Reclaimer,ramp,93,7,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Fiery Confluence,wipe,93,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Requiting Hex,removal,93,7,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Sylvan Safekeeper,protection,93,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Chain Lightning,removal,93,6,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Consider,draw,93,6,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Jeska's Will,ramp,93,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Roaming Throne,protection,93,6,medium_high,unknown,bracket_3_4
+"Deadpool, Trading Card",duel_commander,Screaming Nemesis,removal,93,6,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Unholy Heat,removal,93,6,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Chord of Calling,tutor,93,5,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Chord of Calling,tutor,93,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Elves of Deep Shadow,ramp,93,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Expedition Map,ramp,93,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Finale of Devastation,tutor,93,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Fyndhorn Elves,ramp,93,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mnemonic Betrayal,ramp,93,5,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Mystical Tutor,tutor,93,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Nature's Rhythm,tutor,93,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Talisman of Dominance,ramp,93,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Thassa's Oracle,wincon,93,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Transmute Artifact,tutor,93,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Beseech the Mirror,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Cabal Ritual,ramp,93,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Crop Rotation,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Crop Rotation,ramp,93,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Crop Rotation,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Elvish Spirit Guide,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Formidable Speaker,tutor,93,4,medium_high,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Formidable Speaker,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Green Sun's Zenith,tutor,93,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Green Sun's Zenith,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Green Sun's Zenith,tutor,93,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Ignoble Hierarch,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Imperial Seal,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Lion's Eye Diamond,ramp,93,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Lion's Eye Diamond,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Mana Vault,ramp,93,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mana Vault,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,"Ragavan, Nimble Pilferer",ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Simian Spirit Guide,ramp,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Vampiric Tutor,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Wishclaw Talisman,tutor,93,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Wishclaw Talisman,ramp,93,4,medium,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Clout of the Dominus,protection,92,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Detective's Phoenix,graveyard,92,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Memory Lapse,graveyard,92,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Remand,graveyard,92,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Snapcaster Mage,graveyard,92,28,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Unholy Heat,graveyard,92,26,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Force of Negation,graveyard,92,25,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Lotus Petal,ramp,92,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Silence,stax,92,23,high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Grand Abolisher,stax,92,21,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Lotus Petal,ramp,92,21,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Intuition,graveyard,92,20,high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Lotus Petal,ramp,92,15,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Silence,stax,92,15,high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Lotus Petal,ramp,92,14,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Pyrogoyf,graveyard,92,14,high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Agatha's Soul Cauldron,graveyard,92,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Grand Abolisher,stax,92,13,high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Lotus Petal,ramp,92,13,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Mystic Confluence,removal,92,13,high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,Silence,stax,92,13,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Consider,graveyard,92,11,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Dragon's Rage Channeler,graveyard,92,11,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Lava Dart,graveyard,92,9,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Psychic Frog,graveyard,92,9,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,"Tam, Mindful First-Year",protection,92,9,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Animate Dead,graveyard,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Barrowgoyf,graveyard,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Deathrite Shaman,graveyard,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Detective's Phoenix,graveyard,92,8,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Exclude,draw,92,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Fire Nation Occupation,ramp,92,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Force of Negation,graveyard,92,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Keen-Eyed Curator,graveyard,92,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Memory Lapse,graveyard,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,"Minsc & Boo, Timeless Heroes",token,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,"Minsc & Boo, Timeless Heroes",removal,92,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Mystic Confluence,removal,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Pyrogoyf,graveyard,92,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Remand,graveyard,92,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Unearth,graveyard,92,8,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Animate Dead,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Barrowgoyf,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Detective's Phoenix,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Dragon's Rage Channeler,graveyard,92,7,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Endurance,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Pyrogoyf,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Unearth,graveyard,92,7,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Fellwar Stone,ramp,92,6,medium_high,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Ranger-Captain of Eos,stax,92,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Weather Maker,ramp,92,6,medium_high,unknown,bracket_2_4
+"Tivit, Seller of Secrets",competitive_commander,Esper Sentinel,draw,92,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Flare of Denial,removal,92,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Flywheel Racer,ramp,92,5,medium_high,unknown,bracket_3_4
+"Aragorn, King of Gondor",duel_commander,Mental Misstep,removal,92,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Remand,removal,92,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Spell Snare,removal,92,5,medium_high,unknown,bracket_2_4
+"Tivit, Seller of Secrets",competitive_commander,Fierce Guardianship,removal,92,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Fierce Guardianship,removal,92,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Fierce Guardianship,removal,92,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Force of Will,removal,92,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Force of Will,removal,92,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Swan Song,removal,92,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Swan Song,removal,92,4,medium_high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Fiery Impulse,removal,91,14,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Gene Pollinator,combo_piece,91,9,medium_high,unknown,bracket_3_4
+"Cloud, Midgar Mercenary",duel_commander,Cathar Commando,removal,91,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Fire Nation Occupation,token,91,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Drown in the Loch,removal,91,7,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Legolas's Quick Reflexes,removal,91,7,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Legolas's Quick Reflexes,protection,91,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Long Goodbye,removal,91,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Long Goodbye,protection,91,7,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Lotus Cobra,ramp,91,6,medium_high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Springleaf Drum,combo_piece,91,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Springleaf Drum,combo_piece,91,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Tireless Provisioner,ramp,91,6,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Agatha's Soul Cauldron,ramp,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,An Offer You Can't Refuse,removal,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,An Offer You Can't Refuse,ramp,91,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Galvanic Blast,removal,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Grim Monolith,combo_piece,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,"Lotho, Corrupt Shirriff",token,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mana Vault,combo_piece,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Smothering Tithe,token,91,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Snap,removal,91,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Sowing Mycospawn,ramp,91,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Sowing Mycospawn,ramp,91,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Thassa's Oracle,combo_piece,91,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,The Cabbage Merchant,token,91,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Chain of Vapor,removal,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Chain of Vapor,removal,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Deathrite Shaman,removal,91,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Deathrite Shaman,removal,91,4,medium,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Dispel,removal,91,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Faerie Mastermind,draw,91,4,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Hexing Squelcher,protection,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Mox Amber,ramp,91,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mox Amber,ramp,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mystic Remora,draw,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Mystic Remora,draw,91,4,medium_high,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Orcish Bowmasters,removal,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,"Ragavan, Nimble Pilferer",token,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Rhystic Study,draw,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Rhystic Study,draw,91,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Smothering Tithe,ramp,91,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Swan Song,token,91,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Swan Song,token,91,4,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,"Teferi, Time Raveler",draw,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Thassa's Oracle,protection,91,4,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Toxic Deluge,wipe,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Veil of Summer,draw,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Veil of Summer,protection,91,4,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Voice of Victory,token,91,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Voice of Victory,token,91,4,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Basalt Monolith,combo_piece,90,22,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Oliphaunt,tutor,90,20,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Oliphaunt,ramp,90,20,high,unknown,bracket_2_4
+"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",competitive_commander,Grinding Station,graveyard,90,13,high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Hazel's Brewmaster,graveyard,90,12,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Miscalculation,draw,90,10,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Miscalculation,removal,90,10,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,"Tyvar, Jubilant Brawler",graveyard,90,10,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Grinding Station,graveyard,90,8,medium_high,unknown,bracket_3_4
+"Cloud, Midgar Mercenary",duel_commander,Lion Sash,removal,90,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Miscalculation,removal,90,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Miscalculation,draw,90,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Oliphaunt,ramp,90,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Oliphaunt,tutor,90,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Untimely Malfunction,removal,90,7,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Arboreal Grazer,ramp,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Archdruid's Charm,ramp,90,6,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,"Derevi, Empyrial Tactician",removal,90,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Eternal Witness,graveyard,90,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Expedition Map,ramp,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Malevolent Rumble,ramp,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Nature's Rhythm,tutor,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,"Nissa, Resurgent Animist",ramp,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Spelunking,ramp,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Summoner's Pact,tutor,90,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Worldly Tutor,tutor,90,6,medium_high,unknown,bracket_2_4
+"Phelia, Exuberant Shepherd",duel_commander,Enlightened Tutor,tutor,90,5,medium_high,unknown,bracket_2_4
+"Quintorius, History Chaser",duel_commander,Enlightened Tutor,tutor,90,5,medium_high,unknown,bracket_2_4
+"Tivit, Seller of Secrets",competitive_commander,Force of Negation,graveyard,90,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Force of Negation,graveyard,90,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Knuckles the Echidna,ramp,90,5,medium_high,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mox Diamond,graveyard,90,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Plundering Barbarian,removal,90,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Plundering Barbarian,token,90,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Spellseeker,tutor,90,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Springheart Nantuko,token,90,5,medium_high,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Enduring Vitality,ramp,90,4,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Mana Drain,removal,90,4,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Demonic Consultation,wipe,90,3,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Demonic Consultation,wipe,90,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Flusterstorm,removal,90,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Flusterstorm,removal,90,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Flusterstorm,removal,90,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Mental Misstep,removal,90,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Mental Misstep,removal,90,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Mental Misstep,removal,90,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Opposition Agent,ramp,90,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Pact of Negation,removal,90,3,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Pact of Negation,removal,90,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Pact of Negation,removal,90,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Pact of Negation,removal,90,3,medium,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Pyrokinesis,removal,89,29,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Consecrated Sphinx,draw,89,22,high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Mystic Confluence,draw,89,13,high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Metamorphosis Fanatic,recursion,89,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Mystic Confluence,draw,89,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,On Thin Ice,removal,89,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Puresteel Paladin,draw,89,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Ranger-Captain of Eos,stax,89,8,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,Skullclamp,draw,89,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Skullclamp,draw,89,8,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Fiery Confluence,removal,89,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Pyrokinesis,removal,89,7,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Fear of Missing Out,draw,89,6,medium_high,unknown,bracket_2_4
+"Sisay, Weatherlight Captain",competitive_commander,"Jegantha, the Wellspring",ramp,89,6,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,"Magda, the Hoardmaster",token,89,6,medium_high,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Mental Note,draw,89,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Spelunking,draw,89,6,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Daze,removal,89,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Force Spike,removal,89,5,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Knuckles the Echidna,token,89,5,medium_high,unknown,bracket_3_4
+"Aragorn, King of Gondor",duel_commander,Lose Focus,removal,89,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Mana Leak,removal,89,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Memory Lapse,removal,89,5,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Professional Face-Breaker,ramp,89,5,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Sowing Mycospawn,removal,89,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Sowing Mycospawn,removal,89,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Spark Mage,removal,89,5,medium_high,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Stalactite Dagger,token,89,5,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Chrome Mox,ramp,89,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Chrome Mox,ramp,89,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Demonic Tutor,tutor,89,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Ranger-Captain of Eos,tutor,89,4,medium,unknown,bracket_3_4
+"Magda, Brazen Outlaw",competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Mox Diamond,ramp,89,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Mox Opal,ramp,89,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Mox Opal,ramp,89,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Mox Opal,ramp,89,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Mox Opal,ramp,89,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Mox Opal,ramp,89,3,medium,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Abhorrent Oculus,graveyard,88,18,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,"Nezahal, Primal Tide",draw,88,14,high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Cankerbloom,removal,88,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Cling to Dust,graveyard,88,8,medium_high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Colossal Skyturtle,recursion,88,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Emperor of Bones,graveyard,88,8,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Ledger Shredder,draw,88,8,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Mental Note,graveyard,88,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Springleaf Drum,combo_piece,88,8,medium_high,unknown,bracket_3_4
+Slimefoot and Squee,duel_commander,Wight of the Reliquary,graveyard,88,8,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Cling to Dust,graveyard,88,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Dauthi Voidwalker,graveyard,88,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Emperor of Bones,graveyard,88,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Fear of Missing Out,graveyard,88,7,medium_high,unknown,bracket_2_4
+"Tasigur, the Golden Fang",duel_commander,Languish,wipe,88,7,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Archdruid's Charm,removal,88,6,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Barkform Harvester,graveyard,88,6,medium_high,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Cloud of Faeries,draw,88,6,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Cyclonic Rift,removal,88,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Elvish Reclaimer,ramp,88,6,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,"Grist, the Hunger Tide",removal,88,6,medium_high,unknown,bracket_2_4
+Slimefoot and Squee,duel_commander,"Grist, the Hunger Tide",token,88,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Malevolent Rumble,token,88,6,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,March of Otherworldly Light,removal,88,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Sowing Mycospawn,ramp,88,6,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Sudden Shock,stax,88,6,medium_high,unknown,bracket_3_4
+"Lumra, Bellow of the Woods",duel_commander,Tireless Provisioner,token,88,6,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Faerie Mastermind,draw,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Flame Slash,removal,88,5,medium_high,unknown,bracket_2_4
+"Quintorius, History Chaser",duel_commander,Fury,removal,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Fury,removal,88,5,medium_high,unknown,bracket_2_4
+"Quintorius, History Chaser",duel_commander,Galvanic Discharge,removal,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Gitaxian Probe,draw,88,5,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Hexing Squelcher,protection,88,5,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Hexing Squelcher,protection,88,5,medium_high,unknown,bracket_2_4
+"Phelia, Exuberant Shepherd",duel_commander,Ocelot Pride,token,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,"Phlage, Titan of Fire's Fury",removal,88,5,medium_high,unknown,bracket_2_4
+"Quintorius, History Chaser",duel_commander,"Phlage, Titan of Fire's Fury",removal,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Prismatic Ending,removal,88,5,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Professional Face-Breaker,token,88,5,medium_high,unknown,bracket_3_4
+"Aragorn, King of Gondor",duel_commander,Pyrogoyf,removal,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,Remand,draw,88,5,medium_high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Screaming Nemesis,removal,88,5,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Springleaf Drum,ramp,88,5,medium_high,unknown,bracket_2_4
+"Aragorn, King of Gondor",duel_commander,"Teferi, Time Raveler",draw,88,5,medium_high,unknown,bracket_2_4
+"Magda, Brazen Outlaw",competitive_commander,Untimely Malfunction,removal,88,5,medium_high,unknown,bracket_3_4
+"Aragorn, King of Gondor",duel_commander,Voice of Victory,token,88,5,medium_high,unknown,bracket_2_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Avacyn's Pilgrim,ramp,88,4,medium_high,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Avacyn's Pilgrim,ramp,88,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Chord of Calling,tutor,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Chord of Calling,tutor,88,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Culling Ritual,ramp,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Culling the Weak,ramp,88,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Deathrite Shaman,wincon,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Deathrite Shaman,wincon,88,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Devoted Druid,ramp,88,4,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Drana and Linvala,ramp,88,4,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Elves of Deep Shadow,ramp,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Elves of Deep Shadow,ramp,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Eternal Witness,recursion,88,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Expedition Map,ramp,88,4,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Fabricate,tutor,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Finale of Devastation,tutor,88,4,medium_high,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Gifts Ungiven,tutor,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Mystical Tutor,tutor,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Mystical Tutor,tutor,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Nature's Rhythm,tutor,88,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Noble Hierarch,ramp,88,4,medium_high,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Rite of Flame,ramp,88,4,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Sevinne's Reclamation,recursion,88,4,medium,unknown,bracket_3_4
+"Kraum, Ludevic's Opus + Tymna the Weaver",competitive_commander,Talisman of Dominance,ramp,88,4,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Vial Smasher the Fierce",competitive_commander,Thassa's Oracle,wincon,88,4,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Beseech the Mirror,tutor,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Beseech the Mirror,tutor,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Cabal Ritual,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Cabal Ritual,ramp,88,3,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Elvish Mystic,ramp,88,3,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Elvish Mystic,ramp,88,3,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Elvish Spirit Guide,ramp,88,3,medium,unknown,bracket_3_4
+"Rograkh, Son of Rohgahh + Thrasios, Triton Hero",competitive_commander,Elvish Spirit Guide,ramp,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Elvish Spirit Guide,ramp,88,3,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Yoshimaru, Ever Faithful",competitive_commander,Enlightened Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Enlightened Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Enlightened Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Green Sun's Zenith,tutor,88,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Grim Monolith,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Grim Monolith,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Imperial Seal,tutor,88,3,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Imperial Seal,tutor,88,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Imperial Seal,tutor,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Imperial Seal,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Imperial Seal,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Intuition,tutor,88,3,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,Intuition,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Lion's Eye Diamond,ramp,88,3,medium,unknown,bracket_3_4
+"Thrasios, Triton Hero + Tymna the Weaver",competitive_commander,Lion's Eye Diamond,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Lion's Eye Diamond,ramp,88,3,medium,unknown,bracket_3_4
+"Sisay, Weatherlight Captain",competitive_commander,Lion's Eye Diamond,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Lion's Eye Diamond,ramp,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Mana Vault,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Mana Vault,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Mana Vault,ramp,88,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Mana Vault,ramp,88,3,medium,unknown,bracket_3_4
+Arcum Dagsson,competitive_commander,Mana Vault,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,"Ragavan, Nimble Pilferer",ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,"Ragavan, Nimble Pilferer",ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Simian Spirit Guide,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Simian Spirit Guide,ramp,88,3,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Survival of the Fittest,tutor,88,3,medium,unknown,bracket_3_4
+"Tivit, Seller of Secrets",competitive_commander,"Tezzeret, Cruel Captain",tutor,88,3,medium,unknown,bracket_3_4
+"Tymna the Weaver + Malcolm, Keen-Eyed Navigator",competitive_commander,Vampiric Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Vampiric Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Vampiric Tutor,tutor,88,3,medium,unknown,bracket_3_4
+"Tayam, Luminous Enigma",competitive_commander,Vampiric Tutor,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Vampiric Tutor,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Wishclaw Talisman,tutor,88,3,medium,unknown,bracket_3_4
+The Wandering Minstrel,competitive_commander,Wishclaw Talisman,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Wishclaw Talisman,ramp,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Wishclaw Talisman,ramp,88,3,medium,unknown,bracket_3_4
+"Dargo, the Shipwrecker + Tymna the Weaver",competitive_commander,Wishclaw Talisman,tutor,88,3,medium,unknown,bracket_3_4
+"Ob Nixilis, Captive Kingpin",competitive_commander,Wishclaw Talisman,tutor,88,3,medium,unknown,bracket_3_4
+Spider-Man 2099,duel_commander,Wild Ride,graveyard,87,29,high,unknown,bracket_2_4
+Spider-Man 2099,duel_commander,Reckless Charge,graveyard,87,28,high,unknown,bracket_2_4
+"Kinnan, Bonder Prodigy",competitive_commander,Hullbreaker Horror,removal,87,22,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Dramatic Reversal,combo_piece,87,15,high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Colossal Skyturtle,protection,87,8,medium_high,unknown,bracket_3_4
+"Kinnan, Bonder Prodigy",competitive_commander,Colossal Skyturtle,removal,87,8,medium_high,unknown,bracket_3_4
+"Cloud, Midgar Mercenary",duel_commander,Jolted Awake,recursion,87,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Pre-War Formalwear,graveyard,87,8,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,Umezawa's Jitte,removal,87,8,medium_high,unknown,bracket_2_4
+Tifa Lockhart,duel_commander,Boreal Druid,ramp,87,7,medium_high,unknown,bracket_2_4
+"Cloud, Midgar Mercenary",duel_commander,"Cid, Freeflier Pilot",recursion,87,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Kolaghan's Command,recursion,87,7,medium_high,unknown,bracket_2_4
+"Deadpool, Trading Card",duel_commander,Molten Collapse,removal,87,7,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Aftermath Analyst,recursion,87,6,medium_high,unknown,bracket_2_4
+"Lumra, Bellow of the Woods",duel_commander,Burgeoning,ramp,87,6,medium_high,unknown,bracket_2_4
