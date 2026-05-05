@@ -2,6 +2,67 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-05 — Aggressive Candidate Quality v2 etapa 1: base de dados
+
+### O Porquê
+- O fluxo `intensity=aggressive` esta seguro, mas ainda retorna poucos swaps quando o quality gate rejeita candidatos fracos ou fora de papel.
+- A melhoria correta nao e duplicar linhas em `cards`: e enriquecer cartas existentes com metadata funcional, scores de papel, sinergia por comandante e penalidades agregadas.
+- A etapa precisava ser reversivel, idempotente e incapaz de alterar legalidade, identidade de cor ou bracket.
+
+### O Como
+- `server/lib/ai/candidate_quality_data_support.dart` centraliza heuristicas deterministicamente testaveis para tags como `ramp`, `draw`, `removal`, `board_wipe`, `protection`, `tutor`, `wincon`, `combo_piece`, `mana_fixing`, `graveyard`, `token`, `aristocrats`, `counterspell`, `stax`, `sacrifice` e `recursion`.
+- `server/bin/candidate_quality_data_foundation.dart` implementa:
+  - `--dry-run` default, sem escrita;
+  - `--apply` com schema aditivo e upserts idempotentes;
+  - artefatos JSON/CSV/Markdown em `server/test/artifacts/aggressive_candidate_quality_v2_2026-05-05`;
+  - desempate deterministico por `c.id` para nao alternar printings;
+  - poda segura apenas de linhas geradas pelas fontes desta etapa quando ficam obsoletas.
+- Tabelas criadas:
+  - `card_function_tags`
+  - `card_role_scores`
+  - `commander_card_synergy`
+  - `optimize_rejection_penalties`
+- View criada:
+  - `optimize_candidate_quality_summary`
+- Fontes registradas nos dados:
+  - `deterministic_heuristic_v1`
+  - `meta_decks_cooccurrence_v1`
+  - `quality_gate_history_v1`
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi atualizado para mapear essas tabelas como dependencia interna do modulo AI/Optimize, sem novo campo app-facing.
+- `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_2026-05-05.md` documenta comandos, counts, rollback, dry-run/apply e gaps.
+
+### DB e cobertura
+- Dry-run inicial: `db_mutations=false`, 33774 cards no banco, 33312 cartas canonicas escaneadas.
+- Apply final:
+  - `card_function_tags`: 33011
+  - `card_role_scores`: 30988
+  - `commander_card_synergy`: 5000
+  - `optimize_rejection_penalties`: 358
+  - cards com tags deterministicamente inferidas: 20002 (60.04%).
+- Idempotencia final:
+  - pre/post iguais para as quatro tabelas novas;
+  - stale generated rows = 0;
+  - `cards`, `card_meta_insights`, `meta_decks` e `optimization_analysis_logs` mantiveram contadores estaveis.
+- Auditoria complementar `mtg_data_integrity` em dry-run:
+  - duplicidades `LOWER(sets.code)`: 82 grupos;
+  - `cards.color_identity IS NULL`: 0;
+  - nenhum backfill executado nesta etapa.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai/candidate_quality_data_support.dart bin/candidate_quality_data_foundation.dart test/candidate_quality_data_support_test.dart`: PASS.
+- `cd server && dart test test/candidate_quality_data_support_test.dart`: PASS.
+- `cd server && dart run bin/candidate_quality_data_foundation.dart --dry-run --artifact-dir=test/artifacts/aggressive_candidate_quality_v2_2026-05-05`: PASS.
+- `cd server && dart run bin/candidate_quality_data_foundation.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_v2_2026-05-05`: PASS.
+- `cd server && dart run bin/candidate_quality_data_foundation.dart --apply --artifact-dir=test/artifacts/aggressive_candidate_quality_v2_2026-05-05/final_idempotence`: PASS, pre/post estavel.
+- `cd server && dart run bin/mtg_data_integrity.dart --artifact-dir=test/artifacts/mtg_data_integrity_2026-05-05_acqv2`: PASS dry-run.
+- `cd server && dart analyze bin lib routes test`: PASS.
+- `cd server && dart test test/sets_route_test.dart test/cards_route_test.dart test/candidate_quality_data_support_test.dart`: PASS, 11 testes.
+
+### Rollback
+- Completo: dropar `optimize_candidate_quality_summary` e as quatro tabelas novas.
+- Parcial: deletar apenas rows com `source IN ('deterministic_heuristic_v1', 'meta_decks_cooccurrence_v1', 'quality_gate_history_v1')`.
+- Nenhum rollback precisa tocar em `cards`, `card_legalities`, `sets`, `decks` ou dados de usuario.
+
 ## 2026-05-05 — Sprint 3 Optimize aggressive performance + async UX
 
 ### O Porquê

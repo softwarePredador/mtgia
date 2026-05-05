@@ -1,0 +1,98 @@
+{
+  "schema_version": "aggressive_candidate_quality_v2_stage1",
+  "mode": "apply",
+  "started_at": "2026-05-05T15:06:44.910506",
+  "finished_at": "2026-05-05T15:08:58.302331",
+  "db_mutations": true,
+  "artifact_dir": "test/artifacts/aggressive_candidate_quality_v2_2026-05-05/post_fix_apply",
+  "pre_counts": {
+    "cards": 33774,
+    "card_meta_insights": 33274,
+    "meta_decks": 650,
+    "optimization_analysis_logs": 534,
+    "card_function_tags": 33015,
+    "card_role_scores": 30990,
+    "commander_card_synergy": 5042,
+    "optimize_rejection_penalties": 358
+  },
+  "post_counts": {
+    "cards": 33774,
+    "card_meta_insights": 33274,
+    "meta_decks": 650,
+    "optimization_analysis_logs": 534,
+    "card_function_tags": 33011,
+    "card_role_scores": 30988,
+    "commander_card_synergy": 5000,
+    "optimize_rejection_penalties": 358
+  },
+  "cards_scanned": 33312,
+  "cards_with_function_tags": 20002,
+  "function_tag_rows_planned": 33011,
+  "role_score_rows_planned": 30988,
+  "commander_synergy_rows_planned": 5000,
+  "rejection_penalty_rows_planned": 358,
+  "function_tag_coverage_pct": 60.04442843419788,
+  "upserted_function_tags": 33011,
+  "upserted_role_scores": 30988,
+  "upserted_commander_synergies": 5000,
+  "upserted_rejection_penalties": 358,
+  "stale_generated_rows_before_apply": {
+    "card_function_tags": 6,
+    "card_role_scores": 3,
+    "commander_card_synergy": 69,
+    "optimize_rejection_penalties": 0
+  },
+  "pruned_stale_function_tags": 6,
+  "pruned_stale_role_scores": 3,
+  "pruned_stale_commander_synergies": 69,
+  "pruned_stale_rejection_penalties": 0,
+  "tag_counts": {
+    "sacrifice": 5610,
+    "graveyard": 4723,
+    "removal": 4700,
+    "token": 3912,
+    "draw": 3619,
+    "ramp": 3092,
+    "mana_fixing": 1606,
+    "protection": 1234,
+    "recursion": 1209,
+    "board_wipe": 834,
+    "aristocrats": 702,
+    "tutor": 633,
+    "counterspell": 439,
+    "wincon": 402,
+    "stax": 149,
+    "combo_piece": 147
+  },
+  "role_counts": {
+    "sacrifice": 5610,
+    "graveyard": 4723,
+    "removal": 4700,
+    "token": 3912,
+    "draw": 3619,
+    "ramp": 3114,
+    "protection": 1234,
+    "recursion": 1209,
+    "wipe": 834,
+    "aristocrats": 702,
+    "tutor": 633,
+    "wincon": 402,
+    "stax": 149,
+    "combo_piece": 147
+  },
+  "budget_tier_counts": {
+    "unknown": 30988
+  },
+  "bracket_scope_counts": {
+    "any": 27209,
+    "bracket_2_4": 3637,
+    "bracket_3_4": 142
+  },
+  "sample_candidate_pool_count": 3,
+  "legality_color_identity_guard": "Samples and lookup SQL keep commander legal/restricted/null status and commander color identity filters; tags never override legalities, color_identity, or bracket policy.",
+  "unresolved": {
+    "ai_generated_tags": "not used",
+    "optimizer_runtime_consumption": "not enabled in request path during stage 1",
+    "human_reviewed_tags": "not proven"
+  }
+}

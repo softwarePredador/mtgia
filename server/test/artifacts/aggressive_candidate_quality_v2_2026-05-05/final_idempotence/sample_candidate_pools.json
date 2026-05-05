@@ -1,0 +1,431 @@
+[
+  {
+    "label": "Spider-Man 2099",
+    "commander_identity": [
+      "R",
+      "U"
+    ],
+    "roles_requested": [
+      "ramp",
+      "draw",
+      "removal",
+      "protection",
+      "wipe"
+    ],
+    "guardrails": [
+      "commander legality status legal/restricted/null only",
+      "card color identity subset of commander identity",
+      "metadata tags do not modify legalities or color identity"
+    ],
+    "candidates": [
+      {
+        "card_name": "An Offer You Can't Refuse",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Arcane Signet",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Cavern of Souls",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "City of Brass",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Command Tower",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "not_listed_treated_as_allowed_by_existing_optimizer",
+        "color_identity": []
+      },
+      {
+        "card_name": "Counterspell",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Daze",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Exotic Orchard",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Fierce Guardianship",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_3_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Flusterstorm",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Force Spike",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Force of Negation",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_3_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Kraum, Ludevic's Opus",
+    "commander_identity": [
+      "R",
+      "U"
+    ],
+    "roles_requested": [
+      "ramp",
+      "draw",
+      "removal",
+      "protection",
+      "wipe"
+    ],
+    "guardrails": [
+      "commander legality status legal/restricted/null only",
+      "card color identity subset of commander identity",
+      "metadata tags do not modify legalities or color identity"
+    ],
+    "candidates": [
+      {
+        "card_name": "An Offer You Can't Refuse",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Arcane Signet",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Cavern of Souls",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "City of Brass",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Command Tower",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "not_listed_treated_as_allowed_by_existing_optimizer",
+        "color_identity": []
+      },
+      {
+        "card_name": "Counterspell",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Daze",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Exotic Orchard",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Fierce Guardianship",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_3_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Flusterstorm",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Force Spike",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Force of Negation",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_3_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Thrasios, Triton Hero",
+    "commander_identity": [
+      "G",
+      "U"
+    ],
+    "roles_requested": [
+      "ramp",
+      "draw",
+      "removal",
+      "protection",
+      "wipe"
+    ],
+    "guardrails": [
+      "commander legality status legal/restricted/null only",
+      "card color identity subset of commander identity",
+      "metadata tags do not modify legalities or color identity"
+    ],
+    "candidates": [
+      {
+        "card_name": "An Offer You Can't Refuse",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Arcane Signet",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Birds of Paradise",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "G"
+        ]
+      },
+      {
+        "card_name": "Cavern of Souls",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "City of Brass",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Command Tower",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "not_listed_treated_as_allowed_by_existing_optimizer",
+        "color_identity": []
+      },
+      {
+        "card_name": "Counterspell",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Daze",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Delighted Halfling",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "G"
+        ]
+      },
+      {
+        "card_name": "Exotic Orchard",
+        "role": "ramp",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": []
+      },
+      {
+        "card_name": "Fierce Guardianship",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_3_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      },
+      {
+        "card_name": "Flusterstorm",
+        "role": "removal",
+        "score": 93,
+        "budget_tier": "unknown",
+        "bracket_scope": "bracket_2_4",
+        "legal_status": "legal",
+        "color_identity": [
+          "U"
+        ]
+      }
+    ]
+  }
+]
