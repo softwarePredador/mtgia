@@ -83,6 +83,101 @@ void main() {
     expect(find.text('Nenhuma mudança sugerida para aplicar.'), findsOneWidget);
   });
 
+  testWidgets('optimize no changes feedback explains aggressive diagnostics', (
+    tester,
+  ) async {
+    final result = {
+      'mode': 'optimize',
+      'intensity': 'aggressive',
+      'removals': const <String>[],
+      'additions': const <String>[],
+      'optimize_diagnostics': {
+        'aggressive_candidate_quality': {
+          'removal_candidates': 10,
+          'replacement_candidates': 20,
+          'pairs_generated': 12,
+          'returned_swaps': 0,
+          'rejected_reason_buckets': {'quality_gate_rejected': 9},
+          'low_candidate_coverage': true,
+        },
+      },
+    };
+    final preview = OptimizePreviewData.fromResult(result);
+    final outcome = OptimizeRequestOutcome(
+      result: result,
+      preview: preview,
+      applyPlan: buildOptimizeApplyPlan(preview),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed:
+                    () => showOptimizeNoChangesFeedback(context, outcome),
+                child: const Text('diagnostics'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('diagnostics'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nenhuma melhoria segura encontrada'), findsOneWidget);
+    expect(find.textContaining('gate bloqueou as inseguras'), findsOneWidget);
+    expect(find.text('• Candidatos analisados: 30.'), findsOneWidget);
+    expect(find.text('• Pares avaliados: 12.'), findsOneWidget);
+    expect(find.text('• Swaps seguros retornados: 0.'), findsOneWidget);
+    expect(
+      find.text('• Principal bloqueio: qualidade final insuficiente.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Faltaram candidatos seguros'), findsOneWidget);
+  });
+
+  testWidgets('optimize no changes feedback keeps friendly fallback', (
+    tester,
+  ) async {
+    final result = {
+      'mode': 'optimize',
+      'intensity': 'aggressive',
+      'removals': const <String>[],
+      'additions': const <String>[],
+    };
+    final preview = OptimizePreviewData.fromResult(result);
+    final outcome = OptimizeRequestOutcome(
+      result: result,
+      preview: preview,
+      applyPlan: buildOptimizeApplyPlan(preview),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed:
+                    () => showOptimizeNoChangesFeedback(context, outcome),
+                child: const Text('fallback'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('fallback'));
+    await tester.pump();
+
+    expect(find.text('Nenhuma mudança sugerida para aplicar.'), findsOneWidget);
+  });
+
   testWidgets('guided rebuild created helper shows snackbar', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

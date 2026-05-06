@@ -173,6 +173,24 @@ void showOptimizeNoChangesSnackBar(BuildContext context) {
   );
 }
 
+Future<void> showOptimizeNoChangesFeedback(
+  BuildContext context,
+  OptimizeRequestOutcome? outcome,
+) {
+  final presentation =
+      outcome == null ? null : describeOptimizeNoChanges(outcome);
+  if (presentation == null) {
+    showOptimizeNoChangesSnackBar(context);
+    return Future<void>.value();
+  }
+  return showOutcomeInfoDialog(
+    context,
+    title: presentation.title,
+    message: presentation.message,
+    reasons: presentation.reasons,
+  );
+}
+
 void showOptimizeDebugCopiedSnackBar(BuildContext context) {
   ScaffoldMessenger.of(
     context,

@@ -1,5 +1,27 @@
 # Deck Runtime Handoff - iPhone 15 Simulator - 2026-05-05
 
+## Atualizacao - Aggressive no-op diagnostics UI - 2026-05-06 08:59-09:05 BRT
+
+**PASS WITH RISKS (runtime NOT RUN).** A rodada desta atualizacao foi app/backend-contract focada: a UI passou a consumir diagnostics agregados de `optimize_diagnostics.aggressive_candidate_quality` para explicar safe no-op/quality rejected no modo `Agressivo`, mas o fluxo iPhone 15 Simulator nao foi reexecutado.
+
+| Item | Evidencia |
+| --- | --- |
+| Device primario conhecido | iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime conhecido | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| Backend usado no app | **NOT RUN** nesta rodada; nenhuma porta local foi iniciada. |
+| Health | **NOT RUN** nesta rodada. |
+| Comando app | `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check` -> PASS |
+| Comando app tests | `cd app && flutter test test/features/decks --no-version-check` -> PASS `00:10 +153` |
+| Comando backend | `cd server && dart analyze routes/ai/optimize/index.dart` -> PASS |
+| Runtime command | **NOT RUN**: `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...` nao executado apos esta mudanca. |
+| Screenshots/logs runtime | Nao gerados nesta rodada. |
+| Real vs mocked | Parser/support/widget tests usam payloads fake; nenhum device/UI real ou backend live foi executado nesta atualizacao. |
+| Scanner fisico/camera/OCR | **DEFERRED / NOT PROVEN**, fora do escopo. |
+
+Leitura de produto: quando aggressive encontra ideias mas o gate bloqueia as inseguras, a UI mostra "A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck", contadores agregados de candidatos/pares/swaps e o principal bloqueio traduzido. Sem diagnostics, permanece o fallback amigavel existente. O backend async agora preserva `quality_error.optimize_diagnostics` no polling para que a UI consiga explicar o mesmo caso em jobs 202/failed sem expor payload bruto, JWT, secrets ou prompts.
+
+Menor proxima acao: rerodar o runtime iPhone 15 com backend 8082 e um deck que reproduza `OPTIMIZE_QUALITY_REJECTED` para capturar screenshot da nova mensagem.
+
 ## Atualizacao - Aggressive Candidate Quality v2 runtime - 2026-05-06 08:29-08:40 BRT
 
 **PASS WITH RISKS.** A rodada fresca no iPhone 15 Simulator contra backend local real `http://127.0.0.1:8082` provou que o app continua abrindo detalhes de deck Commander completo, selecionando `Agressivo`, enviando `intensity=aggressive`, recebendo aceite async de `/ai/optimize` e exibindo o branch seguro de quality gate sem crash, overflow, timeout cru, modal preso ou erro 4xx/5xx bruto. Nesta execucao o backend terminou em safe no-op/quality rejected, entao preview aplicavel, desmarcacao e apply parcial ficaram **NOT PROVEN nesta rodada**; a evidencia anterior de preview parcial/apply/validate permanece valida para o contrato Intensity v2 quando o backend retorna swaps.

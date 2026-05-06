@@ -47,6 +47,95 @@ void main() {
     expect(preview.intensity, OptimizeIntensity.focused);
   });
 
+  test('AggressiveCandidateQualityDiagnostics parses optional payload', () {
+    final diagnostics = AggressiveCandidateQualityDiagnostics.fromPayload({
+      'optimize_diagnostics': {
+        'aggressive_candidate_quality': {
+          'requested_target_swaps': {'min': 10, 'max': 20},
+          'removal_candidates': '12',
+          'replacement_candidates': 30,
+          'pairs_generated': 18,
+          'returned_swaps': 0,
+          'rejected_reason_buckets': {
+            'quality_gate_rejected': 7,
+            'role_mismatch': 2,
+          },
+          'low_candidate_coverage': true,
+          'safety_reduced_scope': true,
+          'ranked_before_quality_gate': true,
+          'candidate_sources': const ['aggressive_meta_signal_v1'],
+        },
+      },
+    });
+
+    expect(diagnostics, isNotNull);
+    expect(diagnostics!.requestedTargetSwaps, 20);
+    expect(diagnostics.candidatesAnalyzed, 42);
+    expect(diagnostics.pairsGenerated, 18);
+    expect(diagnostics.returnedSwaps, 0);
+    expect(diagnostics.primaryRejectedBucket, 'quality_gate_rejected');
+    expect(
+      diagnostics.userFacingReasons,
+      contains('Principal bloqueio: qualidade final insuficiente.'),
+    );
+    expect(
+      diagnostics.userFacingReasons,
+      contains(
+        'Faltaram candidatos seguros suficientes para este comandante e bracket.',
+      ),
+    );
+  });
+
+  test('AggressiveCandidateQualityDiagnostics falls back when absent', () {
+    expect(
+      AggressiveCandidateQualityDiagnostics.fromPayload(const {
+        'mode': 'optimize',
+        'intensity': 'aggressive',
+      }),
+      isNull,
+    );
+  });
+
+  test('describeOptimizeNoChanges explains aggressive diagnostics', () {
+    final result = {
+      'mode': 'optimize',
+      'intensity': 'aggressive',
+      'removals': const <String>[],
+      'additions': const <String>[],
+      'optimize_diagnostics': {
+        'aggressive_candidate_quality': {
+          'removal_candidates': 8,
+          'replacement_candidates': 22,
+          'pairs_generated': 14,
+          'returned_swaps': 0,
+          'rejected_reason_buckets': {'mana_or_land_safety': 5},
+        },
+      },
+    };
+    final preview = OptimizePreviewData.fromResult(result);
+    final outcome = OptimizeRequestOutcome(
+      result: result,
+      preview: preview,
+      applyPlan: buildOptimizeApplyPlan(preview),
+    );
+
+    final presentation = describeOptimizeNoChanges(outcome);
+
+    expect(presentation, isNotNull);
+    expect(presentation!.title, 'Nenhuma melhoria segura encontrada');
+    expect(
+      presentation.message,
+      'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
+    );
+    expect(presentation.reasons, contains('Candidatos analisados: 30.'));
+    expect(presentation.reasons, contains('Pares avaliados: 14.'));
+    expect(presentation.reasons, contains('Swaps seguros retornados: 0.'));
+    expect(
+      presentation.reasons,
+      contains('Principal bloqueio: risco na base de mana ou terrenos.'),
+    );
+  });
+
   test('buildOptimizeDebugJson keeps request and response payloads', () {
     final text = buildOptimizeDebugJson(
       deckId: 'deck-1',
@@ -105,6 +194,41 @@ void main() {
     expect(presentation.kind, DeckAiFailureKind.noSafeUpgradeFound);
     expect(presentation.title, 'Nenhuma melhoria segura encontrada');
     expect(presentation.reasons, contains('Gate final'));
+  });
+
+  test('describeDeckAiFailure maps quality rejection diagnostics', () {
+    final error = DeckAiFlowException(
+      message: 'A otimização sugerida não passou no gate final de qualidade.',
+      code: 'OPTIMIZE_QUALITY_REJECTED',
+      payload: const {
+        'quality_error': {
+          'code': 'OPTIMIZE_QUALITY_REJECTED',
+          'message': 'A otimização sugerida não passou no gate final.',
+          'optimize_diagnostics': {
+            'aggressive_candidate_quality': {
+              'removal_candidates': 4,
+              'replacement_candidates': 11,
+              'pairs_generated': 9,
+              'returned_swaps': 0,
+              'rejected_reason_buckets': {'role_mismatch': 6},
+            },
+          },
+        },
+      },
+    );
+
+    final presentation = describeDeckAiFailure(error, const ['Gate final']);
+
+    expect(
+      presentation.message,
+      'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
+    );
+    expect(presentation.reasons, contains('Candidatos analisados: 15.'));
+    expect(
+      presentation.reasons,
+      contains('Principal bloqueio: mudança de função arriscada.'),
+    );
+    expect(presentation.reasons, isNot(contains('Gate final')));
   });
 
   test('buildGuidedRebuildRequest resolves payload and fallbacks', () {
@@ -447,7 +571,7 @@ void main() {
         return outcome.applyPlan;
       },
       onApplyStart: () => calls.add('apply-start'),
-      onNoChanges: () => calls.add('no-changes'),
+      onNoChanges: (_) async => calls.add('no-changes'),
       onSuccess: () => calls.add('success'),
       onAiError: (_) async => calls.add('ai-error'),
       onGenericError: (_) => calls.add('generic-error'),

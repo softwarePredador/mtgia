@@ -3035,20 +3035,30 @@ Future<void> _processOptimizeModeAsync({
   }
 
   if (response.statusCode == HttpStatus.unprocessableEntity) {
+    final qualityError = resultBody['quality_error'] is Map
+        ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
+        : <String, dynamic>{
+            'code': resultBody['outcome_code']?.toString() ??
+                'OPTIMIZE_ASYNC_QUALITY_REJECTED',
+            'message': resultBody['error']?.toString() ??
+                'Optimize async foi bloqueado pelo gate de qualidade.',
+          };
+    final optimizeDiagnostics = resultBody['optimize_diagnostics'] is Map
+        ? (resultBody['optimize_diagnostics'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final asyncQualityError = <String, dynamic>{
+      ...qualityError,
+      if (resultBody['outcome_code'] != null)
+        'outcome_code': resultBody['outcome_code']?.toString(),
+      if (optimizeDiagnostics.isNotEmpty)
+        'optimize_diagnostics': optimizeDiagnostics,
+    };
     await OptimizeJobStore.fail(
       pool,
       jobId,
       error: resultBody['error']?.toString() ??
           'Optimize async nao produziu preview seguro.',
-      qualityError: resultBody['quality_error'] is Map
-          ? (resultBody['quality_error'] as Map).cast<String, dynamic>()
-          : {
-              'code': resultBody['outcome_code']?.toString() ??
-                  'OPTIMIZE_ASYNC_QUALITY_REJECTED',
-              'message': resultBody['error']?.toString() ??
-                  'Optimize async foi bloqueado pelo gate de qualidade.',
-              'response': resultBody,
-            },
+      qualityError: asyncQualityError,
     );
     return;
   }

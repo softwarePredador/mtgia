@@ -2,6 +2,38 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — UI de diagnostics para aggressive safe no-op
+
+### O Porquê
+- O backend ja expunha `optimize_diagnostics.aggressive_candidate_quality`, mas o app ainda mostrava apenas um no-op generico quando `intensity=aggressive` gerava ideias que o quality gate bloqueava.
+- Isso preservava a seguranca, mas aumentava frustracao: o usuario nao entendia se a IA falhou, se nao havia candidatos ou se o gate protegeu o deck.
+- O objetivo foi reduzir a frustracao sem relaxar legalidade, identidade de cor, bracket, comandante, validacao final ou quality gate.
+
+### O Como
+- `app/lib/features/decks/widgets/deck_optimize_flow_support.dart`
+  - adicionou `AggressiveCandidateQualityDiagnostics`, parser tolerante/opcional para resposta sync, erro 422, failed job async e payload legacy;
+  - traduz buckets tecnicos para mensagens curtas de produto;
+  - cria apresentacao de safe no-op aggressive com candidatos analisados, pares avaliados, swaps seguros retornados, principal bloqueio e baixa cobertura quando presente.
+- `app/lib/features/decks/widgets/deck_optimize_dialogs.dart`
+  - adicionou `showOptimizeNoChangesFeedback`, que abre dialog explicativo quando ha diagnostics e preserva snackbar amigavel quando nao ha.
+- `app/lib/features/decks/screens/deck_details_screen.dart`
+  - passou o outcome de optimize sem mudancas para a UI decidir entre diagnostics dialog e fallback.
+- `server/routes/ai/optimize/index.dart`
+  - failed jobs async de 422 agora preservam `quality_error.optimize_diagnostics` agregado no polling, sem anexar payload bruto, secrets, JWT, DATABASE_URL, SENTRY_DSN ou prompts.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  - contrato documentado para diagnostics em failed jobs async e consumo mobile como copy derivada.
+
+### Resultado
+- **PASS WITH RISKS.** UI explica safe no-op/quality rejected quando diagnostics estao presentes e segue amigavel quando ausentes.
+- Nenhum gate foi enfraquecido: diagnostics sao informativos e nao autorizam apply.
+- Runtime iPhone 15 **NOT RUN** nesta rodada; a evidencia anterior de runtime aggressive permanece historica, mas falta screenshot da nova mensagem.
+- Scanner fisico/camera/OCR: **DEFERRED / NOT PROVEN**.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS (`00:10 +153`).
+- `cd server && dart analyze routes/ai/optimize/index.dart`: PASS.
+
 ## 2026-05-06 — Runtime iPhone 15 aggressive apos candidate quality signals
 
 ### O Porquê

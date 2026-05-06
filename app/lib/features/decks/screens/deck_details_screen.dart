@@ -1447,10 +1447,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         showApplyOptimizationLoading(context);
         isLoadingDialogOpen = true;
       },
-      onNoChanges: () {
+      onNoChanges: (outcome) async {
         closeLoadingDialog();
         if (!context.mounted) return;
-        showOptimizeNoChangesSnackBar(context);
+        await showOptimizeNoChangesFeedback(context, outcome);
       },
       onSuccess: () {
         closeLoadingDialog();

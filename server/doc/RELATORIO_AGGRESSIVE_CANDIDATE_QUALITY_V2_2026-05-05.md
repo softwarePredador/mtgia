@@ -2,6 +2,14 @@
 
 Data: 2026-05-05
 
+## Atualizacao 2026-05-06 - consumo UI dos diagnostics
+
+**PASS WITH RISKS.** A camada mobile passou a consumir `optimize_diagnostics.aggressive_candidate_quality` como diagnostico agregado e opcional no branch `intensity=aggressive` sem swaps seguros/quality rejected. A UI mostra copy derivada, nao payload bruto: candidatos analisados, pares avaliados, swaps seguros retornados, principal bloqueio traduzido e baixa cobertura quando `low_candidate_coverage=true`.
+
+Backend contract: failed jobs async de `/ai/optimize/jobs/:id` agora preservam `quality_error.optimize_diagnostics` quando o executor sync interno retorna 422, permitindo que o app explique o mesmo safe no-op em fluxos `202 -> failed`. O quality gate, legalidade, identidade de cor, bracket, preservacao de comandante e validacao final permanecem inalterados.
+
+Validacao: `flutter analyze lib/features/decks test/features/decks --no-version-check` PASS; `flutter test test/features/decks --no-version-check` PASS `+153`; `cd server && dart analyze routes/ai/optimize/index.dart` PASS. Runtime iPhone 15 nao foi reexecutado nesta atualizacao; scanner fisico/camera/OCR segue fora do escopo.
+
 ## Resultado
 
 **PASS.** Foi criada uma base de dados aditiva, idempotente e DB-backed para melhorar candidatos do `optimize` aggressive sem inserir novas cartas e sem alterar `cards`, `card_legalities`, `cards.color_identity` ou regras de bracket/legalidade.

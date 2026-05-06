@@ -21,6 +21,134 @@ class DeckAiFailurePresentation {
   });
 }
 
+class AggressiveCandidateQualityDiagnostics {
+  final int? requestedTargetSwaps;
+  final int? removalCandidates;
+  final int? replacementCandidates;
+  final int? pairsGenerated;
+  final int? returnedSwaps;
+  final Map<String, int> rejectedReasonBuckets;
+  final bool lowCandidateCoverage;
+  final bool safetyReducedScope;
+  final bool rankedBeforeQualityGate;
+  final List<String> candidateSources;
+
+  const AggressiveCandidateQualityDiagnostics({
+    required this.requestedTargetSwaps,
+    required this.removalCandidates,
+    required this.replacementCandidates,
+    required this.pairsGenerated,
+    required this.returnedSwaps,
+    required this.rejectedReasonBuckets,
+    required this.lowCandidateCoverage,
+    required this.safetyReducedScope,
+    required this.rankedBeforeQualityGate,
+    required this.candidateSources,
+  });
+
+  int? get candidatesAnalyzed {
+    final removalCount = removalCandidates;
+    final replacementCount = replacementCandidates;
+    if (removalCount == null && replacementCount == null) return null;
+    return (removalCount ?? 0) + (replacementCount ?? 0);
+  }
+
+  String? get primaryRejectedBucket {
+    if (rejectedReasonBuckets.isEmpty) return null;
+    final entries =
+        rejectedReasonBuckets.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+    return entries.first.key;
+  }
+
+  bool get hasUserFacingSignals =>
+      candidatesAnalyzed != null ||
+      pairsGenerated != null ||
+      returnedSwaps != null ||
+      primaryRejectedBucket != null ||
+      lowCandidateCoverage;
+
+  List<String> get userFacingReasons {
+    final lines = <String>[];
+    final analyzed = candidatesAnalyzed;
+    if (analyzed != null) {
+      lines.add('Candidatos analisados: $analyzed.');
+    }
+    if (pairsGenerated != null) {
+      lines.add('Pares avaliados: $pairsGenerated.');
+    }
+    if (returnedSwaps != null) {
+      lines.add('Swaps seguros retornados: $returnedSwaps.');
+    }
+    final primary = primaryRejectedBucket;
+    if (primary != null) {
+      lines.add('Principal bloqueio: ${friendlyRejectedBucketLabel(primary)}.');
+    }
+    if (lowCandidateCoverage) {
+      lines.add(
+        'Faltaram candidatos seguros suficientes para este comandante e bracket.',
+      );
+    }
+    return lines;
+  }
+
+  static AggressiveCandidateQualityDiagnostics? fromPayload(
+    Map<String, dynamic> payload,
+  ) {
+    final sources = <Map<String, dynamic>>[
+      asDynamicMap(payload['optimize_diagnostics']),
+      asDynamicMap(payload['aggressive_candidate_quality']),
+    ];
+
+    final qualityError = asDynamicMap(payload['quality_error']);
+    sources
+      ..add(asDynamicMap(qualityError['optimize_diagnostics']))
+      ..add(asDynamicMap(qualityError['aggressive_candidate_quality']));
+
+    final qualityResponse = asDynamicMap(qualityError['response']);
+    sources.add(asDynamicMap(qualityResponse['optimize_diagnostics']));
+
+    final result = asDynamicMap(payload['result']);
+    sources.add(asDynamicMap(result['optimize_diagnostics']));
+
+    for (final source in sources) {
+      final direct =
+          source.containsKey('aggressive_candidate_quality')
+              ? asDynamicMap(source['aggressive_candidate_quality'])
+              : source;
+      final parsed = fromMap(direct);
+      if (parsed != null) return parsed;
+    }
+    return null;
+  }
+
+  static AggressiveCandidateQualityDiagnostics? fromMap(
+    Map<String, dynamic> value,
+  ) {
+    if (value.isEmpty) return null;
+    final diagnostics = AggressiveCandidateQualityDiagnostics(
+      requestedTargetSwaps: _readInt(value['requested_target_swaps']),
+      removalCandidates: _readInt(value['removal_candidates']),
+      replacementCandidates: _readInt(value['replacement_candidates']),
+      pairsGenerated: _readInt(value['pairs_generated']),
+      returnedSwaps: _readInt(value['returned_swaps']),
+      rejectedReasonBuckets: _readRejectedReasonBuckets(
+        value['rejected_reason_buckets'],
+      ),
+      lowCandidateCoverage: _readBool(value['low_candidate_coverage']),
+      safetyReducedScope: _readBool(value['safety_reduced_scope']),
+      rankedBeforeQualityGate: _readBool(value['ranked_before_quality_gate']),
+      candidateSources:
+          (value['candidate_sources'] as List?)
+              ?.map((entry) => entry.toString())
+              .where((entry) => entry.trim().isNotEmpty)
+              .toList() ??
+          const <String>[],
+    );
+    return diagnostics.hasUserFacingSignals ? diagnostics : null;
+  }
+}
+
 class GuidedRebuildRequest {
   final String archetype;
   final String? theme;
@@ -121,7 +249,8 @@ typedef GuidedRebuildErrorHandler = void Function(Object error);
 typedef OptimizePreviewConfirmationPresenter =
     Future<OptimizeApplyPlan?> Function(OptimizeRequestOutcome outcome);
 typedef OptimizeApplyStartHandler = void Function();
-typedef OptimizeNoChangesHandler = void Function();
+typedef OptimizeNoChangesHandler =
+    Future<void> Function(OptimizeRequestOutcome? outcome);
 typedef OptimizeSuccessHandler = void Function();
 typedef OptimizeAiErrorHandler =
     Future<void> Function(DeckAiFlowException error);
@@ -306,6 +435,76 @@ FlowProgressState buildInitialOptimizeProgressState({int totalStages = 5}) {
   );
 }
 
+int? _readInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value.trim());
+  if (value is Map) {
+    final map = value.cast<String, dynamic>();
+    return _readInt(map['max'] ?? map['target'] ?? map['value']);
+  }
+  return null;
+}
+
+bool _readBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is String) return value.trim().toLowerCase() == 'true';
+  if (value is num) return value != 0;
+  return false;
+}
+
+Map<String, int> _readRejectedReasonBuckets(dynamic value) {
+  if (value is Map) {
+    final result = value.map((key, bucketValue) {
+      return MapEntry(key.toString(), _readInt(bucketValue) ?? 0);
+    });
+    result.removeWhere((_, bucketValue) => bucketValue <= 0);
+    return result;
+  }
+  if (value is List) {
+    final counts = <String, int>{};
+    for (final entry in value) {
+      final key = entry.toString().trim();
+      if (key.isEmpty) continue;
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+    return counts;
+  }
+  return const <String, int>{};
+}
+
+String friendlyRejectedBucketLabel(String bucket) {
+  return switch (bucket.trim().toLowerCase()) {
+    'incomplete_card_data' => 'dados insuficientes para validar a troca',
+    'role_mismatch' => 'mudança de função arriscada',
+    'curve_or_role_mismatch' => 'curva ou função ficaria incoerente',
+    'mana_or_land_safety' => 'risco na base de mana ou terrenos',
+    'quality_gate_rejected' => 'qualidade final insuficiente',
+    'scope_cap' => 'limite de mudanças da intensidade escolhida',
+    _ => 'segurança do deck',
+  };
+}
+
+DeckAiFailurePresentation? describeOptimizeNoChanges(
+  OptimizeRequestOutcome outcome,
+) {
+  final diagnostics = AggressiveCandidateQualityDiagnostics.fromPayload(
+    outcome.result,
+  );
+  if (outcome.preview.intensity != OptimizeIntensity.aggressive ||
+      diagnostics == null) {
+    return null;
+  }
+
+  return DeckAiFailurePresentation(
+    kind: DeckAiFailureKind.noSafeUpgradeFound,
+    title: 'Nenhuma melhoria segura encontrada',
+    message:
+        'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
+    reasons: diagnostics.userFacingReasons,
+  );
+}
+
 Future<OptimizeRequestOutcome> requestOptimizePreview({
   required String deckId,
   required String archetype,
@@ -368,14 +567,21 @@ DeckAiFailurePresentation describeDeckAiFailure(
   }
 
   if (error.isNoSafeUpgradeFound) {
+    final diagnostics = AggressiveCandidateQualityDiagnostics.fromPayload(
+      error.payload,
+    );
+    final diagnosticReasons =
+        diagnostics?.userFacingReasons ?? const <String>[];
     return DeckAiFailurePresentation(
       kind: DeckAiFailureKind.noSafeUpgradeFound,
       title: 'Nenhuma melhoria segura encontrada',
       message:
-          error.message.isNotEmpty
-              ? error.message
-              : 'As sugestões geradas não passaram pelo gate de segurança.',
-      reasons: reasons,
+          diagnostics == null
+              ? (error.message.isNotEmpty
+                  ? error.message
+                  : 'As sugestões geradas não passaram pelo gate de segurança.')
+              : 'A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.',
+      reasons: diagnosticReasons.isNotEmpty ? diagnosticReasons : reasons,
     );
   }
 
@@ -564,14 +770,14 @@ Future<void> executeOptimizeFlow({
     );
 
     if (optimizeOutcome.applyPlan.mode == OptimizeApplyMode.none) {
-      onNoChanges();
+      await onNoChanges(optimizeOutcome);
       return;
     }
 
     final confirmedPlan = await confirmPreview(optimizeOutcome);
     if (confirmedPlan == null) return;
     if (confirmedPlan.mode == OptimizeApplyMode.none) {
-      onNoChanges();
+      await onNoChanges(null);
       return;
     }
 
