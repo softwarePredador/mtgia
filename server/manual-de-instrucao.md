@@ -2,6 +2,60 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Scanner fisico/camera/OCR release blocker
+
+### O Porquê
+- O app estava `READY WITH RISKS`, mas o ultimo item `DEFERRED / NOT PROVEN`
+  era scanner fisico/camera/OCR.
+- Correcoes anteriores ja cobriam ROI, token handling, fallback token-safe para
+  `Phyrexian Horror`, `include_tokens` e `printings`; faltava uma prova nova em
+  iPhone fisico com cards reais antes de release amplo.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` por `git pull --ff-only`.
+- Device fisico descoberto: `Rafa`, id `00008130-001C152922BA001C`,
+  `iOS 26.5 23F5043k`; iPhone 15 Simulator tambem estava bootado
+  (`F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4).
+- Backend local real em `8082` foi validado por health em `127.0.0.1`,
+  `192.168.20.167` e `192.168.2.46`; para o iPhone fisico, a URL escolhida foi
+  `http://192.168.20.167:8082`.
+- O app foi lancado no iPhone fisico com
+  `flutter run -d 00008130-001C152922BA001C --debug --publish-port ...` e
+  chegou a expor Dart VM Service.
+- A camada controlada do scanner foi validada por analyze/test; o backend foi
+  preflightado com `/cards/resolve`, `/cards?include_tokens=true` e
+  `/cards/printings?dedupe=false`.
+
+### Resultado
+- **BLOCKED / NOT PROVEN** para a prova fisica de camera/OCR.
+- `Phyrexian Horror` token segue protegido no contrato backend: os endpoints
+  retornaram somente rows `Token Artifact Creature - Phyrexian Horror`, sem
+  fallback para `Phyrexian Censor/Scissor`.
+- A matriz real solicitada nao foi executada: token, carta com nome parecido,
+  foil/reflexo, carta antiga, carta escura, carta com multiplas edicoes e carta
+  normal facil ficaram `NOT PROVEN`.
+- Sem fotos, payload bruto de OCR, tokens, JWT, `SENTRY_DSN`, `DATABASE_URL` ou
+  emails reais em docs.
+- Backend `8082` foi encerrado ao final; health em `127.0.0.1:8082` falhou apos
+  o stop, confirmando porta livre.
+- Handoff detalhado:
+  `app/doc/runtime_flow_handoffs/scanner_physical_audit_2026-05-06.md`.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/scanner test/features/scanner --no-version-check`: PASS.
+- `cd app && flutter test test/features/scanner --no-version-check`: PASS, `+20`.
+- Backend live 8082:
+  - `/health`: PASS em loopback e IPs LAN.
+  - `/cards/resolve {"name":"Phyrexian Horror","include_tokens":true}`: PASS,
+    token-only.
+  - `/cards?name=Phyrexian%20Horror&dedupe=false&include_tokens=true`: PASS,
+    token-only.
+  - `/cards/printings?name=Phyrexian%20Horror&dedupe=false`: PASS, token
+    printings com collector/foil.
+- `flutter test integration_test/scanner_controlled_harness_runtime_test.dart -d 00008130...`: BLOCKED, instalou/lancou mas retornou `No tests ran` em uma tentativa e timeout/VM Service em outra.
+- `flutter run -d 00008130... --debug --publish-port ...`: PASS para launch
+  fisico do app, mas sem prova de scanner screen/camera/OCR.
+
 ## 2026-05-06 — Release data readiness follow-up: sets casing + candidate stale row
 
 ### O Porquê
