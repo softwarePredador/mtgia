@@ -2,6 +2,48 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Firebase/Sentry release observability readiness
+
+### O Porquê
+- Firebase Performance ainda nao tinha prova em build real; integration tests
+  anteriores cobriam logs/breadcrumbs, mas nao ingestao no Firebase Console.
+- Era necessario preparar prova de Sentry/Firebase em staging/TestFlight ou
+  classificar blocker tecnico sem expor `SENTRY_DSN`, chaves Firebase sensiveis,
+  tokens, JWT, `DATABASE_URL`, emails reais ou payload sensivel.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` por `git pull --ff-only`, sem
+  mudancas locais pre-existentes.
+- Device primario: iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime
+  `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend nao foi iniciado: o smoke de observabilidade nao precisava de API.
+- Auditoria segura confirmou somente status `PRESENT`/`MISSING`/`NOT CONFIGURED`:
+  Firebase iOS/Android `PRESENT`; app `SENTRY_DSN` `MISSING`; flavors explicitos
+  `NOT CONFIGURED`; Android `key.properties` `MISSING`.
+- Adicionado harness minimo
+  `app/integration_test/release_observability_smoke_test.dart` e getters
+  read-only `@visibleForTesting` em `PerformanceService`.
+
+### Resultado
+- **BLOCKED** para prova TestFlight/internal iOS de observabilidade.
+- Runtime iPhone 15 do smoke: PASS, com Sentry `not_configured` por DSN ausente e
+  Firebase Performance `initialized` / collection `true`.
+- Build iOS: `Runner.xcarchive` gerado, mas export IPA/ad-hoc bloqueado por falta
+  de certificado iOS Distribution, provisioning profile e permissao de criar
+  perfil para o bundle.
+- Build Android release APK: PASS local, mas com risco porque `key.properties`
+  esta ausente e o Gradle usa fallback de assinatura debug para validacao local.
+- Nao houve upload publico, backend, scanner/camera/OCR, nem exposicao de secrets.
+- Relatorio detalhado:
+  `server/doc/FIREBASE_SENTRY_RELEASE_OBSERVABILITY_2026-05-06.md`.
+
+### Validacao executada
+- `cd app && flutter analyze lib/core/services/performance_service.dart integration_test/release_observability_smoke_test.dart --no-version-check`: PASS.
+- `cd app && flutter test integration_test/release_observability_smoke_test.dart -d "iPhone 15" --dart-define=SENTRY_ENVIRONMENT=staging --dart-define=SENTRY_RELEASE=mtgia-observability-2026-05-06 --dart-define=SENTRY_TRACES_SAMPLE_RATE=1.0 --reporter expanded --no-version-check`: PASS.
+- `cd app && flutter build ipa --release --export-method ad-hoc ...`: archive PASS, IPA export BLOCKED por signing/export.
+- `cd app && flutter build apk --release ...`: PASS.
+
 ## 2026-05-06 — Lotus visual polish runtime no iPhone 15
 
 ### O Porquê
