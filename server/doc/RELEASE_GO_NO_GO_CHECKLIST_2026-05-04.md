@@ -1,5 +1,48 @@
 # ManaLoom Release Go/No-Go Checklist - 2026-05-04
 
+## 2026-05-06 consolidation after AI Generate async, Optimize Intensity and Aggressive Candidate Quality
+
+ManaLoom is **READY WITH RISKS** for the non-scanner internal/TestFlight candidate on `master` at `b6f8a1c144f76a6f9ed6b4b34595249bfcaad3e6`, after consolidating the context commits:
+
+| Area | Context commit | Final release status |
+|---|---|---|
+| AI Generate v2 backend | `b1567dd` | PASS WITH MONITORED RISK. Sync remains backward-compatible; async job path is the preferred internal UX. |
+| AI Generate async mobile | `9fd17f1` | PASS. App sends async by default, polls jobs and preserves sync fallback for legacy/unsupported responses. |
+| Optimize Intensity mobile | `5cac310` | PASS. App sends `light/focused/aggressive/rebuild` intent and handles explicit repair/rebuild outcomes. |
+| Aggressive async/performance | `2a861a6` | PASS WITH WATCH. Aggressive optimize uses async path and bounded polling instead of blocking UI. |
+| Candidate quality backend | `b007e99` | PASS WITH RISKS. Candidate recall uses role/tag/meta signals as advisory input; legality, color identity, bracket and final gate remain authoritative. |
+| No-op diagnostics UI | `b6875ec` | PASS. UI explains safe no-op/quality rejected outcomes from aggregate diagnostics, not raw payloads. |
+| Runtime diagnostics proof | `b6f8a1c` | PASS WITH RISKS. iPhone 15 Simulator proof exists for aggressive no-op diagnostics; low-candidate-coverage line remains NOT PROVEN in that live run. |
+
+Final focused sanity on 2026-05-06:
+
+| Area | Command | Result |
+|---|---|---|
+| Branch sync | `git pull --ff-only origin master` | PASS: already up to date. |
+| Backend analyze | `cd server && dart analyze lib routes test` | PASS: no issues. |
+| Backend focused tests without backend | `cd server && dart test test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/candidate_quality_data_support_test.dart -r expanded` | Expected setup failure: live tests hit `127.0.0.1:8082` before backend was started; offline tests continued passing. Not classified as product blocker. |
+| Backend health | `cd server && PORT=8082 dart run .dart_frog/server.dart` + `curl -fsS http://127.0.0.1:8082/health` | PASS: `healthy`. |
+| Backend focused tests with backend | `cd server && dart analyze lib routes test && dart test test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/candidate_quality_data_support_test.dart -r expanded` | PASS: `02:50 +49 ~1`, expected skip for the full stress matrix. |
+| Commander-only dry-run default URL | `cd server && dart run bin/run_commander_only_optimization_validation.dart --dry-run` | Expected setup failure: script defaulted to `8080`; rerun used `TEST_API_BASE_URL`. |
+| Commander-only dry-run on 8082 | `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run` | PASS: 19 candidates would be validated; no auth/deck/optimize/bulk-save/validate mutation executed. |
+| App deck contract | `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check` | PASS: no analyze issues, `+50`. |
+| Backend cleanup | Stop PID `28521`; `lsof -nP -iTCP:8082 -sTCP:LISTEN` | PASS: no listener on `8082`. |
+
+Current release interpretation:
+
+| Topic | Status | Release note |
+|---|---|---|
+| Overall verdict | **READY WITH RISKS** | Suitable for internal/TestFlight non-scanner scope, not broad production approval. |
+| Scanner physical camera/OCR | **DEFERRED / NOT PROVEN** | Outside this release gate. Becomes NO-GO if marketed or required. |
+| AI Generate async | PASS WITH WATCH | Async accepted path is the product-safe UX; sync remains compatible but latency stays monitored. |
+| Optimize intensity | PASS | Omitted intensity remains compatible; explicit intensities are additive and app-consumable. |
+| Aggressive candidate quality | PASS WITH RISKS | More candidate recall is advisory and still reduced/rejected by quality gate when unsafe. |
+| Diagnostics UI | PASS WITH RISKS | Safe no-op/quality rejected state is clear to users; live low-coverage diagnostic line was not proven in the last runtime and stays covered by widget/parser tests. |
+| API contract docs | CURRENT | `server/doc/API_CONTRACTS_AND_DATA_MAP.md` already documents generate async, optimize intensity, aggressive diagnostics and no-op handling; no response-shape change was made in this consolidation. |
+| Secrets/log hygiene | PASS | Release docs record commands, statuses and timings only; no JWT, tokens, DSN, database URL, prompts completos or sensitive payloads were added. |
+
+Accepted risks remain: external AI and DB validation latency, generated-deck fallback quality variance, aggressive safe no-op/low coverage on weak candidate pools, Firebase Performance not proven in integration runtime, and scanner physical proof deferred.
+
 ## 2026-05-05 refresh after AI Generate v2 async path
 
 ManaLoom remains **READY WITH RISKS** for the internal/TestFlight candidate scope, with `/ai/generate` improved to **PASS WITH RISKS** through an opt-in async path. The sync API remains preserved for the current app.

@@ -1,5 +1,36 @@
 # ManaLoom Internal Release / Staging Handoff - 2026-05-04
 
+## 2026-05-06 consolidation handoff - post optimize upgrades
+
+**READY WITH RISKS for internal/TestFlight, non-scanner scope only.** The release candidate was consolidated on `master` at `b6f8a1c144f76a6f9ed6b4b34595249bfcaad3e6` after the AI Generate async, Optimize Intensity, aggressive async/performance, Aggressive Candidate Quality and no-op diagnostics changes.
+
+### Final status by upgraded flow
+
+| Flow | Status | Handoff note |
+|---|---|---|
+| AI Generate async backend/app | PASS WITH WATCH | App uses async by default and polls `/ai/generate/jobs/:id`; sync `200/422` remains fallback/backward-compatible. Latency remains monitored, but no longer blocks internal/TestFlight because the async/progress UX is available. |
+| Optimize Intensity | PASS | `light`, `focused`, `aggressive` and `rebuild` are app-facing choices. Missing `intensity` remains compatible with the backend default. |
+| Aggressive async/performance | PASS WITH WATCH | Aggressive optimize is async-capable and app polling handles `202 -> completed/failed` without blocking UI. |
+| Aggressive Candidate Quality | PASS WITH RISKS | Role/tag/meta signals increase candidate recall before the unchanged quality gate; safe no-op remains a valid outcome when gates block unsafe swaps. |
+| Diagnostics/no-op UI | PASS WITH RISKS | App shows aggregate, translated diagnostics for quality-rejected aggressive results. Last live iPhone 15 proof did not exercise `low_candidate_coverage=true`; keep that line as NOT PROVEN live and covered by focused tests. |
+| Scanner physical camera/OCR | DEFERRED / NOT PROVEN | Still outside scope; do not claim scanner readiness from this handoff. |
+
+### Commands and evidence captured on 2026-05-06
+
+| Area | Result |
+|---|---|
+| `git pull --ff-only origin master` | PASS: branch already up to date. |
+| `cd server && dart analyze lib routes test` | PASS. |
+| Initial focused backend tests before server start | Expected setup failure: live tests could not connect to `127.0.0.1:8082`. |
+| Backend `8082` health | PASS: local backend returned `healthy`; backend was stopped after validation and port `8082` was free. |
+| `cd server && dart analyze lib routes test && dart test test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/candidate_quality_data_support_test.dart -r expanded` | PASS: `02:50 +49 ~1`; the skip is the known full stress matrix skip. |
+| `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run` | PASS: 19 candidates would be validated; no mutation executed. |
+| `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check` | PASS: no analyze issues, `+50`. |
+
+### Release decision
+
+Proceed with an internal/TestFlight candidate only if the product scope remains non-scanner. The smallest accepted risks are AI latency/quality variance, safe no-op on weak aggressive pools, Firebase Performance not proven in integration runtime, and local signing/export still requiring secure CI/local setup. Convert to **BLOCKED** if scanner physical camera/OCR becomes required before a physical-device proof exists, if any final build/upload command exposes secrets, or if staging shows user-facing AI timeout/failure not covered by the async/progress path.
+
 ## 2026-05-05 refresh - AI Generate v2 performance path
 
 **PASS WITH RISKS** for `/ai/generate` v2 on backend `8082`. The sync contract remains default/backward-compatible; a new async opt-in path now returns `202` with `job_id` and polling at `/ai/generate/jobs/:id`.

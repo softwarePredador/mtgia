@@ -11459,3 +11459,85 @@ P2/P3 restantes:
 - adicionar screenshots/regressao para 2P, 6P e sheets auxiliares;
 - perfilar blur/CSS/assets se houver relato de jank em device fisico;
 - decidir produto sobre o quanto o Life Counter pode manter linguagem visual propria sem quebrar coerencia ManaLoom.
+
+## 98. Consolidacao release interno/TestFlight apos upgrades de IA/Optimize - 2026-05-06
+
+### 98.1 Objetivo
+
+Consolidar o status final do release interno/TestFlight apos as mudancas de AI Generate async, Optimize Intensity, aggressive async/performance, Aggressive Candidate Quality e UI de diagnostics de no-op, mantendo scanner fisico/camera/OCR como `DEFERRED / NOT PROVEN`.
+
+### 98.2 Commits de contexto
+
+Foram inspecionados no `master` os commits:
+
+- `b1567dd` - AI Generate v2 backend;
+- `9fd17f1` - Generate async app;
+- `5cac310` - Optimize intensity mobile;
+- `2a861a6` - Aggressive async/performance;
+- `b007e99` - Candidate quality backend;
+- `b6875ec` - No-op diagnostics UI;
+- `b6f8a1c` - Runtime diagnostics proof.
+
+HEAD consolidado: `b6f8a1c144f76a6f9ed6b4b34595249bfcaad3e6`.
+
+### 98.3 Validacao executada
+
+```bash
+git pull --ff-only origin master
+
+cd server
+dart analyze lib routes test
+dart test test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/candidate_quality_data_support_test.dart -r expanded
+
+PORT=8082 dart run .dart_frog/server.dart
+curl -fsS http://127.0.0.1:8082/health
+
+dart analyze lib routes test
+dart test test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/candidate_quality_data_support_test.dart -r expanded
+TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run
+
+cd ../app
+flutter analyze lib/features/decks test/features/decks --no-version-check
+flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check
+```
+
+Resultados:
+
+- `dart analyze lib routes test`: `PASS`;
+- primeira execucao dos testes live sem backend `8082`: falha esperada de setup por `Connection refused`;
+- backend `8082`: `/health` `healthy`;
+- suite backend focada com backend ativo: `PASS`, `02:50 +49 ~1`;
+- dry-run Commander-only com `TEST_API_BASE_URL=http://127.0.0.1:8082`: `PASS`, 19 candidatos seriam validados, sem mutacao;
+- app decks analyze/tests focados: `PASS`, `+50`;
+- backend `8082` encerrado ao final e porta sem listener.
+
+### 98.4 Decisao de release
+
+Veredito final: **READY WITH RISKS** para release interno/TestFlight nao-scanner.
+
+Status por fluxo:
+
+- AI Generate async: `PASS WITH WATCH`; app usa async por padrao e mantem fallback sync;
+- Optimize Intensity: `PASS`; intensidades explicitas e omissao backward-compatible permanecem documentadas;
+- Aggressive async/performance: `PASS WITH WATCH`; polling evita bloquear UI;
+- Aggressive Candidate Quality: `PASS WITH RISKS`; sinais de role/tag/meta aumentam recall, mas nao enfraquecem legalidade, identidade de cor, bracket ou quality gate;
+- diagnostics UI/no-op: `PASS WITH RISKS`; copy agregada explica safe no-op/quality rejected sem payload bruto;
+- scanner fisico/camera/OCR: `DEFERRED / NOT PROVEN`.
+
+### 98.5 Documentacao atualizada
+
+- `server/doc/RELEASE_GO_NO_GO_CHECKLIST_2026-05-04.md`;
+- `server/doc/INTERNAL_RELEASE_STAGING_HANDOFF_2026-05-04.md`;
+- `server/doc/RELEASE_CONSOLIDATION_AFTER_OPTIMIZE_2026-05-06.md`;
+- este `server/manual-de-instrucao.md`.
+
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md` foi revisado e ja documentava os contratos finais de `/ai/generate`, `/ai/generate/jobs/:id`, `/ai/optimize`, `/ai/optimize/jobs/:id`, intensity, diagnostics aggressive e `rebuild_guided`; nao houve mudanca de response shape nesta consolidacao.
+
+### 98.6 Riscos aceitos
+
+- latencia e qualidade variavel de AI Generate por dependencia externa/validacao DB, mitigada por async/progresso;
+- aggressive pode retornar menos swaps, safe no-op ou quality rejected quando o gate bloqueia trocas inseguras;
+- branch live `low_candidate_coverage=true` nao foi provado na ultima execucao iPhone 15, apesar de cobertura widget/parser;
+- Firebase Performance segue nao provado em runtime de integracao;
+- upload TestFlight exige signing/export seguro e URL real de staging;
+- scanner fisico/camera/OCR continua fora do gate e vira NO-GO se entrar no escopo antes de prova fisica.
