@@ -2,6 +2,26 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Release data readiness apos candidate quality/meta signals
+
+### O Porquê
+- Validar readiness interna dos dados depois da base `Aggressive Candidate Quality v2`, sinais `aggressive_meta_signal_v1` e consumo pelo optimize, sem tocar scanner fisico/camera/OCR e sem mutacao destrutiva.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` por `fetch` + `pull --ff-only`, sem mudancas de usuario no inicio.
+- Contexto revisado: relatorio ACQ v2, data map/API contracts e este manual.
+- Rodados dry-runs de `candidate_quality_data_foundation.dart`, `mtg_data_integrity.dart` e `candidate_quality_meta_signals.dart`.
+- Consulta agregada read-only confirmou contagens das quatro tabelas de candidate quality e da view `optimize_candidate_quality_summary`.
+- Validacao obrigatoria: `cd server && dart analyze bin lib routes test`; `cd server && dart test test/candidate_quality_data_support_test.dart test/cards_route_test.dart test/sets_route_test.dart -r expanded`.
+
+### Resultado
+- **PASS WITH RISKS.** Sem `--apply`, sem migracao destrutiva e sem alteracao em `cards`, `sets`, `card_legalities` ou DB source-of-truth.
+- Contagens principais: `card_function_tags=33011`, `card_role_scores=31898`, `commander_card_synergy=7179`, `optimize_rejection_penalties=358`, `optimize_candidate_quality_summary=33774`.
+- Integridade MTG: `cards.color_identity IS NULL=0`; duplicidades `LOWER(sets.code)=82` seguem risco conhecido nao saneado nesta rodada.
+- Meta signals: `aggressive_meta_signal_v1` presente em 2179 synergies e 910 role scores; 360 commander decks com identidade resolvida/candidate signals.
+- Analyzer PASS; testes focados PASS `+11`.
+- Relatorio detalhado: `server/doc/RELEASE_DATA_READINESS_2026-05-06.md`.
+
 ## 2026-05-06 — Final iPhone release QA apos optimize upgrades
 
 ### O Porquê
