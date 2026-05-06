@@ -2,6 +2,32 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Runtime iPhone 15 aggressive apos candidate quality signals
+
+### O Porquê
+- O backend passou a consumir sinais DB-backed no `intensity=aggressive`; era necessario provar que o app mobile continuava compativel mesmo sem consumir `optimize_diagnostics.aggressive_candidate_quality`.
+- O objetivo da rodada foi validar transporte, UX segura e regressao de preview/apply/validate contra backend local real, sem scanner fisico e sem expor secrets/payload sensivel.
+
+### O Como
+- Backend temporario em `http://127.0.0.1:8082` com `PORT=8082 dart run .dart_frog/server.dart`.
+- Health validado em `/health`.
+- iPhone 15 Simulator usado como alvo primario: `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Runtime: `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`.
+- O app abriu detalhes de deck Commander completo, selecionou `Agressivo`, enviou `/ai/optimize`, recebeu `202` em `169ms`, fez polling de job e exibiu safe no-op quando o quality gate rejeitou as trocas.
+
+### Resultado
+- **PASS WITH RISKS** para runtime mobile: sem crash, overflow, timeout cru, modal preso ou erro 4xx/5xx bruto.
+- Preview aplicavel, desmarcacao e apply parcial ficaram **NOT PROVEN nesta rodada** porque o backend nao retornou swaps aprovados; isso e o comportamento seguro esperado.
+- `optimize_diagnostics.aggressive_candidate_quality` nao foi capturado no log app da rodada porque a UI nao consome diagnostics e o job async falho nao imprimiu payload final.
+- Produto: manter diagnostics como operacional; se virar UI, mostrar copy derivada de baixa cobertura/rejeicao agregada, nunca buckets crus.
+- Scanner fisico/camera/OCR: **DEFERRED / NOT PROVEN**.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS (`00:19 +147`).
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded`: PASS (`02:45 +10 ~1`).
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS (`02:58 +1`).
+
 ## 2026-05-05 — Aggressive Candidate Quality v2 etapa 3: consumo runtime
 
 ### O Porquê

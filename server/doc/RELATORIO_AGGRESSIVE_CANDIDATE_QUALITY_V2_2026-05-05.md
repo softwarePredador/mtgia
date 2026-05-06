@@ -16,6 +16,24 @@ Data: 2026-05-05
 
 Riscos restantes: a prova live depende de backend local e dados atuais; quando o pool e fraco ou o gate final rejeita, o resultado correto continua sendo safe no-op/low coverage. Budget tier ainda pode ser `unknown` para parte relevante dos dados e os sinais sao advisory, nao autorizacao.
 
+## Atualizacao 2026-05-06 - runtime iPhone 15 apos consumo dos sinais
+
+**PASS WITH RISKS.** A rodada mobile/runtime foi executada em `master` contra backend local real `http://127.0.0.1:8082` no iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` (`com.apple.CoreSimulator.SimRuntime.iOS-17-4`). O app selecionou `Agressivo`, enviou `intensity=aggressive`, recebeu `202` de `/ai/optimize` em `169ms`, fez polling em `/ai/optimize/jobs/:id` e exibiu o branch seguro de quality gate rejeitado sem crash, overflow, timeout cru, modal preso ou erro bruto para o usuario.
+
+| Validacao | Resultado |
+|---|---|
+| Backend health `http://127.0.0.1:8082/health` | PASS, `healthy` |
+| `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded` | PASS, `02:45 +10 ~1` |
+| `flutter analyze lib/features/decks test/features/decks --no-version-check` | PASS |
+| `flutter test test/features/decks --no-version-check` | PASS, `00:19 +147` |
+| `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` | PASS, `02:58 +1` |
+
+Evidencia: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-05-05.md` e proof folder local ignorado `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/`.
+
+Limite da rodada: o backend retornou safe no-op/quality rejected, entao preview aplicavel, desmarcacao e apply parcial ficaram **NOT PROVEN nesta execucao**. Isso preserva o contrato esperado: quando os sinais aggressive nao produzem swaps seguros suficientes depois do gate, o app nao aplica mudancas arriscadas. O marcador `optimize_diagnostics.aggressive_candidate_quality` nao apareceu no log app desta rodada porque a UI nao consome diagnostics e o resultado async falho nao foi impresso como payload final.
+
+Leitura de produto: manter `aggressive_candidate_quality` como diagnostico operacional por enquanto. Para UI futura, derivar copy agregada de `low_candidate_coverage`/buckets de rejeicao, sem exibir buckets crus nem payload tecnico.
+
 ## Escopo entregue
 
 - Novo helper testavel: `server/lib/ai/candidate_quality_data_support.dart`.

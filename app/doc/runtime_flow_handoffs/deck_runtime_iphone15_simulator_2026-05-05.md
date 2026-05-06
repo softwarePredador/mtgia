@@ -1,5 +1,32 @@
 # Deck Runtime Handoff - iPhone 15 Simulator - 2026-05-05
 
+## Atualizacao - Aggressive Candidate Quality v2 runtime - 2026-05-06 08:29-08:40 BRT
+
+**PASS WITH RISKS.** A rodada fresca no iPhone 15 Simulator contra backend local real `http://127.0.0.1:8082` provou que o app continua abrindo detalhes de deck Commander completo, selecionando `Agressivo`, enviando `intensity=aggressive`, recebendo aceite async de `/ai/optimize` e exibindo o branch seguro de quality gate sem crash, overflow, timeout cru, modal preso ou erro 4xx/5xx bruto. Nesta execucao o backend terminou em safe no-op/quality rejected, entao preview aplicavel, desmarcacao e apply parcial ficaram **NOT PROVEN nesta rodada**; a evidencia anterior de preview parcial/apply/validate permanece valida para o contrato Intensity v2 quando o backend retorna swaps.
+
+| Item | Evidencia |
+| --- | --- |
+| Device | iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| `flutter devices` | `iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)` |
+| `xcrun simctl` | `iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)` |
+| Backend | `http://127.0.0.1:8082` |
+| Health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0"}` |
+| App focused checks | `flutter analyze lib/features/decks test/features/decks --no-version-check` PASS; `flutter test test/features/decks --no-version-check` PASS `00:19 +147` |
+| Backend sanity | `TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/ai_optimize_flow_test.dart --tags live -r expanded` PASS `02:45 +10 ~1` |
+| Runtime command | `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` |
+| Runtime result | PASS `02:58 +1` |
+| Optimize transport | `POST /ai/optimize -> 202 (169ms)`; polling `GET /ai/optimize/jobs/:id -> 200` observado 125 vezes |
+| UI proof | Screenshots `01_login` a `08c_optimize_sheet_aggressive` e `09_quality_rejected_blocker` em `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/` |
+| Log path | `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/deck_runtime_m2006_test_iphone15_8082.log` |
+| Diagnostics marker | `optimize_diagnostics.aggressive_candidate_quality` **NOT CAPTURED** no log app desta rodada; a UI nao consome diagnostics e o job async falho nao imprimiu payload final. O contrato permanece backend-owned/aditivo. |
+
+### Leitura de produto
+
+- `aggressive_candidate_quality` nao deve virar UI principal agora: os contadores sao diagnostico operacional e podem confundir usuario final.
+- Vale promover no futuro uma mensagem derivada e agregada quando houver `low_candidate_coverage` ou buckets de rejeicao recorrentes, por exemplo "encontramos poucas trocas seguras para este comandante/bracket"; a tela nao deve exibir nomes de buckets crus.
+- Scanner fisico/camera/OCR ficou **DEFERRED / NOT PROVEN**, fora do escopo.
+
 ## Resultado
 
 **PASS WITH RISKS.** Optimize Intensity v2 foi provado no app contra backend local real em `http://127.0.0.1:8082`: usuario escolheu `Agressivo`, o app enviou `intensity=aggressive`, exibiu preview selecionavel, desmarcou ao menos uma sugestao, aplicou somente a selecao e validou o deck final preservando o comandante.
