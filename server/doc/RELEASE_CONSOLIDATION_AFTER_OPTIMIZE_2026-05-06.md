@@ -6,6 +6,23 @@
 
 Scanner physical camera/OCR is **DEFERRED / NOT PROVEN** and must not be claimed by this release. If scanner becomes release-critical, the release becomes **BLOCKED** until a physical-device proof exists.
 
+## Fresh optimize apply update - 2026-05-06
+
+**PASS** for the previously missing live apply evidence. A fresh iPhone 15 Simulator run against backend `http://127.0.0.1:8082` proved Deck Details -> Optimize -> approved preview -> deselect one suggestion -> apply selected swaps -> validate final.
+
+| Evidence | Result |
+|---|---|
+| Branch sync | `master`, `git pull --ff-only origin master` already up to date, `HEAD=f6831d2e6583045dfb0f612b351d230be41649cb`. |
+| Backend health | `PORT=8082 dart run .dart_frog/server.dart`; `/health` healthy. |
+| API preflight | Talrand Commander fixture, `intensity=focused`, `mode=optimize`, `outcome=optimized`, `swaps=7`, `elapsed_ms=33122`, `timings` and `stage_telemetry` present. |
+| API partial apply | `deselected=1`, `applied=6`, update `200`, validate `200`, final total `100`, commander preserved. |
+| iPhone 15 runtime | `deck_runtime_m2006_test.dart` with `RUNTIME_OPTIMIZE_INTENSITY_LABEL=Focado`, `RUNTIME_OPTIMIZE_REQUIRE_APPLY=true`, `RUNTIME_OPTIMIZE_FORCE_ARCHETYPE=control`: PASS `01:31 +1`. |
+| Runtime optimize | `POST /ai/optimize -> 200 (30945ms)`; preview screenshots/hooks `09_preview`, `09b_preview_partial_selection`, `10_complete_validated`. |
+| Safety | No crash, overflow, raw timeout, raw 4xx/5xx, raw payload, stuck modal, JWT, secrets, `SENTRY_DSN`, `DATABASE_URL`, or full prompt exposure. |
+| Backend cleanup | PID `80392` stopped; port `8082` free. |
+
+Finding: the same healthy fixture can still return quality rejection for `Spellslinger`; the successful fresh proof used `control`, which the backend API preflight confirmed as the safe actionable path. This is a harness selection issue, not a backend legality relaxation. Quality gate, commander preservation, color identity, bracket and strict validate remained final judges.
+
 ## Repository state
 
 | Item | Value |
@@ -62,7 +79,7 @@ Scanner physical camera/OCR is **DEFERRED / NOT PROVEN** and must not be claimed
 | Aggressive Candidate Quality | PASS WITH RISKS | Candidate pools use local DB legality/color filters, role/function/meta signals and final gate. More candidates do not imply forced swaps. |
 | Diagnostics UI | PASS WITH RISKS | UI explains safe no-op/quality rejected aggregate diagnostics. Live low-candidate-coverage branch remains NOT PROVEN. |
 | Commander legality/color identity | PASS | Focused backend tests, quality gate tests, pipeline tests and commander-only dry-run passed. |
-| App preview/apply/validate contract | PASS | Focused app smoke proved optimize preview/apply/validate and needs-repair/rebuild-guided UI branch. |
+| App preview/apply/validate contract | PASS | Fresh iPhone 15 runtime now proves approved preview, partial deselection, selected apply and final validate against live backend; focused app smoke still covers local mechanics and needs-repair/rebuild-guided UI branch. |
 | Sentry/logging hygiene | PASS WITH WATCH | Docs record observability status without DSN/secrets. App/backend breadcrumbs remain the minimum relied-on visibility. |
 | Scanner physical camera/OCR | DEFERRED / NOT PROVEN | Explicitly out of scope. |
 

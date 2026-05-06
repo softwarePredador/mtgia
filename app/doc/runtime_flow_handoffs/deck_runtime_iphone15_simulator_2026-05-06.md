@@ -1,5 +1,31 @@
 # Runtime Flow Handoff — iPhone 15 Simulator — 2026-05-06
 
+## Fresh optimize apply proof — 2026-05-06 12:19-13:05 -0300
+
+**PASS** for the missing fresh runtime proof: the iPhone 15 Simulator applied freshly approved `/ai/optimize` swaps from the live local backend without relying on historical evidence.
+
+The backend was started on `http://127.0.0.1:8082`, `/health` returned healthy, and the focused API probe found an actionable Talrand Commander optimize response: `intensity=focused`, `mode=optimize`, `outcome=optimized`, `swaps=7`, `elapsed_ms=33122`, `timings` present, `stage_telemetry=true`. The probe then applied a partial selection (`deselected=1`, `applied=6`) through the deck update contract and strict validate returned `200`; final deck total stayed `100` and `Talrand, Sky Summoner` remained commander.
+
+The live iPhone 15 run used the same complete healthy Commander fixture and forced the saved strategy to `control` so the UI consumed the safe, approved path instead of the known `Spellslinger` quality-rejected branch. Command:
+
+```bash
+cd app && flutter test integration_test/deck_runtime_m2006_test.dart \
+  -d "iPhone 15" \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 \
+  --dart-define=RUNTIME_OPTIMIZE_INTENSITY_LABEL=Focado \
+  --dart-define=RUNTIME_OPTIMIZE_REQUIRE_APPLY=true \
+  --dart-define=RUNTIME_OPTIMIZE_FORCE_ARCHETYPE=control \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: **PASS** (`01:31 +1`). Runtime evidence: `POST /ai/optimize -> 200 (30945ms)`, screenshots/hooks `09_preview`, `09b_preview_partial_selection`, and `10_complete_validated`. The harness unchecked one suggestion before applying, applied only selected swaps, validated final state, preserved commander, and did not show crash, overflow, raw timeout, raw 4xx/5xx, raw payload, stuck modal, JWT, secrets, `SENTRY_DSN`, `DATABASE_URL`, or full prompt.
+
+Harness change: `app/integration_test/deck_runtime_m2006_test.dart` now accepts dart-defines for runtime optimize intensity, required-apply mode, and forced saved archetype. Defaults remain backward-compatible (`Agressivo`, no forced apply), so the existing aggressive diagnostics proof still works, while this targeted run can fail fast if live optimize returns `rebuild_guided` or safe no-op.
+
+Backend cleanup: backend PID `80392` was stopped with `kill 80392`; `lsof -nP -iTCP:8082 -sTCP:LISTEN` returned no listener.
+
 ## Final verdict
 
 **PASS WITH RISKS** for final iPhone release QA after optimize upgrades.

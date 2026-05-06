@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/widgets/deck_optimize_sheet_widgets.dart';
 import 'package:manaloom/main.dart' as app;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _completeCommanderImportList = '''
@@ -73,6 +75,27 @@ const _completeCommanderImportList = '''
 1x Haughty Djinn
 1x Ominous Seas
 ''';
+
+const _runtimeOptimizeIntensityLabel = String.fromEnvironment(
+  'RUNTIME_OPTIMIZE_INTENSITY_LABEL',
+  defaultValue: 'Agressivo',
+);
+
+const _runtimeOptimizeRequireApply = bool.fromEnvironment(
+  'RUNTIME_OPTIMIZE_REQUIRE_APPLY',
+);
+
+const _runtimeOptimizeForceArchetype = String.fromEnvironment(
+  'RUNTIME_OPTIMIZE_FORCE_ARCHETYPE',
+);
+
+String _safeCaptureSuffix(String value) {
+  return value
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+}
 
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
@@ -273,6 +296,18 @@ Future<void> _openCreatedDeckDetails(
   await tester.pump();
 }
 
+Future<String> _findDeckIdByName(String deckName) async {
+  final response = await ApiClient().get('/decks');
+  expect(response.statusCode, 200);
+  final deckRows = (response.data as List).cast<Map>();
+  final createdDeck = deckRows.firstWhere(
+    (deck) => deck['name']?.toString() == deckName,
+  );
+  final createdDeckId = createdDeck['id']?.toString();
+  expect(createdDeckId, isNotNull);
+  return createdDeckId!;
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -401,6 +436,23 @@ void main() {
       );
       await _capture(binding, tester, '07_commander_imported');
 
+      if (_runtimeOptimizeForceArchetype.trim().isNotEmpty) {
+        final createdDeckId = await _findDeckIdByName(createdDeckName);
+        final detailsContext = tester.element(
+          find.text('Detalhes do Deck').first,
+        );
+        await detailsContext.read<DeckProvider>().updateDeckStrategy(
+          deckId: createdDeckId,
+          archetype: _runtimeOptimizeForceArchetype,
+          bracket: 2,
+        );
+        await tester.pump();
+        // ignore: avoid_print
+        print(
+          'RUNTIME_OPTIMIZE_FORCED_ARCHETYPE $_runtimeOptimizeForceArchetype',
+        );
+      }
+
       await tester.tap(find.byTooltip('Otimizar deck').first);
       await tester.pump();
 
@@ -420,11 +472,20 @@ void main() {
         scrollable: optimizeScrollable,
       );
       await tester.pump();
-      final aggressiveChoice = find.text('Agressivo');
-      await _pumpUntilFound(tester, aggressiveChoice, attempts: 30);
-      await tester.tap(aggressiveChoice.first);
+      final intensityChoice = find.text(_runtimeOptimizeIntensityLabel);
+      await _pumpUntilFound(tester, intensityChoice, attempts: 30);
+      await tester.tap(intensityChoice.first);
       await tester.pump();
-      await _capture(binding, tester, '08c_optimize_sheet_aggressive');
+      await _capture(
+        binding,
+        tester,
+        '08c_optimize_sheet_${_safeCaptureSuffix(_runtimeOptimizeIntensityLabel)}',
+      );
+
+      await _pumpUntilAny(tester, [
+        strategyCards,
+        applyCurrentStrategy,
+      ], attempts: 240);
 
       if (applyCurrentStrategy.evaluate().isNotEmpty) {
         await tester.ensureVisible(applyCurrentStrategy.first);
@@ -443,6 +504,8 @@ void main() {
           strategyCards.first,
         );
         strategyCard.onTap();
+      } else {
+        fail('Runtime optimize sheet did not expose an actionable strategy.');
       }
       await tester.pump();
 
@@ -455,6 +518,11 @@ void main() {
 
       if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
         await _capture(binding, tester, '09_rebuild_guided_blocker');
+        if (_runtimeOptimizeRequireApply) {
+          fail(
+            'Runtime optimize returned rebuild_guided, but apply proof was required.',
+          );
+        }
         return;
       }
 
@@ -485,6 +553,11 @@ void main() {
         );
         expect(find.textContaining('quality_gate_rejected'), findsNothing);
         await _capture(binding, tester, '09_quality_rejected_blocker');
+        if (_runtimeOptimizeRequireApply) {
+          fail(
+            'Runtime optimize returned safe no-op, but apply proof was required.',
+          );
+        }
         return;
       }
 

@@ -2,6 +2,44 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Fresh optimize apply runtime no iPhone 15
+
+### O Porquê
+- A consolidacao final anterior estava **PASS WITH RISKS** porque a rodada live mais recente de optimize caiu em `rebuild_guided`/safe no-op; faltava prova fresca de preview aplicavel, desmarcacao parcial, apply selecionado e validate final contra backend real.
+- O objetivo foi fechar esse gap sem baixar quality gate, legalidade Commander, identidade de cor, bracket, preservacao de comandante ou validacao estrita.
+
+### O Como
+- Branch `master` sincronizada e alinhada com `origin/master` (`HEAD=f6831d2e6583045dfb0f612b351d230be41649cb`).
+- Backend temporario em `http://127.0.0.1:8082`; `/health` healthy antes das provas.
+- Probe API sanitizado com deck Talrand Commander completo:
+  - `intensity=focused`, `archetype=control`, `mode=optimize`, `outcome=optimized`;
+  - `swaps=7`, `elapsed_ms=33122`, `timings` e `stage_telemetry` presentes;
+  - apply parcial por contrato de deck: `deselected=1`, `applied=6`, update `200`, validate `200`, total final `100`, comandante preservado.
+- Harness `app/integration_test/deck_runtime_m2006_test.dart` parametrizado com dart-defines opcionais:
+  - `RUNTIME_OPTIMIZE_INTENSITY_LABEL`;
+  - `RUNTIME_OPTIMIZE_REQUIRE_APPLY`;
+  - `RUNTIME_OPTIMIZE_FORCE_ARCHETYPE`.
+- Defaults continuam compativeis com a prova aggressive/no-op existente; quando `RUNTIME_OPTIMIZE_REQUIRE_APPLY=true`, o teste falha se o backend retornar `rebuild_guided` ou safe no-op.
+- Runtime final no iPhone 15 Simulator:
+  - `RUNTIME_OPTIMIZE_INTENSITY_LABEL=Focado`;
+  - `RUNTIME_OPTIMIZE_FORCE_ARCHETYPE=control`;
+  - `RUNTIME_OPTIMIZE_REQUIRE_APPLY=true`.
+
+### Resultado
+- **PASS.** `POST /ai/optimize -> 200 (30945ms)`, preview fresco exibido, uma sugestao desmarcada, apply das selecionadas executado e tela final validada (`10_complete_validated`).
+- Comandante `Talrand, Sky Summoner` preservado e deck final valido/100 cartas.
+- Sem crash, overflow, modal preso, timeout cru, raw 4xx/5xx, payload bruto, JWT, secrets, `DATABASE_URL`, `SENTRY_DSN` ou prompt completo exposto.
+- O branch `Spellslinger` da mesma fixture segue podendo retornar quality rejection seguro; a prova acionavel usou `control`, confirmado pelo probe API como caminho seguro.
+- Backend PID `80392` encerrado no final; porta `8082` livre.
+
+### Validacao executada
+- `cd server && dart analyze lib/ai routes/ai bin test`: PASS.
+- `cd server && dart test test/ai_optimize_flow_test.dart test/optimization_quality_gate_test.dart test/optimization_pipeline_integration_test.dart test/optimize_complete_support_test.dart test/external_commander_meta_promotion_support_test.dart`: PASS (`+58 ~1`).
+- `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart run bin/run_commander_only_optimization_validation.dart --dry-run`: PASS, 19 candidatos em dry-run sem mutacao.
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check`: PASS (`+50`).
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...RUNTIME_OPTIMIZE...`: PASS (`01:31 +1`).
+
 ## 2026-05-06 — Release data readiness apos candidate quality/meta signals
 
 ### O Porquê
