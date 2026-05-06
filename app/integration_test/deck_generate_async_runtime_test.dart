@@ -331,7 +331,23 @@ void main() {
       await _pumpUntilAny(tester, [
         find.textContaining('Completar deck ('),
         find.textContaining('Sugestões para '),
+        find.text('Criar reconstrução guiada'),
+        find.text('Nenhuma melhoria segura encontrada'),
       ], attempts: 240);
+
+      if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
+        await _capture(binding, tester, '10_rebuild_guided_blocker');
+        return;
+      }
+
+      if (find
+          .text('Nenhuma melhoria segura encontrada')
+          .evaluate()
+          .isNotEmpty) {
+        await _capture(binding, tester, '10_safe_noop');
+        return;
+      }
+
       await _capture(binding, tester, '10_optimize_preview');
 
       final applyChangesButton = find.text('Aplicar mudanças');

@@ -2,6 +2,37 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Final iPhone release QA apos optimize upgrades
+
+### O Porquê
+- O objetivo foi consolidar a prova final de release no iPhone 15 Simulator, branch `master`, apos os upgrades de optimize/intensity/diagnostics, usando backend local real em `8082`.
+- A rodada precisava cobrir Search/Sets, Generate async -> save -> detail, Optimize aggressive, Binder, Marketplace/Trades/Messages/Notifications e Life Counter/Lotus, mantendo scanner/camera/OCR fora do escopo.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` sem divergencia (`0 0`) e sem sobrescrever mudancas de usuario.
+- Backend temporario em `http://127.0.0.1:8082` com `PORT=8082 dart run .dart_frog/server.dart`.
+- Health validado com `curl -sS http://127.0.0.1:8082/health`.
+- Device primario: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Harness ajustado: `app/integration_test/deck_generate_async_runtime_test.dart` agora aceita `Criar reconstrução guiada` e `Nenhuma melhoria segura encontrada` como estados seguros/produto apos abrir optimize, em vez de falhar quando a resposta live nao traz swaps aplicaveis.
+
+### Resultado
+- **PASS WITH RISKS.** Nao houve crash, overflow bloqueante, modal preso, timeout cru, 4xx/5xx bruto, payload cru, JWT, secrets, `DATABASE_URL`, `SENTRY_DSN` ou prompt completo exposto na UI.
+- `sets_search_catalog_runtime_test.dart`: PASS `00:18 +1`.
+- `deck_generate_async_runtime_test.dart`: primeira tentativa FAIL por assert de harness; apos ajuste, PASS `01:04 +1`.
+- `deck_runtime_m2006_test.dart`: PASS `03:07 +1`; `Agressivo` retornou safe no-op/quality diagnostics amigavel, sem buckets crus na UI.
+- `binder_dashboard_runtime_test.dart`: PASS `00:37 +1`.
+- `binder_marketplace_trade_runtime_test.dart`: PASS `01:45 +2`.
+- `life_counter_lotus_visual_runtime_proof_test.dart`: PASS `00:28 +1`.
+- Sanity: app analyze das features solicitadas PASS; `flutter test test/features/decks --no-version-check` PASS `+153`.
+- Validacao pre-commit: `deck_runtime_widget_flow_test.dart` PASS `+1`; suite focada de details/provider/optimize support PASS `+81`; analyze do harness alterado PASS.
+- Backend temporario 8082 encerrado ao final; porta livre.
+- Scanner fisico/camera/OCR: **DEFERRED / NOT PROVEN**.
+
+### Riscos e proximas acoes
+- Apply com sugestoes live frescas ficou **NOT PROVEN nesta consolidacao** porque o backend escolheu `rebuild_guided` no deck gerado e safe no-op/quality diagnostics no aggressive Talrand. A evidencia historica de 2026-05-05 segue cobrindo preview selecionavel/apply parcial quando ha swaps aprovados.
+- Lotus passou no harness, mas o probe reportou risco visual de fit/texto vazio; tratar como polish de UI.
+- Handoff detalhado: `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-05-06.md`.
+
 ## 2026-05-06 — Runtime iPhone 15 da UI de diagnostics aggressive no-op
 
 ### O Porquê
