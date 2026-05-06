@@ -64,6 +64,8 @@
   - Marketplace/Trades/Notifications/Conversations list.
 - `GET /community/users` sem `q` retorna `400` por contrato; com `q` retorna
   `200`.
+- Relatório sanitizado da bateria:
+  `server/doc/USER_QA_BATTERY_2026-05-06.md`.
 
 ## 2026-05-06 — Firebase FCM fisico bloqueado por provisioning Apple
 
