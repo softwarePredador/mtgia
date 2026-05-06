@@ -1,5 +1,88 @@
 # Runtime Flow Handoff — iPhone 15 Simulator — 2026-05-06
 
+## Lotus visual polish proof — 2026-05-06 12:58-13:07 -0300
+
+**PASS** for Lotus visual polish on the primary iPhone 15 Simulator after fixing the visual probe false negative. The app/runtime surface was real Flutter + embedded Lotus WebView on iOS Simulator; backend was **not started** because this Life Counter/Lotus harness uses local stores and bundled WebView assets only.
+
+Concrete simulator target:
+
+```text
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+```
+
+`xcrun simctl list devices available | grep -E "iPhone 15|Booted"` summary:
+
+```text
+iPhone 15 Pro (F3C5B123-673F-4ACC-84B2-489957CB81C8) (Shutdown)
+iPhone 15 Pro Max (DABB9D79-2FDB-4585-94DB-E31F1288EE74) (Shutdown)
+iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)
+iPhone 15 Plus (6A3E5508-0190-48AC-B6D1-E4BA8A94FFD9) (Shutdown)
+```
+
+Backend:
+
+- URL used by app: **none**.
+- Health result: **not applicable** for this harness.
+- Backend process cleanup: **not applicable**; no backend was started.
+
+Exact runtime command:
+
+```bash
+cd app
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart \
+  -d "iPhone 15" \
+  --reporter expanded \
+  --no-version-check
+```
+
+Final result: **PASS** (`00:27 +1`). Sanitized probe evidence:
+
+```json
+{"firstLifeText":"40","rawFirstLifeText":"","lifeDigitCount":2,"lifeContentFits":true,"horizontalOverflow":false,"webViewErrorText":false}
+{"firstStoredLife":41,"firstLifeText":"41","rawFirstLifeText":"","snapshotLength":845}
+{"firstStoredLife":40,"firstLifeText":"40","rawFirstLifeText":"","snapshotLength":845}
+{"playerCardCount":4,"firstStoredLife":41,"visibleLifeText":"41","rawVisibleLifeText":"","webViewErrorText":false}
+```
+
+Visual inspection:
+
+- Initial table: four players visible, all life totals visually rendered as `40`, no horizontal overflow, no WebView error.
+- After `+1`: first player visually rendered as `41`; other players remain visible and readable; contrast remains acceptable on all four quadrants.
+- `+1/-1` controls: store changed to `41`, then back to `40`, then persisted `41` before reopen.
+- Reopen/persistence: reopened table had four players and first player persisted at `41`.
+- No crash, stuck modal, raw 4xx/5xx, timeout copy, secrets, JWT, `DATABASE_URL`, `SENTRY_DSN`, or payload-sensitive output.
+
+Investigation result:
+
+- The previous `firstLifeText=""` and `lifeContentFits=false` were **false negatives in the harness**, not a visual bug.
+- Lotus renders life totals as CSS sprite digits (`.font.char-4`, `.font.char-0`) rather than text nodes, so `textContent` is expected to be empty.
+- The old fit check measured an individual sprite digit's `scrollWidth/clientWidth`, which is not a reliable "whole life total fits in the life box" assertion.
+- The harness now posts `debug_*` probe messages so the app does not treat probe messages as blocked external shell actions, avoiding the artificial snackbar in screenshots.
+- The harness decodes visible life totals from `.font.char-*` classes and checks every rendered digit stays inside the `.player-life-count` container.
+
+Evidence artifacts:
+
+| Artifact | Purpose |
+| --- | --- |
+| `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_initial_after_probe_fix.png` | Initial four-player visual proof (`40`). |
+| `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_after_plus_after_probe_fix.png` | After `+1` visual proof (`41`). |
+| `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_visual_runtime_proof_test_iphone15_after_probe_fix_sanitized.log` | Sanitized runtime markers only; raw base64 screenshot log was not kept. |
+
+Focused validation:
+
+```bash
+cd app
+dart format integration_test/life_counter_lotus_visual_runtime_proof_test.dart
+flutter analyze integration_test/life_counter_lotus_visual_runtime_proof_test.dart test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check
+flutter test test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check
+flutter test test/features/decks/screens/deck_runtime_widget_flow_test.dart --no-version-check
+flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check
+```
+
+Results: analyze **PASS**, focused Lotus tests **PASS** (`+21`), deck runtime widget **PASS**, focused deck validation suite **PASS** (`+81`).
+
+Blockers: none. Smallest next action: keep the sprite-aware Lotus visual probe as the release/runtime guard for future polish changes.
+
 ## Fresh optimize apply proof — 2026-05-06 12:19-13:05 -0300
 
 **PASS** for the missing fresh runtime proof: the iPhone 15 Simulator applied freshly approved `/ai/optimize` swaps from the live local backend without relying on historical evidence.

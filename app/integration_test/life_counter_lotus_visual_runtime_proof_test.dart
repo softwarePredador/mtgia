@@ -57,6 +57,8 @@ Future<Map<String, dynamic>?> _probeViaShellBridge(
   required String javascriptBody,
 }) async {
   final requestId = DateTime.now().microsecondsSinceEpoch;
+  final shellProbeType =
+      probeType.startsWith('debug_') ? probeType : 'debug_$probeType';
   screenState.debugClearLastShellMessage();
   await screenState.debugRunJavaScript('''
 (() => {
@@ -65,13 +67,13 @@ Future<Map<String, dynamic>?> _probeViaShellBridge(
       $javascriptBody
     })();
     FlutterManaLoomShellBridge.postMessage(JSON.stringify({
-      type: '$probeType',
+      type: '$shellProbeType',
       request_id: $requestId,
       payload,
     }));
   } catch (error) {
     FlutterManaLoomShellBridge.postMessage(JSON.stringify({
-      type: '$probeType',
+      type: '$shellProbeType',
       request_id: $requestId,
       error: true,
       message: String(error),
@@ -89,7 +91,7 @@ Future<Map<String, dynamic>?> _probeViaShellBridge(
 
     final decoded = jsonDecode(raw);
     if (decoded is Map &&
-        decoded['type'] == probeType &&
+        decoded['type'] == shellProbeType &&
         decoded['request_id'] == requestId) {
       return Map<String, dynamic>.from(decoded);
     }
@@ -111,6 +113,43 @@ Future<Map<String, dynamic>> _waitForLotusReady(
       screenState,
       probeType: 'life_counter_lotus_runtime_ready_probe',
       javascriptBody: r'''
+const decodeLifeText = (node) => {
+  const digits = Array.from(node?.querySelectorAll('.font') ?? []);
+  const decodeDigit = (digit) => {
+    const classes = Array.from(digit.classList);
+    const charClass = classes.find((className) => className.startsWith('char-'));
+    if (!charClass) {
+      return '';
+    }
+    const charName = charClass.substring('char-'.length);
+    if (charName === 'plus') {
+      return '+';
+    }
+    if (charName === 'minus') {
+      return '-';
+    }
+    return charName;
+  };
+  return digits.map(decodeDigit).join('');
+};
+const lifeDigitsFit = (node) => {
+  const digits = Array.from(node?.querySelectorAll('.font') ?? []);
+  if (!node || digits.length === 0) {
+    return false;
+  }
+  const containerRect = node.getBoundingClientRect();
+  if (containerRect.width <= 0 || containerRect.height <= 0) {
+    return false;
+  }
+  return digits.every((digit) => {
+    const rect = digit.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 &&
+      rect.left >= containerRect.left - 2 &&
+      rect.right <= containerRect.right + 2 &&
+      rect.top >= containerRect.top - 2 &&
+      rect.bottom <= containerRect.bottom + 2;
+  });
+};
 const playerCards = Array.from(document.querySelectorAll('.player-card'));
 const players = JSON.parse(localStorage.getItem('players') ?? '[]');
 const firstLifeNode = playerCards[0]?.querySelector('.player-life-count');
@@ -125,7 +164,8 @@ return {
   menuCount: document.querySelectorAll('.menu-button').length,
   increaseCount: document.querySelectorAll('.increase-button.life').length,
   decreaseCount: document.querySelectorAll('.decrease-button.life').length,
-  firstLifeText: (firstLifeNode?.textContent ?? '').trim(),
+  firstLifeText: decodeLifeText(firstLifeNode),
+  rawFirstLifeText: (firstLifeNode?.textContent ?? '').trim(),
   firstStoredLife: players[0]?.life ?? null,
   secondStoredLife: players[1]?.life ?? null,
   lifeFontSize: lifeStyle ? parseFloat(lifeStyle.fontSize) : 0,
@@ -133,9 +173,8 @@ return {
   lifeTextShadow: lifeStyle?.textShadow ?? null,
   lifeRectWidth: lifeRect?.width ?? 0,
   lifeRectHeight: lifeRect?.height ?? 0,
-  lifeContentFits:
-    firstLifeFont ? firstLifeFont.scrollWidth <= firstLifeFont.clientWidth + 2 &&
-      firstLifeFont.scrollHeight <= firstLifeFont.clientHeight + 2 : false,
+  lifeDigitCount: firstLifeNode?.querySelectorAll('.font').length ?? 0,
+  lifeContentFits: lifeDigitsFit(firstLifeNode),
   horizontalOverflow:
     document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
   webViewErrorText: document.body.innerText.includes('Life counter unavailable'),
@@ -201,12 +240,32 @@ return { clicked: true };
       screenState,
       probeType: probeType,
       javascriptBody: r'''
+const decodeLifeText = (node) => {
+  const digits = Array.from(node?.querySelectorAll('.font') ?? []);
+  const decodeDigit = (digit) => {
+    const classes = Array.from(digit.classList);
+    const charClass = classes.find((className) => className.startsWith('char-'));
+    if (!charClass) {
+      return '';
+    }
+    const charName = charClass.substring('char-'.length);
+    if (charName === 'plus') {
+      return '+';
+    }
+    if (charName === 'minus') {
+      return '-';
+    }
+    return charName;
+  };
+  return digits.map(decodeDigit).join('');
+};
 const players = JSON.parse(localStorage.getItem('players') ?? '[]');
 const firstCard = document.querySelector('.player-card');
 const firstLifeNode = firstCard?.querySelector('.player-life-count');
 return {
   firstStoredLife: players[0]?.life ?? null,
-  firstLifeText: (firstLifeNode?.textContent ?? '').trim(),
+  firstLifeText: decodeLifeText(firstLifeNode),
+  rawFirstLifeText: (firstLifeNode?.textContent ?? '').trim(),
   snapshotLength: localStorage.getItem('players')?.length ?? 0,
 };
 ''',
@@ -238,13 +297,33 @@ Future<Map<String, dynamic>> _probePersistedSession(
     screenState,
     probeType: 'life_counter_lotus_runtime_reopen_probe',
     javascriptBody: r'''
+const decodeLifeText = (node) => {
+  const digits = Array.from(node?.querySelectorAll('.font') ?? []);
+  const decodeDigit = (digit) => {
+    const classes = Array.from(digit.classList);
+    const charClass = classes.find((className) => className.startsWith('char-'));
+    if (!charClass) {
+      return '';
+    }
+    const charName = charClass.substring('char-'.length);
+    if (charName === 'plus') {
+      return '+';
+    }
+    if (charName === 'minus') {
+      return '-';
+    }
+    return charName;
+  };
+  return digits.map(decodeDigit).join('');
+};
 const players = JSON.parse(localStorage.getItem('players') ?? '[]');
 const playerCards = Array.from(document.querySelectorAll('.player-card'));
+const firstLifeNode = playerCards[0]?.querySelector('.player-life-count');
 return {
   playerCardCount: playerCards.length,
   firstStoredLife: players[0]?.life ?? null,
-  visibleLifeText:
-    (playerCards[0]?.querySelector('.player-life-count')?.textContent ?? '').trim(),
+  visibleLifeText: decodeLifeText(firstLifeNode),
+  rawVisibleLifeText: (firstLifeNode?.textContent ?? '').trim(),
   webViewErrorText: document.body.innerText.includes('Life counter unavailable'),
 };
 ''',
@@ -280,8 +359,10 @@ void main() {
       expect(readyPayload['playerLifeCount'], 4);
       expect(readyPayload['increaseCount'], 4);
       expect(readyPayload['decreaseCount'], 4);
+      expect(readyPayload['firstLifeText'], '40');
       expect(readyPayload['firstStoredLife'], 40);
       expect(readyPayload['secondStoredLife'], 40);
+      expect(readyPayload['lifeDigitCount'], 2);
       expect((readyPayload['lifeFontSize'] as num).toDouble(), greaterThan(12));
       expect(
         (readyPayload['lifeRectWidth'] as num).toDouble(),
@@ -292,7 +373,14 @@ void main() {
         greaterThan(40),
       );
       expect(readyPayload['lifeTextShadow'], isNot('none'));
+      expect(readyPayload['lifeContentFits'], isTrue);
       expect(readyPayload['horizontalOverflow'], isFalse);
+      expect(
+        find.text(
+          'External shortcut disabled while ManaLoom owns the life counter shell.',
+        ),
+        findsNothing,
+      );
 
       await binding.convertFlutterSurfaceToImage();
       final initialScreenshot = await binding.takeScreenshot(
@@ -308,6 +396,7 @@ void main() {
         probeType: 'life_counter_lotus_runtime_after_plus_probe',
       );
       expect(afterPlus['firstStoredLife'], 41);
+      expect(afterPlus['firstLifeText'], '41');
       // ignore: avoid_print
       print('LOTUS_RUNTIME_AFTER_PLUS ${jsonEncode(afterPlus)}');
 
@@ -319,6 +408,7 @@ void main() {
         probeType: 'life_counter_lotus_runtime_after_minus_probe',
       );
       expect(afterMinus['firstStoredLife'], 40);
+      expect(afterMinus['firstLifeText'], '40');
       // ignore: avoid_print
       print('LOTUS_RUNTIME_AFTER_MINUS ${jsonEncode(afterMinus)}');
 
@@ -367,6 +457,7 @@ void main() {
       expect(reopenedPayload['webViewErrorText'], isFalse);
       expect(reopenedPayload['playerCardCount'], 4);
       expect(reopenedPayload['firstStoredLife'], 41);
+      expect(reopenedPayload['visibleLifeText'], '41');
     },
     timeout: const Timeout(Duration(minutes: 5)),
   );

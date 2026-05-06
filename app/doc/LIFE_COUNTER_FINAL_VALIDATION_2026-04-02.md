@@ -1,5 +1,79 @@
 # Life Counter - Final Validation - 2026-04-02
 
+## Update - 2026-05-06 - iPhone 15 Lotus visual polish PASS
+
+### Decision
+
+The `lifeContentFits=false` and empty visible life text reported by the previous
+Lotus visual probe were classified as harness false negatives, not as a product
+visual regression. The iPhone 15 Simulator screenshots show the life totals
+clearly rendered, with acceptable fit and contrast for four players.
+
+### Root cause
+
+Lotus renders life totals with CSS sprite spans such as `.font.char-4` and
+`.font.char-0`, so `.player-life-count.textContent` is expected to be empty. The
+old fit probe also measured an individual sprite digit with `scrollWidth` /
+`clientWidth`, which does not represent whether the full rendered life total
+fits inside the `.player-life-count` container.
+
+The harness now:
+
+- sends probe messages as `debug_*` so the app does not show the blocked-link
+  snackbar during visual capture;
+- decodes visible life text from `.font.char-*` classes;
+- asserts every rendered digit remains inside the life container;
+- asserts initial `40`, after-plus `41`, after-minus `40`, and reopen
+  persistence `41`.
+
+### Runtime proof
+
+Primary target:
+
+```text
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)
+```
+
+Command:
+
+```bash
+cd app
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart \
+  -d "iPhone 15" \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: **PASS** (`00:27 +1`).
+
+Sanitized probe values:
+
+- `firstLifeText=40`, `lifeDigitCount=2`, `lifeContentFits=true`,
+  `horizontalOverflow=false`, `webViewErrorText=false`;
+- after `+1`: `firstStoredLife=41`, `firstLifeText=41`;
+- after `-1`: `firstStoredLife=40`, `firstLifeText=40`;
+- reopen: `playerCardCount=4`, `firstStoredLife=41`,
+  `visibleLifeText=41`.
+
+Evidence:
+
+- `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_initial_after_probe_fix.png`
+- `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_after_plus_after_probe_fix.png`
+- `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_visual_runtime_proof_test_iphone15_after_probe_fix_sanitized.log`
+
+Backend was not started because this harness validates the local Lotus WebView
+and local persistence stores only.
+
+### Validation
+
+```bash
+cd app
+flutter analyze integration_test/life_counter_lotus_visual_runtime_proof_test.dart test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check
+flutter test test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check
+```
+
+Results: analyze **PASS**; focused Lotus tests **PASS** (`+21`).
+
 ## Update - 2026-04-29 - Legacy clone golden stabilization
 
 ### Decision

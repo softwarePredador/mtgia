@@ -2,6 +2,53 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Lotus visual polish runtime no iPhone 15
+
+### O Porquê
+- A consolidacao de release ja tinha passado funcionalmente, mas o probe Lotus
+  ainda registrava `lifeContentFits=false` e texto de vida visivel vazio.
+- O risco precisava ser fechado antes de publico porque poderia indicar numero
+  cortado/invisivel no Life Counter, mesmo sem falha funcional.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` sem divergencia (`0 0`) e
+  sem sobrescrever mudancas de usuario.
+- Device primario: iPhone 15 Simulator
+  `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime
+  `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Backend nao foi iniciado: o harness `life_counter_lotus_visual_runtime_proof_test.dart`
+  valida WebView Lotus embutido e stores locais.
+- Investigacao concluiu que o risco era falso negativo de harness:
+  - Lotus renderiza vida como sprites CSS `.font.char-*`, entao `textContent`
+    fica vazio por design;
+  - o fit antigo media `scrollWidth/clientWidth` de um digito isolado, nao o
+    encaixe do numero inteiro na caixa.
+- O harness foi corrigido para:
+  - enviar probes como `debug_*`, evitando snackbar de link externo bloqueado;
+  - decodificar numeros visuais por classes `.font.char-*`;
+  - validar que todos os digitos renderizados ficam dentro de `.player-life-count`;
+  - exigir `40 -> 41 -> 40 -> reopen 41`, quatro jogadores, sem overflow
+    horizontal e sem erro WebView.
+
+### Resultado
+- **PASS.** Runtime iPhone 15:
+  `flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart -d "iPhone 15" --reporter expanded --no-version-check`
+  passou em `00:27 +1`.
+- Probe final: `firstLifeText=40`, `lifeDigitCount=2`,
+  `lifeContentFits=true`, `horizontalOverflow=false`, `webViewErrorText=false`;
+  after plus `41`, after minus `40`, reopen `41`.
+- Screenshots sanitizadas:
+  - `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_initial_after_probe_fix.png`;
+  - `app/doc/runtime_flow_proofs_2026-05-06_lotus_visual_polish_iphone15/life_counter_lotus_runtime_after_plus_after_probe_fix.png`.
+- Sem crash, modal preso, raw 4xx/5xx, timeout cru, JWT, `DATABASE_URL`,
+  `SENTRY_DSN` ou payload sensivel.
+
+### Validacao executada
+- `cd app && flutter analyze integration_test/life_counter_lotus_visual_runtime_proof_test.dart test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check`: PASS.
+- `cd app && flutter test test/features/home/lotus_visual_skin_test.dart test/features/home/lotus_life_counter_screen_test.dart test/features/home/lotus_life_counter_internal_shell_test.dart --no-version-check`: PASS (`+21`).
+- `cd app && flutter test test/features/decks/screens/deck_runtime_widget_flow_test.dart --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check`: PASS (`+81`).
+
 ## 2026-05-06 — Fresh optimize apply runtime no iPhone 15
 
 ### O Porquê
