@@ -2,6 +2,35 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — iPhone fisico: mitigacao de tela branca no boot
+
+### O Porquê
+- A rodada de Scanner no iPhone fisico ficou `BLOCKED / NOT PROVEN`; o usuario
+  observou tela branca quando tentou abrir o app para testar.
+- A leitura do log bruto mostrou que o app instalava, expunha Dart VM Service e
+  depois registrava `Lost connection to device`, sem prova de primeira tela
+  renderizada.
+- O boot chamava Firebase Push e Firebase Performance antes de `runApp`, o que
+  podia atrasar/travar a primeira UI em device fisico.
+
+### O Como
+- `app/lib/main.dart` foi ajustado para executar `runApp(const ManaLoomApp())`
+  primeiro.
+- Firebase Push e Firebase Performance passaram a inicializar depois do primeiro
+  frame via `addPostFrameCallback`.
+- Cada inicializacao diferida ganhou timeout, log sanitizado e captura Sentry
+  opcional, sem impedir a UI de renderizar.
+- Rodada fisica curta com backend LAN `http://192.168.20.167:8082` comprovou:
+  `ApiClient` apontado para `8082`, router/auth executando, rota `/login`
+  renderizada, Push timeout em `8s` sem bloquear UI e Performance inicializada.
+
+### Resultado
+- **FIXED FOR BOOT / SCANNER STILL NOT PROVEN**.
+- A tela branca inicial foi mitigada como problema de caminho critico de startup,
+  nao como bug de OCR.
+- Scanner fisico/camera/OCR continua exigindo sessao manual: login no device,
+  abrir Scanner, conceder camera e rodar matriz de cartas reais.
+
 ## 2026-05-06 — Scanner fisico/camera/OCR release blocker
 
 ### O Porquê

@@ -1,0 +1,31 @@
+Physical iPhone boot smoke after deferred startup fix
+Date: 2026-05-06 14:20 -0300
+Device: Rafa / 00008130-001C152922BA001C / iOS 26.5 23F5043k
+Backend: http://192.168.20.167:8082
+
+Command:
+cd app && flutter run -d 00008130-001C152922BA001C --debug --publish-port --dart-define=API_BASE_URL=http://192.168.20.167:8082 --dart-define=PUBLIC_API_BASE_URL=http://192.168.20.167:8082 --no-version-check
+
+Sanitized evidence:
+- Xcode build completed.
+- App installed and launched on physical iPhone.
+- ApiClient booted with LAN backend http://192.168.20.167:8082.
+- Router/auth logs reached normal unauthenticated flow.
+- App routed to /login.
+- Firebase Push timed out after 8s but app stayed rendered.
+- Firebase Performance initialized after first frame.
+
+Key lines observed:
+flutter: [ApiClient] baseUrl = http://192.168.20.167:8082
+flutter: [Router] redirect: location=/ | status=AuthStatus.initial
+flutter: [Auth] initialize() -> loading
+flutter: [Auth] savedToken exists: false, savedUser exists: false
+flutter: [Auth] initialize() concluido -> AuthStatus.unauthenticated
+flutter: [Router] redirect: location=/login | status=AuthStatus.unauthenticated
+flutter: [Main] Firebase push excedeu 8s; app segue renderizado.
+flutter: [PerformanceService] Inicializado (enabled=true)
+flutter: [Main] Firebase Performance inicializado apos primeiro frame (6ms)
+
+Verdict:
+FIXED FOR BOOT. The prior white-screen symptom is separated from Scanner/OCR.
+Scanner physical camera/OCR remains NOT PROVEN until manual card matrix runs.

@@ -1,5 +1,42 @@
 # Scanner Physical Audit - 2026-05-06
 
+## Follow-up boot fix - 2026-05-06 14:20 -0300
+
+Verdict for the white-screen blocker: `FIXED FOR BOOT / SCANNER STILL NOT PROVEN`.
+
+The previous physical run was not enough to prove app rendering: it installed,
+exposed Dart VM Service, then logged `Lost connection to device`. That matched
+the user-observed white screen better than a scanner/OCR bug.
+
+Patch applied:
+
+- `runApp(const ManaLoomApp())` now executes before Firebase Push and Firebase
+  Performance initialization.
+- Push and Performance bootstrap now run after the first rendered frame.
+- Each deferred startup task has a timeout and sanitized log/Sentry capture.
+- If Firebase Push hangs on physical iOS, the app keeps rendering instead of
+  blocking the first usable UI.
+
+Fresh physical smoke after the patch:
+
+- Device: `Rafa` (`00008130-001C152922BA001C`, `iOS 26.5 23F5043k`).
+- Backend LAN: `http://192.168.20.167:8082` health `healthy`.
+- Command:
+  `flutter run -d 00008130-001C152922BA001C --debug --publish-port --dart-define=API_BASE_URL=http://192.168.20.167:8082 --dart-define=PUBLIC_API_BASE_URL=http://192.168.20.167:8082 --no-version-check`
+- Result: app rendered normal auth flow and routed to `/login`.
+- Key logs:
+  - `[ApiClient] baseUrl = http://192.168.20.167:8082`
+  - `[Router] redirect: location=/ | status=AuthStatus.initial`
+  - `[Auth] initialize() concluído -> AuthStatus.unauthenticated`
+  - `[Router] redirect: location=/login | status=AuthStatus.unauthenticated`
+  - `[Main] Firebase push excedeu 8s; app segue renderizado.`
+  - `[PerformanceService] Inicializado (enabled=true)`
+
+Remaining scanner status: physical camera/OCR matrix is still `NOT PROVEN`.
+The boot blocker is separated from scanner logic; next manual step is logging in
+on the physical device, opening the Scanner screen, granting camera permission
+and executing the card matrix.
+
 ## Verdict
 
 `BLOCKED / NOT PROVEN` for physical scanner camera/OCR release closure.

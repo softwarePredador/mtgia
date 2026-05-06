@@ -62,25 +62,66 @@ final bool _debugBootIntoLifeCounter =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializa Firebase para push notifications.
-  // Se Firebase não estiver configurado (sem google-services.json),
-  // o app continua funcionando normalmente sem push.
-  try {
-    await PushNotificationService().init();
-  } catch (e) {
-    debugPrint('[Main] Firebase não configurado, push desabilitado: $e');
-  }
-
-  // Inicializa Firebase Performance Monitoring
-  try {
-    await PerformanceService.instance.init();
-  } catch (e) {
-    debugPrint('[Main] Performance monitoring não disponível: $e');
-  }
-
   await AppObservability.instance.bootstrap(() async {
     runApp(const ManaLoomApp());
+    _schedulePostFirstFramePlatformBootstrap();
   });
+}
+
+void _schedulePostFirstFramePlatformBootstrap() {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(_initializePostFirstFramePlatformServices());
+  });
+}
+
+Future<void> _initializePostFirstFramePlatformServices() async {
+  await _runStartupTask(
+    label: 'Firebase push',
+    timeout: const Duration(seconds: 8),
+    task: () => PushNotificationService().init(),
+  );
+  await _runStartupTask(
+    label: 'Firebase Performance',
+    timeout: const Duration(seconds: 5),
+    task: () => PerformanceService.instance.init(),
+  );
+}
+
+Future<void> _runStartupTask({
+  required String label,
+  required Duration timeout,
+  required Future<void> Function() task,
+}) async {
+  final stopwatch = Stopwatch()..start();
+  try {
+    await task().timeout(timeout);
+    debugPrint(
+      '[Main] $label inicializado apos primeiro frame '
+      '(${stopwatch.elapsedMilliseconds}ms)',
+    );
+  } on TimeoutException catch (error, stackTrace) {
+    debugPrint(
+      '[Main] $label excedeu ${timeout.inSeconds}s; app segue renderizado.',
+    );
+    unawaited(
+      AppObservability.instance.captureException(
+        error,
+        stackTrace: stackTrace,
+        tags: const {'source': 'startup_deferred_timeout'},
+        extras: {'startup_task': label, 'timeout_ms': timeout.inMilliseconds},
+      ),
+    );
+  } catch (error, stackTrace) {
+    debugPrint('[Main] $label indisponivel; app segue renderizado: $error');
+    unawaited(
+      AppObservability.instance.captureException(
+        error,
+        stackTrace: stackTrace,
+        tags: const {'source': 'startup_deferred_error'},
+        extras: {'startup_task': label},
+      ),
+    );
+  }
 }
 
 class ManaLoomApp extends StatefulWidget {
