@@ -2,6 +2,32 @@
 
 Data: 2026-05-05
 
+## Atualizacao 2026-05-06 - runtime iPhone 15 da UI de diagnostics
+
+**PASS WITH RISKS.** A UI mobile que consome `optimize_diagnostics.aggressive_candidate_quality` foi provada no iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` (`com.apple.CoreSimulator.SimRuntime.iOS-17-4`) contra backend local real `http://127.0.0.1:8082`.
+
+| Validacao | Resultado |
+|---|---|
+| Backend health `http://127.0.0.1:8082/health` | PASS, `healthy` |
+| `flutter analyze lib/features/decks test/features/decks --no-version-check` | PASS |
+| `flutter test test/features/decks --no-version-check` | PASS, `+153` |
+| `flutter analyze lib/features/decks test/features/decks integration_test/deck_runtime_m2006_test.dart --no-version-check` | PASS |
+| `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" ...8082` | PASS, `03:26 +1` |
+
+O fluxo real abriu deck Commander completo, selecionou `Agressivo`, enviou `POST /ai/optimize -> 202 (183ms)`, fez polling de job e terminou em safe no-op/quality rejected. A tela exibiu dialog de produto com:
+
+| Campo UI | Valor observado |
+|---|---|
+| Mensagem | `A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck.` |
+| Candidatos analisados | `74` |
+| Pares avaliados | `37` |
+| Swaps seguros retornados | `7` |
+| Principal bloqueio | `limite de mudanças da intensidade escolhida` |
+
+Evidencias locais ignoradas pelo git: `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/deck_runtime_m2006_test_iphone15_8082.log` e `09_quality_rejected_blocker.png`. A prova nao exibiu payload bruto, buckets crus, JWT, secrets, prompts completos, `DATABASE_URL`, `SENTRY_DSN`, crash, overflow, modal preso, timeout cru ou 4xx/5xx user-facing. O backend temporario 8082 foi encerrado ao final e a porta ficou livre.
+
+Risco residual: `low_candidate_coverage` nao veio nesta resposta live; portanto a linha de baixa cobertura ficou **NOT PROVEN nesta execucao** e segue coberta por teste widget/parser. O scanner fisico/camera/OCR ficou **DEFERRED**, fora do escopo.
+
 ## Atualizacao 2026-05-06 - consumo UI dos diagnostics
 
 **PASS WITH RISKS.** A camada mobile passou a consumir `optimize_diagnostics.aggressive_candidate_quality` como diagnostico agregado e opcional no branch `intensity=aggressive` sem swaps seguros/quality rejected. A UI mostra copy derivada, nao payload bruto: candidatos analisados, pares avaliados, swaps seguros retornados, principal bloqueio traduzido e baixa cobertura quando `low_candidate_coverage=true`.

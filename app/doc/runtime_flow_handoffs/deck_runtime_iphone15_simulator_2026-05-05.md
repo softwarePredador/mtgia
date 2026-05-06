@@ -1,5 +1,36 @@
 # Deck Runtime Handoff - iPhone 15 Simulator - 2026-05-05
 
+## Atualizacao - Aggressive no-op diagnostics UI runtime - 2026-05-06 10:11-10:31 BRT
+
+**PASS WITH RISKS.** A nova UI de diagnostics para `Optimize -> Agressivo` em safe no-op/quality rejected foi provada no iPhone 15 Simulator contra backend local real `http://127.0.0.1:8082`. O app abriu detalhes de deck Commander completo, selecionou `Agressivo`, recebeu job async de `/ai/optimize`, terminou em quality rejected seguro e exibiu dialog amigavel com diagnostics agregados: candidatos analisados, pares avaliados, swaps seguros retornados e principal bloqueio traduzido. Nao houve payload bruto, `aggressive_candidate_quality`, `quality_gate_rejected`, token, secret, prompt completo, crash, overflow, modal preso, timeout cru ou erro 4xx/5xx user-facing.
+
+| Item | Evidencia |
+| --- | --- |
+| Branch/commit inicial | `master` em `b6875ec` (`Explain aggressive optimize no-op diagnostics`) |
+| `git status --short` inicial | limpo |
+| Device | iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF` |
+| Runtime | `com.apple.CoreSimulator.SimRuntime.iOS-17-4` |
+| `flutter devices` | `iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • com.apple.CoreSimulator.SimRuntime.iOS-17-4 (simulator)` |
+| `xcrun simctl` | `iPhone 15 (F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF) (Booted)` |
+| Backend usado pelo app | `http://127.0.0.1:8082` via `API_BASE_URL` e `PUBLIC_API_BASE_URL` |
+| Backend health | `{"status":"healthy","service":"mtgia-server","environment":"development","version":"1.0.0","checks":{"process":{"status":"healthy"}}}` |
+| App checks | `flutter analyze lib/features/decks test/features/decks --no-version-check` PASS; `flutter test test/features/decks --no-version-check` PASS `00:12 +153`; `flutter analyze lib/features/decks test/features/decks integration_test/deck_runtime_m2006_test.dart --no-version-check` PASS |
+| Runtime command | `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check` |
+| Runtime final | PASS `03:26 +1` |
+| Optimize transport | `POST /ai/optimize -> 202 (183ms)`; polling `GET /ai/optimize/jobs/:id -> 200`; job terminou em safe no-op/quality rejected |
+| UI diagnostics | Screenshot `09_quality_rejected_blocker.png`: mensagem "A IA encontrou ideias, mas o gate bloqueou as inseguras para preservar seu deck"; `Candidatos analisados: 74`; `Pares avaliados: 37`; `Swaps seguros retornados: 7`; `Principal bloqueio: limite de mudanças da intensidade escolhida` |
+| Low coverage | `low_candidate_coverage` nao veio nesta resposta live; harness registrou `LOW_CANDIDATE_COVERAGE_NOT_PRESENT_IN_LIVE_RESPONSE` e nao exibiu a linha de baixa cobertura, corretamente opcional |
+| Log final | `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/deck_runtime_m2006_test_iphone15_8082.log` |
+| Screenshot final | `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/09_quality_rejected_blocker.png` |
+| Tentativa inicial | `deck_runtime_m2006_test_iphone15_8082_failed_low_coverage.log` falhou apenas por assert de harness que exigia baixa cobertura obrigatoria; o produto ja estava exibindo diagnostics, e o harness foi corrigido para tratar baixa cobertura como opcional |
+| Real vs mocked | Runtime com app/UI real no iPhone 15 Simulator, backend Dart Frog real e dados via backend local; tests unit/widget usam mocks/fakes conforme suites existentes |
+| Encerramento backend | Backend temporario 8082 encerrado ao final; porta `8082` livre |
+| Scanner fisico/camera/OCR | **DEFERRED / NOT PROVEN**, fora do escopo |
+
+Leitura de produto: a UI atingiu o objetivo da sprint para safe no-op/quality rejected aggressive: explica que o gate bloqueou trocas inseguras e mostra contadores agregados sem expor payload tecnico. Risco residual: nesta resposta live o diagnostico indicou `returned_swaps=7` mas o job ainda terminou sem preview aplicavel porque o gate final rejeitou o resultado global; o copy continua seguro, mas produto pode refinar o label "Swaps seguros retornados" para evitar leitura de que ha swaps aplicaveis quando o endpoint retorna no-op.
+
+Menor proxima acao: manter o harness exigindo a copy de diagnostics no branch no-op e monitorar respostas com `returned_swaps > 0` + no-op para eventual ajuste de label/copy.
+
 ## Atualizacao - Aggressive no-op diagnostics UI - 2026-05-06 08:59-09:05 BRT
 
 **PASS WITH RISKS (runtime NOT RUN).** A rodada desta atualizacao foi app/backend-contract focada: a UI passou a consumir diagnostics agregados de `optimize_diagnostics.aggressive_candidate_quality` para explicar safe no-op/quality rejected no modo `Agressivo`, mas o fluxo iPhone 15 Simulator nao foi reexecutado.

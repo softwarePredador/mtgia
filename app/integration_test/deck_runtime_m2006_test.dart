@@ -462,6 +462,28 @@ void main() {
           .text('Nenhuma melhoria segura encontrada')
           .evaluate()
           .isNotEmpty) {
+        await _pumpUntilFound(
+          tester,
+          find.textContaining('gate bloqueou as inseguras'),
+          attempts: 30,
+          step: const Duration(milliseconds: 500),
+        );
+        expect(find.textContaining('Candidatos analisados:'), findsWidgets);
+        expect(find.textContaining('Pares avaliados:'), findsWidgets);
+        expect(find.textContaining('Swaps seguros retornados:'), findsWidgets);
+        expect(find.textContaining('Principal bloqueio:'), findsWidgets);
+        final lowCoverage = find.textContaining('Faltaram candidatos seguros');
+        if (lowCoverage.evaluate().isEmpty) {
+          // ignore: avoid_print
+          print('LOW_CANDIDATE_COVERAGE_NOT_PRESENT_IN_LIVE_RESPONSE');
+        } else {
+          expect(lowCoverage, findsWidgets);
+        }
+        expect(
+          find.textContaining('aggressive_candidate_quality'),
+          findsNothing,
+        );
+        expect(find.textContaining('quality_gate_rejected'), findsNothing);
         await _capture(binding, tester, '09_quality_rejected_blocker');
         return;
       }

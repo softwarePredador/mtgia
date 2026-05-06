@@ -2,6 +2,35 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Runtime iPhone 15 da UI de diagnostics aggressive no-op
+
+### O Porquê
+- A mudanca anterior ja adicionava copy amigavel para `optimize_diagnostics.aggressive_candidate_quality`, mas ainda faltava a prova obrigatoria no iPhone 15 Simulator contra backend local real.
+- O criterio de aceite era provar o branch `Optimize -> Agressivo -> safe no-op/quality rejected` com diagnostics visiveis e sem payload bruto, crash, overflow, modal preso, timeout cru, erro tecnico ou secrets.
+
+### O Como
+- Backend temporario em `http://127.0.0.1:8082` com `PORT=8082 dart run .dart_frog/server.dart`.
+- Health validado em `/health`.
+- Device primario: iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, runtime `com.apple.CoreSimulator.SimRuntime.iOS-17-4`.
+- Runtime: `flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`.
+- O harness foi reforcado para, quando o branch no-op aparece, exigir a mensagem `gate bloqueou as inseguras`, os contadores agregados, o principal bloqueio traduzido e a ausencia de strings cruas como `aggressive_candidate_quality` e `quality_gate_rejected`.
+- A linha de baixa cobertura ficou condicional, porque `low_candidate_coverage` e opcional no contrato e nao veio na resposta live desta rodada.
+
+### Resultado
+- **PASS WITH RISKS.** Runtime final passou (`03:26 +1`).
+- A UI exibiu: `Candidatos analisados: 74`, `Pares avaliados: 37`, `Swaps seguros retornados: 7` e `Principal bloqueio: limite de mudanças da intensidade escolhida`.
+- Nao houve payload bruto, JWT, secrets, prompts completos, `DATABASE_URL`, `SENTRY_DSN`, crash, overflow, modal preso, timeout cru ou 4xx/5xx user-facing.
+- Primeira tentativa falhou apenas por assert de harness que exigia baixa cobertura obrigatoria; o harness foi corrigido para refletir o contrato opcional.
+- Backend temporario 8082 encerrado ao final; porta livre.
+- Scanner fisico/camera/OCR: **DEFERRED / NOT PROVEN**.
+
+### Validacao executada
+- `cd app && flutter analyze lib/features/decks test/features/decks --no-version-check`: PASS.
+- `cd app && flutter test test/features/decks --no-version-check`: PASS (`00:12 +153`).
+- `cd app && flutter analyze lib/features/decks test/features/decks integration_test/deck_runtime_m2006_test.dart --no-version-check`: PASS.
+- `cd app && flutter test integration_test/deck_runtime_m2006_test.dart -d "iPhone 15" --dart-define=API_BASE_URL=http://127.0.0.1:8082 --dart-define=PUBLIC_API_BASE_URL=http://127.0.0.1:8082 --reporter expanded --no-version-check`: PASS (`03:26 +1`).
+- Evidencias locais: `app/doc/runtime_flow_proofs_2026-05-06_iphone15_simulator/`.
+
 ## 2026-05-06 — UI de diagnostics para aggressive safe no-op
 
 ### O Porquê
