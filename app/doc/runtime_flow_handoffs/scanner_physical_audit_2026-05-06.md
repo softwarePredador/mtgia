@@ -85,6 +85,61 @@ The boot blocker is separated from scanner logic; next manual step is logging in
 on the physical device, opening the Scanner screen, granting camera permission
 and executing the card matrix.
 
+## Public backend physical boot - 2026-05-06 15:15 -0300
+
+Verdict: `APP BOOT PASS / PUBLIC BACKEND AUTH PASS / SCANNER WAITING MANUAL SCAN`.
+
+The local LAN backend path was replaced with the configured public Easypanel
+host:
+
+- `https://evolution-cartinhas.8ktevp.easypanel.host`
+
+Public backend checks:
+
+- DNS resolved to the production host IP.
+- `GET /health`: `200`, `environment=production`, backend healthy.
+- Sanitized `POST /auth/register`: `201`, token present, no token recorded.
+- `POST /cards/resolve` for `Phyrexian Horror` with `include_tokens=true`:
+  `200`.
+- `GET /cards/printings?name=Phyrexian%20Horror&dedupe=false`: `200`,
+  returned token printings only, no `Phyrexian Scissor/Censor`.
+
+Physical iPhone run:
+
+```bash
+cd app
+flutter run -d 00008130-001C152922BA001C \
+  --debug \
+  --publish-port \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --no-version-check
+```
+
+Result:
+
+- Device: `Rafa` (`00008130-001C152922BA001C`, iOS `26.5`).
+- App launched and rendered `/login`; no white screen.
+- `ApiClient` used the public HTTPS base URL.
+- Firebase Push exceeded the 8s startup timeout but did not block rendering.
+- Firebase Performance initialized after first frame.
+
+iOS debug signing adjustment:
+
+- Debug build no longer requires `Runner.entitlements`, because the current
+  Apple Personal Team provisioning profile does not include Push Notifications.
+- Release/Profile still keep Push entitlements for proper TestFlight/staging
+  validation with a paid Apple Developer Team.
+- `NSLocalNetworkUsageDescription` was added for future local-device backend
+  QA; the current public-backend run does not depend on LAN access.
+
+Remaining scanner status:
+
+- Physical camera/OCR matrix still needs manual execution on the device while
+  logs are attached.
+- The app is ready for the manual scanner run; terminal cannot operate the
+  physical camera/card positioning.
+
 ## Verdict
 
 `BLOCKED / NOT PROVEN` for physical scanner camera/OCR release closure.

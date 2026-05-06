@@ -2,6 +2,37 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Scanner físico com backend público
+
+### O Porquê
+- O caminho LAN/local confundia a validação física do Scanner porque o iPhone
+  não conseguia completar cadastro contra o IP local.
+- O `.env` já apontava para o domínio público Easypanel, então a validação
+  correta para o device físico passou a usar HTTPS público.
+
+### O Como
+- Backend público validado em
+  `https://evolution-cartinhas.8ktevp.easypanel.host`:
+  `/health` retornou `200` e `environment=production`.
+- Cadastro público foi provado com resposta `201` e token presente, sem gravar
+  token em docs/logs.
+- Contrato scanner para `Phyrexian Horror` foi validado no backend público:
+  resolve/printings retornaram token printings e não retornaram
+  `Phyrexian Scissor/Censor`.
+- App físico foi iniciado em `Rafa`
+  (`00008130-001C152922BA001C`) com:
+  `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+### Resultado
+- **APP BOOT PASS / PUBLIC BACKEND AUTH PASS**.
+- A tela branca não reapareceu; o app renderizou `/login`.
+- Debug iOS deixou de exigir entitlement de Push para permitir QA com Apple
+  Personal Team; Release/Profile continuam com Push para staging/TestFlight.
+- Scanner físico/câmera/OCR ainda depende da execução manual da matriz no
+  aparelho enquanto logs estão anexados.
+- Handoff atualizado:
+  `app/doc/runtime_flow_handoffs/scanner_physical_audit_2026-05-06.md`.
+
 ## 2026-05-06 — Firebase FCM fisico bloqueado por provisioning Apple
 
 ### O Porquê
