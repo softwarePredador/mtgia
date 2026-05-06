@@ -2,6 +2,51 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — QA fisico nao-scanner no iPhone Rafa bloqueado por VM Service
+
+### O Porquê
+- Foi solicitada uma matriz automatizada no iPhone fisico `Rafa`
+  (`00008130-001C152922BA001C`) cobrindo todo o app ManaLoom exceto Scanner,
+  camera, OCR e MLKit scanner.
+- A validacao deveria usar o backend publico Easypanel e nunca expor secrets,
+  tokens, JWT, Sentry DSN, DATABASE_URL, OpenAI key, payload sensivel ou senha.
+
+### O Como
+- `master` foi sincronizada e o SHA local `059fc9b` bateu com o `git_sha`
+  publicado em `/health`.
+- Backend publico validado em
+  `https://evolution-cartinhas.8ktevp.easypanel.host`:
+  `/health` retornou `200`, `environment=production` e
+  `git_sha=059fc9b466d45a81bc82cc54ba824de133bf5bff`.
+- Gates locais:
+  - `cd app && flutter analyze lib test integration_test --no-version-check`:
+    PASS.
+  - `cd app && flutter test test --no-version-check`: PASS, 548 testes.
+- O iPhone fisico foi descoberto por Flutter e CoreDevice:
+  `Rafa`, `00008130-001C152922BA001C`, `iOS 26.5 23F5043k`,
+  `iPhone 15 Pro (iPhone16,1)`.
+- A primeira automacao fisica tentada foi
+  `integration_test/sets_catalog_runtime_test.dart` com:
+  `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host` e
+  `PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+### Resultado
+- **APP BOOT PASS / AUTOMATION BLOCKED**.
+- `flutter run -d 00008130-001C152922BA001C` abriu o app fisico, inicializou o
+  `ApiClient` com o backend publico e navegou ate `/login`.
+- `flutter test` no device fisico nao executou o corpo do teste porque o Dart VM
+  Service nao foi descoberto:
+  `The Dart VM Service was not discovered after 60 seconds`.
+- O processo debug tambem perdeu o service protocol apos o boot:
+  `Error connecting to the service protocol: WebSocket connection reset`.
+- Scanner/camera/OCR/MLKit scanner ficaram explicitamente
+  **DEFERRED / IGNORED**.
+- Nao foi feito patch funcional porque o bloqueio provado esta na conexao
+  Flutter/Xcode/device para automacao fisica, nao em contrato backend
+  app-facing nem em fluxo Scanner.
+- Handoff atualizado:
+  `app/doc/runtime_flow_handoffs/physical_iphone_non_scanner_qa_2026-05-06.md`.
+
 ## 2026-05-06 — Scanner físico com backend público
 
 ### O Porquê
