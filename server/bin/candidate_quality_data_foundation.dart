@@ -11,6 +11,29 @@ const _defaultArtifactDir =
 const _heuristicSource = 'deterministic_heuristic_v1';
 const _metaSynergySource = 'meta_decks_cooccurrence_v1';
 const _rejectionPenaltySource = 'quality_gate_history_v1';
+const _staleGeneratedRowsCsvHeaders = <String>[
+  'table',
+  'card_id',
+  'card_name',
+  'tag',
+  'role',
+  'format',
+  'subformat',
+  'bracket_scope',
+  'budget_tier',
+  'commander_name_normalized',
+  'commander_name',
+  'card_name_normalized',
+  'archetype',
+  'function',
+  'source',
+  'score',
+  'confidence',
+  'penalty',
+  'evidence_count',
+  'evidence',
+  'updated_at',
+];
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -19,9 +42,26 @@ Future<void> main(List<String> args) async {
   }
 
   final apply = args.contains('--apply');
-  final dryRun = args.contains('--dry-run') || !apply;
-  if (apply && args.contains('--dry-run')) {
-    throw ArgumentError('Use apenas um modo: --dry-run ou --apply.');
+  final pruneStaleOnly = args.contains('--prune-stale-only');
+  final explicitDryRun = args.contains('--dry-run');
+  final dryRun = explicitDryRun || (!apply && !pruneStaleOnly);
+  if ([apply, pruneStaleOnly, explicitDryRun].where((mode) => mode).length >
+      1) {
+    throw ArgumentError(
+      'Use apenas um modo: --dry-run, --apply ou --prune-stale-only.',
+    );
+  }
+  final pruneTarget = _readArg(args, '--target=');
+  final maxPrune = int.tryParse(_readArg(args, '--max-prune=') ?? '') ?? 1;
+  if (pruneStaleOnly) {
+    if (pruneTarget != 'card_role_scores') {
+      throw ArgumentError(
+        '--prune-stale-only exige --target=card_role_scores nesta etapa.',
+      );
+    }
+    if (maxPrune < 0) {
+      throw ArgumentError('--max-prune deve ser >= 0.');
+    }
   }
 
   final artifactDir = Directory(
@@ -125,13 +165,29 @@ Future<void> main(List<String> args) async {
     var prunedStaleRoleScores = 0;
     var prunedStaleSynergies = 0;
     var prunedStalePenalties = 0;
-    final staleRowsBeforeApply = await _countStaleGeneratedRows(
+    var prunedRows = <Map<String, dynamic>>[];
+    final staleGeneratedRowsBeforeApply = await _loadStaleGeneratedRows(
       pool: pool,
       tagRows: tagRows,
       roleRows: roleRows,
       synergyRows: synergyRows,
       penaltyRows: penaltyRows,
     );
+    final staleRowsBeforeApply = staleGeneratedRowsBeforeApply.map(
+      (table, rows) => MapEntry(table, rows.length),
+    );
+    final flattenedStaleRows =
+        _flattenStaleGeneratedRows(staleGeneratedRowsBeforeApply);
+    await _writeJson(
+      '${artifactDir.path}/stale_generated_rows_preview.json',
+      staleGeneratedRowsBeforeApply,
+    );
+    await _writeCsv(
+      '${artifactDir.path}/stale_generated_rows_preview.csv',
+      flattenedStaleRows,
+      _staleGeneratedRowsCsvHeaders,
+    );
+
     if (apply) {
       await _ensureCandidateQualitySchema(pool);
       upsertedTags = await _upsertFunctionTags(pool, tagRows);
@@ -145,16 +201,42 @@ Future<void> main(List<String> args) async {
       prunedStalePenalties =
           await _pruneStaleRejectionPenalties(pool, penaltyRows);
       applied = true;
+    } else if (pruneStaleOnly) {
+      final expectedRows = staleGeneratedRowsBeforeApply[pruneTarget] ??
+          const <Map<String, dynamic>>[];
+      prunedRows = await _pruneStaleRoleScoresWithGuard(
+        pool: pool,
+        roleRows: roleRows,
+        expectedRows: expectedRows,
+        maxPrune: maxPrune,
+      );
+      prunedStaleRoleScores = prunedRows.length;
+      applied = prunedRows.isNotEmpty;
+      await _writeJson(
+        '${artifactDir.path}/stale_generated_rows_pruned.json',
+        prunedRows,
+      );
+      await _writeCsv(
+        '${artifactDir.path}/stale_generated_rows_pruned.csv',
+        prunedRows.map((row) => {'table': pruneTarget, ...row}).toList(),
+        _staleGeneratedRowsCsvHeaders,
+      );
     }
 
     final postCounts = await _loadPreCounts(pool);
     final summary = {
       'schema_version': candidateQualitySchemaVersion,
-      'mode': dryRun ? 'dry_run' : 'apply',
+      'mode': dryRun
+          ? 'dry_run'
+          : pruneStaleOnly
+              ? 'prune_stale_only'
+              : 'apply',
       'started_at': startedAt.toIso8601String(),
       'finished_at': DateTime.now().toIso8601String(),
       'db_mutations': applied,
       'artifact_dir': artifactDir.path,
+      'prune_target': pruneTarget,
+      'max_prune': maxPrune,
       'pre_counts': preCounts,
       'post_counts': postCounts,
       'cards_scanned': cards.length,
@@ -178,6 +260,7 @@ Future<void> main(List<String> args) async {
       'pruned_stale_role_scores': prunedStaleRoleScores,
       'pruned_stale_commander_synergies': prunedStaleSynergies,
       'pruned_stale_rejection_penalties': prunedStalePenalties,
+      'pruned_rows': prunedRows,
       'tag_counts': _countBy(tagRows, 'tag'),
       'role_counts': _countBy(roleRows, 'role'),
       'budget_tier_counts': _countBy(roleRows, 'budget_tier'),
@@ -220,7 +303,9 @@ Future<void> main(List<String> args) async {
 
     stdout.writeln(apply
         ? '[OK] Candidate quality foundation aplicada.'
-        : '[OK] Candidate quality foundation dry-run concluido.');
+        : pruneStaleOnly
+            ? '[OK] Candidate quality stale prune concluido.'
+            : '[OK] Candidate quality foundation dry-run concluido.');
     stdout.writeln('  - Artefatos: ${artifactDir.path}');
     stdout.writeln('  - Cards escaneadas: ${cards.length}');
     stdout.writeln('  - Tags planejadas: ${tagRows.length}');
@@ -234,16 +319,20 @@ Future<void> main(List<String> args) async {
 
 void _printUsage() {
   stdout.writeln('''
-candidate_quality_data_foundation.dart - Base segura para candidatos aggressive optimize
+  candidate_quality_data_foundation.dart - Base segura para candidatos aggressive optimize
 
 Uso:
   dart run bin/candidate_quality_data_foundation.dart --dry-run
   dart run bin/candidate_quality_data_foundation.dart --apply
+  dart run bin/candidate_quality_data_foundation.dart --prune-stale-only --target=card_role_scores --max-prune=1
   dart run bin/candidate_quality_data_foundation.dart --dry-run --artifact-dir=test/artifacts/acqv2
 
 Opcoes:
   --dry-run                    Gera cobertura/artefatos sem alterar banco (default)
   --apply                      Cria schema aditivo e faz upsert idempotente
+  --prune-stale-only           Remove somente stale generated rows do target explicitado
+  --target=<table>             Target do prune-only; atualmente card_role_scores
+  --max-prune=<N>              Limite de rows deletaveis no prune-only (default: 1)
   --artifact-dir=<path>        Diretorio de artefatos
   --min-synergy-evidence=<N>   Minimo de ocorrencias por commander/card (default: 2)
   --max-synergy-rows=<N>       Limite de rows de synergy a materializar (default: 5000)
@@ -933,7 +1022,7 @@ ON CONFLICT (
   return count;
 }
 
-Future<Map<String, int>> _countStaleGeneratedRows({
+Future<Map<String, List<Map<String, dynamic>>>> _loadStaleGeneratedRows({
   required Pool pool,
   required List<Map<String, dynamic>> tagRows,
   required List<Map<String, dynamic>> roleRows,
@@ -941,21 +1030,35 @@ Future<Map<String, int>> _countStaleGeneratedRows({
   required List<Map<String, dynamic>> penaltyRows,
 }) async {
   return {
-    'card_function_tags': await _countStaleFunctionTags(pool, tagRows),
-    'card_role_scores': await _countStaleRoleScores(pool, roleRows),
+    'card_function_tags': await _loadStaleFunctionTags(pool, tagRows),
+    'card_role_scores': await _loadStaleRoleScores(pool, roleRows),
     'commander_card_synergy':
-        await _countStaleCommanderSynergies(pool, synergyRows),
+        await _loadStaleCommanderSynergies(pool, synergyRows),
     'optimize_rejection_penalties':
-        await _countStaleRejectionPenalties(pool, penaltyRows),
+        await _loadStaleRejectionPenalties(pool, penaltyRows),
   };
 }
 
-Future<int> _countStaleFunctionTags(
-  Pool pool,
+List<Map<String, dynamic>> _flattenStaleGeneratedRows(
+  Map<String, List<Map<String, dynamic>>> rowsByTable,
+) {
+  final rows = <Map<String, dynamic>>[];
+  for (final entry in rowsByTable.entries) {
+    for (final row in entry.value) {
+      rows.add({'table': entry.key, ...row});
+    }
+  }
+  return rows;
+}
+
+Future<List<Map<String, dynamic>>> _loadStaleFunctionTags(
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty || !await _hasTable(pool, 'card_function_tags')) return 0;
-  final result = await pool.execute(
+  if (rows.isEmpty || !await _hasTable(session, 'card_function_tags')) {
+    return const [];
+  }
+  final result = await session.execute(
     Sql.named('''
 WITH planned AS (
   SELECT *
@@ -964,7 +1067,14 @@ WITH planned AS (
     tag text
   )
 )
-SELECT COUNT(*)::int
+SELECT
+  existing.card_id::text,
+  existing.card_name,
+  existing.tag,
+  existing.confidence,
+  existing.source,
+  existing.evidence,
+  existing.updated_at
 FROM card_function_tags existing
 WHERE existing.source = @source
   AND NOT EXISTS (
@@ -973,21 +1083,24 @@ WHERE existing.source = @source
     WHERE existing.card_id = p.card_id::uuid
       AND existing.tag = p.tag
   )
+ORDER BY existing.card_name, existing.tag
 '''),
     parameters: {
       'rows': jsonEncode(rows),
       'source': _heuristicSource,
     },
   );
-  return (result.first[0] as int?) ?? 0;
+  return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
 
-Future<int> _countStaleRoleScores(
-  Pool pool,
+Future<List<Map<String, dynamic>>> _loadStaleRoleScores(
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty || !await _hasTable(pool, 'card_role_scores')) return 0;
-  final result = await pool.execute(
+  if (rows.isEmpty || !await _hasTable(session, 'card_role_scores')) {
+    return const [];
+  }
+  final result = await session.execute(
     Sql.named('''
 WITH planned AS (
   SELECT *
@@ -999,7 +1112,18 @@ WITH planned AS (
     bracket_scope text
   )
 )
-SELECT COUNT(*)::int
+SELECT
+  existing.card_id::text,
+  existing.card_name,
+  existing.role,
+  existing.score,
+  existing.format,
+  existing.subformat,
+  existing.bracket_scope,
+  existing.budget_tier,
+  existing.source,
+  existing.evidence,
+  existing.updated_at
 FROM card_role_scores existing
 WHERE existing.source = @source
   AND NOT EXISTS (
@@ -1011,23 +1135,24 @@ WHERE existing.source = @source
       AND existing.subformat = p.subformat
       AND existing.bracket_scope = p.bracket_scope
   )
+ORDER BY existing.card_name, existing.role, existing.bracket_scope
 '''),
     parameters: {
       'rows': jsonEncode(rows),
       'source': _heuristicSource,
     },
   );
-  return (result.first[0] as int?) ?? 0;
+  return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
 
-Future<int> _countStaleCommanderSynergies(
-  Pool pool,
+Future<List<Map<String, dynamic>>> _loadStaleCommanderSynergies(
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty || !await _hasTable(pool, 'commander_card_synergy')) {
-    return 0;
+  if (rows.isEmpty || !await _hasTable(session, 'commander_card_synergy')) {
+    return const [];
   }
-  final result = await pool.execute(
+  final result = await session.execute(
     Sql.named('''
 WITH planned AS (
   SELECT *
@@ -1037,7 +1162,17 @@ WITH planned AS (
     role text
   )
 )
-SELECT COUNT(*)::int
+SELECT
+  existing.commander_name_normalized,
+  existing.commander_name,
+  existing.card_id::text,
+  existing.card_name,
+  existing.role,
+  existing.score,
+  existing.source,
+  existing.evidence_count,
+  existing.evidence,
+  existing.updated_at
 FROM commander_card_synergy existing
 WHERE existing.source = @source
   AND NOT EXISTS (
@@ -1047,23 +1182,25 @@ WHERE existing.source = @source
       AND existing.card_id = p.card_id::uuid
       AND existing.role = p.role
   )
+ORDER BY existing.commander_name, existing.card_name, existing.role
 '''),
     parameters: {
       'rows': jsonEncode(rows),
       'source': _metaSynergySource,
     },
   );
-  return (result.first[0] as int?) ?? 0;
+  return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
 
-Future<int> _countStaleRejectionPenalties(
-  Pool pool,
+Future<List<Map<String, dynamic>>> _loadStaleRejectionPenalties(
+  Session session,
   List<Map<String, dynamic>> rows,
 ) async {
-  if (rows.isEmpty || !await _hasTable(pool, 'optimize_rejection_penalties')) {
-    return 0;
+  if (rows.isEmpty ||
+      !await _hasTable(session, 'optimize_rejection_penalties')) {
+    return const [];
   }
-  final result = await pool.execute(
+  final result = await session.execute(
     Sql.named('''
 WITH planned AS (
   SELECT *
@@ -1074,7 +1211,18 @@ WITH planned AS (
     function text
   )
 )
-SELECT COUNT(*)::int
+SELECT
+  existing.card_name_normalized,
+  existing.card_name,
+  existing.commander_name_normalized,
+  existing.commander_name,
+  existing.archetype,
+  existing.function,
+  existing.penalty,
+  existing.reject_count,
+  existing.source,
+  existing.evidence,
+  existing.updated_at
 FROM optimize_rejection_penalties existing
 WHERE existing.source = @source
   AND NOT EXISTS (
@@ -1085,13 +1233,14 @@ WHERE existing.source = @source
       AND existing.archetype = p.archetype
       AND existing.function = p.function
   )
+ORDER BY existing.card_name, existing.commander_name, existing.archetype
 '''),
     parameters: {
       'rows': jsonEncode(rows),
       'source': _rejectionPenaltySource,
     },
   );
-  return (result.first[0] as int?) ?? 0;
+  return result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
 }
 
 Future<int> _pruneStaleFunctionTags(
@@ -1127,6 +1276,98 @@ SELECT COUNT(*)::int FROM deleted
     },
   );
   return (result.first[0] as int?) ?? 0;
+}
+
+Future<List<Map<String, dynamic>>> _pruneStaleRoleScoresWithGuard({
+  required Pool pool,
+  required List<Map<String, dynamic>> roleRows,
+  required List<Map<String, dynamic>> expectedRows,
+  required int maxPrune,
+}) async {
+  if (!await _hasTable(pool, 'card_role_scores')) {
+    throw StateError(
+      'Prune abortado: tabela card_role_scores nao existe.',
+    );
+  }
+  final expectedKeys = _roleScoreKeys(expectedRows);
+  if (expectedRows.length > maxPrune) {
+    throw StateError(
+      'Prune abortado: ${expectedRows.length} stale card_role_scores excede '
+      '--max-prune=$maxPrune.',
+    );
+  }
+
+  return pool.runTx((session) async {
+    final actualRows = await _loadStaleRoleScores(session, roleRows);
+    final actualKeys = _roleScoreKeys(actualRows);
+    if (!_sameStringSet(expectedKeys, actualKeys)) {
+      throw StateError(
+        'Prune abortado: stale card_role_scores mudou entre dry-run e '
+        'transacao.',
+      );
+    }
+    if (actualRows.length > maxPrune) {
+      throw StateError(
+        'Prune abortado: ${actualRows.length} stale card_role_scores excede '
+        '--max-prune=$maxPrune.',
+      );
+    }
+    if (actualRows.isEmpty) return const <Map<String, dynamic>>[];
+
+    final result = await session.execute(
+      Sql.named('''
+WITH planned AS (
+  SELECT *
+  FROM jsonb_to_recordset(@rows::jsonb) AS x(
+    card_id text,
+    role text,
+    format text,
+    subformat text,
+    bracket_scope text
+  )
+),
+deleted AS (
+  DELETE FROM card_role_scores existing
+  WHERE existing.source = @source
+    AND NOT EXISTS (
+      SELECT 1
+      FROM planned p
+      WHERE existing.card_id = p.card_id::uuid
+        AND existing.role = p.role
+        AND existing.format = p.format
+        AND existing.subformat = p.subformat
+        AND existing.bracket_scope = p.bracket_scope
+    )
+  RETURNING
+    existing.card_id::text,
+    existing.card_name,
+    existing.role,
+    existing.score,
+    existing.format,
+    existing.subformat,
+    existing.bracket_scope,
+    existing.budget_tier,
+    existing.source,
+    existing.evidence,
+    existing.updated_at
+)
+SELECT * FROM deleted
+'''),
+      parameters: {
+        'rows': jsonEncode(roleRows),
+        'source': _heuristicSource,
+      },
+    );
+    final deletedRows =
+        result.map((row) => _jsonSafeMap(row.toColumnMap())).toList();
+    final deletedKeys = _roleScoreKeys(deletedRows);
+    if (!_sameStringSet(actualKeys, deletedKeys)) {
+      throw StateError(
+        'Prune abortado: deleted card_role_scores diverge do preview.',
+      );
+    }
+    return deletedRows;
+  });
 }
 
 Future<int> _pruneStaleRoleScores(
@@ -1256,8 +1497,8 @@ Iterable<List<Map<String, dynamic>>> _batches(
   }
 }
 
-Future<bool> _hasTable(Pool pool, String tableName) async {
-  final result = await pool.execute(
+Future<bool> _hasTable(Session session, String tableName) async {
+  final result = await session.execute(
     Sql.named('SELECT to_regclass(@name)::text'),
     parameters: {'name': 'public.$tableName'},
   );
@@ -1274,6 +1515,33 @@ Map<String, int> _countBy(List<Map<String, dynamic>> rows, String key) {
   return Map.fromEntries(
     counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value)),
   );
+}
+
+Set<String> _roleScoreKeys(List<Map<String, dynamic>> rows) {
+  return rows
+      .map((row) => [
+            row['card_id'],
+            row['role'],
+            row['format'],
+            row['subformat'],
+            row['bracket_scope'],
+            row['source'],
+          ].map((value) => value?.toString() ?? '').join('|'))
+      .toSet();
+}
+
+bool _sameStringSet(Set<String> a, Set<String> b) {
+  return a.length == b.length && a.containsAll(b);
+}
+
+Map<String, dynamic> _jsonSafeMap(Map<String, dynamic> row) {
+  return row.map((key, value) => MapEntry(key, _jsonSafeValue(value)));
+}
+
+Object? _jsonSafeValue(Object? value) {
+  if (value is DateTime) return value.toIso8601String();
+  if (value is List) return value.map(_jsonSafeValue).toList();
+  return value;
 }
 
 String? _readArg(List<String> args, String prefix) {
@@ -1332,6 +1600,10 @@ Future<void> _writeSummaryMarkdown(
     ..writeln(
       '- Rejection penalty rows planned: `${summary['rejection_penalty_rows_planned']}`',
     )
+    ..writeln('- Stale generated rows before apply/prune: '
+        '`${summary['stale_generated_rows_before_apply']}`')
+    ..writeln('- Pruned stale role scores: '
+        '`${summary['pruned_stale_role_scores']}`')
     ..writeln()
     ..writeln('## Guardrails')
     ..writeln()

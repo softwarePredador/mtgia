@@ -2,6 +2,55 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Release data readiness follow-up: sets casing + candidate stale row
+
+### O Porquê
+- O release data readiness estava **PASS WITH RISKS** por dois riscos nao
+  bloqueantes: 82 grupos duplicados por casing em `sets.code` e 1 row stale
+  gerada em `card_role_scores`.
+- Era necessario decidir entre saneamento imediato e backlog tecnico sem executar
+  updates/deletes destrutivos sem dry-run, sem expor secrets e sem enfraquecer
+  legalidade Commander, identidade de cor, bracket ou quality gate.
+
+### O Como
+- Branch `master` sincronizada com `origin/master` por `git pull --ff-only`, sem
+  mudancas locais pre-existentes.
+- `bin/mtg_data_integrity.dart` foi executado em dry-run no artifact dir
+  `server/test/artifacts/release_data_readiness_2026-05-06/follow_up_mtg_data_integrity_dry_run`.
+- A duplicidade de `sets.code` foi mantida como backlog tecnico porque variantes
+  lowercase ainda sao referenciadas por `cards.set_code`; as rotas `/sets` e
+  `/cards` ja filtram/deduplicam com comparacao case-insensitive.
+- `bin/candidate_quality_data_foundation.dart` ganhou preview
+  `stale_generated_rows_preview.json/csv` e modo guardado
+  `--prune-stale-only --target=card_role_scores --max-prune=N`.
+- O prune-only nao executa upserts, reconsulta as chaves stale dentro da
+  transacao e aborta se o conjunto divergir do preview ou exceder o limite.
+
+### Resultado
+- **PASS WITH RISKS.**
+- `cards.color_identity IS NULL = 0`; nulls recentes/futuros = 0.
+- `sets.code`: 82 grupos `LOWER(code)` e 164 variantes seguem como backlog
+  tecnico, com query-level dedupe provado.
+- `card_role_scores`: 1 row stale de `source='deterministic_heuristic_v1'` foi
+  removida com prune-only; contagem 31.898 -> 31.897; post dry-run stale = 0.
+- Reexecucao prune-only de idempotencia removeu 0 rows e registrou
+  `db_mutations=false`.
+- Nenhuma alteracao em `cards`, `sets`, `card_legalities`, legalidade Commander,
+  identidade de cor, bracket, rotas app-facing ou dados source-of-truth.
+- API contracts nao precisaram mudar; `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  foi consultado e permaneceu inalterado.
+- Relatorios:
+  `server/doc/RELEASE_DATA_READINESS_2026-05-06.md`,
+  `server/doc/RELATORIO_MTG_DATA_INTEGRITY_2026-05-06.md` e
+  `server/doc/RELATORIO_AGGRESSIVE_CANDIDATE_QUALITY_V2_2026-05-06.md`.
+
+### Validacao executada
+- `cd server && dart analyze bin lib routes/cards routes/sets test`: PASS.
+- `cd server && dart test test/sets_route_test.dart test/cards_route_test.dart test/candidate_quality_data_support_test.dart -r expanded`: PASS, `+11`.
+- Backend local `PORT=8082 dart run .dart_frog/server.dart`:
+  `/sets?code=soc&limit=10&page=1`, `/cards?set=SOC&limit=3&page=1` e
+  `/cards?set=ECC&limit=3&page=1` responderam com dados esperados.
+
 ## 2026-05-06 — Firebase/Sentry release observability readiness
 
 ### O Porquê
