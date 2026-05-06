@@ -2,6 +2,42 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-06 — Firebase FCM fisico bloqueado por provisioning Apple
+
+### O Porquê
+- Depois de mitigar a tela branca no iPhone fisico, era necessario verificar
+  Firebase/FCM/APNs real no device.
+- O bundle do Firebase iOS (`GoogleService-Info.plist`) bate com o app:
+  `com.mtgia.mtgApp`.
+- Sem Push Notifications capability, FCM fisico/APNs nao pode ser considerado
+  provado.
+
+### O Como
+- Foram adicionados:
+  - `app/ios/Runner/Runner.entitlements` com `aps-environment`;
+  - capability Push Notifications no target Runner;
+  - Background Modes `remote-notification`;
+  - `APS_ENVIRONMENT=development` no Debug e `production` em Release/Profile.
+- Validações locais:
+  - `plutil -lint` em `Info.plist`, `GoogleService-Info.plist` e
+    `Runner.entitlements`: PASS.
+  - `flutter analyze lib/main.dart integration_test/fcm_staging_smoke_test.dart integration_test/release_observability_smoke_test.dart --no-version-check`: PASS.
+  - `flutter build ios --debug --no-codesign --no-version-check`: PASS.
+- Backend real `8082` respondeu health em `127.0.0.1` e `192.168.20.167`.
+
+### Resultado
+- `flutter run -t integration_test/fcm_staging_smoke_test.dart -d 00008130...`
+  falhou antes de abrir o app porque a Apple Personal Team/provisioning atual
+  nao suporta Push Notifications e o profile nao inclui `aps-environment`.
+- Classificacao: **BLOCKED BY APPLE PROVISIONING**, nao bug de app, Firebase
+  Dart, scanner, OCR ou backend.
+- Para fechar FCM fisico:
+  - usar Apple Developer Team paga;
+  - habilitar Push Notifications para o App ID `com.mtgia.mtgApp`;
+  - gerar/selecionar provisioning profile com `aps-environment`;
+  - configurar APNs key/certificado no Firebase Console;
+  - rerodar `fcm_staging_smoke_test.dart` no iPhone fisico.
+
 ## 2026-05-06 — iPhone fisico: mitigacao de tela branca no boot
 
 ### O Porquê

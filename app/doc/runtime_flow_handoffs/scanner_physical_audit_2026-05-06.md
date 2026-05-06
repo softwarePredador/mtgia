@@ -1,5 +1,53 @@
 # Scanner Physical Audit - 2026-05-06
 
+## Firebase physical push provisioning - 2026-05-06
+
+Verdict: `BLOCKED BY APPLE PROVISIONING`.
+
+The iOS Firebase config matches the app bundle id:
+
+- Firebase `BUNDLE_ID`: `com.mtgia.mtgApp`
+- Xcode `PRODUCT_BUNDLE_IDENTIFIER`: `com.mtgia.mtgApp`
+
+Project adjustments made for a real physical FCM proof:
+
+- Added `Runner.entitlements` with `aps-environment`.
+- Added Xcode Push Notifications capability.
+- Added Background Modes capability for `remote-notification`.
+- Kept `aps-environment=development` for Debug and `production` for
+  Release/Profile.
+
+Verification:
+
+- `plutil -lint` passed for `Info.plist`, `GoogleService-Info.plist` and
+  `Runner.entitlements`.
+- `flutter analyze lib/main.dart integration_test/fcm_staging_smoke_test.dart integration_test/release_observability_smoke_test.dart --no-version-check`: PASS.
+- `flutter build ios --debug --no-codesign --no-version-check`: PASS.
+- Backend `8082` health passed on loopback and LAN IP.
+
+Physical smoke attempt:
+
+```bash
+cd app
+flutter run -t integration_test/fcm_staging_smoke_test.dart \
+  -d 00008130-001C152922BA001C \
+  --debug \
+  --publish-port \
+  --dart-define=API_BASE_URL=http://192.168.20.167:8082 \
+  --dart-define=PUBLIC_API_BASE_URL=http://192.168.20.167:8082 \
+  --no-version-check
+```
+
+Result: build failed before app launch because the current Apple Personal Team
+profile does not support Push Notifications and does not include the
+`aps-environment` entitlement. This is an Apple provisioning blocker, not an app
+runtime crash and not a scanner/OCR failure.
+
+Next requirement: use a paid Apple Developer Team/provisioning profile with Push
+Notifications enabled for `com.mtgia.mtgApp`, register the physical device in
+that team, and configure APNs key/certificate in Firebase Console. Then rerun
+`fcm_staging_smoke_test.dart` on the physical iPhone.
+
 ## Follow-up boot fix - 2026-05-06 14:20 -0300
 
 Verdict for the white-screen blocker: `FIXED FOR BOOT / SCANNER STILL NOT PROVEN`.
