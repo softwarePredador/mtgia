@@ -140,6 +140,40 @@ Remaining scanner status:
 - The app is ready for the manual scanner run; terminal cannot operate the
   physical camera/card positioning.
 
+## Physical scanner live attempt - 2026-05-06 15:35 -0300
+
+Verdict: `CAMERA/OCR RUNTIME PARTIAL PASS / SCANNER QUALITY RISK`.
+
+The physical app stayed attached to `flutter run` and the user interacted with
+the device:
+
+- Register/login against the public backend succeeded.
+- Home, Collection and Decks loaded against the public backend.
+- Scanner opened the physical camera and started live stream.
+- MLKit/TensorFlow Lite initialized on the physical iPhone.
+- `/cards/printings` calls used the public backend.
+
+Observed scanner behavior:
+
+- OCR read substantial non-card text from the environment/package:
+  `Pedido`, `Destinatário`, address-like fragments and timestamps.
+- The scanner eventually confirmed `Turtle-Duck` with collector-like noise
+  (`#01`, language/set fragments).
+- Backend lookup for `Turtle-Duck` returned valid card rows, so this was not a
+  backend 404. It is a live OCR/framing/filtering quality risk.
+- No crash, white screen, camera permission blocker, 4xx/5xx, or raw exception
+  appeared in the captured app log.
+
+Current status:
+
+- Physical camera/OCR path is no longer completely untested.
+- It is still **not ready to close as PASS** because the attempt showed a false
+  positive candidate when off-card text entered the ROI.
+- Next scanner patch should harden confirmation against external text:
+  require stronger title-zone confidence, suppress order/address words before
+  candidate confirmation, and avoid confirming a backend-valid card if the
+  OCR evidence is dominated by non-card regions.
+
 ## Verdict
 
 `BLOCKED / NOT PROVEN` for physical scanner camera/OCR release closure.

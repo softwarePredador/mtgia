@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai_generate_job.dart';
+import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -697,18 +698,12 @@ Future<void> _processAiGenerateAsyncJob({
 }
 
 Uri _resolveInternalGenerateUrl(Request request) {
-  final configured = Platform.environment['AI_GENERATE_INTERNAL_BASE_URL'];
-  if (configured != null && configured.trim().isNotEmpty) {
-    final base = configured.trim().replaceFirst(RegExp(r'/$'), '');
-    return Uri.parse('$base/ai/generate');
-  }
-
-  final host = request.headers['host']?.trim();
-  final fallbackPort = Platform.environment['PORT']?.trim();
-  final resolvedHost = host != null && host.isNotEmpty
-      ? host
-      : '127.0.0.1:${fallbackPort?.isNotEmpty == true ? fallbackPort : '8080'}';
-  return Uri.parse('http://$resolvedHost/ai/generate');
+  return resolveAiGenerateInternalUrl(
+    headers: request.headers,
+    requestUri: request.uri,
+    configuredBaseUrl: Platform.environment['AI_GENERATE_INTERNAL_BASE_URL'],
+    fallbackPort: Platform.environment['PORT']?.trim(),
+  );
 }
 
 Future<Map<String, dynamic>> _buildMockGenerateResponse({

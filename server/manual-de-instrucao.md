@@ -33,6 +33,38 @@
 - Handoff atualizado:
   `app/doc/runtime_flow_handoffs/scanner_physical_audit_2026-05-06.md`.
 
+## 2026-05-06 — QA público com usuário de teste e correção de AI Generate async
+
+### O Porquê
+- A bateria pública com o usuário de QA validou a maioria dos contratos, mas
+  `POST /ai/generate async=true` retornava `202` e falhava no primeiro polling.
+- A causa era a URL de self-call interna: em produção, o backend montava
+  `http://<host>/ai/generate`; atrás do proxy HTTPS isso podia retornar
+  redirect/HTML em vez do JSON esperado pelo job.
+
+### O Como
+- Foi criado `server/lib/ai_generate_internal_url_support.dart`.
+- A resolução da URL interna agora usa, nesta ordem:
+  - `AI_GENERATE_INTERNAL_BASE_URL`, quando configurado;
+  - `x-forwarded-proto` + `Host`, quando atrás de proxy;
+  - scheme da request;
+  - fallback local `127.0.0.1:${PORT}`.
+- Teste novo cobre base configurada, proxy HTTPS, desenvolvimento HTTP local e
+  fallback sem host.
+
+### Resultado
+- Corrige o caso em que o job async recebia resposta inválida do executor
+  interno.
+- A bateria pública também provou:
+  - login/auth/profile;
+  - Sets/Cards;
+  - Scanner backend para `Phyrexian Horror` token-safe;
+  - Binder add/list/update/cleanup;
+  - Deck create/detail/validate/export/cleanup;
+  - Marketplace/Trades/Notifications/Conversations list.
+- `GET /community/users` sem `q` retorna `400` por contrato; com `q` retorna
+  `200`.
+
 ## 2026-05-06 — Firebase FCM fisico bloqueado por provisioning Apple
 
 ### O Porquê
