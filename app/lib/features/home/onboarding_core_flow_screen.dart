@@ -140,7 +140,8 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                         icon: const Icon(Icons.auto_awesome),
                         label: const Text('Gerar com IA'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.manaViolet,
+                          backgroundColor: AppTheme.frost400,
+                          foregroundColor: AppTheme.backgroundAbyss,
                         ),
                       ),
                     ),
@@ -219,11 +220,11 @@ class _StepCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 12,
-                backgroundColor: AppTheme.manaViolet,
+                backgroundColor: AppTheme.brass500,
                 child: Text(
                   step,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.backgroundAbyss,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),

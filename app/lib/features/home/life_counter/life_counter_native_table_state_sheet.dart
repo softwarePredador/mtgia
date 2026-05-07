@@ -13,9 +13,7 @@ Future<LifeCounterSession?> showLifeCounterNativeTableStateSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return _LifeCounterNativeTableStateSheet(
-        initialSession: initialSession,
-      );
+      return _LifeCounterNativeTableStateSheet(initialSession: initialSession);
     },
   );
 }
@@ -251,8 +249,8 @@ class _LifeCounterNativeTableStateSheetState
                           ),
                           onPressed: _apply,
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),
@@ -345,22 +343,19 @@ class _TokenAssignmentSection extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: List<Widget>.generate(
-            playerCount,
-            (index) {
-              final isAvailable = isPlayerAvailable(index);
-              return ChoiceChip(
-                key: Key('$keyPrefix-player-$index'),
-                label: Text(
-                  isAvailable
-                      ? 'Player ${index + 1}'
-                      : 'Player ${index + 1} (out)',
-                ),
-                selected: selectedPlayer == index,
-                onSelected: isAvailable ? (_) => onPlayerSelected(index) : null,
-              );
-            },
-          ),
+          children: List<Widget>.generate(playerCount, (index) {
+            final isAvailable = isPlayerAvailable(index);
+            return ChoiceChip(
+              key: Key('$keyPrefix-player-$index'),
+              label: Text(
+                isAvailable
+                    ? 'Player ${index + 1}'
+                    : 'Player ${index + 1} (out)',
+              ),
+              selected: selectedPlayer == index,
+              onSelected: isAvailable ? (_) => onPlayerSelected(index) : null,
+            );
+          }),
         ),
         const SizedBox(height: 12),
         TextButton.icon(

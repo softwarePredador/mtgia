@@ -295,10 +295,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           unselectedLabelColor: AppTheme.textSecondary,
           tabs: const [
             Tab(icon: Icon(Icons.style_outlined), text: 'Cartas'),
-            Tab(
-              icon: Icon(Icons.auto_awesome_mosaic_outlined),
-              text: 'Coleções',
-            ),
+            Tab(icon: Icon(Icons.grid_view_rounded), text: 'Coleções'),
           ],
         ),
       ),

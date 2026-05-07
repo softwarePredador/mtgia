@@ -13,17 +13,13 @@ Future<LifeCounterSettings?> showLifeCounterNativeSettingsSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return _LifeCounterNativeSettingsSheet(
-        initialSettings: initialSettings,
-      );
+      return _LifeCounterNativeSettingsSheet(initialSettings: initialSettings);
     },
   );
 }
 
 class _LifeCounterNativeSettingsSheet extends StatefulWidget {
-  const _LifeCounterNativeSettingsSheet({
-    required this.initialSettings,
-  });
+  const _LifeCounterNativeSettingsSheet({required this.initialSettings});
 
   final LifeCounterSettings initialSettings;
 
@@ -153,7 +149,9 @@ class _LifeCounterNativeSettingsSheetState
                           onPressed: () => Navigator.of(context).pop(),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppTheme.textSecondary,
-                            side: const BorderSide(color: AppTheme.outlineMuted),
+                            side: const BorderSide(
+                              color: AppTheme.outlineMuted,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Cancel'),
@@ -165,8 +163,8 @@ class _LifeCounterNativeSettingsSheetState
                           key: const Key('life-counter-native-settings-save'),
                           onPressed: () => Navigator.of(context).pop(_settings),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),
@@ -183,10 +181,7 @@ class _LifeCounterNativeSettingsSheetState
     );
   }
 
-  void _handleToggleChanged(
-    LifeCounterSettingFieldId id,
-    bool value,
-  ) {
+  void _handleToggleChanged(LifeCounterSettingFieldId id, bool value) {
     setState(() {
       switch (id) {
         case LifeCounterSettingFieldId.autoKill:
@@ -238,10 +233,7 @@ class _LifeCounterNativeSettingsSheetState
     });
   }
 
-  void _handleNumberChanged(
-    LifeCounterSettingFieldId id,
-    String value,
-  ) {
+  void _handleNumberChanged(LifeCounterSettingFieldId id, String value) {
     final parsed = int.tryParse(value);
     if (parsed == null) {
       return;
@@ -259,10 +251,7 @@ class _LifeCounterNativeSettingsSheetState
     });
   }
 
-  void _handleTextChanged(
-    LifeCounterSettingFieldId id,
-    String value,
-  ) {
+  void _handleTextChanged(LifeCounterSettingFieldId id, String value) {
     setState(() {
       switch (id) {
         case LifeCounterSettingFieldId.whitelabelIcon:
@@ -289,12 +278,10 @@ class _SettingsSection extends StatelessWidget {
   final LifeCounterSettingsSection section;
   final TextEditingController customLongTapController;
   final TextEditingController whitelabelIconController;
-  final void Function(LifeCounterSettingFieldId id, bool value)
-      onToggleChanged;
+  final void Function(LifeCounterSettingFieldId id, bool value) onToggleChanged;
   final void Function(LifeCounterSettingFieldId id, String value)
-      onNumberChanged;
-  final void Function(LifeCounterSettingFieldId id, String value)
-      onTextChanged;
+  onNumberChanged;
+  final void Function(LifeCounterSettingFieldId id, String value) onTextChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -347,12 +334,10 @@ class _SettingEntryTile extends StatelessWidget {
   final LifeCounterSettingEntry entry;
   final TextEditingController customLongTapController;
   final TextEditingController whitelabelIconController;
-  final void Function(LifeCounterSettingFieldId id, bool value)
-      onToggleChanged;
+  final void Function(LifeCounterSettingFieldId id, bool value) onToggleChanged;
   final void Function(LifeCounterSettingFieldId id, String value)
-      onNumberChanged;
-  final void Function(LifeCounterSettingFieldId id, String value)
-      onTextChanged;
+  onNumberChanged;
+  final void Function(LifeCounterSettingFieldId id, String value) onTextChanged;
 
   @override
   Widget build(BuildContext context) {

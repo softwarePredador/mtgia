@@ -84,7 +84,9 @@ class _LifeCounterNativePlayerAppearanceSheet extends StatefulWidget {
     LifeCounterPlayerAppearance appearance,
   )?
   onSaveProfilePressed;
-  final Future<List<LifeCounterPlayerAppearanceProfile>> Function(String profileId)?
+  final Future<List<LifeCounterPlayerAppearanceProfile>> Function(
+    String profileId,
+  )?
   onDeleteProfilePressed;
   final void Function(
     LifeCounterPlayerAppearanceProfile profile,
@@ -121,9 +123,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
     );
     playerAppearances[_targetPlayerIndex] = _draftAppearance;
 
-    return widget.initialSession.copyWith(
-      playerAppearances: playerAppearances,
-    );
+    return widget.initialSession.copyWith(playerAppearances: playerAppearances);
   }
 
   @override
@@ -323,7 +323,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
       widget.onExportPressed != null || widget.onImportSubmitted != null;
 
   bool get _supportsProfiles =>
-      widget.onSaveProfilePressed != null || widget.onDeleteProfilePressed != null;
+      widget.onSaveProfilePressed != null ||
+      widget.onDeleteProfilePressed != null;
 
   bool get _hasPartnerImage =>
       widget.initialSession.partnerCommanders[_targetPlayerIndex] &&
@@ -499,7 +500,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                     children: [
                       _SectionCard(
                         title: 'Target Player',
-                        subtitle: 'Choose which player appearance you want to edit.',
+                        subtitle:
+                            'Choose which player appearance you want to edit.',
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -676,8 +678,8 @@ class _LifeCounterNativePlayerAppearanceSheetState
                             Navigator.of(context).pop(_buildUpdatedSession());
                           },
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: AppTheme.textPrimary,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),
@@ -843,10 +845,7 @@ class _BackgroundPreview extends StatelessWidget {
                 foreground: foreground,
               ),
               if (hasMainImage)
-                _PreviewBadge(
-                  label: 'Main image kept',
-                  foreground: foreground,
-                ),
+                _PreviewBadge(label: 'Main image kept', foreground: foreground),
               if (hasPartnerImage)
                 _PreviewBadge(
                   label: 'Partner image kept',
@@ -1075,8 +1074,7 @@ String? _normalizeHexColor(String raw) {
     return null;
   }
 
-  final withHash =
-      normalized.startsWith('#') ? normalized : '#$normalized';
+  final withHash = normalized.startsWith('#') ? normalized : '#$normalized';
   final isValid = RegExp(r'^#[0-9A-F]{6}$').hasMatch(withHash);
   return isValid ? withHash : null;
 }

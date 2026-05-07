@@ -9,9 +9,7 @@ class LotusLoadingOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Positioned.fill(
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: AppTheme.heroGradient,
-        ),
+        decoration: BoxDecoration(gradient: AppTheme.heroGradient),
         child: Center(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 28),
@@ -121,8 +119,8 @@ class LotusErrorOverlay extends StatelessWidget {
                         child: FilledButton(
                           onPressed: onRetry,
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(

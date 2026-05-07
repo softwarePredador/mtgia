@@ -163,8 +163,8 @@ class _LifeCounterNativeDayNightSheetState
                               context,
                             ).pop(LifeCounterDayNightState(isNight: _isNight)),
                         style: FilledButton.styleFrom(
-                          backgroundColor: AppTheme.manaViolet,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppTheme.brass500,
+                          foregroundColor: AppTheme.backgroundAbyss,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         child: const Text('Apply'),

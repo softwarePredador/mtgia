@@ -2,6 +2,34 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — Auditoria visual Android SM A135M sem Scanner
+
+### O Porquê
+- Foi solicitada auditoria visual/UX no Android fisico `SM A135M`
+  (`R58T300SREH`) contra o backend publico, com login real e Scanner/camera/OCR
+  totalmente fora de escopo.
+- O foco era corrigir apenas drift visual seguro: semantica de icones, contraste
+  de CTA, densidade de tabs e aderencia a Obsidian/Brass/Frost Blue.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; backend publico `/health`
+  respondeu `healthy`.
+- App autenticou com conta QA descartavel sem documentar senha, token, JWT ou
+  payload sensivel.
+- Foram executados harnesses Android para captura visual non-scanner, Sets/Search,
+  Binder/Marketplace/Trades/Messages/Notifications e Life Counter shell.
+- Patches ficaram restritos ao app visual: icone de Colecoes, tabs rolaveis na
+  Collection, CTAs Brass/Obsidian em Life Counter/Lotus e CTA de IA em Frost Blue
+  no onboarding.
+
+### Resultado
+- Classificacao: `PASS WITH RISKS`.
+- Riscos: PNGs de screenshot nao foram persistidos nesta rodada e o rerun fresco
+  de Optimize/Validate bloqueou antes do fluxo, embora haja prova historica do
+  mesmo dia/device.
+- Relatorio:
+  `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`.
+
 ## 2026-05-07 — QA runtime Android fisico SM A135M sem Scanner
 
 ### O Porquê

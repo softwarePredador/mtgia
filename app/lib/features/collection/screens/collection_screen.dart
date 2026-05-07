@@ -51,7 +51,7 @@ class _CollectionScreenState extends State<CollectionScreen>
           IconButton(
             tooltip: 'Catálogo de coleções',
             onPressed: () => context.push('/collection/sets'),
-            icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+            icon: const Icon(Icons.grid_view_rounded),
           ),
           IconButton(
             tooltip: 'Última edição',
@@ -62,6 +62,8 @@ class _CollectionScreenState extends State<CollectionScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 14),
           dividerColor: Colors.transparent,
           indicatorColor: AppTheme.frost400,
           labelColor: AppTheme.frost400,
@@ -78,7 +80,7 @@ class _CollectionScreenState extends State<CollectionScreen>
             Tab(icon: Icon(Icons.storefront, size: 20), text: 'Marketplace'),
             Tab(icon: Icon(Icons.swap_horiz, size: 20), text: 'Trades'),
             Tab(
-              icon: Icon(Icons.auto_awesome_mosaic_outlined, size: 20),
+              icon: Icon(Icons.grid_view_rounded, size: 20),
               text: 'Coleções',
             ),
           ],

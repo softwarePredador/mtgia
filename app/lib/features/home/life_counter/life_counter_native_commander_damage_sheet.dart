@@ -78,10 +78,11 @@ class _LifeCounterNativeCommanderDamageSheetState
       playerIndex: _targetPlayerIndex,
       playerLabelBuilder: _playerLabel,
     );
-    final lethalSources = LifeCounterTabletopEngine.commanderDamageLethalSources(
-      _draftSession,
-      targetPlayerIndex: _targetPlayerIndex,
-    );
+    final lethalSources =
+        LifeCounterTabletopEngine.commanderDamageLethalSources(
+          _draftSession,
+          targetPlayerIndex: _targetPlayerIndex,
+        );
     final lethalSummary = playerBoardSummary.commanderDamageLethalSummary;
     final playerStatusSummary = playerBoardSummary.statusSummary;
 
@@ -238,11 +239,10 @@ class _LifeCounterNativeCommanderDamageSheetState
                                         widget
                                             .initialSession
                                             .partnerCommanders[sourceIndex],
-                                    isLethal: LifeCounterTabletopEngine
-                                        .isCommanderDamageSourceLethal(
+                                    isLethal:
+                                        LifeCounterTabletopEngine.isCommanderDamageSourceLethal(
                                           _draftSession,
-                                          targetPlayerIndex:
-                                              _targetPlayerIndex,
+                                          targetPlayerIndex: _targetPlayerIndex,
                                           sourcePlayerIndex: sourceIndex,
                                         ),
                                     onCommanderOneIncrement:
@@ -306,8 +306,8 @@ class _LifeCounterNativeCommanderDamageSheetState
                                 context,
                               ).pop(_buildUpdatedSession()),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),

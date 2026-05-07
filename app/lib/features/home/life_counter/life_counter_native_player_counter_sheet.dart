@@ -70,12 +70,11 @@ class _LifeCounterNativePlayerCounterSheetState
     super.dispose();
   }
 
-  int get _currentValue =>
-      LifeCounterTabletopEngine.readCounterValue(
-        _draftSession,
-        playerIndex: _targetPlayerIndex,
-        counterKey: _selectedCounterKey,
-      );
+  int get _currentValue => LifeCounterTabletopEngine.readCounterValue(
+    _draftSession,
+    playerIndex: _targetPlayerIndex,
+    counterKey: _selectedCounterKey,
+  );
 
   int get _step => _isTaxCounter(_selectedCounterKey) ? 2 : 1;
 
@@ -528,8 +527,8 @@ class _LifeCounterNativePlayerCounterSheetState
                           onPressed:
                               () => Navigator.of(context).pop(_draftSession),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),
@@ -563,10 +562,7 @@ String _resolveInitialCounterKey(
   return _resolveFallbackCounterKey(session, playerIndex);
 }
 
-String _resolveFallbackCounterKey(
-  LifeCounterSession session,
-  int playerIndex,
-) {
+String _resolveFallbackCounterKey(LifeCounterSession session, int playerIndex) {
   final keys = _buildAvailableCounterKeys(session, playerIndex);
   return keys.isEmpty ? 'poison' : keys.first;
 }
@@ -581,8 +577,8 @@ List<String> _buildAvailableCounterKeys(
     keys.add('tax-2');
   }
 
-  final extraKeys = session.resolvedPlayerExtraCounters[playerIndex].keys.toList()
-    ..sort();
+  final extraKeys =
+      session.resolvedPlayerExtraCounters[playerIndex].keys.toList()..sort();
   for (final extraKey in extraKeys) {
     if (!keys.contains(extraKey)) {
       keys.add(extraKey);

@@ -251,8 +251,8 @@ class _LifeCounterNativeGameTimerSheetState
                           onPressed:
                               () => Navigator.of(context).pop(_draftState),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.manaViolet,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.brass500,
+                            foregroundColor: AppTheme.backgroundAbyss,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text('Apply'),
