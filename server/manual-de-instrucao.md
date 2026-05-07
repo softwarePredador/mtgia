@@ -2,6 +2,38 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — Auditoria visual iPhone 15 Simulator sem Scanner
+
+### O Porquê
+- Foi solicitada uma auditoria visual/densidade profunda no `iPhone 15
+  Simulator`, cobrindo todas as telas non-scanner com foco em design system,
+  paddings, cards, fontes, cores e poluicao visual.
+- Scanner/camera/OCR/MLKit scanner ficaram explicitamente fora de escopo.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; backend publico `/health`
+  respondeu `healthy` com
+  `git_sha=cbfea7356c5e84c51f7adce7ec4b7f7eae2a4a60`.
+- App autenticado real foi exercitado no iPhone 15 Simulator com contas QA
+  descartaveis, sem documentar senha, token, JWT, headers ou payloads sensiveis.
+- Foram executados harnesses non-scanner para app amplo, Sets/Search/Card
+  Detail/Set Detail, Binder dashboard, Marketplace/Trades/Messages/
+  Notifications, Generate async, Deck runtime Optimize/Validate e Life
+  Counter/Lotus.
+- Os PNGs de prova foram materializados em
+  `app/doc/runtime_flow_proofs_2026-05-07_iphone15_visual_density/`.
+
+### Resultado
+- Classificacao: `PASS WITH RISKS`.
+- Nao houve patch visual de runtime: nenhum P0/P1 visual deterministico foi
+  confirmado no iPhone 15.
+- Riscos remanescentes: `deck_runtime_m2006_test.dart` capturou o estado
+  `10_complete_validated`, mas falhou depois por assert textual; a captura ampla
+  de Generate ainda pode finalizar antes do preview, apesar do harness async
+  dedicado passar.
+- Relatorio:
+  `docs/qa/manaloom_visual_density_audit_iphone15_2026-05-07.md`.
+
 ## 2026-05-07 — Segunda passada design Android SM A135M sem Scanner
 
 ### O Porquê
