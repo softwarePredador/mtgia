@@ -1,5 +1,65 @@
 # Physical iPhone Non-Scanner QA - 2026-05-06
 
+## Follow-up Fix And Validation - 2026-05-06
+
+Verdict: `PASS FOR FIRST NON-SCANNER PHYSICAL HARNESS / FIREBASE ISOLATION FIXED`
+
+The blocker was revalidated after the Firebase/Sentry startup hardening. The app
+now supports a physical-device QA mode that disables Firebase startup completely:
+
+```bash
+--dart-define=DISABLE_FIREBASE_STARTUP=true
+```
+
+Code changes:
+
+- Sentry startup moved behind the first frame and no longer wraps or delays
+  `runApp`.
+- Firebase Push and Firebase Performance remain post-first-frame.
+- New QA flags:
+  - `DISABLE_FIREBASE_STARTUP=true`: skips Push and Performance startup.
+  - `DISABLE_PUSH_INIT=true`: skips only Firebase Messaging startup.
+  - `DISABLE_FIREBASE_PERFORMANCE_INIT=true`: skips only Performance startup.
+- `ApiClient` respects the Firebase disable flags and does not try to create
+  Firebase Performance HTTP metrics in isolated physical QA mode.
+
+Validation:
+
+- Public backend `/health`: `200`, `environment=production`,
+  `git_sha=1c89bb0e467fd422d84fa696e57a7f73d07618d3`.
+- `flutter analyze lib test integration_test --no-version-check`: PASS.
+- `flutter test test --no-version-check`: PASS, `549` tests.
+- Physical `flutter run` on `Rafa` with `DISABLE_FIREBASE_STARTUP=true`:
+  reached `/login` and exposed Dart VM Service.
+- Physical integration test:
+
+```bash
+cd app
+flutter test integration_test/sets_catalog_runtime_test.dart \
+  -d 00008130-001C152922BA001C \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Result: `PASS`, `00:15 +1: All tests passed!`
+
+This proves the previous VM Service blocker is avoidable when native Firebase
+startup is isolated. It does not prove scanner/camera/OCR and does not prove
+real FCM delivery; those remain separate physical/provisioning items.
+
+After the final `ApiClient` metrics guard, local analyze/focused tests still
+passed. A repeat physical run was attempted, but Xcode failed before app launch:
+
+```text
+Error starting debug session in Xcode: Timed out waiting for CONFIGURATION_BUILD_DIR to update.
+```
+
+That repeat failure is an Xcode launch/tooling blocker, not the previous
+in-app VM Service/Firebase symptom.
+
 ## Verdict
 
 `BLOCKED`

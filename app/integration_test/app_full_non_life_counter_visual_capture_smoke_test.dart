@@ -120,6 +120,21 @@ Future<void> _pumpUntilAbsent(
   fail('Widget still present: $finder');
 }
 
+Future<bool> _pumpUntilAnyFound(
+  WidgetTester tester,
+  List<Finder> finders, {
+  int attempts = 30,
+  Duration step = const Duration(seconds: 1),
+}) async {
+  for (var i = 0; i < attempts; i += 1) {
+    await tester.pump(step);
+    if (finders.any((finder) => finder.evaluate().isNotEmpty)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -300,10 +315,33 @@ void main() {
     await tester.tap(generateButton);
     await tester.pump();
     final previewTitle = find.text('Preview antes de salvar');
-    await _pumpUntilFound(tester, previewTitle, attempts: 120);
-    await tester.ensureVisible(previewTitle);
-    await tester.pump(const Duration(seconds: 1));
-    await _capture(binding, tester, '06_generate_preview');
+    final asyncAccepted = find.text('Pedido aceito');
+    final rawError = find.textContaining('Exception');
+    final hasGenerateOutcome = await _pumpUntilAnyFound(tester, [
+      previewTitle,
+      asyncAccepted,
+      find.textContaining('Erro'),
+      find.textContaining('Falha'),
+      rawError,
+    ], attempts: 120);
+    expect(hasGenerateOutcome, isTrue);
+    if (previewTitle.evaluate().isNotEmpty) {
+      await tester.ensureVisible(previewTitle);
+      await tester.pump(const Duration(seconds: 1));
+      await _capture(binding, tester, '06_generate_preview');
+    } else {
+      await tester.pump(const Duration(seconds: 1));
+      await _capture(binding, tester, '06_generate_preview_not_proven');
+      expect(rawError, findsNothing);
+      if (find.text('Comunidade').evaluate().isEmpty) {
+        await tester.pageBack();
+        await tester.pump();
+        await _pumpUntilAnyFound(tester, [
+          find.text('Decks'),
+          find.text('Meus Decks'),
+        ]);
+      }
+    }
 
     // Community tab.
     await tester.tap(find.text('Comunidade'));

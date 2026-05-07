@@ -27,8 +27,16 @@ class AppObservability {
     'SENTRY_TRACES_SAMPLE_RATE',
     defaultValue: '0',
   );
+  static const Duration _sentryStartupTimeout = Duration(seconds: 5);
+
+  bool _globalHandlersAttached = false;
+  bool _sentryInitStarted = false;
+  bool _sentryReady = false;
 
   bool get isEnabled => _dsn.trim().isNotEmpty;
+
+  @visibleForTesting
+  bool get isReadyForTesting => _sentryReady;
 
   double get _tracesSampleRate {
     final parsed = double.tryParse(_tracesSampleRateRaw);
@@ -39,34 +47,23 @@ class AppObservability {
   }
 
   Future<void> bootstrap(FutureOr<void> Function() appRunner) async {
-    if (!isEnabled) {
-      _attachGlobalHandlers();
-      await appRunner();
+    _attachGlobalHandlers();
+    await appRunner();
+
+    if (!isEnabled || _sentryInitStarted) {
       return;
     }
 
-    await SentryFlutter.init(
-      (options) {
-        options.dsn = _dsn.trim();
-        options.environment =
-            _environment.trim().isNotEmpty
-                ? _environment.trim()
-                : (kReleaseMode ? 'production' : 'development');
-        if (_release.trim().isNotEmpty) {
-          options.release = _release.trim();
-        }
-        options.sendDefaultPii = false;
-        options.enableLogs = !kReleaseMode;
-        options.tracesSampleRate = _tracesSampleRate;
-      },
-      appRunner: () async {
-        _attachGlobalHandlers();
-        await appRunner();
-      },
-    );
+    _sentryInitStarted = true;
+    unawaited(_initializeSentryAfterFirstFrame());
   }
 
   void _attachGlobalHandlers() {
+    if (_globalHandlersAttached) {
+      return;
+    }
+    _globalHandlersAttached = true;
+
     final previousFlutterErrorHandler = FlutterError.onError;
 
     FlutterError.onError = (details) {
@@ -92,8 +89,36 @@ class AppObservability {
     };
   }
 
+  Future<void> _initializeSentryAfterFirstFrame() async {
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      await SentryFlutter.init((options) {
+        options.dsn = _dsn.trim();
+        options.environment =
+            _environment.trim().isNotEmpty
+                ? _environment.trim()
+                : (kReleaseMode ? 'production' : 'development');
+        if (_release.trim().isNotEmpty) {
+          options.release = _release.trim();
+        }
+        options.sendDefaultPii = false;
+        options.enableLogs = !kReleaseMode;
+        options.tracesSampleRate = _tracesSampleRate;
+      }).timeout(_sentryStartupTimeout);
+      _sentryReady = true;
+      debugPrint('[Observability] Sentry inicializado apos primeiro frame.');
+    } on TimeoutException catch (_) {
+      debugPrint(
+        '[Observability] Sentry excedeu '
+        '${_sentryStartupTimeout.inSeconds}s; app segue renderizado.',
+      );
+    } catch (error) {
+      debugPrint('[Observability] Sentry indisponivel no boot: $error');
+    }
+  }
+
   Future<void> setCurrentRoute(String route) async {
-    if (!isEnabled) {
+    if (!isEnabled || !_sentryReady) {
       return;
     }
 
@@ -103,7 +128,7 @@ class AppObservability {
   }
 
   Future<void> setUserContext(User? user) async {
-    if (!isEnabled) {
+    if (!isEnabled || !_sentryReady) {
       return;
     }
 
@@ -143,7 +168,7 @@ class AppObservability {
       );
     }
 
-    if (!isEnabled) {
+    if (!isEnabled || !_sentryReady) {
       return;
     }
 
@@ -164,7 +189,7 @@ class AppObservability {
     Map<String, Object?>? extras,
     SentryLevel level = SentryLevel.error,
   }) async {
-    if (!isEnabled) {
+    if (!isEnabled || !_sentryReady) {
       return null;
     }
 

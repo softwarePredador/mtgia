@@ -2,6 +2,85 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — QA visual fisico nao-scanner no iPhone Rafa
+
+### O Porquê
+- Foi solicitada uma bateria visual automatica no iPhone fisico
+  `00008130-001C152922BA001C` contra o backend publico Easypanel, cobrindo o app
+  ManaLoom exceto Scanner, camera, OCR e MLKit scanner.
+- O objetivo era capturar evidencias de telas, procurar overflow/texto cortado,
+  loading/modal preso, erro bruto, tela branca e lentidao perceptivel, corrigindo
+  apenas bugs visuais simples e seguros fora do Scanner.
+
+### O Como
+- O device foi validado como `Rafa`, iOS `26.5 23F5043k`,
+  `iPhone 15 Pro (iPhone16,1)`, transport `localNetwork`.
+- O backend publico retornou `/health` com `environment=production` e
+  `git_sha=1c89bb0e467fd422d84fa696e57a7f73d07618d3`.
+- Foi adicionado `app/test_driver/integration_test.dart` com
+  `integration_test_driver_extended` para permitir `flutter drive` com
+  `--publish-port` no iPhone wireless e salvar screenshots via
+  `MANALOOM_SCREENSHOT_DIR`.
+- O harness visual amplo foi tolerante ao contrato assincrono/sem preview
+  sincrono do backend publico: quando o preview de geracao nao aparece, captura
+  a tela como `generate_preview_not_proven` sem transformar isso em erro bruto.
+- Bug visual corrigido em `app/lib/features/binder/screens/binder_screen.dart`:
+  `_applyFilters()` agora desfoca o teclado antes de filtrar e a area vazia do
+  fichario usa `Wrap` nos CTAs, evitando overflow em tela estreita.
+
+### Resultado
+- `PASS WITH RISKS`.
+- Screenshots fisicos reais salvos em
+  `app/doc/runtime_flow_proofs_2026-05-06_physical_iphone_non_scanner_visual/app_full_screenshots/`.
+- Passaram no iPhone fisico: harness visual amplo, Sets catalog, Search/Cards +
+  Colecoes, Collection entrypoints e Binder/Marketplace/Trades/Messages/
+  Notifications.
+- O Binder dashboard expos inicialmente `RenderFlex overflowed by 38 pixels on
+  the bottom`; apos o patch, analyze focado e testes visuais/goldens
+  nao-scanner passaram.
+- Ficaram `NOT PROVEN` por instabilidade do runner fisico wireless: replay
+  completo do dashboard apos patch, Profile/community deep navigation, Lotus
+  fisico e deck Optimize preview/apply/validate fisico.
+- Scanner/camera/OCR/MLKit scanner foram explicitamente ignorados.
+- Handoff:
+  `app/doc/runtime_flow_handoffs/physical_iphone_visual_non_scanner_qa_2026-05-06.md`.
+
+## 2026-05-06 — iPhone fisico nao-scanner desbloqueado com Firebase isolado
+
+### O Porquê
+- A rodada anterior no iPhone fisico `Rafa` abria o app, mas `flutter test` nao
+  descobria o Dart VM Service e a tela podia parecer branca.
+- A hipotese operacional era interferencia de startup nativo Firebase/Sentry no
+  debug fisico.
+
+### O Como
+- `AppObservability.bootstrap()` foi ajustado para nao aguardar Sentry antes do
+  `runApp`; Sentry inicializa apos o primeiro frame e tem timeout.
+- `main.dart` ganhou flags de QA:
+  - `DISABLE_FIREBASE_STARTUP=true`: pula Push e Performance.
+  - `DISABLE_PUSH_INIT=true`: pula apenas Firebase Messaging.
+  - `DISABLE_FIREBASE_PERFORMANCE_INIT=true`: pula apenas Performance.
+- `ApiClient` agora respeita essas flags e nao cria metricas Firebase
+  Performance quando Firebase startup esta desabilitado.
+
+### Resultado
+- Backend publico validado em
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health`:
+  `git_sha=1c89bb0e467fd422d84fa696e57a7f73d07618d3`.
+- `cd app && flutter analyze lib test integration_test --no-version-check`:
+  PASS.
+- `cd app && flutter test test --no-version-check`: PASS, 549 testes.
+- `flutter run` no iPhone fisico com `DISABLE_FIREBASE_STARTUP=true` chegou em
+  `/login` e manteve Dart VM Service disponivel.
+- `integration_test/sets_catalog_runtime_test.dart` no iPhone fisico com o
+  mesmo flag passou: `00:15 +1: All tests passed!`.
+- Apos o guard final do `ApiClient`, analyze/testes focados seguiram PASS; a
+  repeticao fisica posterior falhou antes de abrir o app por timeout do Xcode em
+  `CONFIGURATION_BUILD_DIR`, nao por queda do VM Service.
+- Scanner/camera/OCR e entrega real de FCM continuam escopos separados: o
+  primeiro harness nao-scanner esta desbloqueado, mas scanner fisico e push
+  real ainda exigem validacao propria.
+
 ## 2026-05-06 — QA fisico nao-scanner no iPhone Rafa bloqueado por VM Service
 
 ### O Porquê

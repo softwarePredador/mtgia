@@ -212,6 +212,7 @@ class _BinderListViewState extends State<_BinderListView>
   }
 
   void _applyFilters() {
+    FocusManager.instance.primaryFocus?.unfocus();
     _fetchItems(reset: true);
   }
 
@@ -477,8 +478,10 @@ class _BinderListViewState extends State<_BinderListView>
                 style: const TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 8,
                 children: [
                   ElevatedButton.icon(
                     onPressed: _openAddCard,
@@ -490,7 +493,6 @@ class _BinderListViewState extends State<_BinderListView>
                       foregroundColor: AppTheme.backgroundAbyss,
                     ),
                   ),
-                  const SizedBox(width: 12),
                   ElevatedButton.icon(
                     onPressed: _openScanCard,
                     icon: const Icon(Icons.camera_alt),

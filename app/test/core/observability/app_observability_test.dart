@@ -4,6 +4,18 @@ import 'package:manaloom/features/auth/models/user.dart';
 
 void main() {
   group('AppObservability', () {
+    testWidgets('runs app runner without waiting for Sentry startup', (
+      tester,
+    ) async {
+      var runnerCalled = false;
+
+      await AppObservability.instance.bootstrap(() {
+        runnerCalled = true;
+      });
+
+      expect(runnerCalled, isTrue);
+    });
+
     test('does not attach email to Sentry user context', () {
       final sentryUser = AppObservability.instance.sentryUserFor(
         User(

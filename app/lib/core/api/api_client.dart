@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:async';
 import 'dart:math';
 
@@ -28,7 +28,18 @@ class ApiResponse {
 }
 
 class ApiClient {
-  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
+  static const String _envBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: '',
+  );
+  static const bool _disableFirebaseStartup = bool.fromEnvironment(
+    'DISABLE_FIREBASE_STARTUP',
+    defaultValue: false,
+  );
+  static const bool _disableFirebasePerformanceInit = bool.fromEnvironment(
+    'DISABLE_FIREBASE_PERFORMANCE_INIT',
+    defaultValue: false,
+  );
   static const String _debugAndroidEmulatorUrl = 'http://10.0.2.2:8080';
   static const String _debugLocalhostUrl = 'http://127.0.0.1:8080';
   static const String _releaseFallbackUrl = '';
@@ -67,7 +78,9 @@ class ApiClient {
   /// Log da URL base resolvida (chamado uma vez no boot)
   static void debugLogBaseUrl() {
     debugPrint('[🌐 ApiClient] baseUrl = $baseUrl');
-    debugPrint('[🌐 ApiClient] platform = $defaultTargetPlatform | kIsWeb=$kIsWeb | kDebugMode=$kDebugMode');
+    debugPrint(
+      '[🌐 ApiClient] platform = $defaultTargetPlatform | kIsWeb=$kIsWeb | kDebugMode=$kDebugMode',
+    );
     if (_envBaseUrl.trim().isEmpty) {
       if (kDebugMode) {
         debugPrint(
@@ -94,11 +107,10 @@ class ApiClient {
     String? requestId,
   }) {
     final resolvedRequestId =
-        requestId?.trim().isNotEmpty == true ? requestId!.trim() : generateRequestId();
-    return {
-      ...headers,
-      'x-request-id': resolvedRequestId,
-    };
+        requestId?.trim().isNotEmpty == true
+            ? requestId!.trim()
+            : generateRequestId();
+    return {...headers, 'x-request-id': resolvedRequestId};
   }
 
   static bool isReportableHttpStatus(int statusCode) => statusCode >= 400;
@@ -119,7 +131,10 @@ class ApiClient {
 
   /// Cria um HttpMetric para rastrear a requisição no Firebase Performance
   HttpMetric? _createMetric(String url, HttpMethod method) {
-    if (kIsWeb || _performanceUnavailable) {
+    if (kIsWeb ||
+        _performanceUnavailable ||
+        _disableFirebaseStartup ||
+        _disableFirebasePerformanceInit) {
       return null;
     }
 
@@ -127,7 +142,9 @@ class ApiClient {
       return FirebasePerformance.instance.newHttpMetric(url, method);
     } catch (e) {
       _performanceUnavailable = true;
-      debugPrint('[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: $e');
+      debugPrint(
+        '[⚠️ ApiClient] Firebase Performance indisponível; métricas HTTP desativadas nesta sessão. Detalhe: $e',
+      );
       return null;
     }
   }
@@ -139,33 +156,35 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Get);
     final stopwatch = Stopwatch()..start();
-    
+
     debugPrint('[🌐 ApiClient] GET $url');
-    
+
     try {
       await metric?.start();
-      
-      final response = await _httpClient.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 15));
-      
+
+      final response = await _httpClient
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 15));
+
       stopwatch.stop();
-      
+
       // Registra métricas
       metric?.responseContentType = response.headers['content-type'];
       metric?.httpResponseCode = response.statusCode;
-      metric?.responsePayloadSize = response.contentLength ?? response.bodyBytes.length;
+      metric?.responsePayloadSize =
+          response.contentLength ?? response.bodyBytes.length;
       await metric?.stop();
-      
+
       final durationMs = stopwatch.elapsedMilliseconds;
-      debugPrint('[🌐 ApiClient] GET $endpoint → ${response.statusCode} (${durationMs}ms)');
-      
+      debugPrint(
+        '[🌐 ApiClient] GET $endpoint → ${response.statusCode} (${durationMs}ms)',
+      );
+
       // Alerta requisições lentas
       if (durationMs > 2000) {
         debugPrint('[⚠️ SLOW REQUEST] GET $endpoint demorou ${durationMs}ms');
       }
-      
+
       return _parseResponse(
         response,
         method: 'GET',
@@ -176,7 +195,9 @@ class ApiClient {
     } catch (e) {
       stopwatch.stop();
       await metric?.stop();
-      debugPrint('[❌ ApiClient] GET $endpoint FALHOU após ${stopwatch.elapsedMilliseconds}ms: $e');
+      debugPrint(
+        '[❌ ApiClient] GET $endpoint FALHOU após ${stopwatch.elapsedMilliseconds}ms: $e',
+      );
       unawaited(
         AppObservability.instance.captureException(
           e is Exception ? e : Exception('GET $endpoint failed: $e'),
@@ -193,7 +214,11 @@ class ApiClient {
     }
   }
 
-  Future<ApiResponse> post(String endpoint, Map<String, dynamic> body, {Duration? timeout}) async {
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
     _ensureBaseUrlConfigured();
     final url = '$baseUrl$endpoint';
     final requestId = generateRequestId();
@@ -201,37 +226,42 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Post);
     final stopwatch = Stopwatch()..start();
     final bodyBytes = utf8.encode(jsonEncode(body));
-    
+
     // Endpoints de IA têm timeout maior (2 minutos)
     final isAiEndpoint = endpoint.startsWith('/ai/');
-    final effectiveTimeout = timeout ?? (isAiEndpoint ? const Duration(minutes: 2) : const Duration(seconds: 15));
-    
+    final effectiveTimeout =
+        timeout ??
+        (isAiEndpoint
+            ? const Duration(minutes: 2)
+            : const Duration(seconds: 15));
+
     debugPrint('[🌐 ApiClient] POST $url');
-    
+
     try {
       await metric?.start();
       metric?.requestPayloadSize = bodyBytes.length;
-      
-      final response = await _httpClient.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(body),
-      ).timeout(effectiveTimeout);
-      
+
+      final response = await _httpClient
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(body))
+          .timeout(effectiveTimeout);
+
       stopwatch.stop();
-      
+
       metric?.responseContentType = response.headers['content-type'];
       metric?.httpResponseCode = response.statusCode;
-      metric?.responsePayloadSize = response.contentLength ?? response.bodyBytes.length;
+      metric?.responsePayloadSize =
+          response.contentLength ?? response.bodyBytes.length;
       await metric?.stop();
-      
+
       final durationMs = stopwatch.elapsedMilliseconds;
-      debugPrint('[🌐 ApiClient] POST $endpoint → ${response.statusCode} (${durationMs}ms)');
-      
+      debugPrint(
+        '[🌐 ApiClient] POST $endpoint → ${response.statusCode} (${durationMs}ms)',
+      );
+
       if (durationMs > 2000) {
         debugPrint('[⚠️ SLOW REQUEST] POST $endpoint demorou ${durationMs}ms');
       }
-      
+
       return _parseResponse(
         response,
         method: 'POST',
@@ -242,7 +272,9 @@ class ApiClient {
     } catch (e) {
       stopwatch.stop();
       await metric?.stop();
-      debugPrint('[❌ ApiClient] POST $endpoint FALHOU após ${stopwatch.elapsedMilliseconds}ms: $e');
+      debugPrint(
+        '[❌ ApiClient] POST $endpoint FALHOU após ${stopwatch.elapsedMilliseconds}ms: $e',
+      );
       unawaited(
         AppObservability.instance.captureException(
           e is Exception ? e : Exception('POST $endpoint failed: $e'),
@@ -266,30 +298,30 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Put);
     final stopwatch = Stopwatch()..start();
-    
+
     debugPrint('[🌐 ApiClient] PUT $url');
-    
+
     try {
       await metric?.start();
-      
-      final response = await _httpClient.put(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
-      
+
+      final response = await _httpClient
+          .put(Uri.parse(url), headers: headers, body: jsonEncode(body))
+          .timeout(const Duration(seconds: 15));
+
       stopwatch.stop();
-      
+
       metric?.httpResponseCode = response.statusCode;
       await metric?.stop();
-      
+
       final durationMs = stopwatch.elapsedMilliseconds;
-      debugPrint('[🌐 ApiClient] PUT $endpoint → ${response.statusCode} (${durationMs}ms)');
-      
+      debugPrint(
+        '[🌐 ApiClient] PUT $endpoint → ${response.statusCode} (${durationMs}ms)',
+      );
+
       if (durationMs > 2000) {
         debugPrint('[⚠️ SLOW REQUEST] PUT $endpoint demorou ${durationMs}ms');
       }
-      
+
       return _parseResponse(
         response,
         method: 'PUT',
@@ -324,26 +356,26 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Patch);
     final stopwatch = Stopwatch()..start();
-    
+
     debugPrint('[🌐 ApiClient] PATCH $url');
-    
+
     try {
       await metric?.start();
-      
-      final response = await _httpClient.patch(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
-      
+
+      final response = await _httpClient
+          .patch(Uri.parse(url), headers: headers, body: jsonEncode(body))
+          .timeout(const Duration(seconds: 15));
+
       stopwatch.stop();
-      
+
       metric?.httpResponseCode = response.statusCode;
       await metric?.stop();
-      
+
       final durationMs = stopwatch.elapsedMilliseconds;
-      debugPrint('[🌐 ApiClient] PATCH $endpoint → ${response.statusCode} (${durationMs}ms)');
-      
+      debugPrint(
+        '[🌐 ApiClient] PATCH $endpoint → ${response.statusCode} (${durationMs}ms)',
+      );
+
       return _parseResponse(
         response,
         method: 'PATCH',
@@ -378,25 +410,26 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Delete);
     final stopwatch = Stopwatch()..start();
-    
+
     debugPrint('[🌐 ApiClient] DELETE $url');
-    
+
     try {
       await metric?.start();
-      
-      final response = await _httpClient.delete(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 15));
-      
+
+      final response = await _httpClient
+          .delete(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 15));
+
       stopwatch.stop();
-      
+
       metric?.httpResponseCode = response.statusCode;
       await metric?.stop();
-      
+
       final durationMs = stopwatch.elapsedMilliseconds;
-      debugPrint('[🌐 ApiClient] DELETE $endpoint → ${response.statusCode} (${durationMs}ms)');
-      
+      debugPrint(
+        '[🌐 ApiClient] DELETE $endpoint → ${response.statusCode} (${durationMs}ms)',
+      );
+
       return _parseResponse(
         response,
         method: 'DELETE',
@@ -432,7 +465,7 @@ class ApiClient {
     String? requestId,
   }) {
     dynamic data;
-    
+
     if (response.body.isNotEmpty) {
       try {
         data = jsonDecode(response.body);
@@ -440,7 +473,7 @@ class ApiClient {
         data = response.body;
       }
     }
-    
+
     final parsed = ApiResponse(
       response.statusCode,
       data,

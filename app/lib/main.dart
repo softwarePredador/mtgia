@@ -59,6 +59,19 @@ final bool _debugBootIntoLifeCounter =
       defaultValue: false,
     );
 
+const bool _disableFirebaseStartup = bool.fromEnvironment(
+  'DISABLE_FIREBASE_STARTUP',
+  defaultValue: false,
+);
+const bool _disablePushInit = bool.fromEnvironment(
+  'DISABLE_PUSH_INIT',
+  defaultValue: false,
+);
+const bool _disableFirebasePerformanceInit = bool.fromEnvironment(
+  'DISABLE_FIREBASE_PERFORMANCE_INIT',
+  defaultValue: false,
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -75,11 +88,31 @@ void _schedulePostFirstFramePlatformBootstrap() {
 }
 
 Future<void> _initializePostFirstFramePlatformServices() async {
-  await _runStartupTask(
-    label: 'Firebase push',
-    timeout: const Duration(seconds: 8),
-    task: () => PushNotificationService().init(),
-  );
+  if (_disableFirebaseStartup) {
+    debugPrint(
+      '[Main] Firebase startup desabilitado por DISABLE_FIREBASE_STARTUP.',
+    );
+    return;
+  }
+
+  if (_disablePushInit) {
+    debugPrint('[Main] Firebase push desabilitado por DISABLE_PUSH_INIT.');
+  } else {
+    await _runStartupTask(
+      label: 'Firebase push',
+      timeout: const Duration(seconds: 8),
+      task: () => PushNotificationService().init(),
+    );
+  }
+
+  if (_disableFirebasePerformanceInit) {
+    debugPrint(
+      '[Main] Firebase Performance desabilitado por '
+      'DISABLE_FIREBASE_PERFORMANCE_INIT.',
+    );
+    return;
+  }
+
   await _runStartupTask(
     label: 'Firebase Performance',
     timeout: const Duration(seconds: 5),
