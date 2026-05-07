@@ -148,9 +148,65 @@ When assigned to SM A135M work:
 4. Use the public backend unless the task explicitly asks for local backend:
    `https://evolution-cartinhas.8ktevp.easypanel.host`.
 5. Ignore Scanner/camera/OCR unless explicitly requested.
-6. Capture evidence for relevant screens when possible.
-7. Apply safe visual patches.
-8. Run validation.
+6. Authenticate with a QA account or create a disposable QA account when the
+   task provides no reusable test user.
+7. Navigate through the real authenticated app, not mocked screens.
+8. Capture screenshot/log evidence for every relevant screen when possible.
+9. Apply safe visual patches.
+10. Run validation.
+
+## Authenticated Runtime Evidence Rules
+
+For any full-app visual audit, the agent must prove the real authenticated
+experience unless the user explicitly asks for static-only review.
+
+Required:
+
+- use the public backend or the backend URL explicitly provided by the task;
+- log in with the QA credentials provided in the prompt, or create a disposable
+  QA account through the app/API if no credentials are provided;
+- never write the password, token, JWT, auth header or raw sensitive payload to
+  docs, screenshots, logs or final answers;
+- do not fake authentication state in tests unless the task is explicitly a
+  widget-only static audit;
+- capture the actual post-login navigation state before evaluating authenticated
+  screens;
+- include proof paths for screenshots/logs in the final report.
+
+If login fails:
+
+- classify the audit as `BLOCKED` for authenticated screens;
+- record only sanitized status code/error category;
+- do not continue by judging protected screens from unauthenticated state.
+
+For Android physical proof, prefer screenshots via `adb exec-out screencap -p`
+or integration-test screenshots saved under:
+
+- `app/doc/runtime_flow_proofs_<date>_sm_a135m_design/`
+
+Screens that require authenticated visual proof when in scope:
+
+- Home;
+- Search/Cards;
+- Card Detail;
+- Sets/Coleções;
+- Decks;
+- Deck Detail;
+- Generate;
+- Optimize;
+- Validate;
+- Binder/Fichário;
+- Binder dashboard;
+- Marketplace;
+- Trades;
+- Trade Detail;
+- Messages/Conversations;
+- Notifications;
+- Profile;
+- Community;
+- Life Counter/Lotus.
+
+Scanner/camera/OCR remains excluded unless explicitly requested.
 
 Baseline commands:
 
@@ -201,6 +257,7 @@ The report must include:
 
 - command list and results;
 - device/backend used;
+- QA auth status, sanitized;
 - screen/module matrix;
 - detailed findings with priority;
 - patches applied;
