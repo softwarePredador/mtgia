@@ -2,6 +2,46 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — QA contratos backend publico sem Scanner fisico
+
+### O Porquê
+- Foi solicitada uma validacao direta dos contratos publicos usados pelo app
+  ManaLoom contra o backend Easypanel, cobrindo todos os modulos app-facing
+  exceto Scanner fisico/camera/OCR/MLKit.
+- A rodada deveria usar dados QA descartaveis, nao expor secrets/JWTs/payloads
+  sensiveis e registrar latencias, 4xx esperados, 5xx, timeouts e divergencias
+  reais de shape.
+
+### O Como
+- `master` foi sincronizada com `origin/master` sem conflitos.
+- O backend publico respondeu `/health` em producao com
+  `git_sha=478918369a4e943d40a449e1f4bdbeed57f3714e`.
+- Foi criada uma conta QA descartavel; token, senha e email nao foram
+  documentados.
+- Scanner fisico foi explicitamente ignorado. A validacao scanner-adjacente ficou
+  limitada a chamadas backend token-safe: `/cards/resolve` e
+  `/cards/printings`.
+- Foram validados Auth, Profile, Sets, Cards, Deck create/detail/validate/export,
+  AI Generate async, AI Optimize async/polling, Binder CRUD, Marketplace, Trades
+  list, Notifications, Conversations, Community users com `q` obrigatorio,
+  Market movers e Health/Ready.
+
+### Resultado
+- `PASS WITH RISKS`.
+- Nao houve 5xx nem timeout.
+- `GET /community/users` sem `q` retornou 400 esperado por contrato.
+- `/market/movers` passou, mas foi o endpoint mais lento da bateria (~4,6s).
+- AI Optimize aceitou job async e o polling respondeu 200, mas a amostra chegou a
+  estado terminal `failed`; o transporte async esta provado, enquanto resultado
+  positivo de otimizacao fica como risco/not proven nesta bateria.
+- Trade status mutation ficou `NOT PROVEN`, pois nao era seguro mutar uma troca
+  real com a conta descartavel.
+- Drift documental corrigido em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`:
+  `/cards/resolve` retorna normalmente `{source, name, total_returned, data}` e
+  `/cards/printings` retorna `{name, total_returned, data}` sem ecoar `limit`.
+- Relatorio sanitizado:
+  `server/doc/PUBLIC_BACKEND_CONTRACT_QA_2026-05-07.md`.
+
 ## 2026-05-07 — QA visual fisico nao-scanner no iPhone Rafa
 
 ### O Porquê
