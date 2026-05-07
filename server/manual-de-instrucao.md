@@ -2,6 +2,42 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — Build interno Android APK SM A135M sem Scanner
+
+### O Porquê
+- Foi solicitada preparacao e validacao de build interno Android non-scanner no
+  device fisico `SM A135M` (`R58T300SREH`), instalado fora de
+  `flutter test/flutter run`, para decisao final de release interno.
+- Scanner/camera/OCR/MLKit scanner ficaram explicitamente fora de escopo, e
+  nenhum segredo, token, JWT, DSN ou payload sensivel foi registrado.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; HEAD local:
+  `fd5fa91b2528204ae2818fdc7f263e6676334a79`.
+- Backend publico `/health` respondeu `healthy` com
+  `git_sha=fd5fa91b2528204ae2818fdc7f263e6676334a79`; `/git_sha` separado
+  retornou `Route not found`, entao a validacao de SHA ficou no contrato de
+  `/health`.
+- Passaram `flutter analyze lib test integration_test --no-version-check` e
+  `flutter test test --no-version-check` com 551 testes. A primeira tentativa de
+  teste bateu em `No space left on device`; foram removidos apenas artefatos
+  regeneraveis locais de Flutter/build/temp, e a suite passou em seguida.
+- APK release foi gerado com:
+  `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host` e
+  `PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+### Resultado
+- Classificacao: `BLOCKED` para prova final instalada no SM A135M.
+- Artefato gerado:
+  `app/build/app/outputs/flutter-apk/app-release.apk` (`111,594,763` bytes,
+  SHA-256 `c158e67e733446489df495e0e511df34939f7943154862dba604c7eb1a0fad2e`).
+- Bloqueio: `adb devices -l` nao listou Android, e
+  `adb -s R58T300SREH` retornou `device not found` mesmo apos reiniciar ADB.
+  Portanto instalacao, abertura fora de Flutter, screenshots, logcat filtrado e
+  smoke non-scanner do APK instalado ficaram `NOT PROVEN`.
+- Relatorio:
+  `server/doc/ANDROID_INTERNAL_BUILD_VALIDATION_2026-05-07.md`.
+
 ## 2026-05-07 — Auditoria visual iPhone 15 Simulator sem Scanner
 
 ### O Porquê
