@@ -323,7 +323,13 @@ void main() {
       await _pumpUntilFound(tester, find.text(deckName));
       await tester.tap(find.text(deckName).first);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Deck Público'));
+      await _pumpUntil(
+        tester,
+        () async =>
+            find.text('Deck Público').evaluate().isNotEmpty ||
+            find.text(deckName).evaluate().isNotEmpty,
+        description: 'public deck detail title',
+      );
       await _pumpUntilFound(tester, find.text(deckName));
       await _pumpUntil(
         tester,

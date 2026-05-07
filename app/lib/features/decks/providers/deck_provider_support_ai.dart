@@ -4,6 +4,9 @@ import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
 import 'deck_provider_support_common.dart';
 
+const _genericOptimizeJobFailureMessage =
+    'Não foi possível concluir a otimização agora. Tente novamente em instantes.';
+
 Map<String, dynamic> buildOptimizeRequestPayload({
   required String deckId,
   required String archetype,
@@ -209,15 +212,25 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
     }
     if (status == 'failed') {
       final qualityError = asDynamicMap(data['quality_error']);
-      final errorMsg =
-          data['error'] as String? ??
-          qualityError['message'] as String? ??
-          'Otimização falhou no servidor.';
-      AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $errorMsg');
+      final errorCode =
+          qualityError['code']?.toString() ?? 'OPTIMIZE_JOB_FAILED';
+      final hasQualityMessage =
+          qualityError['message'] != null &&
+          qualityError['message'].toString().trim().isNotEmpty;
+      final rawErrorMsg =
+          hasQualityMessage
+              ? qualityError['message'].toString()
+              : data['error']?.toString() ?? 'Otimização falhou no servidor.';
+      final errorMsg = _friendlyOptimizeJobFailureMessage(
+        rawErrorMsg,
+        code: errorCode,
+        hasQualityMessage: hasQualityMessage,
+      );
+      AppLogger.warning('⚠️ [AI Optimize] job $jobId failed: $rawErrorMsg');
       throw buildDeckAiFlowException(
-        data,
+        {...data, 'error': errorMsg},
         fallbackMessage: errorMsg,
-        fallbackCode: qualityError['code']?.toString() ?? 'OPTIMIZE_JOB_FAILED',
+        fallbackCode: errorCode,
       );
     }
     return OptimizeJobPollResult.pending(
@@ -236,5 +249,21 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
       response,
       context: FriendlyErrorContext.deckOptimize,
     ),
+  );
+}
+
+String _friendlyOptimizeJobFailureMessage(
+  String rawMessage, {
+  required String code,
+  required bool hasQualityMessage,
+}) {
+  if (code == 'OPTIMIZE_JOB_FAILED' && !hasQualityMessage) {
+    return _genericOptimizeJobFailureMessage;
+  }
+
+  return FriendlyErrorMapper.fromException(
+    Exception(rawMessage),
+    context: FriendlyErrorContext.deckOptimize,
+    fallback: _genericOptimizeJobFailureMessage,
   );
 }

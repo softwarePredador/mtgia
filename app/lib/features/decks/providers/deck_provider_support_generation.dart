@@ -5,6 +5,8 @@ import '../../../core/observability/app_observability.dart';
 import '../../../core/utils/logger.dart';
 import 'deck_provider_support_common.dart';
 
+const _defaultGeneratePollInterval = Duration(seconds: 5);
+
 typedef GenerateDeckProgressCallback =
     void Function(GenerateDeckProgressSnapshot progress);
 
@@ -287,7 +289,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       pollInterval:
           pollInterval ??
           _pollIntervalFromResponse(accepted) ??
-          const Duration(milliseconds: 900),
+          _defaultGeneratePollInterval,
     );
   }
 
@@ -358,6 +360,8 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
 
   while (stopwatch.elapsed < timeout) {
     _throwIfGenerateCancelled(cancellation);
+    await Future<void>.delayed(pollInterval);
+    _throwIfGenerateCancelled(cancellation);
     attempt += 1;
 
     final response = await apiClient.get(pollUrl);
@@ -375,6 +379,30 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
         normalizedFormat: normalizedFormat,
         reason: 'poll_not_supported',
       );
+    }
+
+    if (response.statusCode == 429) {
+      _recordGenerateEvent('ai_generate_poll_rate_limited', {
+        'status_code': response.statusCode,
+        'job_id': jobId,
+        'attempt': attempt,
+      });
+      onProgress?.call(
+        GenerateDeckProgressSnapshot(
+          step: 2,
+          message: 'Aguardando limite do servidor antes de continuar...',
+          status: 'rate_limited',
+          jobId: jobId,
+          elapsedMs: stopwatch.elapsedMilliseconds,
+        ),
+      );
+      await Future<void>.delayed(
+        _rateLimitBackoffForGeneratePoll(
+          pollInterval: pollInterval,
+          attempt: attempt,
+        ),
+      );
+      continue;
     }
 
     if (response.statusCode >= 400) {
@@ -476,7 +504,20 @@ Duration? _pollIntervalFromResponse(Map<String, dynamic> accepted) {
   if (parsed == null || parsed <= 0) {
     return null;
   }
-  return Duration(milliseconds: parsed.clamp(250, 5000).toInt());
+  return Duration(milliseconds: parsed.clamp(5000, 10000).toInt());
+}
+
+Duration _rateLimitBackoffForGeneratePoll({
+  required Duration pollInterval,
+  required int attempt,
+}) {
+  if (pollInterval == Duration.zero) return Duration.zero;
+  final baseMs =
+      pollInterval.inMilliseconds <= 0 ? 5000 : pollInterval.inMilliseconds;
+  final multiplier = attempt <= 1 ? 1 : 2;
+  return Duration(
+    milliseconds: (baseMs * multiplier).clamp(5000, 15000).toInt(),
+  );
 }
 
 bool _shouldFallbackToSyncGenerate(ApiResponse response) {

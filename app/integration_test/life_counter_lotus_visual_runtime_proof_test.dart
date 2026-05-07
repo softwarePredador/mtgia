@@ -50,6 +50,25 @@ void _emitScreenshot(String name, List<int> pngBytes) {
   print('SCREENSHOT_END $name');
 }
 
+Future<void> _tryCaptureScreenshot(
+  IntegrationTestWidgetsFlutterBinding binding,
+  String name,
+) async {
+  try {
+    await binding.convertFlutterSurfaceToImage().timeout(
+      const Duration(seconds: 20),
+    );
+    final screenshot = await binding
+        .takeScreenshot(name)
+        .timeout(const Duration(seconds: 30));
+    _emitScreenshot(name, screenshot);
+  } catch (error) {
+    // Screenshot capture is evidence-only; DOM probes below still validate runtime.
+    // ignore: avoid_print
+    print('LOTUS_SCREENSHOT_NOT_PROVEN $name ${error.runtimeType}');
+  }
+}
+
 Future<Map<String, dynamic>?> _probeViaShellBridge(
   WidgetTester tester,
   dynamic screenState, {
@@ -382,11 +401,10 @@ void main() {
         findsNothing,
       );
 
-      await binding.convertFlutterSurfaceToImage();
-      final initialScreenshot = await binding.takeScreenshot(
+      await _tryCaptureScreenshot(
+        binding,
         'life_counter_lotus_runtime_initial',
       );
-      _emitScreenshot('life_counter_lotus_runtime_initial', initialScreenshot);
 
       final afterPlus = await _clickLifeButtonAndProbe(
         tester,
@@ -423,12 +441,9 @@ void main() {
       expect(persistedSession, isNotNull);
       expect(persistedSession!.lives.first, 41);
 
-      final changedScreenshot = await binding.takeScreenshot(
+      await _tryCaptureScreenshot(
+        binding,
         'life_counter_lotus_runtime_after_plus',
-      );
-      _emitScreenshot(
-        'life_counter_lotus_runtime_after_plus',
-        changedScreenshot,
       );
 
       await tester.pumpWidget(const SizedBox.shrink());

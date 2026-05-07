@@ -976,7 +976,15 @@ void main() {
       );
       await expectLater(
         () => pollOptimizeJobRequest(failedClient, 'job-3'),
-        throwsA(isA<DeckAiFlowException>()),
+        throwsA(
+          isA<DeckAiFlowException>()
+              .having(
+                (error) => error.message,
+                'message',
+                'Não foi possível concluir a otimização agora. Tente novamente em instantes.',
+              )
+              .having((error) => error.message, 'message', isNot('Falhou')),
+        ),
       );
     },
   );

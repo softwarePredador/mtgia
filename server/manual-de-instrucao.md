@@ -2,6 +2,62 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — QA runtime Android fisico SM A135M sem Scanner
+
+### O Porquê
+- Foi solicitada uma validacao automatica no Android fisico `SM A135M`
+  (`R58T300SREH`, Android 14/API 34) contra o backend publico Easypanel,
+  cobrindo todo o app ManaLoom exceto Scanner/camera/OCR/MLKit scanner.
+- A rodada precisava provar app real no device, backend real, fluxos
+  automatizaveis nao-scanner, logs sanitizados, latencias >5s, erros brutos
+  user-facing e resultado `PASS/PASS WITH RISKS/BLOCKED`.
+
+### O Como
+- `master` foi sincronizada com `origin/master` via fast-forward.
+- Backend publico validado em `/health` como `healthy`, com `git_sha` final
+  `4874923bc77997100eb30dd967336b0d1ee11252`.
+- Foram executados `flutter analyze lib test integration_test --no-version-check`
+  e `flutter test test --no-version-check --reporter expanded`, ambos PASS apos
+  os patches.
+- Integration tests Android usaram sempre:
+  `--dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`
+  e `--dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+- Scanner/camera/OCR/MLKit foram pulados intencionalmente; os harnesses
+  mencionando esse dominio foram registrados como skipped/deferred.
+
+### Correcoes implementadas
+- `deck_provider_support_ai.dart`: falha generica de job async de optimize
+  (`OPTIMIZE_JOB_FAILED`) agora vira copia amigavel em portugues para o usuario
+  em vez de repassar texto tecnico como `executor interno`.
+- `deck_provider_support_generation.dart`: generate async passou a aguardar
+  antes do primeiro poll, respeitar intervalo minimo de 5s e fazer backoff em
+  `429`, evitando estourar rate limit do backend publico.
+- `deck_runtime_m2006_test.dart`: harness agora prova selecao parcial real
+  (toggle de remocao e adicao), apply balanceado e preservacao do comandante
+  via `DeckProvider`.
+- `profile_community_runtime_test.dart`: harness aceita o titulo real do deck
+  publico quando a tela usa o nome do deck em vez do placeholder `Deck Público`.
+- `life_counter_lotus_visual_runtime_proof_test.dart`: screenshot nativo no
+  Android fisico virou evidencia nao-bloqueante; a prova obrigatoria segue por
+  DOM/controles/persistencia.
+
+### Resultado
+- Classificacao: `PASS WITH RISKS`.
+- Passaram no SM A135M: Sets catalog, Search/Cards + Colecoes, Collection
+  entrypoints, Binder dashboard, Marketplace/Trades/Messages/Notifications,
+  Profile/Community, deck create/import/detail/optimize preview/apply/validate
+  em intensidade `Focado`, deck generate async/save/detail, Life Counter native
+  surfaces, Lotus DOM runtime e FCM smoke sem expor token.
+- Optimize `Agressivo` ficou `NOT PROVEN`: backend publico retornou job async
+  `failed` antes de preview/apply. O app agora mostra falha amigavel.
+- Lotus screenshot PNG ficou `NOT PROVEN` por timeout/assertion de captura no
+  Android fisico, mas DOM/controles/persistencia passaram:
+  `lifeContentFits=true`, `horizontalOverflow=false`, `40 -> 41 -> 40`,
+  reopen em `41`.
+- Sentry DSN nao estava configurado; smokes registraram `not_configured/null`.
+- Relatorio completo:
+  `app/doc/runtime_flow_handoffs/android_sm_a135m_non_scanner_qa_2026-05-07.md`.
+
 ## 2026-05-07 — QA contratos backend publico sem Scanner fisico
 
 ### O Porquê

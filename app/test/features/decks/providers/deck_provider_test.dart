@@ -407,6 +407,57 @@ void main() {
       },
     );
 
+    test('generateDeck retries async polling after 429 rate limit', () async {
+      var pollCount = 0;
+      final progressMessages = <String>[];
+      final apiClient = _FakeApiClient(
+        postHandlers: {
+          '/ai/generate': (body) {
+            expect(body['async'], isTrue);
+            return ApiResponse(202, {
+              'job_id': 'job-rate-limit',
+              'status': 'pending',
+              'poll_url': '/ai/generate/jobs/job-rate-limit',
+              'poll_interval_ms': 1,
+            });
+          },
+        },
+        getHandlers: {
+          '/ai/generate/jobs/job-rate-limit': () {
+            pollCount += 1;
+            if (pollCount == 1) {
+              return ApiResponse(429, {'error': 'too many requests'});
+            }
+            return ApiResponse(200, {
+              'job_id': 'job-rate-limit',
+              'status': 'completed',
+              'result_status_code': 200,
+              'result': generatedDeckPayload(),
+            });
+          },
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+
+      final result = await provider.generateDeck(
+        prompt: 'Talrand spellslinger',
+        format: 'Commander',
+        pollInterval: Duration.zero,
+        onProgress: (progress) => progressMessages.add(progress.message),
+      );
+
+      expect(result['generated_deck'], isA<Map>());
+      expect(apiClient.getCalls, [
+        '/ai/generate/jobs/job-rate-limit',
+        '/ai/generate/jobs/job-rate-limit',
+      ]);
+      expect(
+        progressMessages,
+        contains('Aguardando limite do servidor antes de continuar...'),
+      );
+      expect(progressMessages, contains('Pronto para revisar.'));
+    });
+
     test(
       'generateDeck preserves fallback sync when async is unsupported',
       () async {

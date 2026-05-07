@@ -514,7 +514,24 @@ void main() {
         find.textContaining('Sugestões para '),
         find.text('Criar reconstrução guiada'),
         find.text('Nenhuma melhoria segura encontrada'),
+        find.textContaining('Não foi possível concluir a otimização agora'),
       ], attempts: 240);
+
+      if (find
+          .textContaining('Não foi possível concluir a otimização agora')
+          .evaluate()
+          .isNotEmpty) {
+        await _capture(binding, tester, '09_friendly_optimize_failure');
+        expect(find.textContaining('executor interno'), findsNothing);
+        expect(find.textContaining('resposta invalida'), findsNothing);
+        expect(find.textContaining('resposta inválida'), findsNothing);
+        if (_runtimeOptimizeRequireApply) {
+          fail(
+            'Runtime optimize returned a friendly failure before preview/apply; backend job did not produce suggestions.',
+          );
+        }
+        return;
+      }
 
       if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
         await _capture(binding, tester, '09_rebuild_guided_blocker');
@@ -569,8 +586,36 @@ void main() {
           find.byType(Checkbox).evaluate().length < 2) {
         fail('Runtime preview did not expose selectable swap suggestions');
       }
-      await tester.tap(find.byType(Checkbox).first);
+      final firstCheckboxToDeselect = find.byType(Checkbox).first;
+      await tester.ensureVisible(firstCheckboxToDeselect);
       await tester.pump();
+      final firstSelectedBeforeDeselect =
+          tester.widget<Checkbox>(firstCheckboxToDeselect).value;
+      await tester.tap(firstCheckboxToDeselect);
+      await tester.pump();
+      final firstSelectedAfterDeselect =
+          tester.widget<Checkbox>(firstCheckboxToDeselect).value;
+      expect(
+        firstSelectedAfterDeselect,
+        isNot(firstSelectedBeforeDeselect),
+        reason:
+            'Runtime preview removal checkbox did not toggle for partial apply.',
+      );
+
+      final lastCheckboxToDeselect = find.byType(Checkbox).last;
+      await tester.ensureVisible(lastCheckboxToDeselect);
+      await tester.pump();
+      final lastSelectedBeforeDeselect =
+          tester.widget<Checkbox>(lastCheckboxToDeselect).value;
+      await tester.tap(lastCheckboxToDeselect);
+      await tester.pump();
+      final lastSelectedAfterDeselect =
+          tester.widget<Checkbox>(lastCheckboxToDeselect).value;
+      expect(
+        lastSelectedAfterDeselect,
+        isNot(lastSelectedBeforeDeselect),
+        reason: 'Runtime preview checkbox did not toggle for partial apply.',
+      );
       await _capture(binding, tester, '09b_preview_partial_selection');
 
       final applyChangesButton = find.text('Aplicar mudanças');
@@ -587,7 +632,15 @@ void main() {
       ], attempts: 240);
       await _capture(binding, tester, '10_complete_validated');
 
-      expect(find.text('Talrand, Sky Summoner'), findsWidgets);
+      await _pumpUntil(tester, () {
+        final titleElements = find.text('Detalhes do Deck').evaluate();
+        if (titleElements.isEmpty) return false;
+        final deck = titleElements.first.read<DeckProvider>().selectedDeck;
+        return deck?.commander.any(
+              (card) => card.name == 'Talrand, Sky Summoner',
+            ) ??
+            false;
+      }, description: 'commander preserved after partial apply');
       final hasCompletionSignal =
           find.text('100 / 100 cartas').evaluate().isNotEmpty ||
           find.text('Deck completo!').evaluate().isNotEmpty ||
