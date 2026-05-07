@@ -18,15 +18,18 @@
   payload sensivel.
 - Foram executados harnesses Android para captura visual non-scanner, Sets/Search,
   Binder/Marketplace/Trades/Messages/Notifications e Life Counter shell.
+- Evidencias locais ficaram em
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design/`, incluindo PNGs de
+  Login/Register e screenshots ADB de Sets/Search e Life Counter apos patch.
 - Patches ficaram restritos ao app visual: icone de Colecoes, tabs rolaveis na
   Collection, CTAs Brass/Obsidian em Life Counter/Lotus e CTA de IA em Frost Blue
   no onboarding.
 
 ### Resultado
 - Classificacao: `PASS WITH RISKS`.
-- Riscos: PNGs de screenshot nao foram persistidos nesta rodada e o rerun fresco
-  de Optimize/Validate bloqueou antes do fluxo, embora haja prova historica do
-  mesmo dia/device.
+- Riscos: cobertura PNG dedicada ainda ficou parcial e o rerun fresco de
+  Optimize/Validate bloqueou antes do fluxo, embora haja prova historica do mesmo
+  dia/device.
 - Relatorio:
   `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`.
 

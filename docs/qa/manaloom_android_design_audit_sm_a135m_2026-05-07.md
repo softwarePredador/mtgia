@@ -34,6 +34,10 @@ Scanner, câmera, OCR e MLKit ficaram **100% ignorados**.
 | `flutter test integration_test/deck_runtime_m2006_test.dart -d R58T300SREH ...` | BLOCKED nesta rodada fresca por encerramento prematuro do harness antes do fluxo; evidência histórica do mesmo dia permanece PASS WITH RISKS |
 | `flutter analyze lib test --no-version-check` | PASS, sem issues |
 | `flutter test test/features/cards test/features/collection test/features/home --no-version-check` | PASS |
+| `flutter analyze lib test integration_test --no-version-check` | PASS final, sem issues |
+| `flutter test test --no-version-check --reporter expanded` | PASS final, `550` testes |
+| `flutter test integration_test/sets_search_catalog_runtime_test.dart -d R58T300SREH ...` apos patch | BLOCKED pelo runner (`did not complete`), mas requests `/cards` e `/sets` retornaram 200; screenshot ADB salvo |
+| `flutter test integration_test/life_counter_native_player_state_smoke_test.dart -d R58T300SREH --reporter expanded --no-version-check` apos patch | PASS, `00:36 +2`; screenshot ADB salvo |
 
 Observação operacional: uma tentativa paralela de rodar dois `flutter test`
 Android ao mesmo tempo causou falha Gradle transitória em
@@ -54,18 +58,25 @@ Prova fresca desta rodada:
   `04a_create_deck_dialog`, `04b_deck_details`, `05_generate`,
   `06_generate_preview_not_proven`, `07_community`, `08_collection`,
   `09_profile`.
-- As imagens não foram persistidas em PNG nesta execução; a prova fresca ficou
-  restrita aos eventos/bytes do harness e aos logs sanitizados no console.
+- PNGs locais persistidos em
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design/`:
+  `01_login.png`, `02_register_filled.png`,
+  `sets_search_catalog_after_ux_polish.png` e
+  `life_counter_native_player_state_after_ux_polish.png`.
+- Logs frescos:
+  `app_full_non_life_counter_visual_capture_smoke_test.log`,
+  `sets_search_catalog_runtime_test_after_ux_polish.log` e
+  `life_counter_native_player_state_after_ux_polish.log`.
 
 ## Matriz de telas/módulos
 
 | Tela/módulo | Status | Evidência |
 | --- | --- | --- |
-| Login/Register | PASS | captura in-run `01_login`, `02_register_filled`; registro 201 |
+| Login/Register | PASS | captura in-run e PNGs locais `01_login.png`, `02_register_filled.png`; registro 201 |
 | Home | PASS | captura in-run `03_home`; sem crash/erro bruto |
-| Search/Cards | PASS | `sets_search_catalog_runtime_test`, `/cards?name=Black+Lotus` 200 |
+| Search/Cards | PASS WITH RISKS | `sets_search_catalog_runtime_test`, `/cards?name=Black+Lotus` 200; PNG ADB `sets_search_catalog_after_ux_polish.png`; runner fresco encerrou antes do fim |
 | Card Detail | PASS WITH RISKS | path de cards provado por Search/Sets; captura dedicada não persistida |
-| Sets/Coleções | PASS | `sets_search_catalog_runtime_test`, `/sets` e `/cards?set=ECC` 200 |
+| Sets/Coleções | PASS WITH RISKS | `sets_search_catalog_runtime_test`, `/sets` 200 e prova historica `/cards?set=ECC` 200; PNG ADB `sets_search_catalog_after_ux_polish.png` |
 | Decks | PASS | captura in-run `04_decks`; criação de deck 200 |
 | Deck Detail | PASS | captura in-run `04b_deck_details`; `/decks/:id` 200 |
 | Generate | PASS WITH RISKS | captura `05_generate`; backend aceitou async 202; preview síncrono não provado |
@@ -80,7 +91,7 @@ Prova fresca desta rodada:
 | Notifications | PASS | list/read/read-all PASS |
 | Profile | PASS | captura in-run `09_profile`, `/users/me` 200 |
 | Community | PASS | captura in-run `07_community`, `/community/decks` 200 |
-| Life Counter/Lotus | PASS WITH RISKS | shell native/WebView PASS; PNG nativo segue risco histórico |
+| Life Counter/Lotus | PASS WITH RISKS | shell native/WebView PASS; PNG ADB `life_counter_native_player_state_after_ux_polish.png`; captura nativa via `takeScreenshot` segue risco histórico |
 | Scanner/camera/OCR | IGNORED | fora do escopo |
 
 ## Findings classificados
@@ -114,13 +125,14 @@ Nenhuma alteração backend/API/DB/AI/scanner/secrets foi feita.
 
 ## Itens não verificados
 
-- PNGs persistidos em `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design/`
-  não foram produzidos nesta execução.
+- PNG dedicado por tela para Home/Decks/Deck Detail/Generate/Community/
+  Collection/Profile não ficou persistido individualmente nesta rodada; há
+  eventos in-run e cobertura historica do mesmo dia/device.
 - Optimize/Validate fresco no harness `deck_runtime_m2006_test.dart` ficou
   bloqueado antes do fluxo, apesar de cobertura histórica PASS WITH RISKS do
   mesmo dia/device.
-- Auditoria visual manual pixel-level das imagens não foi possível sem PNGs
-  persistidos.
+- Auditoria visual manual pixel-level ficou parcial, limitada aos PNGs locais de
+  Login/Register, Sets/Search e Life Counter.
 
 ## Veredito
 
@@ -129,4 +141,4 @@ Nenhuma alteração backend/API/DB/AI/scanner/secrets foi feita.
 O app autenticou de forma real, abriu telas centrais no SM A135M, preservou a
 identidade Obsidian/Brass/Frost Blue e recebeu patches visuais seguros de
 semântica de ícone, tab density e contraste de CTA. Os riscos restantes são
-evidência visual PNG não persistida e rerun dedicado de Optimize/Validate.
+cobertura PNG dedicada ainda parcial e rerun dedicado de Optimize/Validate.
