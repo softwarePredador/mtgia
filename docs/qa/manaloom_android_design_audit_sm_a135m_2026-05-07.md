@@ -153,10 +153,10 @@ cobertura PNG dedicada ainda parcial e rerun dedicado de Optimize/Validate.
 **SM A135M** (`R58T300SREH`) contra o backend público
 `https://evolution-cartinhas.8ktevp.easypanel.host`.
 
-O status permanece com risco porque os PNGs da segunda passada foram capturados
-pelos harnesses (`CAPTURE_TAKEN`/`SCREENSHOT_BEGIN`) no stream de teste, mas não
-foram materializados como arquivos individuais no diretório solicitado durante
-esta execução. Scanner/câmera/OCR/MLKit continuaram 100% ignorados.
+O status permanece com risco apenas porque o caminho `Optimize -> Agressivo`
+depende do backend público retornar preview positivo; a UI de falha amigável foi
+provada. Os PNGs da segunda passada foram materializados no diretório solicitado.
+Scanner/câmera/OCR/MLKit continuaram 100% ignorados.
 
 ### Device, backend e autenticação
 
@@ -256,21 +256,16 @@ foi feita.
 - Pasta solicitada para a segunda rodada:
   `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design_second_pass/`.
 - Capturas da segunda rodada foram provadas no stream dos harnesses pelos eventos
-  `CAPTURE_TAKEN` listados na matriz acima. Nesta execução, os PNGs não foram
-  materializados como arquivos individuais nessa pasta, portanto a evidência de
-  arquivo continua como risco documental.
+  `CAPTURE_TAKEN` listados na matriz acima e materializadas como PNGs individuais
+  na pasta solicitada, incluindo logs brutos e `second_pass_contact_sheet.png`.
 
 ### Itens não verificados / riscos remanescentes
 
-- Materialização host-side dos PNGs da segunda passada em
-  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design_second_pass/` ficou
-  **NOT PROVEN**; os bytes foram emitidos pelos harnesses, mas não salvos como
-  arquivos locais nesta execução.
 - Optimize `Agressivo` continua dependente do backend público entregar preview
   positivo; o app mostra falha amigável e o fluxo focado/rebuild guided passou.
 - Auditoria pixel-level manual continua limitada pelas evidências persistidas
   existentes; a segunda passada aumentou cobertura automatizada de screenshots,
-  mas não substitui revisão manual tela-a-tela de PNGs salvos.
+  mas não substitui revisão manual tela-a-tela de todos os PNGs salvos.
 
 ### Veredito da segunda passada
 
@@ -278,6 +273,7 @@ foi feita.
 
 Os fluxos autenticados non-scanner centrais passaram no SM A135M real contra
 backend público, a Home recebeu patch visual seguro para ergonomia/densidade em
-tela estreita, e os harnesses agora capturam mais superfícies críticas. O risco
-restante é documental/operacional: persistir os PNGs da segunda rodada como
-arquivos no diretório de provas solicitado.
+tela estreita, e os harnesses agora capturam mais superfícies críticas com PNGs
+persistidos no diretório de provas solicitado. O risco restante é funcional e
+controlado: `Optimize -> Agressivo` depende de resposta positiva do backend
+público para preview/apply completo, mantendo falha amigável quando indisponível.

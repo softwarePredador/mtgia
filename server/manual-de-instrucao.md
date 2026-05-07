@@ -29,9 +29,12 @@
 - Classificacao: `PASS WITH RISKS`.
 - A experiencia autenticada real ficou provada em Android fisico com backend
   publico e sem tocar backend/API/DB/AI/scanner/secrets.
-- Risco remanescente: os PNGs da segunda passada foram emitidos pelos harnesses
-  como `CAPTURE_TAKEN`/chunks sanitizados, mas nao foram materializados como
-  arquivos locais individuais no diretorio de provas solicitado nesta execucao.
+- Evidencias: os PNGs da segunda passada foram materializados em
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design_second_pass/`,
+  incluindo capturas individuais e `second_pass_contact_sheet.png`.
+- Risco remanescente: `Optimize -> Agressivo` segue dependente de resposta
+  positiva do backend publico para preview/apply completo; falha amigavel foi
+  provada.
 - Relatorio:
   `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`.
 
