@@ -142,3 +142,142 @@ O app autenticou de forma real, abriu telas centrais no SM A135M, preservou a
 identidade Obsidian/Brass/Frost Blue e recebeu patches visuais seguros de
 semântica de ícone, tab density e contraste de CTA. Os riscos restantes são
 cobertura PNG dedicada ainda parcial e rerun dedicado de Optimize/Validate.
+
+---
+
+## Second Pass — Home readability + expanded runtime captures — 2026-05-07
+
+### Resultado final da segunda rodada
+
+**PASS WITH RISKS** para a segunda passada visual/UX no Android físico
+**SM A135M** (`R58T300SREH`) contra o backend público
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+O status permanece com risco porque os PNGs da segunda passada foram capturados
+pelos harnesses (`CAPTURE_TAKEN`/`SCREENSHOT_BEGIN`) no stream de teste, mas não
+foram materializados como arquivos individuais no diretório solicitado durante
+esta execução. Scanner/câmera/OCR/MLKit continuaram 100% ignorados.
+
+### Device, backend e autenticação
+
+| Item | Resultado |
+| --- | --- |
+| Branch | `master`, sincronizada com `origin/master` por fast-forward; havia alterações locais em andamento antes desta segunda passada |
+| Device | `SM-A135M`, Android `14`, API `34`, id `R58T300SREH` |
+| Backend | `https://evolution-cartinhas.8ktevp.easypanel.host` |
+| Health | `healthy`, produção, `version=1.0.0`, `git_sha=797d69f4409ba39ba7674d77a7993ddad9bf8239` |
+| Auth QA | contas QA descartáveis criadas/autenticadas pelos harnesses; senha/token/JWT/headers não documentados |
+| Scanner/camera/OCR | ignorado/deferred |
+
+### Comandos executados na segunda passada
+
+| Comando | Resultado |
+| --- | --- |
+| `git fetch origin && git checkout master && git pull --ff-only origin master && git status --short` | PASS; branch atualizada, com alterações locais de UX/teste já presentes |
+| `adb devices` | PASS; `R58T300SREH device` |
+| `adb -s R58T300SREH shell getprop ro.product.model` / `ro.build.version.release` / `ro.build.version.sdk` | PASS; `SM-A135M`, Android `14`, API `34` |
+| `curl -sS https://evolution-cartinhas.8ktevp.easypanel.host/health` | PASS; `healthy`, `git_sha=797d69f4409ba39ba7674d77a7993ddad9bf8239` |
+| `cd app && flutter analyze lib test integration_test --no-version-check` | PASS, sem issues |
+| `cd app && flutter test test --no-version-check` | PASS, suíte unit/widget completa (`550+` testes) |
+| `flutter test integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart -d R58T300SREH ...` | PASS, `~01:02`, capturas de Login/Register/Home/Decks/Deck Detail/Generate/Community/Collection/Profile |
+| `flutter test integration_test/sets_search_catalog_runtime_test.dart -d R58T300SREH ...` | PASS, `~00:27`, capturas Search/Cards, Card Detail, Coleções e Set Detail |
+| `flutter test integration_test/binder_dashboard_runtime_test.dart -d R58T300SREH ...` | PASS, `~00:55`, capturas Binder dashboard, resultados, add/edit sheets |
+| `flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d R58T300SREH ...` | PASS, `~01:42`, capturas Binder/Marketplace/Trade list/detail/chat/notifications/messages |
+| `flutter test integration_test/deck_runtime_m2006_test.dart -d R58T300SREH ...` | PASS, `~01:12`, capturas Deck flow, Optimize sheet e falha amigável de agressivo |
+| `flutter test integration_test/deck_generate_async_runtime_test.dart -d R58T300SREH ...` | PASS, `~01:20`, capturas Generate async, preview, save, Deck Detail e rebuild guided blocker |
+| `flutter test integration_test/life_counter_native_player_state_smoke_test.dart -d R58T300SREH --reporter expanded --no-version-check` | PASS, `~00:47`, capturas Lotus table e Player State overlays |
+| `git diff --check` | PASS antes do commit da segunda passada |
+| `cd app && flutter analyze lib test --no-version-check` | PASS antes do commit da segunda passada |
+
+### Matriz de telas/módulos — segunda passada
+
+| Tela/módulo | Status | Evidência de segunda passada |
+| --- | --- | --- |
+| Login/Register | PASS | `CAPTURE_TAKEN`: `01_login`, `02_register_filled`; registro/autenticação reais |
+| Home | PASS | `CAPTURE_TAKEN`: `03_home`; patch aplicado para reduzir risco de truncamento no topo e cards |
+| Search/Cards | PASS | `CAPTURE_TAKEN`: `sets_search_01_cards_results` |
+| Card Detail | PASS | `CAPTURE_TAKEN`: `sets_search_02_card_detail` |
+| Sets/Coleções | PASS | `CAPTURE_TAKEN`: `sets_search_03_collections_results` |
+| Set Detail | PASS | `CAPTURE_TAKEN`: `sets_search_04_set_detail` |
+| Decks | PASS | `CAPTURE_TAKEN`: `04_decks`, `04a_create_deck_dialog` |
+| Deck Detail | PASS | `CAPTURE_TAKEN`: `04b_deck_details`, `08_deck_details` |
+| Generate com IA | PASS WITH RISKS | `CAPTURE_TAKEN`: `05_generate`, `04_generate_screen`, `05_generate_async_progress`, `06_generate_preview`; primeira captura ampla ainda marcou `06_generate_preview_not_proven`, mas o harness async dedicado provou preview |
+| Optimize sheet/preview/apply | PASS WITH RISKS | `CAPTURE_TAKEN`: `08_optimize_sheet`, `08c_optimize_sheet_agressivo`, `09_optimize_sheet`; fluxo focado/rebuild guided provado, agressivo continua com falha amigável quando o backend não entrega preview |
+| Validate | PASS | `deck_runtime_m2006_test` PASS no fluxo create/import/optimize/apply/validate em device físico |
+| Binder/Fichário | PASS | `CAPTURE_TAKEN`: `market_trade_01_binder_have`, `binder_01_dashboard` |
+| Binder dashboard | PASS | `CAPTURE_TAKEN`: `binder_01_dashboard`, `binder_02_search_results`, `binder_03_add_item_sheet`, `binder_04_edit_item_sheet` |
+| Marketplace | PASS | `CAPTURE_TAKEN`: `market_trade_02_marketplace_result` |
+| Trades | PASS | `CAPTURE_TAKEN`: `market_trade_03_create_trade` a `market_trade_10_trade_detail_completed` |
+| Trade Detail | PASS | Capturas pending/accepted/shipped/completed no mesmo harness |
+| Messages/Conversations | PASS | `CAPTURE_TAKEN`: `messages_01_inbox`, `messages_02_conversation` |
+| Notifications | PASS | `CAPTURE_TAKEN`: `market_trade_11_notifications` |
+| Profile | PASS | `CAPTURE_TAKEN`: `09_profile` |
+| Community | PASS | `CAPTURE_TAKEN`: `07_community` |
+| Life Counter/Lotus | PASS | `CAPTURE_TAKEN`: `life_counter_01_lotus_table`, `life_counter_02_player_state`, `life_counter_03_player_state_killed_overlay` |
+| Scanner/camera/OCR | IGNORED | fora de escopo |
+
+### Findings da segunda passada
+
+| ID | Prioridade | Finding | Status |
+| --- | --- | --- | --- |
+| UX-A135M-008 | P2 | Na Home em largura SM A135M, o wordmark `ManaLoom` no topo podia competir com ações de perfil/notificações e gerar overflow/truncamento em cenários de escala de fonte/localização. | Corrigido com `Flexible`, `maxLines: 1` e ellipsis preservando gradiente Brass. |
+| UX-A135M-009 | P2 | Headers de seção e cards de intenção da Home dependiam de linhas horizontais densas; em telas estreitas, títulos/subtítulos longos podiam quebrar ritmo visual e pressionar o chevron. | Corrigido com header flexível e cards secundários empilhados, mantendo tap target e hierarquia. |
+| UX-A135M-010 | P2 | A rodada anterior tinha evidência PNG dedicada parcial para Binder/Marketplace/Trades/Messages/Notifications/Sets/Card Detail/Life Counter. | Harnesses non-scanner receberam capturas visuais focadas nessas superfícies. |
+| UX-A135M-011 | P3 | O helper de captura estava duplicado em alguns harnesses e dificultava expansão segura de provas visuais. | Adicionado helper compartilhado `visual_capture_helpers.dart` para capturas em runtime tests tocados. |
+
+### Patches aplicados na segunda passada
+
+- `app/lib/features/home/home_screen.dart`
+  - wordmark flexível no AppBar custom;
+  - `_SectionHeader` resiliente a largura estreita;
+  - `_IntentCard` com helpers internos e layout empilhado para cards secundários,
+    reduzindo pressão horizontal em SM A135M sem trocar tokens/identidade.
+- `app/test/features/home/home_screen_test.dart`
+  - teste widget em largura 390x844 para garantir que os cards de intenção da Home
+    permaneçam renderizados sem exceção.
+- `app/integration_test/visual_capture_helpers.dart`
+  - helper compartilhado para capturas via `IntegrationTestWidgetsFlutterBinding`.
+- `app/integration_test/sets_search_catalog_runtime_test.dart`
+  - capturas de Cards, Card Detail, Coleções e Set Detail.
+- `app/integration_test/binder_dashboard_runtime_test.dart`
+  - capturas de dashboard, busca e sheets de add/edit.
+- `app/integration_test/binder_marketplace_trade_runtime_test.dart`
+  - capturas de Binder, Marketplace, Trade lifecycle, notificações e mensagens.
+- `app/integration_test/life_counter_native_player_state_smoke_test.dart`
+  - capturas Lotus table e Player State overlays.
+
+Nenhuma alteração backend/API/DB/AI/modelo/scanner/secrets/env/signing/deployment
+foi feita.
+
+### Provas e paths
+
+- Base histórica da primeira rodada:
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design/`.
+- Pasta solicitada para a segunda rodada:
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design_second_pass/`.
+- Capturas da segunda rodada foram provadas no stream dos harnesses pelos eventos
+  `CAPTURE_TAKEN` listados na matriz acima. Nesta execução, os PNGs não foram
+  materializados como arquivos individuais nessa pasta, portanto a evidência de
+  arquivo continua como risco documental.
+
+### Itens não verificados / riscos remanescentes
+
+- Materialização host-side dos PNGs da segunda passada em
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m_design_second_pass/` ficou
+  **NOT PROVEN**; os bytes foram emitidos pelos harnesses, mas não salvos como
+  arquivos locais nesta execução.
+- Optimize `Agressivo` continua dependente do backend público entregar preview
+  positivo; o app mostra falha amigável e o fluxo focado/rebuild guided passou.
+- Auditoria pixel-level manual continua limitada pelas evidências persistidas
+  existentes; a segunda passada aumentou cobertura automatizada de screenshots,
+  mas não substitui revisão manual tela-a-tela de PNGs salvos.
+
+### Veredito da segunda passada
+
+**PASS WITH RISKS**.
+
+Os fluxos autenticados non-scanner centrais passaram no SM A135M real contra
+backend público, a Home recebeu patch visual seguro para ergonomia/densidade em
+tela estreita, e os harnesses agora capturam mais superfícies críticas. O risco
+restante é documental/operacional: persistir os PNGs da segunda rodada como
+arquivos no diretório de provas solicitado.

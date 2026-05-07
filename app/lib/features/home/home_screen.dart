@@ -75,15 +75,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            ShaderMask(
-              shaderCallback:
-                  (bounds) => AppTheme.primaryGradient.createShader(bounds),
-              child: Text(
-                'ManaLoom',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+            Flexible(
+              child: ShaderMask(
+                shaderCallback:
+                    (bounds) => AppTheme.primaryGradient.createShader(bounds),
+                child: Text(
+                  'ManaLoom',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ),
@@ -327,27 +331,37 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      children: [
-        Container(
-          width: 3,
-          height: 18,
-          decoration: BoxDecoration(
-            color: AppTheme.frost400,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Icon(icon, size: 16, color: AppTheme.textSecondary),
-        const SizedBox(width: 6),
-        Text(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bounded = constraints.hasBoundedWidth;
+        final labelText = Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.3,
           ),
-        ),
-      ],
+        );
+
+        return Row(
+          mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
+          children: [
+            Container(
+              width: 3,
+              height: 18,
+              decoration: BoxDecoration(
+                color: AppTheme.frost400,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(icon, size: 16, color: AppTheme.textSecondary),
+            const SizedBox(width: 6),
+            if (bounded) Flexible(child: labelText) else labelText,
+          ],
+        );
+      },
     );
   }
 }
@@ -398,57 +412,95 @@ class _IntentCard extends StatelessWidget {
               width: primary ? 0.9 : 0.6,
             ),
           ),
-          child: Row(
+          child: primary ? _horizontalContent(theme) : _stackedContent(theme),
+        ),
+      ),
+    );
+  }
+
+  Widget _accentIcon({required double size, required double iconSize}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: primary ? 0.18 : 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: accentColor.withValues(alpha: 0.18)),
+      ),
+      child: Icon(icon, color: accentColor, size: iconSize),
+    );
+  }
+
+  Widget _titleText(ThemeData theme, {int maxLines = 1}) {
+    return Text(
+      title,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.titleSmall?.copyWith(
+        color: AppTheme.textPrimary,
+        fontWeight: FontWeight.w800,
+        height: 1.12,
+      ),
+    );
+  }
+
+  Widget _subtitleText(ThemeData theme, {int maxLines = 2}) {
+    return Text(
+      subtitle,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: AppTheme.textSecondary,
+        height: 1.25,
+      ),
+    );
+  }
+
+  Widget _chevron() {
+    return Icon(
+      Icons.chevron_right_rounded,
+      color: accentColor.withValues(alpha: 0.78),
+      size: 20,
+    );
+  }
+
+  Widget _horizontalContent(ThemeData theme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _accentIcon(size: 40, iconSize: 21),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: primary ? 0.18 : 0.12),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  border: Border.all(
-                    color: accentColor.withValues(alpha: 0.18),
-                  ),
-                ),
-                child: Icon(icon, color: accentColor, size: 21),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                        height: 1.25,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: accentColor.withValues(alpha: 0.78),
-                size: 20,
-              ),
+              _titleText(theme),
+              const SizedBox(height: 3),
+              _subtitleText(theme),
             ],
           ),
         ),
-      ),
+        _chevron(),
+      ],
+    );
+  }
+
+  Widget _stackedContent(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _accentIcon(size: 36, iconSize: 19),
+            const Spacer(),
+            _chevron(),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _titleText(theme, maxLines: 2),
+        const SizedBox(height: 4),
+        _subtitleText(theme, maxLines: 3),
+      ],
     );
   }
 }

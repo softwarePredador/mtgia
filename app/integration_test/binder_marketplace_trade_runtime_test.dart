@@ -21,6 +21,8 @@ import 'package:manaloom/features/trades/screens/trade_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'visual_capture_helpers.dart';
+
 class _RuntimeUser {
   const _RuntimeUser({
     required this.id,
@@ -472,6 +474,7 @@ void main() {
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
       await _pumpUntilFound(tester, find.text('Arcane Signet'));
+      await captureVisualProof(binding, tester, 'market_trade_01_binder_have');
 
       await tester.tap(
         find.widgetWithText(Tab, 'Marketplace'),
@@ -491,6 +494,11 @@ void main() {
         tester,
         find.textContaining('histórico insuficiente'),
       );
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_02_marketplace_result',
+      );
 
       final sellerCard = find.ancestor(
         of: find.text(seller.username),
@@ -509,6 +517,7 @@ void main() {
       await _pumpUntilFound(tester, find.text('Nova Proposta'));
       await _pumpUntilFound(tester, find.text('Sol Ring'));
       await _pumpUntilFound(tester, find.text('Pagamento'));
+      await captureVisualProof(binding, tester, 'market_trade_03_create_trade');
 
       final tradeMessage = '$marker marketplace sale proposal';
       await tester.ensureVisible(find.text('Mensagem (opcional)'));
@@ -517,6 +526,11 @@ void main() {
       await tester.tap(find.text('Enviar Proposta'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Revisar proposta'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_04_create_trade_review',
+      );
       await tester.tap(
         find.byKey(const ValueKey('create-trade-review-confirm-button')),
       );
@@ -546,6 +560,7 @@ void main() {
       await tester.pump();
       await _pumpUntilFound(tester, find.text(seller.username));
       await _pumpUntilFound(tester, find.text('Pendente'));
+      await captureVisualProof(binding, tester, 'market_trade_05_trade_list');
 
       await _loginAs(auth, seller);
       await tester.pumpWidget(
@@ -564,12 +579,22 @@ void main() {
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Pendente'));
       await _pumpUntilFound(tester, find.text('Equilíbrio de valor'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_06_trade_detail_pending',
+      );
       await tester.tap(find.text('Aceitar'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Aceitar trade?'));
       await tester.tap(find.text('Aceitar trade'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Aceito'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_07_trade_detail_accepted',
+      );
       expect(
         await api.hasNotificationType(buyer.token, 'trade_accepted'),
         isTrue,
@@ -586,6 +611,7 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.send);
       await tester.pump();
       await _pumpUntilFound(tester, find.text(tradeChatMessage));
+      await captureVisualProof(binding, tester, 'market_trade_08_trade_chat');
       expect(
         await api.tradeMessageCount(seller.token, tradeId),
         greaterThan(0),
@@ -603,6 +629,11 @@ void main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'Confirmar envio'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Enviado'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_09_trade_detail_shipped',
+      );
       expect(
         await api.hasNotificationType(buyer.token, 'trade_shipped'),
         isTrue,
@@ -667,6 +698,11 @@ void main() {
       await tester.tap(find.text('Finalizar trade'));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Concluído'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_10_trade_detail_completed',
+      );
       expect(await api.tradeStatus(buyer.token, tradeId), 'completed');
       expect(
         await api.hasNotificationType(seller.token, 'trade_completed'),
@@ -690,6 +726,11 @@ void main() {
       await _pumpUntilFound(tester, find.text('Notificações'));
       await _pumpUntilFound(tester, find.textContaining('aceitou'));
       await _pumpUntilFound(tester, find.text(tradeChatMessage));
+      await captureVisualProof(
+        binding,
+        tester,
+        'market_trade_11_notifications',
+      );
       await tester.tap(find.text(tradeChatMessage));
       await tester.pump();
       await _pumpUntilFound(tester, find.text('Detalhes do Trade'));
@@ -778,9 +819,11 @@ void main() {
       await _pumpUntilFound(tester, find.text('Mensagens'));
       await _pumpUntilFound(tester, find.text(sender.username));
       await _pumpUntilFound(tester, find.text(inboundMessage));
+      await captureVisualProof(binding, tester, 'messages_01_inbox');
       await tester.tap(find.text(sender.username));
       await tester.pump();
       await _pumpUntilFound(tester, find.text(inboundMessage));
+      await captureVisualProof(binding, tester, 'messages_02_conversation');
       await _pumpUntil(
         tester,
         () async => await api.directUnreadCount(receiver.token) == 0,

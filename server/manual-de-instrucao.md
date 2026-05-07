@@ -2,6 +2,39 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-07 — Segunda passada design Android SM A135M sem Scanner
+
+### O Porquê
+- Foi solicitada uma segunda passada visual/UX no Android fisico `SM A135M`
+  (`R58T300SREH`) contra o backend publico, mantendo Scanner/camera/OCR/MLKit
+  completamente fora de escopo.
+- O foco adicional foi reduzir pressao visual na Home em largura mid-size Android
+  e ampliar cobertura de capturas para telas protegidas e superficies criticas.
+
+### O Como
+- `master` foi sincronizada com `origin/master`; backend publico `/health`
+  respondeu `healthy` com
+  `git_sha=797d69f4409ba39ba7674d77a7993ddad9bf8239`.
+- Contas QA descartaveis foram criadas/autenticadas pelos harnesses sem
+  documentar senha, token, JWT, headers ou payloads sensiveis.
+- Passaram no device fisico: `flutter analyze lib test integration_test`,
+  `flutter test test`, app visual amplo, Sets/Search/Card Detail/Set Detail,
+  Binder dashboard, Marketplace/Trades/Messages/Notifications, Deck runtime,
+  Generate async e Life Counter Player State.
+- Patches ficaram restritos ao app visual/testes: Home resiliente a largura
+  estreita, teste widget de Home em 390x844 e helper compartilhado de capturas
+  para harnesses non-scanner.
+
+### Resultado
+- Classificacao: `PASS WITH RISKS`.
+- A experiencia autenticada real ficou provada em Android fisico com backend
+  publico e sem tocar backend/API/DB/AI/scanner/secrets.
+- Risco remanescente: os PNGs da segunda passada foram emitidos pelos harnesses
+  como `CAPTURE_TAKEN`/chunks sanitizados, mas nao foram materializados como
+  arquivos locais individuais no diretorio de provas solicitado nesta execucao.
+- Relatorio:
+  `docs/qa/manaloom_android_design_audit_sm_a135m_2026-05-07.md`.
+
 ## 2026-05-07 — Auditoria visual Android SM A135M sem Scanner
 
 ### O Porquê

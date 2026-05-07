@@ -16,6 +16,8 @@ import 'package:manaloom/features/trades/providers/trade_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'visual_capture_helpers.dart';
+
 class _RuntimeUser {
   const _RuntimeUser({
     required this.username,
@@ -205,6 +207,7 @@ void main() {
       await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
       await _pumpUntilFound(tester, find.text('Resumo da coleção'));
       await _pumpUntilFound(tester, find.text('Wishlist'));
+      await captureVisualProof(binding, tester, 'binder_01_dashboard');
 
       await _tapVisible(
         tester,
@@ -216,12 +219,14 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pump(const Duration(milliseconds: 500));
       await _pumpUntilFound(tester, find.byTooltip('Adicionar'));
+      await captureVisualProof(binding, tester, 'binder_02_search_results');
       await _tapVisible(tester, find.byTooltip('Adicionar').first);
       await tester.pump();
       await _pumpUntilFound(
         tester,
         find.textContaining('Adicionar — Sol Ring'),
       );
+      await captureVisualProof(binding, tester, 'binder_03_add_item_sheet');
       await _tapVisible(tester, find.text('PT'));
       await _tapVisible(
         tester,
@@ -251,6 +256,7 @@ void main() {
       await tester.tap(find.text('Sol Ring').first);
       await tester.pump();
       await _pumpUntilFound(tester, find.textContaining('Editar — Sol Ring'));
+      await captureVisualProof(binding, tester, 'binder_04_edit_item_sheet');
       await _tapVisible(tester, find.byIcon(Icons.add).last);
       await _tapVisible(tester, find.text('LP'));
       await _tapVisible(tester, find.widgetWithText(ElevatedButton, 'Salvar'));

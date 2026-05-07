@@ -7,6 +7,8 @@ import 'package:manaloom/features/home/life_counter/life_counter_settings_store.
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:manaloom/features/home/lotus_life_counter_screen.dart';
 
+import 'visual_capture_helpers.dart';
+
 Future<LifeCounterSession?> _pumpUntilPlayerStateApplied(
   WidgetTester tester,
   LifeCounterSessionStore store,
@@ -25,7 +27,8 @@ Future<LifeCounterSession?> _pumpUntilPlayerStateApplied(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   testWidgets(
     'applies answer-left from the option-card player state shell on the live WebView path',
@@ -78,6 +81,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(seconds: 8));
+      await captureVisualProof(binding, tester, 'life_counter_01_lotus_table');
 
       final dynamic state = tester.state(find.byType(LotusLifeCounterScreen));
       await state.debugHandleShellMessage(
@@ -86,6 +90,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Player State'), findsOneWidget);
+      await captureVisualProof(binding, tester, 'life_counter_02_player_state');
 
       await tester.scrollUntilVisible(
         find.byKey(
@@ -203,6 +208,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Player State'), findsOneWidget);
+      await captureVisualProof(
+        binding,
+        tester,
+        'life_counter_03_player_state_killed_overlay',
+      );
 
       await tester.scrollUntilVisible(
         find.byKey(const Key('life-counter-native-player-state-decked-out')),

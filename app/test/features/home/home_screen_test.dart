@@ -78,4 +78,22 @@ void main() {
       findsNothing,
     );
   });
+
+  testWidgets('keeps home intent cards readable on SM A135M width', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_buildSubject());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Construir deck'), findsOneWidget);
+    expect(find.text('IA de decks'), findsOneWidget);
+    expect(find.text('Minha coleção'), findsOneWidget);
+    expect(find.text('Trocas e mercado'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -8,8 +8,11 @@ import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:manaloom/features/cards/screens/card_search_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'visual_capture_helpers.dart';
+
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   testWidgets(
     'search collections tab searches and opens set detail against live backend',
@@ -29,6 +32,7 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'Black Lotus');
       await tester.pump(const Duration(milliseconds: 500));
       await _pumpUntilFound(tester, find.text('Black Lotus'));
+      await captureVisualProof(binding, tester, 'sets_search_01_cards_results');
       expect(find.byType(CardDetailScreen), findsNothing);
 
       await tester.tap(find.text('Black Lotus').first);
@@ -39,6 +43,7 @@ void main() {
       await tester.pumpAndSettle();
       await _pumpUntilFound(tester, find.byType(CardDetailScreen));
       expect(find.text('Detalhes'), findsWidgets);
+      await captureVisualProof(binding, tester, 'sets_search_02_card_detail');
 
       Navigator.of(tester.element(find.byType(CardDetailScreen))).pop();
       await tester.pumpAndSettle();
@@ -52,6 +57,11 @@ void main() {
       await tester.enterText(find.byKey(const Key('setsSearchField')), 'ECC');
       await tester.pump(const Duration(milliseconds: 500));
       await _pumpUntilFound(tester, find.text('Lorwyn Eclipsed Commander'));
+      await captureVisualProof(
+        binding,
+        tester,
+        'sets_search_03_collections_results',
+      );
 
       await tester.tap(find.text('Lorwyn Eclipsed Commander'));
       await tester.pumpAndSettle();
@@ -65,6 +75,7 @@ void main() {
         cardsList.evaluate().isNotEmpty || emptyState.evaluate().isNotEmpty,
         isTrue,
       );
+      await captureVisualProof(binding, tester, 'sets_search_04_set_detail');
 
       await tester.pageBack();
       await tester.pumpAndSettle();
