@@ -12239,3 +12239,85 @@ Status por fluxo:
 - Firebase Performance segue nao provado em runtime de integracao;
 - upload TestFlight exige signing/export seguro e URL real de staging;
 - scanner fisico/camera/OCR continua fora do gate e vira NO-GO se entrar no escopo antes de prova fisica.
+
+---
+
+## 99. Regressao final Android non-scanner para release interno - 2026-05-07
+
+### 99.1 Objetivo
+
+Executar regressao final non-scanner do ManaLoom em `master`, contra o backend publico `https://evolution-cartinhas.8ktevp.easypanel.host`, usando Android fisico `SM A135M` via adb para decisao de release interno. Scanner, camera, OCR e MLKit scanner ficaram explicitamente fora do escopo.
+
+### 99.2 Ambiente validado
+
+- branch local/origin: `master`;
+- HEAD: `56aed49` (`Polish ManaLoom mobile UX design`);
+- backend `/health`: `200`, `status=healthy`, `environment=production`, `version=1.0.0`;
+- backend `git_sha`: `56aed49c36642148abc99a553459ee584967d47d`;
+- device runtime: `SM A135M`, adb id `R58T300SREH`, Android 14 API 34;
+- app API base: `https://evolution-cartinhas.8ktevp.easypanel.host`;
+- scanner runtime: `DEFERRED / IGNORED`.
+
+### 99.3 Validacao executada
+
+```bash
+git fetch --prune origin
+git pull --ff-only origin master
+git status --short --branch
+flutter devices --no-version-check
+adb devices -l
+curl -sS -i https://evolution-cartinhas.8ktevp.easypanel.host/health
+
+cd app
+flutter analyze lib test integration_test --no-version-check
+flutter test test --no-version-check
+
+flutter test integration_test/sets_catalog_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/sets_search_catalog_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/collection_entrypoints_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/profile_community_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/life_counter_lotus_visual_runtime_proof_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/deck_runtime_m2006_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=RUNTIME_OPTIMIZE_INTENSITY_LABEL=Agressivo --dart-define=RUNTIME_OPTIMIZE_REQUIRE_APPLY=false --reporter expanded --no-version-check
+flutter test integration_test/deck_generate_async_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/binder_dashboard_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/binder_marketplace_trade_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/life_counter_lotus_card_search_visual_smoke_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/life_counter_lotus_settings_visual_smoke_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+flutter test integration_test/life_counter_clock_visual_smoke_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+```
+
+Resultados:
+
+- `flutter analyze lib test integration_test --no-version-check`: `PASS`;
+- `flutter test test --no-version-check`: `PASS`, `+551`;
+- runtime Android non-scanner: 12/12 integration tests `PASS`, 990s somados;
+- nenhum 5xx runtime, crash, tela branca, overflow bloqueante ou timeout de teste;
+- `integration_test/scanner_controlled_harness_runtime_test.dart`: nao executado por estar fora do release interno.
+
+### 99.4 Classificacao
+
+- 4xx esperados: `POST /ai/optimize -> 422` para `OPTIMIZE_NEEDS_REPAIR`, com UI `rebuild_guided` amigavel;
+- 4xx inesperados: nenhum observado em runtime device;
+- 5xx: nenhum observado em runtime device;
+- timeouts: nenhum bloqueante; screenshot nativo Lotus registrou `LOTUS_SCREENSHOT_NOT_PROVEN`, mas DOM/state/reopen passaram;
+- raw error user-facing: nenhum observado; o log interno registrou falha de executor no optimize async, mas a UI validou ausencia de `executor interno` e `resposta invalida/invalidada`;
+- latencia >5s: `/market/movers` 5303ms, `POST /ai/archetypes` 7733ms, AI Generate async 15851ms ate conclusao com feedback inicial em 770ms.
+
+### 99.5 Decisao de release
+
+Veredito final: **GO WITH RISKS** para release interno non-scanner.
+
+Riscos aceitos:
+
+- Optimize agressivo com preview positivo, deselect e apply parcial segue `NOT PROVEN` no backend vivo porque a execucao retornou safe no-op/falha amigavel em vez de sugestoes aplicaveis;
+- `rebuild_guided` foi validado como acao compreensivel para o usuario, nao como erro bruto;
+- latencias acima de 5s exigem monitoramento, mas nao bloquearam feedback visual nem navegacao;
+- scanner/camera/OCR/MLKit permanecem fora do release e continuam `DEFERRED / IGNORED`.
+
+### 99.6 Documentacao atualizada
+
+- `server/doc/RELEASE_INTERNAL_NON_SCANNER_GO_NO_GO_2026-05-07.md`;
+- `app/doc/APP_AUDIT_2026-04-29.md`;
+- este `server/manual-de-instrucao.md`.
+
+Evidencias locais redigidas, nao versionadas por `.gitignore`: `app/doc/runtime_flow_proofs_2026-05-07_android_sm_a135m_non_scanner/`.
