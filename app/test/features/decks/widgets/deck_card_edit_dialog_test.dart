@@ -66,7 +66,10 @@ void main() {
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), '0');
+    await tester.enterText(
+      find.byKey(const Key('deck-card-edit-quantity-field')),
+      '0',
+    );
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
 
@@ -132,7 +135,10 @@ void main() {
     expect(find.textContaining('Non-foil'), findsAtLeastNWidgets(1));
     expect(find.textContaining('Rare'), findsAtLeastNWidgets(1));
 
-    await tester.enterText(find.byType(TextField), '2');
+    await tester.enterText(
+      find.byKey(const Key('deck-card-edit-quantity-field')),
+      '2',
+    );
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
 

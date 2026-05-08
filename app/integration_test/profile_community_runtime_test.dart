@@ -302,14 +302,21 @@ void main() {
       );
       await tester.pump();
       await pumpUntilFound(tester, find.text('Buscar Usuários'));
-      await tester.enterText(find.byType(TextField).first, creator.username);
+      await tester.enterText(
+        find.byKey(const Key('user-search-field')),
+        creator.username,
+      );
       await tester.pump(const Duration(milliseconds: 600));
       await pumpUntil(
         tester,
-        () async => find.text(creator.username).evaluate().length >= 2,
+        () async =>
+            find
+                .byKey(Key('user-search-row-${creator.id}'))
+                .evaluate()
+                .isNotEmpty,
         description: 'user search result for ${creator.username}',
       );
-      await tester.tap(find.text(creator.username).last);
+      await tester.tap(find.byKey(Key('user-search-row-${creator.id}')));
       await tester.pump();
       await pumpUntilFound(tester, find.textContaining('Decks'));
       await tester.pageBack();
@@ -327,11 +334,17 @@ void main() {
       await tester.pump();
       await pumpUntilFound(tester, find.text('Comunidade'));
 
-      await tester.enterText(find.byType(TextField).first, marker);
+      await tester.enterText(
+        find.byKey(const Key('community-explore-search-field')),
+        marker,
+      );
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
-      await pumpUntilFound(tester, find.text(deckName));
-      await tester.tap(find.text(deckName).first);
+      await pumpUntilFound(
+        tester,
+        find.byKey(Key('community-explore-deck-row-$deckId')),
+      );
+      await tester.tap(find.byKey(Key('community-explore-deck-row-$deckId')));
       await tester.pump();
       await pumpUntil(
         tester,
@@ -364,17 +377,28 @@ void main() {
       await tester.pump();
       await pumpUntil(
         tester,
-        () async => find.byType(TextField).evaluate().isNotEmpty,
+        () async =>
+            find
+                .byKey(const Key('community-users-search-field'))
+                .evaluate()
+                .isNotEmpty,
         description: 'community users search field',
       );
-      await tester.enterText(find.byType(TextField).last, creator.username);
+      await tester.enterText(
+        find.byKey(const Key('community-users-search-field')),
+        creator.username,
+      );
       await tester.pump(const Duration(milliseconds: 600));
       await pumpUntil(
         tester,
-        () async => find.text(creator.username).evaluate().length >= 2,
+        () async =>
+            find
+                .byKey(Key('community-users-row-${creator.id}'))
+                .evaluate()
+                .isNotEmpty,
         description: 'community user tab result for ${creator.username}',
       );
-      await tester.tap(find.text(creator.username).last);
+      await tester.tap(find.byKey(Key('community-users-row-${creator.id}')));
       await tester.pump();
       await pumpUntilFound(tester, find.textContaining('Decks'));
       await tester.pageBack();

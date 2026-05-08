@@ -62,6 +62,7 @@ class _LifeCounterNativeCardSearchSheetState
       child: Builder(
         builder: (context) {
           return SafeArea(
+            key: const Key('life-counter-native-card-search-sheet'),
             child: Padding(
               padding: EdgeInsets.only(
                 left: 12,

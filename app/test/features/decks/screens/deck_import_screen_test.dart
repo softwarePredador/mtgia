@@ -75,12 +75,21 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).at(0), 'Deck de teste');
-    await tester.enterText(find.byType(TextField).last, '1 Sol Ring');
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-name-field')),
+      'Deck de teste',
+    );
+    await tester.enterText(
+      find.byKey(const Key('deck-import-screen-list-field')),
+      '1 Sol Ring',
+    );
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Criar Deck'));
-    await tester.tap(find.text('Criar Deck'));
+    final submitButton = find.byKey(
+      const Key('deck-import-screen-submit-button'),
+    );
+    await tester.ensureVisible(submitButton);
+    await tester.tap(submitButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Não foi possível importar agora'), findsOneWidget);

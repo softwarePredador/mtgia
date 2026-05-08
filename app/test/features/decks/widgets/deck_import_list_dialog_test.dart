@@ -64,9 +64,14 @@ void main() {
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Importar Lista'), findsOneWidget);
-    await tester.enterText(find.byType(TextField), '1 Sol Ring\n1 Arcane Signet');
-    await tester.tap(find.text('Importar'));
+    expect(find.byKey(const Key('deck-import-list-dialog')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('deck-import-list-dialog-field')),
+      '1 Sol Ring\n1 Arcane Signet',
+    );
+    await tester.tap(
+      find.byKey(const Key('deck-import-list-dialog-submit-button')),
+    );
     await tester.pumpAndSettle();
 
     expect(importCalls, hasLength(1));

@@ -21,6 +21,7 @@ import 'package:manaloom/features/trades/screens/trade_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'runtime_test_helpers.dart';
 import 'visual_capture_helpers.dart';
 
 class _RuntimeUser {
@@ -372,11 +373,11 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Binder editor runtime harness'));
+      await pumpUntilFound(tester, find.text('Binder editor runtime harness'));
 
       await tester.tap(find.text('Abrir editor add'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Adicionar — Command Tower'));
+      await pumpUntilFound(tester, find.text('Adicionar — Command Tower'));
       await _tapVisible(
         tester,
         find.byKey(const Key('binder-editor-language-pt')),
@@ -400,7 +401,7 @@ void main() {
         find.byKey(const Key('binder-editor-save-button')),
       );
       await tester.pump();
-      await _pumpUntil(tester, () async {
+      await pumpUntil(tester, () async {
         final data = await api.getJson(
           '/binder?search=Command%20Tower&limit=20',
           token: buyer.token,
@@ -411,7 +412,7 @@ void main() {
           return card['name'] == 'Command Tower' && item['language'] == 'pt';
         });
       }, description: 'Command Tower created through BinderItemEditor');
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => find.text('Adicionar — Command Tower').evaluate().isEmpty,
         description: 'BinderItemEditor add sheet dismissed',
@@ -421,7 +422,7 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Abrir editor edit'),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Editar — Command Tower'));
+      await pumpUntilFound(tester, find.text('Editar — Command Tower'));
       await _tapVisible(
         tester,
         find.byKey(const Key('binder-editor-quantity-increment')),
@@ -448,7 +449,7 @@ void main() {
         find.byKey(const Key('binder-editor-save-button')),
       );
       await tester.pump();
-      await _pumpUntil(tester, () async {
+      await pumpUntil(tester, () async {
         final item = await api.findBinderItemByCardName(
           token: buyer.token,
           cardName: 'Command Tower',
@@ -458,7 +459,7 @@ void main() {
             item['language'] == 'es' &&
             (item['price'] as num).toDouble() == 4.56;
       }, description: 'Command Tower edited through BinderItemEditor');
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => find.text('Editar — Command Tower').evaluate().isEmpty,
         description: 'BinderItemEditor edit sheet dismissed',
@@ -468,16 +469,16 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Abrir editor edit'),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Editar — Command Tower'));
+      await pumpUntilFound(tester, find.text('Editar — Command Tower'));
       await _tapVisible(
         tester,
         find.byKey(const Key('binder-editor-remove-button')),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Remover do Fichário?'));
+      await pumpUntilFound(tester, find.text('Remover do Fichário?'));
       await tester.tap(find.widgetWithText(TextButton, 'Remover'));
       await tester.pump();
-      await _pumpUntil(tester, () async {
+      await pumpUntil(tester, () async {
         final data = await api.getJson(
           '/binder?search=Command%20Tower&limit=20',
           token: buyer.token,
@@ -501,10 +502,10 @@ void main() {
       );
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Coleção'));
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
-      await _pumpUntilFound(tester, find.text('Arcane Signet'));
+      await pumpUntilFound(tester, find.text('Coleção'));
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Tenho'));
+      await pumpUntilFound(tester, find.text('Arcane Signet'));
       await captureVisualProof(binding, tester, 'market_trade_01_binder_have');
 
       await tester.tap(
@@ -512,7 +513,7 @@ void main() {
         warnIfMissed: false,
       );
       await tester.pump();
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.byKey(const Key('marketplace-search-field')),
       );
@@ -522,9 +523,9 @@ void main() {
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(seller.username));
-      await _pumpUntilFound(tester, find.textContaining('Ref. interna'));
-      await _pumpUntilFound(
+      await pumpUntilFound(tester, find.text(seller.username));
+      await pumpUntilFound(tester, find.textContaining('Ref. interna'));
+      await pumpUntilFound(
         tester,
         find.textContaining('histórico insuficiente'),
       );
@@ -548,9 +549,9 @@ void main() {
       await tester.tap(buyButton);
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Nova Proposta'));
-      await _pumpUntilFound(tester, find.text('Sol Ring'));
-      await _pumpUntilFound(tester, find.text('Pagamento'));
+      await pumpUntilFound(tester, find.text('Nova Proposta'));
+      await pumpUntilFound(tester, find.text('Sol Ring'));
+      await pumpUntilFound(tester, find.text('Pagamento'));
       await captureVisualProof(binding, tester, 'market_trade_03_create_trade');
 
       final tradeMessage = '$marker marketplace sale proposal';
@@ -564,7 +565,7 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('create-trade-submit-button')));
       await tester.pump();
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.byKey(const Key('create-trade-review-dialog')),
       );
@@ -577,7 +578,7 @@ void main() {
         find.byKey(const ValueKey('create-trade-review-confirm-button')),
       );
       await tester.pump();
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.text('Proposta enviada com sucesso! 🎉'),
         attempts: 60,
@@ -597,11 +598,11 @@ void main() {
 
       await tester.tap(find.widgetWithText(Tab, 'Trades'), warnIfMissed: false);
       await tester.pump();
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Enviadas'));
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Enviadas'));
       await tester.tap(find.widgetWithText(Tab, 'Enviadas'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(seller.username));
-      await _pumpUntilFound(tester, find.text('Pendente'));
+      await pumpUntilFound(tester, find.text(seller.username));
+      await pumpUntilFound(tester, find.text('Pendente'));
       await captureVisualProof(binding, tester, 'market_trade_05_trade_list');
 
       await _loginAs(auth, seller);
@@ -619,8 +620,8 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Pendente'));
-      await _pumpUntilFound(tester, find.text('Equilíbrio de valor'));
+      await pumpUntilFound(tester, find.text('Pendente'));
+      await pumpUntilFound(tester, find.text('Equilíbrio de valor'));
       await captureVisualProof(
         binding,
         tester,
@@ -628,10 +629,10 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('trade-action-accept')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Aceitar trade?'));
+      await pumpUntilFound(tester, find.text('Aceitar trade?'));
       await tester.tap(find.text('Aceitar trade'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Aceito'));
+      await pumpUntilFound(tester, find.text('Aceito'));
       await captureVisualProof(
         binding,
         tester,
@@ -655,7 +656,7 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('trade-message-send-button')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(tradeChatMessage));
+      await pumpUntilFound(tester, find.text(tradeChatMessage));
       await captureVisualProof(binding, tester, 'market_trade_08_trade_chat');
       expect(
         await api.tradeMessageCount(seller.token, tradeId),
@@ -670,14 +671,14 @@ void main() {
       await tester.ensureVisible(shipAction);
       await tester.tap(shipAction);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Confirmar envio'));
+      await pumpUntilFound(tester, find.text('Confirmar envio'));
       await tester.enterText(
         find.byKey(const Key('trade-ship-tracking-field')),
         'QA$marker',
       );
       await tester.tap(find.byKey(const Key('trade-ship-confirm-button')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Enviado'));
+      await pumpUntilFound(tester, find.text('Enviado'));
       await captureVisualProof(
         binding,
         tester,
@@ -715,14 +716,14 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Enviado'));
+      await pumpUntilFound(tester, find.text('Enviado'));
       await tester.scrollUntilVisible(
         find.textContaining('Mensagens deste trade'),
         250,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(tradeChatMessage));
+      await pumpUntilFound(tester, find.text(tradeChatMessage));
       await tester.scrollUntilVisible(
         find.byKey(const Key('trade-action-confirm-delivery')),
         -250,
@@ -731,10 +732,10 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const Key('trade-action-confirm-delivery')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Confirmar entrega?'));
+      await pumpUntilFound(tester, find.text('Confirmar entrega?'));
       await tester.tap(find.text('Confirmar entrega'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Entregue'));
+      await pumpUntilFound(tester, find.text('Entregue'));
       await tester.scrollUntilVisible(
         find.byKey(const Key('trade-action-complete')),
         -250,
@@ -743,10 +744,10 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const Key('trade-action-complete')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Finalizar trade?'));
+      await pumpUntilFound(tester, find.text('Finalizar trade?'));
       await tester.tap(find.text('Finalizar trade'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Concluído'));
+      await pumpUntilFound(tester, find.text('Concluído'));
       await captureVisualProof(
         binding,
         tester,
@@ -772,9 +773,9 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Notificações'));
-      await _pumpUntilFound(tester, find.textContaining('aceitou'));
-      await _pumpUntilFound(tester, find.text(tradeChatMessage));
+      await pumpUntilFound(tester, find.text('Notificações'));
+      await pumpUntilFound(tester, find.textContaining('aceitou'));
+      await pumpUntilFound(tester, find.text(tradeChatMessage));
       await captureVisualProof(
         binding,
         tester,
@@ -782,7 +783,7 @@ void main() {
       );
       await tester.tap(find.text(tradeChatMessage));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Detalhes do Trade'));
+      await pumpUntilFound(tester, find.text('Detalhes do Trade'));
       expect(
         await api.notificationIsRead(
           buyer.token,
@@ -802,14 +803,14 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Notificações'));
-      await _pumpUntilFound(
+      await pumpUntilFound(tester, find.text('Notificações'));
+      await pumpUntilFound(
         tester,
         find.byKey(const Key('notifications-read-all-button')),
       );
       await tester.tap(find.byKey(const Key('notifications-read-all-button')));
       await tester.pump();
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => await api.notificationUnreadCount(buyer.token) == 0,
         description: 'notifications read-all reflected in backend',
@@ -868,15 +869,15 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Mensagens'));
-      await _pumpUntilFound(tester, find.text(sender.username));
-      await _pumpUntilFound(tester, find.text(inboundMessage));
+      await pumpUntilFound(tester, find.text('Mensagens'));
+      await pumpUntilFound(tester, find.text(sender.username));
+      await pumpUntilFound(tester, find.text(inboundMessage));
       await captureVisualProof(binding, tester, 'messages_01_inbox');
       await tester.tap(find.text(sender.username));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(inboundMessage));
+      await pumpUntilFound(tester, find.text(inboundMessage));
       await captureVisualProof(binding, tester, 'messages_02_conversation');
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => await api.directUnreadCount(receiver.token) == 0,
         description: 'direct message read receipt reflected in backend',
@@ -889,8 +890,8 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('chat-message-send-button')));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(reply));
-      await _pumpUntil(
+      await pumpUntilFound(tester, find.text(reply));
+      await pumpUntil(
         tester,
         () async =>
             await api.directMessageCount(receiver.token, conversationId) >= 2,
@@ -1066,37 +1067,8 @@ Future<void> _loginAs(AuthProvider auth, _RuntimeUser user) async {
   expect(ok, isTrue, reason: 'login failed for ${user.username}');
 }
 
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  await _pumpUntil(
-    tester,
-    () async => finder.evaluate().isNotEmpty,
-    description: finder.toString(),
-    attempts: attempts,
-    step: step,
-  );
-}
-
 Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle(const Duration(milliseconds: 100));
   await tester.tap(finder);
-}
-
-Future<void> _pumpUntil(
-  WidgetTester tester,
-  Future<bool> Function() condition, {
-  required String description,
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (await condition()) return;
-  }
-  fail('Timeout waiting for $description');
 }

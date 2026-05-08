@@ -29,6 +29,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
     final summaryLabel = hasWarnings ? 'Pontos de atenção' : 'Base saudável';
 
     return Container(
+      key: const Key('deck-diagnostic-panel'),
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -148,7 +149,9 @@ class DeckDiagnosticPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          ...snapshot.insights.map((insight) => _DiagnosticInsightRow(insight)),
+          ...snapshot.insights.asMap().entries.map(
+            (entry) => _DiagnosticInsightRow(entry.value, index: entry.key),
+          ),
         ],
       ),
     );
@@ -169,6 +172,7 @@ class _DiagnosticMetricCard extends StatelessWidget {
         final isCompact = constraints.maxWidth < 170;
 
         return Container(
+          key: Key('deck-diagnostic-metric-${metric.label}'),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.92),
@@ -262,13 +266,16 @@ class _DiagnosticMetricCard extends StatelessWidget {
 class _DiagnosticInsightRow extends StatelessWidget {
   final _DiagnosticInsight insight;
 
-  const _DiagnosticInsightRow(this.insight);
+  final int index;
+
+  const _DiagnosticInsightRow(this.insight, {required this.index});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
+      key: Key('deck-diagnostic-insight-$index'),
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -314,6 +321,7 @@ class _DiagnosticSummaryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('deck-diagnostic-summary-badge'),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: tone.background,

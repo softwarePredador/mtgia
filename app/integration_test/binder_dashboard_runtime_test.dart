@@ -16,6 +16,7 @@ import 'package:manaloom/features/trades/providers/trade_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'runtime_test_helpers.dart';
 import 'visual_capture_helpers.dart';
 
 class _RuntimeUser {
@@ -203,10 +204,10 @@ void main() {
       );
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Coleção'));
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
-      await _pumpUntilFound(tester, find.text('Resumo da coleção'));
-      await _pumpUntilFound(tester, find.text('Wishlist'));
+      await pumpUntilFound(tester, find.text('Coleção'));
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Fichário'));
+      await pumpUntilFound(tester, find.text('Resumo da coleção'));
+      await pumpUntilFound(tester, find.text('Wishlist'));
       await captureVisualProof(binding, tester, 'binder_01_dashboard');
 
       await _tapVisible(
@@ -214,18 +215,18 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Buscar carta'),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
-      await tester.enterText(find.byType(TextField).first, 'Sol Ring');
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
+      await tester.enterText(
+        find.byKey(const Key('card-search-field')),
+        'Sol Ring',
+      );
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pump(const Duration(milliseconds: 500));
-      await _pumpUntilFound(tester, find.byTooltip('Adicionar'));
+      await pumpUntilFound(tester, find.byTooltip('Adicionar'));
       await captureVisualProof(binding, tester, 'binder_02_search_results');
       await _tapVisible(tester, find.byTooltip('Adicionar').first);
       await tester.pump();
-      await _pumpUntilFound(
-        tester,
-        find.textContaining('Adicionar — Sol Ring'),
-      );
+      await pumpUntilFound(tester, find.textContaining('Adicionar — Sol Ring'));
       await captureVisualProof(binding, tester, 'binder_03_add_item_sheet');
       await _tapVisible(tester, find.text('PT'));
       await _tapVisible(
@@ -234,14 +235,14 @@ void main() {
       );
       await tester.pump();
 
-      await _pumpUntil(tester, () async {
+      await pumpUntil(tester, () async {
         final item = await api.findBinderItemByCardName(
           token: user.token,
           cardName: 'Sol Ring',
         );
         return item != null && item['language'] == 'pt';
       }, description: 'Sol Ring added through collection binder UI');
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async =>
             find.textContaining('Adicionar — Sol Ring').evaluate().isEmpty,
@@ -251,18 +252,18 @@ void main() {
         tester.element(find.byType(Navigator).first),
       ).maybePop();
       await tester.pumpAndSettle();
-      await _pumpUntilFound(tester, find.text('Sol Ring'));
+      await pumpUntilFound(tester, find.text('Sol Ring'));
 
       await tester.tap(find.text('Sol Ring').first);
       await tester.pump();
-      await _pumpUntilFound(tester, find.textContaining('Editar — Sol Ring'));
+      await pumpUntilFound(tester, find.textContaining('Editar — Sol Ring'));
       await captureVisualProof(binding, tester, 'binder_04_edit_item_sheet');
       await _tapVisible(tester, find.byIcon(Icons.add).last);
       await _tapVisible(tester, find.text('LP'));
       await _tapVisible(tester, find.widgetWithText(ElevatedButton, 'Salvar'));
       await tester.pump();
 
-      await _pumpUntil(tester, () async {
+      await pumpUntil(tester, () async {
         final item = await api.findBinderItemByCardName(
           token: user.token,
           cardName: 'Sol Ring',
@@ -283,19 +284,19 @@ void main() {
         );
         await tester.testTextInput.receiveAction(TextInputAction.search);
         await tester.pump(const Duration(milliseconds: 500));
-        await _pumpUntilFound(tester, find.text('Sol Ring'));
+        await pumpUntilFound(tester, find.text('Sol Ring'));
       }
 
       await tester.tap(find.text('Sol Ring').first);
       await tester.pump();
-      await _pumpUntilFound(tester, find.textContaining('Editar — Sol Ring'));
+      await pumpUntilFound(tester, find.textContaining('Editar — Sol Ring'));
       await _tapVisible(tester, find.widgetWithText(OutlinedButton, 'Remover'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Remover do Fichário?'));
+      await pumpUntilFound(tester, find.text('Remover do Fichário?'));
       await tester.tap(find.widgetWithText(TextButton, 'Remover'));
       await tester.pump();
 
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async =>
             await api.findBinderItemByCardName(
@@ -337,37 +338,8 @@ Widget _runtimeApp({
   );
 }
 
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  await _pumpUntil(
-    tester,
-    () async => finder.evaluate().isNotEmpty,
-    description: finder.toString(),
-    attempts: attempts,
-    step: step,
-  );
-}
-
 Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle(const Duration(milliseconds: 100));
   await tester.tap(finder);
-}
-
-Future<void> _pumpUntil(
-  WidgetTester tester,
-  Future<bool> Function() condition, {
-  required String description,
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (await condition()) return;
-  }
-  fail('Timeout waiting for $description');
 }

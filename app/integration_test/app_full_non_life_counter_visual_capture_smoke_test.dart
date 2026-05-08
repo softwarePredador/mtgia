@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/main.dart' as app;
 
+import 'runtime_test_helpers.dart';
+
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
   const chunkSize = 2000;
@@ -90,51 +92,6 @@ Future<void> _capture(
   }
 }
 
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 30,
-  Duration step = const Duration(seconds: 1),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (finder.evaluate().isNotEmpty) {
-      return;
-    }
-  }
-  fail('Widget not found: $finder');
-}
-
-Future<void> _pumpUntilAbsent(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 30,
-  Duration step = const Duration(seconds: 1),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (finder.evaluate().isEmpty) {
-      return;
-    }
-  }
-  fail('Widget still present: $finder');
-}
-
-Future<bool> _pumpUntilAnyFound(
-  WidgetTester tester,
-  List<Finder> finders, {
-  int attempts = 30,
-  Duration step = const Duration(seconds: 1),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (finders.any((finder) => finder.evaluate().isNotEmpty)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -150,41 +107,50 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
 
     // Login screen.
-    await _pumpUntilFound(tester, find.text('Entrar'), attempts: 60);
+    await pumpUntilFound(tester, find.text('Entrar'), attempts: 60);
     await tester.pump(const Duration(seconds: 1));
 
     await _capture(binding, tester, '01_login');
 
     // Navigate to register.
-    await tester.tap(find.text('Criar conta'));
+    await tester.tap(find.byKey(const Key('login-open-register-button')));
     await tester.pump();
 
-    await _pumpUntilFound(tester, find.text('Criar Conta'), attempts: 60);
+    await pumpUntilFound(tester, find.text('Criar Conta'), attempts: 60);
 
     final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
     final username = 'qa$unique';
     final email = 'qa$unique@example.com';
     const password = 'Qa123456!';
 
-    final fields = find.byType(TextFormField);
-    expect(fields, findsNWidgets(4));
-
-    await tester.enterText(fields.at(0), username);
-    await tester.enterText(fields.at(1), email);
-    await tester.enterText(fields.at(2), password);
-    await tester.enterText(fields.at(3), password);
+    await tester.enterText(
+      find.byKey(const Key('register-username-field')),
+      username,
+    );
+    await tester.enterText(
+      find.byKey(const Key('register-email-field')),
+      email,
+    );
+    await tester.enterText(
+      find.byKey(const Key('register-password-field')),
+      password,
+    );
+    await tester.enterText(
+      find.byKey(const Key('register-confirm-password-field')),
+      password,
+    );
     await tester.pump(const Duration(milliseconds: 300));
     await _capture(binding, tester, '02_register_filled');
 
     // Tap the submit button (there is also a heading with the same text).
-    final submit = find.widgetWithText(InkWell, 'Criar Conta');
+    final submit = find.byKey(const Key('register-submit-button'));
     await tester.ensureVisible(submit);
     await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(submit);
     await tester.pump();
 
     // Main shell should appear when authenticated.
-    await _pumpUntilFound(tester, find.text('Decks'), attempts: 90);
+    await pumpUntilFound(tester, find.text('Decks'), attempts: 90);
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '03_home');
 
@@ -195,42 +161,33 @@ void main() {
 
     // Create a minimal deck to also validate/capture the Deck Details surface.
     String? createdName;
-    final newDeckText = find.text('Novo Deck');
-    final newDeckButton = find.ancestor(
-      of: newDeckText,
-      matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+    final newDeckButton = find.byKey(
+      const Key('deck-list-empty-create-button'),
     );
-    if (newDeckText.evaluate().isNotEmpty) {
-      if (newDeckButton.evaluate().isNotEmpty) {
-        await tester.tap(newDeckButton.first);
-      } else {
-        await tester.tap(newDeckText.first);
-      }
+    if (newDeckButton.evaluate().isNotEmpty) {
+      await tester.tap(newDeckButton);
       await tester.pump();
 
-      final dialog = find.byType(AlertDialog);
-      await _pumpUntilFound(tester, dialog, attempts: 60);
+      final dialog = find.byKey(const Key('deck-create-dialog'));
+      await pumpUntilFound(tester, dialog, attempts: 60);
       await tester.pump(const Duration(milliseconds: 300));
       await _capture(binding, tester, '04a_create_deck_dialog');
 
       createdName = 'QA Deck $unique';
-      final nameField =
-          find.descendant(of: dialog, matching: find.byType(TextField)).first;
-      await tester.enterText(nameField, createdName);
+      await tester.enterText(
+        find.byKey(const Key('deck-create-name-field')),
+        createdName,
+      );
       await tester.pump(const Duration(milliseconds: 300));
 
-      final createButton = find.descendant(
-        of: dialog,
-        matching: find.widgetWithText(ElevatedButton, 'Criar'),
-      );
-      await tester.tap(createButton);
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
       await tester.pump();
 
       // Wait for the dialog to close before asserting the deck list updates.
-      await _pumpUntilAbsent(tester, dialog, attempts: 60);
+      await pumpUntilAbsent(tester, dialog, attempts: 60);
 
       final createdText = find.text(createdName);
-      await _pumpUntilFound(tester, createdText, attempts: 120);
+      await pumpUntilFound(tester, createdText, attempts: 120);
       await tester.ensureVisible(createdText);
       await tester.pump(const Duration(seconds: 1));
     }
@@ -247,11 +204,7 @@ void main() {
         await tester.tap(createdText.first);
       }
       await tester.pump();
-      await _pumpUntilFound(
-        tester,
-        find.text('Detalhes do Deck'),
-        attempts: 90,
-      );
+      await pumpUntilFound(tester, find.text('Detalhes do Deck'), attempts: 90);
       await tester.pump(const Duration(seconds: 2));
       await _capture(binding, tester, '04b_deck_details');
 
@@ -261,7 +214,7 @@ void main() {
         await tester.tap(back);
         await tester.pump();
       }
-      await _pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
+      await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
       await tester.pump(const Duration(seconds: 1));
     }
 
@@ -269,16 +222,12 @@ void main() {
     // NOTE: do not tap scanner/camera flows in this test; they can trigger OS
     // permission prompts or external activities and make the app appear to go
     // to background during automated runs.
-    final fabMenu = find.byType(PopupMenuButton<String>);
+    final fabMenu = find.byKey(const Key('deck-list-fab-menu'));
     if (fabMenu.evaluate().isNotEmpty) {
       await tester.tap(fabMenu);
       await tester.pump(const Duration(seconds: 1));
 
-      // Constrain the tap to the popup menu overlay.
-      final generateEntry = find.descendant(
-        of: find.byType(PopupMenuItem<String>),
-        matching: find.text('Gerar com IA'),
-      );
+      final generateEntry = find.byKey(const Key('deck-list-menu-generate'));
       expect(generateEntry, findsOneWidget);
       await tester.tap(generateEntry);
       await tester.pump();
@@ -296,35 +245,29 @@ void main() {
       }
       await tester.pump();
     }
-    await _pumpUntilFound(tester, find.text('Gerador de Decks'), attempts: 60);
+    await pumpUntilFound(tester, find.text('Gerador de Decks'), attempts: 60);
     await tester.pump(const Duration(seconds: 1));
     await _capture(binding, tester, '05_generate');
 
     // Generate preview (mock mode is allowed when OPENAI_API_KEY is missing).
     await tester.enterText(
-      find.byType(TextField).first,
+      find.byKey(const Key('deck-generate-prompt-field')),
       'Deck agressivo de goblins vermelhos com curva baixa e muito burn.',
     );
-    final generateButtonLabel = find.text('Gerar proposta');
-    await tester.ensureVisible(generateButtonLabel);
-    final generateButton = find.ancestor(
-      of: generateButtonLabel,
-      matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
-    );
-    expect(generateButton, findsOneWidget);
+    final generateButton = find.byKey(const Key('deck-generate-submit-button'));
+    await tester.ensureVisible(generateButton);
     await tester.tap(generateButton);
     await tester.pump();
     final previewTitle = find.text('Preview antes de salvar');
     final asyncAccepted = find.text('Pedido aceito');
     final rawError = find.textContaining('Exception');
-    final hasGenerateOutcome = await _pumpUntilAnyFound(tester, [
+    await pumpUntilAnyFound(tester, [
       previewTitle,
       asyncAccepted,
       find.textContaining('Erro'),
       find.textContaining('Falha'),
       rawError,
     ], attempts: 120);
-    expect(hasGenerateOutcome, isTrue);
     if (previewTitle.evaluate().isNotEmpty) {
       await tester.ensureVisible(previewTitle);
       await tester.pump(const Duration(seconds: 1));
@@ -336,7 +279,7 @@ void main() {
       if (find.text('Comunidade').evaluate().isEmpty) {
         await tester.pageBack();
         await tester.pump();
-        await _pumpUntilAnyFound(tester, [
+        await pumpUntilAnyFound(tester, [
           find.text('Decks'),
           find.text('Meus Decks'),
         ]);

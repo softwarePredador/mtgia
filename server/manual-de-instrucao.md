@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-08 — Fechamento dos gaps reais de UI/runtime testability
+
+### O Porquê
+- Depois dos commits `684ba3a`, `eb26435` e `c74bdc9`, os gaps restantes eram
+  de testabilidade UI/runtime: seletores por texto, `TextField` por tipo,
+  indices `first/last/at` em pontos acionaveis e helpers locais duplicados.
+- O escopo foi app-only: sem alterar backend, banco, IA, Scanner/camera/OCR ou
+  regras de negocio.
+
+### O Como
+- Foram adicionadas keys estaveis para criar deck, importar lista no deck,
+  importacao full-screen, busca de usuarios/comunidade, diagnosticos/no-op/gate
+  de Optimize, rebuild guiado, snackbars de erro amigavel de Optimize, overlays
+  Lotus, sheets principais do Life Counter nativo, quantidade de carta e editor
+  de descricao.
+- Harnesses de runtime passaram a reutilizar
+  `app/integration_test/runtime_test_helpers.dart` para esperas genericas,
+  sessao autenticada, checkpoints e validacao de ausencia de erro tecnico cru.
+- `app/doc/UI_TEST_SURFACE_MAP.md` foi atualizado como contrato operacional das
+  novas keys e dos fallbacks restantes.
+
+### Resultado
+- `flutter analyze lib test integration_test --no-version-check` passou.
+- `flutter test test --no-version-check` passou.
+- iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4,
+  validou contra o backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host`:
+  `sets_catalog_runtime_test.dart`,
+  `collection_entrypoints_runtime_test.dart`,
+  `profile_community_runtime_test.dart` e `deck_runtime_m2006_test.dart`.
+- Resultado operacional: **PASS WITH RISKS**. O risco residual e que nem todos
+  os harnesses modificados foram executados isoladamente no simulador nesta
+  rodada; Binder/Marketplace/Trades e smoke visual amplo ficaram sem nova prova
+  runtime, embora analyze/testes unitarios tenham passado e os seletores tenham
+  sido migrados.
+- Handoff:
+  `app/doc/runtime_flow_handoffs/runtime_testability_iphone15_simulator_2026-05-08.md`.
+
 ## 2026-05-08 — UI testability contract para agentes
 
 ### O Porquê

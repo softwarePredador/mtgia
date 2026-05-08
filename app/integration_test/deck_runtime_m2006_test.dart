@@ -168,7 +168,7 @@ Future<void> _waitForDeckListReady(WidgetTester tester) {
     [
       find.text('Nenhum deck criado'),
       find.text('Gerar com IA'),
-      find.byType(PopupMenuButton<String>),
+      find.byKey(const Key('deck-list-fab-menu')),
       find.text('Novo Deck'),
     ],
     attempts: 120,
@@ -177,22 +177,29 @@ Future<void> _waitForDeckListReady(WidgetTester tester) {
 }
 
 Future<void> _openCreateDeckDialog(WidgetTester tester) async {
-  final fabMenu = find.byType(PopupMenuButton<String>);
+  final fabMenu = find.byKey(const Key('deck-list-fab-menu'));
   if (fabMenu.evaluate().isNotEmpty) {
-    await tester.tap(fabMenu.first);
+    await tester.tap(fabMenu);
     await tester.pump();
 
-    final popupCreateEntry = find.descendant(
-      of: find.byType(PopupMenuItem<String>),
-      matching: find.text('Novo Deck'),
-    );
+    final popupCreateEntry = find.byKey(const Key('deck-list-menu-create'));
     await pumpUntilFound(
       tester,
       popupCreateEntry,
       attempts: 60,
       step: const Duration(milliseconds: 300),
     );
-    await tester.tap(popupCreateEntry.first);
+    await tester.tap(popupCreateEntry);
+    await tester.pump();
+    return;
+  }
+
+  final emptyCreateButton = find.byKey(
+    const Key('deck-list-empty-create-button'),
+  );
+  if (emptyCreateButton.evaluate().isNotEmpty) {
+    await tester.ensureVisible(emptyCreateButton);
+    await tester.tap(emptyCreateButton);
     await tester.pump();
     return;
   }
@@ -222,6 +229,21 @@ Future<void> _openCreatedDeckDetails(
   WidgetTester tester,
   String deckName,
 ) async {
+  final deckId = await _findDeckIdByName(deckName);
+  final deckRow = find.byKey(Key('deck-list-row-$deckId'));
+  if (deckId.isNotEmpty) {
+    await pumpUntilFound(
+      tester,
+      deckRow,
+      attempts: 120,
+      step: const Duration(milliseconds: 500),
+    );
+    await tester.ensureVisible(deckRow);
+    await tester.tap(deckRow);
+    await tester.pump();
+    return;
+  }
+
   final createdText = find.text(deckName);
   await pumpUntilFound(
     tester,
@@ -337,22 +359,17 @@ void main() {
 
       await _openCreateDeckDialog(tester);
 
-      final createDialog = find.byType(AlertDialog);
+      final createDialog = find.byKey(const Key('deck-create-dialog'));
       await pumpUntilFound(tester, createDialog, attempts: 60);
 
       final createdDeckName = 'iPhone15 Runtime Talrand $unique';
-      final createDialogNameField =
-          find
-              .descendant(of: createDialog, matching: find.byType(TextField))
-              .first;
-      await tester.enterText(createDialogNameField, createdDeckName);
+      await tester.enterText(
+        find.byKey(const Key('deck-create-name-field')),
+        createdDeckName,
+      );
       await tester.pump(const Duration(milliseconds: 300));
 
-      final createDeckSubmit = find.descendant(
-        of: createDialog,
-        matching: find.widgetWithText(ElevatedButton, 'Criar'),
-      );
-      await tester.tap(createDeckSubmit);
+      await tester.tap(find.byKey(const Key('deck-create-submit-button')));
       await tester.pump();
 
       await pumpUntilAbsent(tester, createDialog, attempts: 60);
@@ -367,23 +384,29 @@ void main() {
       );
       await _capture(binding, tester, '05_empty_deck_details');
 
-      await tester.tap(find.byIcon(Icons.more_vert).first);
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
       await tester.pump();
 
-      final importMenuEntry = find.text('Colar lista de cartas');
+      final importMenuEntry = find.byKey(
+        const Key('deck-details-menu-import-list'),
+      );
       await pumpUntilFound(tester, importMenuEntry, attempts: 30);
-      await tester.tap(importMenuEntry.last);
+      await tester.tap(importMenuEntry);
       await tester.pump();
 
       final importDialogTitle = find.text('Importar Lista');
       await pumpUntilFound(tester, importDialogTitle, attempts: 30);
 
-      final importListField = find.byType(TextField).last;
-      await tester.enterText(importListField, _completeCommanderImportList);
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        _completeCommanderImportList,
+      );
       await tester.pump(const Duration(milliseconds: 300));
       await _capture(binding, tester, '06_import_commander');
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Importar'));
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
       await tester.pump();
 
       await pumpUntilAbsent(tester, importDialogTitle, attempts: 120);
@@ -415,7 +438,7 @@ void main() {
         );
       }
 
-      await tester.tap(find.byTooltip('Otimizar deck').first);
+      await tester.tap(find.byKey(const Key('deck-details-optimize-button')));
       await tester.pump();
 
       await pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
@@ -475,18 +498,29 @@ void main() {
       }
       await tester.pump();
 
+      final optimizePreview = find.byKey(const Key('optimize-preview-dialog'));
+      final optimizeRebuild = find.byKey(
+        const Key('optimize-rebuild-guided-dialog'),
+      );
+      final optimizeOutcome = find.byKey(
+        const Key('optimize-outcome-info-dialog'),
+      );
+      final optimizeAiError = find.byKey(
+        const Key('optimize-ai-error-snackbar'),
+      );
+      final optimizeApplyError = find.byKey(
+        const Key('optimize-apply-error-snackbar'),
+      );
       await pumpUntilAnyFound(tester, [
-        find.textContaining('Completar deck ('),
-        find.textContaining('Sugestões para '),
-        find.text('Criar reconstrução guiada'),
-        find.text('Nenhuma melhoria segura encontrada'),
-        find.textContaining('Não foi possível concluir a otimização agora'),
+        optimizePreview,
+        optimizeRebuild,
+        optimizeOutcome,
+        optimizeAiError,
+        optimizeApplyError,
       ], attempts: 240);
 
-      if (find
-          .textContaining('Não foi possível concluir a otimização agora')
-          .evaluate()
-          .isNotEmpty) {
+      if (optimizeAiError.evaluate().isNotEmpty ||
+          optimizeApplyError.evaluate().isNotEmpty) {
         await _capture(binding, tester, '09_friendly_optimize_failure');
         expect(find.textContaining('executor interno'), findsNothing);
         expect(find.textContaining('resposta invalida'), findsNothing);
@@ -499,7 +533,7 @@ void main() {
         return;
       }
 
-      if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
+      if (optimizeRebuild.evaluate().isNotEmpty) {
         await _capture(binding, tester, '09_rebuild_guided_blocker');
         if (_runtimeOptimizeRequireApply) {
           fail(
@@ -509,16 +543,31 @@ void main() {
         return;
       }
 
-      if (find
-          .text('Nenhuma melhoria segura encontrada')
-          .evaluate()
-          .isNotEmpty) {
+      if (optimizeOutcome.evaluate().isNotEmpty) {
+        if (find
+            .textContaining('Não foi possível concluir a otimização agora')
+            .evaluate()
+            .isNotEmpty) {
+          await _capture(binding, tester, '09_friendly_optimize_failure');
+          expect(find.textContaining('executor interno'), findsNothing);
+          expect(find.textContaining('resposta invalida'), findsNothing);
+          expect(find.textContaining('resposta inválida'), findsNothing);
+          if (_runtimeOptimizeRequireApply) {
+            fail(
+              'Runtime optimize returned a friendly failure before preview/apply; backend job did not produce suggestions.',
+            );
+          }
+          return;
+        }
+
         await pumpUntilFound(
           tester,
-          find.textContaining('gate bloqueou as inseguras'),
+          optimizeOutcome,
           attempts: 30,
           step: const Duration(milliseconds: 500),
         );
+        expect(find.textContaining('Nenhuma melhoria segura'), findsWidgets);
+        expect(find.textContaining('gate bloqueou as inseguras'), findsWidgets);
         expect(find.textContaining('Candidatos analisados:'), findsWidgets);
         expect(find.textContaining('Pares avaliados:'), findsWidgets);
         expect(find.textContaining('Swaps seguros retornados:'), findsWidgets);
@@ -547,6 +596,7 @@ void main() {
       await _capture(binding, tester, '09_preview');
 
       final canDeselectWithoutBreakingCompletion =
+          optimizePreview.evaluate().isNotEmpty &&
           find.textContaining('Sugestões para ').evaluate().isNotEmpty;
       if (!canDeselectWithoutBreakingCompletion ||
           find.byType(Checkbox).evaluate().length < 2) {
@@ -584,7 +634,9 @@ void main() {
       );
       await _capture(binding, tester, '09b_preview_partial_selection');
 
-      final applyChangesButton = find.text('Aplicar mudanças');
+      final applyChangesButton = find.byKey(
+        const Key('optimize-preview-apply-button'),
+      );
       await tester.ensureVisible(applyChangesButton);
       await tester.tap(applyChangesButton);
       await tester.pump();

@@ -29,6 +29,16 @@ de animação.
 | Título do picker | Bottom sheet | `deck-edition-picker-title` | Para comandante: `Escolher edição do comandante`. | Texto como evidência visual, key como âncora. |
 | Opção de edição | Bottom sheet | `deck-edition-option-<newCardId>` | Seleciona impressão específica pelo `card_id`. | Tap por key, não por índice de `ListTile`. |
 | Pós-troca de comandante | API `GET /decks/:id` | N/A | Exatamente 1 comandante; card escolhido não aparece em `main_board`. | Conferir `commander.length == 1` e ausência nas 99. |
+| Dialog criar deck | `DeckListScreen` | `deck-create-dialog` | Modal de criação aberto no `Overlay`. | `find.byKey`; não usar `AlertDialog`/índice. |
+| Campos criar deck | `DeckListScreen` | `deck-create-name-field`, `deck-create-format-field`, `deck-create-description-field`, `deck-create-public-switch` | Preenche nome/formato/descrição/visibilidade. | `enterText`/tap por key. |
+| Ações criar deck | `DeckListScreen` | `deck-create-cancel-button`, `deck-create-submit-button` | Cancela ou cria deck. | Tap por key + API/lista. |
+| Lista de decks | `DeckListScreen` | `deck-list`, `deck-list-row-<deckId>`, `deck-list-empty-create-button`, `deck-list-fab-menu`, `deck-list-menu-create`, `deck-list-menu-generate`, `deck-list-menu-import` | Lista/FAB não dependem de copy para abrir fluxos. | O menu e o dialog vivem no `Overlay`; localizar por key global. |
+| Ações do deck | `DeckDetailsScreen` | `deck-details-optimize-button`, `deck-details-menu`, `deck-details-menu-import-list` | Abre optimize e importar lista sem depender de ícone/texto do menu. | Tap por key; texto como evidência visual. |
+| Importar lista no deck | `DeckDetailsScreen` dialog | `deck-import-list-dialog`, `deck-import-list-dialog-field`, `deck-import-list-dialog-replace-switch`, `deck-import-list-dialog-submit-button`, `deck-import-list-dialog-cancel-button` | Cola lista no deck atual e opcionalmente substitui cartas. | `enterText` e tap por key; validar refresh/API. |
+| Estados importar lista | `DeckDetailsScreen` dialog | `deck-import-list-dialog-error`, `deck-import-list-dialog-not-found` | Expõe erro amigável e linhas não encontradas. | Texto como evidência visual ancorado por key. |
+| Importar lista full-screen | `DeckImportScreen` | `deck-import-screen`, `deck-import-screen-name-field`, `deck-import-screen-format-field`, `deck-import-screen-commander-field`, `deck-import-screen-description-field`, `deck-import-screen-list-field`, `deck-import-screen-example-button`, `deck-import-screen-count-status`, `deck-import-screen-error`, `deck-import-screen-submit-button` | Cria deck a partir de lista colada. | Usar keys de tela para testes widget/runtime. |
+| Editar quantidade de carta | `DeckCardEditDialog` | `deck-card-edit-quantity-field` | Edita quantidade de carta não-comandante. | `enterText` por key. |
+| Editar descrição | Dialog de descrição | `deck-description-editor-field`, `deck-description-editor-cancel-button`, `deck-description-editor-save-button` | Edita plano/descrição do deck. | `enterText` e salvar por key. |
 
 ## Auth / Profile
 
@@ -52,6 +62,7 @@ de animação.
 | Observações de troca | `ProfileScreen` | `profile-trade-notes-field` | Edita texto público de troca. | `enterText` por key. |
 | Salvar perfil | `ProfileScreen` | `profile-save-button` | Persiste perfil. | Tap por key + API. |
 | Atalhos coleção | `ProfileScreen` | `profile-open-binder-button`, `profile-open-marketplace-button` | Abrem fichário/marketplace. | Tap por key. |
+| Busca de usuários | `UserSearchScreen` | `user-search-field`, `user-search-clear-button`, `user-search-list`, `user-search-row-<userId>` | Busca perfis e abre perfil público. | `enterText` e tap por key baseada em `user.id`. |
 
 ## Search / Sets
 
@@ -69,6 +80,7 @@ de animação.
 | Campo de coleções | `SetsCatalogScreen` | `setsSearchField` | Busca por nome/código. | `enterText` por key. |
 | Linha de coleção | `SetsCatalogScreen` | `set-tile-<setCode>` | Abre coleção específica. | Tap por key. |
 | Lista de cards do set | `SetCardsScreen` | `setCardsList` | Renderiza `/cards?set=<code>`. | `find.byKey`. |
+| Estado vazio do set | `SetCardsScreen` | `setCardsEmptyState` | Coleção futura/parcial ou sem cartas locais. | `find.byKey` + copy como evidência. |
 | Card do set | `SetCardsScreen` | `set-card-<cardName>` | Abre detalhe ou prova presença. | Preferir key; nomes duplicados exigem API quando necessário. |
 
 ## Binder / Marketplace / Trades
@@ -112,6 +124,17 @@ de animação.
 | Confirmar envio | `TradeDetailScreen` | `trade-ship-confirm-button` | Muda status para enviado. | Tap por key + API. |
 | Chat de trade | `TradeDetailScreen` | `trade-message-field`, `trade-message-send-button` | Envia mensagem presa ao trade. | `enterText` + tap por key. |
 
+## Community
+
+| Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
+|---|---|---|---|---|
+| Tabs comunidade | `CommunityScreen` | `community-tabs` | Alterna Explorar, Seguindo, Usuários e Cotações. | Localizar TabBar por key; texto só como evidência. |
+| Busca Explorar | `_ExploreTab` | `community-explore-search-field`, `community-explore-search-clear-button` | Busca decks públicos. | `enterText` por key + submit. |
+| Filtros Explorar | `_ExploreTab` | `community-explore-format-chip-<format|all>` | Filtra decks por formato. | Tap por key. |
+| Lista Explorar | `_ExploreTab` | `community-explore-deck-list`, `community-explore-deck-row-<deckId>`, `community-explore-deck-owner-<ownerId>` | Abre deck público ou perfil do dono. | Usar IDs vindos do setup/API em runtime. |
+| Lista Seguindo | `_FollowingFeedTab` | `community-following-deck-list`, `community-following-deck-row-<deckId>` | Abre decks dos seguidos. | `find.byKey` + screenshot. |
+| Busca Usuários inline | `_UserSearchTab` | `community-users-search-field`, `community-users-search-clear-button`, `community-users-list`, `community-users-row-<userId>` | Busca perfis na aba Comunidade. | `enterText` e tap por key baseada em `user.id`. |
+
 ## Messages / Notifications
 
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
@@ -133,6 +156,10 @@ de animação.
 | Sugestão de remoção | `OptimizationPreviewDialog` | `optimize-suggestion-remove-<index>` | Permite desmarcar remoção. | Tap por key; validar seleção parcial. |
 | Sugestão de adição | `OptimizationPreviewDialog` | `optimize-suggestion-add-<index>` | Permite desmarcar adição. | Tap por key; validar seleção parcial. |
 | Aplicar preview | `OptimizationPreviewDialog` | `optimize-preview-apply-button` | Aplica somente swaps selecionados. | Tap por key; validar deck final por API. |
+| Diagnóstico local | `DeckDiagnosticPanel` | `deck-diagnostic-panel`, `deck-diagnostic-summary-badge`, `deck-diagnostic-metric-<label>`, `deck-diagnostic-insight-<index>` | Âncoras para no-op/gate local sem depender só de copy. | `find.byKey` para bloco e métrica; texto como evidência. |
+| Resultado informativo | `OutcomeInfoDialog` | `optimize-outcome-info-dialog` | Exibe no-op seguro, near-peak ou falha de rebuild sem expor erro cru. | `find.byKey`; texto apenas classifica o motivo. |
+| Rebuild guiado | `GuidedRebuildActionDialog` | `optimize-rebuild-guided-dialog`, `optimize-rebuild-guided-cancel-button`, `optimize-rebuild-guided-create-button` | Explica rebuild como ação de produto. | Tap por key; não expor erro técnico cru. |
+| Erros amigáveis | Optimize flow | `optimize-ai-error-snackbar`, `optimize-apply-error-snackbar` | Fallback quando backend/job falha sem preview aplicável. | `find.byKey` + garantir ausência de copy técnica sensível. |
 
 ## Generate
 
@@ -143,6 +170,17 @@ de animação.
 | Gerar | `DeckGenerateScreen` | `deck-generate-submit-button` | Dispara `/ai/generate` sync/async. | Tap por key + polling. |
 | Nome do deck gerado | `DeckGenerateScreen` | `deck-generate-name-field` | Edita nome antes de salvar. | `enterText` por key. |
 | Salvar deck gerado | `DeckGenerateScreen` | `deck-generate-save-button` | Persiste deck gerado. | Tap por key + API. |
+
+## Life Counter / Lotus
+
+| Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
+|---|---|---|---|---|
+| Lotus loading | `LotusLoadingOverlay` | `lotus-loading-overlay` | Shell carregando contador. | `find.byKey` + screenshot. |
+| Lotus erro/retry | `LotusErrorOverlay` | `lotus-error-overlay`, `lotus-error-retry-button` | Erro de shell com retry seguro. | Tap retry por key; copy como evidência. |
+| Sheet estado jogador | Life Counter nativo | `life-counter-native-player-state-sheet` | Overlay principal de estado do jogador. | Usar root key e ações internas já mapeadas. |
+| Sheet dados | Life Counter nativo | `life-counter-native-dice-sheet` | Overlay de dado/moeda/high roll. | Usar root key e botões internos já mapeados. |
+| Sheet configurações | Life Counter nativo | `life-counter-native-settings-sheet` | Overlay de ajustes do contador. | Usar root key e `life-counter-native-settings-save`. |
+| Sheet busca carta | Life Counter nativo | `life-counter-native-card-search-sheet` | Overlay de busca de carta sem Scanner/OCR. | Usar root key e campos internos já mapeados. |
 
 ## Runtime helper
 
@@ -166,9 +204,12 @@ comum de runtime:
 |---|---|---|
 | `sets_search_catalog_runtime_test.dart` | Busca de cartas por `card-search-field` e esperas por helper comum. | Tabs ainda usam texto como evidência visual. |
 | `deck_generate_async_runtime_test.dart` | Cadastro, prompt, gerar, nome e salvar por keys estáveis. | Estados visuais de progresso continuam validados por copy. |
-| `deck_runtime_m2006_test.dart` | Cadastro, estratégia atual e intensidade de optimize por keys estáveis. | Dialogs de criar deck/importar lista ainda dependem de texto/campo enquanto não houver keys dedicadas. |
-| `profile_community_runtime_test.dart` | Campos e salvar perfil por keys estáveis. | Busca de usuários/comunidade ainda depende de campo textual sem key dedicada. |
-| `binder_marketplace_trade_runtime_test.dart` | Binder editor, marketplace search, review de trade, ações de status, chat, notificações e direct messages por keys estáveis. | Alguns wrappers de lista ainda usam texto para evidência visual. |
+| `deck_runtime_m2006_test.dart` | Cadastro, criar deck, importar lista, estratégia atual, intensidade, preview/no-op/rebuild/erro amigável de optimize por keys estáveis. | Nome do tab/rota ainda aparece como evidência visual. |
+| `profile_community_runtime_test.dart` | Campos de perfil, UserSearchScreen, busca Explore e Users da Comunidade por keys estáveis. | Conteúdo de deck público ainda usa texto como evidência visual depois do tap por key. |
+| `binder_marketplace_trade_runtime_test.dart` | Binder editor, marketplace search, review de trade, ações de status, chat, notificações e direct messages por keys estáveis e helper comum. | Alguns textos de confirmação permanecem como evidência visual. |
+| `sets_catalog_runtime_test.dart` | Catálogo de coleções usa helper comum e abre sets por `set-tile-<setCode>`. | Título/nome da coleção segue como evidência visual. |
+| `collection_entrypoints_runtime_test.dart` | Entry points de coleção usam helper comum de runtime. | Tabs ainda usam texto como evidência visual. |
+| `app_full_non_life_counter_visual_capture_smoke_test.dart` | Criar deck e Generate usam keys de dialog/prompt/CTA; helpers genéricos foram removidos. | Navegação ampla do shell ainda usa labels das tabs como evidência visual. |
 
 ## Checkpoints obrigatórios para agentes
 
@@ -183,15 +224,12 @@ comum de runtime:
 
 ## Backlog de mapeamento
 
-- Criar deck: adicionar keys dedicadas ao dialog de nome/formato e ao botao de
-  confirmar, removendo fallback por texto/campo em harnesses de deck runtime.
-- Importar lista: adicionar keys ao dialog, campo de lista e botao de importar.
-- Community/user search: adicionar keys aos campos de busca e rows acionaveis.
-- Optimize diagnostics: mapear keys especificas para diagnostico de no-op/gate
-  quando a UI precisar validar esses blocos sem depender de copy.
-- Life Counter/Lotus: manter keys existentes e mapear overlays principais neste
-  arquivo.
 - Wrappers visuais restantes: substituir validacoes apenas por texto quando
-  houver lista/card/container acionavel ainda sem key.
+  houver lista/card/container acionavel ainda sem key. Após esta rodada, os
+  fallbacks conhecidos ficam principalmente em labels de tabs, confirmações
+  modais e evidência visual não-acionável.
+- Helpers específicos de Life Counter que fazem polling de estado/snapshot não
+  são duplicatas do helper comum de widget tree; migrar caso virem espera
+  genérica de Finder.
 - Scanner/câmera/OCR: permanece fora de escopo quando o release for
   explicitamente non-scanner.

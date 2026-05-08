@@ -282,29 +282,48 @@ void main() {
       }
       await tester.pump();
 
+      final optimizePreview = find.byKey(const Key('optimize-preview-dialog'));
+      final optimizeRebuild = find.byKey(
+        const Key('optimize-rebuild-guided-dialog'),
+      );
+      final optimizeOutcome = find.byKey(
+        const Key('optimize-outcome-info-dialog'),
+      );
+      final optimizeAiError = find.byKey(
+        const Key('optimize-ai-error-snackbar'),
+      );
+      final optimizeApplyError = find.byKey(
+        const Key('optimize-apply-error-snackbar'),
+      );
       await pumpUntilAnyFound(tester, [
-        find.textContaining('Completar deck ('),
-        find.textContaining('Sugestões para '),
-        find.text('Criar reconstrução guiada'),
-        find.text('Nenhuma melhoria segura encontrada'),
+        optimizePreview,
+        optimizeRebuild,
+        optimizeOutcome,
+        optimizeAiError,
+        optimizeApplyError,
       ], attempts: 240);
 
-      if (find.text('Criar reconstrução guiada').evaluate().isNotEmpty) {
+      if (optimizeAiError.evaluate().isNotEmpty ||
+          optimizeApplyError.evaluate().isNotEmpty) {
+        await _capture(binding, tester, '10_friendly_optimize_failure');
+        return;
+      }
+
+      if (optimizeRebuild.evaluate().isNotEmpty) {
         await _capture(binding, tester, '10_rebuild_guided_blocker');
         return;
       }
 
-      if (find
-          .text('Nenhuma melhoria segura encontrada')
-          .evaluate()
-          .isNotEmpty) {
+      if (optimizeOutcome.evaluate().isNotEmpty) {
         await _capture(binding, tester, '10_safe_noop');
         return;
       }
 
       await _capture(binding, tester, '10_optimize_preview');
 
-      final applyChangesButton = find.text('Aplicar mudanças');
+      final applyChangesButton = find.byKey(
+        const Key('optimize-preview-apply-button'),
+      );
       await tester.ensureVisible(applyChangesButton);
       await tester.tap(applyChangesButton);
       await tester.pump();

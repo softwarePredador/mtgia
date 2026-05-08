@@ -58,6 +58,7 @@ class _LifeCounterNativeSettingsSheetState
     final sections = buildLifeCounterSettingsCatalog(_settings);
 
     return SafeArea(
+      key: const Key('life-counter-native-settings-sheet'),
       child: Padding(
         padding: EdgeInsets.only(
           left: 12,

@@ -151,7 +151,10 @@ void main() {
       await tester.pump();
       await pumpUntilFound(tester, find.text('Cartas'), attempts: 60);
 
-      await tester.enterText(find.byType(TextField).first, commanderName);
+      await tester.enterText(
+        find.byKey(const Key('card-search-field')),
+        commanderName,
+      );
       await tester.pump();
       await pumpUntilFound(tester, find.text(commanderName), attempts: 80);
       await pumpUntilFound(

@@ -28,6 +28,7 @@ Future<String?> showDeckDescriptionEditorDialog({
             accent: AppTheme.primarySoft,
           ),
           content: TextField(
+            key: const Key('deck-description-editor-field'),
             controller: controller,
             maxLines: 5,
             autofocus: true,
@@ -44,10 +45,12 @@ Future<String?> showDeckDescriptionEditorDialog({
           ),
           actions: [
             TextButton(
+              key: const Key('deck-description-editor-cancel-button'),
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
+              key: const Key('deck-description-editor-save-button'),
               onPressed: () => Navigator.pop(ctx, controller.text.trim()),
               child: const Text('Salvar'),
             ),

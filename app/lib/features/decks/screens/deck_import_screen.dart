@@ -364,6 +364,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      key: const Key('deck-import-screen'),
       appBar: AppBar(
         title: const Text('Importar Lista'),
         leading: IconButton(
@@ -447,6 +448,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
             // Nome do Deck
             TextField(
+              key: const Key('deck-import-screen-name-field'),
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nome do Deck',
@@ -462,6 +464,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
             // Formato
             DropdownButtonFormField<String>(
+              key: const Key('deck-import-screen-format-field'),
               initialValue: _selectedFormat,
               decoration: const InputDecoration(
                 labelText: 'Formato *',
@@ -489,6 +492,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             // Comandante (só para Commander/Brawl)
             if (_isCommanderFormat) ...[
               TextField(
+                key: const Key('deck-import-screen-commander-field'),
                 controller: _commanderController,
                 decoration: const InputDecoration(
                   labelText: 'Comandante (opcional)',
@@ -503,6 +507,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
 
             // Descrição
             TextField(
+              key: const Key('deck-import-screen-description-field'),
               controller: _descriptionController,
               decoration: const InputDecoration(
                 labelText: 'Descrição (opcional)',
@@ -530,6 +535,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   ),
                 ),
                 TextButton.icon(
+                  key: const Key('deck-import-screen-example-button'),
                   onPressed: _pasteExample,
                   icon: Icon(
                     Icons.help_outline,
@@ -545,6 +551,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             ),
             const SizedBox(height: 8),
             TextField(
+              key: const Key('deck-import-screen-list-field'),
               controller: _listController,
               decoration: InputDecoration(
                 hintText:
@@ -568,6 +575,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
               builder: (context) {
                 final hasCards = _detectedCount > 0;
                 return Container(
+                  key: const Key('deck-import-screen-count-status'),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 8,
@@ -620,6 +628,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             if (_error != null) ...[
               const SizedBox(height: 16),
               Container(
+                key: const Key('deck-import-screen-error'),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -666,6 +675,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
             SizedBox(
               height: 54,
               child: ElevatedButton(
+                key: const Key('deck-import-screen-submit-button'),
                 onPressed: _isImporting ? null : _importDeck,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,

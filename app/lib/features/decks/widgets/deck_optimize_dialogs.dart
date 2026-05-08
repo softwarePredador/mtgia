@@ -217,7 +217,11 @@ void showOptimizeApplyErrorSnackBar(BuildContext context, Object error) {
     context: FriendlyErrorContext.deckOptimize,
   );
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: AppTheme.error),
+    SnackBar(
+      key: const Key('optimize-apply-error-snackbar'),
+      content: Text(message),
+      backgroundColor: AppTheme.error,
+    ),
   );
 }
 
@@ -277,6 +281,10 @@ void showGuidedRebuildErrorSnackBar(BuildContext context, Object error) {
 
 void showDeckAiErrorSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: AppTheme.error),
+    SnackBar(
+      key: const Key('optimize-ai-error-snackbar'),
+      content: Text(message),
+      backgroundColor: AppTheme.error,
+    ),
   );
 }

@@ -830,6 +830,7 @@ class OutcomeInfoDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key('optimize-outcome-info-dialog'),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       title: DialogTitleBlock(
@@ -903,6 +904,7 @@ class GuidedRebuildActionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key('optimize-rebuild-guided-dialog'),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       title: DialogTitleBlock(
@@ -961,10 +963,12 @@ class GuidedRebuildActionDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
+          key: const Key('optimize-rebuild-guided-cancel-button'),
           onPressed: () => Navigator.pop(context, false),
           child: const Text('Agora não'),
         ),
         ElevatedButton.icon(
+          key: const Key('optimize-rebuild-guided-create-button'),
           onPressed: () => Navigator.pop(context, true),
           icon: const Icon(Icons.auto_fix_high_rounded),
           label: const Text('Criar reconstrução guiada'),

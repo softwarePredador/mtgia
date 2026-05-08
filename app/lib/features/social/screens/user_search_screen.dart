@@ -47,17 +47,24 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
             padding: const EdgeInsets.all(12),
             color: AppTheme.surfaceElevated,
             child: TextField(
+              key: const Key('user-search-field'),
               controller: _searchController,
               autofocus: true,
               style: const TextStyle(color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Buscar por nome de usuário...',
                 hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                prefixIcon:
-                    const Icon(Icons.search, color: AppTheme.primarySoft),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppTheme.primarySoft,
+                ),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear,
-                      color: AppTheme.textSecondary, size: 18),
+                  key: const Key('user-search-clear-button'),
+                  icon: const Icon(
+                    Icons.clear,
+                    color: AppTheme.textSecondary,
+                    size: 18,
+                  ),
                   onPressed: () {
                     _searchController.clear();
                     context.read<SocialProvider>().clearSearch();
@@ -70,7 +77,9 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
               onChanged: _onSearchChanged,
             ),
@@ -82,7 +91,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 if (provider.isSearching) {
                   return const Center(
                     child: CircularProgressIndicator(
-                        color: AppTheme.manaViolet),
+                      color: AppTheme.manaViolet,
+                    ),
                   );
                 }
 
@@ -90,8 +100,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                   return Center(
                     child: Text(
                       provider.searchError!,
-                      style:
-                          const TextStyle(color: AppTheme.textSecondary),
+                      style: const TextStyle(color: AppTheme.textSecondary),
                     ),
                   );
                 }
@@ -101,10 +110,11 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.person_search,
-                            size: 64,
-                            color: AppTheme.textSecondary.withValues(
-                                alpha: 0.4)),
+                        Icon(
+                          Icons.person_search,
+                          size: 64,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                        ),
                         const SizedBox(height: 16),
                         const Text(
                           'Digite para buscar usuários',
@@ -123,10 +133,11 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.search_off,
-                            size: 48,
-                            color: AppTheme.textSecondary.withValues(
-                                alpha: 0.5)),
+                        Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'Nenhum usuário encontrado',
@@ -141,6 +152,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                 }
 
                 return ListView.builder(
+                  key: const Key('user-search-list'),
                   padding: const EdgeInsets.all(12),
                   itemCount: provider.searchResults.length,
                   itemBuilder: (context, index) {
@@ -151,8 +163,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                UserProfileScreen(userId: user.id),
+                            builder: (_) => UserProfileScreen(userId: user.id),
                           ),
                         );
                       },
@@ -184,6 +195,7 @@ class _UserSearchCard extends StatelessWidget {
         side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
       ),
       child: InkWell(
+        key: Key('user-search-row-${user.id}'),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
@@ -193,21 +205,22 @@ class _UserSearchCard extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 24,
-                backgroundColor:
-                    AppTheme.manaViolet.withValues(alpha: 0.3),
-                backgroundImage: user.avatarUrl != null
-                    ? CachedNetworkImageProvider(user.avatarUrl!)
-                    : null,
-                child: user.avatarUrl == null
-                    ? Text(
-                        user.username[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppTheme.manaViolet,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppTheme.fontXl,
-                        ),
-                      )
-                    : null,
+                backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
+                backgroundImage:
+                    user.avatarUrl != null
+                        ? CachedNetworkImageProvider(user.avatarUrl!)
+                        : null,
+                child:
+                    user.avatarUrl == null
+                        ? Text(
+                          user.username[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: AppTheme.manaViolet,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppTheme.fontXl,
+                          ),
+                        )
+                        : null,
               ),
               const SizedBox(width: 12),
               // Info
@@ -234,8 +247,11 @@ class _UserSearchCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.style,
-                            size: 13, color: AppTheme.primarySoft.withValues(alpha: 0.7)),
+                        Icon(
+                          Icons.style,
+                          size: 13,
+                          color: AppTheme.primarySoft.withValues(alpha: 0.7),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${user.publicDeckCount} decks',
@@ -245,9 +261,11 @@ class _UserSearchCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Icon(Icons.people,
-                            size: 13,
-                            color: AppTheme.manaViolet.withValues(alpha: 0.7)),
+                        Icon(
+                          Icons.people,
+                          size: 13,
+                          color: AppTheme.manaViolet.withValues(alpha: 0.7),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${user.followerCount} seguidores',
@@ -261,8 +279,11 @@ class _UserSearchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppTheme.textSecondary, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppTheme.textSecondary,
+                size: 20,
+              ),
             ],
           ),
         ),

@@ -444,6 +444,7 @@ class _EmptySetCardsState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppStatePanel(
+      key: const Key('setCardsEmptyState'),
       icon:
           set.isFuture
               ? Icons.hourglass_top_rounded

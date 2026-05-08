@@ -11,10 +11,7 @@ typedef DeckImportListExecutor =
 
 typedef DeckRefreshExecutor = Future<void> Function(String deckId);
 typedef DeckImportSnackBarPresenter =
-    void Function({
-      required String message,
-      required Color backgroundColor,
-    });
+    void Function({required String message, required Color backgroundColor});
 
 Future<void> showDeckImportListDialog({
   required BuildContext context,
@@ -39,6 +36,7 @@ Future<void> showDeckImportListDialog({
               (ctx, setDialogState) => PopScope(
                 canPop: !isImporting,
                 child: AlertDialog(
+                  key: const Key('deck-import-list-dialog'),
                   title: Row(
                     children: [
                       Icon(
@@ -97,6 +95,9 @@ Future<void> showDeckImportListDialog({
                               ),
                             ),
                             child: CheckboxListTile(
+                              key: const Key(
+                                'deck-import-list-dialog-replace-switch',
+                              ),
                               value: replaceAll,
                               onChanged: (value) {
                                 setDialogState(
@@ -133,12 +134,10 @@ Future<void> showDeckImportListDialog({
                                     : 'Mantém cartas existentes e adiciona as novas',
                                 style: TextStyle(
                                   fontSize: AppTheme.fontSm,
-                                  color:
-                                      replaceAll ? AppTheme.warning : null,
+                                  color: replaceAll ? AppTheme.warning : null,
                                 ),
                               ),
-                              controlAffinity:
-                                  ListTileControlAffinity.trailing,
+                              controlAffinity: ListTileControlAffinity.trailing,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 4,
@@ -147,6 +146,7 @@ Future<void> showDeckImportListDialog({
                           ),
                           const SizedBox(height: 16),
                           TextField(
+                            key: const Key('deck-import-list-dialog-field'),
                             controller: listController,
                             decoration: InputDecoration(
                               hintText:
@@ -171,6 +171,7 @@ Future<void> showDeckImportListDialog({
                           if (error != null) ...[
                             const SizedBox(height: 12),
                             Container(
+                              key: const Key('deck-import-list-dialog-error'),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: AppTheme.error.withValues(alpha: 0.15),
@@ -205,6 +206,9 @@ Future<void> showDeckImportListDialog({
                           if (notFoundLines.isNotEmpty) ...[
                             const SizedBox(height: 12),
                             Container(
+                              key: const Key(
+                                'deck-import-list-dialog-not-found',
+                              ),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: AppTheme.warning.withValues(alpha: 0.15),
@@ -229,17 +233,19 @@ Future<void> showDeckImportListDialog({
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  ...notFoundLines.take(5).map(
-                                    (line) => Text(
-                                      '• $line',
-                                      style: TextStyle(
-                                        fontSize: AppTheme.fontSm,
-                                        color: AppTheme.warning.withValues(
-                                          alpha: 0.6,
+                                  ...notFoundLines
+                                      .take(5)
+                                      .map(
+                                        (line) => Text(
+                                          '• $line',
+                                          style: TextStyle(
+                                            fontSize: AppTheme.fontSm,
+                                            color: AppTheme.warning.withValues(
+                                              alpha: 0.6,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
                                   if (notFoundLines.length > 5)
                                     Text(
                                       '... e mais ${notFoundLines.length - 5}',
@@ -261,10 +267,12 @@ Future<void> showDeckImportListDialog({
                   ),
                   actions: [
                     TextButton(
+                      key: const Key('deck-import-list-dialog-cancel-button'),
                       onPressed: isImporting ? null : () => Navigator.pop(ctx),
                       child: const Text('Cancelar'),
                     ),
                     ElevatedButton.icon(
+                      key: const Key('deck-import-list-dialog-submit-button'),
                       onPressed:
                           isImporting
                               ? null
@@ -300,7 +308,8 @@ Future<void> showDeckImportListDialog({
                                 if (result['success'] == true) {
                                   Navigator.pop(ctx);
 
-                                  final imported = result['cards_imported'] ?? 0;
+                                  final imported =
+                                      result['cards_imported'] ?? 0;
                                   showSnackBar(
                                     message:
                                         notFoundLines.isEmpty

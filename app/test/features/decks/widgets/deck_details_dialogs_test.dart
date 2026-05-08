@@ -50,8 +50,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Descrição do deck'), findsOneWidget);
-    await tester.enterText(find.byType(TextField), 'Plano atualizado');
-    await tester.tap(find.text('Salvar'));
+    await tester.enterText(
+      find.byKey(const Key('deck-description-editor-field')),
+      'Plano atualizado',
+    );
+    await tester.tap(
+      find.byKey(const Key('deck-description-editor-save-button')),
+    );
     await tester.pumpAndSettle();
 
     expect(result, 'Plano atualizado');

@@ -62,6 +62,7 @@ class _CommunityScreenState extends State<CommunityScreen>
         backgroundColor: AppTheme.surfaceElevated,
         actions: const [ShellAppBarActions()],
         bottom: TabBar(
+          key: const Key('community-tabs'),
           controller: _tabController,
           dividerColor: Colors.transparent,
           indicatorColor: AppTheme.manaViolet,
@@ -166,6 +167,7 @@ class _ExploreTabState extends State<_ExploreTab>
           child: Column(
             children: [
               TextField(
+                key: const Key('community-explore-search-field'),
                 controller: _searchController,
                 style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
@@ -176,6 +178,7 @@ class _ExploreTabState extends State<_ExploreTab>
                     color: AppTheme.primarySoft,
                   ),
                   suffixIcon: IconButton(
+                    key: const Key('community-explore-search-clear-button'),
                     icon: const Icon(
                       Icons.clear,
                       color: AppTheme.textSecondary,
@@ -280,6 +283,7 @@ class _ExploreTabState extends State<_ExploreTab>
               }
 
               return ListView.builder(
+                key: const Key('community-explore-deck-list'),
                 controller: _scrollController,
                 padding: EdgeInsets.fromLTRB(
                   12,
@@ -327,6 +331,7 @@ class _ExploreTabState extends State<_ExploreTab>
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
+        key: Key('community-explore-format-chip-${format ?? 'all'}'),
         label: Text(
           label,
           style: TextStyle(
@@ -476,6 +481,7 @@ class _FollowingFeedTabState extends State<_FollowingFeedTab>
           onRefresh: () => provider.fetchFollowingFeed(reset: true),
           color: AppTheme.manaViolet,
           child: ListView.builder(
+            key: const Key('community-following-deck-list'),
             controller: _scrollController,
             padding: EdgeInsets.fromLTRB(
               12,
@@ -559,6 +565,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
           padding: const EdgeInsets.all(12),
           color: AppTheme.surfaceElevated,
           child: TextField(
+            key: const Key('community-users-search-field'),
             controller: _searchController,
             style: const TextStyle(color: AppTheme.textPrimary),
             decoration: InputDecoration(
@@ -569,6 +576,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
                 color: AppTheme.primarySoft,
               ),
               suffixIcon: IconButton(
+                key: const Key('community-users-search-clear-button'),
                 icon: const Icon(
                   Icons.clear,
                   color: AppTheme.textSecondary,
@@ -674,6 +682,7 @@ class _UserSearchTabState extends State<_UserSearchTab>
               }
 
               return ListView.builder(
+                key: const Key('community-users-list'),
                 padding: EdgeInsets.fromLTRB(
                   12,
                   12,
@@ -724,6 +733,7 @@ class _CommunityDeckCard extends StatelessWidget {
         side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
       ),
       child: InkWell(
+        key: Key('community-explore-deck-row-${deck.id}'),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
@@ -764,6 +774,12 @@ class _CommunityDeckCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: GestureDetector(
+                            key:
+                                deck.ownerId != null
+                                    ? Key(
+                                      'community-explore-deck-owner-${deck.ownerId}',
+                                    )
+                                    : null,
                             onTap:
                                 deck.ownerId != null
                                     ? () {
@@ -931,6 +947,7 @@ class _FollowingDeckCard extends StatelessWidget {
         side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
       ),
       child: InkWell(
+        key: Key('community-following-deck-row-${deck.id}'),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(
@@ -1074,6 +1091,7 @@ class _UserCard extends StatelessWidget {
         side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
       ),
       child: InkWell(
+        key: Key('community-users-row-${user.id}'),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         onTap: onTap,
         child: Padding(

@@ -39,7 +39,8 @@ class _LifeCounterNativeDiceSheet extends StatefulWidget {
       _LifeCounterNativeDiceSheetState();
 }
 
-class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet> {
+class _LifeCounterNativeDiceSheetState
+    extends State<_LifeCounterNativeDiceSheet> {
   late LifeCounterSession _draftSession;
 
   Set<int> get _highRollWinners =>
@@ -56,10 +57,7 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
   }
 
   void _applyAction(
-    LifeCounterSession Function(
-      LifeCounterSession session, {
-      Random? random,
-    })
+    LifeCounterSession Function(LifeCounterSession session, {Random? random})
     action,
   ) {
     setState(() {
@@ -70,6 +68,7 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      key: const Key('life-counter-native-dice-sheet'),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         child: FractionallySizedBox(
@@ -184,7 +183,8 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                               onPressed:
                                   _hasAnyActivePlayers
                                       ? () => _applyAction(
-                                        LifeCounterDiceEngine.runFirstPlayerRoll,
+                                        LifeCounterDiceEngine
+                                            .runFirstPlayerRoll,
                                       )
                                       : null,
                               icon: const Icon(Icons.flag_rounded),
@@ -219,7 +219,9 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                           ],
                         ),
                       ),
-                      if (_draftSession.lastHighRolls.whereType<int>().isNotEmpty) ...[
+                      if (_draftSession.lastHighRolls
+                          .whereType<int>()
+                          .isNotEmpty) ...[
                         const SizedBox(height: 18),
                         _DiceSectionCard(
                           title: 'High Roll Board',
@@ -240,7 +242,9 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                                   _RollChip(
                                     label: 'P${index + 1}',
                                     value: _draftSession.lastHighRolls[index]!,
-                                    highlighted: _highRollWinners.contains(index),
+                                    highlighted: _highRollWinners.contains(
+                                      index,
+                                    ),
                                   ),
                             ],
                           ),
@@ -261,7 +265,8 @@ class _LifeCounterNativeDiceSheetState extends State<_LifeCounterNativeDiceSheet
                       const Spacer(),
                       FilledButton.icon(
                         key: const Key('life-counter-native-dice-apply'),
-                        onPressed: () => Navigator.of(context).pop(_draftSession),
+                        onPressed:
+                            () => Navigator.of(context).pop(_draftSession),
                         icon: const Icon(Icons.check_rounded),
                         label: const Text('Apply'),
                       ),

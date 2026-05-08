@@ -214,6 +214,7 @@ class _LifeCounterNativePlayerStateSheetState
         ).statusSummary;
 
     return SafeArea(
+      key: const Key('life-counter-native-player-state-sheet'),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
         child: FractionallySizedBox(

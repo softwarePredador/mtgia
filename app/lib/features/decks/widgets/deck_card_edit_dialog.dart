@@ -75,6 +75,7 @@ Future<void> showDeckCardEditDialog({
                       )
                     else
                       TextField(
+                        key: const Key('deck-card-edit-quantity-field'),
                         controller: qtyController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(

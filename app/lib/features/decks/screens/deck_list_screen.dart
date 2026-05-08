@@ -47,12 +47,14 @@ class _DeckListScreenState extends State<DeckListScreen> {
           (context) => StatefulBuilder(
             builder:
                 (context, setState) => AlertDialog(
+                  key: const Key('deck-create-dialog'),
                   title: const Text('Novo Deck'),
                   content: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
+                          key: const Key('deck-create-name-field'),
                           controller: nameController,
                           decoration: const InputDecoration(
                             labelText: 'Nome do Deck',
@@ -61,6 +63,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ),
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
+                          key: const Key('deck-create-format-field'),
                           initialValue: selectedFormat,
                           decoration: const InputDecoration(
                             labelText: 'Formato',
@@ -84,6 +87,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ),
                         const SizedBox(height: 16),
                         TextField(
+                          key: const Key('deck-create-description-field'),
                           controller: descriptionController,
                           decoration: const InputDecoration(
                             labelText: 'Descrição (Opcional)',
@@ -93,6 +97,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ),
                         const SizedBox(height: 16),
                         SwitchListTile(
+                          key: const Key('deck-create-public-switch'),
                           title: const Text('Deck público'),
                           subtitle: const Text('Visível na comunidade'),
                           value: isPublic,
@@ -104,10 +109,12 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   ),
                   actions: [
                     TextButton(
+                      key: const Key('deck-create-cancel-button'),
                       onPressed: () => Navigator.pop(context),
                       child: const Text('Cancelar'),
                     ),
                     ElevatedButton(
+                      key: const Key('deck-create-submit-button'),
                       onPressed: () async {
                         if (isSubmitting) return;
 
@@ -303,6 +310,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
+                      key: const Key('deck-list-empty-create-button'),
                       onPressed: () => _showCreateDeckDialog(context),
                       icon: const Icon(Icons.add, size: 18),
                       label: const Text('Novo Deck'),
@@ -327,11 +335,13 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
           // Lista de Decks
           return ListView.builder(
+            key: const Key('deck-list'),
             padding: const EdgeInsets.all(16),
             itemCount: decks.length,
             itemBuilder: (context, index) {
               final deck = decks[index];
               return DeckCard(
+                key: Key('deck-list-row-${deck.id}'),
                 deck: deck,
                 onTap: () {
                   context.go('/decks/${deck.id}');
@@ -352,6 +362,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           deckCount == 0
               ? null
               : PopupMenuButton<String>(
+                key: const Key('deck-list-fab-menu'),
                 onSelected: (value) {
                   switch (value) {
                     case 'create':
@@ -372,6 +383,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                 itemBuilder:
                     (context) => [
                       PopupMenuItem(
+                        key: const Key('deck-list-menu-create'),
                         value: 'create',
                         child: ListTile(
                           leading: Icon(
@@ -385,6 +397,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ),
                       ),
                       PopupMenuItem(
+                        key: const Key('deck-list-menu-generate'),
                         value: 'generate',
                         child: ListTile(
                           leading: Icon(
@@ -398,6 +411,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                         ),
                       ),
                       PopupMenuItem(
+                        key: const Key('deck-list-menu-import'),
                         value: 'import',
                         child: ListTile(
                           leading: Icon(

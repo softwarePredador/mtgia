@@ -123,11 +123,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         title: const Text('Detalhes do Deck'),
         actions: [
           IconButton(
+            key: const Key('deck-details-optimize-button'),
             icon: const Icon(Icons.auto_fix_high),
             tooltip: 'Otimizar deck',
             onPressed: () => _showOptimizationOptions(context),
           ),
           PopupMenuButton<String>(
+            key: const Key('deck-details-menu'),
             icon: const Icon(Icons.more_vert),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -156,6 +158,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               final isPublic = deck?.isPublic ?? false;
               return [
                 const PopupMenuItem(
+                  key: Key('deck-details-menu-import-list'),
                   value: 'paste',
                   child: ListTile(
                     leading: Icon(Icons.content_paste_go),

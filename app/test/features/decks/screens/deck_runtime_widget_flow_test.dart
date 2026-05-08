@@ -534,12 +534,11 @@ void main() {
       expect(find.text('Gerar proposta'), findsOneWidget);
 
       await tester.enterText(
-        find.byType(TextField).first,
+        find.byKey(const Key('deck-generate-prompt-field')),
         'Talrand commander de spellslinger azul com instants baratos',
       );
-      final generateProposalButton = find.widgetWithText(
-        ElevatedButton,
-        'Gerar proposta',
+      final generateProposalButton = find.byKey(
+        const Key('deck-generate-submit-button'),
       );
       await tester.ensureVisible(generateProposalButton);
       await tester.tap(generateProposalButton);
