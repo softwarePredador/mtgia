@@ -410,78 +410,19 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                 ),
               ),
               title: Text(card.name),
-              subtitle:
-                  widget.isBinderMode
-                      ? Row(
-                        children: [
-                          if (card.setCode.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              margin: const EdgeInsets.only(right: 6),
-                              decoration: BoxDecoration(
-                                color: AppTheme.frost400.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: AppTheme.frost400.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                card.setCode.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.frost400,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          Flexible(
-                            child: Text(
-                              [
-                                if ((card.setName ?? '').trim().isNotEmpty)
-                                  card.setName!,
-                                if ((card.setReleaseDate ?? '')
-                                    .trim()
-                                    .isNotEmpty)
-                                  card.setReleaseDate!.substring(0, 4),
-                                card.rarity.isNotEmpty
-                                    ? card.rarity[0].toUpperCase() +
-                                        card.rarity.substring(1)
-                                    : '',
-                              ].where((s) => s.isNotEmpty).join(' • '),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                      : Text(
-                        [
-                          card.typeLine,
-                          if ((card.setName ?? '').trim().isNotEmpty)
-                            card.setName!,
-                          if ((card.setReleaseDate ?? '').trim().isNotEmpty)
-                            card.setReleaseDate!,
-                          if (mustPickCommanderFirst && !isCommanderEligible)
-                            'Selecione um comandante primeiro',
-                          if (!mustPickCommanderFirst &&
-                              isCommanderFormat &&
-                              commanderIdentity != null &&
-                              !allowedByIdentity)
-                            'Fora da identidade do comandante',
-                        ].join(' • '),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+              subtitle: _CardSearchEditionSubtitle(
+                card: card,
+                showTypeLine: !widget.isBinderMode,
+                warning:
+                    mustPickCommanderFirst && !isCommanderEligible
+                        ? 'Selecione um comandante primeiro'
+                        : !mustPickCommanderFirst &&
+                            isCommanderFormat &&
+                            commanderIdentity != null &&
+                            !allowedByIdentity
+                        ? 'Fora da identidade do comandante'
+                        : null,
+              ),
               trailing: IconButton(
                 tooltip: 'Adicionar',
                 icon: const Icon(Icons.add_circle_outline),
@@ -572,6 +513,15 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
+            _CardSearchEditionSubtitle(
+              card: widget.card,
+              showTypeLine: true,
+              warning:
+                  widget.forceCommander
+                      ? 'Será definido como comandante'
+                      : null,
+            ),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -685,4 +635,99 @@ bool _isCommanderEligible(DeckCardItem card) {
   final oracle = (card.oracleText ?? '').toLowerCase();
   return typeLine.contains('legendary creature') ||
       oracle.contains('can be your commander');
+}
+
+class _CardSearchEditionSubtitle extends StatelessWidget {
+  const _CardSearchEditionSubtitle({
+    required this.card,
+    required this.showTypeLine,
+    this.warning,
+  });
+
+  final DeckCardItem card;
+  final bool showTypeLine;
+  final String? warning;
+
+  @override
+  Widget build(BuildContext context) {
+    final setCode = card.setCode.trim().toUpperCase();
+    final collector = (card.collectorNumber ?? '').trim();
+    final editionParts = [
+      if ((card.setName ?? '').trim().isNotEmpty) card.setName!.trim(),
+      if ((card.setReleaseDate ?? '').trim().isNotEmpty)
+        _releaseYear(card.setReleaseDate!.trim()),
+      if (card.rarity.trim().isNotEmpty) _capitalize(card.rarity.trim()),
+      if (card.foil == true) 'Foil',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (showTypeLine && card.typeLine.trim().isNotEmpty)
+          Text(
+            card.typeLine,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+          ),
+        const SizedBox(height: 3),
+        Row(
+          children: [
+            if (setCode.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                margin: const EdgeInsets.only(right: 6),
+                decoration: BoxDecoration(
+                  color: AppTheme.frost400.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: AppTheme.frost400.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Text(
+                  collector.isEmpty ? setCode : '$setCode #$collector',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.frost400,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+            Flexible(
+              child: Text(
+                editionParts.where((s) => s.isNotEmpty).join(' • '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if ((warning ?? '').isNotEmpty) ...[
+          const SizedBox(height: 3),
+          Text(
+            warning!,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: AppTheme.warning, fontSize: 12),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+String _capitalize(String value) {
+  if (value.isEmpty) return value;
+  return value[0].toUpperCase() + value.substring(1);
+}
+
+String _releaseYear(String value) {
+  if (value.length < 4) return value;
+  return value.substring(0, 4);
 }

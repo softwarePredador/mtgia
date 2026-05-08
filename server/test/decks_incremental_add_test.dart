@@ -163,6 +163,8 @@ void main() {
     required String deckId,
     required String cardId,
     required int quantity,
+    bool isCommander = false,
+    bool replaceSameName = false,
   }) {
     return http.post(
       Uri.parse('$baseUrl/decks/$deckId/cards/set'),
@@ -173,8 +175,38 @@ void main() {
       body: jsonEncode({
         'card_id': cardId,
         'quantity': quantity,
+        'is_commander': isCommander,
+        'replace_same_name': replaceSameName,
       }),
     );
+  }
+
+  Future<Map<String, dynamic>> fetchDeck(String token, String deckId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/decks/$deckId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch deck: ${response.body}');
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchPrintings(
+    String token,
+    String name,
+  ) async {
+    final response = await http.get(
+      Uri.parse(
+        '$baseUrl/cards/printings?name=${Uri.encodeQueryComponent(name)}&limit=50&dedupe=false',
+      ),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode != 200) return const [];
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return ((data['data'] as List?) ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .toList();
   }
 
   setUpAll(() async {
@@ -303,6 +335,70 @@ void main() {
       );
 
       expect(response.statusCode, equals(400), reason: response.body);
+    },
+    skip: skipIntegration,
+  );
+
+  test(
+    'POST /decks/:id/cards/set should preserve commander slot when changing edition',
+    () async {
+      final token = await getAuthToken();
+      final commander = await findCardByNames(token, names: [
+        'Talrand, Sky Summoner',
+        'Krenko, Mob Boss',
+        'Lathril, Blade of the Elves',
+        'Niv-Mizzet, Parun',
+      ]);
+      if (commander == null || !isCommanderEligible(commander)) {
+        return;
+      }
+
+      final printings =
+          await fetchPrintings(token, commander['name'] as String);
+      if (printings.length < 2) {
+        return;
+      }
+
+      final firstId = printings.first['id'] as String;
+      final secondId = printings.firstWhere(
+        (p) => p['id'] != firstId,
+        orElse: () => printings.last,
+      )['id'] as String;
+      if (firstId == secondId) return;
+
+      final deckId = await createDeck(token, format: 'commander');
+      final addCommanderRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: firstId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(addCommanderRes.statusCode, equals(200),
+          reason: addCommanderRes.body);
+
+      final setRes = await setCardQuantity(
+        token,
+        deckId: deckId,
+        cardId: secondId,
+        quantity: 1,
+        isCommander: true,
+        replaceSameName: true,
+      );
+      expect(setRes.statusCode, equals(200), reason: setRes.body);
+
+      final deck = await fetchDeck(token, deckId);
+      final commanderCards =
+          ((deck['commander'] as List?) ?? const []).cast<Map>();
+      expect(commanderCards, hasLength(1));
+      expect(commanderCards.single['id'], secondId);
+
+      final mainBoard = (deck['mainboard'] as Map?) ?? const {};
+      final flattenedMain = mainBoard.values
+          .whereType<List>()
+          .expand((items) => items)
+          .whereType<Map>();
+      expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
     },
     skip: skipIntegration,
   );

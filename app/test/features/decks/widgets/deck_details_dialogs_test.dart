@@ -10,6 +10,9 @@ DeckCardItem _buildCard() => DeckCardItem(
   typeLine: 'Artifact',
   oracleText: '{T}: Add one mana of any color.',
   setCode: 'tst',
+  setName: 'Test Set',
+  setReleaseDate: '2026-01-01',
+  collectorNumber: '42',
   rarity: 'common',
   quantity: 1,
   isCommander: false,
@@ -115,15 +118,20 @@ void main() {
                           (_) async => [
                             {
                               'id': 'card-1',
+                              'set_code': 'TST',
                               'set_name': 'Test Set',
                               'set_release_date': '2026-01-01',
+                              'collector_number': '42',
                               'rarity': 'common',
                               'image_url': null,
                             },
                             {
                               'id': 'card-2',
+                              'set_code': 'OTH',
                               'set_name': 'Other Set',
                               'set_release_date': '2025-01-01',
+                              'collector_number': '7',
+                              'foil': true,
                               'rarity': 'rare',
                               'price': 1.5,
                               'image_url': null,
@@ -147,9 +155,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Edições disponíveis'), findsOneWidget);
-    expect(find.text('Other Set'), findsOneWidget);
+    expect(find.text('OTH #7 foil'), findsOneWidget);
+    expect(find.text('Other Set • 2025-01-01 • rare'), findsOneWidget);
 
-    await tester.tap(find.text('Other Set'));
+    await tester.tap(find.text('OTH #7 foil'));
     await tester.pumpAndSettle();
 
     expect(replacedId, 'card-2');
@@ -158,11 +167,7 @@ void main() {
   testWidgets('showDeckCardDetailsDialog renders actions and callbacks', (
     tester,
   ) async {
-    final card = _buildCard().copyWith(
-      manaCost: '{2}',
-      setName: 'Test Set',
-      setReleaseDate: '2026-01-01',
-    );
+    final card = _buildCard().copyWith(manaCost: '{2}');
     var explanationCalls = 0;
     var editionCalls = 0;
     var detailsCalls = 0;
@@ -202,6 +207,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Arcane Signet'), findsOneWidget);
+    expect(find.text('TST #42'), findsOneWidget);
+    expect(find.text('Test Set • 2026-01-01 • common'), findsOneWidget);
     expect(find.text('Trocar edição'), findsOneWidget);
     expect(find.text('Explicar'), findsOneWidget);
     expect(find.text('Ver Detalhes'), findsOneWidget);

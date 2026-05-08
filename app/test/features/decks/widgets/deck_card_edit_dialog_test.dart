@@ -33,14 +33,15 @@ void main() {
                       context: context,
                       card: card,
                       deckFormat: 'commander',
-                      loadPrintings: (_) async => [
-                        {
-                          'id': 'card-1',
-                          'set_code': 'TST',
-                          'set_name': 'Test Set',
-                          'set_release_date': '2026-01-01',
-                        },
-                      ],
+                      loadPrintings:
+                          (_) async => [
+                            {
+                              'id': 'card-1',
+                              'set_code': 'TST',
+                              'set_name': 'Test Set',
+                              'set_release_date': '2026-01-01',
+                            },
+                          ],
                       onSave: ({
                         required selectedCardId,
                         required quantity,
@@ -91,14 +92,15 @@ void main() {
                       context: context,
                       card: card,
                       deckFormat: 'commander',
-                      loadPrintings: (_) async => [
-                        {
-                          'id': 'card-1',
-                          'set_code': 'TST',
-                          'set_name': 'Test Set',
-                          'set_release_date': '2026-01-01',
-                        },
-                      ],
+                      loadPrintings:
+                          (_) async => [
+                            {
+                              'id': 'card-1',
+                              'set_code': 'TST',
+                              'set_name': 'Test Set',
+                              'set_release_date': '2026-01-01',
+                            },
+                          ],
                       onSave: ({
                         required selectedCardId,
                         required quantity,
@@ -131,5 +133,84 @@ void main() {
     expect(savedCardId, 'card-1');
     expect(savedConsolidate, isTrue);
     expect(find.text('Editar carta'), findsNothing);
+  });
+
+  testWidgets('showDeckCardEditDialog keeps commander quantity fixed', (
+    tester,
+  ) async {
+    final card = _buildCard().copyWith(
+      isCommander: true,
+      collectorNumber: '42',
+    );
+    int? savedQty;
+    String? savedCardId;
+    bool? savedConsolidate;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await showDeckCardEditDialog(
+                      context: context,
+                      card: card,
+                      deckFormat: 'commander',
+                      loadPrintings:
+                          (_) async => [
+                            {
+                              'id': 'card-1',
+                              'set_code': 'TST',
+                              'set_name': 'Test Set',
+                              'set_release_date': '2026-01-01',
+                              'collector_number': '42',
+                            },
+                            {
+                              'id': 'card-2',
+                              'set_code': 'OTH',
+                              'set_name': 'Other Set',
+                              'set_release_date': '2025-01-01',
+                              'collector_number': '7',
+                            },
+                          ],
+                      onSave: ({
+                        required selectedCardId,
+                        required quantity,
+                        required selectedCondition,
+                        required consolidateSameName,
+                      }) async {
+                        savedQty = quantity;
+                        savedCardId = selectedCardId;
+                        savedConsolidate = consolidateSameName;
+                      },
+                    );
+                  },
+                  child: const Text('abrir'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Editar comandante'), findsOneWidget);
+    expect(find.text('1 cópia fixa para comandante'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('OTH').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+
+    expect(savedQty, 1);
+    expect(savedCardId, 'card-2');
+    expect(savedConsolidate, isTrue);
   });
 }

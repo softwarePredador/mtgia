@@ -104,6 +104,8 @@ class CardProvider extends ChangeNotifier {
             setName: json['set_name'],
             setReleaseDate: json['set_release_date'],
             rarity: json['rarity'] ?? '',
+            collectorNumber: json['collector_number']?.toString(),
+            foil: json['foil'] as bool?,
             quantity: 1,
             isCommander: false,
           );
@@ -165,7 +167,9 @@ class CardProvider extends ChangeNotifier {
 
   /// Chama /cards/resolve para importar todas as edições do Scryfall
   /// e depois retorna a lista atualizada de printings do banco.
-  Future<List<Map<String, dynamic>>> resolveAndFetchPrintings(String name) async {
+  Future<List<Map<String, dynamic>>> resolveAndFetchPrintings(
+    String name,
+  ) async {
     // Usa o parâmetro sync=true que importa automaticamente do Scryfall
     final encoded = Uri.encodeQueryComponent(name.trim());
     final response = await _apiClient.get(

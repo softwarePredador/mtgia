@@ -94,21 +94,26 @@ class DeckProvider extends ChangeNotifier {
     String? cardName,
     bool consolidateSameName = false,
     String condition = 'NM',
+    bool isCommander = false,
   }) async {
     if (quantity <= 0) {
       throw Exception('Quantidade deve ser > 0');
     }
+    if (isCommander && quantity != 1) {
+      throw Exception('Comandante deve ter exatamente 1 cópia');
+    }
 
     // Commander/Brawl (ou quando explicitamente pedido): resolve duplicatas por NOME no backend.
     // Isso garante que, se o deck já estiver com 2 edições da mesma carta, o usuário consegue corrigir.
-    if (consolidateSameName) {
+    if (consolidateSameName || isCommander) {
       final result = await setDeckCardQuantityRequest(
         _apiClient,
         deckId: deckId,
         cardId: newCardId,
-        quantity: quantity,
+        quantity: isCommander ? 1 : quantity,
         replaceSameName: true,
         condition: condition,
+        isCommander: isCommander,
       );
 
       if (!result.isSuccess) {
@@ -131,6 +136,7 @@ class DeckProvider extends ChangeNotifier {
         quantity: quantity,
         replaceSameName: false,
         condition: condition,
+        isCommander: false,
       );
 
       if (!result.isSuccess) {

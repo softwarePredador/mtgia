@@ -1182,6 +1182,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             cardName: card.name,
             consolidateSameName: consolidateSameName,
             condition: selectedCondition.code,
+            isCommander: card.isCommander,
           ),
       onSaved: () {
         ScaffoldMessenger.of(context).showSnackBar(

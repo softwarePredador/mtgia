@@ -23,7 +23,9 @@ Future<void> showDeckCardEditDialog({
   final theme = Theme.of(context);
   final qtyController = TextEditingController(text: '${card.quantity}');
   final format = deckFormat.toLowerCase();
-  final consolidateSameName = format == 'commander' || format == 'brawl';
+  final isCommanderCard = card.isCommander;
+  final consolidateSameName =
+      isCommanderCard || format == 'commander' || format == 'brawl';
 
   bool isSaving = false;
   String? error;
@@ -36,7 +38,9 @@ Future<void> showDeckCardEditDialog({
         (dialogContext) => StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              title: const Text('Editar carta'),
+              title: Text(
+                isCommanderCard ? 'Editar comandante' : 'Editar carta',
+              ),
               content: SizedBox(
                 width: double.maxFinite,
                 child: Column(
@@ -50,15 +54,33 @@ Future<void> showDeckCardEditDialog({
                         color: AppTheme.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: qtyController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Quantidade',
-                        border: OutlineInputBorder(),
+                    if (isCommanderCard) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'A edição escolhida fica no slot de comandante, fora das 99 cartas.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
-                    ),
+                    ],
+                    const SizedBox(height: 12),
+                    if (isCommanderCard)
+                      const InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Quantidade',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Text('1 cópia fixa para comandante'),
+                      )
+                    else
+                      TextField(
+                        controller: qtyController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Quantidade',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     FutureBuilder<List<Map<String, dynamic>>>(
                       future: loadPrintings(card.name),
@@ -105,11 +127,17 @@ Future<void> showDeckCardEditDialog({
                                             .toUpperCase();
                                     final setName =
                                         (it['set_name'] ?? '').toString();
+                                    final collector =
+                                        (it['collector_number'] ?? '')
+                                            .toString();
+                                    final foil = it['foil'] == true;
                                     final date =
                                         (it['set_release_date'] ?? '')
                                             .toString();
                                     final label = [
                                       if (setCode.isNotEmpty) setCode,
+                                      if (collector.isNotEmpty) '#$collector',
+                                      if (foil) 'foil',
                                       if (setName.isNotEmpty) setName,
                                       if (date.isNotEmpty) '($date)',
                                     ].join(' • ');
@@ -126,7 +154,9 @@ Future<void> showDeckCardEditDialog({
                                       ? null
                                       : (v) {
                                         if (v == null) return;
-                                        setDialogState(() => selectedCardId = v);
+                                        setDialogState(
+                                          () => selectedCardId = v,
+                                        );
                                       },
                             ),
                           ),
@@ -155,9 +185,7 @@ Future<void> showDeckCardEditDialog({
                                   ? null
                                   : (v) {
                                     if (v == null) return;
-                                    setDialogState(
-                                      () => selectedCondition = v,
-                                    );
+                                    setDialogState(() => selectedCondition = v);
                                   },
                         ),
                       ),
@@ -182,7 +210,10 @@ Future<void> showDeckCardEditDialog({
                       isSaving
                           ? null
                           : () async {
-                            final qty = int.tryParse(qtyController.text.trim());
+                            final qty =
+                                isCommanderCard
+                                    ? 1
+                                    : int.tryParse(qtyController.text.trim());
                             if (qty == null || qty <= 0) {
                               setDialogState(
                                 () => error = 'Quantidade inválida',

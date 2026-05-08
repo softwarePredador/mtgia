@@ -10,7 +10,8 @@ import '../../../../../lib/deck_rules_service.dart';
 /// {
 ///   "card_id": "...",
 ///   "quantity": 1,
-///   "replace_same_name": true|false
+///   "replace_same_name": true|false,
+///   "is_commander": true|false
 /// }
 ///
 /// - quantity é ABSOLUTO (não soma).
@@ -40,6 +41,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       ? quantityRaw
       : int.tryParse(quantityRaw?.toString() ?? '');
   final replaceSameName = body['replace_same_name'] == true;
+  final targetIsCommander = body['is_commander'] == true;
   final condition = _validateCondition(body['condition']?.toString());
 
   if (cardId == null || cardId.isEmpty) {
@@ -52,6 +54,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': 'quantity deve ser > 0'},
+    );
+  }
+  if (targetIsCommander && quantity != 1) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'error': 'Comandante deve ter exatamente 1 cópia'},
     );
   }
 
@@ -118,16 +126,29 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         };
       }
 
+      final existingTargetIsCommander =
+          nextCards[cardId]?['is_commander'] as bool? ?? false;
+      final nextIsCommander = targetIsCommander || existingTargetIsCommander;
+      if (nextIsCommander && quantity != 1) {
+        return {
+          'error': 'Comandante deve ter exatamente 1 cópia',
+          'status': HttpStatus.badRequest,
+        };
+      }
+
       if (replaceSameName) {
         nextCards.removeWhere((_, card) {
-          final sameName = (card['name'] as String).toLowerCase() ==
-              cardName.toLowerCase();
+          final sameName =
+              (card['name'] as String).toLowerCase() == cardName.toLowerCase();
           final isCommander = card['is_commander'] as bool? ?? false;
+          if (nextIsCommander) return sameName;
           return sameName && !isCommander;
         });
       } else {
         final existing = nextCards[cardId];
-        if (existing != null && !(existing['is_commander'] as bool? ?? false)) {
+        if (existing != null &&
+            (nextIsCommander ||
+                !(existing['is_commander'] as bool? ?? false))) {
           nextCards.remove(cardId);
         }
       }
@@ -135,7 +156,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       nextCards[cardId] = {
         'card_id': cardId,
         'quantity': quantity,
-        'is_commander': false,
+        'is_commander': nextIsCommander,
         'condition': condition,
         'name': cardName,
       };
@@ -191,6 +212,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         'card_id': cardId,
         'name': cardName,
         'quantity': quantity,
+        'is_commander': nextIsCommander,
         'condition': condition,
         'replace_same_name': replaceSameName,
       };

@@ -2,6 +2,28 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-08 — Commander edition change preserves commander slot
+
+### O Porquê
+- Foi reportado que a escolha/troca de edicao do comandante nao deixava a
+  impressao visualmente clara e, ao alterar a edicao, a nova impressao podia
+  entrar na lista das 99 cartas em vez de permanecer no slot de comandante.
+
+### O Como
+- O app passou a mostrar `SET #collector`, foil, nome da colecao, raridade e
+  data na busca, no detalhe da carta e no seletor de edicoes.
+- A edicao generica de uma carta agora reconhece `card.isCommander`, fixa a
+  quantidade em 1 e envia `is_commander=true` para `/decks/:id/cards/set`.
+- O backend `/decks/:id/cards/set` preserva comandante existente por padrao e,
+  quando `is_commander=true`, troca a edicao dentro do slot de comandante sem
+  adicionar a nova impressao ao mainboard.
+
+### Resultado
+- Validados `flutter analyze` focado em Cards/Decks, testes focados de widgets e
+  provider de Decks, `dart analyze` focado em rotas de Decks e live
+  `decks_incremental_add_test` em backend 8082.
+- Backend temporario 8082 foi encerrado apos a validacao.
+
 ## 2026-05-08 — Build interno Android APK SM A135M PASS WITH RISKS
 
 ### O Porquê

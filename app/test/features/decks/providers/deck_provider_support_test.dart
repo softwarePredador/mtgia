@@ -1133,6 +1133,7 @@ void main() {
           '/decks/deck-1/cards/set': (body) {
             expect(body['card_id'], 'card-1');
             expect(body['replace_same_name'], isFalse);
+            expect(body['is_commander'], isFalse);
             return ApiResponse(200, const {});
           },
           '/ai/archetypes': (body) {

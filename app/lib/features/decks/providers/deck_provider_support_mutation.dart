@@ -125,12 +125,14 @@ Future<DeckMutationResult> setDeckCardQuantityRequest(
   required int quantity,
   required bool replaceSameName,
   required String condition,
+  bool isCommander = false,
 }) async {
   final response = await apiClient.post('/decks/$deckId/cards/set', {
     'card_id': cardId,
     'quantity': quantity,
     'replace_same_name': replaceSameName,
     'condition': condition,
+    'is_commander': isCommander,
   });
   return parseDeckMutationResponse(
     response,
