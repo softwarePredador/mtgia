@@ -21,11 +21,16 @@
 - `commander_edition_runtime_test.dart` passou a selecionar troca de edicao e
   opcao alvo por key, usando texto como evidencia visual e nao como ancora
   principal.
+- Search/Sets, Binder/Fichario, Marketplace/Trades e Optimize tambem ganharam
+  keys minimas para campos de busca, listas, cards, acoes criticas,
+  preview/apply e selecao parcial.
 
 ### Resultado
 - Agentes devem usar o mapa antes de criar QA visual novo.
 - Se um fluxo P1 depender de `find.text`, `find.byType` ou indice de lista,
   deve registrar o motivo e propor a key minima.
+- Validado com `flutter analyze` focado e testes focados de Deck dialog,
+  Binder, Trades, Cards e Collection.
 
 ## 2026-05-08 — Commander edition runtime iPhone 15 PASS
 

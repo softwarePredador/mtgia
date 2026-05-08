@@ -49,11 +49,13 @@ class _CollectionScreenState extends State<CollectionScreen>
         backgroundColor: AppTheme.surfaceElevated,
         actions: [
           IconButton(
+            key: const Key('collection-open-sets-catalog'),
             tooltip: 'Catálogo de coleções',
             onPressed: () => context.push('/collection/sets'),
             icon: const Icon(Icons.grid_view_rounded),
           ),
           IconButton(
+            key: const Key('collection-open-latest-set'),
             tooltip: 'Última edição',
             onPressed: () => context.push('/collection/latest-set'),
             icon: const Icon(Icons.new_releases_outlined),
@@ -61,6 +63,7 @@ class _CollectionScreenState extends State<CollectionScreen>
           const ShellAppBarActions(),
         ],
         bottom: TabBar(
+          key: const Key('collection-hub-tabs'),
           controller: _tabController,
           isScrollable: true,
           labelPadding: const EdgeInsets.symmetric(horizontal: 14),

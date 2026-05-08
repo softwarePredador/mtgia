@@ -262,6 +262,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                 : Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: TextField(
+                    key: const Key('card-search-field'),
                     controller: _searchController,
                     onChanged: _onSearchChanged,
                     autofocus: true,
@@ -366,6 +367,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
             provider.searchResults.length + (provider.hasMore ? 1 : 0);
 
         return ListView.builder(
+          key: const Key('card-search-results-list'),
           controller: _scrollController,
           itemCount: totalItems,
           itemBuilder: (context, index) {
@@ -392,7 +394,9 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                         ? isCommanderEligible
                         : allowedByIdentity);
             return ListTile(
+              key: Key('card-search-result-${card.id}'),
               leading: GestureDetector(
+                key: Key('card-search-image-${card.id}'),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -425,6 +429,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
                         : null,
               ),
               trailing: IconButton(
+                key: Key('card-search-add-${card.id}'),
                 tooltip: 'Adicionar',
                 icon: const Icon(Icons.add_circle_outline),
                 onPressed:
@@ -501,6 +506,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
     final isCommanderEligible = _isCommanderEligible(widget.card);
 
     return AlertDialog(
+      key: Key('card-search-add-dialog-${widget.card.id}'),
       title: Text('Adicionar ${widget.card.name}'),
       content: SingleChildScrollView(
         child: Column(
@@ -595,6 +601,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
+          key: Key('card-search-add-confirm-${widget.card.id}'),
           onPressed:
               _isSubmitting || !widget.canAddByCommanderIdentity
                   ? null

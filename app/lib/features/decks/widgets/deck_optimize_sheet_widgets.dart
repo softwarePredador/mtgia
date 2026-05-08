@@ -308,6 +308,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   Widget _selectableSuggestionList({
     required List<Map<String, dynamic>> items,
     required Set<int> selectedIndexes,
+    required String keyPrefix,
     required Color accent,
     required ValueChanged<int> onToggleOff,
     required ValueChanged<int> onToggleOn,
@@ -317,6 +318,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
       children: [
         for (var index = 0; index < items.take(limit).length; index++)
           _SelectableSuggestionLineItem(
+            key: Key('optimize-suggestion-$keyPrefix-$index'),
             item: items[index],
             accent: accent,
             selected: selectedIndexes.contains(index),
@@ -350,6 +352,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
     final warningLines = _warningLines();
 
     return AlertDialog(
+      key: const Key('optimize-preview-dialog'),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -574,6 +577,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                       _selectableSuggestionList(
                         items: widget.displayRemovals,
                         selectedIndexes: _selectedRemovalIndexes,
+                        keyPrefix: 'remove',
                         accent: AppTheme.error,
                         onToggleOff: (index) => _toggleRemoval(index, false),
                         onToggleOn: (index) => _toggleRemoval(index, true),
@@ -595,6 +599,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                       _selectableSuggestionList(
                         items: widget.displayAdditions,
                         selectedIndexes: _selectedAdditionIndexes,
+                        keyPrefix: 'add',
                         accent: AppTheme.success,
                         onToggleOff: (index) => _toggleAddition(index, false),
                         onToggleOn: (index) => _toggleAddition(index, true),
@@ -627,6 +632,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
             child: const Text('Copiar relatório técnico'),
           ),
         ElevatedButton(
+          key: const Key('optimize-preview-apply-button'),
           onPressed: _selectedChangeCount == 0 ? null : _confirmSelected,
           child: const Text('Aplicar mudanças'),
         ),
@@ -1081,6 +1087,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const _SelectableSuggestionLineItem({
+    super.key,
     required this.item,
     required this.accent,
     required this.selected,

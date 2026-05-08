@@ -519,6 +519,7 @@ class _BinderListViewState extends State<_BinderListView>
       },
       color: AppTheme.frost400,
       child: ListView.builder(
+        key: Key('binder-list-${widget.listType}'),
         controller: _scrollController,
         padding: EdgeInsets.fromLTRB(
           12,
@@ -565,6 +566,7 @@ class _StatsBar extends StatelessWidget {
             ? stats.totalItems - stats.uniqueCards
             : 0;
     return Container(
+      key: const Key('binder-stats-dashboard'),
       constraints: const BoxConstraints(maxHeight: 300),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
       color: AppTheme.surfaceElevated,
@@ -586,18 +588,21 @@ class _StatsBar extends StatelessWidget {
               child: Row(
                 children: [
                   _StatCard(
+                    key: const Key('binder-stat-total'),
                     icon: Icons.collections_bookmark,
                     label: 'Total',
                     value: '${stats.totalItems}',
                     tooltip: 'Cartas cadastradas no fichário',
                   ),
                   _StatCard(
+                    key: const Key('binder-stat-unique'),
                     icon: Icons.style,
                     label: 'Únicas',
                     value: '${stats.uniqueCards}',
                     tooltip: 'Cartas únicas',
                   ),
                   _StatCard(
+                    key: const Key('binder-stat-duplicates'),
                     icon: Icons.library_add_check_outlined,
                     label: 'Duplicadas',
                     value: '$duplicateCopies',
@@ -647,6 +652,7 @@ class _StatsBar extends StatelessWidget {
                   ),
                   if (onScan != null)
                     _ActionIconButton(
+                      key: const Key('binder-scan-card-action'),
                       icon: Icons.camera_alt,
                       tooltip: 'Escanear carta',
                       onPressed: onScan!,
@@ -654,6 +660,7 @@ class _StatsBar extends StatelessWidget {
                     ),
                   if (onAdd != null)
                     _ActionIconButton(
+                      key: const Key('binder-add-card-action'),
                       icon: Icons.add,
                       tooltip: 'Adicionar carta',
                       onPressed: onAdd!,
@@ -968,6 +975,7 @@ class _StatCard extends StatelessWidget {
   final Color color;
 
   const _StatCard({
+    super.key,
     required this.icon,
     required this.label,
     required this.value,
@@ -1028,6 +1036,7 @@ class _ActionIconButton extends StatelessWidget {
   final Color color;
 
   const _ActionIconButton({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.onPressed,
@@ -1108,6 +1117,7 @@ class _SearchFilterBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            key: const Key('binder-search-field'),
             controller: searchController,
             onSubmitted: (_) => onSearch(),
             style: const TextStyle(
@@ -1448,6 +1458,7 @@ class _BinderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      key: Key('binder-item-card-${item.id}'),
       margin: const EdgeInsets.only(bottom: 8),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(

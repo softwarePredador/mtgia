@@ -704,12 +704,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         if (isReceiver) {
           actions.addAll([
             _actionButton(
+              key: const Key('trade-action-accept'),
               label: 'Aceitar',
               icon: Icons.check,
               color: AppTheme.success,
               onTap: () => _respondTrade(provider, trade, 'accept'),
             ),
             _actionButton(
+              key: const Key('trade-action-decline'),
               label: 'Recusar',
               icon: Icons.close,
               color: AppTheme.error,
@@ -720,6 +722,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         if (isSender) {
           actions.add(
             _actionButton(
+              key: const Key('trade-action-cancel'),
               label: 'Cancelar',
               icon: Icons.block,
               color: AppTheme.disabled,
@@ -736,6 +739,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         if (canShip) {
           actions.add(
             _actionButton(
+              key: const Key('trade-action-ship'),
               label: 'Marcar como Enviado',
               icon: Icons.local_shipping,
               color: AppTheme.frost400,
@@ -745,6 +749,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         }
         actions.add(
           _actionButton(
+            key: const Key('trade-action-cancel'),
             label: 'Cancelar',
             icon: Icons.block,
             color: AppTheme.disabled,
@@ -760,6 +765,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         if (canConfirm) {
           actions.add(
             _actionButton(
+              key: const Key('trade-action-confirm-delivery'),
               label: 'Confirmar Entrega',
               icon: Icons.inventory_2,
               color: AppTheme.success,
@@ -769,6 +775,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
         }
         actions.add(
           _actionButton(
+            key: const Key('trade-action-dispute'),
             label: 'Disputar',
             icon: Icons.warning_amber,
             color: AppTheme.error,
@@ -780,12 +787,14 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       case 'delivered':
         actions.addAll([
           _actionButton(
+            key: const Key('trade-action-complete'),
             label: 'Finalizar',
             icon: Icons.check_circle,
             color: AppTheme.success,
             onTap: () => _updateStatus(provider, trade, 'completed'),
           ),
           _actionButton(
+            key: const Key('trade-action-dispute'),
             label: 'Disputar',
             icon: Icons.warning_amber,
             color: AppTheme.error,
@@ -801,6 +810,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   }
 
   Widget _actionButton({
+    Key? key,
     required String label,
     required IconData icon,
     required Color color,
@@ -809,6 +819,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 160),
       child: ElevatedButton.icon(
+        key: key,
         onPressed: onTap,
         icon: Icon(icon, size: 18),
         label: Text(
@@ -1153,6 +1164,7 @@ class _ShipmentConfirmationDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      key: const Key('trade-ship-confirm-dialog'),
       backgroundColor: AppTheme.surfaceSlate,
       title: const Text(
         'Confirmar envio',
@@ -1174,6 +1186,7 @@ class _ShipmentConfirmationDialogState
             ),
             const SizedBox(height: 14),
             TextField(
+              key: const Key('trade-ship-tracking-field'),
               controller: _trackingController,
               style: const TextStyle(color: AppTheme.textPrimary),
               decoration: const InputDecoration(
@@ -1182,6 +1195,7 @@ class _ShipmentConfirmationDialogState
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
+              key: const Key('trade-ship-method-field'),
               initialValue: _method,
               decoration: const InputDecoration(labelText: 'Método de envio'),
               dropdownColor: AppTheme.surfaceSlate,
@@ -1205,6 +1219,7 @@ class _ShipmentConfirmationDialogState
           child: const Text('Voltar'),
         ),
         ElevatedButton.icon(
+          key: const Key('trade-ship-confirm-button'),
           onPressed: () {
             final trackingCode = _trackingController.text.trim();
             Navigator.pop(

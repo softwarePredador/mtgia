@@ -81,6 +81,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: TextField(
+            key: const Key('marketplace-search-field'),
             controller: _searchController,
             onSubmitted: (_) => _doSearch(),
             style: const TextStyle(
@@ -239,6 +240,7 @@ class _MarketplaceTabContentState extends State<MarketplaceTabContent>
     }
 
     return ListView.builder(
+      key: const Key('marketplace-list'),
       controller: _scrollController,
       padding: const EdgeInsets.all(12),
       itemCount: provider.marketItems.length + (provider.hasMoreMarket ? 1 : 0),
@@ -426,6 +428,7 @@ class _MarketplaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      key: Key('marketplace-item-card-${item.id}'),
       margin: const EdgeInsets.only(bottom: 10),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
@@ -517,6 +520,7 @@ class _MarketplaceCard extends StatelessWidget {
 
                   // Owner + location
                   GestureDetector(
+                    key: Key('marketplace-owner-${item.ownerId}'),
                     onTap: onOwnerTap,
                     child: Row(
                       children: [
@@ -622,6 +626,7 @@ class _MarketplaceCard extends StatelessWidget {
                       width: double.infinity,
                       height: 32,
                       child: OutlinedButton.icon(
+                        key: Key('marketplace-propose-trade-${item.id}'),
                         onPressed: onTradeTap,
                         style: OutlinedButton.styleFrom(
                           foregroundColor:
