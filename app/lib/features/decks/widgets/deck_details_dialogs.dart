@@ -381,7 +381,10 @@ Future<void> showDeckCardDetailsDialog({
                         Align(
                           alignment: Alignment.centerLeft,
                           child: TextButton.icon(
-                            onPressed: onShowEditionPicker,
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                              onShowEditionPicker();
+                            },
                             icon: const Icon(Icons.collections_bookmark),
                             label: const Text('Trocar edição'),
                           ),

@@ -2,6 +2,37 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-08 — Commander edition runtime iPhone 15 PASS
+
+### O Porquê
+- A correcao de troca de edicao do comandante precisava ser provada em runtime,
+  porque havia risco de a edicao visual nao ficar clara e de a troca adicionar
+  uma copia do comandante nas 99 cartas.
+
+### O Como
+- Criado harness `app/integration_test/commander_edition_runtime_test.dart`.
+- Rodado no iPhone 15 Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`,
+  iOS 17.4, contra backend local real `http://127.0.0.1:8081`.
+- Fluxo: registro QA, deck Commander, comandante `Lorehold, the Historian`
+  `PSOS #201p`, busca com edicao visivel, Deck Detail, picker de edicao,
+  troca para `SOS #284`, verificacao API de 1 comandante e `main_board` sem a
+  carta.
+- Corrigido bug de UI onde o picker abria atras do dialog de detalhes; o dialog
+  agora fecha antes de abrir o picker.
+- Corrigido `GET /decks/:id` para deduplicar o `LEFT JOIN sets` por
+  `LOWER(code)`, evitando duplicar cartas quando existem variantes de casing em
+  `sets.code`.
+
+### Resultado
+- `flutter analyze integration_test/commander_edition_runtime_test.dart`
+  passou.
+- Runtime iPhone 15 passou: `00:45 +1: All tests passed!`.
+- Handoff:
+  `app/doc/runtime_flow_handoffs/commander_edition_iphone15_simulator_2026-05-08.md`.
+- Risco residual: `POST /decks/:id/cards` e `POST /decks/:id/cards/replace`
+  seguem lentos em backend local remoto (~7.7s e ~6.9s), mas sem falha
+  funcional.
+
 ## 2026-05-08 — Card entry QA: edicao visivel e comandante preservado
 
 ### O Porquê

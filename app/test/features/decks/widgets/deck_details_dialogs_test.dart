@@ -213,10 +213,6 @@ void main() {
     expect(find.text('Explicar'), findsOneWidget);
     expect(find.text('Ver Detalhes'), findsOneWidget);
 
-    await tester.tap(find.text('Trocar edição'));
-    await tester.pumpAndSettle();
-    expect(editionCalls, 1);
-
     await tester.tap(find.text('Explicar'));
     await tester.pumpAndSettle();
     expect(explanationCalls, 1);
@@ -224,6 +220,13 @@ void main() {
     await tester.tap(find.text('Ver Detalhes'));
     await tester.pumpAndSettle();
     expect(detailsCalls, 1);
+
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Trocar edição'));
+    await tester.pumpAndSettle();
+    expect(editionCalls, 1);
+    expect(find.text('Trocar edição'), findsNothing);
   });
 
   testWidgets('showDeckRemoveCardConfirmationDialog returns confirmation', (

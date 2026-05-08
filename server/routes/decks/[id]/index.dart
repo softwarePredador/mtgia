@@ -362,7 +362,16 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           ${hasSets ? 's.release_date' : 'NULL::date'} AS set_release_date
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
-        ${hasSets ? 'LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)' : ''}
+        ${hasSets ? '''
+        LEFT JOIN (
+          SELECT DISTINCT ON (LOWER(code))
+            code,
+            name,
+            release_date
+          FROM sets
+          ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+        ) s ON LOWER(s.code) = LOWER(c.set_code)
+        ''' : ''}
         WHERE dc.deck_id = @deckId
       '''),
       parameters: {'deckId': deckId},
