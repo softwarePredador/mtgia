@@ -2,6 +2,53 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-08 — Build interno Android APK SM A135M PASS WITH RISKS
+
+### O Porquê
+- Foi solicitada nova preparacao e validacao de build interno Android
+  non-scanner no device fisico `SM A135M` (`R58T300SREH`), instalado e aberto
+  fora de `flutter test/flutter run`, para decisao final de release interno.
+- Scanner/camera/OCR/MLKit scanner ficaram explicitamente fora de escopo, e
+  nenhum segredo, token, JWT, DSN, credencial ou payload sensivel foi
+  registrado nos documentos.
+
+### O Como
+- `master` estava limpo e atualizado com `origin/master`; HEAD local:
+  `01c55faf3dc32cba80756c7198911385d9490723`.
+- Backend publico `/health` respondeu `healthy` com
+  `git_sha=01c55faf3dc32cba80756c7198911385d9490723`; `/git_sha` separado
+  retornou `404`, entao a validacao de SHA ficou no contrato de `/health`.
+- Passaram `flutter analyze lib test integration_test --no-version-check` e
+  `flutter test test --no-version-check`.
+- APK release foi gerado com:
+  `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host` e
+  `PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+- O APK foi instalado via `adb install -r` e aberto via
+  `adb shell am start -W -n com.mtgia.mtg_app/.MainActivity`, sem `flutter run`.
+- A smoke instalada percorreu Auth register/login, Home, Search/Cards,
+  Search/Colecoes/Set Detail, Decks, Generate async/save, Deck Detail,
+  Optimize `rebuild_guided`, Validate, Binder, Marketplace, Trades,
+  Messages/Notifications, Community e Life Counter/Lotus.
+
+### Resultado
+- Classificacao: `PASS WITH RISKS` / `GO WITH RISKS` para release interno
+  Android non-scanner.
+- Artefato gerado:
+  `app/build/app/outputs/flutter-apk/app-release.apk` (`111,594,763` bytes,
+  SHA-256 `c158e67e733446489df495e0e511df34939f7943154862dba604c7eb1a0fad2e`).
+- Evidencias redigidas em:
+  `app/doc/runtime_flow_proofs_2026-05-07_sm_a135m/`.
+- Nao houve P0/P1 fora de Scanner, crash/ANR do app, 5xx, tela branca ou
+  overflow bloqueante observado.
+- Riscos aceitos: Generate async demorou ~55s e retornou fallback deterministico
+  amigavel; Optimize retornou `422` e a UI mapeou para reconstrucao guiada sem
+  aplicar mudancas, ainda com o termo tecnico `rebuild_guided` visivel na
+  microcopy; logs Android tiveram ruido `gralloc4`/`OpenGLRenderer` sem impacto
+  funcional.
+- Scanner/camera/OCR/MLKit scanner permaneceram `DEFERRED/IGNORED`.
+- Relatorio:
+  `server/doc/ANDROID_INTERNAL_BUILD_VALIDATION_2026-05-07.md`.
+
 ## 2026-05-08 — Build interno Android APK SM A135M instalado, smoke bloqueado por lockscreen
 
 ### O Porquê

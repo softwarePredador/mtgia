@@ -1,5 +1,214 @@
 # Android internal build validation - 2026-05-07
 
+## Atualizacao - 2026-05-08 14:04-14:23 -0300
+
+### Resultado
+
+**PASS WITH RISKS para o APK interno Android non-scanner instalado no SM A135M.**
+
+O APK release foi gerado contra o backend publico, instalado no device alvo
+`SM A135M` (`adb R58T300SREH`) e aberto fora de `flutter test`/`flutter run`
+via `am start`. A rodada provou UI/backend reais para os fluxos non-scanner
+criticos: register/login, Home, Search/Cards, Search/Colecoes, detalhe de
+colecao, Decks, Generate async/save, Deck Detail, Optimize com
+`rebuild_guided`, Validate, Binder, Marketplace, Trades list, Messages,
+Notifications, Community e Life Counter/Lotus.
+
+Scanner, camera, OCR e MLKit scanner ficaram **DEFERRED/IGNORED** e nao foram
+tocados.
+
+### Sync e branch
+
+```text
+git status --short
+<sem saida antes da rodada; worktree limpo>
+
+git branch --show-current
+master
+
+git log -1 --oneline
+01c55fa (HEAD -> master, origin/master, origin/HEAD) Document Android internal install lockscreen validation
+
+git fetch origin master --quiet && git pull --ff-only origin master
+Already up to date.
+```
+
+### Backend publico
+
+URL usada no build e runtime:
+
+```text
+https://evolution-cartinhas.8ktevp.easypanel.host
+```
+
+`/health` respondeu `healthy` e incluiu `git_sha`:
+
+```json
+{"status":"healthy","service":"mtgia-server","environment":"production","version":"1.0.0","git_sha":"01c55faf3dc32cba80756c7198911385d9490723","checks":{"process":{"status":"healthy"}}}
+```
+
+`/git_sha` separado retornou `404`; a validacao de SHA ficou no campo
+`git_sha` de `/health`.
+
+### Device Android fisico
+
+```text
+flutter devices --no-version-check
+SM A135M (mobile)  • R58T300SREH • android-arm • Android 14 (API 34)
+iPhone 15 (mobile) • F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF • ios • iOS 17.4 simulator
+macOS (desktop)
+Chrome (web)
+
+adb devices -l
+R58T300SREH device usb:2-1 product:a13ub model:SM_A135M device:a13 transport_id:1
+
+ro.product.model: SM-A135M
+ro.product.manufacturer: samsung
+ro.build.version.release: 14
+ro.build.version.sdk: 34
+ro.product.device: a13
+```
+
+### Validacao local pre-build
+
+```bash
+cd app
+flutter analyze lib test integration_test --no-version-check
+```
+
+Resultado: `No issues found`.
+
+```bash
+cd app
+flutter test test --no-version-check
+```
+
+Resultado: PASS, processo terminou com exit code `0`.
+
+### APK interno
+
+Comando executado:
+
+```bash
+cd app
+flutter build apk --release --no-version-check \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host
+```
+
+Resultado:
+
+```text
+Built build/app/outputs/flutter-apk/app-release.apk (111.6MB)
+```
+
+Artefato:
+
+```text
+app/build/app/outputs/flutter-apk/app-release.apk
+size: 111,594,763 bytes
+sha256: c158e67e733446489df495e0e511df34939f7943154862dba604c7eb1a0fad2e
+package: com.mtgia.mtg_app
+activity: com.mtgia.mtg_app/.MainActivity
+```
+
+### Instalacao e abertura fora de Flutter
+
+```text
+adb -s R58T300SREH install -r app/build/app/outputs/flutter-apk/app-release.apk
+Performing Streamed Install
+Success
+
+adb -s R58T300SREH shell am start -W -n com.mtgia.mtg_app/.MainActivity
+Status: ok
+Activity: com.mtgia.mtg_app/.MainActivity
+Complete
+```
+
+O app foi aberto e operado por ADB/shell no APK instalado. Nao foi usado
+`flutter run`, `flutter test` ou runner de integration test para a prova
+funcional instalada.
+
+### Smoke non-scanner solicitado
+
+| Area | Resultado | Evidencia |
+|---|---:|---|
+| Login/register | PASS | Registro pelo app abriu Home autenticada; login UI explicito em conta QA separada carregou Home. |
+| Home | PASS | `14_home_notifications_allowed.png`, `41_login_success_home.png`. |
+| Search/Cards | PASS | Busca `sol` retornou cartas e CTAs `Adicionar`; `17_card_search_sol_results.png`. |
+| Search/Colecoes | PASS | Aba `Colecoes` carregou catalogo com sets futuros, seguida de abertura do set `MSH`; evidencia principal em `19_set_detail_msh.png`. |
+| Set detail | PASS | `MSH` abriu com cartas e metadata local; `19_set_detail_msh.png`. |
+| Decks | PASS | Lista vazia inicial, geracao IA e deck salvo em `Decks`; `25_after_save_generated_deck.png`. |
+| Generate async | PASS WITH RISKS | Geracao demorou ~55s e caiu em fallback deterministico/mock amigavel; deck 100/100 salvo. |
+| Deck Detail | PASS | `26_deck_detail.png`. |
+| Optimize safe no-op/rebuild_guided | PASS WITH RISKS | Backend retornou `POST /ai/optimize -> 422`; UI exibiu modal de reconstrucao guiada com CTA e sem aplicar mudancas. |
+| Validate | PASS | Deck seguiu `Deck legal para o formato`, `100/100`, comandante definido; `30_deck_detail_validate_after_optimize.png`. |
+| Binder | PASS | Aba `Fichario` abriu sem crash; `31_binder_tab.png`. |
+| Marketplace | PASS | Lista global carregou itens e vendedores; `32_marketplace_tab.png`. |
+| Trades list | PASS | Lista abriu estado vazio amigavel; `33_trades_tab.png`. |
+| Messages/Notifications | PASS | Estados vazios amigaveis; `34_messages_inbox.png`, `35_notifications.png`. |
+| Profile/Community | PASS | Community carregou decks publicos; perfil foi observado autenticado sem crash. |
+| Life Counter/Lotus | PASS WITH RISKS | WebView `ManaLoom Life Counter` abriu e processo permaneceu vivo; um comando ADB de captura encerrou com `137`, recuperado sem crash do app. |
+| Scanner/camera/OCR/MLKit | DEFERRED/IGNORED | Fora de escopo e nenhum CTA de scanner foi acionado. |
+
+### Classificacao de riscos
+
+| Categoria | Classificacao | Evidencia |
+|---|---:|---|
+| Crash/ANR app | PASS | Logcat por PID do app sem `FATAL EXCEPTION`, ANR, SIGABRT ou SIGSEGV. |
+| Tela branca | PASS | Telas funcionais renderizadas; Life Counter mostrou WebView. |
+| 4xx/5xx | PASS WITH RISKS | Uma chamada app-facing `POST /ai/optimize -> 422` foi observada e mapeada para UX de rebuild guiado; nao houve 5xx. |
+| Timeout/latencia >5s | PASS WITH RISKS | Generate async levou ~55s e retornou fallback deterministico com copia amigavel. |
+| Erro bruto user-facing | PASS WITH RISKS | Nao houve 4xx/5xx cru; o modal ainda mostra o termo tecnico `rebuild_guided` no corpo, classificado como risco P2 de microcopy. |
+| Overflow | PASS | Logcat app sem `RenderFlex`/overflow; telas capturadas nao mostraram overflow bloqueante. |
+| Logs graficos Android | RISCO ACEITO | `gralloc4`/`OpenGLRenderer` do device apareceram sem crash e sem impacto visual observado. |
+
+### Evidencias salvas
+
+Diretorio:
+
+```text
+app/doc/runtime_flow_proofs_2026-05-07_sm_a135m/
+```
+
+Arquivos principais:
+
+```text
+14_home_notifications_allowed.png
+17_card_search_sol_results.png
+19_set_detail_msh.png
+24_generate_result_55s.png
+25_after_save_generated_deck.png
+26_deck_detail.png
+28_optimize_after_submit_15s.png
+30_deck_detail_validate_after_optimize.png
+31_binder_tab.png
+32_marketplace_tab.png
+33_trades_tab.png
+34_messages_inbox.png
+35_notifications.png
+36_community_tab.png
+38_life_counter_lotus.png
+40_login_screen_before_login.png
+41_login_success_home.png
+logcat_filtered_redacted.txt
+logcat_app_pid_17415_redacted.txt
+logcat_app_pid_20234_redacted.txt
+```
+
+Os logs foram redigidos para remover tokens, headers, emails e chaves. Arquivos
+brutos de logcat e dumps XML com campos de formulario foram removidos antes do
+commit.
+
+### Decisao
+
+**GO WITH RISKS / PASS WITH RISKS** para release interno Android non-scanner.
+
+Nao foi encontrado P0/P1 fora de Scanner que exigisse patch antes da decisao.
+Os riscos remanescentes sao aceitaveis para build interno: fallback lento de
+Generate async, `rebuild_guided` acionado por deck estruturalmente ruim com
+termo tecnico ainda visivel, e ruido grafico Android sem impacto funcional.
+
 ## Atualizacao - 2026-05-08 13:43-13:49 -0300
 
 ### Resultado
