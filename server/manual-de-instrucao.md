@@ -2,6 +2,46 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
+## 2026-05-08 — Build interno Android APK SM A135M instalado, smoke bloqueado por lockscreen
+
+### O Porquê
+- Foi solicitada nova validacao end-to-end do APK interno Android non-scanner no
+  device fisico `SM A135M` (`R58T300SREH`), instalado e aberto fora de
+  `flutter run`, para decisao de release interno.
+- Scanner/camera/OCR/MLKit scanner ficaram explicitamente fora de escopo, e
+  nenhum segredo, token, JWT, DSN, credencial ou payload sensivel foi registrado.
+
+### O Como
+- `master` estava limpo e atualizado com `origin/master`; HEAD local:
+  `74e3176543b7fe9a727567d6ed7cf4503157b70e`.
+- Backend publico `/health` respondeu `healthy` com
+  `git_sha=74e3176543b7fe9a727567d6ed7cf4503157b70e`; `/git_sha` separado
+  retornou `Route not found`, entao a validacao de SHA ficou no contrato de
+  `/health`.
+- Passaram `flutter analyze lib test integration_test --no-version-check` e
+  `flutter test test --no-version-check`.
+- APK release foi gerado com:
+  `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host` e
+  `PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host`.
+- O device Android foi detectado em ADB como `SM-A135M`, `samsung`, Android 14
+  API 34; `adb install -r` retornou `Success`; `am start -W` abriu
+  `com.mtgia.mtg_app/.MainActivity` fora de Flutter.
+
+### Resultado
+- Classificacao: `BLOCKED` para smoke funcional completo.
+- Artefato gerado:
+  `app/build/app/outputs/flutter-apk/app-release.apk` (`111,594,763` bytes,
+  SHA-256 `c158e67e733446489df495e0e511df34939f7943154862dba604c7eb1a0fad2e`).
+- O processo `com.mtgia.mtg_app` ficou vivo e o logcat filtrado nao mostrou
+  `FATAL EXCEPTION`/ANR do pacote apos o launch.
+- Bloqueio: o telefone permaneceu no lockscreen/keyguard
+  (`NotificationShade`, `mDreamingLockscreen=true`, atividade em `top-sleeping`),
+  impedindo prova visual/interativa de Login, Home, Search/Sets, Decks,
+  Generate async, Deck Detail, Optimize/Validate, Binder, Marketplace, Trades,
+  Messages/Notifications, Profile/Community e Life Counter/Lotus.
+- Relatorio:
+  `server/doc/ANDROID_INTERNAL_BUILD_VALIDATION_2026-05-07.md`.
+
 ## 2026-05-07 — Build interno Android APK SM A135M sem Scanner
 
 ### O Porquê
