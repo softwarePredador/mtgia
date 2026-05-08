@@ -12603,3 +12603,21 @@ duplicar funcoes locais de polling.
 Esta etapa nao altera contrato backend, banco, IA, Scanner/camera/OCR ou
 fluxos de negocio. O objetivo e reduzir fragilidade de automacao e aumentar
 confianca na criacao de testes de tela.
+
+### 100.4 Migracao dos harnesses existentes
+
+Em 2026-05-08, os harnesses existentes de Search/Sets, Deck Generate async,
+Deck runtime, Profile/Community e Binder/Marketplace/Trades foram atualizados
+para reutilizar `app/integration_test/runtime_test_helpers.dart` e anchors por
+`Key` nas acoes principais.
+
+Validacao executada:
+
+- `cd app && flutter analyze lib test integration_test --no-version-check`:
+  `PASS`;
+- `cd app && flutter test test --no-version-check`: `PASS`, `+552`.
+
+Ao adicionar novo teste, nao recriar helpers locais de polling sem motivo
+explicito. Se o teste ainda precisar de `find.byType(TextField)` ou texto para
+executar uma acao critica, registrar o fallback no `UI_TEST_SURFACE_MAP.md` e
+adicionar a menor `Key` possivel na tela.

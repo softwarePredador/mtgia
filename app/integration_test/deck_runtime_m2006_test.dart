@@ -10,6 +10,8 @@ import 'package:manaloom/main.dart' as app;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'runtime_test_helpers.dart';
+
 const _completeCommanderImportList = '''
 1x Talrand, Sky Summoner [Commander]
 38x Island
@@ -97,6 +99,16 @@ String _safeCaptureSuffix(String value) {
       .replaceAll(RegExp(r'^_+|_+$'), '');
 }
 
+String _optimizeIntensityKeyForLabel(String label) {
+  return switch (label.trim().toLowerCase()) {
+    'leve' => 'optimize-intensity-light',
+    'focado' => 'optimize-intensity-focused',
+    'agressivo' => 'optimize-intensity-aggressive',
+    'rebuild' => 'optimize-intensity-rebuild',
+    _ => 'optimize-intensity-${_safeCaptureSuffix(label)}',
+  };
+}
+
 void _emitScreenshot(String name, List<int> pngBytes) {
   final encoded = base64Encode(pngBytes);
   const chunkSize = 2000;
@@ -150,67 +162,8 @@ Future<void> _capture(
   _emitScreenshot(name, screenshot);
 }
 
-Future<void> _pumpUntil(
-  WidgetTester tester,
-  bool Function() condition, {
-  required String description,
-  int attempts = 60,
-  Duration step = const Duration(seconds: 1),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (condition()) return;
-  }
-  fail('Timeout waiting for $description');
-}
-
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 60,
-  Duration step = const Duration(seconds: 1),
-}) {
-  return _pumpUntil(
-    tester,
-    () => finder.evaluate().isNotEmpty,
-    description: finder.toString(),
-    attempts: attempts,
-    step: step,
-  );
-}
-
-Future<void> _pumpUntilAbsent(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 60,
-  Duration step = const Duration(seconds: 1),
-}) {
-  return _pumpUntil(
-    tester,
-    () => finder.evaluate().isEmpty,
-    description: '${finder.toString()} to disappear',
-    attempts: attempts,
-    step: step,
-  );
-}
-
-Future<void> _pumpUntilAny(
-  WidgetTester tester,
-  List<Finder> finders, {
-  int attempts = 60,
-  Duration step = const Duration(seconds: 1),
-}) {
-  return _pumpUntil(
-    tester,
-    () => finders.any((finder) => finder.evaluate().isNotEmpty),
-    description: finders.map((finder) => finder.toString()).join(' OR '),
-    attempts: attempts,
-    step: step,
-  );
-}
-
 Future<void> _waitForDeckListReady(WidgetTester tester) {
-  return _pumpUntilAny(
+  return pumpUntilAnyFound(
     tester,
     [
       find.text('Nenhum deck criado'),
@@ -233,7 +186,7 @@ Future<void> _openCreateDeckDialog(WidgetTester tester) async {
       of: find.byType(PopupMenuItem<String>),
       matching: find.text('Novo Deck'),
     );
-    await _pumpUntilFound(
+    await pumpUntilFound(
       tester,
       popupCreateEntry,
       attempts: 60,
@@ -245,7 +198,7 @@ Future<void> _openCreateDeckDialog(WidgetTester tester) async {
   }
 
   final newDeckText = find.text('Novo Deck');
-  await _pumpUntilFound(
+  await pumpUntilFound(
     tester,
     newDeckText,
     attempts: 90,
@@ -270,7 +223,7 @@ Future<void> _openCreatedDeckDetails(
   String deckName,
 ) async {
   final createdText = find.text(deckName);
-  await _pumpUntilFound(
+  await pumpUntilFound(
     tester,
     createdText,
     attempts: 120,
@@ -329,7 +282,7 @@ void main() {
       await tester.pumpWidget(const app.ManaLoomApp());
       await tester.pump();
 
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.text('Entrar'),
         attempts: 90,
@@ -343,40 +296,49 @@ void main() {
       await tester.tap(registerLink);
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Criar Conta'), attempts: 60);
+      await pumpUntilFound(tester, find.text('Criar Conta'), attempts: 60);
 
       final unique = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
       final username = 'iphone15_$unique';
       final email = 'iphone15_$unique@example.com';
       const password = 'Qa123456!';
 
-      final registerFields = find.byType(TextFormField);
-      expect(registerFields, findsNWidgets(4));
+      await tester.enterText(
+        find.byKey(const Key('register-username-field')),
+        username,
+      );
+      await tester.enterText(
+        find.byKey(const Key('register-email-field')),
+        email,
+      );
+      await tester.enterText(
+        find.byKey(const Key('register-password-field')),
+        password,
+      );
+      await tester.enterText(
+        find.byKey(const Key('register-confirm-password-field')),
+        password,
+      );
 
-      await tester.enterText(registerFields.at(0), username);
-      await tester.enterText(registerFields.at(1), email);
-      await tester.enterText(registerFields.at(2), password);
-      await tester.enterText(registerFields.at(3), password);
-
-      final registerSubmit = find.widgetWithText(InkWell, 'Criar Conta');
+      final registerSubmit = find.byKey(const Key('register-submit-button'));
       await tester.ensureVisible(registerSubmit);
       await tester.tap(registerSubmit);
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Decks'), attempts: 120);
+      await pumpUntilFound(tester, find.text('Decks'), attempts: 120);
       await _capture(binding, tester, '02_registered_home');
 
       await tester.tap(find.text('Decks').first);
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
+      await pumpUntilFound(tester, find.text('Meus Decks'), attempts: 60);
       await _waitForDeckListReady(tester);
       await _capture(binding, tester, '03_decks');
 
       await _openCreateDeckDialog(tester);
 
       final createDialog = find.byType(AlertDialog);
-      await _pumpUntilFound(tester, createDialog, attempts: 60);
+      await pumpUntilFound(tester, createDialog, attempts: 60);
 
       final createdDeckName = 'iPhone15 Runtime Talrand $unique';
       final createDialogNameField =
@@ -393,12 +355,12 @@ void main() {
       await tester.tap(createDeckSubmit);
       await tester.pump();
 
-      await _pumpUntilAbsent(tester, createDialog, attempts: 60);
+      await pumpUntilAbsent(tester, createDialog, attempts: 60);
       await _capture(binding, tester, '04_deck_created');
 
       await _openCreatedDeckDetails(tester, createdDeckName);
 
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.text('Detalhes do Deck'),
         attempts: 120,
@@ -409,12 +371,12 @@ void main() {
       await tester.pump();
 
       final importMenuEntry = find.text('Colar lista de cartas');
-      await _pumpUntilFound(tester, importMenuEntry, attempts: 30);
+      await pumpUntilFound(tester, importMenuEntry, attempts: 30);
       await tester.tap(importMenuEntry.last);
       await tester.pump();
 
       final importDialogTitle = find.text('Importar Lista');
-      await _pumpUntilFound(tester, importDialogTitle, attempts: 30);
+      await pumpUntilFound(tester, importDialogTitle, attempts: 30);
 
       final importListField = find.byType(TextField).last;
       await tester.enterText(importListField, _completeCommanderImportList);
@@ -424,12 +386,12 @@ void main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'Importar'));
       await tester.pump();
 
-      await _pumpUntilAbsent(tester, importDialogTitle, attempts: 120);
+      await pumpUntilAbsent(tester, importDialogTitle, attempts: 120);
 
       await tester.tap(find.text('Cartas').first);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Comandante'), attempts: 60);
-      await _pumpUntilFound(
+      await pumpUntilFound(tester, find.text('Comandante'), attempts: 60);
+      await pumpUntilFound(
         tester,
         find.text('Talrand, Sky Summoner'),
         attempts: 120,
@@ -456,10 +418,12 @@ void main() {
       await tester.tap(find.byTooltip('Otimizar deck').first);
       await tester.pump();
 
-      await _pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
-      final applyCurrentStrategy = find.text('Aplicar estratégia atual');
+      await pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
+      final applyCurrentStrategy = find.byKey(
+        const Key('optimize-apply-current-strategy-button'),
+      );
       final strategyCards = find.byType(StrategyOptionCard);
-      await _pumpUntilAny(tester, [
+      await pumpUntilAnyFound(tester, [
         strategyCards,
         applyCurrentStrategy,
       ], attempts: 240);
@@ -472,8 +436,10 @@ void main() {
         scrollable: optimizeScrollable,
       );
       await tester.pump();
-      final intensityChoice = find.text(_runtimeOptimizeIntensityLabel);
-      await _pumpUntilFound(tester, intensityChoice, attempts: 30);
+      final intensityChoice = find.byKey(
+        Key(_optimizeIntensityKeyForLabel(_runtimeOptimizeIntensityLabel)),
+      );
+      await pumpUntilFound(tester, intensityChoice, attempts: 30);
       await tester.tap(intensityChoice.first);
       await tester.pump();
       await _capture(
@@ -482,7 +448,7 @@ void main() {
         '08c_optimize_sheet_${_safeCaptureSuffix(_runtimeOptimizeIntensityLabel)}',
       );
 
-      await _pumpUntilAny(tester, [
+      await pumpUntilAnyFound(tester, [
         strategyCards,
         applyCurrentStrategy,
       ], attempts: 240);
@@ -509,7 +475,7 @@ void main() {
       }
       await tester.pump();
 
-      await _pumpUntilAny(tester, [
+      await pumpUntilAnyFound(tester, [
         find.textContaining('Completar deck ('),
         find.textContaining('Sugestões para '),
         find.text('Criar reconstrução guiada'),
@@ -547,7 +513,7 @@ void main() {
           .text('Nenhuma melhoria segura encontrada')
           .evaluate()
           .isNotEmpty) {
-        await _pumpUntilFound(
+        await pumpUntilFound(
           tester,
           find.textContaining('gate bloqueou as inseguras'),
           attempts: 30,
@@ -623,8 +589,8 @@ void main() {
       await tester.tap(applyChangesButton);
       await tester.pump();
 
-      await _pumpUntilAbsent(tester, applyChangesButton, attempts: 240);
-      await _pumpUntilAny(tester, [
+      await pumpUntilAbsent(tester, applyChangesButton, attempts: 240);
+      await pumpUntilAnyFound(tester, [
         find.text('100 / 100 cartas'),
         find.text('Deck completo!'),
         find.text('Válido'),
@@ -632,7 +598,7 @@ void main() {
       ], attempts: 240);
       await _capture(binding, tester, '10_complete_validated');
 
-      await _pumpUntil(tester, () {
+      await pumpUntil(tester, () {
         final titleElements = find.text('Detalhes do Deck').evaluate();
         if (titleElements.isEmpty) return false;
         final deck = titleElements.first.read<DeckProvider>().selectedDeck;

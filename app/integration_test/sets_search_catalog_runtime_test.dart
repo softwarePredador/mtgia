@@ -8,6 +8,7 @@ import 'package:manaloom/features/cards/screens/card_detail_screen.dart';
 import 'package:manaloom/features/cards/screens/card_search_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'runtime_test_helpers.dart';
 import 'visual_capture_helpers.dart';
 
 void main() {
@@ -28,10 +29,13 @@ void main() {
         ),
       );
 
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
-      await tester.enterText(find.byType(TextField).first, 'Black Lotus');
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Cartas'));
+      await tester.enterText(
+        find.byKey(const Key('card-search-field')),
+        'Black Lotus',
+      );
       await tester.pump(const Duration(milliseconds: 500));
-      await _pumpUntilFound(tester, find.text('Black Lotus'));
+      await pumpUntilFound(tester, find.text('Black Lotus'));
       await captureVisualProof(binding, tester, 'sets_search_01_cards_results');
       expect(find.byType(CardDetailScreen), findsNothing);
 
@@ -41,22 +45,22 @@ void main() {
 
       await tester.tap(find.byType(CachedCardImage).first);
       await tester.pumpAndSettle();
-      await _pumpUntilFound(tester, find.byType(CardDetailScreen));
+      await pumpUntilFound(tester, find.byType(CardDetailScreen));
       expect(find.text('Detalhes'), findsWidgets);
       await captureVisualProof(binding, tester, 'sets_search_02_card_detail');
 
       Navigator.of(tester.element(find.byType(CardDetailScreen))).pop();
       await tester.pumpAndSettle();
-      await _pumpUntilFound(tester, find.text('Black Lotus'));
+      await pumpUntilFound(tester, find.text('Black Lotus'));
 
-      await _pumpUntilFound(tester, find.widgetWithText(Tab, 'Coleções'));
+      await pumpUntilFound(tester, find.widgetWithText(Tab, 'Coleções'));
       await tester.tap(find.widgetWithText(Tab, 'Coleções'));
       await tester.pumpAndSettle();
 
-      await _pumpUntilFound(tester, find.byKey(const Key('setsSearchField')));
+      await pumpUntilFound(tester, find.byKey(const Key('setsSearchField')));
       await tester.enterText(find.byKey(const Key('setsSearchField')), 'ECC');
       await tester.pump(const Duration(milliseconds: 500));
-      await _pumpUntilFound(tester, find.text('Lorwyn Eclipsed Commander'));
+      await pumpUntilFound(tester, find.text('Lorwyn Eclipsed Commander'));
       await captureVisualProof(
         binding,
         tester,
@@ -65,11 +69,11 @@ void main() {
 
       await tester.tap(find.text('Lorwyn Eclipsed Commander'));
       await tester.pumpAndSettle();
-      await _pumpUntilFound(tester, find.text('Lorwyn Eclipsed Commander'));
+      await pumpUntilFound(tester, find.text('Lorwyn Eclipsed Commander'));
 
       final cardsList = find.byKey(const Key('setCardsList'));
       final emptyState = find.text('Nenhuma carta local nesta coleção');
-      await _pumpUntilAnyFound(tester, [cardsList, emptyState]);
+      await pumpUntilAnyFound(tester, [cardsList, emptyState]);
 
       expect(
         cardsList.evaluate().isNotEmpty || emptyState.evaluate().isNotEmpty,
@@ -82,31 +86,4 @@ void main() {
       expect(find.byKey(const Key('setsCatalogList')), findsOneWidget);
     },
   );
-}
-
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  Duration timeout = const Duration(seconds: 20),
-}) async {
-  final end = DateTime.now().add(timeout);
-  while (DateTime.now().isBefore(end)) {
-    await tester.pump(const Duration(milliseconds: 250));
-    if (finder.evaluate().isNotEmpty) return;
-  }
-  expect(finder, findsOneWidget);
-}
-
-Future<void> _pumpUntilAnyFound(
-  WidgetTester tester,
-  List<Finder> finders, {
-  Duration timeout = const Duration(seconds: 20),
-}) async {
-  final end = DateTime.now().add(timeout);
-  while (DateTime.now().isBefore(end)) {
-    await tester.pump(const Duration(milliseconds: 250));
-    if (finders.any((finder) => finder.evaluate().isNotEmpty)) return;
-  }
-
-  fail('Expected at least one search-to-set runtime state to render.');
 }

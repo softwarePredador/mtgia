@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -27,14 +28,14 @@ class RuntimeAuthSession {
 
 Future<void> pumpUntil(
   WidgetTester tester,
-  bool Function() condition, {
+  FutureOr<bool> Function() condition, {
   required String description,
   int attempts = 60,
   Duration step = const Duration(milliseconds: 500),
 }) async {
   for (var i = 0; i < attempts; i += 1) {
     await tester.pump(step);
-    if (condition()) return;
+    if (await condition()) return;
   }
   fail('Timeout waiting for $description');
 }
@@ -64,6 +65,21 @@ Future<void> pumpUntilAbsent(
     tester,
     () => finder.evaluate().isEmpty,
     description: '${finder.toString()} to disappear',
+    attempts: attempts,
+    step: step,
+  );
+}
+
+Future<void> pumpUntilAnyFound(
+  WidgetTester tester,
+  List<Finder> finders, {
+  int attempts = 60,
+  Duration step = const Duration(milliseconds: 500),
+}) {
+  return pumpUntil(
+    tester,
+    () => finders.any((finder) => finder.evaluate().isNotEmpty),
+    description: finders.map((finder) => finder.toString()).join(' OR '),
     attempts: attempts,
     step: step,
   );

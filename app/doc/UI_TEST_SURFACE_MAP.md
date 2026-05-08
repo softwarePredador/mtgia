@@ -149,12 +149,26 @@ de animação.
 `app/integration_test/runtime_test_helpers.dart` centraliza esperas e sessão:
 
 - `pumpUntil`, `pumpUntilFound`, `pumpUntilAbsent`;
+- `pumpUntilAnyFound`;
 - `clearRuntimeAuth`;
 - `seedAuthenticatedSession`;
 - `captureRuntimeCheckpoint`;
 - `expectNoRawTechnicalErrorText`.
 
 Novos harnesses devem usar esse helper antes de criar funções locais duplicadas.
+
+## Harnesses migrados - 2026-05-08
+
+Os harnesses abaixo foram migrados para usar os anchors deste mapa e o helper
+comum de runtime:
+
+| Harness | Melhoria aplicada | Fallback ainda aceito |
+|---|---|---|
+| `sets_search_catalog_runtime_test.dart` | Busca de cartas por `card-search-field` e esperas por helper comum. | Tabs ainda usam texto como evidência visual. |
+| `deck_generate_async_runtime_test.dart` | Cadastro, prompt, gerar, nome e salvar por keys estáveis. | Estados visuais de progresso continuam validados por copy. |
+| `deck_runtime_m2006_test.dart` | Cadastro, estratégia atual e intensidade de optimize por keys estáveis. | Dialogs de criar deck/importar lista ainda dependem de texto/campo enquanto não houver keys dedicadas. |
+| `profile_community_runtime_test.dart` | Campos e salvar perfil por keys estáveis. | Busca de usuários/comunidade ainda depende de campo textual sem key dedicada. |
+| `binder_marketplace_trade_runtime_test.dart` | Binder editor, marketplace search, review de trade, ações de status, chat, notificações e direct messages por keys estáveis. | Alguns wrappers de lista ainda usam texto para evidência visual. |
 
 ## Checkpoints obrigatórios para agentes
 

@@ -22,6 +22,8 @@ import 'package:manaloom/features/social/screens/user_search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'runtime_test_helpers.dart';
+
 class _RuntimeUser {
   const _RuntimeUser({
     required this.id,
@@ -207,17 +209,25 @@ void main() {
         _runtimeApp(auth: auth, home: const ProfileScreen()),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Perfil'));
-      await _pumpUntilFound(tester, find.text(viewer.username));
+      await pumpUntilFound(tester, find.text('Perfil'));
+      await pumpUntilFound(tester, find.text(viewer.username));
 
       final editedDisplayName = 'Runtime Profile $marker';
       final editedCity = 'Sao Paulo';
       final editedNotes = 'Runtime trade notes $marker';
-      await tester.enterText(find.byType(TextField).at(0), editedDisplayName);
-      await tester.enterText(find.byType(TextField).at(1), editedCity);
-      await tester.enterText(find.byType(TextField).at(2), editedNotes);
-      final saveProfileButton =
-          find.widgetWithText(ElevatedButton, 'Salvar').last;
+      await tester.enterText(
+        find.byKey(const Key('profile-display-name-field')),
+        editedDisplayName,
+      );
+      await tester.enterText(
+        find.byKey(const Key('profile-city-field')),
+        editedCity,
+      );
+      await tester.enterText(
+        find.byKey(const Key('profile-trade-notes-field')),
+        editedNotes,
+      );
+      final saveProfileButton = find.byKey(const Key('profile-save-button'));
       await tester.scrollUntilVisible(
         saveProfileButton,
         250,
@@ -225,7 +235,7 @@ void main() {
       );
       await tester.tap(saveProfileButton);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Perfil atualizado'));
+      await pumpUntilFound(tester, find.text('Perfil atualizado'));
 
       final reloadedProfile = await api.getJson(
         '/users/me',
@@ -245,23 +255,23 @@ void main() {
         ),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(editedDisplayName));
-      await _pumpUntilFound(tester, find.text(editedNotes));
+      await pumpUntilFound(tester, find.text(editedDisplayName));
+      await pumpUntilFound(tester, find.text(editedNotes));
 
       await tester.pumpWidget(
         _runtimeApp(auth: auth, home: UserProfileScreen(userId: creator.id)),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(creator.username));
-      await _pumpUntilFound(tester, find.textContaining('Decks'));
-      await _pumpUntilFound(tester, find.text('Seguidores'));
-      await _pumpUntilFound(tester, find.text('Seguindo'));
-      await _pumpUntilFound(tester, find.text(deckName));
+      await pumpUntilFound(tester, find.text(creator.username));
+      await pumpUntilFound(tester, find.textContaining('Decks'));
+      await pumpUntilFound(tester, find.text('Seguidores'));
+      await pumpUntilFound(tester, find.text('Seguindo'));
+      await pumpUntilFound(tester, find.text(deckName));
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Seguir'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Deixar de seguir'));
-      await _pumpUntil(
+      await pumpUntilFound(tester, find.text('Deixar de seguir'));
+      await pumpUntil(
         tester,
         () => api.isFollowing(token: viewer.token, targetUserId: creator.id),
         description: 'follow persisted',
@@ -269,15 +279,15 @@ void main() {
 
       await tester.tap(find.widgetWithText(Tab, 'Seguidores'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(editedDisplayName));
+      await pumpUntilFound(tester, find.text(editedDisplayName));
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Deixar de seguir'));
       await tester.pump();
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.widgetWithText(ElevatedButton, 'Seguir'),
       );
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async =>
             !(await api.isFollowing(
@@ -291,20 +301,20 @@ void main() {
         _runtimeApp(auth: auth, home: const UserSearchScreen()),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Buscar Usuários'));
+      await pumpUntilFound(tester, find.text('Buscar Usuários'));
       await tester.enterText(find.byType(TextField).first, creator.username);
       await tester.pump(const Duration(milliseconds: 600));
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => find.text(creator.username).evaluate().length >= 2,
         description: 'user search result for ${creator.username}',
       );
       await tester.tap(find.text(creator.username).last);
       await tester.pump();
-      await _pumpUntilFound(tester, find.textContaining('Decks'));
+      await pumpUntilFound(tester, find.textContaining('Decks'));
       await tester.pageBack();
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Buscar Usuários'));
+      await pumpUntilFound(tester, find.text('Buscar Usuários'));
 
       await api.postJson(
         '/users/${creator.id}/follow',
@@ -315,23 +325,23 @@ void main() {
         _runtimeApp(auth: auth, home: const CommunityScreen()),
       );
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Comunidade'));
+      await pumpUntilFound(tester, find.text('Comunidade'));
 
       await tester.enterText(find.byType(TextField).first, marker);
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(deckName));
+      await pumpUntilFound(tester, find.text(deckName));
       await tester.tap(find.text(deckName).first);
       await tester.pump();
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async =>
             find.text('Deck Público').evaluate().isNotEmpty ||
             find.text(deckName).evaluate().isNotEmpty,
         description: 'public deck detail title',
       );
-      await _pumpUntilFound(tester, find.text(deckName));
-      await _pumpUntil(
+      await pumpUntilFound(tester, find.text(deckName));
+      await pumpUntil(
         tester,
         () async => find.byType(Scrollable).evaluate().isNotEmpty,
         description: 'public deck detail scrollable',
@@ -344,32 +354,32 @@ void main() {
       expect(find.textContaining('Sol Ring'), findsWidgets);
       await tester.pageBack();
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Comunidade'));
+      await pumpUntilFound(tester, find.text('Comunidade'));
 
       await tester.tap(find.widgetWithText(Tab, 'Seguindo'));
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(deckName));
+      await pumpUntilFound(tester, find.text(deckName));
 
       await tester.tap(find.widgetWithText(Tab, 'Usuários'));
       await tester.pump();
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => find.byType(TextField).evaluate().isNotEmpty,
         description: 'community users search field',
       );
       await tester.enterText(find.byType(TextField).last, creator.username);
       await tester.pump(const Duration(milliseconds: 600));
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () async => find.text(creator.username).evaluate().length >= 2,
         description: 'community user tab result for ${creator.username}',
       );
       await tester.tap(find.text(creator.username).last);
       await tester.pump();
-      await _pumpUntilFound(tester, find.textContaining('Decks'));
+      await pumpUntilFound(tester, find.textContaining('Decks'));
       await tester.pageBack();
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Comunidade'));
+      await pumpUntilFound(tester, find.text('Comunidade'));
 
       await api.deleteJson('/users/${creator.id}/follow', token: viewer.token);
       expect(tester.takeException(), isNull);
@@ -401,33 +411,4 @@ Widget _runtimeApp({required AuthProvider auth, required Widget home}) {
       home: home,
     ),
   );
-}
-
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  await _pumpUntil(
-    tester,
-    () async => finder.evaluate().isNotEmpty,
-    description: finder.toString(),
-    attempts: attempts,
-    step: step,
-  );
-}
-
-Future<void> _pumpUntil(
-  WidgetTester tester,
-  Future<bool> Function() condition, {
-  required String description,
-  int attempts = 80,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (await condition()) return;
-  }
-  fail('Timeout waiting for $description');
 }
