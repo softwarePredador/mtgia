@@ -2,26 +2,36 @@
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 
-## 2026-05-08 — Commander edition change preserves commander slot
+## 2026-05-08 — Card entry QA: edicao visivel e comandante preservado
 
 ### O Porquê
-- Foi reportado que a escolha/troca de edicao do comandante nao deixava a
-  impressao visualmente clara e, ao alterar a edicao, a nova impressao podia
-  entrar na lista das 99 cartas em vez de permanecer no slot de comandante.
+- Foi executada auditoria focada nos fluxos de busca, detalhe, insercao,
+  edicao, troca de edicao, remocao e fichario, sem Scanner/camera/OCR/MLKit.
+- A escolha/troca de edicao precisava deixar a impressao visualmente clara
+  antes da confirmacao e impedir que comandante fosse demovido para as 99.
 
 ### O Como
-- O app passou a mostrar `SET #collector`, foil, nome da colecao, raridade e
-  data na busca, no detalhe da carta e no seletor de edicoes.
+- O app passou a mostrar `SET #collector`, foil/non-foil quando conhecido, nome
+  da colecao, raridade e data na busca, no detalhe da carta, nos cards de deck e
+  nos seletores de edicoes de Deck/Binder.
 - A edicao generica de uma carta agora reconhece `card.isCommander`, fixa a
   quantidade em 1 e envia `is_commander=true` para `/decks/:id/cards/set`.
-- O backend `/decks/:id/cards/set` preserva comandante existente por padrao e,
-  quando `is_commander=true`, troca a edicao dentro do slot de comandante sem
-  adicionar a nova impressao ao mainboard.
+- O backend `GET /decks/:id` agora hidrata cartas com `collector_number`,
+  `foil`, `set_name` e `set_release_date` quando disponivel, mantendo os campos
+  opcionais para compatibilidade.
+- O backend `POST /decks/:id/cards` passou a tratar `is_commander=true` como
+  mutacao atomica do slot de comandante em Commander/Brawl: valida o estado final
+  com `DeckRulesService`, remove o comandante unico anterior dentro da mesma
+  transacao e insere a nova impressao com quantidade 1, sem demover para o
+  mainboard. Decks com multiplos comandantes ficam protegidos contra troca cega.
+- Icones de foil/raridade em superficies non-AI deixaram de usar
+  `Icons.auto_awesome`, reservando a semantica de IA para Generate/Optimize.
 
 ### Resultado
-- Validados `flutter analyze` focado em Cards/Decks, testes focados de widgets e
-  provider de Decks, `dart analyze` focado em rotas de Decks e live
-  `decks_incremental_add_test` em backend 8082.
+- Validados `flutter analyze` focado em Cards/Decks/Binder, `dart analyze`
+  focado em Cards/Decks/Binder/testes, suite focada de Flutter e suite server
+  obrigatoria com backend local 8082. A suite recebeu `binder_route_test.dart`
+  para cobrir o contrato local do fichario.
 - Backend temporario 8082 foi encerrado apos a validacao.
 
 ## 2026-05-08 — Build interno Android APK SM A135M PASS WITH RISKS

@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/binder_provider.dart';
 import '../widgets/binder_item_editor.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../../cards/screens/card_search_screen.dart';
 import '../../scanner/screens/card_scanner_screen.dart';
 
@@ -1226,7 +1227,7 @@ class _SearchFilterBar extends StatelessWidget {
                             : AppTheme.outlineMuted,
                   ),
                   avatar: Icon(
-                    Icons.auto_awesome,
+                    Icons.flare_rounded,
                     size: 14,
                     color:
                         foilFilter == true
@@ -1492,7 +1493,7 @@ class _BinderItemCard extends StatelessWidget {
                         if (item.isFoil) ...[
                           const SizedBox(width: 6),
                           Icon(
-                            Icons.auto_awesome,
+                            Icons.flare_rounded,
                             size: 14,
                             color: AppTheme.brass400.withValues(alpha: 0.8),
                           ),
@@ -1500,7 +1501,7 @@ class _BinderItemCard extends StatelessWidget {
                         if (item.cardSetCode != null) ...[
                           const SizedBox(width: 6),
                           Text(
-                            item.cardSetCode!.toUpperCase(),
+                            cardEditionCodeLabel(setCode: item.cardSetCode),
                             style: const TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: AppTheme.fontXs,

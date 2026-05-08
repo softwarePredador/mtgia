@@ -9,6 +9,7 @@ import '../../decks/providers/deck_provider.dart';
 import '../../decks/models/deck_card_item.dart';
 import '../../decks/models/deck_details.dart';
 import '../../collection/screens/sets_catalog_screen.dart';
+import '../widgets/card_edition_metadata.dart';
 import 'card_detail_screen.dart';
 import 'dart:async';
 
@@ -650,16 +651,6 @@ class _CardSearchEditionSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final setCode = card.setCode.trim().toUpperCase();
-    final collector = (card.collectorNumber ?? '').trim();
-    final editionParts = [
-      if ((card.setName ?? '').trim().isNotEmpty) card.setName!.trim(),
-      if ((card.setReleaseDate ?? '').trim().isNotEmpty)
-        _releaseYear(card.setReleaseDate!.trim()),
-      if (card.rarity.trim().isNotEmpty) _capitalize(card.rarity.trim()),
-      if (card.foil == true) 'Foil',
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -672,62 +663,16 @@ class _CardSearchEditionSubtitle extends StatelessWidget {
             style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
           ),
         const SizedBox(height: 3),
-        Row(
-          children: [
-            if (setCode.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                margin: const EdgeInsets.only(right: 6),
-                decoration: BoxDecoration(
-                  color: AppTheme.frost400.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: AppTheme.frost400.withValues(alpha: 0.4),
-                  ),
-                ),
-                child: Text(
-                  collector.isEmpty ? setCode : '$setCode #$collector',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.frost400,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-              ),
-            Flexible(
-              child: Text(
-                editionParts.where((s) => s.isNotEmpty).join(' • '),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
+        CardEditionMetadataLine(
+          setCode: card.setCode,
+          collectorNumber: card.collectorNumber,
+          setName: card.setName,
+          setReleaseDate: card.setReleaseDate,
+          rarity: card.rarity,
+          foil: card.foil,
+          warning: warning,
         ),
-        if ((warning ?? '').isNotEmpty) ...[
-          const SizedBox(height: 3),
-          Text(
-            warning!,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppTheme.warning, fontSize: 12),
-          ),
-        ],
       ],
     );
   }
-}
-
-String _capitalize(String value) {
-  if (value.isEmpty) return value;
-  return value[0].toUpperCase() + value.substring(1);
-}
-
-String _releaseYear(String value) {
-  if (value.length < 4) return value;
-  return value.substring(0, 4);
 }

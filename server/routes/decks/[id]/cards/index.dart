@@ -100,15 +100,120 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       }
 
       final isBasicLand = typeLine.contains('basic land');
+      if (isCommander) {
+        if (format != 'commander' && format != 'brawl') {
+          throw DeckRulesException(
+            'Regra violada: comandante só é permitido em Commander/Brawl.',
+          );
+        }
+
+        final typeLower = typeLine;
+        final oracleLower = (oracleText ?? '').toLowerCase();
+        final eligible = (typeLower.contains('legendary') &&
+                typeLower.contains('creature')) ||
+            oracleLower.contains('can be your commander');
+        if (!eligible) {
+          throw DeckRulesException(
+              'Regra violada: "$cardName" não pode ser comandante.');
+        }
+
+        final deckCardsResult = await session.execute(
+          Sql.named('''
+            SELECT card_id::text, quantity::int, is_commander
+            FROM deck_cards
+            WHERE deck_id = @deckId
+          '''),
+          parameters: {'deckId': deckId},
+        );
+
+        final existingCommanders =
+            deckCardsResult.where((row) => row[2] as bool? ?? false).toList();
+        final targetAlreadyCommander =
+            existingCommanders.any((row) => row[0] == cardId);
+        if (existingCommanders.length > 1 && !targetAlreadyCommander) {
+          throw DeckRulesException(
+            'Regra violada: este deck tem múltiplos comandantes; edite o slot de comandante específico.',
+          );
+        }
+
+        final nextCards = <Map<String, dynamic>>[];
+        for (final r in deckCardsResult) {
+          final existingCardId = r[0] as String;
+          final existingIsCommander = r[2] as bool? ?? false;
+          if (existingCardId == cardId) continue;
+          if (existingCommanders.length <= 1 && existingIsCommander) continue;
+          nextCards.add({
+            'card_id': existingCardId,
+            'quantity': r[1] as int,
+            'is_commander': existingIsCommander,
+          });
+        }
+        nextCards.add({
+          'card_id': cardId,
+          'quantity': 1,
+          'is_commander': true,
+        });
+
+        await DeckRulesService(session).validateAndThrow(
+          format: format,
+          cards: nextCards,
+          strict: false,
+        );
+
+        if (existingCommanders.length <= 1) {
+          await session.execute(
+            Sql.named('''
+              DELETE FROM deck_cards
+              WHERE deck_id = @deckId
+                AND (is_commander = TRUE OR card_id = @cardId)
+            '''),
+            parameters: {'deckId': deckId, 'cardId': cardId},
+          );
+        } else {
+          await session.execute(
+            Sql.named('''
+              DELETE FROM deck_cards
+              WHERE deck_id = @deckId AND card_id = @cardId
+            '''),
+            parameters: {'deckId': deckId, 'cardId': cardId},
+          );
+        }
+
+        await session.execute(
+          Sql.named('''
+            INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander, condition)
+            VALUES (@deckId, @cardId, 1, TRUE, @condition)
+          '''),
+          parameters: {
+            'deckId': deckId,
+            'cardId': cardId,
+            'condition': condition,
+          },
+        );
+
+        final updatedTotalResult = await session.execute(
+          Sql.named(
+              'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards WHERE deck_id = @deckId'),
+          parameters: {'deckId': deckId},
+        );
+        final updatedTotal = (updatedTotalResult.first[0] as int?) ?? 0;
+
+        return {
+          'ok': true,
+          'deck_id': deckId,
+          'card_id': cardId,
+          'card_name': cardName,
+          'quantity': 1,
+          'is_commander': true,
+          'condition': condition,
+          'total_cards': updatedTotal,
+        };
+      }
+
       final maxCopies = (format == 'commander' || format == 'brawl') ? 1 : 4;
       if (!isBasicLand && quantity > maxCopies && !isCommander) {
         throw DeckRulesException(
             'Regra violada: "$cardName" excede o limite de $maxCopies cópia(s) para o formato $format.');
-      }
-
-      if (isCommander && quantity != 1) {
-        throw DeckRulesException(
-            'Regra violada: comandante deve ter quantidade 1.');
       }
 
       // Total atual de cartas
@@ -167,53 +272,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
       // Regras de Commander: identidade de cor e elegibilidade do comandante
       if (format == 'commander' || format == 'brawl') {
-        if (isCommander) {
-          final typeLower = typeLine;
-          final oracleLower = (oracleText ?? '').toLowerCase();
-          final eligible = (typeLower.contains('legendary') &&
-                  typeLower.contains('creature')) ||
-              oracleLower.contains('can be your commander');
-          if (!eligible) {
-            throw DeckRulesException(
-                'Regra violada: "$cardName" não pode ser comandante.');
-          }
-
-          // Substituir comandante existente (MVP: 1 comandante)
-          await session.execute(
-            Sql.named(
-                'UPDATE deck_cards SET is_commander = FALSE WHERE deck_id = @deckId AND is_commander = TRUE'),
-            parameters: {'deckId': deckId},
-          );
-
-          // Validar identidade do comandante contra TODAS as cartas já no deck (inclusive esta).
-          final commanderIdentity =
-              (colorIdentity.isNotEmpty ? colorIdentity : colors)
-                  .map((e) => e.toUpperCase())
-                  .toSet();
-          final deckCardsResult = await session.execute(
-            Sql.named('''
-              SELECT c.name, c.color_identity, c.colors
-              FROM deck_cards dc
-              JOIN cards c ON c.id = dc.card_id
-              WHERE dc.deck_id = @deckId
-            '''),
-            parameters: {'deckId': deckId},
-          );
-          for (final r in deckCardsResult) {
-            final n = r[0] as String;
-            final id = (r[1] as List?)?.map((e) => e.toString()).toList() ??
-                const <String>[];
-            final cs = (r[2] as List?)?.map((e) => e.toString()).toList() ??
-                const <String>[];
-            final identity = (id.isNotEmpty ? id : cs);
-            final ok = identity
-                .every((c) => commanderIdentity.contains(c.toUpperCase()));
-            if (!ok) {
-              throw DeckRulesException(
-                  'Regra violada: "$n" está fora da identidade de cor do comandante.');
-            }
-          }
-        } else {
+        {
           // Se já existe comandante, validar identidade antes de inserir.
           final commanderResult = await session.execute(
             Sql.named('''

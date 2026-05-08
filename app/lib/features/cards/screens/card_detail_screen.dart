@@ -4,6 +4,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../decks/models/deck_card_item.dart';
+import '../widgets/card_edition_metadata.dart';
 
 class CardDetailScreen extends StatelessWidget {
   final DeckCardItem card;
@@ -360,7 +361,7 @@ class CardDetailScreen extends StatelessWidget {
               _detailDivider(),
               _detailRowWithWidget(
                 theme,
-                icon: Icons.auto_awesome,
+                icon: Icons.grade_outlined,
                 label: 'Raridade',
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -384,6 +385,36 @@ class CardDetailScreen extends StatelessWidget {
                 ),
               ),
               _detailDivider(),
+              if (card.setCode.trim().isNotEmpty) ...[
+                _detailRow(
+                  theme,
+                  icon: Icons.confirmation_number_outlined,
+                  label: 'Código',
+                  value: cardEditionCodeLabel(
+                    setCode: card.setCode,
+                    collectorNumber: card.collectorNumber,
+                  ),
+                ),
+                _detailDivider(),
+              ],
+              if ((card.setReleaseDate ?? '').trim().isNotEmpty) ...[
+                _detailRow(
+                  theme,
+                  icon: Icons.event_outlined,
+                  label: 'Lançamento',
+                  value: card.setReleaseDate!.trim(),
+                ),
+                _detailDivider(),
+              ],
+              if (card.foil != null) ...[
+                _detailRow(
+                  theme,
+                  icon: Icons.flare_rounded,
+                  label: 'Acabamento',
+                  value: cardFoilLabel(card.foil),
+                ),
+                _detailDivider(),
+              ],
               _detailRowWithWidget(
                 theme,
                 icon: Icons.palette,
@@ -397,16 +428,6 @@ class CardDetailScreen extends StatelessWidget {
                 label: 'CMC',
                 value: cmc.toString(),
               ),
-              if (card.collectorNumber != null &&
-                  card.collectorNumber!.isNotEmpty) ...[
-                _detailDivider(),
-                _detailRow(
-                  theme,
-                  icon: Icons.tag,
-                  label: 'Número',
-                  value: card.collectorNumber!,
-                ),
-              ],
             ],
           ),
         ),

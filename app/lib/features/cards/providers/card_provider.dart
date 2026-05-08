@@ -76,7 +76,8 @@ class CardProvider extends ChangeNotifier {
     if (requestQuery != _currentQuery) return;
 
     if (response.statusCode != 200) {
-      _errorMessage = 'Erro ao buscar cartas: ${response.statusCode}';
+      _errorMessage =
+          'Não foi possível buscar cartas agora. Verifique a conexão e tente novamente.';
       _hasMore = false;
       return;
     }
@@ -157,7 +158,7 @@ class CardProvider extends ChangeNotifier {
       '/cards/printings?name=$encoded&limit=50',
     );
     if (response.statusCode != 200) {
-      throw Exception('Falha ao buscar edições: ${response.statusCode}');
+      throw Exception('Não foi possível carregar as edições agora.');
     }
 
     final data = response.data as Map<String, dynamic>;
@@ -176,7 +177,7 @@ class CardProvider extends ChangeNotifier {
       '/cards/printings?name=$encoded&limit=50&sync=true',
     );
     if (response.statusCode != 200) {
-      throw Exception('Falha ao sincronizar edições: ${response.statusCode}');
+      throw Exception('Não foi possível sincronizar as edições agora.');
     }
 
     final data = response.data as Map<String, dynamic>;

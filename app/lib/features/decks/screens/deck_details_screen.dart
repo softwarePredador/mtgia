@@ -26,6 +26,7 @@ import '../widgets/deck_progress_indicator.dart';
 import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../cards/screens/card_detail_screen.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
@@ -630,9 +631,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             if (mounted) {
               setState(() => _hiddenCardIds.remove(card.id));
               if (!context.mounted) return false;
+              final message = FriendlyErrorMapper.fromException(
+                e,
+                context: FriendlyErrorContext.deckSave,
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Erro ao remover: $e'),
+                  content: Text(message),
                   backgroundColor: theme.colorScheme.error,
                 ),
               );
@@ -760,7 +765,28 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                 ManaCostRow(cost: card.manaCost),
                               if (card.setCode.isNotEmpty)
                                 _buildDeckCardMetaPill(
-                                  label: card.setCode.toUpperCase(),
+                                  label: cardEditionCodeLabel(
+                                    setCode: card.setCode,
+                                    collectorNumber: card.collectorNumber,
+                                  ),
+                                  textColor: AppTheme.textSecondary,
+                                  backgroundColor: AppTheme.surfaceSlate
+                                      .withValues(alpha: 0.78),
+                                ),
+                              if (card.foil != null)
+                                _buildDeckCardMetaPill(
+                                  label: cardFoilLabel(card.foil),
+                                  textColor: AppTheme.mythicGold,
+                                  backgroundColor: AppTheme.mythicGold
+                                      .withValues(alpha: 0.12),
+                                  borderColor: AppTheme.mythicGold.withValues(
+                                    alpha: 0.22,
+                                  ),
+                                  icon: Icons.flare_rounded,
+                                ),
+                              if (card.rarity.isNotEmpty)
+                                _buildDeckCardMetaPill(
+                                  label: card.rarity,
                                   textColor: AppTheme.textSecondary,
                                   backgroundColor: AppTheme.surfaceSlate
                                       .withValues(alpha: 0.78),

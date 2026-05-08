@@ -482,7 +482,7 @@ class _MarketplaceCard extends StatelessWidget {
                         ),
                       if (item.isFoil)
                         Icon(
-                          Icons.auto_awesome,
+                          Icons.flare_rounded,
                           size: 14,
                           color: AppTheme.brass400.withValues(alpha: 0.8),
                         ),

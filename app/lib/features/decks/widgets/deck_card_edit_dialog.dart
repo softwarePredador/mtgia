@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../models/deck_card_item.dart';
 
 typedef DeckCardEditSave =
@@ -93,7 +94,7 @@ Future<void> showDeckCardEditDialog({
                         }
                         if (snapshot.hasError) {
                           return Text(
-                            'Erro ao carregar edições: ${snapshot.error}',
+                            'Não foi possível carregar as edições agora. Tente novamente.',
                             style: TextStyle(color: theme.colorScheme.error),
                           );
                         }
@@ -109,57 +110,57 @@ Future<void> showDeckCardEditDialog({
                           selectedCardId = list.first['id'].toString();
                         }
 
-                        return InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'Edição (set)',
-                            border: OutlineInputBorder(),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              value: selectedCardId,
-                              items:
-                                  list.map((it) {
-                                    final id = (it['id'] ?? '').toString();
-                                    final setCode =
-                                        (it['set_code'] ?? '')
-                                            .toString()
-                                            .toUpperCase();
-                                    final setName =
-                                        (it['set_name'] ?? '').toString();
-                                    final collector =
-                                        (it['collector_number'] ?? '')
-                                            .toString();
-                                    final foil = it['foil'] == true;
-                                    final date =
-                                        (it['set_release_date'] ?? '')
-                                            .toString();
-                                    final label = [
-                                      if (setCode.isNotEmpty) setCode,
-                                      if (collector.isNotEmpty) '#$collector',
-                                      if (foil) 'foil',
-                                      if (setName.isNotEmpty) setName,
-                                      if (date.isNotEmpty) '($date)',
-                                    ].join(' • ');
-                                    return DropdownMenuItem<String>(
-                                      value: id,
-                                      child: Text(
-                                        label.isEmpty ? id : label,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    );
-                                  }).toList(),
-                              onChanged:
-                                  isSaving
-                                      ? null
-                                      : (v) {
-                                        if (v == null) return;
-                                        setDialogState(
-                                          () => selectedCardId = v,
+                        final selectedPrinting = list.firstWhere(
+                          (m) => (m['id'] ?? '').toString() == selectedCardId,
+                          orElse: () => list.first,
+                        );
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InputDecorator(
+                              decoration: const InputDecoration(
+                                labelText: 'Edição (set)',
+                                border: OutlineInputBorder(),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  isExpanded: true,
+                                  value: selectedCardId,
+                                  items:
+                                      list.map((it) {
+                                        final id = (it['id'] ?? '').toString();
+                                        final label = cardEditionFullLabel(it);
+                                        return DropdownMenuItem<String>(
+                                          value: id,
+                                          child: Text(
+                                            label.isEmpty ? id : label,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         );
-                                      },
+                                      }).toList(),
+                                  onChanged:
+                                      isSaving
+                                          ? null
+                                          : (v) {
+                                            if (v == null) return;
+                                            setDialogState(
+                                              () => selectedCardId = v,
+                                            );
+                                          },
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 6),
+                            Text(
+                              cardEditionFullLabel(selectedPrinting),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),

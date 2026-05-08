@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../../cards/providers/card_provider.dart';
+import '../../cards/widgets/card_edition_metadata.dart';
 import '../providers/binder_provider.dart';
 
 /// Modal (BottomSheet) para editar/ver detalhes de um item do fichário.
@@ -87,6 +88,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   /// Edições disponíveis da carta (só para adição)
   List<Map<String, dynamic>> _printings = [];
   bool _loadingPrintings = false;
+  String? _printingsError;
   int _selectedPrintingIndex = 0;
 
   static const conditions = ['NM', 'LP', 'MP', 'HP', 'DMG'];
@@ -130,7 +132,10 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
   }
 
   Future<void> _fetchPrintings() async {
-    setState(() => _loadingPrintings = true);
+    setState(() {
+      _loadingPrintings = true;
+      _printingsError = null;
+    });
     try {
       final provider = context.read<CardProvider>();
       var results = await provider.fetchPrintingsByName(widget.cardName!);
@@ -159,6 +164,12 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       });
     } catch (e) {
       debugPrint('[BinderItemEditor] Erro ao buscar edições: $e');
+      if (mounted) {
+        setState(() {
+          _printingsError =
+              'Não foi possível carregar as edições agora. Você ainda pode salvar a carta selecionada.';
+        });
+      }
     } finally {
       if (mounted) setState(() => _loadingPrintings = false);
     }
@@ -189,6 +200,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     return null;
   }
 
+  Map<String, dynamic>? get _selectedPrinting {
+    if (_printings.isNotEmpty && _selectedPrintingIndex < _printings.length) {
+      return _printings[_selectedPrintingIndex];
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     _priceController.dispose();
@@ -198,6 +216,12 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
   Future<void> _save() async {
     if (_saving) return;
+    if (widget.item == null && (_effectiveCardId ?? '').isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecione uma edição válida da carta.')),
+      );
+      return;
+    }
     setState(() => _saving = true);
 
     final data = <String, dynamic>{
@@ -384,7 +408,15 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     ),
                   ),
                 )
-              else if (_printings.isNotEmpty) ...[
+              else if (_printingsError != null) ...[
+                Text(
+                  _printingsError!,
+                  style: const TextStyle(
+                    color: AppTheme.warning,
+                    fontSize: AppTheme.fontSm,
+                  ),
+                ),
+              ] else if (_printings.isNotEmpty) ...[
                 Row(
                   children: [
                     const Text(
@@ -406,7 +438,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
-                  height: 56,
+                  height: 78,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _printings.length,
@@ -418,6 +450,10 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                       final setName = p['set_name'] as String? ?? setCode;
                       final releaseDate =
                           p['set_release_date'] as String? ?? '';
+                      final collector =
+                          (p['collector_number'] ?? '').toString();
+                      final rarity = (p['rarity'] ?? '').toString();
+                      final foil = p['foil'] as bool?;
                       final year =
                           releaseDate.length >= 4
                               ? releaseDate.substring(0, 4)
@@ -477,7 +513,10 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
-                                      setCode,
+                                      cardEditionCodeLabel(
+                                        setCode: setCode,
+                                        collectorNumber: collector,
+                                      ),
                                       style: TextStyle(
                                         color:
                                             isSelected
@@ -512,6 +551,22 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                   ],
                                 ],
                               ),
+                              if (rarity.isNotEmpty || foil != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  [
+                                    if (rarity.isNotEmpty) rarity,
+                                    if (cardFoilLabel(foil).isNotEmpty)
+                                      cardFoilLabel(foil),
+                                  ].join(' • '),
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 10,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                               const SizedBox(height: 2),
                               Text(
                                 setName,
@@ -532,6 +587,18 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     },
                   ),
                 ),
+                if (_selectedPrinting != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    cardEditionFullLabel(_selectedPrinting!),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: AppTheme.fontSm,
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: 16),
             ],
@@ -762,7 +829,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
               secondary: Icon(
-                Icons.auto_awesome,
+                Icons.flare_rounded,
                 color: _isFoil ? AppTheme.mythicGold : AppTheme.outlineMuted,
               ),
               value: _isFoil,

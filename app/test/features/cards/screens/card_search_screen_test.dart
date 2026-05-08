@@ -107,7 +107,10 @@ DeckCardItem _sampleCard() {
     oracleText: 'Flying, vigilance, deathtouch, lifelink',
     setCode: 'c16',
     setName: 'Commander 2016',
+    setReleaseDate: '2016-11-11',
     rarity: 'mythic',
+    collectorNumber: '28',
+    foil: false,
     quantity: 1,
     isCommander: false,
   );
@@ -136,6 +139,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(card.name), findsOneWidget);
+      expect(find.textContaining('C16 #28'), findsOneWidget);
+      expect(find.textContaining('Non-foil'), findsOneWidget);
       expect(find.byType(CardDetailScreen), findsNothing);
 
       await tester.tap(find.text(card.name));
@@ -145,6 +150,10 @@ void main() {
       await tester.tap(find.byType(CachedCardImage).first);
       await tester.pumpAndSettle();
       expect(find.byType(CardDetailScreen), findsOneWidget);
+      expect(find.text('Código'), findsOneWidget);
+      expect(find.text('C16 #28'), findsOneWidget);
+      expect(find.text('Acabamento'), findsOneWidget);
+      expect(find.text('Non-foil'), findsOneWidget);
 
       Navigator.of(tester.element(find.byType(CardDetailScreen))).pop();
       await tester.pumpAndSettle();

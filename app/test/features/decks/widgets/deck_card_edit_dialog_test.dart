@@ -40,6 +40,8 @@ void main() {
                               'set_code': 'TST',
                               'set_name': 'Test Set',
                               'set_release_date': '2026-01-01',
+                              'rarity': 'rare',
+                              'foil': false,
                             },
                           ],
                       onSave: ({
@@ -99,6 +101,8 @@ void main() {
                               'set_code': 'TST',
                               'set_name': 'Test Set',
                               'set_release_date': '2026-01-01',
+                              'rarity': 'rare',
+                              'foil': false,
                             },
                           ],
                       onSave: ({
@@ -124,6 +128,9 @@ void main() {
 
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
+
+    expect(find.textContaining('Non-foil'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('Rare'), findsAtLeastNWidgets(1));
 
     await tester.enterText(find.byType(TextField), '2');
     await tester.tap(find.text('Salvar'));
@@ -166,6 +173,8 @@ void main() {
                               'set_name': 'Test Set',
                               'set_release_date': '2026-01-01',
                               'collector_number': '42',
+                              'rarity': 'mythic',
+                              'foil': false,
                             },
                             {
                               'id': 'card-2',
@@ -173,6 +182,8 @@ void main() {
                               'set_name': 'Other Set',
                               'set_release_date': '2025-01-01',
                               'collector_number': '7',
+                              'rarity': 'mythic',
+                              'foil': false,
                             },
                           ],
                       onSave: ({

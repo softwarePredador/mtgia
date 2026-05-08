@@ -393,11 +393,75 @@ void main() {
       expect(commanderCards, hasLength(1));
       expect(commanderCards.single['id'], secondId);
 
-      final mainBoard = (deck['mainboard'] as Map?) ?? const {};
+      final mainBoard = (deck['main_board'] as Map?) ?? const {};
       final flattenedMain = mainBoard.values
           .whereType<List>()
           .expand((items) => items)
           .whereType<Map>();
+      expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
+      expect(flattenedMain.any((card) => card['id'] == firstId), isFalse);
+    },
+    skip: skipIntegration,
+  );
+
+  test(
+    'POST /decks/:id/cards should replace single commander slot without demoting old commander',
+    () async {
+      final token = await getAuthToken();
+      final commander = await findCardByNames(token, names: [
+        'Talrand, Sky Summoner',
+        'Krenko, Mob Boss',
+        'Lathril, Blade of the Elves',
+        'Niv-Mizzet, Parun',
+      ]);
+      if (commander == null || !isCommanderEligible(commander)) {
+        return;
+      }
+
+      final printings =
+          await fetchPrintings(token, commander['name'] as String);
+      if (printings.length < 2) {
+        return;
+      }
+
+      final firstId = printings.first['id'] as String;
+      final secondId = printings.firstWhere(
+        (p) => p['id'] != firstId,
+        orElse: () => printings.last,
+      )['id'] as String;
+      if (firstId == secondId) return;
+
+      final deckId = await createDeck(token, format: 'commander');
+      final addFirstRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: firstId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(addFirstRes.statusCode, equals(200), reason: addFirstRes.body);
+
+      final addSecondRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: secondId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(addSecondRes.statusCode, equals(200), reason: addSecondRes.body);
+
+      final deck = await fetchDeck(token, deckId);
+      final commanderCards =
+          ((deck['commander'] as List?) ?? const []).cast<Map>();
+      expect(commanderCards, hasLength(1));
+      expect(commanderCards.single['id'], secondId);
+
+      final mainBoard = (deck['main_board'] as Map?) ?? const {};
+      final flattenedMain = mainBoard.values
+          .whereType<List>()
+          .expand((items) => items)
+          .whereType<Map>();
+      expect(flattenedMain.any((card) => card['id'] == firstId), isFalse);
       expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
     },
     skip: skipIntegration,

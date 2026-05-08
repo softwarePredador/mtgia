@@ -291,6 +291,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
   final hasPricing = await hasDeckPricingColumns(conn);
+  final hasSets = await _hasTable(conn, 'sets');
 
   try {
     // 1. Buscar os detalhes do deck e verificar se pertence ao usuário
@@ -354,9 +355,14 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           c.color_identity,
           c.image_url,
           c.set_code,
-          c.rarity
+          c.rarity,
+          c.collector_number,
+          c.foil,
+          ${hasSets ? 's.name' : 'NULL::text'} AS set_name,
+          ${hasSets ? 's.release_date' : 'NULL::date'} AS set_release_date
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
+        ${hasSets ? 'LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)' : ''}
         WHERE dc.deck_id = @deckId
       '''),
       parameters: {'deckId': deckId},
@@ -365,6 +371,12 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
     final cardsList = cardsResult.map((row) {
       final m = row.toColumnMap();
       m['image_url'] = normalizeScryfallImageUrl(m['image_url']?.toString());
+      if (m['set_release_date'] is DateTime) {
+        m['set_release_date'] = (m['set_release_date'] as DateTime)
+            .toIso8601String()
+            .split('T')
+            .first;
+      }
       return m;
     }).toList();
 
@@ -500,4 +512,17 @@ String _validateCardCondition(String? raw) {
   final upper = raw.trim().toUpperCase();
   const valid = {'NM', 'LP', 'MP', 'HP', 'DMG'};
   return valid.contains(upper) ? upper : 'NM';
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  try {
+    final result = await pool.execute(
+      Sql.named('SELECT to_regclass(@name)::text'),
+      parameters: {'name': 'public.$tableName'},
+    );
+    final value = result.isNotEmpty ? result.first[0] : null;
+    return value != null;
+  } catch (_) {
+    return false;
+  }
 }
