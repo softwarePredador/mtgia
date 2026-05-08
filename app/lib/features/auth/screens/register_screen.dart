@@ -88,6 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         elevation: 0,
         surfaceTintColor: AppTheme.transparent,
         leading: IconButton(
+          key: const Key('register-back-button'),
           icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
           onPressed: _returnToLogin,
         ),
@@ -166,6 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         // Username
                         TextFormField(
+                          key: const Key('register-username-field'),
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: 'Nome de Usuário',
@@ -196,6 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         // Email
                         TextFormField(
+                          key: const Key('register-email-field'),
                           controller: _emailController,
                           focusNode: _emailFocusNode,
                           keyboardType: TextInputType.emailAddress,
@@ -225,6 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         // Senha
                         TextFormField(
+                          key: const Key('register-password-field'),
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
@@ -265,6 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         // Confirmar Senha
                         TextFormField(
+                          key: const Key('register-confirm-password-field'),
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
@@ -350,6 +355,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: Material(
                                 color: AppTheme.transparent,
                                 child: InkWell(
+                                  key: const Key('register-submit-button'),
                                   borderRadius: BorderRadius.circular(
                                     AppTheme.radiusMd,
                                   ),
@@ -382,6 +388,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: theme.textTheme.bodyMedium,
                             ),
                             TextButton(
+                              key: const Key('register-open-login-button'),
                               onPressed: _returnToLogin,
                               child: Text(
                                 'Entrar',

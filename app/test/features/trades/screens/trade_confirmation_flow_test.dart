@@ -152,13 +152,24 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).last, '10');
+    expect(find.byKey(const Key('create-trade-type-sale')), findsOneWidget);
+    expect(find.byKey(const Key('create-trade-payment-field')), findsOneWidget);
+    expect(
+      find.byKey(const Key('create-trade-selected-item-requested-0')),
+      findsOneWidget,
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('create-trade-payment-field')),
+      '10',
+    );
     await tester.ensureVisible(
       find.byKey(const ValueKey('create-trade-submit-button')),
     );
     await tester.tap(find.byKey(const ValueKey('create-trade-submit-button')));
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('create-trade-review-dialog')), findsOneWidget);
     expect(find.text('Revisar proposta'), findsOneWidget);
     expect(find.textContaining('1x Doubling Season • LP • pt'), findsOneWidget);
     expect(find.textContaining('O valor pedido parece maior'), findsOneWidget);
@@ -181,8 +192,9 @@ void main() {
 
     await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
 
-    await tester.ensureVisible(find.text('Aceitar'));
-    await tester.tap(find.text('Aceitar'));
+    final acceptButton = find.byKey(const Key('trade-action-accept'));
+    await tester.ensureVisible(acceptButton);
+    await tester.tap(acceptButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Aceitar trade?'), findsOneWidget);
@@ -205,8 +217,11 @@ void main() {
 
     await _pumpTradeDetail(tester, provider, currentUserId: 'user-1');
 
-    await tester.ensureVisible(find.text('Confirmar Entrega'));
-    await tester.tap(find.text('Confirmar Entrega'));
+    final confirmDeliveryButton = find.byKey(
+      const Key('trade-action-confirm-delivery'),
+    );
+    await tester.ensureVisible(confirmDeliveryButton);
+    await tester.tap(confirmDeliveryButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Confirmar entrega?'), findsOneWidget);

@@ -41,6 +41,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   provider.notifications.any((n) => !n.isRead);
               if (!hasUnread) return const SizedBox.shrink();
               return TextButton(
+                key: const Key('notifications-read-all-button'),
                 onPressed: () => provider.markAllAsRead(),
                 child: const Text(
                   'Ler todas',
@@ -76,12 +77,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
             color: AppTheme.manaViolet,
             onRefresh: () => provider.fetchNotifications(),
             child: ListView.separated(
+              key: const Key('notifications-list'),
               padding: const EdgeInsets.all(12),
               itemCount: provider.notifications.length,
               separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final notif = provider.notifications[index];
                 return _NotificationTile(
+                  key: Key('notification-tile-${notif.id}'),
                   notification: notif,
                   onTap: () {
                     if (!notif.isRead) {
@@ -129,7 +132,11 @@ class _NotificationTile extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback onTap;
 
-  const _NotificationTile({required this.notification, required this.onTap});
+  const _NotificationTile({
+    super.key,
+    required this.notification,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -12569,3 +12569,37 @@ Riscos aceitos:
 - este `server/manual-de-instrucao.md`.
 
 Evidencias locais redigidas, nao versionadas por `.gitignore`: `app/doc/runtime_flow_proofs_2026-05-07_android_sm_a135m_non_scanner/`.
+
+## 100. Fundacao de testabilidade UI/runtime - 2026-05-08
+
+### 100.1 Regra operacional para agentes
+
+Antes de criar ou alterar qualquer harness P1 de app, consultar
+`app/doc/UI_TEST_SURFACE_MAP.md`. O teste deve preferir `find.byKey` para
+campos, botoes, dialogs, bottom sheets e itens selecionaveis. `find.text` deve
+ficar como evidencia visual ou fallback documentado, nao como seletor primario
+em fluxo critico.
+
+### 100.2 Anchors adicionados
+
+Foram adicionadas `Key`s estaveis em:
+
+- Auth/Login/Register;
+- Profile;
+- Binder editor;
+- Create Trade e Trade Detail chat;
+- Direct Messages;
+- Notifications;
+- Deck Generate;
+- Optimize config/intensidade.
+
+Tambem foi criado `app/integration_test/runtime_test_helpers.dart` com helpers
+comuns para espera, sessao autenticada, captura visual e checagem contra erro
+tecnico cru. Novos testes de runtime devem reutilizar esse arquivo em vez de
+duplicar funcoes locais de polling.
+
+### 100.3 Escopo
+
+Esta etapa nao altera contrato backend, banco, IA, Scanner/camera/OCR ou
+fluxos de negocio. O objetivo e reduzir fragilidade de automacao e aumentar
+confianca na criacao de testes de tela.

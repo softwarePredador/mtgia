@@ -71,6 +71,7 @@ class OptimizationConfigSection extends StatelessWidget {
               ),
             ),
             child: SwitchListTile.adaptive(
+              key: const Key('optimize-keep-theme-switch'),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 2,
@@ -151,6 +152,7 @@ class _OptimizationIntensitySelector extends StatelessWidget {
                 final isSelected = selected == intensity;
                 final accent = _accent(intensity);
                 return ChoiceChip(
+                  key: Key('optimize-intensity-${intensity.name}'),
                   label: Text(_title(intensity)),
                   selected: isSelected,
                   onSelected: (_) => onChanged(intensity),
@@ -292,6 +294,7 @@ class CurrentStrategySection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         FilledButton.icon(
+          key: const Key('optimize-apply-current-strategy-button'),
           onPressed: onApply,
           icon: const Icon(Icons.check),
           label: const Text('Aplicar estratégia atual'),

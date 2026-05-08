@@ -27,6 +27,10 @@ void main() {
     expect(find.text('Entre na sua conta'), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
     expect(find.text('Criar conta'), findsOneWidget);
+    expect(find.byKey(const Key('login-email-field')), findsOneWidget);
+    expect(find.byKey(const Key('login-password-field')), findsOneWidget);
+    expect(find.byKey(const Key('login-submit-button')), findsOneWidget);
+    expect(find.byKey(const Key('login-open-register-button')), findsOneWidget);
   });
 
   testWidgets('register screen shows calmer onboarding header', (tester) async {
@@ -37,5 +41,14 @@ void main() {
     expect(find.text('Criar Conta'), findsNWidgets(2));
     expect(find.text('Comece sua jornada no ManaLoom'), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
+    expect(find.byKey(const Key('register-username-field')), findsOneWidget);
+    expect(find.byKey(const Key('register-email-field')), findsOneWidget);
+    expect(find.byKey(const Key('register-password-field')), findsOneWidget);
+    expect(
+      find.byKey(const Key('register-confirm-password-field')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('register-submit-button')), findsOneWidget);
+    expect(find.byKey(const Key('register-open-login-button')), findsOneWidget);
   });
 }

@@ -1075,6 +1075,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           children: [
             Expanded(
               child: TextField(
+                key: const Key('trade-message-field'),
                 controller: _messageController,
                 style: const TextStyle(color: AppTheme.textPrimary),
                 textInputAction: TextInputAction.send,

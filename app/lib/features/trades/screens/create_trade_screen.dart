@@ -173,6 +173,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       context: context,
       builder:
           (ctx) => AlertDialog(
+            key: const Key('create-trade-review-dialog'),
             backgroundColor: AppTheme.surfaceSlate,
             title: const Text(
               'Revisar proposta',
@@ -263,6 +264,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             ),
             actions: [
               TextButton(
+                key: const Key('create-trade-review-back-button'),
                 onPressed: () => Navigator.pop(ctx, false),
                 child: const Text('Voltar e editar'),
               ),
@@ -580,6 +582,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             _sectionTitle('Itens que você quer'),
             const SizedBox(height: 8),
             _buildItemsList(
+              keyPrefix: 'requested',
               items: _requestedItems,
               emptyText: 'Nenhum item selecionado',
               onAdd: _pickFromOtherUser,
@@ -603,6 +606,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 )
               else
                 _buildItemsList(
+                  keyPrefix: 'offered',
                   items: _myItems,
                   emptyText: 'Nenhum item oferecido',
                   onAdd: _pickFromMyBinder,
@@ -626,6 +630,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             _sectionTitle('Mensagem (opcional)'),
             const SizedBox(height: 8),
             TextField(
+              key: const Key('create-trade-message-field'),
               controller: _messageCtrl,
               maxLines: 3,
               style: const TextStyle(color: AppTheme.textPrimary),
@@ -765,6 +770,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   Widget _typeChip(String label, String value, IconData icon, Color color) {
     final selected = _type == value;
     return GestureDetector(
+      key: Key('create-trade-type-$value'),
       onTap: () => setState(() => _type = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -806,6 +812,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   Widget _buildItemsList({
+    required String keyPrefix,
     required List<_SelectedItem> items,
     required String emptyText,
     required VoidCallback onAdd,
@@ -840,6 +847,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
           final idx = e.key;
           final sel = e.value;
           return _selectedItemCard(
+            keyPrefix,
             sel,
             idx,
             onRemove,
@@ -849,6 +857,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
         }),
         const SizedBox(height: 8),
         OutlinedButton.icon(
+          key: Key('create-trade-add-item-$keyPrefix'),
           onPressed: onAdd,
           style: OutlinedButton.styleFrom(
             foregroundColor: accentColor,
@@ -865,6 +874,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   }
 
   Widget _selectedItemCard(
+    String keyPrefix,
     _SelectedItem sel,
     int index,
     void Function(int) onRemove,
@@ -873,6 +883,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   ) {
     final item = sel.binderItem;
     return Card(
+      key: Key('create-trade-selected-item-$keyPrefix-$index'),
       margin: const EdgeInsets.only(bottom: 6),
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
@@ -946,6 +957,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
+                    key: Key('create-trade-item-decrement-$keyPrefix-$index'),
                     onTap:
                         sel.quantity > 1
                             ? () => onQtyChange(index, sel.quantity - 1)
@@ -963,6 +975,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     ),
                   ),
                   Padding(
+                    key: Key('create-trade-item-quantity-$keyPrefix-$index'),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
                       '${sel.quantity}',
@@ -974,6 +987,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                     ),
                   ),
                   InkWell(
+                    key: Key('create-trade-item-increment-$keyPrefix-$index'),
                     onTap:
                         sel.quantity < item.quantity
                             ? () => onQtyChange(index, sel.quantity + 1)
@@ -996,6 +1010,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
             const SizedBox(width: 4),
             // Remove
             InkWell(
+              key: Key('create-trade-item-remove-$keyPrefix-$index'),
               onTap: () => onRemove(index),
               child: const Icon(
                 Icons.close,
@@ -1013,6 +1028,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
     return Column(
       children: [
         TextField(
+          key: const Key('create-trade-payment-field'),
           controller: _paymentCtrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: const TextStyle(color: AppTheme.textPrimary),
@@ -1068,6 +1084,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
   Widget _payChip(String label, String value) {
     final selected = _paymentMethod == value;
     return GestureDetector(
+      key: Key('create-trade-payment-method-$value'),
       onTap: () => setState(() => _paymentMethod = value),
       child: Container(
         constraints: const BoxConstraints(minHeight: 46),

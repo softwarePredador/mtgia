@@ -724,11 +724,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 ),
                 const Spacer(),
                 _QuantityButton(
+                  key: const Key('binder-editor-quantity-decrement'),
                   icon: Icons.remove,
                   onTap:
                       _quantity > 1 ? () => setState(() => _quantity--) : null,
                 ),
                 Padding(
+                  key: const Key('binder-editor-quantity-value'),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     '$_quantity',
@@ -740,6 +742,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                   ),
                 ),
                 _QuantityButton(
+                  key: const Key('binder-editor-quantity-increment'),
                   icon: Icons.add,
                   onTap: () => setState(() => _quantity++),
                 ),
@@ -762,6 +765,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                   conditions.map((c) {
                     final selected = _condition == c;
                     return ChoiceChip(
+                      key: Key('binder-editor-condition-$c'),
                       label: Text(c),
                       selected: selected,
                       onSelected: (_) => setState(() => _condition = c),
@@ -798,6 +802,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                   languages.map((language) {
                     final selected = _language == language;
                     return ChoiceChip(
+                      key: Key('binder-editor-language-$language'),
                       label: Text(
                         languageLabels[language] ?? language.toUpperCase(),
                       ),
@@ -823,6 +828,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
             // Foil toggle
             SwitchListTile(
+              key: const Key('binder-editor-foil-switch'),
               contentPadding: EdgeInsets.zero,
               title: const Text(
                 'Foil',
@@ -839,6 +845,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
             // Para Troca
             SwitchListTile(
+              key: const Key('binder-editor-for-trade-switch'),
               contentPadding: EdgeInsets.zero,
               title: const Text(
                 'Disponível para troca',
@@ -855,6 +862,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
 
             // Para Venda
             SwitchListTile(
+              key: const Key('binder-editor-for-sale-switch'),
               contentPadding: EdgeInsets.zero,
               title: const Text(
                 'Disponível para venda',
@@ -873,6 +881,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             if (_forSale) ...[
               const SizedBox(height: 8),
               TextField(
+                key: const Key('binder-editor-price-field'),
                 controller: _priceController,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
@@ -898,6 +907,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
             // Notas
             const SizedBox(height: 12),
             TextField(
+              key: const Key('binder-editor-notes-field'),
               controller: _notesController,
               maxLines: 2,
               style: const TextStyle(color: AppTheme.textPrimary),
@@ -922,6 +932,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 if (isEditing)
                   Expanded(
                     child: OutlinedButton.icon(
+                      key: const Key('binder-editor-remove-button'),
                       onPressed: _saving ? null : _delete,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.error,
@@ -940,6 +951,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 if (isEditing) const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
+                    key: const Key('binder-editor-save-button'),
                     onPressed: _saving ? null : _save,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.manaViolet,
@@ -979,7 +991,7 @@ class _QuantityButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
-  const _QuantityButton({required this.icon, this.onTap});
+  const _QuantityButton({super.key, required this.icon, this.onTap});
 
   @override
   Widget build(BuildContext context) {

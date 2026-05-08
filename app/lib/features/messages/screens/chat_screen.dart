@@ -48,9 +48,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _loadMessages({bool incremental = false}) {
     context.read<MessageProvider>().fetchMessages(
-          widget.conversationId,
-          incremental: incremental,
-        );
+      widget.conversationId,
+      incremental: incremental,
+    );
   }
 
   void _markAsRead() {
@@ -87,23 +87,25 @@ class _ChatScreenState extends State<ChatScreen> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
-              backgroundImage: widget.otherUser.avatarUrl != null &&
-                      widget.otherUser.avatarUrl!.isNotEmpty
-                  ? NetworkImage(widget.otherUser.avatarUrl!)
-                  : null,
-              child: widget.otherUser.avatarUrl == null ||
-                      widget.otherUser.avatarUrl!.isEmpty
-                  ? Text(
-                      widget.otherUser.label.isNotEmpty
-                          ? widget.otherUser.label[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        color: AppTheme.manaViolet,
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppTheme.fontSm,
-                      ),
-                    )
-                  : null,
+              backgroundImage:
+                  widget.otherUser.avatarUrl != null &&
+                          widget.otherUser.avatarUrl!.isNotEmpty
+                      ? NetworkImage(widget.otherUser.avatarUrl!)
+                      : null,
+              child:
+                  widget.otherUser.avatarUrl == null ||
+                          widget.otherUser.avatarUrl!.isEmpty
+                      ? Text(
+                        widget.otherUser.label.isNotEmpty
+                            ? widget.otherUser.label[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          color: AppTheme.manaViolet,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.fontSm,
+                        ),
+                      )
+                      : null,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -127,7 +129,9 @@ class _ChatScreenState extends State<ChatScreen> {
               builder: (context, provider, _) {
                 if (provider.isLoadingMessages && provider.messages.isEmpty) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.manaViolet),
+                    child: CircularProgressIndicator(
+                      color: AppTheme.manaViolet,
+                    ),
                   );
                 }
 
@@ -148,7 +152,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 return ListView.builder(
                   controller: _scrollController,
                   reverse: true, // mais recente embaixo
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   itemCount: provider.messages.length,
                   itemBuilder: (context, index) {
                     final msg = provider.messages[index];
@@ -178,6 +185,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    key: const Key('chat-message-field'),
                     controller: _messageController,
                     style: const TextStyle(color: AppTheme.textPrimary),
                     maxLines: 4,
@@ -203,20 +211,22 @@ class _ChatScreenState extends State<ChatScreen> {
                 Consumer<MessageProvider>(
                   builder: (context, provider, _) {
                     return IconButton(
+                      key: const Key('chat-message-send-button'),
                       onPressed: provider.isSending ? null : _sendMessage,
-                      icon: provider.isSending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
+                      icon:
+                          provider.isSending
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppTheme.manaViolet,
+                                ),
+                              )
+                              : const Icon(
+                                Icons.send_rounded,
                                 color: AppTheme.manaViolet,
                               ),
-                            )
-                          : const Icon(
-                              Icons.send_rounded,
-                              color: AppTheme.manaViolet,
-                            ),
                     );
                   },
                 ),
@@ -249,9 +259,10 @@ class _MessageBubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe
-              ? AppTheme.manaViolet.withValues(alpha: 0.85)
-              : AppTheme.surfaceSlate,
+          color:
+              isMe
+                  ? AppTheme.manaViolet.withValues(alpha: 0.85)
+                  : AppTheme.surfaceSlate,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),

@@ -86,17 +86,29 @@ void main() {
       expect(find.text('Perfil'), findsOneWidget);
       expect(find.text('runtime_profile'), findsOneWidget);
       expect(find.text('Initial notes'), findsOneWidget);
+      expect(
+        find.byKey(const Key('profile-display-name-field')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('profile-city-field')), findsOneWidget);
+      expect(
+        find.byKey(const Key('profile-trade-notes-field')),
+        findsOneWidget,
+      );
 
       await tester.enterText(
-        find.byType(TextField).at(0),
+        find.byKey(const Key('profile-display-name-field')),
         'Runtime Nick Edited',
       );
-      await tester.enterText(find.byType(TextField).at(1), 'Campinas');
       await tester.enterText(
-        find.byType(TextField).at(2),
+        find.byKey(const Key('profile-city-field')),
+        'Campinas',
+      );
+      await tester.enterText(
+        find.byKey(const Key('profile-trade-notes-field')),
         'Runtime trade notes edited',
       );
-      final saveButton = find.widgetWithText(ElevatedButton, 'Salvar').last;
+      final saveButton = find.byKey(const Key('profile-save-button'));
       await tester.scrollUntilVisible(
         saveButton,
         250,

@@ -335,6 +335,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             Text('Formato:', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
+              key: const Key('deck-generate-format-field'),
               initialValue: _selectedFormat,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -361,6 +362,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             Text('Descreva seu deck:', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             TextField(
+              key: const Key('deck-generate-prompt-field'),
               controller: _promptController,
               maxLines: 4,
               decoration: InputDecoration(
@@ -377,6 +379,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
             // Generate Button (CTA primeiro, para não ficar "abaixo do fold")
             ElevatedButton.icon(
+              key: const Key('deck-generate-submit-button'),
               onPressed: _isGenerating ? null : _generateDeck,
               icon:
                   _isGenerating
@@ -472,6 +475,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
               // Deck Name Input
               TextField(
+                key: const Key('deck-generate-name-field'),
                 controller: _deckNameController,
                 decoration: InputDecoration(
                   labelText: 'Nome do Deck',
@@ -492,6 +496,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
 
               // Save Button
               ElevatedButton.icon(
+                key: const Key('deck-generate-save-button'),
                 onPressed: _isGeneratedDeckValid() ? _saveDeck : null,
                 icon: const Icon(Icons.save),
                 label: const Text(

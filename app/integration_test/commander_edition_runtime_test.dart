@@ -8,36 +8,8 @@ import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/main.dart' as app;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'runtime_test_helpers.dart';
 import 'visual_capture_helpers.dart';
-
-Future<void> _pumpUntil(
-  WidgetTester tester,
-  bool Function() condition, {
-  required String description,
-  int attempts = 60,
-  Duration step = const Duration(milliseconds: 500),
-}) async {
-  for (var i = 0; i < attempts; i += 1) {
-    await tester.pump(step);
-    if (condition()) return;
-  }
-  fail('Timeout waiting for $description');
-}
-
-Future<void> _pumpUntilFound(
-  WidgetTester tester,
-  Finder finder, {
-  int attempts = 60,
-  Duration step = const Duration(milliseconds: 500),
-}) {
-  return _pumpUntil(
-    tester,
-    () => finder.evaluate().isNotEmpty,
-    description: finder.toString(),
-    attempts: attempts,
-    step: step,
-  );
-}
 
 String _editionTitle(Map<String, dynamic> printing) {
   final setCode = (printing['set_code'] ?? '').toString().toUpperCase();
@@ -172,17 +144,17 @@ void main() {
 
       await tester.pumpWidget(const app.ManaLoomApp());
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Decks'), attempts: 120);
+      await pumpUntilFound(tester, find.text('Decks'), attempts: 120);
 
       final navContext = tester.element(find.text('Decks').first);
       GoRouter.of(navContext).go('/decks/$deckId/search?mode=commander');
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Cartas'), attempts: 60);
+      await pumpUntilFound(tester, find.text('Cartas'), attempts: 60);
 
       await tester.enterText(find.byType(TextField).first, commanderName);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text(commanderName), attempts: 80);
-      await _pumpUntilFound(
+      await pumpUntilFound(tester, find.text(commanderName), attempts: 80);
+      await pumpUntilFound(
         tester,
         find.textContaining(firstPrinting['set_code'].toString().toUpperCase()),
         attempts: 40,
@@ -195,12 +167,8 @@ void main() {
 
       GoRouter.of(navContext).go('/decks/$deckId');
       await tester.pump();
-      await _pumpUntilFound(
-        tester,
-        find.text('Detalhes do Deck'),
-        attempts: 80,
-      );
-      await _pumpUntilFound(tester, find.text(commanderName));
+      await pumpUntilFound(tester, find.text('Detalhes do Deck'), attempts: 80);
+      await pumpUntilFound(tester, find.text(commanderName));
       await captureVisualProof(
         binding,
         tester,
@@ -210,15 +178,15 @@ void main() {
       await tester.tap(find.text('Cartas'));
       await tester.pumpAndSettle();
       final commanderTile = find.byKey(ValueKey('deck-card-$firstId'));
-      await _pumpUntilFound(tester, commanderTile, attempts: 40);
+      await pumpUntilFound(tester, commanderTile, attempts: 40);
       await tester.ensureVisible(commanderTile);
       await tester.tap(commanderTile);
       await tester.pump();
       final changeEditionButton = find.byKey(
         ValueKey('deck-card-change-edition-$firstId'),
       );
-      await _pumpUntilFound(tester, changeEditionButton, attempts: 40);
-      await _pumpUntilFound(tester, find.textContaining(firstEditionTitle));
+      await pumpUntilFound(tester, changeEditionButton, attempts: 40);
+      await pumpUntilFound(tester, find.textContaining(firstEditionTitle));
       await captureVisualProof(
         binding,
         tester,
@@ -227,16 +195,16 @@ void main() {
 
       await tester.tap(changeEditionButton);
       await tester.pump();
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.byKey(ValueKey('deck-edition-picker-sheet-$firstId')),
         attempts: 40,
       );
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.byKey(const Key('deck-edition-picker-title')),
       );
-      await _pumpUntil(
+      await pumpUntil(
         tester,
         () =>
             find
@@ -258,7 +226,7 @@ void main() {
       await tester.tap(targetEditionRow);
       await tester.pump();
 
-      await _pumpUntilFound(
+      await pumpUntilFound(
         tester,
         find.text('Edição atualizada.'),
         attempts: 80,

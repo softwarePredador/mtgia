@@ -118,6 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           text: _avatarUrlController.text,
         );
         return AlertDialog(
+          key: const Key('profile-avatar-dialog'),
           title: const Text('Alterar foto de perfil'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -131,6 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 12),
               TextField(
+                key: const Key('profile-avatar-url-field'),
                 controller: controller,
                 decoration: const InputDecoration(
                   labelText: 'URL da imagem',
@@ -143,11 +145,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           actions: [
             TextButton(
+              key: const Key('profile-avatar-cancel-button'),
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Cancelar'),
             ),
             if (_avatarUrlController.text.isNotEmpty)
               TextButton(
+                key: const Key('profile-avatar-remove-button'),
                 onPressed: () {
                   _avatarUrlController.clear();
                   Navigator.pop(ctx);
@@ -159,6 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ElevatedButton(
+              key: const Key('profile-avatar-apply-button'),
               onPressed: () {
                 _avatarUrlController.text = controller.text.trim();
                 Navigator.pop(ctx);
@@ -247,6 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               child: InkWell(
+                                key: const Key('profile-avatar-edit-button'),
                                 customBorder: const CircleBorder(),
                                 onTap: () => _showAvatarDialog(context),
                                 child: const Padding(
@@ -301,6 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 12),
                     TextField(
+                      key: const Key('profile-display-name-field'),
                       controller: _displayNameController,
                       decoration: const InputDecoration(
                         labelText: 'Nick / Apelido',
@@ -346,6 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(
                           width: 116,
                           child: DropdownButtonFormField<String?>(
+                            key: const Key('profile-state-field'),
                             initialValue: _selectedState,
                             isExpanded: true,
                             decoration: const InputDecoration(
@@ -376,6 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // Cidade
                         Expanded(
                           child: TextField(
+                            key: const Key('profile-city-field'),
                             controller: _cityController,
                             decoration: const InputDecoration(
                               labelText: 'Cidade',
@@ -390,6 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     // Observação de troca
                     TextField(
+                      key: const Key('profile-trade-notes-field'),
                       controller: _tradeNotesController,
                       maxLines: 3,
                       maxLength: 500,
@@ -403,6 +413,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
+                      key: const Key('profile-save-button'),
                       onPressed: _isSaving ? null : _save,
                       icon:
                           _isSaving
@@ -430,6 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
+                            key: const Key('profile-open-binder-button'),
                             onPressed: () => context.push('/collection?tab=0'),
                             icon: const Icon(Icons.collections_bookmark),
                             label: const Text('Meu Fichário'),
@@ -441,6 +453,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
+                            key: const Key('profile-open-marketplace-button'),
                             onPressed: () => context.push('/collection?tab=1'),
                             icon: const Icon(Icons.store),
                             label: const Text('Marketplace'),

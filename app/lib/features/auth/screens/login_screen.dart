@@ -153,6 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Email
                         TextFormField(
+                          key: const Key('login-email-field'),
                           controller: _emailController,
                           focusNode: _emailFocusNode,
                           keyboardType: TextInputType.emailAddress,
@@ -182,6 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Senha
                         TextFormField(
+                          key: const Key('login-password-field'),
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
@@ -266,6 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Material(
                                 color: AppTheme.transparent,
                                 child: InkWell(
+                                  key: const Key('login-submit-button'),
                                   borderRadius: BorderRadius.circular(
                                     AppTheme.radiusMd,
                                   ),
@@ -298,6 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: theme.textTheme.bodyMedium,
                             ),
                             TextButton(
+                              key: const Key('login-open-register-button'),
                               onPressed: () => context.push('/register'),
                               child: Text(
                                 'Criar conta',
