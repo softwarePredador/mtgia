@@ -111,8 +111,14 @@ documented in `UI_TEST_SURFACE_MAP.md`, including:
 - create deck dialog;
 - import deck list dialog;
 - community/user search fields;
+- optimize diagnostics/no-op blocks when validated by copy only;
 - Life Counter/Lotus overlays;
 - wrappers or list containers still validated only by text.
+
+Do not treat already mapped Binder editor, Marketplace/Trades status actions,
+Trade chat, Notifications, Search/Sets rows or Optimize intensity/preview/apply
+as missing just because older docs mention them. Verify them, then focus on the
+remaining fallbacks listed in `UI_TEST_SURFACE_MAP.md`.
 
 If a new key is added to the app, update `UI_TEST_SURFACE_MAP.md`, the relevant
 harness, and the docs/handoff for the run.

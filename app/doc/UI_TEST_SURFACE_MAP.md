@@ -183,7 +183,15 @@ comum de runtime:
 
 ## Backlog de mapeamento
 
+- Criar deck: adicionar keys dedicadas ao dialog de nome/formato e ao botao de
+  confirmar, removendo fallback por texto/campo em harnesses de deck runtime.
+- Importar lista: adicionar keys ao dialog, campo de lista e botao de importar.
+- Community/user search: adicionar keys aos campos de busca e rows acionaveis.
+- Optimize diagnostics: mapear keys especificas para diagnostico de no-op/gate
+  quando a UI precisar validar esses blocos sem depender de copy.
 - Life Counter/Lotus: manter keys existentes e mapear overlays principais neste
   arquivo.
+- Wrappers visuais restantes: substituir validacoes apenas por texto quando
+  houver lista/card/container acionavel ainda sem key.
 - Scanner/câmera/OCR: permanece fora de escopo quando o release for
   explicitamente non-scanner.
