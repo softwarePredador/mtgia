@@ -1,6 +1,31 @@
 > Manual tecnico continuo e historico de implementacao.
 > Para prioridade operacional atual e decisao de escopo, consultar primeiro `docs/CONTEXTO_PRODUTO_ATUAL.md`.
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
+> **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
+
+## 2026-05-08 — UI testability contract para agentes
+
+### O Porquê
+- Runtimes visuais estavam vulneraveis a seletores por texto, ordem de
+  `ListTile` e modais empilhados. Isso aumenta falso negativo quando copy muda
+  ou quando um dialog fica por cima de um picker.
+
+### O Como
+- Criado `app/doc/UI_TEST_SURFACE_MAP.md` como mapa operacional de keys,
+  rotas/telas, checkpoints visuais e validacao API esperada.
+- O fluxo Decks/Card Entry/Commander Edition ganhou keys estaveis:
+  `deck-card-details-dialog-<cardId>`,
+  `deck-card-change-edition-<cardId>`,
+  `deck-edition-picker-sheet-<cardId>`,
+  `deck-edition-picker-title` e `deck-edition-option-<cardId>`.
+- `commander_edition_runtime_test.dart` passou a selecionar troca de edicao e
+  opcao alvo por key, usando texto como evidencia visual e nao como ancora
+  principal.
+
+### Resultado
+- Agentes devem usar o mapa antes de criar QA visual novo.
+- Se um fluxo P1 depender de `find.text`, `find.byType` ou indice de lista,
+  deve registrar o motivo e propor a key minima.
 
 ## 2026-05-08 — Commander edition runtime iPhone 15 PASS
 

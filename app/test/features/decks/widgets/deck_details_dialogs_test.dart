@@ -207,9 +207,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Arcane Signet'), findsOneWidget);
+    expect(
+      find.byKey(const Key('deck-card-details-dialog-card-1')),
+      findsOneWidget,
+    );
     expect(find.text('TST #42'), findsOneWidget);
     expect(find.text('Test Set • 2026-01-01 • common'), findsOneWidget);
-    expect(find.text('Trocar edição'), findsOneWidget);
+    expect(
+      find.byKey(const Key('deck-card-change-edition-card-1')),
+      findsOneWidget,
+    );
     expect(find.text('Explicar'), findsOneWidget);
     expect(find.text('Ver Detalhes'), findsOneWidget);
 
@@ -221,12 +228,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(detailsCalls, 1);
 
+    await tester.tap(find.text('Fechar'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Trocar edição'));
+    await tester.tap(find.byKey(const Key('deck-card-change-edition-card-1')));
     await tester.pumpAndSettle();
     expect(editionCalls, 1);
-    expect(find.text('Trocar edição'), findsNothing);
+    expect(
+      find.byKey(const Key('deck-card-change-edition-card-1')),
+      findsNothing,
+    );
   });
 
   testWidgets('showDeckRemoveCardConfirmationDialog returns confirmation', (

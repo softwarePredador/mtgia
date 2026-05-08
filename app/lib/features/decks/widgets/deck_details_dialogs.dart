@@ -175,6 +175,7 @@ Future<void> showDeckEditionPicker({
     ),
     builder: (sheetContext) {
       return SafeArea(
+        key: Key('deck-edition-picker-sheet-${card.id}'),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -182,6 +183,7 @@ Future<void> showDeckEditionPicker({
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                key: const Key('deck-edition-picker-title'),
                 card.isCommander
                     ? 'Escolher edição do comandante'
                     : 'Edições disponíveis',
@@ -252,6 +254,7 @@ Future<void> showDeckEditionPicker({
                         final isSelected = id == card.id;
 
                         return ListTile(
+                          key: Key('deck-edition-option-$id'),
                           leading: CachedCardImage(
                             imageUrl: it['image_url'],
                             width: 40,
@@ -314,6 +317,7 @@ Future<void> showDeckCardDetailsDialog({
     context: context,
     builder:
         (dialogContext) => Dialog(
+          key: Key('deck-card-details-dialog-${card.id}'),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
@@ -381,6 +385,7 @@ Future<void> showDeckCardDetailsDialog({
                         Align(
                           alignment: Alignment.centerLeft,
                           child: TextButton.icon(
+                            key: Key('deck-card-change-edition-${card.id}'),
                             onPressed: () {
                               Navigator.pop(dialogContext);
                               onShowEditionPicker();

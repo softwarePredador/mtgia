@@ -214,7 +214,10 @@ void main() {
       await tester.ensureVisible(commanderTile);
       await tester.tap(commanderTile);
       await tester.pump();
-      await _pumpUntilFound(tester, find.text('Trocar edição'), attempts: 40);
+      final changeEditionButton = find.byKey(
+        ValueKey('deck-card-change-edition-$firstId'),
+      );
+      await _pumpUntilFound(tester, changeEditionButton, attempts: 40);
       await _pumpUntilFound(tester, find.textContaining(firstEditionTitle));
       await captureVisualProof(
         binding,
@@ -222,16 +225,24 @@ void main() {
         '03_commander_card_dialog_current_edition',
       );
 
-      await tester.tap(find.text('Trocar edição'));
+      await tester.tap(changeEditionButton);
       await tester.pump();
       await _pumpUntilFound(
         tester,
-        find.text('Escolher edição do comandante'),
+        find.byKey(ValueKey('deck-edition-picker-sheet-$firstId')),
         attempts: 40,
+      );
+      await _pumpUntilFound(
+        tester,
+        find.byKey(const Key('deck-edition-picker-title')),
       );
       await _pumpUntil(
         tester,
-        () => find.byType(ListTile).evaluate().length >= 2,
+        () =>
+            find
+                .byKey(ValueKey('deck-edition-option-$secondId'))
+                .evaluate()
+                .isNotEmpty,
         description: 'at least two edition rows',
         attempts: 40,
       );
@@ -240,7 +251,9 @@ void main() {
         tester,
         '04_commander_edition_picker_target_visible',
       );
-      final targetEditionRow = find.byType(ListTile).at(1);
+      final targetEditionRow = find.byKey(
+        ValueKey('deck-edition-option-$secondId'),
+      );
       await tester.ensureVisible(targetEditionRow);
       await tester.tap(targetEditionRow);
       await tester.pump();
