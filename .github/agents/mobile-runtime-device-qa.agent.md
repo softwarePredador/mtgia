@@ -75,11 +75,47 @@ Touch backend code only when a runtime blocker is proven to be a backend contrac
 Read before running device validation:
 
 - `.github/instructions/guia.instructions.md`
+- `app/doc/UI_TEST_SURFACE_MAP.md`
 - `app/doc/runtime_flow_handoffs/README.md`
 - `app/doc/runtime_flow_handoffs/deck_runtime_2026-04-27.md`
 - `server/doc/RELATORIO_COMMANDER_ONLY_OPTIMIZATION_VALIDATION_2026-04-21.md`
 - `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-04-24.md`
 - `server/manual-de-instrucao.md`
+
+## UI Runtime Testability Rules
+
+Before creating or changing any app integration/runtime harness, consult
+`app/doc/UI_TEST_SURFACE_MAP.md` and keep it updated.
+
+Use stable `Key`s as primary selectors for:
+
+- form fields;
+- primary and destructive buttons;
+- dialogs, bottom sheets and overlays;
+- selectable list items;
+- tabs/chips that change state;
+- async progress/preview/apply surfaces.
+
+Do not introduce or keep fragile selectors in P1 flows without documenting the
+reason in `UI_TEST_SURFACE_MAP.md`:
+
+- `find.byType(TextField)` for a critical action;
+- `.first`, `.last` or `.at(index)` when a stable key is feasible;
+- `find.text` as the only way to trigger a critical action;
+- duplicated local `pumpUntil` helpers when
+  `app/integration_test/runtime_test_helpers.dart` already covers the case.
+
+When finishing runtime-testability work, specifically check remaining fallbacks
+documented in `UI_TEST_SURFACE_MAP.md`, including:
+
+- create deck dialog;
+- import deck list dialog;
+- community/user search fields;
+- Life Counter/Lotus overlays;
+- wrappers or list containers still validated only by text.
+
+If a new key is added to the app, update `UI_TEST_SURFACE_MAP.md`, the relevant
+harness, and the docs/handoff for the run.
 
 ## Mandatory Simulator Rules
 
