@@ -3,6 +3,41 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Runtime publico Strixhaven lote 2 bloqueado por cards ausentes
+
+### O Porquê
+- Apos o deploy do lote 2, era necessario provar que os novos Commander
+  Reference Profiles geravam decks Commander validos e consumiveis pelo app no
+  backend publico.
+- O criterio de PASS exigia status 200, comandante preservado, 99 cartas no
+  main, `validation.is_valid=true` e diagnostics de profile/card stats.
+
+### O Como
+- Sincronizado `master` em
+  `a137dd5039884dabdb92862ee807322073d1ec40`.
+- Poll de `/health` confirmou o backend publico em production servindo o mesmo
+  `git_sha`.
+- Criado usuario QA descartavel e executados 14 probes sanitizados de
+  `/ai/generate`: 12 com `commander_name` exato para o lote 2, incluindo 3
+  amostras para Aziza e 3 para Zaffai, mais 2 baselines sem `commander_name`.
+- Nenhum token, JWT, senha, prompt completo, decklist completa, DSN,
+  `DATABASE_URL` ou `OPENAI_API_KEY` foi registrado.
+
+### Resultado
+- **BLOCKED**: 12/12 probes com `commander_name` retornaram 422.
+- Todos ativaram `reference_profile_used=true` e
+  `reference_card_stats_used=true`, com `on_theme_candidate_count` entre 39 e
+  52 e `unresolved_reference_cards=[]`.
+- Nenhum preservou comandante, nenhum chegou a `main_quantity=99` e nenhum teve
+  `validation.is_valid=true`.
+- Causa raiz provada: `GET /cards?name=<commander>&limit=3` retornou
+  `total_returned=0` e `exact_matches=0` para os 8 comandantes do lote no
+  backend publico.
+- Nao foi aplicado hotfix de codigo porque mascarar comandante ausente com stub
+  quebraria legalidade, `card_id` e salvamento pelo app.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_RUNTIME_2026-05-11.md`.
+
 ## 2026-05-11 — Commander Reference Profiles Strixhaven lote 2
 
 ### O Porquê

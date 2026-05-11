@@ -176,6 +176,17 @@ off-identity issue observed. Sanitized comparison against a baseline without
 without exposing decklists. See
 `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`.
 
+Public Strixhaven lot 2 runtime proof for `POST /ai/generate`: on 2026-05-11,
+backend `a137dd5039884dabdb92862ee807322073d1ec40` activated exact
+`reference_profile_used=true` and `reference_card_stats_used=true` for Aziza,
+Berta, Excava, Gorma, Muddle, Primo, Scriv, and Zaffai, but the runtime was
+**BLOCKED** because the public `/cards` index returned `total_returned=0` for
+all 8 exact commander names. Exact profile/stats rows are therefore necessary
+but not sufficient for app-consumable generation: the commander card itself must
+also resolve in `cards`/legalities so validation can preserve commander,
+Commander color identity, singleton and save-ready `card_id` semantics. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_RUNTIME_2026-05-11.md`.
+
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`
 is configured, the backend derives the internal `/ai/generate` URL from

@@ -1,0 +1,61 @@
+{
+  "backend": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "checked_at": "2026-05-11T21:06:00Z",
+  "endpoint": "GET /cards?name=<commander>&limit=3",
+  "results": [
+    {
+      "commander": "Aziza, Mage Tower Captain",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Berta, Wise Extrapolator",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Excava, the Risen Past",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Gorma, the Gullet",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Muddle, the Ever-Changing",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Primo, the Unbounded",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Scriv, the Obligator",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    },
+    {
+      "commander": "Zaffai and the Tempests",
+      "status": 200,
+      "total_returned": 0,
+      "exact_matches": 0
+    }
+  ],
+  "sanitization": {
+    "tokens_recorded": false,
+    "prompts_recorded": false,
+    "decklists_recorded": false,
+    "secrets_recorded": false
+  }
+}
