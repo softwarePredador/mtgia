@@ -13084,7 +13084,37 @@ adb devices -l
 flutter devices --no-version-check
 ```
 
-## 103. Lorehold external reference profile - 2026-05-11
+## 103. Lorehold final deck generation proof - 2026-05-11
+
+Foi reexecutado no Android fisico `SM A135M` (`R58T300SREH`) o fluxo completo
+de criacao de deck Commander com `Lorehold, the Historian`, usando backend
+publico `https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+Comando validado:
+
+```bash
+cd app
+flutter test integration_test/lorehold_generate_reference_stats_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+```
+
+Resultado: `PASS`, `01:00 +1`, `All tests passed!`.
+
+Resumo final do deck salvo:
+
+- deck: `8457a713-f861-4477-a21d-0e3315da5fc6`;
+- `validation_ok=true`;
+- `classification=on_theme`;
+- `on_theme_reference_matches=33`;
+- `main_qty=99`;
+- `total_with_commander=100`;
+- `lorehold_commander_count=1`;
+- `lorehold_in_99_count=0`;
+- `off_identity_count=0`.
+
+Handoff:
+`app/doc/runtime_flow_handoffs/lorehold_final_deck_validation_sm_a135m_2026-05-11.md`.
+
+## 104. Lorehold external reference profile - 2026-05-11
 
 Foi criado um perfil externo/agregado para `Lorehold, the Historian` sem alterar
 codigo runtime e sem copiar decklists publicas completas.
