@@ -3,6 +3,49 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Prova publica e runtime mobile de Lorehold Reference Card Stats v1
+
+### O Porquê
+- A entrega `59c75ff` adicionou `commander_reference_card_stats` e diagnostics
+  de Reference Card Stats v1, mas a prova anterior ainda estava limitada a
+  ambiente local/sanity publico em commit antigo. Era necessario provar o
+  backend publico e o app real consumindo `commander_name=Lorehold, the
+  Historian`.
+
+### O Como
+- O backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health` foi verificado em
+  `git_sha=59c75ff735357832c854aebf051acfb0da8c9834`.
+- O probe publico sanitizado de `/ai/generate` usou usuario QA descartavel e
+  request sync com `format=commander` e `commander_name=Lorehold, the Historian`.
+  A prova confirmou `reference_profile_used=true`,
+  `reference_card_stats_used=true`, `on_theme_candidate_count=34`,
+  `package_keys` preenchido, `unresolved_reference_cards=[]`,
+  `classification=on_theme`, 100 cartas, Lorehold unico no slot de comandante,
+  0 Lorehold nas 99 e 0 off-identity. Tentativas async iniciais foram
+  bloqueadas por `429` no bucket publico de IA/polling e registradas como tal.
+- No app, foi adicionada a key `deck-list-empty-generate-button` para abrir
+  Generate a partir da lista vazia sem depender de texto. O novo harness
+  `app/integration_test/lorehold_generate_reference_stats_runtime_test.dart`
+  registra usuario pela UI, preenche `deck-generate-commander-field`, gera,
+  salva, abre o detalhe e valida o deck salvo por API.
+- A primeira tentativa device falhou antes de chamar IA porque o teclado
+  interceptava o tap no CTA; o harness passou a fechar foco/teclado e usar
+  `ensureVisible` antes do tap.
+
+### Resultado
+- Runtime PASS no Android fisico `SM A135M` (`R58T300SREH`, Android 14/API 34)
+  contra o backend publico. Deck salvo:
+  `18da672e-f48b-4e6c-8a65-bb828e6a28b8`.
+- Validacao API: `validation_ok=true`, `main_qty=99`,
+  `total_with_commander=100`, `lorehold_commander_count=1`,
+  `lorehold_in_99_count=0`, `off_identity_count=0`,
+  `classification=on_theme`, `on_theme_reference_matches=33`.
+- Evidencias:
+  `docs/qa/manaloom_lorehold_commander_flow_2026-05-11.md` e
+  `app/doc/runtime_flow_handoffs/lorehold_reference_stats_sm_a135m_2026-05-11.md`.
+- Scanner/camera/OCR/MLKit nao foram testados nem alterados.
+
 ## 2026-05-11 — Lorehold Reference Card Stats v1 em /ai/generate
 
 ### O Porquê
@@ -47,8 +90,10 @@
 - `/ai/generate` local com `commander_name=Lorehold, the Historian` e
   `LIVE_REFERENCE_CARD_STATS=1` passou, provando diagnostics de stats e mantendo
   legalidade/validacao final.
-- Backend publico usado apenas para sanity de `/health`; ainda reporta
-  `git_sha=87d9b7c3814ea07c3e89d718976fb694efd57d1d`, anterior a esta entrega.
+- Backend publico foi posteriormente provado em
+  `git_sha=59c75ff735357832c854aebf051acfb0da8c9834`, incluindo
+  `/ai/generate` com `reference_card_stats_used=true` e runtime mobile no
+  `SM A135M`.
 - Relatorio:
   `server/doc/RELATORIO_LOREHOLD_REFERENCE_CARD_STATS_V1_2026-05-11.md`.
 - Scanner/camera/OCR/MLKit nao foram tocados.

@@ -317,6 +317,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
+                      key: const Key('deck-list-empty-generate-button'),
                       onPressed: () => context.go('/decks/generate'),
                       icon: const Icon(Icons.auto_awesome, size: 18),
                       label: const Text('Gerar com IA'),

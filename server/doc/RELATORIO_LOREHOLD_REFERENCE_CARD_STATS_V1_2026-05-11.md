@@ -2,7 +2,7 @@
 
 Data: 2026-05-11
 
-Resultado: **PASS WITH RISKS**
+Resultado: **PASS**
 
 ## Escopo
 
@@ -20,7 +20,7 @@ Resultado: **PASS WITH RISKS**
 | Item | Commit |
 | --- | --- |
 | Base sincronizada em `master` | `04c4fbd Wire Lorehold commander generate profile in app` |
-| Backend publico sanity `/health` | `87d9b7c3814ea07c3e89d718976fb694efd57d1d` |
+| Backend publico `/health` + prova `/ai/generate` | `59c75ff735357832c854aebf051acfb0da8c9834` |
 
 ## Antes / depois
 
@@ -160,12 +160,13 @@ O avaliador e explicativo. A legalidade real continua em
 | `flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check` | PASS |
 | Backend local `PORT=8080` + `dart run bin/run_commander_only_optimization_validation.dart --dry-run` | PASS, 19 candidatos seriam validados; sem auth/deck/optimize/bulk save/validate |
 | `curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health` | PASS, sanity publico |
+| Probe publico sanitizado `POST /ai/generate` sync com `commander_name=Lorehold, the Historian` | PASS, `reference_profile_used=true`, `reference_card_stats_used=true`, `on_theme_candidate_count=34`, `package_keys` preenchido, `unresolved_reference_cards=[]`, 100 cartas, Lorehold unico, 0 off-identity, validacao OK |
+| `flutter test integration_test/lorehold_generate_reference_stats_runtime_test.dart -d R58T300SREH ...` | PASS, app real no `SM A135M`, deck salvo `18da672e-f48b-4e6c-8a65-bb828e6a28b8`, `classification=on_theme`, 33 matches de referencia |
 
 ## Limites e riscos
 
-- **PASS WITH RISKS** porque o backend publico ainda reporta commit anterior a
-  esta entrega; a prova publica de `reference_card_stats_used=true` depende de
-  deploy.
+- O backend publico ja reporta `59c75ff` e a prova publica de
+  `reference_card_stats_used=true` foi concluida.
 - Reference Card Stats v1 e Lorehold-only. Outros comandantes continuam sem
   stats dedicados por design.
 - `interaction_and_resets` permanece role agregada v1; uma futura v2 pode dividir
@@ -176,8 +177,8 @@ O avaliador e explicativo. A legalidade real continua em
 
 ## Menores proximos ajustes
 
-1. Publicar o backend e repetir a prova publica de `/ai/generate` com
-   `LIVE_REFERENCE_CARD_STATS=1`.
+1. Monitorar probes async publicos longos, pois o polling tambem consome o
+   bucket de rate limit de IA.
 2. Adicionar profiles/card stats para outros comandantes apenas com evidencia
    agregada e sem copiar decklists publicas.
 3. Refinar roles por oracle text para separar `interaction_and_resets` em spot

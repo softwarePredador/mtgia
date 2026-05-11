@@ -32,7 +32,7 @@ de animação.
 | Dialog criar deck | `DeckListScreen` | `deck-create-dialog` | Modal de criação aberto no `Overlay`. | `find.byKey`; não usar `AlertDialog`/índice. |
 | Campos criar deck | `DeckListScreen` | `deck-create-name-field`, `deck-create-format-field`, `deck-create-description-field`, `deck-create-public-switch` | Preenche nome/formato/descrição/visibilidade. | `enterText`/tap por key. |
 | Ações criar deck | `DeckListScreen` | `deck-create-cancel-button`, `deck-create-submit-button` | Cancela ou cria deck. | Tap por key + API/lista. |
-| Lista de decks | `DeckListScreen` | `deck-list`, `deck-list-row-<deckId>`, `deck-list-empty-create-button`, `deck-list-fab-menu`, `deck-list-menu-create`, `deck-list-menu-generate`, `deck-list-menu-import` | Lista/FAB não dependem de copy para abrir fluxos. | O menu e o dialog vivem no `Overlay`; localizar por key global. |
+| Lista de decks | `DeckListScreen` | `deck-list`, `deck-list-row-<deckId>`, `deck-list-empty-create-button`, `deck-list-empty-generate-button`, `deck-list-fab-menu`, `deck-list-menu-create`, `deck-list-menu-generate`, `deck-list-menu-import` | Lista/FAB não dependem de copy para abrir fluxos. | O menu e o dialog vivem no `Overlay`; localizar por key global. |
 | Ações do deck | `DeckDetailsScreen` | `deck-details-optimize-button`, `deck-details-menu`, `deck-details-menu-import-list` | Abre optimize e importar lista sem depender de ícone/texto do menu. | Tap por key; texto como evidência visual. |
 | Importar lista no deck | `DeckDetailsScreen` dialog | `deck-import-list-dialog`, `deck-import-list-dialog-field`, `deck-import-list-dialog-replace-switch`, `deck-import-list-dialog-submit-button`, `deck-import-list-dialog-cancel-button` | Cola lista no deck atual e opcionalmente substitui cartas. | `enterText` e tap por key; validar refresh/API. |
 | Estados importar lista | `DeckDetailsScreen` dialog | `deck-import-list-dialog-error`, `deck-import-list-dialog-not-found` | Expõe erro amigável e linhas não encontradas. | Texto como evidência visual ancorado por key. |
@@ -213,6 +213,7 @@ comum de runtime:
 | `sets_catalog_runtime_test.dart` | Catálogo de coleções usa helper comum e abre sets por `set-tile-<setCode>`. | Título/nome da coleção segue como evidência visual. |
 | `collection_entrypoints_runtime_test.dart` | Entry points de coleção usam helper comum de runtime. | Tabs ainda usam texto como evidência visual. |
 | `app_full_non_life_counter_visual_capture_smoke_test.dart` | Criar deck e Generate usam keys de dialog/prompt/CTA; helpers genéricos foram removidos. | Navegação ampla do shell ainda usa labels das tabs como evidência visual. |
+| `lorehold_generate_reference_stats_runtime_test.dart` | Cadastro, CTA de generate em lista vazia, comandante, prompt, salvar preview e abrir deck salvo por keys estáveis. | Labels de navegação `Decks`/`Meus Decks` seguem como evidência visual. |
 
 ## Checkpoints obrigatórios para agentes
 

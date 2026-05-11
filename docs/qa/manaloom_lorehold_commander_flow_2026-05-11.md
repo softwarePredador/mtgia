@@ -2,78 +2,131 @@
 
 ## Resultado
 
-**PASS WITH RISKS** para contrato app/backend e profile publico. **BLOCKED** para
-runtime fisico no device alvo `SM A135M` / `R58T300SREH`, porque o aparelho nao
-estava conectado/detectavel nesta rodada.
+**PASS** para prova publica de `Lorehold Reference Card Stats v1` e para runtime
+visual no device fisico `SM A135M` / `R58T300SREH`.
+
+Scanner/camera/OCR/MLKit nao foram testados nem acionados.
 
 ## Escopo
 
-- Fechar o piloto Lorehold Commander Reference Profile v1 no app sem testar
-  Scanner/camera/OCR/MLKit.
-- Confirmar que o backend publico esta no commit do profile Lorehold.
-- Fazer o app enviar `commander_name` para `/ai/generate` quando o usuario
-  informa o comandante no fluxo de gerar deck.
-- Provar o uso real do profile de forma sanitizada e registrar o bloqueio de
-  runtime fisico quando o device alvo nao aparece.
+- Confirmar que o backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host` esta no commit
+  `59c75ff`.
+- Provar `/ai/generate` publico com `commander_name=Lorehold, the Historian` e
+  diagnostics `reference_profile_used=true` e `reference_card_stats_used=true`.
+- Provar no app o fluxo register -> Decks -> Gerar com IA -> campo comandante
+  Lorehold -> preview -> salvar -> abrir detalhe -> validar deck salvo por API.
+- Registrar latencias, bloqueios ambientais, screenshots/logs e classificacao
+  tematica sem expor JWT, tokens, emails reais, secrets ou payload sensivel.
 
 ## Evidencia de ambiente
 
 | Item | Resultado |
 | --- | --- |
 | Branch | `master`, sincronizada com `origin/master` |
+| Commit local | `59c75ff Add Lorehold reference card stats` |
 | Backend publico | `https://evolution-cartinhas.8ktevp.easypanel.host` |
-| `/health` | `200`, `status=healthy`, `git_sha=87d9b7c3814ea07c3e89d718976fb694efd57d1d` |
-| `/health/git_sha` | `404`; SHA obtido pelo payload de `/health` |
+| `/health` publico | `200`, `status=healthy`, `git_sha=59c75ff735357832c854aebf051acfb0da8c9834` |
 | Device alvo | `SM A135M` / `R58T300SREH` |
-| Device discovery | `R58T300SREH` ausente em `flutter devices` e `adb devices -l` |
-| Scanner/OCR | Nao testado por escopo |
+| Device discovery | `flutter devices`: `SM A135M (mobile) • R58T300SREH • android-arm • Android 14 (API 34)` |
+| Fallback disponivel | `iPhone 15` Simulator `F0B1713F-4B8A-4DB9-825E-C8A4B17A03DF`, iOS 17.4, mas nao foi necessario |
 
-## Mudanca app-side
-
-- `DeckGenerateScreen` agora mostra `deck-generate-commander-field` em
-  Commander/Brawl.
-- `DeckProvider.generateDeck` aceita `commanderName` opcional.
-- `deck_provider_support_generation.dart` envia `commander_name` no request
-  async e preserva o campo nos fallbacks sync.
-- Apps/fluxos que deixam o comandante vazio continuam omitindo `commander_name`.
-
-## Prova publica sanitizada do profile
+## Prova publica sanitizada de Reference Card Stats v1
 
 Fluxo executado por API publica com usuario QA descartavel, sem registrar JWT,
-email real, token, payload sensivel ou secrets:
+email real, token, payload sensivel ou secrets.
 
-1. `POST /auth/register`
-2. `POST /ai/generate` com `async=true`, `format=commander` e
-   `commander_name=Lorehold, the Historian`
-3. Poll de `poll_url` ate `completed`
+Primeiras tentativas async:
 
-Resumo do resultado:
+- `POST /ai/generate async=true` foi aceito, mas o poll recebeu `429`.
+- Nova tentativa imediata recebeu `429` no generate.
+- Classificacao: tentativa valida como evidencia de rate limit publico; nao foi
+  mascarada.
+
+Prova final apos janela de rate limit: `POST /ai/generate` sincrono com
+`format=commander` e `commander_name=Lorehold, the Historian`.
 
 | Criterio | Valor |
 | --- | --- |
-| HTTP inicial | `202` |
-| Polls | `processing` x3, `completed` x1 |
-| Commander | `Lorehold, the Historian` |
-| Total main deck | `99` |
+| HTTP | `200` |
+| Latencia `/health` | `618ms` |
+| Latencia register | `742ms` |
+| Latencia generate sync | `627ms` |
+| `diagnostics.reference_profile_used` | `true` |
+| `diagnostics.reference_card_stats_used` | `true` |
+| `on_theme_candidate_count` | `34` |
+| `package_keys` | `interaction_and_resets`, `miracle_payoffs_expensive_spells`, `spell_payoff_copy_package`, `topdeck_and_miracle_setup` |
+| `unresolved_reference_cards` | `[]` |
+| `reference_deck_evaluation.classification` | `on_theme` |
+| `reference_deck_evaluation.counts` | `on_theme=31`, `generic=57`, `questionable=11`, `off_theme=0` |
+| Main deck | `99` |
 | Total com comandante | `100` |
+| Lorehold comandante | `1` |
 | Lorehold nas 99 | `0` |
 | Off-identity | `0` |
-| `validation.is_valid` | `true` |
-| `diagnostics.reference_profile_used` | `true` |
-| `profile_confidence` | `high` |
-| `source_count` | `4` |
-| Themes | `boros_miracle_big_spells`, `topdeck_manipulation`, `opponent_turn_draw_rummage`, `spellslinger_copy_payoffs`, `token_burst_finishers`, `graveyard_flashback_recursion` |
+| Validacao | `true` |
 
-## Avaliacao contra o reference profile
+## Prova runtime app no SM A135M
 
-- PASS: exatamente um comandante Lorehold.
-- PASS: Lorehold nao apareceu nas 99.
-- PASS: total final 100.
-- PASS: identidade de cor R/W ou colorless nos cards com `color_identity`
-  exposto.
-- PASS: diagnostics confirmam profile agregado usado de verdade.
-- PASS WITH RISKS: a avaliacao visual no app e screenshots no SM A135M ficaram
-  bloqueadas pela ausencia do device alvo.
+Handoff detalhado:
+`app/doc/runtime_flow_handoffs/lorehold_reference_stats_sm_a135m_2026-05-11.md`.
+
+Comando executado:
+
+```bash
+cd app
+set -o pipefail
+flutter test integration_test/lorehold_generate_reference_stats_runtime_test.dart \
+  -d R58T300SREH \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=DISABLE_FIREBASE_STARTUP=true \
+  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --reporter expanded \
+  --no-version-check
+```
+
+Resultado runtime: **PASS** (`00:57 +1: All tests passed!`).
+
+| Checkpoint | Evidencia |
+| --- | --- |
+| Backend usado pelo app | `LOREHOLD_RUNTIME_BASE_URL https://evolution-cartinhas.8ktevp.easypanel.host` |
+| Health no app | `status=200`, `git_sha=59c75ff735357832c854aebf051acfb0da8c9834`, `latency_ms=1447` |
+| Feedback inicial generate | `858ms` ate "Pedido aceito" |
+| Deck salvo | `18da672e-f48b-4e6c-8a65-bb828e6a28b8` |
+| Validacao API | `validation_ok=true` |
+| Classificacao QA | `on_theme` |
+| Matches de reference package | `33` |
+| Main deck | `99` |
+| Total com comandante | `100` |
+| Lorehold comandante | `1` |
+| Lorehold nas 99 | `0` |
+| Off-identity | `0` |
+| Erro bruto/overflow/modal preso | Nao observado na prova PASS |
+
+Screenshots extraidas:
+
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_01_login.png`
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_02_registered.png`
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_03_prompt_with_commander.png`
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_04_preview.png`
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_05_saved.png`
+- `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_06_details.png`
+
+Logs:
+
+- Tentativa 1 bloqueada pelo harness/teclado:
+  `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_reference_stats_runtime_attempt1_failed.filtered.log`
+- Prova PASS:
+  `app/doc/runtime_flow_proofs_2026-05-11_sm_a135m_lorehold_reference_stats/lorehold_generate_reference_stats_runtime_pass.filtered.log`
+
+## Mudanca app-side desta rodada
+
+- `DeckListScreen` ganhou a key `deck-list-empty-generate-button` para acionar o
+  fluxo Generate em lista vazia sem depender apenas de texto.
+- `lorehold_generate_reference_stats_runtime_test.dart` cobre o fluxo visual no
+  app e valida o deck salvo por API.
+- `UI_TEST_SURFACE_MAP.md` foi atualizado com a nova key/harness.
 
 ## Comandos de validacao
 
@@ -83,33 +136,25 @@ git fetch origin master --quiet
 git pull --ff-only origin master
 flutter devices --no-version-check
 adb devices -l
+xcrun simctl list devices available | grep -E "iPhone 15|Booted"
 curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health
-curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health/git_sha
-cd app && flutter test test/features/decks/providers/deck_provider_test.dart --no-version-check
-cd app && flutter analyze lib/features/decks test/features/decks integration_test/lorehold_commander_edition_android_runtime_test.dart --no-version-check
-cd app && flutter test test/features/decks --no-version-check
+cd app && flutter analyze lib/features/decks/screens/deck_list_screen.dart integration_test/lorehold_generate_reference_stats_runtime_test.dart --no-version-check
+cd app && flutter test test/features/decks/screens/deck_runtime_widget_flow_test.dart --no-version-check
+cd app && flutter test test/features/decks/screens/deck_details_screen_smoke_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart --no-version-check
+cd app && flutter test integration_test/lorehold_generate_reference_stats_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --reporter expanded --no-version-check
 ```
 
-Resultados desta rodada:
+Resultados:
 
-- `flutter analyze ...`: PASS, sem issues.
-- `flutter test test/features/decks --no-version-check`: PASS, `+156`.
+- Analyze focado: PASS.
+- Testes focados de deck: PASS.
+- Runtime SM A135M: PASS.
 
-## Bloqueios e menor proxima acao
+## Observacoes e riscos
 
-- **BLOCKED runtime fisico:** conectar/desbloquear o `SM A135M` serial
-  `R58T300SREH` e repetir:
-
-```bash
-cd app
-flutter test integration_test/lorehold_commander_edition_android_runtime_test.dart \
-  -d R58T300SREH \
-  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --reporter expanded \
-  --no-version-check
-```
-
-Para provar o fluxo de generate visual de ponta a ponta, usar o novo campo
-`deck-generate-commander-field` com `Lorehold, the Historian` antes de tocar em
-`deck-generate-submit-button`.
+- O backend publico esta no commit correto e Reference Card Stats v1 foi provado
+  publicamente.
+- Rate limit publico de IA foi observado em tentativas async/polling (`429`); a
+  prova final usou geracao sync apos aguardar a janela. O app runtime PASS usou o
+  fluxo async normal e completou sem `429`.
+- Reference Card Stats v1 segue propositalmente Lorehold-only.
