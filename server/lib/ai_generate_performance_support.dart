@@ -19,17 +19,30 @@ String normalizeAiGenerateBracket(Object? bracket) {
   return raw.isEmpty ? 'unspecified' : raw;
 }
 
+String normalizeAiGenerateCommanderName(String? commanderName) {
+  final raw = commanderName?.trim().toLowerCase() ?? '';
+  return raw.isEmpty ? '' : raw.replaceAll(RegExp(r'\s+'), ' ');
+}
+
 String buildAiGenerateCacheKey({
   required String prompt,
   required String format,
   Object? bracket,
+  String? commanderName,
+  String? referenceProfileVersion,
 }) {
-  final material = jsonEncode({
+  final normalizedCommander = normalizeAiGenerateCommanderName(commanderName);
+  final normalizedProfileVersion = referenceProfileVersion?.trim() ?? '';
+  final payload = {
     'version': 1,
     'prompt': normalizeAiGeneratePrompt(prompt),
     'format': normalizeAiGenerateFormat(format),
     'bracket': normalizeAiGenerateBracket(bracket),
-  });
+    if (normalizedCommander.isNotEmpty) 'commander_name': normalizedCommander,
+    if (normalizedProfileVersion.isNotEmpty)
+      'reference_profile_version': normalizedProfileVersion,
+  };
+  final material = jsonEncode(payload);
   final digest = sha256.convert(utf8.encode(material)).toString();
   return 'ai_generate:v1:$digest';
 }

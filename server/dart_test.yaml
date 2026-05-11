@@ -4,6 +4,7 @@ paths:
   - test/cards_route_test.dart
   - test/color_identity_test.dart
   - test/commander_only_runtime_validation_config_test.dart
+  - test/commander_reference_profile_support_test.dart
   - test/deck_validation_test.dart
   - test/external_commander_deck_expansion_support_test.dart
   - test/external_commander_meta_candidate_support_test.dart
@@ -52,6 +53,7 @@ presets:
       - test/ai_optimize_telemetry_contract_test.dart
       - test/auth_flow_integration_test.dart
       - test/commander_reference_atraxa_test.dart
+      - test/commander_reference_profile_generate_live_test.dart
       - test/core_flow_smoke_test.dart
       - test/deck_analysis_contract_test.dart
       - test/decks_crud_test.dart

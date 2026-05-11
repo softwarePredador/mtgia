@@ -10,6 +10,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
+import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/internal_ai_request_token.dart';
@@ -45,10 +46,36 @@ Future<Response> onRequest(RequestContext context) async {
     final totalStopwatch = Stopwatch()..start();
     final timings = <String, int>{};
     final bracket = body['bracket'];
+    final requestedCommanderName = body['commander_name']?.toString().trim();
+    final pool = context.read<Pool>();
+
+    Map<String, dynamic>? referenceProfile;
+    final referenceProfileStopwatch = Stopwatch()..start();
+    if (isLoreholdCommanderReferenceCandidate(requestedCommanderName)) {
+      try {
+        referenceProfile = await loadUsableCommanderReferenceProfile(
+          pool: pool,
+          commanderName: requestedCommanderName,
+        );
+      } catch (error) {
+        Log.w(
+          'Lorehold reference profile unavailable; continuing legacy generate path. '
+          'error=$error',
+        );
+      }
+    }
+    timings['reference_profile_ms'] =
+        referenceProfileStopwatch.elapsedMilliseconds;
+
+    final referenceProfileVersion = referenceProfile == null
+        ? null
+        : commanderReferenceProfileCacheVersion(referenceProfile);
     final cacheKey = buildAiGenerateCacheKey(
       prompt: prompt,
       format: format,
       bracket: bracket,
+      commanderName: referenceProfile == null ? null : requestedCommanderName,
+      referenceProfileVersion: referenceProfileVersion,
     );
 
     final cacheLookupStopwatch = Stopwatch()..start();
@@ -69,7 +96,6 @@ Future<Response> onRequest(RequestContext context) async {
     final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
     final aiConfig = OpenAiRuntimeConfig(env);
     final apiKey = env['OPENAI_API_KEY'];
-    final pool = context.read<Pool>();
     final cacheTtl = Duration(
       seconds: aiConfig.intFor(
         key: 'AI_GENERATE_CACHE_TTL_SECONDS',
@@ -87,6 +113,7 @@ Future<Response> onRequest(RequestContext context) async {
         pool: pool,
         prompt: prompt,
         format: format,
+        referenceProfile: referenceProfile,
         warningCode: 'openai_api_key_missing',
         warningMessage:
             'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
@@ -226,9 +253,15 @@ Deck construction guidelines:
 - Use exact real card names in English.
 ''';
 
+    final referenceProfilePrompt = referenceProfile == null
+        ? ''
+        : buildCommanderReferenceProfilePrompt(referenceProfile);
+
     final userMessage = '''
 Build a deck based on this description: "$prompt".
 Format: $format.
+
+$referenceProfilePrompt
 
 $metaContext
 ''';
@@ -300,6 +333,7 @@ $metaContext
         pool: pool,
         prompt: prompt,
         format: format,
+        referenceProfile: referenceProfile,
         warningCode: 'openai_timeout_deterministic_fallback',
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -346,6 +380,7 @@ $metaContext
           pool: pool,
           prompt: prompt,
           format: format,
+          referenceProfile: referenceProfile,
           warningCode: 'openai_api_key_invalid_dev_fallback',
           warningMessage:
               'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
@@ -414,6 +449,15 @@ $metaContext
       commanderName = commanderRaw;
     }
 
+    if (referenceProfile != null &&
+        !isLoreholdCommanderReferenceCandidate(commanderName)) {
+      Log.w(
+        'AI generate ignored Lorehold reference commander; forcing '
+        '$loreholdReferenceCommanderName before validation.',
+      );
+      commanderName = loreholdReferenceCommanderName;
+    }
+
     final validationService = GeneratedDeckValidationService(
       PostgresGeneratedDeckRepository(pool, preferredFormat: format),
     );
@@ -443,6 +487,8 @@ $metaContext
         'invalid_cards': validation.invalidCards.length,
       },
       'validation': validation.validationSummary(),
+      if (referenceProfile != null)
+        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
       if (metaReferenceContext != null && metaReferenceContext.isNotEmpty)
         'meta_reference_context':
             augmentMetaDeckEvidencePayloadWithOutputMatches(
@@ -469,6 +515,7 @@ $metaContext
         pool: pool,
         prompt: prompt,
         format: format,
+        referenceProfile: referenceProfile,
         warningCode: 'ai_generate_validation_fallback',
         warningMessage:
             'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -547,6 +594,16 @@ Future<Response> _startAiGenerateAsyncJob({
     prompt: prompt,
     format: format,
     bracket: body['bracket'],
+    commanderName: isLoreholdCommanderReferenceCandidate(
+      body['commander_name']?.toString(),
+    )
+        ? body['commander_name']?.toString()
+        : null,
+    referenceProfileVersion: isLoreholdCommanderReferenceCandidate(
+      body['commander_name']?.toString(),
+    )
+        ? loreholdReferenceProfileVersion
+        : null,
   );
   final jobId = await AiGenerateJobStore.create(
     pool: pool,
@@ -710,10 +767,15 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   required Pool pool,
   required String prompt,
   required String format,
+  Map<String, dynamic>? referenceProfile,
   required String warningCode,
   required String warningMessage,
 }) async {
-  final mockDeck = await _mockGeneratedDeck(pool, format);
+  final mockDeck = await _mockGeneratedDeck(
+    pool,
+    format,
+    referenceProfile: referenceProfile,
+  );
 
   String? commanderName;
   final commanderRaw = mockDeck['commander'];
@@ -764,6 +826,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'invalid_cards': validation.invalidCards.length,
       },
       'validation': validation.validationSummary(),
+      if (referenceProfile != null)
+        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
       'warnings': warnings,
     };
   } catch (e) {
@@ -785,6 +849,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'suggestions': const <String, List<String>>{},
         'warnings': const <String>[],
       },
+      if (referenceProfile != null)
+        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
       'warnings': {
         'code': warningCode,
         'message': warningMessage,
@@ -794,10 +860,17 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
 }
 
 Future<Map<String, dynamic>> _mockGeneratedDeck(
-    Pool pool, String format) async {
+  Pool pool,
+  String format, {
+  Map<String, dynamic>? referenceProfile,
+}) async {
   final normalized = format.trim().toLowerCase();
 
   if (normalized == 'commander' || normalized == 'edh') {
+    if (referenceProfile != null) {
+      return _mockLoreholdReferenceDeck();
+    }
+
     return {
       'commander': {'name': 'Isamaru, Hound of Konda'},
       'cards': [
@@ -830,6 +903,84 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
       total: 60,
       colors: const ['W', 'U', 'B', 'R', 'G'],
     ),
+  };
+}
+
+Map<String, dynamic> _mockLoreholdReferenceDeck() {
+  const nonLands = [
+    'Sol Ring',
+    'Arcane Signet',
+    'Boros Signet',
+    'Talisman of Conviction',
+    'Mind Stone',
+    'Fellwar Stone',
+    "Wayfarer's Bauble",
+    'Thought Vessel',
+    "Commander's Sphere",
+    'Marble Diamond',
+    'Fire Diamond',
+    "Sensei's Divining Top",
+    'Scroll Rack',
+    'Library of Leng',
+    'Brainstone',
+    'Temple Bell',
+    'Victory Chimes',
+    'Faithless Looting',
+    'Thrill of Possibility',
+    'Big Score',
+    'Unexpected Windfall',
+    'Seize the Spoils',
+    'Reckless Impulse',
+    "Wrenn's Resolve",
+    'Light Up the Stage',
+    'Esper Sentinel',
+    'Tocasia\'s Welcome',
+    'Swords to Plowshares',
+    'Path to Exile',
+    'Generous Gift',
+    'Chaos Warp',
+    'Wear // Tear',
+    'Blasphemous Act',
+    'Austere Command',
+    'Terminus',
+    'Bonfire of the Damned',
+    'Storm-Kiln Artist',
+    'Monastery Mentor',
+    'Young Pyromancer',
+    'Primal Amulet // Primal Wellspring',
+    "Pyromancer's Goggles",
+    'Double Vision',
+    "Sunbird's Invocation",
+    'Arcane Bombardment',
+    "Chandra, Hope's Beacon",
+    'Approach of the Second Sun',
+    'Storm Herd',
+    'Rise of the Eldrazi',
+    'Soulfire Eruption',
+    'Apex of Power',
+    'Volcanic Vision',
+    'Creative Technique',
+    'Dance with Calamity',
+    'Call Forth the Tempest',
+    "Brass's Bounty",
+    'Hit the Mother Lode',
+    "Mizzix's Mastery",
+    'Boros Charm',
+    'Swiftfoot Boots',
+    'Lightning Greaves',
+    'Teferi\'s Protection',
+    'Reconstruct History',
+  ];
+
+  final cards = [
+    for (final name in nonLands) {'name': name, 'quantity': 1},
+    {'name': 'Plains', 'quantity': 19},
+    {'name': 'Mountain', 'quantity': 18},
+  ];
+
+  return {
+    'commander': {'name': loreholdReferenceCommanderName},
+    'cards': cards,
   };
 }
 

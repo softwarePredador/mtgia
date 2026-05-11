@@ -3,6 +3,50 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Commander Reference Profile v1 para Lorehold em /ai/generate
+
+### O Porquê
+- O relatorio `docs/qa/lorehold_reference_profile_2026-05-11.md` provou um
+  perfil agregado seguro para `Lorehold, the Historian`, mas `/ai/generate`
+  ainda tratava o pedido como prompt generico de Commander.
+- O piloto precisava guiar apenas Lorehold, manter compatibilidade para apps que
+  omitem `commander_name`, evitar scraping/copia de listas e preservar os gates
+  de legalidade, identidade de cor e tamanho final.
+
+### O Como
+- Criado `server/lib/ai/commander_reference_profile_support.dart` com o payload
+  agregado v1: `themes`, `role_targets`, `expected_packages`,
+  `avoid_patterns`, `confidence=high`, `source_count=4`, versao e diagnosticos
+  seguros.
+- Criado o runner seguro
+  `server/bin/commander_reference_profile_lorehold.dart` com `--dry-run` padrao
+  e `--apply`. O runner audita antes as tabelas
+  `commander_reference_profiles`, `commander_card_synergy`,
+  `card_role_scores` e `card_function_tags`; no apply, faz upsert apenas em
+  `commander_reference_profiles` com `deck_count=0`, porque o perfil e
+  agregado e nao copia decklists publicas.
+- `/ai/generate` agora aceita `commander_name` opcional. O profile so e carregado
+  quando o nome normalizado e exatamente `Lorehold, the Historian` e
+  `profile_json.confidence >= medium`; outros comandantes seguem o caminho
+  legado. Quando ativo, o prompt fixa Lorehold como comandante, R/W como
+  identidade, os alvos de roles e os padroes a evitar. O cache inclui a versao
+  do profile apenas quando ele e usado.
+- Diagnosticos opcionais foram adicionados sob `diagnostics`:
+  `reference_profile_used`, `reference_profile_source`,
+  `reference_profile_version`, `profile_confidence`, `themes` e `source_count`.
+  O fallback deterministico de ambiente sem OpenAI tambem pode retornar um seed
+  Lorehold validavel quando o profile estiver ativo.
+
+### Resultado
+- Dry-run auditou as quatro tabelas existentes sem mutacao; apply persistiu o
+  profile Lorehold com `usable_after_run=true`.
+- Evidencias em
+  `server/test/artifacts/commander_reference_profile_lorehold_2026-05-11/`.
+- Relatorio: `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_V1_2026-05-11.md`.
+- Validado com analyze backend amplo, testes unitarios do profile/cache, prova
+  live local de `/ai/generate` com Lorehold e teste CRUD de decks com servidor
+  local. Scanner/camera/OCR/MLKit nao foram tocados.
+
 ## 2026-05-11 — Prova Android FCM real no SM A135M
 
 ### O Porquê

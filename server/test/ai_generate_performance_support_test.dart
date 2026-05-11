@@ -29,6 +29,36 @@ void main() {
       expect(first, isNot(contains('mono red')));
     });
 
+    test('omits commander profile material unless explicitly supplied', () {
+      final legacy = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+      );
+      final stillLegacy = buildAiGenerateCacheKey(
+        prompt: '  Boros   Miracle Big Spells ',
+        format: 'edh',
+        commanderName: '',
+        referenceProfileVersion: '',
+      );
+      final loreholdProfile = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: 'Lorehold, the Historian',
+        referenceProfileVersion: 'lorehold_reference_profile_v1_2026-05-11',
+      );
+      final loreholdProfileV2 = buildAiGenerateCacheKey(
+        prompt: 'boros miracle big spells',
+        format: 'Commander',
+        commanderName: 'Lorehold, the Historian',
+        referenceProfileVersion: 'future_profile_version',
+      );
+
+      expect(legacy, equals(stillLegacy));
+      expect(loreholdProfile, isNot(equals(legacy)));
+      expect(loreholdProfileV2, isNot(equals(loreholdProfile)));
+      expect(loreholdProfile, isNot(contains('Lorehold')));
+    });
+
     test('returns cache hits as cloned payloads with cache metadata', () {
       final cacheKey = buildAiGenerateCacheKey(
         prompt: 'azorius control',
