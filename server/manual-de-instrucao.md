@@ -13160,20 +13160,28 @@ Validacoes executadas:
 - `cd server && dart analyze lib routes test`: `PASS`;
 - `cd server && dart test -r expanded`: `PASS`, `+586`.
 
-Prova publica inicial em `e5d8d8a26d6692f0d038bdf05d1778ade2b43759`:
+Prova publica:
 
-- probe sanitizado de `Velomachus Lorehold` sem profile exato retornou
+- em `e5d8d8a26d6692f0d038bdf05d1778ade2b43759`, probe sanitizado de
+  `Velomachus Lorehold` sem profile exato retornou
   `archetype_reference_used=true`, `archetype_candidate_count=48`, fontes
   `Lorehold, the Historian` e `Quintorius, History Chaser`, e validacao OK;
-- a rodada tambem expôs bug de fallback: quando a OpenAI excedia timeout, o
+- essa rodada tambem expôs bug de fallback: quando a OpenAI excedia timeout, o
   fallback deterministico preservava diagnostics de arquetipo mas retornava
   `Isamaru, Hound of Konda`;
 - o handler foi corrigido para preservar `commander_name` no fallback
   deterministico sem profile exato, resolvendo o comandante no banco antes de
-  montar o seed com terrenos basicos.
+  montar o seed com terrenos basicos;
+- em `637054b9a706b0a232bab7fab72cc21c0db6ecd7`, novo probe sanitizado com
+  cache bypass retornou `commander_returned=Velomachus Lorehold`,
+  `commander_preserved=true`, `main_quantity=99`, `validation_is_valid=true`,
+  `archetype_reference_used=true`, `archetype_candidate_count=48` e sources
+  `Lorehold, the Historian`/`Quintorius, History Chaser`.
 
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_REUSE_2026-05-11.md`.
 
-Status: `PASS WITH RISKS`. O patch de preservacao do comandante no fallback
-precisa de deploy publico e novo probe para fechar a prova runtime completa.
+Status: `PASS WITH RISKS`. A prova publica fechou diagnostics de arquetipo e
+preservacao do comandante no fallback. Risco restante: ainda falta uma amostra
+em que a OpenAI responda dentro do timeout para avaliar qualidade tematica do
+deck completo, nao apenas fallback deterministico valido.

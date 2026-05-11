@@ -49,7 +49,7 @@ confiança, nao como lista fixa.
 | `cd server && dart analyze lib routes test` | PASS |
 | `cd server && dart test -r expanded` | PASS, `+586` |
 
-## Prova publica inicial
+## Prova publica
 
 Depois do deploy publico em `e5d8d8a26d6692f0d038bdf05d1778ade2b43759`, foi
 rodado probe sanitizado para `Velomachus Lorehold`, sem profile exato, com
@@ -72,10 +72,31 @@ arquetipo mas retornava `Isamaru, Hound of Konda` como comandante. O handler foi
 ajustado para resolver e preservar `commander_name` tambem no fallback
 deterministico sem profile exato.
 
+Depois do deploy publico em `637054b9a706b0a232bab7fab72cc21c0db6ecd7`, o
+probe sanitizado foi repetido com cache bypass. Resultado final:
+
+- `status=200`;
+- `commander_requested=Velomachus Lorehold`;
+- `commander_returned=Velomachus Lorehold`;
+- `commander_preserved=true`;
+- `main_quantity=99`;
+- `validation_is_valid=true`;
+- `reference_profile_used=false`;
+- `reference_card_stats_used=false`;
+- `archetype_reference_used=true`;
+- `archetype_candidate_count=48`;
+- `archetype_source_commanders=[Lorehold, the Historian, Quintorius, History Chaser]`;
+- `warning_code=openai_timeout_deterministic_fallback`.
+
+Leitura: mesmo quando a OpenAI excedeu o timeout, o fallback deterministico
+preservou o comandante pedido e manteve os diagnostics de arquetipo.
+
 ## Riscos e limites
 
-- A prova publica confirmou diagnostics de arquetipo, mas o patch de preservacao
-  do comandante no fallback ainda precisa de deploy publico e novo probe.
+- A prova publica confirmou diagnostics de arquetipo e preservacao do
+  comandante no fallback, mas a geracao com resposta OpenAI completa para esse
+  comandante ainda nao foi observada porque a rodada caiu no fallback por
+  timeout.
 - O fallback por arquétipo nao garante que todo comandante "parecido" usara
   Lorehold; ele precisa resolver identidade de cor e ter match de prompt/tema.
 - O avaliador `reference_deck_evaluation` continua reservado para profile exato.
@@ -83,7 +104,6 @@ deterministico sem profile exato.
 
 ## Proximo passo recomendado
 
-Depois do deploy do patch de fallback, repetir o probe de `Velomachus Lorehold`
-para confirmar simultaneamente `archetype_reference_used=true`,
-`commander_returned=Velomachus Lorehold`, 100 cartas, 0 off-identity e validacao
-OK.
+Rodar uma nova amostra quando a OpenAI responder dentro do timeout para avaliar
+a qualidade tematica do deck completo gerado por IA, nao apenas o fallback
+deterministico valido.
