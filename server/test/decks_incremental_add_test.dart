@@ -209,6 +209,39 @@ void main() {
         .toList();
   }
 
+  Future<List<Map<String, dynamic>>> fetchPickerPrintings(
+    String token,
+    String name,
+  ) async {
+    final response = await http.get(
+      Uri.parse(
+        '$baseUrl/cards/printings?name=${Uri.encodeQueryComponent(name)}&limit=50&sync=true',
+      ),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch picker printings: ${response.body}');
+    }
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final rows =
+        ((data['data'] as List?) ?? const []).whereType<Map<String, dynamic>>();
+    final uniqueById = <String, Map<String, dynamic>>{};
+    for (final row in rows) {
+      final id = row['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+      uniqueById.putIfAbsent(id, () => row);
+    }
+    return uniqueById.values.toList();
+  }
+
+  Iterable<Map> flattenMainBoard(Map<String, dynamic> deck) {
+    final mainBoard = (deck['main_board'] as Map?) ?? const {};
+    return mainBoard.values
+        .whereType<List>()
+        .expand((items) => items)
+        .whereType<Map>();
+  }
+
   setUpAll(() async {
     await Future.delayed(const Duration(milliseconds: 200));
   });
@@ -463,6 +496,89 @@ void main() {
           .whereType<Map>();
       expect(flattenedMain.any((card) => card['id'] == firstId), isFalse);
       expect(flattenedMain.any((card) => card['id'] == secondId), isFalse);
+    },
+    skip: skipIntegration,
+  );
+
+  test(
+    'Lorehold, the Historian picker options should all preserve commander slot',
+    () async {
+      final token = await getAuthToken();
+      const commanderName = 'Lorehold, the Historian';
+      final printings = await fetchPickerPrintings(token, commanderName);
+
+      expect(
+        printings,
+        hasLength(greaterThanOrEqualTo(2)),
+        reason:
+            'Lorehold should expose multiple picker options for edition selection.',
+      );
+
+      for (final printing in printings) {
+        expect(printing['name'], commanderName);
+        expect(isCommanderEligible(printing), isTrue);
+        expect(
+          identityOf(printing).map((e) => e.toUpperCase()).toSet(),
+          containsAll(<String>{'R', 'W'}),
+        );
+        expect((printing['set_code'] ?? '').toString().trim(), isNotEmpty);
+        expect(
+          (printing['collector_number'] ?? '').toString().trim(),
+          isNotEmpty,
+        );
+        expect(printing.containsKey('foil'), isTrue);
+        expect((printing['rarity'] ?? '').toString().trim(), isNotEmpty);
+      }
+
+      final deckId = await createDeck(token, format: 'commander');
+      final firstId = printings.first['id'] as String;
+      final addCommanderRes = await addCard(
+        token,
+        deckId: deckId,
+        cardId: firstId,
+        quantity: 1,
+        isCommander: true,
+      );
+      expect(addCommanderRes.statusCode, equals(200),
+          reason: addCommanderRes.body);
+
+      for (final option in printings) {
+        final optionId = option['id'] as String;
+        final setRes = await setCardQuantity(
+          token,
+          deckId: deckId,
+          cardId: optionId,
+          quantity: 1,
+          isCommander: true,
+          replaceSameName: true,
+        );
+        expect(setRes.statusCode, equals(200), reason: setRes.body);
+
+        final deck = await fetchDeck(token, deckId);
+        final commanderCards =
+            ((deck['commander'] as List?) ?? const []).cast<Map>();
+        expect(commanderCards, hasLength(1));
+        expect(commanderCards.single['id'], optionId);
+        expect(commanderCards.single['name'], commanderName);
+        expect(
+          (commanderCards.single['set_code'] ?? '').toString().toLowerCase(),
+          (option['set_code'] ?? '').toString().toLowerCase(),
+        );
+        expect(
+          commanderCards.single['collector_number']?.toString(),
+          option['collector_number']?.toString(),
+        );
+        expect(commanderCards.single['foil'], option['foil']);
+
+        final mainCards = flattenMainBoard(deck);
+        expect(mainCards.any((card) => card['name'] == commanderName), isFalse);
+        for (final printing in printings) {
+          expect(
+            mainCards.any((card) => card['id'] == printing['id']),
+            isFalse,
+          );
+        }
+      }
     },
     skip: skipIntegration,
   );

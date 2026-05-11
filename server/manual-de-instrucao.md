@@ -12734,3 +12734,29 @@ Ao adicionar novo teste, nao recriar helpers locais de polling sem motivo
 explicito. Se o teste ainda precisar de `find.byType(TextField)` ou texto para
 executar uma acao critica, registrar o fallback no `UI_TEST_SURFACE_MAP.md` e
 adicionar a menor `Key` possivel na tela.
+
+## 101. Lorehold commander edition regression - 2026-05-11
+
+Foi adicionada regressao live em `server/test/decks_incremental_add_test.dart`
+para `Lorehold, the Historian`.
+
+Contrato validado:
+
+- `/cards/printings?name=Lorehold%2C%20the%20Historian&limit=50&sync=true`
+  deve retornar multiplas opcoes unicas para o picker;
+- cada opcao precisa ser elegivel como comandante, manter identidade `R/W` e
+  expor metadados de edicao (`set_code`, `collector_number`, chave `foil` e
+  `rarity`);
+- `POST /decks/:id/cards/set` com `is_commander=true` e
+  `replace_same_name=true` deve aceitar cada opcao retornada;
+- apos cada troca, o deck deve conter exatamente um comandante e nenhuma
+  impressao de `Lorehold, the Historian` em `main_board`.
+
+Comando validado contra backend publico:
+
+```bash
+cd server
+TEST_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart test test/decks_incremental_add_test.dart --tags live --plain-name 'Lorehold, the Historian picker options should all preserve commander slot' -r expanded
+```
+
+Resultado: `PASS`, `+1`, `All tests passed!`.

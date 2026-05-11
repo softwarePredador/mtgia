@@ -20,6 +20,8 @@ fora do escopo.
 - `cd server && PORT=8082 dart run .dart_frog/server.dart`
 - `curl -fsS http://127.0.0.1:8082/health`
 - `cd server && TEST_API_BASE_URL=http://127.0.0.1:8082 dart test test/cards_route_test.dart test/sets_route_test.dart test/decks_incremental_add_test.dart test/binder_route_test.dart -r expanded`
+- `cd server && dart analyze routes/decks routes/cards test/decks_incremental_add_test.dart`
+- `cd server && TEST_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart test test/decks_incremental_add_test.dart --tags live --plain-name 'Lorehold, the Historian picker options should all preserve commander slot' -r expanded`
 
 ## Affected files
 
@@ -69,6 +71,26 @@ optional `collector_number`, `foil`, `set_name` and `set_release_date` in card
 rows so deck card review and Card Detail can show edition identity consistently.
 `server/doc/API_CONTRACTS_AND_DATA_MAP.md` was updated.
 
+## Addendum 2026-05-11 - Lorehold commander edition options
+
+Added a live backend regression test for `Lorehold, the Historian` covering the
+same picker contract used by the app:
+
+- fetches `/cards/printings?name=Lorehold%2C%20the%20Historian&limit=50&sync=true`;
+- requires multiple unique picker options;
+- verifies every option is commander-eligible and has visible edition metadata
+  (`set_code`, `collector_number`, `foil` key and `rarity`);
+- verifies Boros color identity (`R/W`) for each option;
+- creates a Commander deck, adds Lorehold as commander, then iterates through
+  every returned picker option using `POST /decks/:id/cards/set` with
+  `is_commander=true` and `replace_same_name=true`;
+- after every replacement, verifies exactly one commander remains and no
+  Lorehold printing appears in `main_board`.
+
+Result against public backend:
+
+- `PASS`, `+1`, `All tests passed!`.
+
 ## Visual findings
 
 - Edition metadata is visible before confirmation in search/add, deck edit and
@@ -81,7 +103,9 @@ rows so deck card review and Card Detail can show edition identity consistently.
 
 ## Remaining risks
 
-- Device runtime proof on iPhone 15/Android was not requested and was not run.
+- Device runtime proof on iPhone 15/Android for the visual picker was not
+  requested and was not run in this addendum; the backend contract behind all
+  Lorehold picker options was proven live.
 - Binder server coverage added in this pass is an offline source contract guard;
   the deck mutation path received the live backend proof on `127.0.0.1:8082`.
 - Scanner/camera/OCR/MLKit were intentionally not tested.
