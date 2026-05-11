@@ -2,7 +2,25 @@
 
 ## Status
 
-Resultado: **PASS WITH RISKS**.
+Resultado: **PASS** para Android FCM real no `SM A135M` e **PASS WITH RISKS**
+para iPhone 15 Simulator, onde APNs/FCM real segue dependente de provisioning.
+
+### Atualizacao Android FCM real - 2026-05-11
+
+- Device: `SM A135M`, adb `R58T300SREH`, Android 14/API 34.
+- Backend publico:
+  `https://evolution-cartinhas.8ktevp.easypanel.host`.
+- Backend `/health`: `healthy`,
+  `git_sha=70303922a57bd1d2f91115f5cb5977ee8c3c123d`.
+- Foreground real: `direct_message` entregue via FCM, callback recebido e
+  badge/lista/inbox atualizados.
+- Background/tap real: app enviado para home, novo evento criado via segundo
+  usuario QA/API publica, notificacao Android chegou no canal
+  `manaloom_notifications`, tap navegou para `/messages/:conversationId`.
+- Ajustes app-side: `POST_NOTIFICATIONS`, canal nativo
+  `manaloom_notifications` e harness host-assisted para background real.
+- Handoff:
+  `app/doc/runtime_flow_handoffs/push_delivery_android_sm_a135m_2026-05-11.md`.
 
 ## Escopo
 

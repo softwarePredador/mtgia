@@ -3,6 +3,41 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Prova Android FCM real no SM A135M
+
+### O Porquê
+- A rodada anterior de realtime notifications provava o coordenador e payload
+  no iPhone 15 Simulator, mas APNs/FCM real seguia como risco ambiental.
+- O objetivo desta validacao foi fechar a prova no Android fisico `SM A135M`
+  (`R58T300SREH`) usando o backend publico, sem expor token FCM, JWT, senha ou
+  payload sensivel.
+
+### O Como
+- O app passou a declarar `android.permission.POST_NOTIFICATIONS` para Android
+  13+.
+- `MainActivity` agora cria o canal nativo `manaloom_notifications`, o mesmo
+  `channel_id` usado pelo backend ao enviar FCM Android.
+- Foi adicionado `android_fcm_delivery_runtime_test.dart` para provar token,
+  foreground e tap real. O harness espera um gatilho externo para a etapa de
+  background, porque o device precisa ir para home antes de o segundo usuario QA
+  criar a nova `direct_message` real via API.
+- A prova foi executada contra
+  `https://evolution-cartinhas.8ktevp.easypanel.host`, com dois usuarios QA
+  descartaveis e sem registrar senha, JWT ou token completo nos artefatos.
+
+### Resultado
+- Device: `SM A135M`, adb `R58T300SREH`, Android 14/API 34.
+- Backend `/health`: `healthy`,
+  `git_sha=70303922a57bd1d2f91115f5cb5977ee8c3c123d`.
+- `PUT /users/me/fcm-token` retornou `200` e os logs registraram apenas
+  `token_present=true`.
+- Foreground real: `direct_message` chegou por FCM e atualizou badge/listas.
+- Background/tap real: notificacao Android no canal `manaloom_notifications`
+  chegou; o tap disparou `FCM_TAP_CALLBACK type=direct_message` e navegou para
+  `/messages/:conversationId`.
+- Handoff:
+  `app/doc/runtime_flow_handoffs/push_delivery_android_sm_a135m_2026-05-11.md`.
+
 ## 2026-05-11 — Realtime Notifications & Badges
 
 ### O Porquê
