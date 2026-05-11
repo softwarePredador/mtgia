@@ -688,6 +688,7 @@ class DeckProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> generateDeck({
     required String prompt,
     required String format,
+    String? commanderName,
     GenerateDeckProgressCallback? onProgress,
     GenerateDeckCancellation? cancellation,
     Duration pollTimeout = const Duration(seconds: 90),
@@ -696,6 +697,7 @@ class DeckProvider extends ChangeNotifier {
     _apiClient,
     prompt: prompt,
     format: format,
+    commanderName: commanderName,
     onProgress: onProgress,
     cancellation: cancellation,
     pollTimeout: pollTimeout,

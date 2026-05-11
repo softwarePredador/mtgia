@@ -168,6 +168,7 @@ de animação.
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
 |---|---|---|---|---|
 | Formato do deck | `DeckGenerateScreen` | `deck-generate-format-field` | Seleciona formato. | Seleção por key. |
+| Comandante opcional | `DeckGenerateScreen` | `deck-generate-commander-field` | Envia `commander_name` para `/ai/generate` em Commander/Brawl quando preenchido, preservando omissão no legado. | `enterText` por key + validar payload do provider/API. |
 | Prompt | `DeckGenerateScreen` | `deck-generate-prompt-field` | Descreve deck. | `enterText` por key. |
 | Gerar | `DeckGenerateScreen` | `deck-generate-submit-button` | Dispara `/ai/generate` sync/async. | Tap por key + polling. |
 | Nome do deck gerado | `DeckGenerateScreen` | `deck-generate-name-field` | Edita nome antes de salvar. | `enterText` por key. |

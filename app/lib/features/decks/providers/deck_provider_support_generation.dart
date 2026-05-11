@@ -208,12 +208,16 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
   ApiClient apiClient, {
   required String prompt,
   required String format,
+  String? commanderName,
   GenerateDeckProgressCallback? onProgress,
   GenerateDeckCancellation? cancellation,
   Duration pollTimeout = const Duration(seconds: 90),
   Duration? pollInterval,
 }) async {
   final normalizedFormat = format.trim().toLowerCase();
+  final normalizedCommanderName = _normalizeGenerateCommanderName(
+    commanderName,
+  );
   _throwIfGenerateCancelled(cancellation);
   onProgress?.call(
     const GenerateDeckProgressSnapshot(
@@ -227,6 +231,8 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
     'prompt': prompt,
     'format': normalizedFormat,
     'async': true,
+    if (normalizedCommanderName != null)
+      'commander_name': normalizedCommanderName,
   });
 
   _throwIfGenerateCancelled(cancellation);
@@ -254,6 +260,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
         apiClient,
         prompt: prompt,
         normalizedFormat: normalizedFormat,
+        commanderName: normalizedCommanderName,
         reason: 'missing_job_contract',
       );
     }
@@ -283,6 +290,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       jobId: jobId,
       prompt: prompt,
       normalizedFormat: normalizedFormat,
+      commanderName: normalizedCommanderName,
       cancellation: cancellation,
       onProgress: onProgress,
       timeout: pollTimeout,
@@ -302,6 +310,7 @@ Future<Map<String, dynamic>> generateDeckFromPrompt(
       apiClient,
       prompt: prompt,
       normalizedFormat: normalizedFormat,
+      commanderName: normalizedCommanderName,
       reason: 'async_not_supported',
     );
   }
@@ -328,12 +337,14 @@ Future<Map<String, dynamic>> _generateDeckSyncFallback(
   ApiClient apiClient, {
   required String prompt,
   required String normalizedFormat,
+  required String? commanderName,
   required String reason,
 }) async {
   AppLogger.info('[DeckGenerate] falling back to sync generate reason=$reason');
   final response = await apiClient.post('/ai/generate', {
     'prompt': prompt,
     'format': normalizedFormat,
+    if (commanderName != null) 'commander_name': commanderName,
   });
 
   final data = _tryParseLegacyGenerateResponse(response);
@@ -350,6 +361,7 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
   required String jobId,
   required String prompt,
   required String normalizedFormat,
+  required String? commanderName,
   required GenerateDeckCancellation? cancellation,
   required GenerateDeckProgressCallback? onProgress,
   required Duration timeout,
@@ -377,6 +389,7 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
         apiClient,
         prompt: prompt,
         normalizedFormat: normalizedFormat,
+        commanderName: commanderName,
         reason: 'poll_not_supported',
       );
     }
@@ -486,6 +499,14 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
     'timeout_ms': timeout.inMilliseconds,
   });
   throw const GenerateDeckTimeoutException();
+}
+
+String? _normalizeGenerateCommanderName(String? commanderName) {
+  final trimmed = commanderName?.trim();
+  if (trimmed == null || trimmed.isEmpty) {
+    return null;
+  }
+  return trimmed;
 }
 
 Map<String, dynamic> _asStringMap(dynamic value) {

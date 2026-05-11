@@ -3,6 +3,50 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Consumo mobile do Commander Reference Profile Lorehold
+
+### O Porquê
+- O backend publico ja estava no commit `87d9b7c` com suporte a
+  `commander_name`, mas o fluxo mobile de gerar deck ainda nao enviava o nome do
+  comandante; assim o profile Lorehold nao seria usado de verdade pelo app.
+- O piloto precisava manter compatibilidade com respostas antigas de
+  `/ai/generate`, preservar o fluxo async/sync fallback e nao tocar em
+  Scanner/camera/OCR/MLKit.
+
+### O Como
+- `DeckGenerateScreen` passou a exibir o campo opcional
+  `deck-generate-commander-field` apenas para Commander/Brawl. Quando preenchido,
+  o valor trimado e repassado ao provider; quando vazio ou em outros formatos, o
+  app continua omitindo `commander_name`.
+- `DeckProvider.generateDeck` e `generateDeckFromPrompt` agora aceitam
+  `commanderName` opcional. O payload async envia `commander_name` quando
+  presente, e os fallbacks sync por contrato ausente/async unsupported/poll
+  unsupported preservam o mesmo campo sem enviar `async`.
+- `deck_provider_test.dart` cobre o payload Lorehold/commander_name em async e
+  fallback sync; `deck_runtime_widget_flow_test.dart` cobre o campo UI por key e
+  o envio pelo provider em fluxo widget.
+- `UI_TEST_SURFACE_MAP.md`, `API_CONTRACTS_AND_DATA_MAP.md`,
+  `APP_AUDIT_2026-04-29.md` e o handoff QA foram atualizados com o contrato.
+
+### Resultado
+- Backend publico `/health`: `healthy`,
+  `git_sha=87d9b7c3814ea07c3e89d718976fb694efd57d1d`; `/health/git_sha`
+  retornou 404, entao o SHA foi lido do payload de `/health`.
+- Prova publica sanitizada de `/ai/generate` com
+  `commander_name=Lorehold, the Historian`: async `202`, polling concluiu, e o
+  resultado trouxe `diagnostics.reference_profile_used=true`,
+  `profile_confidence=high`, `source_count=4`, 100 cartas, Lorehold fora das 99,
+  identidade R/W e `validation.is_valid=true`.
+- Validacao app: `flutter analyze lib/features/decks test/features/decks
+  integration_test/lorehold_commander_edition_android_runtime_test.dart
+  --no-version-check` PASS e `flutter test test/features/decks
+  --no-version-check` PASS (`+156`).
+- Runtime fisico no `SM A135M` / `R58T300SREH`: **BLOCKED**, porque o device nao
+  apareceu em `flutter devices` nem em `adb devices -l`; somente iPhone 15
+  Simulator/macOS/Chrome foram listados no segundo discovery. Sem screenshots.
+- Evidencias: `docs/qa/manaloom_lorehold_commander_flow_2026-05-11.md` e
+  `app/doc/runtime_flow_handoffs/lorehold_commander_flow_android_sm_a135m_2026-05-11.md`.
+
 ## 2026-05-11 — Commander Reference Profile v1 para Lorehold em /ai/generate
 
 ### O Porquê

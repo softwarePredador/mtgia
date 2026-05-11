@@ -323,6 +323,7 @@ void main() {
           '/ai/generate': (body) {
             expect(body['format'], 'commander');
             expect(body['async'], isTrue);
+            expect(body['commander_name'], 'Talrand, Sky Summoner');
             expect(
               body['prompt'],
               'Talrand commander de spellslinger azul com instants baratos',
@@ -536,6 +537,10 @@ void main() {
       await tester.enterText(
         find.byKey(const Key('deck-generate-prompt-field')),
         'Talrand commander de spellslinger azul com instants baratos',
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-generate-commander-field')),
+        'Talrand, Sky Summoner',
       );
       final generateProposalButton = find.byKey(
         const Key('deck-generate-submit-button'),

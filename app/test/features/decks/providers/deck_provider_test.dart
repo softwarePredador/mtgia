@@ -407,6 +407,39 @@ void main() {
       },
     );
 
+    test(
+      'generateDeck sends optional commander_name to async and sync fallback',
+      () async {
+        var postCount = 0;
+        final apiClient = _FakeApiClient(
+          postHandlers: {
+            '/ai/generate': (body) {
+              postCount += 1;
+              expect(body['prompt'], 'Boros miracle big spells');
+              expect(body['format'], 'commander');
+              expect(body['commander_name'], 'Lorehold, the Historian');
+              if (postCount == 1) {
+                expect(body['async'], isTrue);
+                return ApiResponse(400, {'error': 'async unsupported'});
+              }
+              expect(body.containsKey('async'), isFalse);
+              return ApiResponse(200, generatedDeckPayload());
+            },
+          },
+        );
+        final provider = DeckProvider(apiClient: apiClient);
+
+        final result = await provider.generateDeck(
+          prompt: 'Boros miracle big spells',
+          format: 'Commander',
+          commanderName: '  Lorehold, the Historian  ',
+        );
+
+        expect(result['generated_deck'], isA<Map>());
+        expect(apiClient.postCalls, equals(['/ai/generate', '/ai/generate']));
+      },
+    );
+
     test('generateDeck retries async polling after 429 rate limit', () async {
       var pollCount = 0;
       final progressMessages = <String>[];

@@ -19,6 +19,7 @@ class DeckGenerateScreen extends StatefulWidget {
 
 class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   final _promptController = TextEditingController();
+  final _commanderController = TextEditingController();
   final _deckNameController = TextEditingController();
   final _scrollController = ScrollController();
   final _previewKey = GlobalKey();
@@ -51,6 +52,17 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     return null;
   }
 
+  bool get _usesCommanderField {
+    final normalized = _selectedFormat.trim().toLowerCase();
+    return normalized == 'commander' || normalized == 'brawl';
+  }
+
+  String? _selectedCommanderName() {
+    if (!_usesCommanderField) return null;
+    final value = _commanderController.text.trim();
+    return value.isEmpty ? null : value;
+  }
+
   final List<String> _formats = [
     'Commander',
     'Brawl',
@@ -75,6 +87,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   void dispose() {
     _generateCancellation?.cancel();
     _promptController.dispose();
+    _commanderController.dispose();
     _deckNameController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -106,6 +119,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       final result = await context.read<DeckProvider>().generateDeck(
         prompt: _promptController.text.trim(),
         format: _selectedFormat,
+        commanderName: _selectedCommanderName(),
         cancellation: cancellation,
         onProgress: (progress) {
           if (!mounted || _generateCancellation != cancellation) return;
@@ -357,6 +371,28 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               },
             ),
             const SizedBox(height: 24),
+            if (_usesCommanderField) ...[
+              Text(
+                'Comandante (opcional):',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                key: const Key('deck-generate-commander-field'),
+                controller: _commanderController,
+                decoration: InputDecoration(
+                  hintText: 'Ex: Lorehold, the Historian',
+                  helperText:
+                      'Use quando quiser guiar a geração por um comandante específico.',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  ),
+                  filled: true,
+                  fillColor: theme.colorScheme.surface,
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // Prompt Input
             Text('Descreva seu deck:', style: theme.textTheme.titleMedium),
