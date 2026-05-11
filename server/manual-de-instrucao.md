@@ -12760,3 +12760,36 @@ TEST_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart test te
 ```
 
 Resultado: `PASS`, `+1`, `All tests passed!`.
+
+## 102. Lorehold commander Android runtime proof - 2026-05-11
+
+Foi criado `app/integration_test/lorehold_commander_edition_android_runtime_test.dart`
+para validar no Android fisico `SM A135M` (`R58T300SREH`) que o picker visual de
+edicoes de `Lorehold, the Historian` mostra metadados suficientes e troca a
+edicao do comandante sem inserir uma copia nas 99 cartas.
+
+Comando de runtime validado no SM A135M:
+
+```bash
+cd app
+flutter test integration_test/lorehold_commander_edition_android_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+```
+
+Validados nesta etapa:
+
+- `cd app && flutter analyze integration_test/lorehold_commander_edition_android_runtime_test.dart --no-version-check`: `PASS`;
+- `cd app && flutter analyze lib test integration_test --no-version-check`: `PASS`;
+- `cd app && flutter build apk --debug --no-version-check`: `PASS`;
+- `cd app && flutter test test --no-version-check`: `PASS`, `+559`.
+- `cd app && flutter test integration_test/lorehold_commander_edition_android_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check`: `PASS`, `00:39 +1`, `All tests passed!`.
+
+Status fisico: `PASS`. O runtime registrou `LOREHOLD_ANDROID_OPTIONS 2`,
+capturou marcadores visuais de busca/detalhe/picker e terminou com
+`LOREHOLD_ANDROID_RUNTIME_RESULT PASS`.
+
+Antes de reexecutar com agentes, confirmar:
+
+```bash
+adb devices -l
+flutter devices --no-version-check
+```

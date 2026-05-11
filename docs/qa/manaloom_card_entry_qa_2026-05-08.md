@@ -91,6 +91,51 @@ Result against public backend:
 
 - `PASS`, `+1`, `All tests passed!`.
 
+## Addendum 2026-05-11 - Android runtime proof for SM A135M
+
+Added `app/integration_test/lorehold_commander_edition_android_runtime_test.dart`
+to compile and run the Lorehold commander edition flow on Android/SM A135M.
+
+The harness:
+
+- registers a disposable QA user against the configured API;
+- fetches all `/cards/printings` options for `Lorehold, the Historian`;
+- verifies picker metadata before UI interaction;
+- creates a Commander deck and adds Lorehold as commander;
+- opens the app UI, confirms Lorehold edition metadata is visible in search and
+  deck detail;
+- opens the deck card edition picker, selects each alternate printing, and
+  verifies `Edição atualizada.`;
+- verifies after every change that exactly one commander remains and no Lorehold
+  printing was added to `main_board`;
+- captures visual proof markers through the shared runtime helpers.
+
+Command prepared for SM A135M:
+
+```bash
+cd app
+flutter test integration_test/lorehold_commander_edition_android_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check
+```
+
+Validation completed in this pass:
+
+- `dart format integration_test/lorehold_commander_edition_android_runtime_test.dart`: `PASS`;
+- `flutter analyze integration_test/lorehold_commander_edition_android_runtime_test.dart --no-version-check`: `PASS`;
+- `flutter analyze lib test integration_test --no-version-check`: `PASS`;
+- `flutter build apk --debug --no-version-check`: `PASS`, built
+  `build/app/outputs/flutter-apk/app-debug.apk`;
+- `flutter test test --no-version-check`: `PASS`, `+559`;
+- `flutter test integration_test/lorehold_commander_edition_android_runtime_test.dart -d R58T300SREH --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --reporter expanded --no-version-check`: `PASS`, `00:39 +1`, `All tests passed!`.
+
+Physical runtime status:
+
+- `PASS` on `SM A135M` / `R58T300SREH` / Android 14 against the public backend;
+- the run printed `LOREHOLD_ANDROID_OPTIONS 2` and
+  `LOREHOLD_ANDROID_RUNTIME_RESULT PASS`;
+- visual proof markers were captured for search edition visibility, deck detail
+  before edition change, picker option visibility and deck detail after all
+  changes.
+
 ## Visual findings
 
 - Edition metadata is visible before confirmation in search/add, deck edit and
@@ -103,9 +148,7 @@ Result against public backend:
 
 ## Remaining risks
 
-- Device runtime proof on iPhone 15/Android for the visual picker was not
-  requested and was not run in this addendum; the backend contract behind all
-  Lorehold picker options was proven live.
+- Android runtime proof for the visual Lorehold picker passed on `SM A135M`.
 - Binder server coverage added in this pass is an offline source contract guard;
   the deck mutation path received the live backend proof on `127.0.0.1:8082`.
 - Scanner/camera/OCR/MLKit were intentionally not tested.
