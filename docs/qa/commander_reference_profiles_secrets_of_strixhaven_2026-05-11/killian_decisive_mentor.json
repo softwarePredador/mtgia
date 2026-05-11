@@ -1,0 +1,156 @@
+{
+  "version": "secrets_of_strixhaven_killian_decisive_mentor_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Killian, Decisive Mentor",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "B",
+    "W"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary BW creature with aura/enchantment and goad text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "WotC/Playgroup set context supports the Secrets of Strixhaven Commander release."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/4/killian-decisive-mentor",
+    "https://edhrec.com/commanders/killian-decisive-mentor",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Do not merge this card with older Killian spell-discount Voltron assumptions.",
+    "No copied decklist or unofficial runtime dependency."
+  ],
+  "themes": [
+    {
+      "name": "orzhov_aura_politics",
+      "confidence": "high",
+      "notes": "Enchantments entering tap and goad creatures, creating political pressure."
+    },
+    {
+      "name": "enchanted_attack_draw",
+      "confidence": "high",
+      "notes": "Auras on creatures that attack become a repeatable card-draw engine."
+    },
+    {
+      "name": "enchantress_and_aura_recursion",
+      "confidence": "medium_high",
+      "notes": "The deck needs enough auras plus recursion/protection to avoid running out of material."
+    },
+    {
+      "name": "distributed_voltron",
+      "confidence": "medium",
+      "notes": "Spread auras across evasive or resilient attackers instead of going all-in on one threat."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 34,
+      "max": 37
+    },
+    "auras": {
+      "min": 16,
+      "max": 24
+    },
+    "enchantment_creature_payoffs": {
+      "min": 8,
+      "max": 13
+    },
+    "evasive_attackers": {
+      "min": 8,
+      "max": 12
+    },
+    "draw_engines": {
+      "min": 7,
+      "max": 11
+    },
+    "recursion_protection": {
+      "min": 6,
+      "max": 10
+    },
+    "interaction": {
+      "min": 6,
+      "max": 10
+    }
+  },
+  "expected_packages": {
+    "aura_core": [
+      "Ethereal Armor",
+      "All That Glitters",
+      "Kaya's Ghostform",
+      "Spirit Mantle",
+      "Unquestioned Authority",
+      "Gift of Immortality",
+      "Angelic Gift",
+      "Hyena Umbra",
+      "Parasitic Impetus",
+      "Vow of Duty",
+      "Vow of Malice"
+    ],
+    "enchantress_draw_payoffs": [
+      "Sram, Senior Edificer",
+      "Kor Spiritdancer",
+      "Mesa Enchantress",
+      "Doomwake Giant",
+      "Archon of Sun's Grace",
+      "Hateful Eidolon",
+      "Grim Guardian",
+      "Starfield Mystic"
+    ],
+    "tutors_recursion_protection": [
+      "Open the Armory",
+      "Hall of Heliod's Generosity",
+      "Retether",
+      "Replenish",
+      "Sevinne's Reclamation",
+      "Selfless Spirit",
+      "Teferi's Protection",
+      "Flawless Maneuver"
+    ],
+    "aura_based_interaction": [
+      "Darksteel Mutation",
+      "Minimus Containment",
+      "Dead Weight",
+      "Mire's Grasp",
+      "Pacifism",
+      "Demonic Vigor"
+    ],
+    "evasive_or_resilient_attackers": [
+      "Light-Paws, Emperor's Voice",
+      "Danitha Capashen, Paragon",
+      "Healer's Hawk",
+      "Vault Skirge",
+      "Adanto Vanguard"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "old_killian_spell_discount_contamination",
+      "examples": [
+        "targeting-spell discount Voltron shell"
+      ],
+      "reason": "This profile is for Killian, Decisive Mentor, not older Killian variants."
+    },
+    {
+      "pattern": "single_threat_all_in_voltron",
+      "examples": [
+        "one huge creature with no backup attackers or recursion"
+      ],
+      "reason": "The attack draw trigger is safer when distributed across resilient attackers."
+    },
+    {
+      "pattern": "low_aura_density",
+      "examples": [
+        "enchantment deck with few Auras"
+      ],
+      "reason": "The commander specifically rewards enchanted attacking creatures."
+    }
+  ]
+}

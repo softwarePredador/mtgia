@@ -1,0 +1,159 @@
+{
+  "version": "secrets_of_strixhaven_dina_essence_brewer_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Dina, Essence Brewer",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "B",
+    "G"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary BG creature.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "WotC/Playgroup set context supports the Secrets of Strixhaven Commander release."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/1/dina-essence-brewer",
+    "https://edhrec.com/commanders/dina-essence-brewer",
+    "https://edhrec.com/articles/a-new-commander-brew-with-dina-essence-brewer/",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Do not merge this card with older Dina lifegain-drain assumptions.",
+    "No decklist was copied."
+  ],
+  "themes": [
+    {
+      "name": "golgari_sacrifice_once_per_turn_draw",
+      "confidence": "high",
+      "notes": "Dina draws from creature sacrifice only once each turn, so repeatable sacrifice across turns matters more than one huge sacrifice chain."
+    },
+    {
+      "name": "high_power_sacrifice_lifegain_counters",
+      "confidence": "high",
+      "notes": "The activated ability rewards sacrificing a high-power creature for life and +1/+1 counters."
+    },
+    {
+      "name": "fodder_recursion_engine",
+      "confidence": "high",
+      "notes": "Recursive bodies keep card draw and activated ability online."
+    },
+    {
+      "name": "aristocrats_secondary",
+      "confidence": "medium",
+      "notes": "Aristocrat payoffs are useful, but the once-per-turn trigger prevents pure spam from being the main plan."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 35,
+      "max": 38
+    },
+    "free_or_repeatable_sac_outlets": {
+      "min": 7,
+      "max": 11
+    },
+    "fodder_and_recursion": {
+      "min": 12,
+      "max": 18
+    },
+    "high_power_sacrifice_targets": {
+      "min": 4,
+      "max": 7
+    },
+    "card_draw": {
+      "min": 8,
+      "max": 12
+    },
+    "interaction": {
+      "min": 7,
+      "max": 11
+    },
+    "lifegain_counter_payoffs": {
+      "min": 4,
+      "max": 8
+    }
+  },
+  "expected_packages": {
+    "sacrifice_outlets": [
+      "Viscera Seer",
+      "Carrion Feeder",
+      "Woe Strider",
+      "Ashnod's Altar",
+      "Phyrexian Altar",
+      "Yawgmoth, Thran Physician",
+      "Greater Good"
+    ],
+    "recursive_fodder": [
+      "Reassembling Skeleton",
+      "Bloodghast",
+      "Nether Traitor",
+      "Ophiomancer",
+      "Jadar, Ghoulcaller of Nephalia",
+      "Sifter of Skulls",
+      "Pitiless Plunderer",
+      "Chatterfang, Squirrel General"
+    ],
+    "high_power_sacrifice_targets": [
+      "Lord of Extinction",
+      "Daemogoth Titan",
+      "Yargle and Multani",
+      "Ghalta, Primal Hunger",
+      "Phyrexian Dreadnought",
+      "Kokusho, the Evening Star"
+    ],
+    "lifegain_and_counter_support": [
+      "Essence Warden",
+      "Prosperous Innkeeper",
+      "The Ozolith",
+      "Hardened Scales",
+      "Winding Constrictor",
+      "Reyhan, Last of the Abzan"
+    ],
+    "recursion_and_value": [
+      "Victimize",
+      "Living Death",
+      "Reanimate",
+      "Animate Dead",
+      "Eternal Witness",
+      "Meren of Clan Nel Toth",
+      "Skullclamp"
+    ],
+    "interaction": [
+      "Beast Within",
+      "Assassin's Trophy",
+      "Putrefy",
+      "Abrupt Decay",
+      "Krosan Grip"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "older_dina_soul_steeper_contamination",
+      "examples": [
+        "lifegain-drain-only package with no creature sacrifice"
+      ],
+      "reason": "Dina, Essence Brewer has a different oracle text and incentives."
+    },
+    {
+      "pattern": "one_turn_aristocrat_spam",
+      "examples": [
+        "all sacrifice loops assuming every sacrifice draws"
+      ],
+      "reason": "The draw trigger happens only once each turn."
+    },
+    {
+      "pattern": "low_power_fodder_only",
+      "examples": [
+        "no high-power creatures for the activated ability"
+      ],
+      "reason": "The tap ability scales with sacrificed creature power."
+    }
+  ]
+}

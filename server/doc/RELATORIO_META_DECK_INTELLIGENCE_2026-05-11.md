@@ -81,3 +81,83 @@ nao foi provada nesta rodada.
    consumir perfis de referencia.
 3. Adicionar teste futuro que rejeite blue miracle/off-color e banidas de
    Commander ao recomendar cartas para Lorehold.
+
+---
+
+# Atualizacao - Commander Reference Profiles Secrets of Strixhaven Lote 1
+
+## Escopo
+
+- Data: 2026-05-11.
+- Superficie alterada: documentacao/QA apenas.
+- Codigo runtime: nao alterado.
+- Banco: nenhum apply executado.
+- Diretorio persistido:
+  `docs/qa/commander_reference_profiles_secrets_of_strixhaven_2026-05-11/`.
+
+## Veredito
+
+**PASS WITH RISKS**
+
+Foram criados 10 profiles JSON v1 para o lote 1 de Secrets of Strixhaven:
+`Lorehold, the Historian`, `Prismari, the Inspiration`,
+`Quandrix, the Proof`, `Silverquill, the Disputant`,
+`Witherbloom, the Balancer`, `Dina, Essence Brewer`,
+`Killian, Decisive Mentor`, `Rootha, Mastering the Moment`,
+`Zimone, Infinite Analyst` e `Quintorius, History Chaser`.
+
+## Fatos locais provados
+
+- O plano local define o lote 1 como cinco Elder Dragons das escolas mais cinco
+  face commanders/comandantes de maior chance de uso.
+- O seed local prova nome exato, set, type line, oracle text e color identity de
+  cada comandante.
+- `Quintorius, History Chaser` aparece no seed como planeswalker que pode ser
+  comandante.
+- Nenhum profile foi aplicado em `commander_reference_profiles` ou
+  `commander_reference_card_stats`.
+
+## Achados derivados da web
+
+- Scryfall e EDHREC fornecem contexto publico de Commander para os 10 nomes.
+- WotC e Playgroup foram usados somente como contexto publico de baixo volume
+  para o set e os comandantes SOC.
+- Draftsim corroborou o plano Commander de Lorehold.
+- Um artigo EDHREC corroborou a leitura Commander de `Dina, Essence Brewer`.
+- Relevancia cEDH: **not proven** para todos os 10.
+
+## Interpretacao estrategica
+
+- Lorehold: miracle big-spells com setup de topo/primeira compra antes de
+  haymakers.
+- Prismari: spellslinger/storm Izzet com velocidade, rituais/tesouros e payoff
+  por contagem de spells.
+- Quandrix: cascade Simic que exige curva e hits seguros, nao goodstuff generico.
+- Silverquill: casualty Orzhov com fodder, aristocrats e spells que valem copiar.
+- Witherbloom: affinity for creatures Golgari, densidade de criaturas e spells
+  grandes descontadas.
+- Dina: sacrificio uma vez por turno, recursao e alvos de alto poder para a
+  habilidade ativada.
+- Killian: Auras BW, goad politico e compra por atacantes encantados.
+- Rootha: spell grande antes do combate para token Elemental voador/haste.
+- Zimone: X-spells com +1/+1 counters, ramp e escalonamento.
+- Quintorius: cartas saindo do cemiterio para Spirits, flashback/escape e
+  protecao de planeswalker.
+
+## Padroes arriscados ou nao transferiveis
+
+- Nao tratar estes profiles como cEDH.
+- Nao copiar decklists publicas nem usar EDHREC/Playgroup/WotC como dependencia
+  runtime.
+- Nao misturar cards antigos de nomes semelhantes em Dina, Killian, Rootha ou
+  Quintorius.
+- Nao importar pacotes off-color de arquetipos genericos.
+- Nao pular validacao local de legalidade, banlist e color identity.
+
+## Menores proximas acoes tecnicas
+
+1. Rodar `server/bin/commander_reference_profile.dart --dry-run` para cada JSON.
+2. Revisar unresolved/off-color antes de qualquer apply.
+3. Aplicar somente profiles com resolucao segura e `confidence >= medium`.
+4. Fazer probes sanitizados de `/ai/generate` apos apply em pelo menos 3
+   comandantes.

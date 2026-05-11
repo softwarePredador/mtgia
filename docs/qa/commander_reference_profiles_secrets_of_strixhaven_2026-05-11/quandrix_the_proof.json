@@ -1,0 +1,157 @@
+{
+  "version": "secrets_of_strixhaven_quandrix_the_proof_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Quandrix, the Proof",
+  "confidence": "high",
+  "source_count": 3,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "G",
+    "U"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary GU Elder Dragon with cascade-granting oracle text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "No cEDH relevance was proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/218/quandrix-the-proof",
+    "https://edhrec.com/commanders/quandrix-the-proof",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no public decklist copied.",
+    "Cascade recommendations must be curve-aware and avoid bad reactive hits.",
+    "Use as Commander reference, not cEDH profile."
+  ],
+  "themes": [
+    {
+      "name": "simic_cascade_spells",
+      "confidence": "high",
+      "notes": "Instants and sorceries from hand receive cascade, making mana-value curve design central."
+    },
+    {
+      "name": "topdeck_curve_engineering",
+      "confidence": "medium_high",
+      "notes": "Topdeck setup and low-MV card quality improve cascade outcomes."
+    },
+    {
+      "name": "ramp_into_value_spells",
+      "confidence": "high",
+      "notes": "The deck wants enough ramp to cast expensive spells while still hitting useful lower-MV cascades."
+    },
+    {
+      "name": "spell_copy_value",
+      "confidence": "medium",
+      "notes": "Copy/value engines scale with high-impact spells but should not replace curve discipline."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 36,
+      "max": 39
+    },
+    "ramp": {
+      "min": 11,
+      "max": 15
+    },
+    "topdeck_selection": {
+      "min": 5,
+      "max": 8
+    },
+    "cascade_safe_low_mv_hits": {
+      "min": 12,
+      "max": 20
+    },
+    "high_impact_spells": {
+      "min": 8,
+      "max": 13
+    },
+    "interaction": {
+      "min": 6,
+      "max": 10
+    },
+    "win_conditions": {
+      "min": 4,
+      "max": 7
+    }
+  },
+  "expected_packages": {
+    "ramp_and_land_velocity": [
+      "Sol Ring",
+      "Arcane Signet",
+      "Simic Signet",
+      "Nature's Lore",
+      "Three Visits",
+      "Cultivate",
+      "Kodama's Reach",
+      "Growth Spiral",
+      "Eureka Moment",
+      "Harrow"
+    ],
+    "topdeck_and_cascade_setup": [
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Brainstorm",
+      "Ponder",
+      "Preordain",
+      "Mystic Sanctuary",
+      "Crystal Ball"
+    ],
+    "cascade_safe_value_hits": [
+      "Regrowth",
+      "Explore",
+      "Beast Within",
+      "Rapid Hybridization",
+      "Reality Shift",
+      "Arcane Denial",
+      "Growth Spiral",
+      "Frantic Search"
+    ],
+    "high_impact_cascade_spells": [
+      "Rishkar's Expertise",
+      "Sublime Epiphany",
+      "Rite of Replication",
+      "Sea Gate Restoration // Sea Gate, Reborn",
+      "Finale of Revelation",
+      "Genesis Wave",
+      "Dig Through Time",
+      "Treasure Cruise"
+    ],
+    "spell_value_payoffs": [
+      "Rashmi, Eternities Crafter",
+      "Twinning Staff",
+      "Double Major",
+      "Swarm Intelligence",
+      "Thousand-Year Elixir",
+      "Aesi, Tyrant of Gyre Strait"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "bad_cascade_hits",
+      "examples": [
+        "narrow counterspells as the only low-MV package",
+        "reactive spells that miss when cascaded at sorcery speed"
+      ],
+      "reason": "Cascade can cast cards at awkward times; low-MV hits need broad utility."
+    },
+    {
+      "pattern": "generic_simic_goodstuff_only",
+      "examples": [
+        "ramp deck with no cascade curve planning"
+      ],
+      "reason": "The commander-specific value is cascade on instants and sorceries."
+    },
+    {
+      "pattern": "cedh_assumption",
+      "examples": [
+        "fast combo shells without source proof"
+      ],
+      "reason": "Competitive Commander relevance was not proven."
+    }
+  ]
+}

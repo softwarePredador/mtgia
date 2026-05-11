@@ -1,0 +1,157 @@
+{
+  "version": "secrets_of_strixhaven_rootha_mastering_the_moment_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Rootha, Mastering the Moment",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "R",
+    "U"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary RU creature with precombat instant/sorcery payoff text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "WotC/Playgroup set context supports the Secrets of Strixhaven Commander release."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/8/rootha-mastering-the-moment",
+    "https://edhrec.com/commanders/rootha-mastering-the-moment",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Do not merge this card with older Rootha copy-spell profiles.",
+    "No copied public decklist or runtime dependency."
+  ],
+  "themes": [
+    {
+      "name": "precombat_big_spell_tokens",
+      "confidence": "high",
+      "notes": "The commander creates a flying haste Elemental at combat based on the greatest mana value spell cast that turn."
+    },
+    {
+      "name": "cost_reduction_and_treasure_setup",
+      "confidence": "high",
+      "notes": "Big precombat instants/sorceries need mana support."
+    },
+    {
+      "name": "elemental_token_finishers",
+      "confidence": "medium_high",
+      "notes": "The deck converts single large tokens into combat damage, copied tokens, or damage triggers."
+    },
+    {
+      "name": "tempo_interaction",
+      "confidence": "medium",
+      "notes": "Reactive spells are useful but should not crowd out precombat trigger reliability."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 35,
+      "max": 38
+    },
+    "precombat_instants_sorceries": {
+      "min": 18,
+      "max": 28
+    },
+    "high_mana_value_spells": {
+      "min": 8,
+      "max": 13
+    },
+    "cost_reducers_ramp": {
+      "min": 9,
+      "max": 13
+    },
+    "token_payoffs": {
+      "min": 5,
+      "max": 9
+    },
+    "protection": {
+      "min": 4,
+      "max": 7
+    },
+    "interaction": {
+      "min": 6,
+      "max": 10
+    }
+  },
+  "expected_packages": {
+    "high_mana_value_precombat_spells": [
+      "Magma Opus",
+      "Creative Outburst",
+      "Volcanic Vision",
+      "Apex of Power",
+      "Treasure Cruise",
+      "Dig Through Time",
+      "Temporal Trespass",
+      "Rousing Refrain",
+      "Brass's Bounty"
+    ],
+    "cost_reducers_and_mana": [
+      "Goblin Electromancer",
+      "Baral, Chief of Compliance",
+      "Jace's Sanctum",
+      "Storm-Kiln Artist",
+      "Izzet Signet",
+      "Arcane Signet",
+      "Sol Ring",
+      "Big Score",
+      "Unexpected Windfall",
+      "Mana Geyser"
+    ],
+    "token_damage_and_copy_payoffs": [
+      "Impact Tremors",
+      "Purphoros, God of the Forge",
+      "Brudiclad, Telchor Engineer",
+      "Kindred Discovery",
+      "Shared Animosity",
+      "Fling",
+      "Kazuul's Fury // Kazuul's Cliffs",
+      "Twinning Staff"
+    ],
+    "setup_and_selection": [
+      "Ponder",
+      "Preordain",
+      "Brainstorm",
+      "Faithless Looting",
+      "Frantic Search",
+      "Expressive Iteration"
+    ],
+    "protection_and_interaction": [
+      "Counterspell",
+      "Arcane Denial",
+      "Swan Song",
+      "Deflecting Swat",
+      "Lightning Greaves",
+      "Swiftfoot Boots"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "older_rootha_copy_spell_contamination",
+      "examples": [
+        "bounce-and-copy activated ability package"
+      ],
+      "reason": "Rootha, Mastering the Moment is a combat token payoff commander."
+    },
+    {
+      "pattern": "reactive_only_spellslinger",
+      "examples": [
+        "mostly counters and removal with few precombat spells"
+      ],
+      "reason": "The combat trigger needs spells cast before combat on your turn."
+    },
+    {
+      "pattern": "small_cantrip_only_tokens",
+      "examples": [
+        "no high-MV spells, producing only small Elementals"
+      ],
+      "reason": "The token size scales with greatest mana value."
+    }
+  ]
+}

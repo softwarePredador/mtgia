@@ -1,0 +1,160 @@
+{
+  "version": "secrets_of_strixhaven_zimone_infinite_analyst_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Zimone, Infinite Analyst",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "G",
+    "U"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary GU creature with X-spell and +1/+1 counter oracle text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "WotC/Playgroup set context supports the Secrets of Strixhaven Commander release."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/10/zimone-infinite-analyst",
+    "https://edhrec.com/commanders/zimone-infinite-analyst",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Infinite-mana X-spell lines are bracket/power opt-in, not default.",
+    "No copied public decklist or runtime dependency."
+  ],
+  "themes": [
+    {
+      "name": "simic_x_spells",
+      "confidence": "high",
+      "notes": "The first X spell each turn becomes cheaper as Zimone gains +1/+1 counters."
+    },
+    {
+      "name": "plus_one_counter_engine",
+      "confidence": "high",
+      "notes": "Casting X spells grows Zimone, which further discounts future X spells."
+    },
+    {
+      "name": "ramp_scalable_payoffs",
+      "confidence": "high",
+      "notes": "Ramp and scalable spells convert the discount into cards, board, and finishers."
+    },
+    {
+      "name": "proliferate_and_counter_doubling",
+      "confidence": "medium_high",
+      "notes": "Counter multipliers accelerate the commander but should not replace X-spell density."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 36,
+      "max": 39
+    },
+    "ramp": {
+      "min": 11,
+      "max": 15
+    },
+    "x_spells": {
+      "min": 14,
+      "max": 22
+    },
+    "plus_one_counter_support": {
+      "min": 8,
+      "max": 13
+    },
+    "card_draw": {
+      "min": 8,
+      "max": 12
+    },
+    "interaction": {
+      "min": 7,
+      "max": 11
+    },
+    "protection": {
+      "min": 4,
+      "max": 7
+    }
+  },
+  "expected_packages": {
+    "ramp": [
+      "Sol Ring",
+      "Arcane Signet",
+      "Simic Signet",
+      "Nature's Lore",
+      "Three Visits",
+      "Cultivate",
+      "Kodama's Reach",
+      "Gyre Sage",
+      "Incubation Druid",
+      "Kami of Whispered Hopes"
+    ],
+    "x_spell_core": [
+      "Finale of Devastation",
+      "Genesis Wave",
+      "Blue Sun's Zenith",
+      "Pull from Tomorrow",
+      "Hydroid Krasis",
+      "Finale of Revelation",
+      "Curse of the Swine",
+      "Walking Ballista",
+      "Stonecoil Serpent",
+      "Awaken the Woods"
+    ],
+    "counter_engine": [
+      "Hardened Scales",
+      "Branching Evolution",
+      "The Ozolith",
+      "Evolution Sage",
+      "Vorinclex, Monstrous Raider",
+      "Master Biomancer",
+      "Forgotten Ancient",
+      "Simic Ascendancy"
+    ],
+    "draw_and_value": [
+      "Guardian Project",
+      "Beast Whisperer",
+      "Rishkar's Expertise",
+      "Return of the Wildspeaker",
+      "The Great Henge",
+      "Zegana, Utopian Speaker"
+    ],
+    "interaction_and_protection": [
+      "Heroic Intervention",
+      "Swiftfoot Boots",
+      "Lightning Greaves",
+      "Beast Within",
+      "Rapid Hybridization",
+      "Reality Shift",
+      "Counterspell",
+      "Arcane Denial"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "generic_simic_ramp_without_x_spells",
+      "examples": [
+        "landfall/goodstuff pile with no X-spell density"
+      ],
+      "reason": "The commander specifically discounts X spells and grows from them."
+    },
+    {
+      "pattern": "infinite_combo_by_default",
+      "examples": [
+        "infinite mana into Blue Sun's Zenith as mandatory plan"
+      ],
+      "reason": "Combo power should be bracket-gated and was not proven as cEDH default."
+    },
+    {
+      "pattern": "counter_support_without_payoff",
+      "examples": [
+        "+1/+1 counter cards with no scalable spells"
+      ],
+      "reason": "Counters are infrastructure for X spells, not the entire deck."
+    }
+  ]
+}

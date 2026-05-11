@@ -1,0 +1,158 @@
+{
+  "version": "secrets_of_strixhaven_quintorius_history_chaser_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Quintorius, History Chaser",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "R",
+    "W"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary RW planeswalker that can be your commander.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "WotC/Playgroup set context supports the Secrets of Strixhaven Commander release."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/7/quintorius-history-chaser",
+    "https://edhrec.com/commanders/quintorius-history-chaser",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Do not merge this profile with older creature Quintorius lists without checking oracle incentives.",
+    "No copied public decklist or runtime dependency."
+  ],
+  "themes": [
+    {
+      "name": "boros_graveyard_leaves_spirits",
+      "confidence": "high",
+      "notes": "Whenever cards leave the graveyard, Quintorius creates 3/2 Spirits."
+    },
+    {
+      "name": "loot_mill_flashback_escape",
+      "confidence": "high",
+      "notes": "The +1 fills the graveyard, while flashback/escape/recursion convert it into tokens."
+    },
+    {
+      "name": "spirit_token_combat_finish",
+      "confidence": "medium_high",
+      "notes": "The -4 gives Spirits double strike and vigilance, so token density and anthems matter."
+    },
+    {
+      "name": "planeswalker_protection",
+      "confidence": "high",
+      "notes": "As a planeswalker commander, Quintorius needs blockers, pillowfort, and protection."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 35,
+      "max": 38
+    },
+    "self_mill_loot_discard": {
+      "min": 8,
+      "max": 13
+    },
+    "graveyard_leave_enablers": {
+      "min": 12,
+      "max": 20
+    },
+    "spirit_token_payoffs": {
+      "min": 7,
+      "max": 12
+    },
+    "planeswalker_protection": {
+      "min": 6,
+      "max": 10
+    },
+    "interaction": {
+      "min": 7,
+      "max": 11
+    },
+    "recursion": {
+      "min": 5,
+      "max": 9
+    }
+  },
+  "expected_packages": {
+    "graveyard_leave_enablers": [
+      "Sevinne's Reclamation",
+      "Past in Flames",
+      "Faithless Looting",
+      "Ox of Agonas",
+      "Prismatic Strands",
+      "Divine Reckoning",
+      "Increasing Vengeance",
+      "Reconstruct History",
+      "Late to Dinner",
+      "Escape Velocity"
+    ],
+    "loot_self_mill_setup": [
+      "Thrill of Possibility",
+      "Cathartic Reunion",
+      "Big Score",
+      "Unexpected Windfall",
+      "Perpetual Timepiece",
+      "Mesmeric Orb",
+      "Millikin",
+      "Lorehold Excavation"
+    ],
+    "spirit_and_token_payoffs": [
+      "Quintorius, Field Historian",
+      "Desecrated Tomb",
+      "Clarion Spirit",
+      "Anointed Procession",
+      "Mondrak, Glory Dominus",
+      "Intangible Virtue",
+      "Rally the Ranks",
+      "Hofri Ghostforge"
+    ],
+    "planeswalker_protection": [
+      "Ghostly Prison",
+      "Windborn Muse",
+      "Mangara, the Diplomat",
+      "Boros Charm",
+      "Teferi's Protection",
+      "Flawless Maneuver",
+      "Sun Titan"
+    ],
+    "interaction": [
+      "Swords to Plowshares",
+      "Path to Exile",
+      "Wear // Tear",
+      "Generous Gift",
+      "Blasphemous Act",
+      "Austere Command"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "older_quintorius_profile_contamination",
+      "examples": [
+        "creature-only Quintorius Field Historian assumptions"
+      ],
+      "reason": "This commander is a planeswalker and needs defense plus loyalty-aware sequencing."
+    },
+    {
+      "pattern": "graveyard_exile_without_payoff",
+      "examples": [
+        "random graveyard hate that empties your own graveyard"
+      ],
+      "reason": "Cards should leave the graveyard for value, not just disappear."
+    },
+    {
+      "pattern": "off_color_spirit_tribal",
+      "examples": [
+        "Drogskol Captain",
+        "Tormod, the Desecrator"
+      ],
+      "reason": "Do not import UW or black Spirit/graveyard packages into RW."
+    }
+  ]
+}

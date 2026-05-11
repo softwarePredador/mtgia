@@ -1,0 +1,151 @@
+{
+  "version": "secrets_of_strixhaven_silverquill_the_disputant_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Silverquill, the Disputant",
+  "confidence": "high",
+  "source_count": 3,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "B",
+    "W"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary BW Elder Dragon with casualty-granting oracle text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "No cEDH relevance was proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/226/silverquill-the-disputant",
+    "https://edhrec.com/commanders/silverquill-the-disputant",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Casualty requires creature fodder before copy-worthy spells are over-weighted.",
+    "No public decklist was copied."
+  ],
+  "themes": [
+    {
+      "name": "orzhov_casualty_spells",
+      "confidence": "high",
+      "notes": "Instant and sorcery spells can be copied by sacrificing creatures with power 1 or greater."
+    },
+    {
+      "name": "token_fodder_engine",
+      "confidence": "high",
+      "notes": "Reliable expendable bodies are required for casualty to function."
+    },
+    {
+      "name": "aristocrats_overlap",
+      "confidence": "medium_high",
+      "notes": "Sacrifice payoffs convert casualty costs into incremental damage/life/card value."
+    },
+    {
+      "name": "copy_worthy_removal_draw_reanimation",
+      "confidence": "medium_high",
+      "notes": "Prioritize spells that materially improve when copied."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 35,
+      "max": 38
+    },
+    "token_fodder": {
+      "min": 12,
+      "max": 18
+    },
+    "sacrifice_payoffs": {
+      "min": 6,
+      "max": 10
+    },
+    "copy_worthy_spells": {
+      "min": 12,
+      "max": 18
+    },
+    "card_draw": {
+      "min": 8,
+      "max": 12
+    },
+    "interaction": {
+      "min": 7,
+      "max": 11
+    },
+    "recursion": {
+      "min": 4,
+      "max": 8
+    }
+  },
+  "expected_packages": {
+    "repeatable_fodder": [
+      "Bitterblossom",
+      "Ophiomancer",
+      "Jadar, Ghoulcaller of Nephalia",
+      "Reassembling Skeleton",
+      "Skrelv's Hive",
+      "Lingering Souls",
+      "Secure the Wastes",
+      "Dreadhorde Invasion"
+    ],
+    "aristocrats_sacrifice_payoffs": [
+      "Blood Artist",
+      "Zulaport Cutthroat",
+      "Cruel Celebrant",
+      "Bastion of Remembrance",
+      "Elas il-Kor, Sadistic Pilgrim",
+      "Pitiless Plunderer",
+      "Skullclamp"
+    ],
+    "copy_worthy_draw_and_value": [
+      "Village Rites",
+      "Deadly Dispute",
+      "Plumb the Forbidden",
+      "Sign in Blood",
+      "Night's Whisper",
+      "Read the Bones",
+      "Victimize"
+    ],
+    "copy_worthy_interaction": [
+      "Swords to Plowshares",
+      "Path to Exile",
+      "Anguished Unmaking",
+      "Despark",
+      "Utter End",
+      "Vanishing Verse",
+      "Merciless Eviction"
+    ],
+    "finishers": [
+      "Inkshield",
+      "Exsanguinate",
+      "Debt to the Deathless",
+      "Revel in Riches",
+      "Living Death"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "creature_light_control",
+      "examples": [
+        "mostly sweepers and planeswalkers with no casualty fodder"
+      ],
+      "reason": "Casualty becomes nonfunctional without expendable creatures."
+    },
+    {
+      "pattern": "pure_orzhov_lifegain",
+      "examples": [
+        "lifegain shell with no sacrifice or copy-worthy spells"
+      ],
+      "reason": "The commander rewards casualty, not generic BW lifegain."
+    },
+    {
+      "pattern": "cedh_assumption",
+      "examples": [
+        "stax/combo labels without source proof"
+      ],
+      "reason": "cEDH relevance was not proven."
+    }
+  ]
+}

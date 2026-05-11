@@ -1,0 +1,158 @@
+{
+  "version": "secrets_of_strixhaven_prismari_the_inspiration_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Prismari, the Inspiration",
+  "confidence": "high",
+  "source_count": 3,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "R",
+    "U"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary RU Elder Dragon with storm-granting oracle text.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "No cEDH source context was proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/212/prismari-the-inspiration",
+    "https://edhrec.com/commanders/prismari-the-inspiration",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual Commander reference only.",
+    "Storm packages must remain bracket-aware and must not assume cEDH.",
+    "No decklist was copied or staged as training data."
+  ],
+  "themes": [
+    {
+      "name": "izzet_storm_spellslinger",
+      "confidence": "high",
+      "notes": "The commander gives instant and sorcery spells storm, so cheap spell velocity and mana-positive turns are core."
+    },
+    {
+      "name": "ritual_treasure_chain",
+      "confidence": "high",
+      "notes": "Rituals and treasure spells let copied spells continue the turn without relying on banned fast mana."
+    },
+    {
+      "name": "magecraft_spell_count_payoffs",
+      "confidence": "medium_high",
+      "notes": "Spell-count payoffs turn storm copies into mana, damage, cards, or board presence."
+    },
+    {
+      "name": "copy_and_recursion_finishers",
+      "confidence": "medium",
+      "notes": "Past in Flames and Mizzix's Mastery effects are finishers, not default early-game keeps."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 34,
+      "max": 37
+    },
+    "cheap_cantrips_selection": {
+      "min": 10,
+      "max": 16
+    },
+    "rituals_treasure_mana_bursts": {
+      "min": 8,
+      "max": 12
+    },
+    "cost_reducers": {
+      "min": 4,
+      "max": 7
+    },
+    "storm_payoffs_finishers": {
+      "min": 5,
+      "max": 9
+    },
+    "interaction_protection": {
+      "min": 7,
+      "max": 11
+    },
+    "graveyard_spell_recursion": {
+      "min": 3,
+      "max": 6
+    }
+  },
+  "expected_packages": {
+    "cheap_cantrip_velocity": [
+      "Ponder",
+      "Preordain",
+      "Brainstorm",
+      "Opt",
+      "Consider",
+      "Faithless Looting",
+      "Frantic Search",
+      "Expressive Iteration"
+    ],
+    "ritual_and_treasure_chain": [
+      "Seething Song",
+      "Mana Geyser",
+      "Jeska's Will",
+      "Big Score",
+      "Unexpected Windfall",
+      "Prismari Command",
+      "Strike It Rich",
+      "Storm-Kiln Artist"
+    ],
+    "cost_reducers_and_spell_engines": [
+      "Goblin Electromancer",
+      "Baral, Chief of Compliance",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Jace's Sanctum",
+      "Primal Amulet // Primal Wellspring",
+      "Archmage Emeritus",
+      "Veyran, Voice of Duality"
+    ],
+    "storm_copy_finishers": [
+      "Grapeshot",
+      "Aetherflux Reservoir",
+      "Thousand-Year Storm",
+      "Mizzix's Mastery",
+      "Past in Flames",
+      "Bonus Round",
+      "Apex of Power",
+      "Mind's Desire"
+    ],
+    "protection_and_stack_interaction": [
+      "Counterspell",
+      "Swan Song",
+      "Arcane Denial",
+      "Deflecting Swat",
+      "Fierce Guardianship",
+      "Lightning Greaves",
+      "Swiftfoot Boots"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "cedh_storm_by_default",
+      "examples": [
+        "Underworld Breach deterministic lines",
+        "all-in fast mana mulligans"
+      ],
+      "reason": "Storm text is not proof of cEDH viability; high-power combo should be opt-in."
+    },
+    {
+      "pattern": "creature_heavy_izzet_goodstuff",
+      "examples": [
+        "generic dragons",
+        "artifact beatdown without spell density"
+      ],
+      "reason": "The commander rewards instants and sorceries, not generic RU threats."
+    },
+    {
+      "pattern": "banned_fast_mana_override",
+      "examples": [
+        "Mana Crypt",
+        "Jeweled Lotus"
+      ],
+      "reason": "Never bypass local Commander legality validation."
+    }
+  ]
+}

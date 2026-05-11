@@ -1,0 +1,155 @@
+{
+  "version": "secrets_of_strixhaven_witherbloom_the_balancer_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Witherbloom, the Balancer",
+  "confidence": "high",
+  "source_count": 3,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "B",
+    "G"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary BG Elder Dragon with affinity for creatures.",
+      "Scryfall card context and EDHREC Commander context exist.",
+      "No cEDH source context was proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/245/witherbloom-the-balancer",
+    "https://edhrec.com/commanders/witherbloom-the-balancer",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "The profile rewards creature density plus discounted instants/sorceries, not generic Golgari midrange.",
+    "No public decklist was copied."
+  ],
+  "themes": [
+    {
+      "name": "golgari_affinity_for_creatures",
+      "confidence": "high",
+      "notes": "Creature count reduces commander and instant/sorcery costs."
+    },
+    {
+      "name": "go_wide_tokens_and_creature_ramp",
+      "confidence": "high",
+      "notes": "Creature-based ramp and tokens are both mana and affinity infrastructure."
+    },
+    {
+      "name": "discounted_big_spells",
+      "confidence": "medium_high",
+      "notes": "Large BG spells become efficient only when the board is established."
+    },
+    {
+      "name": "sacrifice_value_overlap",
+      "confidence": "medium",
+      "notes": "Sacrifice payoffs are useful if they preserve creature density and card flow."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 35,
+      "max": 38
+    },
+    "creatures_and_token_sources": {
+      "min": 28,
+      "max": 38
+    },
+    "creature_ramp": {
+      "min": 8,
+      "max": 12
+    },
+    "discounted_spells": {
+      "min": 8,
+      "max": 13
+    },
+    "card_draw_engines": {
+      "min": 8,
+      "max": 12
+    },
+    "interaction": {
+      "min": 7,
+      "max": 11
+    },
+    "finishers": {
+      "min": 4,
+      "max": 7
+    }
+  },
+  "expected_packages": {
+    "creature_ramp": [
+      "Llanowar Elves",
+      "Elves of Deep Shadow",
+      "Sakura-Tribe Elder",
+      "Wood Elves",
+      "Springbloom Druid",
+      "Farhaven Elf",
+      "Deathrite Shaman",
+      "Circle of Dreams Druid"
+    ],
+    "token_and_creature_density": [
+      "Chatterfang, Squirrel General",
+      "Scute Swarm",
+      "Ophiomancer",
+      "Tendershoot Dryad",
+      "Avenger of Zendikar",
+      "Endrek Sahr, Master Breeder",
+      "Awakening Zone",
+      "Beledros Witherbloom"
+    ],
+    "discounted_big_spells": [
+      "Torment of Hailfire",
+      "Exsanguinate",
+      "Casualties of War",
+      "Culling Ritual",
+      "Seasons Past",
+      "Return of the Wildspeaker",
+      "Rishkar's Expertise",
+      "Overwhelming Stampede"
+    ],
+    "draw_and_sacrifice_value": [
+      "Skullclamp",
+      "Beast Whisperer",
+      "Guardian Project",
+      "Moldervine Reclamation",
+      "Greater Good",
+      "Deadly Dispute",
+      "Village Rites",
+      "Plumb the Forbidden"
+    ],
+    "interaction": [
+      "Beast Within",
+      "Assassin's Trophy",
+      "Putrefy",
+      "Abrupt Decay",
+      "Maelstrom Pulse",
+      "Krosan Grip"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "creature_light_golgari_control",
+      "examples": [
+        "spell-heavy shell with few bodies"
+      ],
+      "reason": "Affinity for creatures fails without a board."
+    },
+    {
+      "pattern": "wipe_heavy_self_sabotage",
+      "examples": [
+        "too many symmetric creature wipes"
+      ],
+      "reason": "Repeatedly clearing your own board removes the discount engine."
+    },
+    {
+      "pattern": "generic_lifegain_only",
+      "examples": [
+        "Witherbloom college lifegain shell without affinity support"
+      ],
+      "reason": "This specific commander is about creature density and spell discounts."
+    }
+  ]
+}

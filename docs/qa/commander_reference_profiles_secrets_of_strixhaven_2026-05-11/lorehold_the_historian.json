@@ -1,0 +1,161 @@
+{
+  "version": "secrets_of_strixhaven_lorehold_the_historian_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Lorehold, the Historian",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T17:58:00Z",
+  "color_identity": [
+    "R",
+    "W"
+  ],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a legendary RW Elder Dragon with Commander color identity.",
+      "Scryfall card context and public Commander aggregate pages exist.",
+      "No cEDH relevance was proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/201/lorehold-the-historian",
+    "https://edhrec.com/commanders/lorehold-the-historian",
+    "https://draftsim.com/lorehold-the-historian-edh-deck/",
+    "https://playgroup.gg/sets/secrets-of-strixhaven"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no public decklist was copied.",
+    "No scraping, private endpoint, unofficial runtime API, or cEDH proof was used.",
+    "Use as casual/tuned Commander guidance, not as competitive Commander truth."
+  ],
+  "themes": [
+    {
+      "name": "boros_miracle_big_spells",
+      "confidence": "high",
+      "notes": "Miracle {2} turns expensive instants and sorceries into tempo swings when draw timing is controlled."
+    },
+    {
+      "name": "topdeck_and_first_draw_control",
+      "confidence": "high",
+      "notes": "The profile needs topdeck setup and opponent-turn draw to avoid random haymaker piles."
+    },
+    {
+      "name": "spellslinger_copy_payoffs",
+      "confidence": "medium",
+      "notes": "Copy and token payoffs are useful after ramp, setup, and interaction are covered."
+    },
+    {
+      "name": "graveyard_flashback_value",
+      "confidence": "medium_low",
+      "notes": "Secondary value path for cards discarded to Lorehold."
+    }
+  ],
+  "role_targets": {
+    "lands": {
+      "min": 36,
+      "max": 38
+    },
+    "mana_rocks_treasure_ramp": {
+      "min": 10,
+      "max": 13
+    },
+    "topdeck_miracle_setup": {
+      "min": 6,
+      "max": 9
+    },
+    "draw_rummage_opponent_turn_draw": {
+      "min": 8,
+      "max": 12
+    },
+    "miracle_haymakers": {
+      "min": 10,
+      "max": 16
+    },
+    "spot_interaction": {
+      "min": 4,
+      "max": 6
+    },
+    "board_wipes_resets": {
+      "min": 3,
+      "max": 5
+    },
+    "spell_payoffs_copy_engines": {
+      "min": 5,
+      "max": 8
+    },
+    "graveyard_recursion": {
+      "min": 2,
+      "max": 5
+    }
+  },
+  "expected_packages": {
+    "topdeck_and_miracle_setup": [
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Library of Leng",
+      "Brainstone",
+      "Temple Bell",
+      "Mikokoro, Center of the Sea",
+      "Victory Chimes"
+    ],
+    "miracle_payoffs_expensive_spells": [
+      "Approach of the Second Sun",
+      "Storm Herd",
+      "Rise of the Eldrazi",
+      "Soulfire Eruption",
+      "Apex of Power",
+      "Volcanic Vision",
+      "Creative Technique",
+      "Dance with Calamity",
+      "Call Forth the Tempest",
+      "Brass's Bounty",
+      "Hit the Mother Lode",
+      "Mizzix's Mastery"
+    ],
+    "interaction_and_resets": [
+      "Swords to Plowshares",
+      "Path to Exile",
+      "Blasphemous Act",
+      "Austere Command",
+      "Terminus",
+      "Bonfire of the Damned"
+    ],
+    "spell_payoff_copy_package": [
+      "Storm-Kiln Artist",
+      "Monastery Mentor",
+      "Young Pyromancer",
+      "Primal Amulet // Primal Wellspring",
+      "Pyromancer's Goggles",
+      "Double Vision",
+      "Sunbird's Invocation",
+      "Arcane Bombardment",
+      "Chandra, Hope's Beacon"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "blue_miracle_package",
+      "examples": [
+        "Temporal Mastery",
+        "Devastation Tide",
+        "Mystical Tutor",
+        "Brainstorm"
+      ],
+      "reason": "Generic miracle research overrepresents blue cards; Lorehold is RW."
+    },
+    {
+      "pattern": "cedh_assumption",
+      "examples": [
+        "full fast-mana storm shell"
+      ],
+      "reason": "cEDH relevance was not proven."
+    },
+    {
+      "pattern": "uncategorized_haymakers",
+      "examples": [
+        "random seven-plus mana spells without setup or payoff"
+      ],
+      "reason": "Miracle needs setup-before-haymaker scoring."
+    }
+  ]
+}
