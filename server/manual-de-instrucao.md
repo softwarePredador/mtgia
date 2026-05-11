@@ -3,6 +3,42 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Prova publica de qualidade do Commander Archetype Reference Reuse
+
+### O Porquê
+- O fluxo de Commander Archetype Reference Reuse ja provava diagnostics e
+  fallback valido para `Velomachus Lorehold`, mas ainda faltava uma amostra
+  publica com OpenAI real, sem timeout, para confirmar se a reutilizacao de
+  arquetipo melhora qualidade percebida contra baseline sem `commander_name`.
+
+### O Como
+- Sincronizado `master` em `f3bac2bb2fa8de53430acd940732a77e1cd2e133` e
+  validado `/health` no backend publico
+  `https://evolution-cartinhas.8ktevp.easypanel.host`.
+- Criado usuario QA descartavel via `/auth/register`, sem registrar senha, JWT,
+  prompt completo ou decklist completa.
+- Executadas 5 amostras sync de `POST /ai/generate` para Commander:
+  4 com `commander_name=Velomachus Lorehold` e prompt Boros big
+  spells/topdeck/miracle/spellslinger, e 1 baseline sem `commander_name`.
+- As respostas representativas foram reabertas por cache e classificadas apenas
+  por contagens agregadas usando metadata publica de `/cards`.
+
+### Resultado
+- 5/5 probes retornaram `status=200`, `main_quantity=99`,
+  `validation.is_valid=true` e `commander_returned=Velomachus Lorehold`.
+- 4/4 probes com `commander_name` retornaram `archetype_reference_used=true`,
+  `archetype_candidate_count=48`, `reference_profile_used=false` e
+  `reference_card_stats_used=false`.
+- 1 probe com `commander_name` retornou OpenAI real sem
+  `ai_generation_timed_out`; 3 cairam em fallback timeout valido com
+  `warnings.code=openai_timeout_deterministic_fallback`.
+- Comparacao sanitizada da amostra real: archetype reuse teve densidade tematica
+  aproximada maior que baseline (`on_theme=18` vs `on_theme=4`), sem
+  off-identity e sem `Lorehold, the Historian` nas 99.
+- Resultado operacional: **PASS**, com risco de latencia/timeout ainda presente.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`.
+
 ## 2026-05-11 — Runtime app real dos Secrets of Strixhaven Commander Profiles
 
 ### O Porquê

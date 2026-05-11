@@ -93,10 +93,18 @@ preservou o comandante pedido e manteve os diagnostics de arquetipo.
 
 ## Riscos e limites
 
-- A prova publica confirmou diagnostics de arquetipo e preservacao do
-  comandante no fallback, mas a geracao com resposta OpenAI completa para esse
-  comandante ainda nao foi observada porque a rodada caiu no fallback por
-  timeout.
+- A prova publica inicial confirmou diagnostics de arquetipo e preservacao do
+  comandante no fallback.
+- Em nova rodada publica no mesmo dia, no backend
+  `f3bac2bb2fa8de53430acd940732a77e1cd2e133`, houve resposta OpenAI real para
+  `Velomachus Lorehold` sem `ai_generation_timed_out`: `status=200`,
+  `commander_returned=Velomachus Lorehold`, `main_quantity=99`,
+  `validation.is_valid=true`, `archetype_reference_used=true`,
+  `archetype_candidate_count=48`, zero off-identity reportado e sem
+  `Lorehold, the Historian` nas 99.
+- Comparacao sanitizada contra baseline sem `commander_name` mostrou maior
+  densidade tematica aproximada na resposta com archetype reuse
+  (`on_theme=18` vs `on_theme=4`), sem expor decklists.
 - O fallback por arquétipo nao garante que todo comandante "parecido" usara
   Lorehold; ele precisa resolver identidade de cor e ter match de prompt/tema.
 - O avaliador `reference_deck_evaluation` continua reservado para profile exato.
@@ -104,6 +112,9 @@ preservou o comandante pedido e manteve os diagnostics de arquetipo.
 
 ## Proximo passo recomendado
 
-Rodar uma nova amostra quando a OpenAI responder dentro do timeout para avaliar
-a qualidade tematica do deck completo gerado por IA, nao apenas o fallback
-deterministico valido.
+Medir uma amostra maior antes de alterar timeout/modelo de producao, porque a
+rodada de qualidade teve OpenAI real valido, mas 3 de 4 probes com
+`commander_name` ainda cairam no fallback por timeout.
+
+Relatorio de qualidade:
+`server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`.
