@@ -15,6 +15,8 @@ void main() {
       : 'Defina RUN_LOREHOLD_REFERENCE_PROFILE_LIVE=1 para provar /ai/generate live.';
   final baseUrl = Platform.environment['TEST_API_BASE_URL'] ??
       'https://evolution-cartinhas.8ktevp.easypanel.host';
+  final expectCardStats =
+      Platform.environment['LIVE_REFERENCE_CARD_STATS'] == '1';
 
   Map<String, dynamic> decodeJson(http.Response response) {
     final body = response.body.trim();
@@ -71,6 +73,14 @@ void main() {
         expect(diagnostics!['reference_profile_used'], isTrue);
         expect(diagnostics['profile_confidence'], equals('high'));
         expect(diagnostics['source_count'], greaterThanOrEqualTo(4));
+        expect(diagnostics, contains('reference_card_stats_used'));
+        expect(diagnostics, contains('on_theme_candidate_count'));
+        expect(diagnostics, contains('unresolved_reference_cards'));
+        expect(diagnostics, contains('package_keys'));
+        if (expectCardStats) {
+          expect(diagnostics['reference_card_stats_used'], isTrue);
+          expect(diagnostics['on_theme_candidate_count'], greaterThan(0));
+        }
 
         final generatedDeck =
             (body['generated_deck'] as Map?)?.cast<String, dynamic>();

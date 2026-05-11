@@ -10,6 +10,7 @@ const loreholdReferenceProfileSource = 'aggregate_reference_profile_v1';
 
 const commanderReferenceRequiredTables = <String>[
   'commander_reference_profiles',
+  'commander_reference_card_stats',
   'commander_card_synergy',
   'card_role_scores',
   'card_function_tags',
@@ -46,9 +47,13 @@ bool isLoreholdCommanderReferenceCandidate(String? commanderName) {
 }
 
 bool isReferenceProfileConfidenceUsable(Object? confidence) {
+  return commanderReferenceConfidenceRank(confidence) >=
+      commanderReferenceConfidenceRank('medium');
+}
+
+int commanderReferenceConfidenceRank(Object? confidence) {
   final normalized = normalizeCommanderReferenceConfidence(confidence);
-  final rank = _confidenceRank[normalized];
-  return rank != null && rank >= _confidenceRank['medium']!;
+  return _confidenceRank[normalized] ?? _confidenceRank['not_proven']!;
 }
 
 Map<String, dynamic> buildLoreholdReferenceProfilePayload({
@@ -207,10 +212,22 @@ String commanderReferenceProfileCacheVersion(Map<String, dynamic> profile) {
 }
 
 Map<String, dynamic> buildCommanderReferenceDiagnostics(
-  Map<String, dynamic>? profile,
-) {
+  Map<String, dynamic>? profile, {
+  Map<String, dynamic> cardStatsDiagnostics = const {
+    'reference_card_stats_used': false,
+    'on_theme_candidate_count': 0,
+    'unresolved_reference_cards': <String>[],
+    'package_keys': <String>[],
+  },
+  Map<String, dynamic>? referenceDeckEvaluation,
+}) {
   if (profile == null) {
-    return const {'reference_profile_used': false};
+    return {
+      'reference_profile_used': false,
+      ...cardStatsDiagnostics,
+      if (referenceDeckEvaluation != null)
+        'reference_deck_evaluation': referenceDeckEvaluation,
+    };
   }
 
   return {
@@ -223,6 +240,9 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
     ),
     'themes': _themeNames(profile).take(8).toList(growable: false),
     'source_count': _sourceCount(profile),
+    ...cardStatsDiagnostics,
+    if (referenceDeckEvaluation != null)
+      'reference_deck_evaluation': referenceDeckEvaluation,
   };
 }
 

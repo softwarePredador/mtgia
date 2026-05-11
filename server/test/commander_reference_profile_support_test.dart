@@ -72,6 +72,10 @@ void main() {
       final diagnostics = buildCommanderReferenceDiagnostics(profile);
 
       expect(diagnostics['reference_profile_used'], isTrue);
+      expect(diagnostics['reference_card_stats_used'], isFalse);
+      expect(diagnostics['on_theme_candidate_count'], equals(0));
+      expect(diagnostics['unresolved_reference_cards'], isEmpty);
+      expect(diagnostics['package_keys'], isEmpty);
       expect(diagnostics['profile_confidence'], equals('high'));
       expect(diagnostics['source_count'], equals(4));
       expect(diagnostics['themes'], isA<List>());

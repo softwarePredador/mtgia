@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:server/ai/commander_reference_card_stats_support.dart';
 import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:server/database.dart';
 
@@ -33,13 +34,24 @@ Future<void> main(List<String> args) async {
     final profile = buildLoreholdReferenceProfilePayload(updatedAt: startedAt);
     final profileHash = commanderReferenceProfileHash(profile);
 
+    final cardStatsResolution = await resolveLoreholdReferenceCardStats(
+      pool,
+      profile,
+    );
+
     if (apply) {
       await ensureCommanderReferenceProfileTable(pool);
+      await ensureCommanderReferenceCardStatsTable(pool);
       await upsertLoreholdReferenceProfile(pool, updatedAt: startedAt);
+      await upsertCommanderReferenceCardStats(pool, cardStatsResolution.stats);
     }
 
     final postTableAudit = await auditCommanderReferenceTables(pool);
     final loadedProfile = await loadUsableCommanderReferenceProfile(
+      pool: pool,
+      commanderName: loreholdReferenceCommanderName,
+    );
+    final loadedStats = await loadUsableCommanderReferenceCardStats(
       pool: pool,
       commanderName: loreholdReferenceCommanderName,
     );
@@ -65,15 +77,32 @@ Future<void> main(List<String> args) async {
         'deck_count_note':
             'Aggregate reference profile; no public 100-card decklist copied or counted.',
       },
+      'reference_card_stats': {
+        'table_mutated': apply,
+        'stats_total': cardStatsResolution.stats.length,
+        'resolved_count': cardStatsResolution.resolvedCount,
+        'unresolved_count': cardStatsResolution.unresolvedCardNames.length,
+        'unresolved_reference_cards': cardStatsResolution.unresolvedCardNames,
+        'package_coverage': cardStatsResolution.packageCoverage,
+        'loaded_usable_after_run': loadedStats.stats.length,
+        'loaded_unresolved_after_run': loadedStats.unresolvedCardNames,
+        'cache_version':
+            commanderReferenceCardStatsCacheVersion(loadedStats.stats),
+      },
       'generate_contract': {
         'request_field': 'commander_name',
         'enabled_only_for': loreholdReferenceCommanderName,
         'minimum_confidence': 'medium',
         'diagnostics': [
           'reference_profile_used',
+          'reference_card_stats_used',
           'profile_confidence',
           'themes',
           'source_count',
+          'on_theme_candidate_count',
+          'unresolved_reference_cards',
+          'package_keys',
+          'reference_deck_evaluation',
         ],
         'fallback_for_other_commanders': 'legacy_generate_path',
       },

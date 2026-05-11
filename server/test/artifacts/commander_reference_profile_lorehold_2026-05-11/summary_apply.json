@@ -2,17 +2,19 @@
   "status": "PASS",
   "mode": "apply",
   "db_mutations": true,
-  "started_at": "2026-05-11T15:03:01.394306Z",
-  "finished_at": "2026-05-11T15:03:04.346063Z",
+  "started_at": "2026-05-11T17:10:00.261478Z",
+  "finished_at": "2026-05-11T17:10:25.895304Z",
   "artifact_dir": "test/artifacts/commander_reference_profile_lorehold_2026-05-11",
   "tables_checked_before_schema_action": {
     "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
     "commander_card_synergy": true,
     "card_role_scores": true,
     "card_function_tags": true
   },
   "tables_checked_after": {
     "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
     "commander_card_synergy": true,
     "card_role_scores": true,
     "card_function_tags": true
@@ -23,10 +25,38 @@
     "source": "aggregate_reference_profile_v1",
     "confidence": "high",
     "source_count": 4,
-    "hash": "94e1d23f8f85",
+    "hash": "a1a5f5e0be12",
     "usable_after_run": true,
     "deck_count_column_value": 0,
     "deck_count_note": "Aggregate reference profile; no public 100-card decklist copied or counted."
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 34,
+    "resolved_count": 34,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "package_coverage": {
+      "interaction_and_resets": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "miracle_payoffs_expensive_spells": {
+        "resolved": 12,
+        "unresolved": 0
+      },
+      "spell_payoff_copy_package": {
+        "resolved": 9,
+        "unresolved": 0
+      },
+      "topdeck_and_miracle_setup": {
+        "resolved": 7,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 34,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:8bbfb843a0b4"
   },
   "generate_contract": {
     "request_field": "commander_name",
@@ -34,9 +64,14 @@
     "minimum_confidence": "medium",
     "diagnostics": [
       "reference_profile_used",
+      "reference_card_stats_used",
       "profile_confidence",
       "themes",
-      "source_count"
+      "source_count",
+      "on_theme_candidate_count",
+      "unresolved_reference_cards",
+      "package_keys",
+      "reference_deck_evaluation"
     ],
     "fallback_for_other_commanders": "legacy_generate_path"
   },

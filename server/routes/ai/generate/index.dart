@@ -10,6 +10,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
+import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -50,6 +51,8 @@ Future<Response> onRequest(RequestContext context) async {
     final pool = context.read<Pool>();
 
     Map<String, dynamic>? referenceProfile;
+    var referenceCardStats = const <CommanderReferenceCardStat>[];
+    var unresolvedReferenceCards = const <String>[];
     final referenceProfileStopwatch = Stopwatch()..start();
     if (isLoreholdCommanderReferenceCandidate(requestedCommanderName)) {
       try {
@@ -57,9 +60,17 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           commanderName: requestedCommanderName,
         );
+        if (referenceProfile != null) {
+          final statsLoad = await loadUsableCommanderReferenceCardStats(
+            pool: pool,
+            commanderName: requestedCommanderName,
+          );
+          referenceCardStats = statsLoad.stats;
+          unresolvedReferenceCards = statsLoad.unresolvedCardNames;
+        }
       } catch (error) {
         Log.w(
-          'Lorehold reference profile unavailable; continuing legacy generate path. '
+          'Lorehold reference profile/card stats unavailable; continuing legacy generate path. '
           'error=$error',
         );
       }
@@ -67,9 +78,10 @@ Future<Response> onRequest(RequestContext context) async {
     timings['reference_profile_ms'] =
         referenceProfileStopwatch.elapsedMilliseconds;
 
-    final referenceProfileVersion = referenceProfile == null
-        ? null
-        : commanderReferenceProfileCacheVersion(referenceProfile);
+    final referenceProfileVersion = _buildReferenceGenerateCacheVersion(
+      referenceProfile: referenceProfile,
+      referenceCardStats: referenceCardStats,
+    );
     final cacheKey = buildAiGenerateCacheKey(
       prompt: prompt,
       format: format,
@@ -114,6 +126,8 @@ Future<Response> onRequest(RequestContext context) async {
         prompt: prompt,
         format: format,
         referenceProfile: referenceProfile,
+        referenceCardStats: referenceCardStats,
+        unresolvedReferenceCards: unresolvedReferenceCards,
         warningCode: 'openai_api_key_missing',
         warningMessage:
             'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
@@ -255,7 +269,10 @@ Deck construction guidelines:
 
     final referenceProfilePrompt = referenceProfile == null
         ? ''
-        : buildCommanderReferenceProfilePrompt(referenceProfile);
+        : [
+            buildCommanderReferenceProfilePrompt(referenceProfile),
+            buildCommanderReferenceCardStatsPrompt(referenceCardStats),
+          ].where((line) => line.trim().isNotEmpty).join('\n');
 
     final userMessage = '''
 Build a deck based on this description: "$prompt".
@@ -334,6 +351,8 @@ $metaContext
         prompt: prompt,
         format: format,
         referenceProfile: referenceProfile,
+        referenceCardStats: referenceCardStats,
+        unresolvedReferenceCards: unresolvedReferenceCards,
         warningCode: 'openai_timeout_deterministic_fallback',
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -381,6 +400,8 @@ $metaContext
           prompt: prompt,
           format: format,
           referenceProfile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          unresolvedReferenceCards: unresolvedReferenceCards,
           warningCode: 'openai_api_key_invalid_dev_fallback',
           warningMessage:
               'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
@@ -474,6 +495,27 @@ $metaContext
         .where((name) => name.isNotEmpty)
         .toList(growable: false);
 
+    Map<String, dynamic>? referenceDeckEvaluation;
+    if (referenceProfile != null) {
+      final generatedDeckForEvaluation = validation.generatedDeck;
+      final evaluationCards = (generatedDeckForEvaluation['cards'] as List?)
+              ?.whereType<Map>()
+              .map((card) => card['name']?.toString().trim() ?? '')
+              .where((name) => name.isNotEmpty)
+              .toList(growable: false) ??
+          const <String>[];
+      final evaluationMetadata = await loadReferenceEvaluationCardMetadata(
+        pool: pool,
+        cardNames: evaluationCards,
+      );
+      referenceDeckEvaluation = evaluateGeneratedDeckAgainstReferenceStats(
+        generatedDeck: generatedDeckForEvaluation,
+        profile: referenceProfile,
+        stats: referenceCardStats,
+        cardMetadataByName: evaluationMetadata,
+      ).toJson();
+    }
+
     final responseBody = <String, dynamic>{
       'prompt': prompt,
       'format': format,
@@ -488,7 +530,14 @@ $metaContext
       },
       'validation': validation.validationSummary(),
       if (referenceProfile != null)
-        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
+        'diagnostics': buildCommanderReferenceDiagnostics(
+          referenceProfile,
+          cardStatsDiagnostics: buildCommanderReferenceCardStatsDiagnostics(
+            stats: referenceCardStats,
+            unresolvedCardNames: unresolvedReferenceCards,
+          ),
+          referenceDeckEvaluation: referenceDeckEvaluation,
+        ),
       if (metaReferenceContext != null && metaReferenceContext.isNotEmpty)
         'meta_reference_context':
             augmentMetaDeckEvidencePayloadWithOutputMatches(
@@ -516,6 +565,8 @@ $metaContext
         prompt: prompt,
         format: format,
         referenceProfile: referenceProfile,
+        referenceCardStats: referenceCardStats,
+        unresolvedReferenceCards: unresolvedReferenceCards,
         warningCode: 'ai_generate_validation_fallback',
         warningMessage:
             'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -590,20 +641,18 @@ Future<Response> _startAiGenerateAsyncJob({
   }
 
   final requestStopwatch = Stopwatch()..start();
+  final referenceCacheVersion = await _resolveReferenceGenerateCacheVersion(
+    pool: pool,
+    commanderName: body['commander_name']?.toString(),
+  );
   final cacheKey = buildAiGenerateCacheKey(
     prompt: prompt,
     format: format,
     bracket: body['bracket'],
-    commanderName: isLoreholdCommanderReferenceCandidate(
-      body['commander_name']?.toString(),
-    )
-        ? body['commander_name']?.toString()
-        : null,
-    referenceProfileVersion: isLoreholdCommanderReferenceCandidate(
-      body['commander_name']?.toString(),
-    )
-        ? loreholdReferenceProfileVersion
-        : null,
+    commanderName: referenceCacheVersion == null
+        ? null
+        : body['commander_name']?.toString(),
+    referenceProfileVersion: referenceCacheVersion,
   );
   final jobId = await AiGenerateJobStore.create(
     pool: pool,
@@ -657,6 +706,48 @@ Future<Response> _startAiGenerateAsyncJob({
       },
     },
   );
+}
+
+String? _buildReferenceGenerateCacheVersion({
+  required Map<String, dynamic>? referenceProfile,
+  required List<CommanderReferenceCardStat> referenceCardStats,
+}) {
+  if (referenceProfile == null) return null;
+  final profileVersion =
+      commanderReferenceProfileCacheVersion(referenceProfile);
+  final statsVersion = commanderReferenceCardStatsCacheVersion(
+    referenceCardStats,
+  );
+  if (statsVersion == null) return profileVersion;
+  return '$profileVersion:$statsVersion';
+}
+
+Future<String?> _resolveReferenceGenerateCacheVersion({
+  required Pool pool,
+  required String? commanderName,
+}) async {
+  if (!isLoreholdCommanderReferenceCandidate(commanderName)) return null;
+  try {
+    final profile = await loadUsableCommanderReferenceProfile(
+      pool: pool,
+      commanderName: commanderName,
+    );
+    if (profile == null) return null;
+    final statsLoad = await loadUsableCommanderReferenceCardStats(
+      pool: pool,
+      commanderName: commanderName,
+    );
+    return _buildReferenceGenerateCacheVersion(
+      referenceProfile: profile,
+      referenceCardStats: statsLoad.stats,
+    );
+  } catch (error) {
+    Log.w(
+      'Lorehold reference cache version unavailable for async generate; '
+      'using legacy cache key. error=$error',
+    );
+    return null;
+  }
 }
 
 Future<void> _processAiGenerateAsyncJob({
@@ -768,6 +859,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   required String prompt,
   required String format,
   Map<String, dynamic>? referenceProfile,
+  List<CommanderReferenceCardStat> referenceCardStats = const [],
+  List<String> unresolvedReferenceCards = const [],
   required String warningCode,
   required String warningMessage,
 }) async {
@@ -812,6 +905,26 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'suggestions': validation.suggestions,
     };
 
+    Map<String, dynamic>? referenceDeckEvaluation;
+    if (referenceProfile != null) {
+      final evaluationCards = (validation.generatedDeck['cards'] as List?)
+              ?.whereType<Map>()
+              .map((card) => card['name']?.toString().trim() ?? '')
+              .where((name) => name.isNotEmpty)
+              .toList(growable: false) ??
+          const <String>[];
+      final evaluationMetadata = await loadReferenceEvaluationCardMetadata(
+        pool: pool,
+        cardNames: evaluationCards,
+      );
+      referenceDeckEvaluation = evaluateGeneratedDeckAgainstReferenceStats(
+        generatedDeck: validation.generatedDeck,
+        profile: referenceProfile,
+        stats: referenceCardStats,
+        cardMetadataByName: evaluationMetadata,
+      ).toJson();
+    }
+
     return {
       'prompt': prompt,
       'format': format,
@@ -827,7 +940,14 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       },
       'validation': validation.validationSummary(),
       if (referenceProfile != null)
-        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
+        'diagnostics': buildCommanderReferenceDiagnostics(
+          referenceProfile,
+          cardStatsDiagnostics: buildCommanderReferenceCardStatsDiagnostics(
+            stats: referenceCardStats,
+            unresolvedCardNames: unresolvedReferenceCards,
+          ),
+          referenceDeckEvaluation: referenceDeckEvaluation,
+        ),
       'warnings': warnings,
     };
   } catch (e) {
@@ -850,7 +970,13 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'warnings': const <String>[],
       },
       if (referenceProfile != null)
-        'diagnostics': buildCommanderReferenceDiagnostics(referenceProfile),
+        'diagnostics': buildCommanderReferenceDiagnostics(
+          referenceProfile,
+          cardStatsDiagnostics: buildCommanderReferenceCardStatsDiagnostics(
+            stats: referenceCardStats,
+            unresolvedCardNames: unresolvedReferenceCards,
+          ),
+        ),
       'warnings': {
         'code': warningCode,
         'message': warningMessage,

@@ -3,6 +3,56 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Lorehold Reference Card Stats v1 em /ai/generate
+
+### O Porquê
+- O piloto anterior persistia um profile Lorehold agregado, mas os
+  `expected_packages` ainda eram apenas texto dentro de JSON. Isso dificultava
+  auditar quais cartas foram resolvidas no banco, pontuar candidatos e provar se
+  `/ai/generate` usou um pool estruturado em vez de prompt livre.
+- A evolucao precisava manter compatibilidade: apps sem `commander_name` ou
+  comandantes diferentes de `Lorehold, the Historian` continuam no fluxo legado;
+  se a nova tabela estiver vazia/ausente, o backend volta ao profile atual.
+
+### O Como
+- Criado `server/lib/ai/commander_reference_card_stats_support.dart` com:
+  - flatten dos `expected_packages` em stats por carta;
+  - normalizacao de comandante/carta;
+  - resolucao contra `cards` via `resolveImportCardNames`, incluindo aliases de
+    split/DFC como `Primal Amulet // Primal Wellspring`;
+  - tabela `commander_reference_card_stats` com PK normalizada, `card_id`
+    nullable, `package_key`, `role`, `score`, `confidence`,
+    `confidence_rank`, `source`, `evidence_count`, `unresolved` e `updated_at`;
+  - leitura apenas de candidatos `confidence_rank >= medium` e
+    `unresolved=false`;
+  - diagnostics seguros e avaliador tematico
+    `on_theme/generic/questionable/off_theme`.
+- `commander_reference_profile_lorehold.dart --apply` agora cria/upserta a nova
+  tabela e grava todas as cartas dos packages. Linhas unresolved ficam na mesma
+  tabela com `card_id=NULL` e nao quebram o apply; nesta rodada o DB local
+  resolveu 34/34 cartas e `unresolved_count=0`.
+- `/ai/generate` carrega card stats quando o profile Lorehold esta ativo, injeta
+  um bloco "Reference card stats v1" como candidate pool/structured guidance e
+  adiciona diagnostics opcionais: `reference_card_stats_used`,
+  `on_theme_candidate_count`, `unresolved_reference_cards`, `package_keys` e
+  `reference_deck_evaluation`.
+- O cache de generate inclui a versao do profile e um hash deterministico dos
+  stats usados. Se stats estiver vazio/ausente, o segmento de stats e omitido e
+  o fallback profile-only permanece igual.
+
+### Resultado
+- Runner dry-run/apply: PASS; apply repetido manteve `resolved_count=34`,
+  `loaded_usable_after_run=34` e cache version
+  `reference_card_stats_v1:8bbfb843a0b4`.
+- `/ai/generate` local com `commander_name=Lorehold, the Historian` e
+  `LIVE_REFERENCE_CARD_STATS=1` passou, provando diagnostics de stats e mantendo
+  legalidade/validacao final.
+- Backend publico usado apenas para sanity de `/health`; ainda reporta
+  `git_sha=87d9b7c3814ea07c3e89d718976fb694efd57d1d`, anterior a esta entrega.
+- Relatorio:
+  `server/doc/RELATORIO_LOREHOLD_REFERENCE_CARD_STATS_V1_2026-05-11.md`.
+- Scanner/camera/OCR/MLKit nao foram tocados.
+
 ## 2026-05-11 — Consumo mobile do Commander Reference Profile Lorehold
 
 ### O Porquê
