@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import 'endpoint_cache.dart';
+import 'openai_runtime_config.dart';
 
 String normalizeAiGeneratePrompt(String prompt) {
   return prompt.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
@@ -74,6 +75,71 @@ Map<String, dynamic> buildAiGenerateSyncPayloadForAsyncJob(
     }
   }
   return payload;
+}
+
+class AiGenerateOpenAiTimeoutSelection {
+  const AiGenerateOpenAiTimeoutSelection({
+    required this.timeout,
+    required this.envKey,
+    required this.referenceGuidanceBudget,
+  });
+
+  final Duration timeout;
+  final String envKey;
+  final bool referenceGuidanceBudget;
+}
+
+bool isCommanderReferenceGuidanceFormat(String normalizedFormat) {
+  return normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+}
+
+AiGenerateOpenAiTimeoutSelection selectAiGenerateOpenAiTimeout({
+  required OpenAiRuntimeConfig config,
+  required String normalizedFormat,
+  required bool referenceGuidanceEnabled,
+}) {
+  final baseTimeout = config.timeoutFor(
+    key: 'OPENAI_TIMEOUT_GENERATE_SECONDS',
+    fallback: const Duration(seconds: 8),
+    devFallback: const Duration(seconds: 8),
+    stagingFallback: const Duration(seconds: 8),
+    prodFallback: const Duration(seconds: 12),
+    min: const Duration(seconds: 3),
+    max: const Duration(seconds: 90),
+  );
+
+  if (!referenceGuidanceEnabled ||
+      !isCommanderReferenceGuidanceFormat(normalizedFormat)) {
+    return AiGenerateOpenAiTimeoutSelection(
+      timeout: baseTimeout,
+      envKey: 'OPENAI_TIMEOUT_GENERATE_SECONDS',
+      referenceGuidanceBudget: false,
+    );
+  }
+
+  final hasReferenceOverride =
+      (config.env['OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS'] ?? '')
+          .trim()
+          .isNotEmpty;
+  final referenceTimeout = config.timeoutFor(
+    key: 'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS',
+    fallback: const Duration(seconds: 20),
+    devFallback: const Duration(seconds: 20),
+    stagingFallback: const Duration(seconds: 20),
+    prodFallback: const Duration(seconds: 20),
+    min: const Duration(seconds: 3),
+    max: const Duration(seconds: 90),
+  );
+  final selectedTimeout =
+      !hasReferenceOverride && baseTimeout > referenceTimeout
+          ? baseTimeout
+          : referenceTimeout;
+
+  return AiGenerateOpenAiTimeoutSelection(
+    timeout: selectedTimeout,
+    envKey: 'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS',
+    referenceGuidanceBudget: true,
+  );
 }
 
 Map<String, dynamic> cloneAiGenerateJsonMap(Map<String, dynamic> payload) {

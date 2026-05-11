@@ -1,7 +1,9 @@
+import 'package:dotenv/dotenv.dart';
 import 'package:test/test.dart';
 
 import '../lib/ai_generate_job.dart';
 import '../lib/ai_generate_performance_support.dart';
+import '../lib/openai_runtime_config.dart';
 
 void main() {
   group('AI generate performance support', () {
@@ -122,6 +124,95 @@ void main() {
       expect(payload.containsKey('async'), isFalse);
       expect(payload.containsKey('profile'), isFalse);
       expect(payload.containsKey('response_mode'), isFalse);
+    });
+
+    test('keeps legacy generate timeout when reference guidance is inactive',
+        () {
+      final config = OpenAiRuntimeConfig(
+        DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
+      );
+
+      final selection = selectAiGenerateOpenAiTimeout(
+        config: config,
+        normalizedFormat: 'commander',
+        referenceGuidanceEnabled: false,
+      );
+
+      expect(selection.timeout, equals(const Duration(seconds: 8)));
+      expect(selection.envKey, equals('OPENAI_TIMEOUT_GENERATE_SECONDS'));
+      expect(selection.referenceGuidanceBudget, isFalse);
+    });
+
+    test('uses larger default timeout for Commander reference guidance', () {
+      final config = OpenAiRuntimeConfig(
+        DotEnv()..addAll({'ENVIRONMENT': 'staging'}),
+      );
+
+      final selection = selectAiGenerateOpenAiTimeout(
+        config: config,
+        normalizedFormat: 'commander',
+        referenceGuidanceEnabled: true,
+      );
+
+      expect(selection.timeout, equals(const Duration(seconds: 20)));
+      expect(
+        selection.envKey,
+        equals('OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS'),
+      );
+      expect(selection.referenceGuidanceBudget, isTrue);
+    });
+
+    test('does not use reference timeout outside Commander or Brawl', () {
+      final config = OpenAiRuntimeConfig(
+        DotEnv()
+          ..addAll({
+            'ENVIRONMENT': 'staging',
+            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '20',
+          }),
+      );
+
+      final selection = selectAiGenerateOpenAiTimeout(
+        config: config,
+        normalizedFormat: 'standard',
+        referenceGuidanceEnabled: true,
+      );
+
+      expect(selection.timeout, equals(const Duration(seconds: 8)));
+      expect(selection.referenceGuidanceBudget, isFalse);
+    });
+
+    test('honors bounded explicit reference timeout override', () {
+      final lowConfig = OpenAiRuntimeConfig(
+        DotEnv()
+          ..addAll({
+            'ENVIRONMENT': 'production',
+            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '2',
+          }),
+      );
+      final highConfig = OpenAiRuntimeConfig(
+        DotEnv()
+          ..addAll({
+            'ENVIRONMENT': 'production',
+            'OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS': '120',
+          }),
+      );
+
+      expect(
+        selectAiGenerateOpenAiTimeout(
+          config: lowConfig,
+          normalizedFormat: 'commander',
+          referenceGuidanceEnabled: true,
+        ).timeout,
+        equals(const Duration(seconds: 3)),
+      );
+      expect(
+        selectAiGenerateOpenAiTimeout(
+          config: highConfig,
+          normalizedFormat: 'brawl',
+          referenceGuidanceEnabled: true,
+        ).timeout,
+        equals(const Duration(seconds: 90)),
+      );
     });
 
     test('serializes async job lifecycle state with result status', () {

@@ -183,3 +183,25 @@ backend em commit divergente ou indisponibilidade total da OpenAI.
 - Ajuste recomendado em sprint separada: medir `OPENAI_TIMEOUT_GENERATE_SECONDS`
   e `OPENAI_MODEL_GENERATE` com amostra maior antes de alterar defaults de
   producao.
+
+## Addendum 2026-05-11 — Timeout reference-guided
+
+O ajuste recomendado foi medido e aplicado de forma incremental em
+`server/doc/RELATORIO_AI_GENERATE_REFERENCE_TIMEOUT_TUNING_2026-05-11.md`.
+
+- Publico atual em `a199569`: 5 amostras Velomachus com
+  `commander_name` tiveram `fallback_rate=40%`, 5/5 `status=200`, 5/5
+  comandante preservado, 5/5 `main_quantity=99` e 5/5 validacao OK.
+- Local staging atual com budget 8s: 5/5 Velomachus cairam em fallback por
+  timeout.
+- Local com patch e `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS` default 20s
+  para Commander/Brawl reference-guided: 0/5 fallbacks, 5/5 OpenAI real,
+  5/5 comandante preservado, 5/5 `main_quantity=99`, 5/5 validacao OK e
+  `on_theme` aproximado 10-13.
+- Baseline sem `commander_name` permaneceu no budget legacy de 8s, preservando
+  compatibilidade para clientes antigos.
+
+Leitura: o resultado e **PASS WITH RISKS**. A taxa de fallback caiu de forma
+clara no caso-alvo sem piorar contrato/validacao, mas o N ainda e pequeno para
+afirmar ganho estatistico definitivo de qualidade tematica contra a melhor
+amostra publica anterior.

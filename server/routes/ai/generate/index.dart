@@ -311,15 +311,13 @@ $metaContext
 ''';
 
     final normalizedFormat = normalizeAiGenerateFormat(format);
-    final openAiTimeout = aiConfig.timeoutFor(
-      key: 'OPENAI_TIMEOUT_GENERATE_SECONDS',
-      fallback: const Duration(seconds: 8),
-      devFallback: const Duration(seconds: 8),
-      stagingFallback: const Duration(seconds: 8),
-      prodFallback: const Duration(seconds: 12),
-      min: const Duration(seconds: 3),
-      max: const Duration(seconds: 90),
+    final openAiTimeoutSelection = selectAiGenerateOpenAiTimeout(
+      config: aiConfig,
+      normalizedFormat: normalizedFormat,
+      referenceGuidanceEnabled: referenceGuidanceEnabled,
     );
+    final openAiTimeout = openAiTimeoutSelection.timeout;
+    timings['openai_timeout_ms'] = openAiTimeout.inMilliseconds;
     final maxTokens = aiConfig.intFor(
       key: 'OPENAI_MAX_TOKENS_GENERATE',
       fallback: normalizedFormat == 'commander' ? 3400 : 2200,
@@ -371,7 +369,9 @@ $metaContext
       timings['openai_ms'] = openAiStopwatch.elapsedMilliseconds;
       Log.w(
         'AI generate OpenAI timeout; using deterministic fallback. '
-        'format=$format timeout_ms=${openAiTimeout.inMilliseconds}',
+        'format=$format timeout_ms=${openAiTimeout.inMilliseconds} '
+        'timeout_key=${openAiTimeoutSelection.envKey} '
+        'reference_guidance=${openAiTimeoutSelection.referenceGuidanceBudget}',
       );
       final fallbackBody = await _buildMockGenerateResponse(
         pool: pool,

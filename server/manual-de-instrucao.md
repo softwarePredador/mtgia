@@ -3,6 +3,43 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Tuning de timeout do AI Generate com Commander Reference Guidance
+
+### O Porquê
+- A prova publica do Commander Archetype Reference Reuse confirmou melhor
+  qualidade tematica para `Velomachus Lorehold`, mas tambem expôs fallback por
+  timeout em 3/4 amostras com `commander_name`.
+- O objetivo foi reduzir `openai_timeout_deterministic_fallback` quando ha
+  Commander Reference Profile ou Archetype Reference Reuse, sem aumentar a
+  latencia do caminho legacy e sem alterar modelo, temperatura, prompt ou regras
+  de validacao.
+
+### O Como
+- Criado `selectAiGenerateOpenAiTimeout` em
+  `server/lib/ai_generate_performance_support.dart`.
+- O caminho legacy continua usando `OPENAI_TIMEOUT_GENERATE_SECONDS`
+  (`8s` dev/staging, `12s` prod).
+- O caminho Commander/Brawl com reference guidance passa a usar
+  `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS`, default `20s`, clamp `3-90s`.
+- Overrides explicitos por env sao honrados apos clamp; o codigo nao usa `max()`
+  para esconder uma reducao operacional intencional.
+- `POST /ai/generate` agora expõe `timings.openai_timeout_ms` como metadado
+  aditivo e loga apenas `format`, timeout, env key e flag de reference guidance.
+  Prompt, decklist, JWT, tokens e secrets continuam fora dos logs/docs.
+
+### Resultado
+- Publico atual antes do patch: Velomachus reference-guided com 5 amostras teve
+  `fallback_rate=40%`, 5/5 `status=200`, 5/5 comandante preservado,
+  5/5 `main_quantity=99` e 5/5 validacao OK.
+- Local staging atual 8s: `fallback_rate=100%` em 5 amostras Velomachus.
+- Local patch reference 20s: `fallback_rate=0%` em 5 amostras Velomachus,
+  5/5 `status=200`, 5/5 comandante preservado, 5/5 `main_quantity=99`,
+  5/5 validacao OK e `on_theme` aproximado 10-13.
+- Baseline sem `commander_name` permaneceu no budget legacy de 8s, confirmando
+  compatibilidade para apps/requests antigos.
+- Relatorio:
+  `server/doc/RELATORIO_AI_GENERATE_REFERENCE_TIMEOUT_TUNING_2026-05-11.md`.
+
 ## 2026-05-11 — Prova publica de qualidade do Commander Archetype Reference Reuse
 
 ### O Porquê
