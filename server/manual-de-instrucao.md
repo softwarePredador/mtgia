@@ -12793,3 +12793,26 @@ Antes de reexecutar com agentes, confirmar:
 adb devices -l
 flutter devices --no-version-check
 ```
+
+## 103. Lorehold external reference profile - 2026-05-11
+
+Foi criado um perfil externo/agregado para `Lorehold, the Historian` sem alterar
+codigo runtime e sem copiar decklists publicas completas.
+
+Artefatos:
+
+- `docs/qa/lorehold_reference_profile_2026-05-11.md`
+- `server/doc/RELATORIO_META_DECK_INTELLIGENCE_2026-05-11.md`
+
+Leitura tecnica:
+
+- Scryfall confirmou `Lorehold, the Historian` como comandante legal `R/W` e
+  listou tres prints publicas (`PSOS #201p`, `SOS #284`, `SOS #201`).
+- O backend local retornou duas prints (`PSOS #201p`, `SOS #284`), indicando que
+  a completude local de prints ainda nao deve ser prometida para este card.
+- EDHREC, Archidekt e MTGGoldfish foram usados apenas como sinais agregados de
+  baixa escala para Commander casual/high-power.
+- Playgroup ficou como **not proven** nesta rodada porque nao houve pagina
+  publica indexada/acessivel para Lorehold.
+- O perfil recomenda absorcao futura apenas como referencia
+  `boros_miracle_big_spells`, separada de `competitive_commander`/cEDH.
