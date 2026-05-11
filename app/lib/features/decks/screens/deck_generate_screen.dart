@@ -137,6 +137,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       );
 
       if (!mounted) return;
+      _logReferenceDiagnostics(result, _selectedCommanderName());
       setState(() {
         _generatedDeck = result;
         _isGenerating = false;
@@ -179,6 +180,35 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         ).showSnackBar(SnackBar(content: Text(message)));
       }
     }
+  }
+
+  void _logReferenceDiagnostics(
+    Map<String, dynamic> result,
+    String? commanderName,
+  ) {
+    final diagnostics = result['diagnostics'];
+    if (diagnostics is! Map) return;
+
+    final referenceProfileUsed = diagnostics['reference_profile_used'];
+    final referenceCardStatsUsed = diagnostics['reference_card_stats_used'];
+    if (referenceProfileUsed == null && referenceCardStatsUsed == null) {
+      return;
+    }
+
+    final unresolvedRaw = diagnostics['unresolved_reference_cards'];
+    final unresolvedCount =
+        unresolvedRaw is List
+            ? unresolvedRaw.length
+            : int.tryParse(unresolvedRaw?.toString() ?? '') ?? 0;
+
+    AppLogger.info(
+      '[DeckGenerate] reference diagnostics '
+      'commander="${commanderName ?? ''}" '
+      'reference_profile_used=$referenceProfileUsed '
+      'reference_card_stats_used=$referenceCardStatsUsed '
+      'on_theme_candidate_count=${diagnostics['on_theme_candidate_count']} '
+      'unresolved_reference_cards=$unresolvedCount',
+    );
   }
 
   bool _isGeneratedDeckValid() {

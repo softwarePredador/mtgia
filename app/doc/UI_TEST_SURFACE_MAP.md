@@ -214,6 +214,7 @@ comum de runtime:
 | `collection_entrypoints_runtime_test.dart` | Entry points de coleção usam helper comum de runtime. | Tabs ainda usam texto como evidência visual. |
 | `app_full_non_life_counter_visual_capture_smoke_test.dart` | Criar deck e Generate usam keys de dialog/prompt/CTA; helpers genéricos foram removidos. | Navegação ampla do shell ainda usa labels das tabs como evidência visual. |
 | `lorehold_generate_reference_stats_runtime_test.dart` | Cadastro, CTA de generate em lista vazia, comandante, prompt, salvar preview e abrir deck salvo por keys estáveis. | Labels de navegação `Decks`/`Meus Decks` seguem como evidência visual. |
+| `strixhaven_commander_profiles_runtime_test.dart` | Cadastro/login, generate Commander com `commander_name`, preview, salvar, abrir Deck Detail e validar decks por keys estáveis e API real. | Labels de navegação `Decks`/`Meus Decks` seguem como evidência visual; screenshots ficam como markers sanitizados. |
 
 ## Checkpoints obrigatórios para agentes
 

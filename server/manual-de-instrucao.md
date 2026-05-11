@@ -3,6 +3,39 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Runtime app real dos Secrets of Strixhaven Commander Profiles
+
+### O Porquê
+- A aplicacao dos Commander Reference Profiles no backend precisava de prova no
+  app real, nao apenas probes server-side, para confirmar que o campo mobile
+  `commander_name` ativa Lorehold, Dina e Zimone sem quebrar register/login,
+  preview, save, Deck Details e validacao.
+
+### O Como
+- Criado `app/integration_test/strixhaven_commander_profiles_runtime_test.dart`.
+- O harness usa keys estaveis existentes para auth e generate, executa no Android
+  fisico `SM A135M` (`R58T300SREH`) e valida por API real os decks salvos.
+- `DeckGenerateScreen` passou a registrar um log debug sanitizado dos diagnostics
+  opcionais de Commander Reference Profile/Card Stats quando o backend os expõe,
+  sem logar prompt completo, token, JWT ou payload sensivel.
+- Logs brutos com chunks de screenshot foram substituidos por logs sanitizados
+  com markers, summaries e paths de evidencia.
+
+### Resultado
+- Backend publico:
+  `https://evolution-cartinhas.8ktevp.easypanel.host`, `/health` `200`,
+  `git_sha=2e0702fb6face5721e53621a792d5ba15cd6705f`.
+- Runtime Android real: **PASS** para `Lorehold, the Historian`,
+  `Dina, Essence Brewer` e `Zimone, Infinite Analyst`.
+- Cada deck salvo ficou com 99 cartas nas 99, 1 comandante unico fora das 99,
+  100 cartas totais, 0 off-identity e `validation_ok=true`.
+- Diagnostics no app: `reference_profile_used=true`,
+  `reference_card_stats_used=true`, `unresolved_reference_cards=0` para os tres
+  comandantes.
+- Scanner/camera/OCR/MLKit nao foram usados.
+- Evidencia:
+  `app/doc/runtime_flow_handoffs/strixhaven_commander_profiles_runtime_2026-05-11.md`.
+
 ## 2026-05-11 — Secrets of Strixhaven Commander Reference Profiles v1
 
 ### O Porquê
