@@ -46,6 +46,11 @@ bool isLoreholdCommanderReferenceCandidate(String? commanderName) {
       normalizeCommanderReferenceName(loreholdReferenceCommanderName);
 }
 
+String? normalizedCommanderReferenceCandidate(String? commanderName) {
+  final normalized = normalizeCommanderReferenceName(commanderName ?? '');
+  return normalized.isEmpty ? null : normalized;
+}
+
 bool isReferenceProfileConfidenceUsable(Object? confidence) {
   return commanderReferenceConfidenceRank(confidence) >=
       commanderReferenceConfidenceRank('medium');
@@ -59,20 +64,19 @@ int commanderReferenceConfidenceRank(Object? confidence) {
 Map<String, dynamic> buildLoreholdReferenceProfilePayload({
   DateTime? updatedAt,
 }) {
-  final updatedIso = (updatedAt ?? DateTime.now().toUtc()).toIso8601String();
-  return {
-    'version': loreholdReferenceProfileVersion,
-    'source': loreholdReferenceProfileSource,
-    'commander': loreholdReferenceCommanderName,
-    'confidence': 'high',
-    'source_count': 4,
-    'updated_at': updatedIso,
-    'source_limit_notes': [
+  return buildCommanderReferenceProfilePayload(
+    commanderName: loreholdReferenceCommanderName,
+    version: loreholdReferenceProfileVersion,
+    source: loreholdReferenceProfileSource,
+    confidence: 'high',
+    sourceCount: 4,
+    colorIdentity: const ['R', 'W'],
+    sourceLimitNotes: const [
       'Aggregate/manual reference only; no copied public decklist.',
       'No heavy scraping and no private endpoint assumptions.',
       'No cEDH proof was established for this commander.',
     ],
-    'themes': [
+    themes: const [
       {
         'name': 'boros_miracle_big_spells',
         'confidence': 'high',
@@ -110,7 +114,7 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
             'Secondary subtheme only when discard value is intentionally supported.',
       },
     ],
-    'role_targets': {
+    roleTargets: const {
       'lands': {'min': 36, 'max': 38},
       'mana_rocks_treasure_ramp': {'min': 10, 'max': 13},
       'topdeck_miracle_setup': {'min': 6, 'max': 9},
@@ -122,7 +126,7 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
       'graveyard_recursion': {'min': 2, 'max': 5},
       'dedicated_win_conditions': {'min': 4, 'max': 7},
     },
-    'expected_packages': {
+    expectedPackages: const {
       'topdeck_and_miracle_setup': [
         "Sensei's Divining Top",
         'Scroll Rack',
@@ -166,7 +170,7 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
         "Chandra, Hope's Beacon",
       ],
     },
-    'avoid_patterns': [
+    avoidPatterns: const [
       {
         'pattern': 'blue_miracle_package',
         'examples': [
@@ -197,6 +201,51 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
             'Every expensive spell must map to payoff, removal, mana, refill or win condition.',
       },
     ],
+    updatedAt: updatedAt,
+  );
+}
+
+Map<String, dynamic> buildCommanderReferenceProfilePayload({
+  required String commanderName,
+  required String version,
+  required String source,
+  required String confidence,
+  required int sourceCount,
+  required List<String> colorIdentity,
+  required List<Map<String, dynamic>> themes,
+  required Map<String, dynamic> roleTargets,
+  required Map<String, List<String>> expectedPackages,
+  required List<Map<String, dynamic>> avoidPatterns,
+  List<String> sourceLimitNotes = const [],
+  DateTime? updatedAt,
+}) {
+  final commander = commanderName.trim();
+  if (commander.isEmpty) {
+    throw ArgumentError.value(commanderName, 'commanderName', 'is required');
+  }
+  final updatedIso = (updatedAt ?? DateTime.now().toUtc()).toIso8601String();
+  return {
+    'version': version.trim().isEmpty
+        ? commanderReferenceProfileHash({'commander': commander})
+        : version.trim(),
+    'source': source.trim().isEmpty
+        ? 'aggregate_reference_profile_v1'
+        : source.trim(),
+    'commander': commander,
+    'confidence': normalizeCommanderReferenceConfidence(confidence),
+    'source_count': sourceCount < 0 ? 0 : sourceCount,
+    'updated_at': updatedIso,
+    'color_identity': colorIdentity
+        .map((color) => color.trim().toUpperCase())
+        .where((color) => color.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort(),
+    'source_limit_notes': sourceLimitNotes,
+    'themes': themes,
+    'role_targets': roleTargets,
+    'expected_packages': expectedPackages,
+    'avoid_patterns': avoidPatterns,
   };
 }
 
@@ -247,6 +296,8 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
 }
 
 String buildCommanderReferenceProfilePrompt(Map<String, dynamic> profile) {
+  final commander = _profileCommanderName(profile);
+  final identity = _profileColorIdentity(profile);
   final themes = _themeNames(profile).take(6).join(', ');
   final roleTargets = _formatRoleTargets(profile['role_targets']);
   final packages = _formatExpectedPackages(profile['expected_packages']);
@@ -254,9 +305,9 @@ String buildCommanderReferenceProfilePrompt(Map<String, dynamic> profile) {
 
   return '''
 Commander reference profile active:
-- Use exactly "$loreholdReferenceCommanderName" as the Commander.
-- Format is Commander; total deck must be exactly 100 cards including Lorehold.
-- Color identity is exactly Red/White (R/W). Never include blue, black, green, or banned Commander cards.
+- Use exactly "$commander" as the Commander.
+- Format is Commander; total deck must be exactly 100 cards including the Commander.
+- Color identity is exactly ${identity.isEmpty ? 'the profile color identity' : identity.join('/')}. Never include cards outside this color identity or banned Commander cards.
 - Core themes: $themes.
 - Role targets: $roleTargets.
 - Prioritize these package signals when legal and budget/bracket appropriate: $packages.
@@ -269,7 +320,8 @@ Future<Map<String, dynamic>?> loadUsableCommanderReferenceProfile({
   required Pool pool,
   required String? commanderName,
 }) async {
-  if (!isLoreholdCommanderReferenceCandidate(commanderName)) return null;
+  final commander = commanderName?.trim();
+  if (commander == null || commander.isEmpty) return null;
 
   final result = await pool.execute(
     Sql.named('''
@@ -278,7 +330,7 @@ Future<Map<String, dynamic>?> loadUsableCommanderReferenceProfile({
       WHERE LOWER(commander_name) = LOWER(@commander)
       LIMIT 1
     '''),
-    parameters: {'commander': loreholdReferenceCommanderName},
+    parameters: {'commander': commander},
   );
 
   if (result.isEmpty) return null;
@@ -325,6 +377,17 @@ Future<void> upsertLoreholdReferenceProfile(
   DateTime? updatedAt,
 }) async {
   final profile = buildLoreholdReferenceProfilePayload(updatedAt: updatedAt);
+  await upsertCommanderReferenceProfile(pool, profile);
+}
+
+Future<void> upsertCommanderReferenceProfile(
+  Pool pool,
+  Map<String, dynamic> profile,
+) async {
+  final commander = _profileCommanderName(profile);
+  if (commander.isEmpty) {
+    throw ArgumentError.value(profile, 'profile', 'commander is required');
+  }
   await pool.execute(
     Sql.named('''
       INSERT INTO commander_reference_profiles (
@@ -348,8 +411,9 @@ Future<void> upsertLoreholdReferenceProfile(
         updated_at = NOW()
     '''),
     parameters: {
-      'commander': loreholdReferenceCommanderName,
-      'source': loreholdReferenceProfileSource,
+      'commander': commander,
+      'source':
+          profile['source']?.toString() ?? 'aggregate_reference_profile_v1',
       'profile': jsonEncode(profile),
     },
   );
@@ -371,6 +435,23 @@ int _sourceCount(Map<String, dynamic> profile) {
   if (raw is int) return raw;
   if (raw is num) return raw.toInt();
   return int.tryParse(raw?.toString() ?? '') ?? 0;
+}
+
+String _profileCommanderName(Map<String, dynamic> profile) {
+  final raw = profile['commander'] ?? profile['commander_name'];
+  return raw?.toString().trim() ?? '';
+}
+
+List<String> _profileColorIdentity(Map<String, dynamic> profile) {
+  final raw = profile['color_identity'];
+  if (raw is! Iterable) return const [];
+  final colors = raw
+      .map((color) => color.toString().trim().toUpperCase())
+      .where((color) => color.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+  return colors;
 }
 
 List<String> _themeNames(Map<String, dynamic> profile) {

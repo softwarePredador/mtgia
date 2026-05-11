@@ -50,6 +50,65 @@ void main() {
       );
     });
 
+    test('builds a generic commander profile payload for future commanders',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'test_profile_v1',
+        source: 'manual_reference_profile_v1',
+        confidence: 'medium-high',
+        sourceCount: 2,
+        colorIdentity: const ['G', 'U', 'G'],
+        themes: const [
+          {'name': 'test_value', 'confidence': 'medium'}
+        ],
+        roleTargets: const {
+          'lands': {'min': 36, 'max': 38}
+        },
+        expectedPackages: const {
+          'test_package': ['Cultivate']
+        },
+        avoidPatterns: const [
+          {
+            'pattern': 'off_color',
+            'examples': ['Lightning Bolt'],
+            'reason': 'outside commander identity',
+          }
+        ],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+
+      expect(profile['commander'], equals('Test Commander'));
+      expect(profile['confidence'], equals('medium_high'));
+      expect(profile['color_identity'], equals(['G', 'U']));
+      expect(profile['expected_packages'], contains('test_package'));
+      expect(isReferenceProfileConfidenceUsable(profile['confidence']), isTrue);
+    });
+
+    test('generic prompt uses commander name and profile color identity', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'test_profile_v1',
+        source: 'manual_reference_profile_v1',
+        confidence: 'medium',
+        sourceCount: 1,
+        colorIdentity: const ['B', 'G'],
+        themes: const [
+          {'name': 'graveyard_value', 'confidence': 'medium'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+      );
+
+      final prompt = buildCommanderReferenceProfilePrompt(profile);
+
+      expect(prompt, contains('"Test Commander"'));
+      expect(prompt, contains('B/G'));
+      expect(prompt, contains('graveyard_value'));
+      expect(prompt, isNot(contains('Lorehold')));
+    });
+
     test('prompt guidance forces Lorehold, R/W identity and avoid patterns',
         () {
       final profile = buildLoreholdReferenceProfilePayload(
@@ -58,7 +117,7 @@ void main() {
       final prompt = buildCommanderReferenceProfilePrompt(profile);
 
       expect(prompt, contains('"Lorehold, the Historian"'));
-      expect(prompt, contains('Color identity is exactly Red/White'));
+      expect(prompt, contains('Color identity is exactly R/W'));
       expect(prompt, contains('boros_miracle_big_spells'));
       expect(prompt, contains('topdeck_miracle_setup'));
       expect(prompt, contains('blue_miracle_package'));

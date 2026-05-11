@@ -104,6 +104,75 @@ void main() {
       expect(prompt, contains('Do not force every card'));
     });
 
+    test('flattens generic commander package stats', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'test_profile_v1',
+        source: 'manual_reference_profile_v1',
+        confidence: 'medium',
+        sourceCount: 1,
+        colorIdentity: const ['G'],
+        themes: const [
+          {'name': 'ramp_value', 'confidence': 'medium'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {
+          'ramp_package': ['Cultivate'],
+        },
+        avoidPatterns: const [],
+      );
+
+      final stats = buildCommanderReferenceCardStatsFromProfile(
+        profile: profile,
+        resolvedCardsByName: {
+          'cultivate': _resolvedCard(id: 'cultivate-id', name: 'Cultivate'),
+        },
+      );
+
+      expect(stats, hasLength(1));
+      expect(stats.single.commanderName, equals('Test Commander'));
+      expect(stats.single.packageKey, equals('ramp_package'));
+      expect(stats.single.role, equals('ramp_package'));
+      expect(stats.single.cardId, equals('cultivate-id'));
+      expect(buildCommanderReferenceCardStatsPrompt(stats),
+          contains('Test Commander'));
+    });
+
+    test('evaluator respects generic profile color identity', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'test_profile_v1',
+        source: 'manual_reference_profile_v1',
+        confidence: 'medium',
+        sourceCount: 1,
+        colorIdentity: const ['G'],
+        themes: const [],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+      );
+      final evaluation = evaluateGeneratedDeckAgainstReferenceStats(
+        generatedDeck: {
+          'cards': [
+            {'name': 'Lightning Bolt', 'quantity': 1},
+          ],
+        },
+        profile: profile,
+        stats: const [],
+        cardMetadataByName: {
+          'lightning bolt': _resolvedCard(
+            id: 'bolt-id',
+            name: 'Lightning Bolt',
+            colorIdentity: const ['R'],
+            typeLine: 'Instant',
+          ),
+        },
+      );
+
+      expect(evaluation.counts['off_theme'], equals(1));
+      expect(evaluation.classification, equals('off_theme'));
+    });
+
     test('evaluator classifies on-theme, generic, questionable and off-theme',
         () {
       final profile = buildLoreholdReferenceProfilePayload(

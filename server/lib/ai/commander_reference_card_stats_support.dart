@@ -145,8 +145,24 @@ List<CommanderReferenceCardStat> buildLoreholdReferenceCardStatsFromProfile({
   required Map<String, dynamic> profile,
   required Map<String, Map<String, dynamic>> resolvedCardsByName,
 }) {
+  return buildCommanderReferenceCardStatsFromProfile(
+    profile: profile,
+    resolvedCardsByName: resolvedCardsByName,
+  );
+}
+
+List<CommanderReferenceCardStat> buildCommanderReferenceCardStatsFromProfile({
+  required Map<String, dynamic> profile,
+  required Map<String, Map<String, dynamic>> resolvedCardsByName,
+}) {
   final expectedPackages = profile['expected_packages'];
   if (expectedPackages is! Map) return const [];
+
+  final commanderName =
+      (profile['commander'] ?? profile['commander_name'] ?? '')
+          .toString()
+          .trim();
+  if (commanderName.isEmpty) return const [];
 
   final source = profile['source']?.toString().trim().isNotEmpty == true
       ? profile['source'].toString().trim()
@@ -175,9 +191,9 @@ List<CommanderReferenceCardStat> buildLoreholdReferenceCardStatsFromProfile({
 
       stats.add(
         CommanderReferenceCardStat(
-          commanderName: loreholdReferenceCommanderName,
+          commanderName: commanderName,
           commanderNameNormalized: normalizeCommanderReferenceName(
-            loreholdReferenceCommanderName,
+            commanderName,
           ),
           cardName: cardName,
           cardNameNormalized: normalized,
@@ -199,6 +215,14 @@ List<CommanderReferenceCardStat> buildLoreholdReferenceCardStatsFromProfile({
 }
 
 Future<CommanderReferenceCardStatsResolution> resolveLoreholdReferenceCardStats(
+  Pool pool,
+  Map<String, dynamic> profile,
+) async {
+  return resolveCommanderReferenceCardStats(pool, profile);
+}
+
+Future<CommanderReferenceCardStatsResolution>
+    resolveCommanderReferenceCardStats(
   Pool pool,
   Map<String, dynamic> profile,
 ) async {
@@ -228,7 +252,7 @@ Future<CommanderReferenceCardStatsResolution> resolveLoreholdReferenceCardStats(
           preferredFormat: 'commander',
         );
 
-  final stats = buildLoreholdReferenceCardStatsFromProfile(
+  final stats = buildCommanderReferenceCardStatsFromProfile(
     profile: profile,
     resolvedCardsByName: resolved.map(
       (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
@@ -371,7 +395,8 @@ Future<CommanderReferenceCardStatsLoadResult>
   required String? commanderName,
   String minimumConfidence = 'medium',
 }) async {
-  if (!isLoreholdCommanderReferenceCandidate(commanderName)) {
+  final commander = commanderName?.trim();
+  if (commander == null || commander.isEmpty) {
     return const CommanderReferenceCardStatsLoadResult(
       tableAvailable: false,
       stats: [],
@@ -382,7 +407,7 @@ Future<CommanderReferenceCardStatsLoadResult>
   try {
     final minRank = commanderReferenceConfidenceRank(minimumConfidence);
     final commanderNormalized = normalizeCommanderReferenceName(
-      loreholdReferenceCommanderName,
+      commander,
     );
     final result = await pool.execute(
       Sql.named('''
@@ -495,8 +520,9 @@ String buildCommanderReferenceCardStatsPrompt(
     return '- ${entry.key}: $cards';
   }).join('\n');
 
+  final commanderName = usable.first.commanderName;
   return '''
-Reference card stats v1 active for $loreholdReferenceCommanderName:
+Reference card stats v1 active for $commanderName:
 $packageLines
 Use these normalized card stats as on-theme candidate pool and structured guidance when legal, bracket-appropriate and functional. Do not force every card; validation and deck balance remain mandatory.
 ''';
@@ -543,6 +569,7 @@ ReferenceGeneratedDeckEvaluation evaluateGeneratedDeckAgainstReferenceStats({
   required List<CommanderReferenceCardStat> stats,
   required Map<String, Map<String, dynamic>> cardMetadataByName,
 }) {
+  final commanderIdentity = _profileColorIdentity(profile);
   final statsByName = {
     for (final stat in stats)
       if (!stat.unresolved) stat.cardNameNormalized: stat,
@@ -578,6 +605,7 @@ ReferenceGeneratedDeckEvaluation evaluateGeneratedDeckAgainstReferenceStats({
       stat: stat,
       metadata: metadata,
       avoidNames: avoidNames,
+      commanderIdentity: commanderIdentity,
     );
     counts[classification] = (counts[classification] ?? 0) + quantity;
     final role = stat?.role ?? _genericRoleForCard(name, metadata);
@@ -698,6 +726,7 @@ String _classifyReferenceGeneratedCard({
   required CommanderReferenceCardStat? stat,
   required Map<String, dynamic>? metadata,
   required Set<String> avoidNames,
+  required Set<String> commanderIdentity,
 }) {
   if (stat != null) return 'on_theme';
   if (avoidNames.contains(normalizedName)) return 'off_theme';
@@ -706,13 +735,22 @@ String _classifyReferenceGeneratedCard({
   final identity = _metadataColorIdentity(metadata);
   if (!isWithinCommanderIdentity(
     cardIdentity: identity,
-    commanderIdentity: const {'R', 'W'},
+    commanderIdentity: commanderIdentity,
   )) {
     return 'off_theme';
   }
 
   if (_isGenericLoreholdSupport(name, metadata)) return 'generic';
   return 'questionable';
+}
+
+Set<String> _profileColorIdentity(Map<String, dynamic>? profile) {
+  final raw = profile?['color_identity'];
+  if (raw is! Iterable) return const {};
+  return raw
+      .map((color) => color.toString().trim().toUpperCase())
+      .where((color) => color.isNotEmpty)
+      .toSet();
 }
 
 Set<String> _metadataColorIdentity(Map<String, dynamic>? metadata) {

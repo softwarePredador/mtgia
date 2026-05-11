@@ -54,26 +54,24 @@ Future<Response> onRequest(RequestContext context) async {
     var referenceCardStats = const <CommanderReferenceCardStat>[];
     var unresolvedReferenceCards = const <String>[];
     final referenceProfileStopwatch = Stopwatch()..start();
-    if (isLoreholdCommanderReferenceCandidate(requestedCommanderName)) {
-      try {
-        referenceProfile = await loadUsableCommanderReferenceProfile(
+    try {
+      referenceProfile = await loadUsableCommanderReferenceProfile(
+        pool: pool,
+        commanderName: requestedCommanderName,
+      );
+      if (referenceProfile != null) {
+        final statsLoad = await loadUsableCommanderReferenceCardStats(
           pool: pool,
           commanderName: requestedCommanderName,
         );
-        if (referenceProfile != null) {
-          final statsLoad = await loadUsableCommanderReferenceCardStats(
-            pool: pool,
-            commanderName: requestedCommanderName,
-          );
-          referenceCardStats = statsLoad.stats;
-          unresolvedReferenceCards = statsLoad.unresolvedCardNames;
-        }
-      } catch (error) {
-        Log.w(
-          'Lorehold reference profile/card stats unavailable; continuing legacy generate path. '
-          'error=$error',
-        );
+        referenceCardStats = statsLoad.stats;
+        unresolvedReferenceCards = statsLoad.unresolvedCardNames;
       }
+    } catch (error) {
+      Log.w(
+        'Commander reference profile/card stats unavailable; continuing legacy generate path. '
+        'error=$error',
+      );
     }
     timings['reference_profile_ms'] =
         referenceProfileStopwatch.elapsedMilliseconds;
@@ -470,13 +468,18 @@ $metaContext
       commanderName = commanderRaw;
     }
 
+    final referenceCommanderName =
+        referenceProfile?['commander']?.toString().trim();
     if (referenceProfile != null &&
-        !isLoreholdCommanderReferenceCandidate(commanderName)) {
+        referenceCommanderName != null &&
+        referenceCommanderName.isNotEmpty &&
+        normalizeCommanderReferenceName(commanderName ?? '') !=
+            normalizeCommanderReferenceName(referenceCommanderName)) {
       Log.w(
-        'AI generate ignored Lorehold reference commander; forcing '
-        '$loreholdReferenceCommanderName before validation.',
+        'AI generate ignored reference commander; forcing '
+        '$referenceCommanderName before validation.',
       );
-      commanderName = loreholdReferenceCommanderName;
+      commanderName = referenceCommanderName;
     }
 
     final validationService = GeneratedDeckValidationService(
@@ -726,7 +729,6 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
   required Pool pool,
   required String? commanderName,
 }) async {
-  if (!isLoreholdCommanderReferenceCandidate(commanderName)) return null;
   try {
     final profile = await loadUsableCommanderReferenceProfile(
       pool: pool,
@@ -743,7 +745,7 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
     );
   } catch (error) {
     Log.w(
-      'Lorehold reference cache version unavailable for async generate; '
+      'Commander reference cache version unavailable for async generate; '
       'using legacy cache key. error=$error',
     );
     return null;
@@ -994,7 +996,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
 
   if (normalized == 'commander' || normalized == 'edh') {
     if (referenceProfile != null) {
-      return _mockLoreholdReferenceDeck();
+      return _mockReferenceProfileDeck(referenceProfile);
     }
 
     return {
@@ -1029,6 +1031,54 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
       total: 60,
       colors: const ['W', 'U', 'B', 'R', 'G'],
     ),
+  };
+}
+
+Map<String, dynamic> _mockReferenceProfileDeck(Map<String, dynamic> profile) {
+  if (isLoreholdCommanderReferenceCandidate(profile['commander']?.toString())) {
+    return _mockLoreholdReferenceDeck();
+  }
+
+  final commanderName =
+      (profile['commander'] ?? profile['commander_name'] ?? '')
+          .toString()
+          .trim();
+  final expectedPackages = profile['expected_packages'];
+  final nonLands = <String>[];
+  if (expectedPackages is Map) {
+    final entries = expectedPackages.entries.toList()
+      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+    for (final entry in entries) {
+      if (entry.value is! List) continue;
+      for (final rawCard in entry.value as List) {
+        final cardName = rawCard.toString().trim();
+        if (cardName.isEmpty || nonLands.contains(cardName)) continue;
+        nonLands.add(cardName);
+        if (nonLands.length >= 62) break;
+      }
+      if (nonLands.length >= 62) break;
+    }
+  }
+
+  final colors = (profile['color_identity'] as Iterable?)
+          ?.map((color) => color.toString().trim().toUpperCase())
+          .where((color) => color.isNotEmpty)
+          .toSet()
+          .toList() ??
+      const <String>[];
+  final basics = _buildBasicLandMockCards(
+    total: 99 - nonLands.length,
+    colors: colors.isEmpty ? const ['W'] : colors,
+  );
+
+  return {
+    'commander': {
+      'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName
+    },
+    'cards': [
+      for (final name in nonLands) {'name': name, 'quantity': 1},
+      ...basics,
+    ],
   };
 }
 

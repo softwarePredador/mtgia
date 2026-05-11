@@ -3,6 +3,49 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Generalizacao do Commander Reference Pipeline
+
+### O Porquê
+- Lorehold provou o fluxo completo de Commander Reference Profile/Card Stats,
+  mas o pipeline ainda estava hardcoded em funcoes e carregamento especificos
+  do comandante.
+- Para receber proximas listas por colecao/comandante sem refazer codigo, o
+  backend precisa aceitar um profile JSON curado e aplicar o mesmo caminho:
+  profile persistido, card stats resolvidos, diagnostics e generate
+  backward-compatible.
+
+### O Como
+- Criado runner generico:
+  `server/bin/commander_reference_profile.dart`.
+- O runner aceita:
+  - `--profile-json=<path>`;
+  - `--dry-run` padrao;
+  - `--apply` explicito;
+  - `--artifact-dir=<path>` opcional.
+- `loadUsableCommanderReferenceProfile` e
+  `loadUsableCommanderReferenceCardStats` agora carregam qualquer comandante
+  persistido com `confidence >= medium`; Lorehold continua como fixture e
+  regressao.
+- O prompt de `/ai/generate` usa nome e identidade de cor do profile, nao mais
+  valores fixos de Lorehold/RW.
+- O avaliador de deck gerado usa a identidade de cor do profile para classificar
+  `on_theme/generic/questionable/off_theme`.
+
+### Resultado
+- Dry-run sintetico do runner generico:
+  - comandante: `Test Commander`;
+  - cards resolvidos: `2/2`;
+  - unresolved: `0`;
+  - `db_mutations=false`.
+- Artifact:
+  `server/test/artifacts/commander_reference_profile_generalized_2026-05-11/test_commander_dry_run_summary.json`.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PIPELINE_GENERALIZATION_2026-05-11.md`.
+- Proximas listas podem ser enviadas quando tiverem pelo menos: nome exato do
+  comandante, identidade de cor, temas, role targets, expected packages,
+  avoid patterns e fontes/observacoes. Se vierem somente nomes, a proxima sprint
+  deve primeiro criar os profiles por pesquisa/curadoria.
+
 ## 2026-05-11 — Prova publica e runtime mobile de Lorehold Reference Card Stats v1
 
 ### O Porquê

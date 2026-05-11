@@ -1,0 +1,53 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "mode": "dry_run",
+  "db_mutations": false,
+  "commander": "Test Commander",
+  "started_at": "2026-05-11T17:46:53.153583Z",
+  "finished_at": "2026-05-11T17:46:56.096957Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_generalized_2026-05-11",
+  "profile_hash": "499418e75d51",
+  "profile_confidence": "medium",
+  "profile_usable_after_run": false,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": false,
+    "stats_total": 2,
+    "resolved_count": 2,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "package_coverage": {
+      "ramp_package": {
+        "resolved": 2,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 0,
+    "loaded_unresolved_after_run": [],
+    "cache_version": null
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}
