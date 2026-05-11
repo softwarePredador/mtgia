@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Quandrix, the Proof",
+  "started_at": "2026-05-11T18:16:03.368778Z",
+  "finished_at": "2026-05-11T18:16:32.476080Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_secrets_of_strixhaven_2026-05-11_apply",
+  "profile_hash": "102dfaabd01c",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 39,
+    "resolved_count": 39,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "cascade_safe_value_hits": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "high_impact_cascade_spells": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "ramp_and_land_velocity": {
+        "resolved": 10,
+        "unresolved": 0
+      },
+      "spell_value_payoffs": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "topdeck_and_cascade_setup": {
+        "resolved": 7,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 39,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:aeafe51a32a3"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

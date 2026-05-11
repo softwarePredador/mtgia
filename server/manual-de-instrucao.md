@@ -3,6 +3,37 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Secrets of Strixhaven Commander Reference Profiles v1
+
+### O Porquê
+- O pipeline generico de Commander Reference Profile precisava receber os
+  profiles ja curados de Secrets of Strixhaven e provar que eles ativam
+  `/ai/generate` sem quebrar compatibilidade mobile.
+- Como os profiles influenciam sugestoes de deck, o apply precisava de evidencia
+  explicita de `resolved/unresolved/off-color` antes de qualquer escrita.
+
+### O Como
+- Aplicados 10 profiles do lote 1:
+  Dina, Killian, Lorehold, Prismari, Quandrix, Quintorius, Rootha, Silverquill,
+  Witherbloom e Zimone.
+- O runner `server/bin/commander_reference_profile.dart` agora inclui
+  `off_color_count` e `off_color_reference_cards` nos summaries e bloqueia
+  `--apply` quando uma carta resolvida viola a identidade de cor do comandante.
+- `server/lib/ai/commander_reference_card_stats_support.dart` ganhou
+  `findOffColorCommanderReferenceCards`, coberto por teste focado.
+
+### Resultado
+- Dry-run/apply dos 10 profiles: `unresolved=0`, `off_color=0`, profiles e card
+  stats carregaveis apos escrita.
+- Probes locais sanitizados de `/ai/generate` para Lorehold, Dina e Zimone:
+  `reference_profile_used=true`, `reference_card_stats_used=true`, 100 cartas,
+  comandante unico, 0 off-identity e `validation.is_valid=true`.
+- Validacao: `dart analyze lib/ai routes/ai bin test` PASS; testes focados de
+  Commander Reference/Profile Generate Performance PASS, com o teste live externo
+  skipado por flag.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_SECRETS_OF_STRIXHAVEN_2026-05-11.md`.
+
 ## 2026-05-11 — Generalizacao do Commander Reference Pipeline
 
 ### O Porquê

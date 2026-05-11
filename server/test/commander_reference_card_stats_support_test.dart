@@ -138,6 +138,47 @@ void main() {
           contains('Test Commander'));
     });
 
+    test('audits off-color reference cards before profile apply', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'test_profile_v1',
+        source: 'manual_reference_profile_v1',
+        confidence: 'medium',
+        sourceCount: 1,
+        colorIdentity: const ['G'],
+        themes: const [
+          {'name': 'green_value', 'confidence': 'medium'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {
+          'mixed_package': ['Cultivate', 'Lightning Bolt'],
+        },
+        avoidPatterns: const [],
+      );
+      final resolvedCardsByName = {
+        'cultivate': _resolvedCard(id: 'cultivate-id', name: 'Cultivate'),
+        'lightning bolt': _resolvedCard(
+          id: 'bolt-id',
+          name: 'Lightning Bolt',
+          colorIdentity: const ['R'],
+          typeLine: 'Instant',
+        ),
+      };
+      final stats = buildCommanderReferenceCardStatsFromProfile(
+        profile: profile,
+        resolvedCardsByName: resolvedCardsByName,
+      );
+
+      expect(
+        findOffColorCommanderReferenceCards(
+          profile: profile,
+          stats: stats,
+          resolvedCardsByName: resolvedCardsByName,
+        ),
+        equals(['Lightning Bolt']),
+      );
+    });
+
     test('evaluator respects generic profile color identity', () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: 'Test Commander',

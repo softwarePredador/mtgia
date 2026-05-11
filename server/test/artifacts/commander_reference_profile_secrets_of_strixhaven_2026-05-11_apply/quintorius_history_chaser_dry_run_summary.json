@@ -1,0 +1,71 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "mode": "dry_run",
+  "db_mutations": false,
+  "commander": "Quintorius, History Chaser",
+  "started_at": "2026-05-11T18:13:26.596333Z",
+  "finished_at": "2026-05-11T18:13:30.299736Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_secrets_of_strixhaven_2026-05-11_apply",
+  "profile_hash": "3d15c2f5913d",
+  "profile_confidence": "high",
+  "profile_usable_after_run": false,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": false,
+    "stats_total": 39,
+    "resolved_count": 39,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "graveyard_leave_enablers": {
+        "resolved": 10,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "loot_self_mill_setup": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "planeswalker_protection": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "spirit_and_token_payoffs": {
+        "resolved": 8,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 0,
+    "loaded_unresolved_after_run": [],
+    "cache_version": null
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

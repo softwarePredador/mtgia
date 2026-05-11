@@ -49,6 +49,12 @@ Future<void> main(List<String> args) async {
     );
 
     if (apply) {
+      if (cardStatsResolution.offColorCardNames.isNotEmpty) {
+        throw StateError(
+          'Profile contem cartas fora da identidade de cor do comandante: '
+          '${cardStatsResolution.offColorCardNames.join(', ')}',
+        );
+      }
       await ensureCommanderReferenceProfileTable(pool);
       await ensureCommanderReferenceCardStatsTable(pool);
       await upsertCommanderReferenceProfile(pool, profile);
@@ -92,6 +98,8 @@ Future<void> main(List<String> args) async {
         'resolved_count': cardStatsResolution.resolvedCount,
         'unresolved_count': cardStatsResolution.unresolvedCardNames.length,
         'unresolved_reference_cards': cardStatsResolution.unresolvedCardNames,
+        'off_color_count': cardStatsResolution.offColorCardNames.length,
+        'off_color_reference_cards': cardStatsResolution.offColorCardNames,
         'package_coverage': cardStatsResolution.packageCoverage,
         'loaded_usable_after_run': loadedStats.stats.length,
         'loaded_unresolved_after_run': loadedStats.unresolvedCardNames,
@@ -122,6 +130,8 @@ Future<void> main(List<String> args) async {
           (summary['reference_card_stats'] as Map)['resolved_count'],
       'unresolved_count':
           (summary['reference_card_stats'] as Map)['unresolved_count'],
+      'off_color_count':
+          (summary['reference_card_stats'] as Map)['off_color_count'],
       'artifact': outputPath,
     }));
   } finally {

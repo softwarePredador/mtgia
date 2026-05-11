@@ -61,10 +61,12 @@ class CommanderReferenceCardStatsResolution {
   const CommanderReferenceCardStatsResolution({
     required this.stats,
     required this.unresolvedCardNames,
+    required this.offColorCardNames,
   });
 
   final List<CommanderReferenceCardStat> stats;
   final List<String> unresolvedCardNames;
+  final List<String> offColorCardNames;
 
   int get resolvedCount => stats.where((stat) => !stat.unresolved).length;
 
@@ -72,6 +74,8 @@ class CommanderReferenceCardStatsResolution {
         'resolved_count': resolvedCount,
         'unresolved_count': unresolvedCardNames.length,
         'unresolved_reference_cards': unresolvedCardNames,
+        'off_color_count': offColorCardNames.length,
+        'off_color_reference_cards': offColorCardNames,
         'package_coverage': packageCoverage,
       };
 
@@ -264,11 +268,48 @@ Future<CommanderReferenceCardStatsResolution>
       .toSet()
       .toList()
     ..sort();
+  final offColor = findOffColorCommanderReferenceCards(
+    profile: profile,
+    stats: stats,
+    resolvedCardsByName: resolved.map(
+      (key, value) => MapEntry(normalizeCommanderReferenceCardName(key), value),
+    ),
+  );
 
   return CommanderReferenceCardStatsResolution(
     stats: stats,
     unresolvedCardNames: unresolved,
+    offColorCardNames: offColor,
   );
+}
+
+List<String> findOffColorCommanderReferenceCards({
+  required Map<String, dynamic> profile,
+  required List<CommanderReferenceCardStat> stats,
+  required Map<String, Map<String, dynamic>> resolvedCardsByName,
+}) {
+  final commanderIdentity = _profileColorIdentity(profile);
+  final offColor = <String>{};
+  for (final stat in stats) {
+    if (stat.unresolved) continue;
+    final resolved = _findResolvedReferenceCard(
+      cardName: stat.cardName,
+      resolvedCardsByName: resolvedCardsByName,
+    );
+    final identity = resolveCardColorIdentity(
+      colorIdentity: _metadataStringIterable(resolved?['color_identity']),
+      colors: _metadataStringIterable(resolved?['colors']),
+      oracleText: resolved?['oracle_text']?.toString(),
+      manaCost: resolved?['mana_cost']?.toString(),
+    );
+    if (!isWithinCommanderIdentity(
+      cardIdentity: identity,
+      commanderIdentity: commanderIdentity,
+    )) {
+      offColor.add(stat.cardName);
+    }
+  }
+  return offColor.toList()..sort();
 }
 
 Future<void> ensureCommanderReferenceCardStatsTable(Pool pool) async {
@@ -759,6 +800,14 @@ Set<String> _metadataColorIdentity(Map<String, dynamic>? metadata) {
     return raw.map((value) => value.toString().trim().toUpperCase()).toSet();
   }
   return const {};
+}
+
+Iterable<String> _metadataStringIterable(Object? value) {
+  if (value is Iterable) {
+    return value.map((item) => item.toString());
+  }
+  final text = value?.toString().trim();
+  return text == null || text.isEmpty ? const <String>[] : [text];
 }
 
 bool _isOffThemeBasicLand(String normalizedName) {
