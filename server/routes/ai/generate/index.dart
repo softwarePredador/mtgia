@@ -53,6 +53,9 @@ Future<Response> onRequest(RequestContext context) async {
     Map<String, dynamic>? referenceProfile;
     var referenceCardStats = const <CommanderReferenceCardStat>[];
     var unresolvedReferenceCards = const <String>[];
+    var archetypeReferenceStats = const <CommanderReferenceCardStat>[];
+    var archetypeSourceCommanderNames = const <String>[];
+    var archetypeCommanderColorIdentity = const <String>[];
     final referenceProfileStopwatch = Stopwatch()..start();
     try {
       referenceProfile = await loadUsableCommanderReferenceProfile(
@@ -66,6 +69,17 @@ Future<Response> onRequest(RequestContext context) async {
         );
         referenceCardStats = statsLoad.stats;
         unresolvedReferenceCards = statsLoad.unresolvedCardNames;
+      } else {
+        final archetypeStatsLoad =
+            await loadCompatibleCommanderReferenceArchetypeStats(
+          pool: pool,
+          commanderName: requestedCommanderName,
+          prompt: prompt,
+        );
+        archetypeReferenceStats = archetypeStatsLoad.stats;
+        archetypeSourceCommanderNames = archetypeStatsLoad.sourceCommanderNames;
+        archetypeCommanderColorIdentity =
+            archetypeStatsLoad.commanderColorIdentity;
       }
     } catch (error) {
       Log.w(
@@ -79,12 +93,15 @@ Future<Response> onRequest(RequestContext context) async {
     final referenceProfileVersion = _buildReferenceGenerateCacheVersion(
       referenceProfile: referenceProfile,
       referenceCardStats: referenceCardStats,
+      archetypeReferenceStats: archetypeReferenceStats,
     );
+    final referenceGuidanceEnabled =
+        referenceProfile != null || archetypeReferenceStats.isNotEmpty;
     final cacheKey = buildAiGenerateCacheKey(
       prompt: prompt,
       format: format,
       bracket: bracket,
-      commanderName: referenceProfile == null ? null : requestedCommanderName,
+      commanderName: referenceGuidanceEnabled ? requestedCommanderName : null,
       referenceProfileVersion: referenceProfileVersion,
     );
 
@@ -126,6 +143,9 @@ Future<Response> onRequest(RequestContext context) async {
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        archetypeReferenceStats: archetypeReferenceStats,
+        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
         warningCode: 'openai_api_key_missing',
         warningMessage:
             'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
@@ -265,12 +285,18 @@ Deck construction guidelines:
 - Use exact real card names in English.
 ''';
 
-    final referenceProfilePrompt = referenceProfile == null
-        ? ''
-        : [
+    final referenceProfilePrompt = referenceProfile != null
+        ? [
             buildCommanderReferenceProfilePrompt(referenceProfile),
             buildCommanderReferenceCardStatsPrompt(referenceCardStats),
-          ].where((line) => line.trim().isNotEmpty).join('\n');
+          ].where((line) => line.trim().isNotEmpty).join('\n')
+        : archetypeReferenceStats.isNotEmpty
+            ? buildCommanderReferenceArchetypeStatsPrompt(
+                commanderName: requestedCommanderName ?? '',
+                stats: archetypeReferenceStats,
+                sourceCommanderNames: archetypeSourceCommanderNames,
+              )
+            : '';
 
     final userMessage = '''
 Build a deck based on this description: "$prompt".
@@ -351,6 +377,9 @@ $metaContext
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        archetypeReferenceStats: archetypeReferenceStats,
+        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
         warningCode: 'openai_timeout_deterministic_fallback',
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -400,6 +429,9 @@ $metaContext
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
           unresolvedReferenceCards: unresolvedReferenceCards,
+          archetypeReferenceStats: archetypeReferenceStats,
+          archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+          archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
           warningCode: 'openai_api_key_invalid_dev_fallback',
           warningMessage:
               'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
@@ -541,6 +573,12 @@ $metaContext
           ),
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
+      if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
+        'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
+          stats: archetypeReferenceStats,
+          sourceCommanderNames: archetypeSourceCommanderNames,
+          commanderColorIdentity: archetypeCommanderColorIdentity,
+        ),
       if (metaReferenceContext != null && metaReferenceContext.isNotEmpty)
         'meta_reference_context':
             augmentMetaDeckEvidencePayloadWithOutputMatches(
@@ -570,6 +608,9 @@ $metaContext
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        archetypeReferenceStats: archetypeReferenceStats,
+        archetypeSourceCommanderNames: archetypeSourceCommanderNames,
+        archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
         warningCode: 'ai_generate_validation_fallback',
         warningMessage:
             'A geracao principal retornou um deck invalido. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -647,6 +688,7 @@ Future<Response> _startAiGenerateAsyncJob({
   final referenceCacheVersion = await _resolveReferenceGenerateCacheVersion(
     pool: pool,
     commanderName: body['commander_name']?.toString(),
+    prompt: prompt,
   );
   final cacheKey = buildAiGenerateCacheKey(
     prompt: prompt,
@@ -714,8 +756,17 @@ Future<Response> _startAiGenerateAsyncJob({
 String? _buildReferenceGenerateCacheVersion({
   required Map<String, dynamic>? referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
+  List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
 }) {
-  if (referenceProfile == null) return null;
+  if (referenceProfile == null) {
+    final statsVersion = commanderReferenceCardStatsCacheVersion(
+      archetypeReferenceStats,
+    );
+    return statsVersion?.replaceFirst(
+      'reference_card_stats_v1:',
+      'archetype_reference_v1:',
+    );
+  }
   final profileVersion =
       commanderReferenceProfileCacheVersion(referenceProfile);
   final statsVersion = commanderReferenceCardStatsCacheVersion(
@@ -728,13 +779,26 @@ String? _buildReferenceGenerateCacheVersion({
 Future<String?> _resolveReferenceGenerateCacheVersion({
   required Pool pool,
   required String? commanderName,
+  required String prompt,
 }) async {
   try {
     final profile = await loadUsableCommanderReferenceProfile(
       pool: pool,
       commanderName: commanderName,
     );
-    if (profile == null) return null;
+    if (profile == null) {
+      final archetypeStatsLoad =
+          await loadCompatibleCommanderReferenceArchetypeStats(
+        pool: pool,
+        commanderName: commanderName,
+        prompt: prompt,
+      );
+      return _buildReferenceGenerateCacheVersion(
+        referenceProfile: null,
+        referenceCardStats: const [],
+        archetypeReferenceStats: archetypeStatsLoad.stats,
+      );
+    }
     final statsLoad = await loadUsableCommanderReferenceCardStats(
       pool: pool,
       commanderName: commanderName,
@@ -863,6 +927,9 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   List<String> unresolvedReferenceCards = const [],
+  List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
+  List<String> archetypeSourceCommanderNames = const [],
+  List<String> archetypeCommanderColorIdentity = const [],
   required String warningCode,
   required String warningMessage,
 }) async {
@@ -950,6 +1017,12 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           ),
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
+      if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
+        'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
+          stats: archetypeReferenceStats,
+          sourceCommanderNames: archetypeSourceCommanderNames,
+          commanderColorIdentity: archetypeCommanderColorIdentity,
+        ),
       'warnings': warnings,
     };
   } catch (e) {
@@ -978,6 +1051,12 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
+        ),
+      if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
+        'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
+          stats: archetypeReferenceStats,
+          sourceCommanderNames: archetypeSourceCommanderNames,
+          commanderColorIdentity: archetypeCommanderColorIdentity,
         ),
       'warnings': {
         'code': warningCode,

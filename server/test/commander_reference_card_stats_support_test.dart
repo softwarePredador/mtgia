@@ -104,6 +104,61 @@ void main() {
       expect(prompt, contains('Do not force every card'));
     });
 
+    test('builds lower-confidence archetype reuse prompt', () {
+      final prompt = buildCommanderReferenceArchetypeStatsPrompt(
+        commanderName: 'Test Boros Commander',
+        sourceCommanderNames: const [loreholdReferenceCommanderName],
+        stats: [
+          _stat(
+            cardName: "Sensei's Divining Top",
+            cardId: 'top-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 67,
+            confidence: 'medium',
+          ),
+        ],
+      );
+
+      expect(prompt, contains('Test Boros Commander'));
+      expect(prompt, contains(loreholdReferenceCommanderName));
+      expect(prompt, contains('lower than an exact commander profile'));
+      expect(prompt, contains('not as a decklist to copy'));
+      expect(prompt, contains("Sensei's Divining Top"));
+    });
+
+    test('builds archetype reuse diagnostics without claiming exact profile',
+        () {
+      final diagnostics = buildCommanderReferenceArchetypeStatsDiagnostics(
+        sourceCommanderNames: const [loreholdReferenceCommanderName],
+        commanderColorIdentity: const ['R', 'W'],
+        stats: [
+          _stat(
+            cardName: "Sensei's Divining Top",
+            cardId: 'top-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 67,
+            confidence: 'medium',
+          ),
+        ],
+      );
+
+      expect(diagnostics['reference_profile_used'], isFalse);
+      expect(diagnostics['reference_card_stats_used'], isFalse);
+      expect(diagnostics['archetype_reference_used'], isTrue);
+      expect(diagnostics['archetype_candidate_count'], equals(1));
+      expect(
+        diagnostics['archetype_package_keys'],
+        equals(['topdeck_and_miracle_setup']),
+      );
+      expect(
+        diagnostics['archetype_source_commanders'],
+        equals([loreholdReferenceCommanderName]),
+      );
+      expect(diagnostics['archetype_confidence'], equals('medium_low'));
+    });
+
     test('flattens generic commander package stats', () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: 'Test Commander',

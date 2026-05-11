@@ -13136,3 +13136,30 @@ Leitura tecnica:
   publica indexada/acessivel para Lorehold.
 - O perfil recomenda absorcao futura apenas como referencia
   `boros_miracle_big_spells`, separada de `competitive_commander`/cEDH.
+
+## 105. Commander archetype reference reuse - 2026-05-11
+
+Foi implementado em `/ai/generate` o reaproveitamento conservador de pacotes por
+arquetipo para comandantes sem profile exato.
+
+Regra operacional:
+
+- profile exato por `commander_name` continua tendo prioridade absoluta;
+- se nao houver profile exato, o backend pode ler stats ja aprovados de outros
+  comandantes compativeis por identidade de cor e tema/prompt;
+- essa orientacao e marcada como baixa confianca em diagnostics
+  (`archetype_reference_used=true`) e nao deve ser tratada como decklist copiada;
+- o generate nao grava rows novas durante esse fallback;
+- legalidade, identidade de cor, singleton, tamanho do deck e validacao final
+  continuam obrigatorios.
+
+Validacoes executadas:
+
+- `cd server && dart analyze lib/ai routes/ai test/commander_reference_card_stats_support_test.dart`: `PASS`;
+- `cd server && dart test test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart test/ai_generate_performance_support_test.dart -r expanded`: `PASS`, `+23`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_REUSE_2026-05-11.md`.
+
+Status: `PASS WITH RISKS`. A prova publica/runtime fica pendente ate deploy do
+backend com este commit.

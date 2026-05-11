@@ -105,6 +105,20 @@ class CommanderReferenceCardStatsLoadResult {
   final List<String> unresolvedCardNames;
 }
 
+class CommanderReferenceArchetypeStatsLoadResult {
+  const CommanderReferenceArchetypeStatsLoadResult({
+    required this.tableAvailable,
+    required this.stats,
+    required this.sourceCommanderNames,
+    required this.commanderColorIdentity,
+  });
+
+  final bool tableAvailable;
+  final List<CommanderReferenceCardStat> stats;
+  final List<String> sourceCommanderNames;
+  final List<String> commanderColorIdentity;
+}
+
 class ReferenceGeneratedDeckEvaluation {
   const ReferenceGeneratedDeckEvaluation({
     required this.classification,
@@ -507,6 +521,143 @@ Future<CommanderReferenceCardStatsLoadResult>
   }
 }
 
+Future<CommanderReferenceArchetypeStatsLoadResult>
+    loadCompatibleCommanderReferenceArchetypeStats({
+  required Pool pool,
+  required String? commanderName,
+  required String prompt,
+  String minimumConfidence = 'medium',
+  int limit = 48,
+}) async {
+  final commander = commanderName?.trim();
+  if (commander == null || commander.isEmpty) {
+    return const CommanderReferenceArchetypeStatsLoadResult(
+      tableAvailable: false,
+      stats: [],
+      sourceCommanderNames: [],
+      commanderColorIdentity: [],
+    );
+  }
+
+  final commanderIdentity = await _resolveCommanderReferenceTargetIdentity(
+    pool: pool,
+    commanderName: commander,
+  );
+  if (commanderIdentity == null) {
+    return const CommanderReferenceArchetypeStatsLoadResult(
+      tableAvailable: true,
+      stats: [],
+      sourceCommanderNames: [],
+      commanderColorIdentity: [],
+    );
+  }
+
+  try {
+    final minRank = commanderReferenceConfidenceRank(minimumConfidence);
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          s.commander_name,
+          s.commander_name_normalized,
+          s.card_name,
+          s.card_name_normalized,
+          s.card_id::text,
+          s.package_key,
+          s.role,
+          s.score,
+          s.confidence,
+          s.confidence_rank,
+          s.source,
+          s.evidence_count,
+          s.unresolved,
+          s.updated_at,
+          p.profile_json
+        FROM commander_reference_card_stats s
+        JOIN commander_reference_profiles p
+          ON p.commander_name = s.commander_name
+        WHERE s.unresolved = FALSE
+          AND s.confidence_rank >= @minimum_rank
+        ORDER BY s.confidence_rank DESC, s.score DESC, s.package_key ASC
+        LIMIT 600
+      '''),
+      parameters: {'minimum_rank': minRank},
+    );
+
+    final promptTokens = _referenceArchetypePromptTokens(prompt);
+    final sourceCommanders = <String>{};
+    final selected = <CommanderReferenceCardStat>[];
+    final seen = <String>{};
+
+    for (final row in result) {
+      final map = row.toColumnMap();
+      final sourceProfile = _decodeJsonMap(map['profile_json']);
+      if (sourceProfile == null ||
+          !isReferenceProfileConfidenceUsable(sourceProfile['confidence'])) {
+        continue;
+      }
+      final sourceIdentity = _profileColorIdentity(sourceProfile);
+      if (!isWithinCommanderIdentity(
+        cardIdentity: sourceIdentity,
+        commanderIdentity: commanderIdentity,
+      )) {
+        continue;
+      }
+
+      final sourceStat = _cardStatFromRow(map);
+      if (!_referenceArchetypeMatchesPrompt(
+        stat: sourceStat,
+        profile: sourceProfile,
+        promptTokens: promptTokens,
+      )) {
+        continue;
+      }
+      final key = '${sourceStat.cardNameNormalized}:${sourceStat.packageKey}';
+      if (!seen.add(key)) continue;
+
+      final sourceCommander = sourceStat.commanderName;
+      sourceCommanders.add(sourceCommander);
+      selected.add(
+        CommanderReferenceCardStat(
+          commanderName: commander,
+          commanderNameNormalized: normalizeCommanderReferenceName(commander),
+          cardName: sourceStat.cardName,
+          cardNameNormalized: sourceStat.cardNameNormalized,
+          cardId: sourceStat.cardId,
+          packageKey: sourceStat.packageKey,
+          role: sourceStat.role,
+          score: (sourceStat.score * 0.72).clamp(1, 100).toDouble(),
+          confidence: _downgradeArchetypeConfidence(sourceStat.confidence),
+          confidenceRank: commanderReferenceConfidenceRank(
+            _downgradeArchetypeConfidence(sourceStat.confidence),
+          ),
+          source: 'archetype_reference_reuse_v1:$sourceCommander',
+          evidenceCount: sourceStat.evidenceCount,
+          unresolved: false,
+          updatedAt: sourceStat.updatedAt,
+        ),
+      );
+      if (selected.length >= limit) break;
+    }
+
+    return CommanderReferenceArchetypeStatsLoadResult(
+      tableAvailable: true,
+      stats: selected,
+      sourceCommanderNames: sourceCommanders.toList()..sort(),
+      commanderColorIdentity: commanderIdentity.toList()..sort(),
+    );
+  } catch (error) {
+    if (_isUndefinedTableError(error)) {
+      return CommanderReferenceArchetypeStatsLoadResult(
+        tableAvailable: false,
+        stats: const [],
+        sourceCommanderNames: const [],
+        commanderColorIdentity: commanderIdentity.toList()..sort(),
+      );
+    }
+    rethrow;
+  }
+}
+
 String? commanderReferenceCardStatsCacheVersion(
   List<CommanderReferenceCardStat> stats,
 ) {
@@ -569,6 +720,44 @@ Use these normalized card stats as on-theme candidate pool and structured guidan
 ''';
 }
 
+String buildCommanderReferenceArchetypeStatsPrompt({
+  required String commanderName,
+  required List<CommanderReferenceCardStat> stats,
+  required List<String> sourceCommanderNames,
+}) {
+  final usable = stats.where((stat) => !stat.unresolved).toList()
+    ..sort((a, b) {
+      final packageCompare = a.packageKey.compareTo(b.packageKey);
+      if (packageCompare != 0) return packageCompare;
+      final scoreCompare = b.score.compareTo(a.score);
+      if (scoreCompare != 0) return scoreCompare;
+      return a.cardName.compareTo(b.cardName);
+    });
+  if (usable.isEmpty) return '';
+
+  final byPackage = <String, List<CommanderReferenceCardStat>>{};
+  for (final stat in usable) {
+    byPackage.putIfAbsent(stat.packageKey, () => []).add(stat);
+  }
+
+  final packageLines = byPackage.entries.map((entry) {
+    final cards = entry.value
+        .take(10)
+        .map((stat) => '${stat.cardName} [${stat.role}]')
+        .join(', ');
+    return '- ${entry.key}: $cards';
+  }).join('\n');
+  final sources = sourceCommanderNames.take(5).join(', ');
+
+  return '''
+Archetype reference package reuse active for $commanderName:
+- Derived from approved commander profiles: $sources.
+- Confidence is lower than an exact commander profile; use these as similar-archetype candidate packages, not as a decklist to copy.
+$packageLines
+Only use cards that are legal, color-identity compliant, bracket-appropriate and coherent with this commander's own text. Prefer exact commander profile data if available.
+''';
+}
+
 Map<String, dynamic> buildCommanderReferenceCardStatsDiagnostics({
   required List<CommanderReferenceCardStat> stats,
   required List<String> unresolvedCardNames,
@@ -580,6 +769,25 @@ Map<String, dynamic> buildCommanderReferenceCardStatsDiagnostics({
     'on_theme_candidate_count': stats.length,
     'unresolved_reference_cards': unresolvedCardNames,
     'package_keys': packageKeys,
+  };
+}
+
+Map<String, dynamic> buildCommanderReferenceArchetypeStatsDiagnostics({
+  required List<CommanderReferenceCardStat> stats,
+  required List<String> sourceCommanderNames,
+  required List<String> commanderColorIdentity,
+}) {
+  final packageKeys = stats.map((stat) => stat.packageKey).toSet().toList()
+    ..sort();
+  return {
+    'reference_profile_used': false,
+    'reference_card_stats_used': false,
+    'archetype_reference_used': stats.isNotEmpty,
+    'archetype_candidate_count': stats.length,
+    'archetype_package_keys': packageKeys,
+    'archetype_source_commanders': sourceCommanderNames,
+    'archetype_commander_color_identity': commanderColorIdentity,
+    'archetype_confidence': stats.isEmpty ? 'not_proven' : 'medium_low',
   };
 }
 
@@ -900,6 +1108,120 @@ String? _genericRoleForCard(String name, Map<String, dynamic>? metadata) {
   return null;
 }
 
+Future<Set<String>?> _resolveCommanderReferenceTargetIdentity({
+  required Pool pool,
+  required String commanderName,
+}) async {
+  final resolved = await resolveImportCardNames(
+    pool,
+    [
+      {'name': commanderName}
+    ],
+    preferredFormat: 'commander',
+  );
+  Map<String, dynamic>? card;
+  for (final entry in resolved.entries) {
+    if (normalizeCommanderReferenceCardName(entry.key) ==
+        normalizeCommanderReferenceCardName(commanderName)) {
+      card = entry.value;
+      break;
+    }
+  }
+  if (card == null && resolved.values.isNotEmpty) {
+    card = resolved.values.first;
+  }
+  if (card == null) return null;
+
+  return resolveCardColorIdentity(
+    colorIdentity: _metadataStringIterable(card['color_identity']),
+    colors: _metadataStringIterable(card['colors']),
+    oracleText: card['oracle_text']?.toString(),
+    manaCost: card['mana_cost']?.toString(),
+  );
+}
+
+Set<String> _referenceArchetypePromptTokens(String prompt) {
+  final normalized = prompt.toLowerCase();
+  final tokens = normalized
+      .split(RegExp(r'[^a-z0-9]+'))
+      .map((token) => token.trim())
+      .where((token) => token.length >= 4)
+      .toSet();
+  if (normalized.contains('big spell')) tokens.add('big_spells');
+  if (normalized.contains('magia grande') ||
+      normalized.contains('magias grandes')) {
+    tokens.add('big_spells');
+  }
+  if (normalized.contains('spell copy')) tokens.add('copy');
+  if (normalized.contains('copiar magia') ||
+      normalized.contains('copia magia')) {
+    tokens.add('copy');
+  }
+  if (normalized.contains('topdeck')) tokens.add('topdeck');
+  if (normalized.contains('topo do grimorio') ||
+      normalized.contains('topo do grimório')) {
+    tokens.add('topdeck');
+  }
+  if (normalized.contains('miracle')) tokens.add('miracle');
+  if (normalized.contains('milagre')) tokens.add('miracle');
+  if (normalized.contains('spellslinger')) tokens.add('spellslinger');
+  if (normalized.contains('muitas magias') ||
+      normalized.contains('instants e sorceries') ||
+      normalized.contains('instantaneas e feiticos') ||
+      normalized.contains('instantâneas e feitiços')) {
+    tokens.add('spellslinger');
+  }
+  return tokens;
+}
+
+bool _referenceArchetypeMatchesPrompt({
+  required CommanderReferenceCardStat stat,
+  required Map<String, dynamic> profile,
+  required Set<String> promptTokens,
+}) {
+  if (promptTokens.isEmpty) return true;
+  final haystack = <String>[
+    stat.packageKey,
+    stat.role,
+    stat.cardName,
+    for (final theme in _themeNamesFromProfile(profile)) theme,
+  ].join(' ').toLowerCase().replaceAll('_', ' ');
+  final compactHaystack = haystack.replaceAll(' ', '_');
+  return promptTokens.any(
+    (token) => haystack.contains(token) || compactHaystack.contains(token),
+  );
+}
+
+Iterable<String> _themeNamesFromProfile(Map<String, dynamic> profile) sync* {
+  final themes = profile['themes'];
+  if (themes is! Iterable) return;
+  for (final theme in themes) {
+    if (theme is Map && theme['name'] != null) {
+      yield theme['name'].toString();
+    } else {
+      yield theme.toString();
+    }
+  }
+}
+
+String _downgradeArchetypeConfidence(String confidence) {
+  final rank = commanderReferenceConfidenceRank(confidence);
+  if (rank >= commanderReferenceConfidenceRank('high')) return 'medium';
+  if (rank >= commanderReferenceConfidenceRank('medium_high')) return 'medium';
+  return 'medium_low';
+}
+
+Map<String, dynamic>? _decodeJsonMap(Object? value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return value.cast<String, dynamic>();
+  if (value is String && value.trim().isNotEmpty) {
+    final decoded = jsonDecode(value);
+    if (decoded is Map<String, dynamic>) return decoded;
+    if (decoded is Map) return decoded.cast<String, dynamic>();
+  }
+  return null;
+}
+
 String _referenceClassificationReason(String classification) {
   return switch (classification) {
     'generic' => 'legal_generic_support_or_mana_base',
@@ -929,6 +1251,7 @@ bool _isUndefinedTableError(Object error) {
   final text = error.toString().toLowerCase();
   return text.contains('42p01') ||
       text.contains('undefined_table') ||
-      text.contains('does not exist') &&
-          text.contains('commander_reference_card_stats');
+      (text.contains('does not exist') &&
+          (text.contains('commander_reference_card_stats') ||
+              text.contains('commander_reference_profiles')));
 }
