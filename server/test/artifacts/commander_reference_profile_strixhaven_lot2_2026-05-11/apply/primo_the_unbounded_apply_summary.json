@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Primo, the Unbounded",
+  "started_at": "2026-05-11T20:45:17.876598Z",
+  "finished_at": "2026-05-11T20:45:47.938064Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_strixhaven_lot2_2026-05-11/apply",
+  "profile_hash": "344fd173af45",
+  "profile_confidence": "medium_high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 43,
+    "resolved_count": 43,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "base_power_zero_threats": {
+        "resolved": 11,
+        "unresolved": 0
+      },
+      "counter_engine": {
+        "resolved": 9,
+        "unresolved": 0
+      },
+      "evasion_and_finish": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "interaction_and_protection": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "ramp": {
+        "resolved": 9,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 43,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:485aaa6ac409"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

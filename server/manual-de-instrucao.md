@@ -3,6 +3,37 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Commander Reference Profiles Strixhaven lote 2
+
+### O Porquê
+- Depois da validacao publica do tuning `76a8ddc`, o proximo passo seguro era
+  ampliar a cobertura de Commander Reference Profiles para comandantes de
+  Secrets of Strixhaven ainda sem profile exato.
+- O lote foi limitado a 8 comandantes com identidade/tema claros e bom suporte
+  de cartas no banco, evitando copiar decklists publicas ou promover cEDH sem
+  evidencia.
+
+### O Como
+- Selecionados e curados profiles JSON para Aziza, Berta, Excava, Gorma,
+  Muddle, Primo, Scriv e Zaffai.
+- As fontes externas foram usadas apenas como sinais agregados de Commander:
+  Scryfall, EDHREC, Wizards/SOC set context e comentario estrategico publico.
+  Nenhuma decklist completa, token, JWT, DSN, `DATABASE_URL` ou chave OpenAI foi
+  registrada.
+- O runner `server/bin/commander_reference_profile.dart` foi executado primeiro
+  em `--dry-run`; somente apos `unresolved=0` e `off_color=0` para todos os
+  profiles o lote foi aplicado.
+- A aplicacao foi repetida em artifact separado para provar idempotencia.
+
+### Resultado
+- 8/8 profiles aplicados em `commander_reference_profiles`.
+- `commander_reference_card_stats` resolveu 39-52 cartas representativas por
+  comandante, todas com `unresolved=0` e `off_color=0`.
+- Resultado: **PASS** para apply/idempotencia do lote; cEDH permanece
+  **not proven**.
+- Relatorio:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_2026-05-11.md`.
+
 ## 2026-05-11 — Prova publica do deploy de timeout reference-guided
 
 ### O Porquê

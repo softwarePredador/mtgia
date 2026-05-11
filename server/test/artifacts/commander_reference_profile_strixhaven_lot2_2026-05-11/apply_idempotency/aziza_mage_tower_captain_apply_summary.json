@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Aziza, Mage Tower Captain",
+  "started_at": "2026-05-11T20:47:40.000025Z",
+  "finished_at": "2026-05-11T20:48:13.375210Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_strixhaven_lot2_2026-05-11/apply_idempotency",
+  "profile_hash": "75894ac92fc2",
+  "profile_confidence": "medium",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 46,
+    "resolved_count": 46,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "copy_worthy_spells": {
+        "resolved": 10,
+        "unresolved": 0
+      },
+      "interaction_and_protection": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "spell_payoffs_and_copy": {
+        "resolved": 12,
+        "unresolved": 0
+      },
+      "token_creature_sources": {
+        "resolved": 12,
+        "unresolved": 0
+      },
+      "untap_vigilance_support": {
+        "resolved": 5,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 46,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:aaceb63572ed"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}

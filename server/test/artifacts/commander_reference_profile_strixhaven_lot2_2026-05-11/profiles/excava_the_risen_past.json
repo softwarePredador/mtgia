@@ -1,0 +1,132 @@
+{
+  "version": "secrets_of_strixhaven_excava_the_risen_past_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Excava, the Risen Past",
+  "confidence": "medium_high",
+  "source_count": 4,
+  "updated_at": "2026-05-11T20:45:00Z",
+  "color_identity": ["R", "W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a RW legendary creature from Secrets of Strixhaven Commander.",
+      "Scryfall card context verifies oracle text and color identity.",
+      "EDHREC Commander context and SOC set context exist; cEDH relevance is not proven."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/soc/2/excava-the-risen-past",
+    "https://edhrec.com/commanders/excava-the-risen-past",
+    "https://magic.wizards.com/en/news/announcements/secrets-of-strixhaven-commander-decklists",
+    "https://draftsim.com/strixhaven-secondary-precon-commanders/"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Expected packages are role signals, not copied public decklists.",
+    "Finality-counter recursion should be treated as value, not as a guaranteed loop."
+  ],
+  "themes": [
+    {
+      "name": "boros_small_permanent_recursion",
+      "confidence": "high",
+      "notes": "Excava attacks to return mana value 3 or less artifacts, creatures, or non-Aura enchantments from the graveyard."
+    },
+    {
+      "name": "graveyard_setup_and_loot",
+      "confidence": "medium_high",
+      "notes": "Discard, mill, and sacrifice setup turn the attack trigger into reliable value."
+    },
+    {
+      "name": "etb_death_value_with_finality",
+      "confidence": "medium_high",
+      "notes": "Returned cards should create value immediately because finality counters cap repeat recursion."
+    },
+    {
+      "name": "spirit_flying_token_pressure",
+      "confidence": "medium",
+      "notes": "Returned permanents become 1/1 flying Spirits, so anthem/token payoffs are secondary support."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 35, "max": 38},
+    "graveyard_setup": {"min": 7, "max": 11},
+    "cheap_recursion_targets": {"min": 14, "max": 22},
+    "artifact_enchantment_value": {"min": 7, "max": 12},
+    "spirit_token_payoffs": {"min": 4, "max": 8},
+    "interaction": {"min": 7, "max": 11},
+    "protection": {"min": 4, "max": 7}
+  },
+  "expected_packages": {
+    "graveyard_setup": [
+      "Faithless Looting",
+      "Thrill of Possibility",
+      "Cathartic Reunion",
+      "Bitter Reunion",
+      "Big Score",
+      "Unexpected Windfall",
+      "Perpetual Timepiece",
+      "Millikin"
+    ],
+    "cheap_permanent_value_targets": [
+      "Selfless Savior",
+      "Selfless Spirit",
+      "Hope of Ghirapur",
+      "Spirited Companion",
+      "Circuit Mender",
+      "Welcoming Vampire",
+      "Mentor of the Meek",
+      "Imperial Recruiter",
+      "Recruiter of the Guard",
+      "Goblin Engineer",
+      "Goblin Welder",
+      "Scrap Trawler"
+    ],
+    "artifact_enchantment_engine": [
+      "Skullclamp",
+      "Wayfarer's Bauble",
+      "Expedition Map",
+      "Mind Stone",
+      "Boros Signet",
+      "Arcane Signet",
+      "Talisman of Conviction",
+      "Seal of Cleansing",
+      "Soul-Guide Lantern",
+      "Tocasia's Welcome"
+    ],
+    "spirit_and_token_payoffs": [
+      "Clarion Spirit",
+      "Hofri Ghostforge",
+      "Anointed Procession",
+      "Mondrak, Glory Dominus",
+      "Impact Tremors",
+      "Intangible Virtue"
+    ],
+    "interaction_and_protection": [
+      "Swords to Plowshares",
+      "Path to Exile",
+      "Wear // Tear",
+      "Generous Gift",
+      "Blasphemous Act",
+      "Austere Command",
+      "Boros Charm",
+      "Flawless Maneuver"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "large_reanimator_targets",
+      "examples": ["seven-mana haymakers with no mana value 3 recursion target role"],
+      "reason": "Excava's trigger returns only low-mana permanents."
+    },
+    {
+      "pattern": "off_color_graveyard_packages",
+      "examples": ["black aristocrats recursion", "blue blink-control shells"],
+      "reason": "The profile is RW and must not import off-identity engines."
+    },
+    {
+      "pattern": "combo_assumption",
+      "examples": ["artifact-loop shell as the default plan"],
+      "reason": "Loop play is not proven as the product default and should be bracket-gated."
+    }
+  ]
+}

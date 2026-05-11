@@ -1,0 +1,133 @@
+{
+  "version": "secrets_of_strixhaven_aziza_mage_tower_captain_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Aziza, Mage Tower Captain",
+  "confidence": "medium",
+  "source_count": 3,
+  "updated_at": "2026-05-11T20:45:00Z",
+  "color_identity": ["R", "W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a RW legendary creature from Secrets of Strixhaven.",
+      "Scryfall card context verifies an instant/sorcery copy trigger paid by tapping three creatures.",
+      "Public Commander/source context exists, but commander-specific strategic evidence is thinner than SOC face commanders."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/174/aziza-mage-tower-captain",
+    "https://edhrec.com/commanders/aziza-mage-tower-captain",
+    "https://scryfall.com/sets/sos"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Profile relies primarily on oracle-text incentives and local card support.",
+    "No cEDH context was proven."
+  ],
+  "themes": [
+    {
+      "name": "boros_creature_tap_spell_copy",
+      "confidence": "high",
+      "notes": "Aziza copies instants and sorceries by tapping three untapped creatures."
+    },
+    {
+      "name": "go_wide_token_spellslinger",
+      "confidence": "medium_high",
+      "notes": "Cheap token makers provide bodies that pay the copy cost while spells provide payoff."
+    },
+    {
+      "name": "magecraft_and_cast_triggers",
+      "confidence": "medium",
+      "notes": "Spell payoffs help convert copied instants and sorceries into board pressure."
+    },
+    {
+      "name": "untap_vigilance_support",
+      "confidence": "medium",
+      "notes": "Untap and vigilance effects keep creatures available for both combat and copying."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 35, "max": 38},
+    "token_creature_sources": {"min": 11, "max": 17},
+    "copy_worthy_spells": {"min": 10, "max": 16},
+    "spell_payoffs": {"min": 6, "max": 10},
+    "untap_vigilance": {"min": 3, "max": 7},
+    "interaction": {"min": 7, "max": 11},
+    "protection": {"min": 4, "max": 7}
+  },
+  "expected_packages": {
+    "token_creature_sources": [
+      "Secure the Wastes",
+      "White Sun's Zenith",
+      "Finale of Glory",
+      "Hordeling Outburst",
+      "Dragon Fodder",
+      "Krenko's Command",
+      "Goblin Instigator",
+      "Servo Exhibition",
+      "Sram's Expertise",
+      "Launch the Fleet",
+      "Battle Screech",
+      "Clarion Spirit"
+    ],
+    "spell_payoffs_and_copy": [
+      "Young Pyromancer",
+      "Monastery Mentor",
+      "Storm-Kiln Artist",
+      "Leonin Lightscribe",
+      "Guttersnipe",
+      "Reverberate",
+      "Increasing Vengeance",
+      "Dualcaster Mage",
+      "Primal Amulet // Primal Wellspring",
+      "Double Vision",
+      "Bonus Round",
+      "Sunbird's Invocation"
+    ],
+    "copy_worthy_spells": [
+      "Boros Charm",
+      "Unexpected Windfall",
+      "Big Score",
+      "Jeska's Will",
+      "Comet Storm",
+      "Aurelia's Fury",
+      "Stoke the Flames",
+      "Generous Gift",
+      "Wear // Tear",
+      "Seize the Day"
+    ],
+    "untap_vigilance_support": [
+      "Village Bell-Ringer",
+      "To Arms!",
+      "Reconnaissance",
+      "Brave the Sands",
+      "Holdout Settlement"
+    ],
+    "interaction_and_protection": [
+      "Swords to Plowshares",
+      "Path to Exile",
+      "Blasphemous Act",
+      "Austere Command",
+      "Teferi's Protection",
+      "Flawless Maneuver",
+      "Clever Concealment"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "spellslinger_without_bodies",
+      "examples": ["pure Boros burn deck with no token creature density"],
+      "reason": "Aziza needs three untapped creatures to copy a spell."
+    },
+    {
+      "pattern": "off_color_magecraft_import",
+      "examples": ["Kykar, Wind's Fury", "Sedgemoor Witch", "Third Path Iconoclast"],
+      "reason": "Common spellslinger token cards can be off-color for RW."
+    },
+    {
+      "pattern": "copying_low_impact_spells",
+      "examples": ["copying cantrips with no payoff"],
+      "reason": "Copy targets should materially affect mana, cards, board, removal, or win conditions."
+    }
+  ]
+}

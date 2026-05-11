@@ -1,0 +1,139 @@
+{
+  "version": "secrets_of_strixhaven_zaffai_and_the_tempests_reference_profile_v1_2026-05-11",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Zaffai and the Tempests",
+  "confidence": "medium",
+  "source_count": 3,
+  "updated_at": "2026-05-11T20:45:00Z",
+  "color_identity": ["R", "U"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Local seed identifies a UR legendary creature from Secrets of Strixhaven.",
+      "Scryfall card context verifies once-per-turn free casting of an instant or sorcery from hand.",
+      "Public Commander/source context exists, but commander-specific strategic evidence is thinner than SOC face commanders."
+    ]
+  },
+  "source_refs": [
+    "https://scryfall.com/card/sos/246/zaffai-and-the-tempests",
+    "https://edhrec.com/commanders/zaffai-and-the-tempests",
+    "https://scryfall.com/sets/sos"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only.",
+    "Big-spell packages are role signals, not copied decklists.",
+    "Do not merge blindly with older Zaffai, Thunder Conductor profiles."
+  ],
+  "themes": [
+    {
+      "name": "izzet_free_big_spells_once_per_turn",
+      "confidence": "high",
+      "notes": "Zaffai can cast one instant or sorcery from hand for free during each of your turns."
+    },
+    {
+      "name": "hand_topdeck_setup_for_haymakers",
+      "confidence": "medium_high",
+      "notes": "Selection and card draw keep high-impact spells available without clogging early turns."
+    },
+    {
+      "name": "spell_copy_and_recursion",
+      "confidence": "medium",
+      "notes": "Copy and flashback effects turn a free big spell into a decisive swing."
+    },
+    {
+      "name": "spellslinger_payoff_shell",
+      "confidence": "medium",
+      "notes": "Cost reducers, Magecraft-like payoffs, and token engines support the free-spell plan."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 35, "max": 38},
+    "mana_rocks_ramp": {"min": 9, "max": 13},
+    "big_instants_sorceries": {"min": 12, "max": 19},
+    "selection_draw": {"min": 9, "max": 14},
+    "spell_copy_recursion": {"min": 6, "max": 11},
+    "interaction": {"min": 7, "max": 11},
+    "protection": {"min": 3, "max": 6}
+  },
+  "expected_packages": {
+    "ramp_and_cost_support": [
+      "Sol Ring",
+      "Arcane Signet",
+      "Izzet Signet",
+      "Talisman of Creativity",
+      "Goblin Electromancer",
+      "Baral, Chief of Compliance",
+      "Mizzix of the Izmagnus",
+      "Jace's Sanctum",
+      "Storm-Kiln Artist"
+    ],
+    "big_spell_payoffs": [
+      "Apex of Power",
+      "Clone Legion",
+      "Magma Opus",
+      "Aminatou's Augury",
+      "Expropriate",
+      "Time Stretch",
+      "Sea Gate Restoration // Sea Gate, Reborn",
+      "Creative Technique",
+      "Brass's Bounty",
+      "Volcanic Vision",
+      "Mizzix's Mastery",
+      "Sublime Epiphany",
+      "Treasure Cruise"
+    ],
+    "selection_and_setup": [
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Brainstorm",
+      "Ponder",
+      "Preordain",
+      "Faithless Looting",
+      "Frantic Search",
+      "Expressive Iteration",
+      "Big Score",
+      "Unexpected Windfall"
+    ],
+    "copy_recursion_payoffs": [
+      "Reverberate",
+      "Increasing Vengeance",
+      "Narset's Reversal",
+      "Expansion // Explosion",
+      "Twincast",
+      "Dualcaster Mage",
+      "Past in Flames",
+      "Underworld Breach",
+      "Thousand-Year Storm",
+      "Metallurgic Summonings",
+      "Swarm Intelligence",
+      "Arcane Bombardment",
+      "Archmage Emeritus"
+    ],
+    "interaction_and_protection": [
+      "Counterspell",
+      "Arcane Denial",
+      "Chaos Warp",
+      "Vandalblast",
+      "Reality Shift",
+      "Cyclonic Rift",
+      "Deflecting Swat"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "old_zaffai_profile_contamination",
+      "examples": ["Zaffai, Thunder Conductor magecraft thresholds as the only plan"],
+      "reason": "This profile is for the Secrets of Strixhaven commander named Zaffai and the Tempests."
+    },
+    {
+      "pattern": "small_spell_storm_only",
+      "examples": ["cantrip storm with no high-impact free spells"],
+      "reason": "The commander specifically rewards free-casting large instants and sorceries from hand."
+    },
+    {
+      "pattern": "off_color_big_spells",
+      "examples": ["Storm Herd", "Approach of the Second Sun"],
+      "reason": "Popular big spells from white are not legal in UR."
+    }
+  ]
+}

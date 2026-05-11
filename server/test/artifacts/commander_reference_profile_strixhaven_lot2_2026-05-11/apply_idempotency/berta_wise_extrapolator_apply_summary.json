@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Berta, Wise Extrapolator",
+  "started_at": "2026-05-11T20:48:15.699304Z",
+  "finished_at": "2026-05-11T20:48:47.042710Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_strixhaven_lot2_2026-05-11/apply_idempotency",
+  "profile_hash": "f0e20b9f2d6b",
+  "profile_confidence": "medium",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 44,
+    "resolved_count": 44,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "counter_engine": {
+        "resolved": 11,
+        "unresolved": 0
+      },
+      "interaction_and_protection": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "ramp": {
+        "resolved": 9,
+        "unresolved": 0
+      },
+      "untap_support": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "x_spells_and_fractals": {
+        "resolved": 9,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 44,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:0a8f46a868e7"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}
