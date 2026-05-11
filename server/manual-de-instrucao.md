@@ -13156,10 +13156,24 @@ Regra operacional:
 Validacoes executadas:
 
 - `cd server && dart analyze lib/ai routes/ai test/commander_reference_card_stats_support_test.dart`: `PASS`;
-- `cd server && dart test test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart test/ai_generate_performance_support_test.dart -r expanded`: `PASS`, `+23`.
+- `cd server && dart test test/commander_reference_card_stats_support_test.dart test/commander_reference_profile_support_test.dart test/ai_generate_performance_support_test.dart -r expanded`: `PASS`, `+23`;
+- `cd server && dart analyze lib routes test`: `PASS`;
+- `cd server && dart test -r expanded`: `PASS`, `+586`.
+
+Prova publica inicial em `e5d8d8a26d6692f0d038bdf05d1778ade2b43759`:
+
+- probe sanitizado de `Velomachus Lorehold` sem profile exato retornou
+  `archetype_reference_used=true`, `archetype_candidate_count=48`, fontes
+  `Lorehold, the Historian` e `Quintorius, History Chaser`, e validacao OK;
+- a rodada tambem expôs bug de fallback: quando a OpenAI excedia timeout, o
+  fallback deterministico preservava diagnostics de arquetipo mas retornava
+  `Isamaru, Hound of Konda`;
+- o handler foi corrigido para preservar `commander_name` no fallback
+  deterministico sem profile exato, resolvendo o comandante no banco antes de
+  montar o seed com terrenos basicos.
 
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_REUSE_2026-05-11.md`.
 
-Status: `PASS WITH RISKS`. A prova publica/runtime fica pendente ate deploy do
-backend com este commit.
+Status: `PASS WITH RISKS`. O patch de preservacao do comandante no fallback
+precisa de deploy publico e novo probe para fechar a prova runtime completa.

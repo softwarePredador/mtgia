@@ -12,8 +12,10 @@ import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
+import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/internal_ai_request_token.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_format_support.dart';
@@ -140,6 +142,7 @@ Future<Response> onRequest(RequestContext context) async {
         pool: pool,
         prompt: prompt,
         format: format,
+        requestedCommanderName: requestedCommanderName,
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
@@ -374,6 +377,7 @@ $metaContext
         pool: pool,
         prompt: prompt,
         format: format,
+        requestedCommanderName: requestedCommanderName,
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
@@ -426,6 +430,7 @@ $metaContext
           pool: pool,
           prompt: prompt,
           format: format,
+          requestedCommanderName: requestedCommanderName,
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
           unresolvedReferenceCards: unresolvedReferenceCards,
@@ -605,6 +610,7 @@ $metaContext
         pool: pool,
         prompt: prompt,
         format: format,
+        requestedCommanderName: requestedCommanderName,
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
@@ -924,6 +930,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   required Pool pool,
   required String prompt,
   required String format,
+  String? requestedCommanderName,
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   List<String> unresolvedReferenceCards = const [],
@@ -936,6 +943,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   final mockDeck = await _mockGeneratedDeck(
     pool,
     format,
+    requestedCommanderName: requestedCommanderName,
     referenceProfile: referenceProfile,
   );
 
@@ -1069,6 +1077,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
 Future<Map<String, dynamic>> _mockGeneratedDeck(
   Pool pool,
   String format, {
+  String? requestedCommanderName,
   Map<String, dynamic>? referenceProfile,
 }) async {
   final normalized = format.trim().toLowerCase();
@@ -1076,6 +1085,36 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   if (normalized == 'commander' || normalized == 'edh') {
     if (referenceProfile != null) {
       return _mockReferenceProfileDeck(referenceProfile);
+    }
+    final requestedCommander = requestedCommanderName?.trim();
+    if (requestedCommander != null && requestedCommander.isNotEmpty) {
+      final resolved = await resolveImportCardNames(
+        pool,
+        [
+          {'name': requestedCommander}
+        ],
+        preferredFormat: 'commander',
+      );
+      final card = _bestResolvedCommanderCard(
+        requestedCommander: requestedCommander,
+        resolved: resolved,
+      );
+      if (card != null) {
+        final colors = resolveCardColorIdentity(
+          colorIdentity: _stringIterable(card['color_identity']),
+          colors: _stringIterable(card['colors']),
+          oracleText: card['oracle_text']?.toString(),
+          manaCost: card['mana_cost']?.toString(),
+        ).toList()
+          ..sort();
+        return {
+          'commander': {'name': card['name']?.toString() ?? requestedCommander},
+          'cards': _buildBasicLandMockCards(
+            total: 99,
+            colors: colors.isEmpty ? const ['W'] : colors,
+          ),
+        };
+      }
     }
 
     return {
@@ -1237,6 +1276,28 @@ Map<String, dynamic> _mockLoreholdReferenceDeck() {
     'commander': {'name': loreholdReferenceCommanderName},
     'cards': cards,
   };
+}
+
+Map<String, dynamic>? _bestResolvedCommanderCard({
+  required String requestedCommander,
+  required Map<String, Map<String, dynamic>> resolved,
+}) {
+  if (resolved.isEmpty) return null;
+  for (final entry in resolved.entries) {
+    if (normalizeCommanderReferenceCardName(entry.key) ==
+        normalizeCommanderReferenceCardName(requestedCommander)) {
+      return entry.value;
+    }
+  }
+  return resolved.values.first;
+}
+
+Iterable<String> _stringIterable(Object? value) {
+  if (value is Iterable) return value.map((item) => item.toString());
+  if (value is String && value.trim().isNotEmpty) {
+    return value.split(',').map((item) => item.trim());
+  }
+  return const [];
 }
 
 List<Map<String, dynamic>> _buildBasicLandMockCards({
