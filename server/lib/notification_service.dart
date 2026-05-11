@@ -37,16 +37,19 @@ class NotificationService {
         },
       );
 
-      // Envia push notification em background (não bloqueia)
-      PushNotificationService.sendToUser(
-        pool: pool,
-        userId: userId,
-        title: title,
-        body: body,
-        data: {
-          'type': type,
-          if (referenceId != null) 'reference_id': referenceId,
-        },
+      // Envia push notification em background; a gravação no banco é a fonte
+      // de verdade e não deve depender da disponibilidade do FCM.
+      unawaited(
+        PushNotificationService.sendToUser(
+          pool: pool,
+          userId: userId,
+          title: title,
+          body: body,
+          data: {
+            'type': type,
+            if (referenceId != null) 'reference_id': referenceId,
+          },
+        ),
       );
     } catch (e, st) {
       Log.e(

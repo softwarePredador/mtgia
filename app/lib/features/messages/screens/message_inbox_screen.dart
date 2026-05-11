@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../providers/message_provider.dart';
-import 'chat_screen.dart';
 
 /// Tela Inbox de mensagens diretas — lista de conversas
 class MessageInboxScreen extends StatefulWidget {
@@ -14,12 +16,25 @@ class MessageInboxScreen extends StatefulWidget {
 }
 
 class _MessageInboxScreenState extends State<MessageInboxScreen> {
+  Timer? _pollTimer;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MessageProvider>().fetchConversations();
+      _pollTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+        if (mounted) {
+          context.read<MessageProvider>().fetchConversations();
+        }
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -56,6 +71,7 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
             color: AppTheme.manaViolet,
             onRefresh: () => provider.fetchConversations(),
             child: ListView.separated(
+              key: const Key('messages-inbox-list'),
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: provider.conversations.length,
               separatorBuilder:
@@ -67,18 +83,10 @@ class _MessageInboxScreenState extends State<MessageInboxScreen> {
               itemBuilder: (context, index) {
                 final conv = provider.conversations[index];
                 return _ConversationTile(
+                  key: Key('message-conversation-tile-${conv.id}'),
                   conversation: conv,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => ChatScreen(
-                              conversationId: conv.id,
-                              otherUser: conv.otherUser,
-                            ),
-                      ),
-                    );
+                    context.push('/messages/${conv.id}', extra: conv.otherUser);
                   },
                 );
               },
@@ -94,7 +102,11 @@ class _ConversationTile extends StatelessWidget {
   final Conversation conversation;
   final VoidCallback onTap;
 
-  const _ConversationTile({required this.conversation, required this.onTap});
+  const _ConversationTile({
+    super.key,
+    required this.conversation,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

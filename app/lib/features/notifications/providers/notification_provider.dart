@@ -42,7 +42,10 @@ class AppNotification {
 // ─── Provider ────────────────────────────────────────────────
 
 class NotificationProvider extends ChangeNotifier {
-  final ApiClient _api = ApiClient();
+  final ApiClient _api;
+
+  NotificationProvider({ApiClient? apiClient})
+    : _api = apiClient ?? ApiClient();
 
   List<AppNotification> _notifications = [];
   List<AppNotification> get notifications => _notifications;
@@ -52,6 +55,7 @@ class NotificationProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _hasLoadedNotifications = false;
 
   Timer? _pollTimer;
 
@@ -121,6 +125,7 @@ class NotificationProvider extends ChangeNotifier {
             list
                 .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
                 .toList();
+        _hasLoadedNotifications = true;
       }
     } catch (e, stackTrace) {
       debugPrint('[NotificationProvider] fetchNotifications error: $e');
@@ -133,6 +138,25 @@ class NotificationProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Atualiza badge/lista em resposta a um evento FCM em foreground.
+  Future<void> handleRealtimeEvent({
+    required String type,
+    String? referenceId,
+  }) async {
+    unawaited(
+      AppObservability.instance.recordEvent(
+        'notification_realtime_refresh',
+        category: 'notifications',
+        data: {'type': type, 'has_reference_id': referenceId != null},
+      ),
+    );
+
+    await fetchUnreadCount();
+    if (_hasLoadedNotifications || _notifications.isNotEmpty) {
+      await fetchNotifications();
     }
   }
 
@@ -213,7 +237,10 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
-    if (_notifications.isEmpty && _unreadCount == 0 && !_isLoading) {
+    if (_notifications.isEmpty &&
+        _unreadCount == 0 &&
+        !_isLoading &&
+        !_hasLoadedNotifications) {
       stopPolling();
       return;
     }
@@ -222,6 +249,7 @@ class NotificationProvider extends ChangeNotifier {
     _notifications = [];
     _unreadCount = 0;
     _isLoading = false;
+    _hasLoadedNotifications = false;
     notifyListeners();
   }
 

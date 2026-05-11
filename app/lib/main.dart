@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/push_notification_service.dart';
+import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/home_screen.dart';
@@ -45,6 +46,7 @@ import 'features/collection/screens/set_cards_screen.dart';
 import 'features/collection/screens/sets_catalog_screen.dart';
 import 'features/messages/providers/message_provider.dart';
 import 'features/messages/screens/message_inbox_screen.dart';
+import 'features/messages/screens/chat_screen.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
@@ -175,6 +177,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final TradeProvider _tradeProvider;
   late final MessageProvider _messageProvider;
   late final NotificationProvider _notificationProvider;
+  late final RealtimeNotificationCoordinator _realtimeCoordinator;
   late final GoRouter _router;
   bool _hadAuthenticatedSession = false;
 
@@ -390,6 +393,23 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             GoRoute(
               path: '/messages',
               builder: (context, state) => const MessageInboxScreen(),
+              routes: [
+                GoRoute(
+                  path: ':conversationId',
+                  builder: (context, state) {
+                    final conversationId =
+                        state.pathParameters['conversationId']!;
+                    final otherUser =
+                        state.extra is ConversationUser
+                            ? state.extra as ConversationUser
+                            : null;
+                    return ChatScreen(
+                      conversationId: conversationId,
+                      otherUser: otherUser,
+                    );
+                  },
+                ),
+              ],
             ),
             GoRoute(
               path: '/notifications',
@@ -419,6 +439,24 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ),
       ],
     );
+    _configureRealtimePushHandlers();
+  }
+
+  void _configureRealtimePushHandlers() {
+    _realtimeCoordinator = RealtimeNotificationCoordinator(
+      router: _router,
+      notificationProvider: _notificationProvider,
+      messageProvider: _messageProvider,
+      tradeProvider: _tradeProvider,
+    );
+
+    final pushService = PushNotificationService();
+    pushService.onForegroundMessage = (message) {
+      unawaited(_realtimeCoordinator.handleForegroundData(message.data));
+    };
+    pushService.onMessageTap = (message) {
+      _realtimeCoordinator.handleMessageTapData(message.data);
+    };
   }
 
   void _onAuthChanged() {
@@ -431,7 +469,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
       _messageProvider.startPolling();
 
       // Registra FCM token para push notifications
-      PushNotificationService().requestPermissionAndRegister();
+      if (!_disableFirebaseStartup && !_disablePushInit) {
+        unawaited(PushNotificationService().requestPermissionAndRegister());
+      }
       return;
     }
 
@@ -449,7 +489,9 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
       // Remove FCM token do server apenas quando houve sessão autenticada antes.
       // Evita chamadas redundantes no boot/login sem token válido no backend.
       if (_hadAuthenticatedSession) {
-        PushNotificationService().unregister();
+        if (!_disableFirebaseStartup && !_disablePushInit) {
+          unawaited(PushNotificationService().unregister());
+        }
       }
       _hadAuthenticatedSession = false;
 

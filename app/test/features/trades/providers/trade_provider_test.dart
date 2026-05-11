@@ -30,6 +30,63 @@ class _TradeFailureApiClient extends ApiClient {
   }
 }
 
+class _RealtimeTradeApiClient extends ApiClient {
+  final getEndpoints = <String>[];
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    getEndpoints.add(endpoint);
+    if (endpoint == '/trades/trade-1') {
+      return ApiResponse(200, {
+        'id': 'trade-1',
+        'status': 'shipped',
+        'type': 'sale',
+        'sender': {'id': 'buyer-1', 'username': 'buyer'},
+        'receiver': {'id': 'seller-1', 'username': 'seller'},
+        'created_at': '2026-05-11T10:00:00Z',
+        'updated_at': '2026-05-11T10:05:00Z',
+        'my_items': [],
+        'their_items': [],
+        'messages': [
+          {
+            'id': 'message-1',
+            'sender_id': 'seller-1',
+            'message': 'Enviado',
+            'created_at': '2026-05-11T10:05:00Z',
+          },
+        ],
+        'status_history': [
+          {
+            'id': 'history-1',
+            'old_status': 'accepted',
+            'new_status': 'shipped',
+            'changed_by_username': 'seller',
+            'created_at': '2026-05-11T10:05:00Z',
+          },
+        ],
+      });
+    }
+    if (endpoint == '/trades?page=1&limit=20&role=all') {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'trade-1',
+            'status': 'shipped',
+            'type': 'sale',
+            'sender': {'id': 'buyer-1', 'username': 'buyer'},
+            'receiver': {'id': 'seller-1', 'username': 'seller'},
+            'created_at': '2026-05-11T10:00:00Z',
+            'updated_at': '2026-05-11T10:05:00Z',
+          },
+        ],
+        'total': 1,
+        'page': 1,
+      });
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
+
 void main() {
   test(
     'createTrade maps item availability failure to friendly message',
@@ -69,6 +126,35 @@ void main() {
         'Esta troca mudou de status. Atualize e tente novamente.',
       );
       expect(provider.errorMessage, isNot(contains('invalid status')));
+    },
+  );
+
+  test(
+    'foreground trade status refreshes active detail and timeline',
+    () async {
+      final api = _RealtimeTradeApiClient();
+      final provider = TradeProvider(apiClient: api);
+      provider.setActiveTrade('trade-1');
+
+      await provider.handleRealtimeTradeEvent('trade_shipped', 'trade-1');
+
+      expect(provider.selectedTrade?.status, 'shipped');
+      expect(provider.chatMessages, hasLength(1));
+      expect(provider.selectedTrade?.statusHistory, hasLength(1));
+      expect(api.getEndpoints, contains('/trades/trade-1'));
+    },
+  );
+
+  test(
+    'foreground trade event refreshes inbox list when detail is inactive',
+    () async {
+      final api = _RealtimeTradeApiClient();
+      final provider = TradeProvider(apiClient: api);
+
+      await provider.handleRealtimeTradeEvent('trade_message', 'trade-1');
+
+      expect(provider.trades, hasLength(1));
+      expect(api.getEndpoints, contains('/trades?page=1&limit=20&role=all'));
     },
   );
 }

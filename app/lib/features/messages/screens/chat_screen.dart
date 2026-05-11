@@ -8,13 +8,9 @@ import '../providers/message_provider.dart';
 /// Tela de chat direto com bolhas, scroll infinito e polling 5s
 class ChatScreen extends StatefulWidget {
   final String conversationId;
-  final ConversationUser otherUser;
+  final ConversationUser? otherUser;
 
-  const ChatScreen({
-    super.key,
-    required this.conversationId,
-    required this.otherUser,
-  });
+  const ChatScreen({super.key, required this.conversationId, this.otherUser});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -24,13 +20,24 @@ class _ChatScreenState extends State<ChatScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   Timer? _pollTimer;
+  MessageProvider? _messageProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _messageProvider ??= context.read<MessageProvider>();
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _messageProvider?.setActiveConversation(widget.conversationId);
       _loadMessages();
       _markAsRead();
+      if (widget.otherUser == null) {
+        _messageProvider?.fetchConversations();
+      }
     });
     // Polling a cada 5 segundos para novas mensagens
     _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
@@ -41,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _pollTimer?.cancel();
+    _messageProvider?.clearActiveConversation(widget.conversationId);
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -76,6 +84,18 @@ class _ChatScreenState extends State<ChatScreen> {
     final currentUserId = context.select<AuthProvider, String?>(
       (auth) => auth.user?.id,
     );
+    final otherUser =
+        context.select<MessageProvider, ConversationUser?>((provider) {
+          for (final conversation in provider.conversations) {
+            if (conversation.id == widget.conversationId) {
+              return conversation.otherUser;
+            }
+          }
+          return null;
+        }) ??
+        widget.otherUser;
+    final label = otherUser?.label ?? 'Conversa';
+    final avatarUrl = otherUser?.avatarUrl;
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundAbyss,
@@ -88,17 +108,13 @@ class _ChatScreenState extends State<ChatScreen> {
               radius: 16,
               backgroundColor: AppTheme.manaViolet.withValues(alpha: 0.3),
               backgroundImage:
-                  widget.otherUser.avatarUrl != null &&
-                          widget.otherUser.avatarUrl!.isNotEmpty
-                      ? NetworkImage(widget.otherUser.avatarUrl!)
+                  avatarUrl != null && avatarUrl.isNotEmpty
+                      ? NetworkImage(avatarUrl)
                       : null,
               child:
-                  widget.otherUser.avatarUrl == null ||
-                          widget.otherUser.avatarUrl!.isEmpty
+                  avatarUrl == null || avatarUrl.isEmpty
                       ? Text(
-                        widget.otherUser.label.isNotEmpty
-                            ? widget.otherUser.label[0].toUpperCase()
-                            : '?',
+                        label.isNotEmpty ? label[0].toUpperCase() : '?',
                         style: const TextStyle(
                           color: AppTheme.manaViolet,
                           fontWeight: FontWeight.bold,
@@ -110,7 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                widget.otherUser.label,
+                label,
                 style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: AppTheme.fontLg,

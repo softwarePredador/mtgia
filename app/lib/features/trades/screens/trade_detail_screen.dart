@@ -21,32 +21,36 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   Timer? _pollTimer;
+  TradeProvider? _tradeProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _tradeProvider ??= context.read<TradeProvider>();
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TradeProvider>().fetchTradeDetail(widget.tradeId);
-      // Polling de mensagens a cada 10s
-      _pollTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      final provider = _tradeProvider;
+      if (provider == null) return;
+      provider.setActiveTrade(widget.tradeId);
+      provider.fetchTradeDetail(widget.tradeId);
+      // Polling leve atualiza status, timeline e mensagens quando push não chegar.
+      _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
         if (mounted) {
-          context.read<TradeProvider>().fetchMessages(widget.tradeId);
+          _tradeProvider?.refreshTradeDetail(widget.tradeId);
         }
       });
     });
   }
 
   @override
-  void deactivate() {
-    _pollTimer?.cancel();
-    _pollTimer = null;
-    context.read<TradeProvider>().clearSelectedTrade();
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
     _pollTimer?.cancel();
+    _tradeProvider?.clearActiveTrade(widget.tradeId);
+    _tradeProvider?.clearSelectedTrade();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();

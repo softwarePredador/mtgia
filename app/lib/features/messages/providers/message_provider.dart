@@ -104,6 +104,7 @@ class MessageProvider extends ChangeNotifier {
   final ApiClient _api;
   final Map<String, String> _lastMessageAtByConversation = {};
   final Set<String> _activeMessageFetches = {};
+  String? _activeConversationId;
 
   MessageProvider({ApiClient? apiClient}) : _api = apiClient ?? ApiClient();
 
@@ -134,6 +135,7 @@ class MessageProvider extends ChangeNotifier {
   /// Contagem global de mensagens não-lidas (para badge no AppBar)
   int _unreadCount = 0;
   int get unreadCount => _unreadCount;
+  String? get activeConversationId => _activeConversationId;
 
   Timer? _pollTimer;
 
@@ -150,6 +152,20 @@ class MessageProvider extends ChangeNotifier {
   void stopPolling() {
     _pollTimer?.cancel();
     _pollTimer = null;
+  }
+
+  void setActiveConversation(String conversationId) {
+    if (_activeConversationId == conversationId) {
+      return;
+    }
+    _activeConversationId = conversationId;
+  }
+
+  void clearActiveConversation(String conversationId) {
+    if (_activeConversationId != conversationId) {
+      return;
+    }
+    _activeConversationId = null;
   }
 
   @override
@@ -186,9 +202,10 @@ class MessageProvider extends ChangeNotifier {
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        _conversations = list
-            .map((e) => Conversation.fromJson(e as Map<String, dynamic>))
-            .toList();
+        _conversations =
+            list
+                .map((e) => Conversation.fromJson(e as Map<String, dynamic>))
+                .toList();
         _totalConversations = data['total'] as int? ?? list.length;
         // Sincronizar badge de unread
         _unreadCount = _conversations.fold(0, (sum, c) => sum + c.unreadCount);
@@ -199,6 +216,16 @@ class MessageProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> handleRealtimeDirectMessage(String conversationId) async {
+    await Future.wait([fetchUnreadCount(), fetchConversations()]);
+
+    if (_activeConversationId == conversationId) {
+      await fetchMessages(conversationId, incremental: true);
+      await markAsRead(conversationId);
+      await fetchUnreadCount();
     }
   }
 
@@ -247,17 +274,19 @@ class MessageProvider extends ChangeNotifier {
 
     try {
       final since = _lastMessageAtByConversation[conversationId];
-      final endpoint = incremental && since != null
-          ? '/conversations/$conversationId/messages?since=${Uri.encodeQueryComponent(since)}&limit=$limit'
-          : '/conversations/$conversationId/messages?page=$page&limit=$limit';
+      final endpoint =
+          incremental && since != null
+              ? '/conversations/$conversationId/messages?since=${Uri.encodeQueryComponent(since)}&limit=$limit'
+              : '/conversations/$conversationId/messages?page=$page&limit=$limit';
 
       final resp = await _api.get(endpoint);
       if (resp.statusCode == 200 && resp.data is Map) {
         final data = resp.data as Map<String, dynamic>;
         final list = (data['data'] as List?) ?? [];
-        final fetched = list
-            .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final fetched =
+            list
+                .map((e) => DirectMessage.fromJson(e as Map<String, dynamic>))
+                .toList();
 
         if (!incremental || since == null) {
           _messages = fetched;
@@ -266,7 +295,8 @@ class MessageProvider extends ChangeNotifier {
         } else if (fetched.isNotEmpty) {
           // Evita duplicatas ao mesclar com lista local (DESC)
           final existingIds = _messages.map((m) => m.id).toSet();
-          final toInsert = fetched.where((m) => !existingIds.contains(m.id)).toList();
+          final toInsert =
+              fetched.where((m) => !existingIds.contains(m.id)).toList();
           if (toInsert.isNotEmpty) {
             _messages.insertAll(0, toInsert);
             _totalMessages += toInsert.length;
@@ -306,10 +336,9 @@ class MessageProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final resp = await _api.post(
-        '/conversations/$conversationId/messages',
-        {'message': message},
-      );
+      final resp = await _api.post('/conversations/$conversationId/messages', {
+        'message': message,
+      });
       if (resp.statusCode == 201 && resp.data is Map) {
         final dm = DirectMessage.fromJson(resp.data as Map<String, dynamic>);
         _messages.insert(0, dm); // Mensagens em DESC, nova no topo
@@ -369,6 +398,7 @@ class MessageProvider extends ChangeNotifier {
         _totalConversations == 0 &&
         _totalMessages == 0 &&
         _unreadCount == 0 &&
+        _activeConversationId == null &&
         _lastMessageAtByConversation.isEmpty) {
       stopPolling();
       return;
@@ -384,6 +414,7 @@ class MessageProvider extends ChangeNotifier {
     _totalConversations = 0;
     _totalMessages = 0;
     _unreadCount = 0;
+    _activeConversationId = null;
     _lastMessageAtByConversation.clear();
     _activeMessageFetches.clear();
     notifyListeners();

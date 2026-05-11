@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -31,17 +33,41 @@ class PushNotificationService {
   final _api = ApiClient();
   FirebaseMessaging? _messaging;
   String? _currentToken;
+  Future<void>? _initFuture;
+  RemoteMessage? _pendingTapMessage;
+  bool _isListeningForTokenRefresh = false;
+  void Function(RemoteMessage message)? _onForegroundMessage;
+  void Function(RemoteMessage message)? _onMessageTap;
 
   /// Callback para quando uma notificação é recebida em foreground.
   /// O consumer pode mostrar um snackbar ou atualizar badge.
-  void Function(RemoteMessage message)? onForegroundMessage;
+  set onForegroundMessage(void Function(RemoteMessage message)? callback) {
+    _onForegroundMessage = callback;
+  }
 
   /// Callback para quando o usuário toca na notificação.
-  void Function(RemoteMessage message)? onMessageTap;
+  set onMessageTap(void Function(RemoteMessage message)? callback) {
+    _onMessageTap = callback;
+    final pending = _pendingTapMessage;
+    if (callback != null && pending != null) {
+      _pendingTapMessage = null;
+      callback(pending);
+    }
+  }
 
   /// Inicializa Firebase e configura handlers.
   /// Chamar uma vez no app startup.
   Future<void> init() async {
+    final existing = _initFuture;
+    if (existing != null) {
+      return existing;
+    }
+
+    _initFuture = _initInternal();
+    return _initFuture!;
+  }
+
+  Future<void> _initInternal() async {
     try {
       if (kIsWeb) {
         debugPrint(
@@ -54,6 +80,11 @@ class PushNotificationService {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       _messaging = FirebaseMessaging.instance;
+      await _messaging!.setForegroundNotificationPresentationOptions(
+        alert: false,
+        badge: false,
+        sound: false,
+      );
 
       // Handler de background (top-level function)
       FirebaseMessaging.onBackgroundMessage(
@@ -82,8 +113,11 @@ class PushNotificationService {
   /// Chamar após o login do usuário.
   Future<void> requestPermissionAndRegister() async {
     if (_messaging == null) {
-      debugPrint('[Push] Firebase não inicializado');
-      return;
+      debugPrint('[Push] Firebase ainda não inicializado; aguardando init');
+      await init();
+      if (_messaging == null) {
+        return;
+      }
     }
 
     try {
@@ -113,10 +147,13 @@ class PushNotificationService {
       }
 
       // Escuta mudanças de token (rotação automática do Firebase)
-      _messaging!.onTokenRefresh.listen((newToken) {
-        _currentToken = newToken;
-        _sendTokenToServer(newToken);
-      });
+      if (!_isListeningForTokenRefresh) {
+        _isListeningForTokenRefresh = true;
+        _messaging!.onTokenRefresh.listen((newToken) {
+          _currentToken = newToken;
+          unawaited(_sendTokenToServer(newToken));
+        });
+      }
     } catch (e) {
       debugPrint('[Push] Erro ao registrar: $e');
     }
@@ -155,13 +192,18 @@ class PushNotificationService {
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
-    debugPrint('[Push] Foreground: ${message.notification?.title}');
-    onForegroundMessage?.call(message);
+    debugPrint('[Push] Foreground: type=${message.data['type'] ?? 'unknown'}');
+    _onForegroundMessage?.call(message);
   }
 
   void _handleMessageTap(RemoteMessage message) {
-    debugPrint('[Push] Tap: ${message.data}');
-    onMessageTap?.call(message);
+    debugPrint('[Push] Tap: type=${message.data['type'] ?? 'unknown'}');
+    final callback = _onMessageTap;
+    if (callback == null) {
+      _pendingTapMessage = message;
+      return;
+    }
+    callback(message);
   }
 
   String? get currentToken => _currentToken;

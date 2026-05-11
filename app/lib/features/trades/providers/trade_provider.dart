@@ -441,6 +441,7 @@ class TradeProvider extends ChangeNotifier {
   // ─── State ──────────────────────────────────────────────────
   List<TradeOffer> _trades = [];
   TradeOffer? _selectedTrade;
+  String? _activeTradeId;
   bool _isLoading = false;
   String? _errorMessage;
   int _totalTrades = 0;
@@ -459,6 +460,17 @@ class TradeProvider extends ChangeNotifier {
   int get currentPage => _currentPage;
   List<TradeMessage> get chatMessages => _chatMessages;
   int get chatTotal => _chatTotal;
+  String? get activeTradeId => _activeTradeId;
+
+  void setActiveTrade(String tradeId) {
+    if (_activeTradeId == tradeId) return;
+    _activeTradeId = tradeId;
+  }
+
+  void clearActiveTrade(String tradeId) {
+    if (_activeTradeId != tradeId) return;
+    _activeTradeId = null;
+  }
 
   // ─── Fetch trades (list) ────────────────────────────────────
   Future<void> fetchTrades({
@@ -550,9 +562,20 @@ class TradeProvider extends ChangeNotifier {
 
   // ─── Fetch trade detail ─────────────────────────────────────
   Future<void> fetchTradeDetail(String tradeId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    await refreshTradeDetail(tradeId, showLoading: true);
+  }
+
+  Future<void> refreshTradeDetail(
+    String tradeId, {
+    bool showLoading = false,
+  }) async {
+    if (showLoading) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    } else {
+      _errorMessage = null;
+    }
 
     try {
       final res = await _api.get('/trades/$tradeId');
@@ -576,9 +599,19 @@ class TradeProvider extends ChangeNotifier {
         context: FriendlyErrorContext.tradeDetail,
       );
     } finally {
-      _isLoading = false;
+      if (showLoading) {
+        _isLoading = false;
+      }
       notifyListeners();
     }
+  }
+
+  Future<void> handleRealtimeTradeEvent(String type, String tradeId) async {
+    if (_activeTradeId == tradeId) {
+      await refreshTradeDetail(tradeId);
+      return;
+    }
+    await fetchTrades();
   }
 
   // ─── Create trade proposal ──────────────────────────────────
@@ -810,6 +843,7 @@ class TradeProvider extends ChangeNotifier {
         _errorMessage == null &&
         _totalTrades == 0 &&
         _currentPage == 1 &&
+        _activeTradeId == null &&
         _chatMessages.isEmpty &&
         _chatTotal == 0) {
       return;
@@ -817,6 +851,7 @@ class TradeProvider extends ChangeNotifier {
 
     _trades = [];
     _selectedTrade = null;
+    _activeTradeId = null;
     _isLoading = false;
     _errorMessage = null;
     _totalTrades = 0;

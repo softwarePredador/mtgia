@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -14,12 +16,25 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  Timer? _pollTimer;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationProvider>().fetchNotifications();
+      _pollTimer = Timer.periodic(const Duration(seconds: 25), (_) {
+        if (mounted) {
+          context.read<NotificationProvider>().fetchNotifications();
+        }
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -120,8 +135,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         context.push('/trades/$refId');
         break;
       case 'direct_message':
-        // refId = conversationId → navega direto para o inbox de mensagens
-        context.push('/messages');
+        context.push('/messages/$refId');
         break;
     }
   }

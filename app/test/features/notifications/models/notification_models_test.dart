@@ -1,5 +1,51 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
+
+class _FakeNotificationApiClient extends ApiClient {
+  final requestedEndpoints = <String>[];
+  final putEndpoints = <String>[];
+  int unread = 2;
+  bool readAllCalled = false;
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    requestedEndpoints.add(endpoint);
+    if (endpoint == '/notifications/count') {
+      return ApiResponse(200, {'unread': unread});
+    }
+    if (endpoint.startsWith('/notifications?')) {
+      return ApiResponse(200, {
+        'data': [
+          {
+            'id': 'notif-1',
+            'type': 'direct_message',
+            'reference_id': 'conversation-1',
+            'title': 'Nova mensagem',
+            'body': 'Oi',
+            'read_at': null,
+            'created_at': '2026-05-11T10:00:00Z',
+          },
+        ],
+        'total': 1,
+      });
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+
+  @override
+  Future<ApiResponse> put(String endpoint, Map<String, dynamic> body) async {
+    putEndpoints.add(endpoint);
+    if (endpoint == '/notifications/read-all') {
+      readAllCalled = true;
+      return ApiResponse(200, {'ok': true});
+    }
+    if (endpoint == '/notifications/notif-1/read') {
+      return ApiResponse(200, {'ok': true});
+    }
+    return ApiResponse(404, {'error': 'unexpected $endpoint'});
+  }
+}
 
 void main() {
   group('AppNotification Model', () {
@@ -44,9 +90,7 @@ void main() {
     });
 
     test('fromJson deve usar defaults para campos ausentes', () {
-      final json = {
-        'id': 'notif-3',
-      };
+      final json = {'id': 'notif-3'};
 
       final notif = AppNotification.fromJson(json);
 
@@ -113,6 +157,49 @@ void main() {
       // startPolling will fail without server, but stopPolling should work
       provider.stopPolling();
       // No exception means success
+    });
+
+    test(
+      'foreground event refreshes badge and loaded notification list',
+      () async {
+        final api = _FakeNotificationApiClient();
+        final provider = NotificationProvider(apiClient: api);
+
+        await provider.fetchNotifications();
+        api.unread = 3;
+
+        await provider.handleRealtimeEvent(
+          type: 'direct_message',
+          referenceId: 'conversation-1',
+        );
+
+        expect(provider.unreadCount, 3);
+        expect(provider.notifications, hasLength(1));
+        expect(
+          api.requestedEndpoints,
+          containsAll([
+            '/notifications/count',
+            '/notifications?page=1&limit=30',
+          ]),
+        );
+      },
+    );
+
+    test('markAsRead and markAllAsRead update local badge state', () async {
+      final api = _FakeNotificationApiClient();
+      final provider = NotificationProvider(apiClient: api);
+
+      await provider.fetchNotifications();
+      await provider.fetchUnreadCount();
+      expect(provider.unreadCount, 2);
+
+      await provider.markAsRead('notif-1');
+      expect(provider.notifications.single.isRead, isTrue);
+      expect(provider.unreadCount, 1);
+
+      await provider.markAllAsRead();
+      expect(api.readAllCalled, isTrue);
+      expect(provider.unreadCount, 0);
     });
   });
 }

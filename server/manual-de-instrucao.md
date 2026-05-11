@@ -3,6 +3,46 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Realtime Notifications & Badges
+
+### O Porquê
+- Badges e listas de notificacoes/mensagens/trades dependiam quase so de polling
+  ou refresh manual. Push FCM ja existia, mas `onForegroundMessage` e
+  `onMessageTap` nao estavam conectados aos providers/navegacao do app.
+- A experiencia esperada era receber eventos de follower, direct message,
+  trade message e status de trade sem sair da tela atual, mantendo fallback por
+  polling e sem expor payload sensivel.
+
+### O Como
+- Criado `app/lib/core/services/realtime_notification_coordinator.dart` para
+  parsear o payload FCM minimo (`type`, `reference_id`) e disparar refreshes
+  contextuais:
+  - notificacoes: badge + lista carregada;
+  - mensagens: inbox/unread + chat ativo;
+  - trades: detalhe completo do trade ativo ou lista de trades.
+- `PushNotificationService` agora guarda tap inicial pendente ate o callback
+  estar conectado, suprime banner foreground duplicado e registra token apos
+  Firebase init sem bloquear a primeira tela.
+- `main.dart` conecta os callbacks ao coordenador e adiciona a rota
+  `/messages/:conversationId` para deep link de `direct_message`.
+- `NotificationScreen`, `MessageInboxScreen` e `TradeDetailScreen` mantem
+  polling leve complementar; TradeDetail passou a atualizar status/timeline
+  alem de mensagens.
+- Backend preserva `NotificationService.create` como fonte DB e envia FCM com
+  `unawaited`; follow passou a usar a criacao deferida padronizada.
+
+### Resultado
+- Contratos atualizados em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- Mapa de testabilidade atualizado para inbox/conversas.
+- Relatorio criado em
+  `server/doc/RELATORIO_REALTIME_NOTIFICATIONS_2026-05-11.md`.
+- Validacao: analyze server focado PASS, analyze app PASS, `flutter test test`
+  PASS (`559` tests), `dart test` server PASS (`579` tests), live social/trading
+  notifications PASS contra backend local 8081 e runtime iPhone 15 Simulator
+  PASS com payload FCM simulado no app.
+- Handoff runtime:
+  `app/doc/runtime_flow_handoffs/deck_runtime_iphone15_simulator_2026-05-11.md`.
+
 ## 2026-05-08 — Fechamento dos gaps reais de UI/runtime testability
 
 ### O Porquê

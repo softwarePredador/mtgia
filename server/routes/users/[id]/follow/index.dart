@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/notification_service.dart';
 import '../../../../lib/observability.dart';
+import '../../../../lib/request_trace.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   switch (context.request.method) {
@@ -56,21 +57,16 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
     // Retornar contadores atualizados
     final counts = await _getFollowCounts(conn, targetId);
 
-    // 🔔 Notificação: novo seguidor
-    final followerInfo = await conn.execute(
-      Sql.named('SELECT username, display_name FROM users WHERE id = @id'),
-      parameters: {'id': userId},
-    );
-    final followerName = followerInfo.isNotEmpty
-        ? (followerInfo.first.toColumnMap()['display_name'] ??
-            followerInfo.first.toColumnMap()['username']) as String
-        : 'Alguém';
-    await NotificationService.create(
+    // 🔔 Notificação: novo seguidor (DB + FCM em fluxo deferido).
+    NotificationService.createFromActorDeferred(
       pool: conn,
+      actorUserId: userId,
       userId: targetId,
       type: 'new_follower',
-      title: '$followerName começou a seguir você',
+      titleBuilder: (followerName) => '$followerName começou a seguir você',
       referenceId: userId,
+      endpoint: 'POST /users/:id/follow',
+      requestId: _requestId(context),
     );
 
     return Response.json(
@@ -95,6 +91,14 @@ Future<Response> _followUser(RequestContext context, String targetId) async {
       statusCode: HttpStatus.internalServerError,
       body: {'error': 'Internal server error'},
     );
+  }
+}
+
+String _requestId(RequestContext context) {
+  try {
+    return context.read<RequestTrace>().requestId;
+  } catch (_) {
+    return context.request.headers['x-request-id'] ?? 'n/a';
   }
 }
 

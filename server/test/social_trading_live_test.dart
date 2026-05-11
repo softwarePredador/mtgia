@@ -80,6 +80,18 @@ void main() {
     return body['unread'] as int? ?? 0;
   }
 
+  Map<String, dynamic> notificationByType(
+    Map<String, dynamic> response,
+    String type,
+  ) {
+    final notifications =
+        (response['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+    return notifications.firstWhere(
+      (item) => item['type'] == type,
+      orElse: () => fail('notification type $type not found'),
+    );
+  }
+
   Future<Map<String, dynamic>> createTradeFixture(String suffix) async {
     final seller = await registerUser('${suffix}_seller');
     final buyer = await registerUser('${suffix}_buyer');
@@ -264,6 +276,9 @@ void main() {
             .map((item) => item['type'])
             .toSet();
         expect(acceptedTypes, contains('trade_accepted'));
+        final acceptedNotification =
+            notificationByType(acceptedNotifications, 'trade_accepted');
+        expect(acceptedNotification['reference_id'], tradeId);
 
         final invalidStatus = await http.put(
           Uri.parse('$baseUrl/trades/$tradeId/status'),
@@ -306,6 +321,9 @@ void main() {
             .map((item) => item['type'])
             .toSet();
         expect(buyerTypes, contains('trade_shipped'));
+        final shippedNotification =
+            notificationByType(buyerNotifications, 'trade_shipped');
+        expect(shippedNotification['reference_id'], tradeId);
 
         final tradeMessage = await jsonRequest(
           'POST',
@@ -318,6 +336,24 @@ void main() {
           tradeMessage.keys,
           containsAll(['id', 'trade_offer_id', 'sender_id', 'message']),
         );
+
+        final delivered = await jsonRequest(
+          'PUT',
+          '/trades/$tradeId/status',
+          token: buyerToken,
+          body: {'status': 'delivered'},
+        );
+        expect(delivered['old_status'], 'shipped');
+        expect(delivered['status'], 'delivered');
+
+        final completed = await jsonRequest(
+          'PUT',
+          '/trades/$tradeId/status',
+          token: sellerToken,
+          body: {'status': 'completed'},
+        );
+        expect(completed['old_status'], 'delivered');
+        expect(completed['status'], 'completed');
 
         final conversation = await jsonRequest(
           'POST',
@@ -348,7 +384,40 @@ void main() {
             .cast<Map<String, dynamic>>()
             .map((item) => item['type'])
             .toSet();
-        expect(types, containsAll(['trade_offer_received', 'direct_message']));
+        expect(
+          types,
+          containsAll([
+            'trade_offer_received',
+            'trade_message',
+            'trade_delivered',
+            'direct_message',
+          ]),
+        );
+        expect(
+          notificationByType(
+              notifications, 'trade_offer_received')['reference_id'],
+          tradeId,
+        );
+        expect(
+          notificationByType(notifications, 'trade_message')['reference_id'],
+          tradeId,
+        );
+        expect(
+          notificationByType(notifications, 'direct_message')['reference_id'],
+          conversationId,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 1600));
+        final completedNotifications = await jsonRequest(
+          'GET',
+          '/notifications?limit=20',
+          token: buyerToken,
+        );
+        expect(
+          notificationByType(
+              completedNotifications, 'trade_completed')['reference_id'],
+          tradeId,
+        );
       },
       timeout: const Timeout(Duration(minutes: 2)),
       skip: skipIntegration,

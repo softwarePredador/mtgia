@@ -141,6 +141,8 @@ de animação.
 |---|---|---|---|---|
 | Campo de chat direto | `ChatScreen` | `chat-message-field` | Preenche mensagem direta. | `enterText` por key. |
 | Enviar chat direto | `ChatScreen` | `chat-message-send-button` | Persiste mensagem em `/conversations/:id/messages`. | Tap por key + API. |
+| Lista de conversas | `MessageInboxScreen` | `messages-inbox-list` | Renderiza `/conversations` e atualiza por foreground/polling leve. | `find.byKey` + contagem por API. |
+| Conversa individual | `MessageInboxScreen` | `message-conversation-tile-<conversationId>` | Abre `/messages/:conversationId` com contexto estável para tap de FCM. | Tap por key ou deep link por rota. |
 | Lista de notificações | `NotificationScreen` | `notifications-list` | Renderiza notificações. | `find.byKey`. |
 | Notificação individual | `NotificationScreen` | `notification-tile-<notificationId>` | Abre contexto e marca como lida quando aplicável. | Tap por key. |
 | Ler todas | `NotificationScreen` | `notifications-read-all-button` | Marca todas como lidas. | Tap por key + API. |
