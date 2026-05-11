@@ -111,3 +111,65 @@ melhor amostra publica anterior, embora ainda acima do baseline historico.
   producao e confirmar headroom contra proxy/client timeout.
 - Se p95 continuar proximo de 20s, avaliar `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS=25`
   por env antes de mudar default em codigo.
+
+## Addendum 2026-05-11 17:29 BRT — Prova publica do deploy `76a8ddc`
+
+### Objetivo
+
+Validar no backend publico o deploy do commit
+`76a8ddc561f686318a6cf0dc4cecefc79de024e1` ("Tune AI generate reference
+timeout") para `POST /ai/generate` com `commander_name=Velomachus Lorehold` e
+Commander Archetype Reference Guidance.
+
+### Comandos executados
+
+| Comando | Resultado |
+| --- | --- |
+| `git fetch origin master && git pull --ff-only origin master` | PASS, branch local `master` em `76a8ddc`. |
+| Poll sanitizado de `GET /health` no backend publico | PASS, `200`, `environment=production`, `git_sha=76a8ddc561f686318a6cf0dc4cecefc79de024e1`. |
+| Probe sanitizado Python: register QA descartavel + 5x `POST /ai/generate` | PASS, 5/5 `status=200`. |
+| `git diff --check` | PASS. |
+| Scan simples de secrets no diff | PASS, sem JWT/token/API key/DSN/DB URL no diff. |
+
+Credenciais, JWT, prompt completo, decklists completas, tokens, DSN, URL de
+banco e chaves OpenAI nao foram persistidos nem documentados.
+
+### Resultado publico pos-deploy
+
+| Variante | Velomachus N | Fallback rate | Status | Commander | Main | Validacao | Archetype reuse | OpenAI budget | p50 | p95 aprox. | On-theme aprox. |
+| --- | ---: | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |
+| Publico deploy `76a8ddc` | 5 | 0% | 5x 200 | 5/5 preservado | 5/5 = 99 | 5/5 valid | 5/5 | 20000 ms | 12155 ms | 13604 ms | 5-6 |
+
+Detalhe sanitizado por amostra:
+
+| Amostra | Status | Elapsed | Cache | Warning | Commander | Main | Validacao | Archetype reuse | Candidatos | Timeout |
+| --- | ---: | ---: | --- | --- | --- | ---: | --- | --- | ---: | ---: |
+| `public_76a8ddc_1` | 200 | 11111 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_76a8ddc_2` | 200 | 12867 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_76a8ddc_3` | 200 | 13604 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_76a8ddc_4` | 200 | 11427 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_76a8ddc_5` | 200 | 12155 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+
+`diagnostics.reference_profile_used=false` e
+`diagnostics.reference_card_stats_used=false` em todas as amostras, confirmando
+que o caminho selecionado foi Archetype Reference Reuse, nao profile exato. As
+fontes observadas foram `Lorehold, the Historian` e
+`Quintorius, History Chaser`.
+
+### Comparacao com evidencia pre-deploy
+
+| Evidencia | Fallback rate | Leitura |
+| --- | ---: | --- |
+| Publico pre-deploy `a199569` | 40% | 2/5 fallbacks em amostra Velomachus reference-guided. |
+| Local staging 8s | 100% | 5/5 fallbacks no budget antigo. |
+| Local patch reference 20s | 0% | 5/5 OpenAI real no budget novo. |
+| Publico pos-deploy `76a8ddc` | 0% | 5/5 OpenAI real, `timings.openai_timeout_ms=20000`. |
+
+### Resultado
+
+**PASS.** O backend publico esta no commit esperado e a taxa de fallback do
+caso-alvo caiu para 0% em 5 amostras, mantendo comandante correto, 99 cartas no
+main, `validation.is_valid=true`, cache miss nos probes, diagnostics coerentes e
+contrato app-facing estavel. A metrica `on_theme` segue aproximada e
+conservadora porque foi calculada apenas por heuristica agregada, sem persistir
+decklist completa.

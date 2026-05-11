@@ -3,6 +3,37 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-11 — Prova publica do deploy de timeout reference-guided
+
+### O Porquê
+- Depois do commit `76a8ddc` era necessario provar que o backend publico
+  realmente recebeu `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS` e que
+  `/ai/generate` com `commander_name` reduziu fallback sem quebrar Commander.
+
+### O Como
+- Sincronizado `master` em `76a8ddc561f686318a6cf0dc4cecefc79de024e1`.
+- Poll de `/health` no backend publico confirmou `environment=production` e
+  `git_sha=76a8ddc561f686318a6cf0dc4cecefc79de024e1`.
+- Criado usuario QA descartavel e executadas 5 amostras sanitizadas de
+  `POST /ai/generate` para `Velomachus Lorehold`, formato Commander e tema
+  Boros big spells/topdeck/miracle/spellslinger/ramp/draw/removal/protection.
+- Nenhum JWT, senha, prompt completo, decklist completa, DSN, DATABASE_URL,
+  OPENAI_API_KEY ou outro segredo foi persistido nos documentos.
+
+### Resultado
+- 5/5 probes retornaram `status=200`, cache miss,
+  `commander_returned=Velomachus Lorehold`, `main_quantity=99` e
+  `validation.is_valid=true`.
+- 5/5 usaram Archetype Reference Reuse com 48 candidatos, fontes
+  `Lorehold, the Historian` e `Quintorius, History Chaser`, sem profile exato.
+- 5/5 expuseram `timings.openai_timeout_ms=20000` e 0/5 retornaram
+  `openai_timeout_deterministic_fallback`.
+- Fallback publico caiu de 40% no pre-deploy `a199569` para 0% no deploy
+  `76a8ddc`; p50 observado `12155 ms`, p95 aproximado `13604 ms`.
+- Relatorios atualizados:
+  `server/doc/RELATORIO_AI_GENERATE_REFERENCE_TIMEOUT_TUNING_2026-05-11.md` e
+  `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`.
+
 ## 2026-05-11 — Tuning de timeout do AI Generate com Commander Reference Guidance
 
 ### O Porquê

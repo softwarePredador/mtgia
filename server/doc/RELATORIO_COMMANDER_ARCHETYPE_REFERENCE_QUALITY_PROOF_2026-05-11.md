@@ -205,3 +205,31 @@ Leitura: o resultado e **PASS WITH RISKS**. A taxa de fallback caiu de forma
 clara no caso-alvo sem piorar contrato/validacao, mas o N ainda e pequeno para
 afirmar ganho estatistico definitivo de qualidade tematica contra a melhor
 amostra publica anterior.
+
+## Addendum 2026-05-11 17:29 BRT — Deploy do timeout reference-guided
+
+O commit `76a8ddc561f686318a6cf0dc4cecefc79de024e1` foi observado no backend
+publico por `/health` e validado com 5 probes sanitizados de `POST /ai/generate`
+para `commander_name=Velomachus Lorehold`.
+
+| Criterio | Resultado |
+| --- | --- |
+| Backend publico no commit esperado | PASS, `git_sha` inicia com `76a8ddc`. |
+| Usuario QA descartavel | PASS, sem documentar credenciais/JWT. |
+| Status HTTP | PASS, 5/5 `200`. |
+| Cache | 5/5 miss nos probes iniciais. |
+| Commander | 5/5 retornaram e preservaram `Velomachus Lorehold`. |
+| Main deck | 5/5 com `main_quantity=99`. |
+| Validacao | 5/5 `validation.is_valid=true`. |
+| Archetype Reference Reuse | 5/5 `archetype_reference_used=true`, 48 candidatos. |
+| Source commanders | `Lorehold, the Historian` e `Quintorius, History Chaser`. |
+| Fallback timeout | 0/5, sem `openai_timeout_deterministic_fallback`. |
+| Timeout selecionado | 5/5 `timings.openai_timeout_ms=20000`. |
+| Timings | p50 `12155 ms`; p95 aproximado `13604 ms`. |
+| On-theme aproximado | 5-6 por heuristica agregada conservadora. |
+
+Comparado ao publico pre-deploy (`a199569`, `fallback_rate=40%`) e ao local
+staging 8s (`fallback_rate=100%`), o deploy reduziu fallback para 0% sem quebrar
+comandante, tamanho do main ou validacao. Resultado atualizado:
+**PASS** para o tuning de timeout em producao; a leitura de qualidade tematica
+permanece limitada por N=5 e por classificacao aproximada sem decklist completa.
