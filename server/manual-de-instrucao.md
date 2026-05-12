@@ -13773,3 +13773,36 @@ Relatorio:
 
 Proximo gate: Batch D com o mesmo processo de profiles DB-backed, apply
 idempotente, deploy publico e runtime publico.
+
+## 110. Commander Reference Deck Corpus v1 foundation - 2026-05-12
+
+Foi criada a fundacao para armazenar decks completos de referencia por
+comandante sem alterar app ou `/ai/generate`.
+
+Arquivos:
+
+- `server/lib/ai/commander_reference_deck_corpus_support.dart`;
+- `server/bin/commander_reference_deck_corpus.dart`;
+- `server/test/commander_reference_deck_corpus_support_test.dart`;
+- `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_V1_2026-05-12.md`.
+
+Tabelas criadas somente em `--apply`:
+
+- `commander_reference_decks`;
+- `commander_reference_deck_cards`;
+- `commander_reference_deck_analysis`.
+
+Gates obrigatorios para aplicar um deck:
+
+- comandante resolvido;
+- exatamente 1 comandante;
+- exatamente 99 cartas no main;
+- `unresolved=0`;
+- `off_color=0`;
+- sem violacao singleton fora de terrenos basicos.
+
+O runner nao faz scraping, nao versiona deck fake e nao usa decklist como prompt
+para copiar. Ele grava estrutura e agregados para uso futuro em generate/optimize.
+
+Proximo passo: Sprint 2 com 3-5 decks reais de `Lorehold, the Historian`,
+fornecidos/curados via JSON, para gerar a primeira analise agregada real.
