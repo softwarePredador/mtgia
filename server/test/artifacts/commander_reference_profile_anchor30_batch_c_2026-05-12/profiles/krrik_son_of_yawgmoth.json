@@ -1,0 +1,56 @@
+{
+  "version": "anchor30_krrik_son_of_yawgmoth_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "K'rrik, Son of Yawgmoth",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-12T19:05:00Z",
+  "color_identity": ["B"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists K'rrik as mono-black life-as-mana combo.",
+      "K'rrik rewards black pips, life gain, tutors and storm-like combo chains.",
+      "High-power/cEDH signals are bracket-aware and should not be forced into casual requests."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/krrik-son-of-yawgmoth",
+    "https://edhrec.com/average-decks/krrik-son-of-yawgmoth",
+    "https://moxfield.com/decks/public/advanced?commanderCardId=K%27rrik%2C%20Son%20of%20Yawgmoth",
+    "https://archidekt.com/search/decks?commanders=K%27rrik%2C%20Son%20of%20Yawgmoth"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Fast combo/tutor density should be scaled by bracket.",
+    "Avoid off-color Phyrexian mana assumptions; identity remains mono-black."
+  ],
+  "themes": [
+    {"name": "life_as_mana_combo", "confidence": "high", "notes": "K'rrik converts black pips into explosive tempo with life as resource."},
+    {"name": "mono_black_tutor_engine", "confidence": "high", "notes": "Tutors and recursion assemble compact combo lines."},
+    {"name": "lifegain_storm_safety", "confidence": "medium", "notes": "Life gain offsets commander payment and enables longer chains."}
+  ],
+  "role_targets": {
+    "lands": {"min": 30, "max": 33},
+    "ramp": {"min": 10, "max": 14},
+    "draw_value": {"min": 10, "max": 14},
+    "interaction": {"min": 7, "max": 10},
+    "board_wipes": {"min": 1, "max": 2},
+    "protection": {"min": 3, "max": 5},
+    "tutors": {"min": 5, "max": 9},
+    "combo_payoffs": {"min": 5, "max": 9},
+    "lifegain_sources": {"min": 4, "max": 7}
+  },
+  "expected_packages": {
+    "life_as_mana_core": ["Bolas's Citadel", "Aetherflux Reservoir", "Vilis, Broker of Blood", "Gray Merchant of Asphodel", "Exquisite Blood", "Font of Agonies"],
+    "mono_black_tutors": ["Demonic Tutor", "Vampiric Tutor", "Diabolic Intent", "Wishclaw Talisman", "Beseech the Queen", "Profane Tutor"],
+    "fast_mana_rituals": ["Sol Ring", "Arcane Signet", "Dark Ritual", "Cabal Ritual", "Culling the Weak", "Jet Medallion"],
+    "recursion_engines": ["Reanimate", "Animate Dead", "Victimize", "Yawgmoth's Will", "Phyrexian Reclamation"],
+    "interaction": ["Toxic Deluge", "Feed the Swarm", "Snuff Out", "Dismember", "Defile"]
+  },
+  "avoid_patterns": [
+    {"pattern": "generic_black_midrange", "examples": ["high curve demons without combo"], "reason": "K'rrik wants pip density and explosive life-payment lines."},
+    {"pattern": "unsafe_life_loss_without_payoff", "examples": ["many pain effects without lifegain or wincon"], "reason": "Life is a resource but still needs stabilization."},
+    {"pattern": "off_identity_phyrexian_package", "examples": ["non-black Phyrexian mana cards with colored identity"], "reason": "Commander legality must remain mono-black."}
+  ]
+}

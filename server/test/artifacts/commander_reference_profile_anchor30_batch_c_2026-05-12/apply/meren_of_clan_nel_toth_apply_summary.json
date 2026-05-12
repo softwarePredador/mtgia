@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Meren of Clan Nel Toth",
+  "started_at": "2026-05-12T19:10:53.256291Z",
+  "finished_at": "2026-05-12T19:11:19.178023Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/apply",
+  "profile_hash": "770f6edfc87d",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Meren of Clan Nel Toth",
+    "resolved": true,
+    "card_id": "518e6479-6e60-4805-903e-81029e60db47",
+    "card_name": "Meren of Clan Nel Toth"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 31,
+    "resolved_count": 31,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "graveyard_engines": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "payoffs": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "recursion_value": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "sacrifice_outlets": {
+        "resolved": 6,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 31,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:48d2b421f965"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

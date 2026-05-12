@@ -1,0 +1,55 @@
+{
+  "version": "anchor30_light_paws_emperors_voice_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Light-Paws, Emperor's Voice",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-12T19:05:00Z",
+  "color_identity": ["W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Light-Paws as mono-white Auras/Voltron.",
+      "Light-Paws tutors Auras directly, so package structure matters more than generic equipment.",
+      "Profile emphasizes protection, evasion, and low curve aura chains."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/light-paws-emperors-voice",
+    "https://edhrec.com/average-decks/light-paws-emperors-voice",
+    "https://moxfield.com/decks/public/advanced?commanderCardId=Light-Paws%2C%20Emperor%27s%20Voice",
+    "https://archidekt.com/search/decks?commanders=Light-Paws%2C%20Emperor%27s%20Voice"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Aura mana values should be staggered to support Light-Paws tutor chains.",
+    "Equipment should be minimal unless the prompt explicitly asks."
+  ],
+  "themes": [
+    {"name": "auras_voltron", "confidence": "high", "notes": "Cheap Auras trigger Light-Paws and build lethal commander damage."},
+    {"name": "protection_evasion", "confidence": "high", "notes": "Protection and evasion are required because the commander carries the plan."},
+    {"name": "mono_white_stax_backup", "confidence": "medium", "notes": "Light stax/protection can buy time without replacing the Aura plan."}
+  ],
+  "role_targets": {
+    "lands": {"min": 31, "max": 34},
+    "ramp": {"min": 7, "max": 10},
+    "draw_value": {"min": 7, "max": 10},
+    "interaction": {"min": 7, "max": 10},
+    "board_wipes": {"min": 1, "max": 2},
+    "protection": {"min": 7, "max": 11},
+    "aura_density": {"min": 22, "max": 32},
+    "evasion_finishers": {"min": 5, "max": 9}
+  },
+  "expected_packages": {
+    "cheap_aura_chain": ["Ethereal Armor", "All That Glitters", "Sage's Reverie", "Hyena Umbra", "Solid Footing", "Sentinel's Eyes", "Spirit Mantle", "Angelic Gift"],
+    "protection_auras": ["Shielded by Faith", "Flickering Ward", "Gift of Immortality", "Indestructibility", "Timely Ward", "Benevolent Blessing"],
+    "voltron_support": ["Sram, Senior Edificer", "Kor Spiritdancer", "Mesa Enchantress", "Pearl-Ear, Imperial Advisor", "Open the Armory", "Retether"],
+    "white_ramp_draw": ["Sol Ring", "Arcane Signet", "Marble Diamond", "Land Tax", "Esper Sentinel", "Tocasia's Welcome"],
+    "interaction": ["Swords to Plowshares", "Path to Exile", "Generous Gift", "Winds of Abandon", "Austere Command"]
+  },
+  "avoid_patterns": [
+    {"pattern": "equipment_voltron_drift", "examples": ["Sword package replacing Auras"], "reason": "Light-Paws tutors Auras, not Equipment."},
+    {"pattern": "aura_curve_mismatch", "examples": ["too many same-cost Auras"], "reason": "Tutor chains need mana value spread."},
+    {"pattern": "no_protection_glass_cannon", "examples": ["all pump no protection"], "reason": "Commander removal breaks the plan."}
+  ]
+}

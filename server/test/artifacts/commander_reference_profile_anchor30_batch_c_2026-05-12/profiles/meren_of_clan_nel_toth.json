@@ -1,0 +1,55 @@
+{
+  "version": "anchor30_meren_of_clan_nel_toth_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Meren of Clan Nel Toth",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-12T19:05:00Z",
+  "color_identity": ["B", "G"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Meren as Golgari graveyard/sacrifice recursion.",
+      "Meren needs sacrifice outlets, ETB/death creatures and graveyard value.",
+      "Profile separates grindy recursion from generic Golgari goodstuff."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/meren-of-clan-nel-toth",
+    "https://edhrec.com/average-decks/meren-of-clan-nel-toth",
+    "https://moxfield.com/decks/public/advanced?commanderCardId=Meren%20of%20Clan%20Nel%20Toth",
+    "https://archidekt.com/search/decks?commanders=Meren%20of%20Clan%20Nel%20Toth"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Use sacrifice/recursion engines as core, not incidental value.",
+    "Stax/locks are bracket-aware and should not be defaulted into casual."
+  ],
+  "themes": [
+    {"name": "graveyard_sacrifice_recursion", "confidence": "high", "notes": "Meren converts creature deaths into repeatable recursion."},
+    {"name": "etb_death_value", "confidence": "high", "notes": "Creatures with ETB/death triggers become reusable answers and card advantage."},
+    {"name": "golgari_aristocrats_control", "confidence": "medium_high", "notes": "Sacrifice payoffs and attrition control close long games."}
+  ],
+  "role_targets": {
+    "lands": {"min": 34, "max": 36},
+    "ramp": {"min": 9, "max": 12},
+    "draw_value": {"min": 10, "max": 14},
+    "interaction": {"min": 9, "max": 12},
+    "board_wipes": {"min": 2, "max": 3},
+    "sacrifice_outlets": {"min": 6, "max": 10},
+    "recursion_targets": {"min": 14, "max": 22},
+    "graveyard_enablers": {"min": 5, "max": 8}
+  },
+  "expected_packages": {
+    "sacrifice_outlets": ["Viscera Seer", "Carrion Feeder", "Woe Strider", "Yawgmoth, Thran Physician", "Ashnod's Altar", "Altar of Dementia"],
+    "recursion_value": ["Sakura-Tribe Elder", "Spore Frog", "Plaguecrafter", "Ravenous Chupacabra", "Eternal Witness", "Skull Prophet", "Solemn Simulacrum"],
+    "graveyard_engines": ["Entomb", "Buried Alive", "Life from the Loam", "Stitcher's Supplier", "Satyr Wayfinder", "Victimize"],
+    "payoffs": ["Blood Artist", "Zulaport Cutthroat", "Syr Konrad, the Grim", "Dictate of Erebos", "Grave Pact", "Mazirek, Kraul Death Priest"],
+    "interaction": ["Assassin's Trophy", "Abrupt Decay", "Putrefy", "Beast Within", "Toxic Deluge", "Living Death"]
+  },
+  "avoid_patterns": [
+    {"pattern": "generic_golgari_midrange", "examples": ["random big creatures without recursion text"], "reason": "Meren needs creatures that benefit from dying/reentering."},
+    {"pattern": "graveyard_without_sac_outlets", "examples": ["mill only package"], "reason": "Experience counters and recursion need repeatable deaths."},
+    {"pattern": "off_color_reanimator", "examples": ["blue looting package"], "reason": "Profile remains black-green."}
+  ]
+}

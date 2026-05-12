@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Krenko, Mob Boss",
+  "started_at": "2026-05-12T19:13:35.286741Z",
+  "finished_at": "2026-05-12T19:14:02.401903Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/apply_idempotency",
+  "profile_hash": "76e28182a98b",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Krenko, Mob Boss",
+    "resolved": true,
+    "card_id": "ccbe3585-62b0-4fd0-945f-b18e5c1a6527",
+    "card_name": "Krenko, Mob Boss"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 32,
+    "resolved_count": 32,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "goblin_core": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "haste_untap_engines": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "mono_red_value": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "sacrifice_damage": {
+        "resolved": 6,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 32,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:3d00dd577940"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

@@ -13717,3 +13717,34 @@ Relatorio:
 Regra operacional: so avancar para o proximo batch depois de repetir o mesmo
 gate de apply DB-backed, deploy publico, probes publicos sanitizados e
 documentacao versionada.
+
+## 108. Commander Reference Anchor 30 Batch C apply - 2026-05-12
+
+Foram criados e aplicados 8 profiles DB-backed do Batch C:
+
+- Brago, King Eternal;
+- Feather, the Redeemed;
+- Giada, Font of Hope;
+- K'rrik, Son of Yawgmoth;
+- Krenko, Mob Boss;
+- Light-Paws, Emperor's Voice;
+- Meren of Clan Nel Toth;
+- Niv-Mizzet, Parun.
+
+Gates:
+
+- commander card resolvido: 8/8;
+- dry-run sem mutacao: 8/8;
+- apply: 8/8;
+- apply idempotente: 8/8;
+- `unresolved_count=0`: 8/8;
+- `off_color_count=0`: 8/8.
+
+Observacao: o primeiro dry-run de Giada detectou `Boros Charm` como off-color.
+O profile foi corrigido para `Make a Stand` antes do apply.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_2026-05-12.md`.
+
+Proximo gate: apos deploy, rodar runtime publico `/ai/generate` para os 8
+comandantes com `commander_name` e registrar relatório runtime separado.

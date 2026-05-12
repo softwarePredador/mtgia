@@ -1,0 +1,55 @@
+{
+  "version": "anchor30_giada_font_of_hope_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Giada, Font of Hope",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-12T19:05:00Z",
+  "color_identity": ["W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Giada as mono-white Angels/counters.",
+      "Giada provides ramp and counters specifically for Angel density.",
+      "Profile keeps white interaction/protection while avoiding unrelated white weenie shells."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/giada-font-of-hope",
+    "https://edhrec.com/average-decks/giada-font-of-hope",
+    "https://moxfield.com/decks/public/advanced?commanderCardId=Giada%2C%20Font%20of%20Hope",
+    "https://archidekt.com/search/decks?commanders=Giada%2C%20Font%20of%20Hope"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Angel density and curve reduction are more important than generic mono-white staples.",
+    "Counters are support, not a separate proliferate deck."
+  ],
+  "themes": [
+    {"name": "angel_typal_counters", "confidence": "high", "notes": "Giada ramps Angels and scales later Angels with counters."},
+    {"name": "mono_white_protection", "confidence": "medium_high", "notes": "Board protection keeps expensive Angels from being reset."},
+    {"name": "lifegain_combat_airforce", "confidence": "medium", "notes": "Flying pressure and lifegain stabilize while Angels close."}
+  ],
+  "role_targets": {
+    "lands": {"min": 34, "max": 36},
+    "ramp": {"min": 9, "max": 12},
+    "draw_value": {"min": 8, "max": 11},
+    "interaction": {"min": 8, "max": 11},
+    "board_wipes": {"min": 2, "max": 3},
+    "protection": {"min": 4, "max": 7},
+    "angel_density": {"min": 22, "max": 32},
+    "counters_synergy": {"min": 4, "max": 7}
+  },
+  "expected_packages": {
+    "angel_core": ["Youthful Valkyrie", "Righteous Valkyrie", "Bishop of Wings", "Resplendent Angel", "Angel of Jubilation", "Lyra Dawnbringer", "Sephara, Sky's Blade", "Avacyn, Angel of Hope"],
+    "angel_payoffs": ["Herald's Horn", "Urza's Incubator", "Vanquisher's Banner", "Icon of Ancestry", "Starnheim Aspirant", "The Book of Exalted Deeds"],
+    "white_ramp_draw": ["Sol Ring", "Arcane Signet", "Marble Diamond", "Smothering Tithe", "Esper Sentinel", "Welcoming Vampire", "Tocasia's Welcome"],
+    "protection": ["Teferi's Protection", "Flawless Maneuver", "Make a Stand", "Clever Concealment", "Akroma's Will"],
+    "interaction": ["Swords to Plowshares", "Path to Exile", "Generous Gift", "Austere Command", "Farewell"]
+  },
+  "avoid_patterns": [
+    {"pattern": "generic_lifegain_without_angels", "examples": ["Soul Sisters package without Angel density"], "reason": "Giada's strongest text needs Angel count."},
+    {"pattern": "too_many_seven_drops", "examples": ["Angel pile with no curve support"], "reason": "Giada helps but still needs curve discipline."},
+    {"pattern": "off_color_boros_angels", "examples": ["red Angel support"], "reason": "Profile is mono-white."}
+  ]
+}

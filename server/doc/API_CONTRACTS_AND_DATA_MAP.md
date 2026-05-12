@@ -234,6 +234,15 @@ send `commander_name` to activate exact profile/card-stats guidance. See
 and
 `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_RUNTIME_2026-05-12.md`.
 
+Anchor 30 Batch C local DB-backed proof for `POST /ai/generate` guidance: on
+2026-05-12, exact Commander Reference Profiles were applied for Brago, Feather,
+Giada, K'rrik, Krenko, Light-Paws, Meren, and Niv-Mizzet. The generic runner
+proved commander card resolution plus dry-run/apply/idempotency with
+`unresolved_count=0` and `off_color_count=0` for all 8; resolved package-card
+counts ranged from 28 to 32. Public runtime validation remains the next gate
+after deploy. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_2026-05-12.md`.
+
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`
 is configured, the backend derives the internal `/ai/generate` URL from

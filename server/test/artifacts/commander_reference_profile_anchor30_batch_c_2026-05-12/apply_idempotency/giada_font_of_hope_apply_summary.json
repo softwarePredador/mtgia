@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Giada, Font of Hope",
+  "started_at": "2026-05-12T19:13:06.818216Z",
+  "finished_at": "2026-05-12T19:13:32.758927Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/apply_idempotency",
+  "profile_hash": "857f9149b8a1",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Giada, Font of Hope",
+    "resolved": true,
+    "card_id": "bdd2caf6-c57b-4f14-93ce-7d8ae7cc6d7d",
+    "card_name": "Giada, Font of Hope"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 31,
+    "resolved_count": 31,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "angel_core": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "angel_payoffs": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "protection": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "white_ramp_draw": {
+        "resolved": 7,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 31,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:966a582538d0"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "K'rrik, Son of Yawgmoth",
+  "started_at": "2026-05-12T19:14:04.888697Z",
+  "finished_at": "2026-05-12T19:14:28.367688Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_c_2026-05-12/apply_idempotency",
+  "profile_hash": "4f2dd3d22f99",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "K'rrik, Son of Yawgmoth",
+    "resolved": true,
+    "card_id": "0393bac6-7d55-4227-b469-898b156d7f93",
+    "card_name": "K'rrik, Son of Yawgmoth"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 28,
+    "resolved_count": 28,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "fast_mana_rituals": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "life_as_mana_core": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "mono_black_tutors": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "recursion_engines": {
+        "resolved": 5,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 28,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:5b8013db4928"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}
