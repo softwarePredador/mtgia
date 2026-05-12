@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Follow-up Chulane invalid_cards_count no Anchor 30 Batch A
+
+### O Porquê
+- O runtime publico Anchor 30 Batch A em `d7afb39` aprovou 12/12 probes, mas a
+  amostra de Chulane mostrou `invalid_cards_count=1` com
+  `validation.is_valid=true`, comandante preservado e main com 99 cartas.
+- A investigacao precisava classificar a causa sem expor token, JWT, secrets,
+  prompt completo ou decklist completa, e sem bloquear profiles ja aprovados.
+
+### O Como
+- `master` foi sincronizada com `origin/master` e o worktree estava limpo antes
+  da auditoria.
+- Foram consultados o relatorio runtime Batch A e artefatos sanitizados do
+  profile Chulane.
+- Uma nova amostra publica de Chulane foi executada contra
+  `https://evolution-cartinhas.8ktevp.easypanel.host`, imprimindo apenas resumo
+  sanitizado: status, comandante, main quantity, validation/stats invalid counts,
+  warnings e diagnostics de profile/stats.
+- `/cards/resolve` foi chamado para `Chulane, Teller of Tales` e retornou match
+  local por prefix para `Chulane, Teller of Tales // Chulane, Teller of Tales`.
+- `/cards/resolve/batch` foi chamado para as 35 cartas dos pacotes esperados do
+  profile Chulane e retornou 35 resolvidas, 0 unresolved e 0 ambiguous.
+
+### Resultado
+- **PASS WITH RISKS non-blocking**: nao houve bug sistemico de lookup,
+  normalizacao, legalidade ou profile expected_packages.
+- O nome da carta invalida original nao ficou recuperavel no artefato versionado,
+  porque o runtime Batch A persistiu apenas resumo sanitizado, sem decklist ou
+  payload completo.
+- Bucket operacional: `validator_repaired_warning_or_isolated_hallucination`.
+  A nova amostra publica retornou `invalid_cards=0`, `validation.is_valid=true`,
+  `main_quantity=99`, `reference_profile_used=true` e
+  `reference_card_stats_used=true`.
+- Nenhum codigo, profile ou dado foi alterado. A recomendacao e adicionar, se o
+  sinal reaparecer, telemetry/artefato QA com apenas bucket sanitizado ou hash do
+  nome invalido, nunca decklist completa.
+- Relatorio atualizado:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_RUNTIME_2026-05-12.md`.
+
 ## 2026-05-12 — Runtime publico Anchor 30 Batch A em AI Generate
 
 ### O Porquê

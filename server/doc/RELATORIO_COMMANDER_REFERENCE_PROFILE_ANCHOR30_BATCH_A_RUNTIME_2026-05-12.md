@@ -9,10 +9,12 @@
 `reference_card_stats_used=true`.
 
 A classificacao nao e `BLOCKED`: nao houve 422 sistemico, 5xx, erro de auth
-apos registro QA, nem indicio de DB incompleto para o lote. O risco restante e
+apos registro QA, nem indicio de DB incompleto para o lote. O risco restante era
 diagnostico: uma amostra de Chulane retornou `invalid_cards_count=1` mesmo com
-validacao final verdadeira, sugerindo saneamento/repair interno que deve ser
-explicado melhor no contrato ou zerado quando nao afeta o deck final.
+validacao final verdadeira. O follow-up de 2026-05-12 nao reproduziu o invalido
+em nova amostra publica, confirmou `/cards/resolve` para Chulane e resolveu
+35/35 cartas dos pacotes esperados; a classificacao atual e warning reparado
+pelo validator/alucinacao isolada nao bloqueante.
 
 Escopo fora deste relatorio: scanner/camera/OCR, secrets, tokens, JWT,
 `DATABASE_URL`, `SENTRY_DSN`, `OPENAI_API_KEY`, prompts completos sensiveis e
@@ -158,6 +160,43 @@ especifico.
 - Nenhum 422 foi observado; por isso nao houve buckets de invalid_cards 422 a
   extrair.
 
+## Follow-up Chulane `invalid_cards_count=1`
+
+**Resultado:** non-blocking. O nome exato da carta invalida original nao esta
+recuperavel nos artefatos versionados porque o runtime Batch A persistiu apenas
+resumos sanitizados, por desenho, sem decklist/payload completo. A nova amostra
+publica de Chulane retornou `HTTP 200`, `validation.is_valid=true`,
+`main_quantity=99`, `stats.invalid_cards=0`, `validation.invalid_cards=[]` e
+`warnings.invalid_cards=[]`.
+
+Evidencia sanitizada:
+
+| Checagem | Resultado |
+| --- | --- |
+| Nome sanitizado original | `not_recorded_in_sanitized_artifact` |
+| Bucket classificado | `validator_repaired_warning_or_isolated_hallucination` |
+| `/cards/resolve` Chulane | `200`, `source=local`, match prefix para `Chulane, Teller of Tales // Chulane, Teller of Tales` |
+| Pacotes esperados Chulane | `35/35` resolvidos via `/cards/resolve/batch`, `0` unresolved, `0` ambiguous |
+| Nova amostra publica Chulane | `invalid_cards=0`, commander preservado, main `99`, profile/stats ativos |
+
+Classificacao por causa:
+
+| Hipotese | Status | Evidencia |
+| --- | --- | --- |
+| Nome inexistente/alucinado | Provavel para a amostra original, mas nao reproduzido | Validator permite deck valido removendo sugestao invalida e reparando tamanho; nova amostra nao trouxe invalido. |
+| Split face | Descartado como blocker | Chulane resolve localmente por prefix para o nome double-faced armazenado. |
+| Acento/pontuacao | Nao provado | Nenhuma entrada invalida foi preservada no artefato; pacotes esperados resolvem 35/35. |
+| Legalidade | Nao provado | `validation.is_valid=true`, off-id aproximado `0`, sem 422. |
+| Print ausente no DB | Descartado para profile | Pacotes esperados resolvem 35/35 no backend publico. |
+| Query `/cards`/`/cards/resolve` | Descartado para Chulane/profile | Resolve publico retorna 200 para comandante e pacote esperado. |
+| Warning reparado pelo validator | Classificacao operacional | Contador original ficou em `invalid_cards_count=1`, mas o deck final foi valido e a nova amostra retornou 0 invalidos. |
+
+Decisao: nao alterar codigo nem profile neste stage. A anomalia nao bloqueia os
+profiles ja aprovados. O risco remanescente e de observabilidade: se for
+necessario diagnosticar nomes invalidos em producao sem vazar decklists, adicionar
+bucket sanitizado/hash do nome invalido em telemetry segura ou em artefato QA
+explicitamente sanitizado.
+
 ## Sentry/logging findings
 
 - Sentry nao foi observado diretamente pelo runtime publico.
@@ -174,14 +213,15 @@ descartavel, e `/ai/generate` respondeu 200 para os 8 commanders do Batch A.
 
 ## Smallest next fixes
 
-1. Explicar ou corrigir o `invalid_cards_count=1` em Chulane quando a validacao
-   final e verdadeira.
-2. Normalizar `commander_returned` para faces duplas no diagnostic/contract ou
+1. Normalizar `commander_returned` para faces duplas no diagnostic/contract ou
    documentar explicitamente que consumidores devem comparar a primeira face.
-3. Garantir que a tela de gerar deck sempre envie `commander_name` quando o
+2. Garantir que a tela de gerar deck sempre envie `commander_name` quando o
    usuario selecionar/digitar comandante, pois prompt-only nao ativa Anchor 30.
-4. Adicionar tags de observabilidade para timeout/fallback e diagnostics de
+3. Adicionar tags de observabilidade para timeout/fallback e diagnostics de
    Commander Reference sem registrar prompt/decklist.
+4. Se `invalid_cards_count>0 && validation.is_valid=true` reaparecer, registrar
+   apenas bucket sanitizado/hash do nome invalido em QA telemetry para permitir
+   reproducao sem persistir decklist.
 
 ## Comandos executados
 
@@ -194,6 +234,9 @@ curl/urllib GET https://evolution-cartinhas.8ktevp.easypanel.host/health
 POST /auth/register com usuario QA descartavel sanitizado
 POST /ai/generate para 12 probes principais com commander_name exato
 POST /ai/generate para 2 baselines sem commander_name
+POST /ai/generate Chulane follow-up publico com resumo sanitizado
+POST /cards/resolve Chulane no backend publico
+POST /cards/resolve/batch para 35 cartas dos pacotes esperados Chulane
 git diff --check
 scan simples de secrets nos arquivos alterados
 ```
@@ -204,4 +247,3 @@ scan simples de secrets nos arquivos alterados
 - Scan simples de secrets: executado apenas sobre arquivos alterados.
 - Analyze/test de codigo: nao aplicavel porque a auditoria alterou apenas
   documentacao e nao mudou `lib`, `routes`, `bin` ou `test`.
-
