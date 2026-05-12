@@ -239,9 +239,15 @@ Anchor 30 Batch C local DB-backed proof for `POST /ai/generate` guidance: on
 Giada, K'rrik, Krenko, Light-Paws, Meren, and Niv-Mizzet. The generic runner
 proved commander card resolution plus dry-run/apply/idempotency with
 `unresolved_count=0` and `off_color_count=0` for all 8; resolved package-card
-counts ranged from 28 to 32. Public runtime validation remains the next gate
-after deploy. See
-`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_2026-05-12.md`.
+counts ranged from 28 to 32. Public runtime on deploy `b90d507` returned
+`HTTP 200` for 8/8 sanitized probes with `commander_name`,
+`validation.is_valid=true`, `reference_profile_used=true`,
+`reference_card_stats_used=true`, `main_quantity=99`, and first-face commander
+preservation for all 8. Giada had one primary repaired warning but a cache-bypass
+follow-up returned `invalid_cards_count=0`. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_2026-05-12.md`
+and
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_RUNTIME_2026-05-12.md`.
 
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`

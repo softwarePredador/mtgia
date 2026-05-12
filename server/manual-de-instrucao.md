@@ -13748,3 +13748,28 @@ Relatorio:
 
 Proximo gate: apos deploy, rodar runtime publico `/ai/generate` para os 8
 comandantes com `commander_name` e registrar relatório runtime separado.
+
+## 109. Commander Reference Anchor 30 Batch C runtime - 2026-05-12
+
+O deploy publico do Batch C foi validado em
+`https://evolution-cartinhas.8ktevp.easypanel.host` no commit
+`b90d50731c71750194306c61d4a84c8ec3696305`.
+
+Resultado:
+
+- `/health` e `/ready`: `200`;
+- 8/8 probes publicos com `commander_name` retornaram `HTTP 200`;
+- 8/8 retornaram `validation.is_valid=true`, `reference_profile_used=true`,
+  `reference_card_stats_used=true` e `main_quantity=99`;
+- comandantes cobertos: Brago, Feather, Giada, K'rrik, Krenko, Light-Paws,
+  Meren e Niv-Mizzet;
+- 0/8 probes usaram fallback deterministico;
+- Giada teve `invalid_cards_count=7` em uma amostra primaria, mas follow-up
+  cache-bypass retornou `invalid_cards_count=0`, ficando como warning nao
+  bloqueante.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_C_RUNTIME_2026-05-12.md`.
+
+Proximo gate: Batch D com o mesmo processo de profiles DB-backed, apply
+idempotente, deploy publico e runtime publico.
