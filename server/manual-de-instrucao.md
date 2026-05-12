@@ -13511,3 +13511,24 @@ Status: `PASS WITH RISKS`. A prova publica fechou diagnostics de arquetipo e
 preservacao do comandante no fallback. Risco restante: ainda falta uma amostra
 em que a OpenAI responda dentro do timeout para avaliar qualidade tematica do
 deck completo, nao apenas fallback deterministico valido.
+
+## 106. Commander Reference Anchor 30 plan - 2026-05-12
+
+Foi preparado o plano da primeira base ampla de 30 comandantes âncora para
+alimentar `/ai/generate`, archetype reference reuse e futuros sinais de
+optimize/rebuild.
+
+Artefatos:
+
+- `server/doc/COMMANDER_REFERENCE_PROFILE_ANCHOR_30_PLAN_2026-05-12.md`;
+- `server/test/artifacts/commander_reference_profile_anchor30_2026-05-12/anchor_30_queue.json`.
+
+Leitura operacional:
+
+- a lista exclui os profiles Strixhaven já aplicados;
+- Batch A tem 8 comandantes prioritários: Atraxa, Korvold, Muldrotha, Chulane,
+  Yuriko, Kinnan, Winota e Prosper;
+- cada profile continua sujeito aos gates obrigatórios: commander resolve,
+  `unresolved=0`, `off_color_count=0`, dry-run/apply/idempotência e runtime
+  público antes do próximo batch;
+- partner pairs ficaram fora da primeira onda para reduzir risco de contrato.

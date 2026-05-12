@@ -1,0 +1,266 @@
+{
+  "generated_at": "2026-05-12",
+  "purpose": "Commander Reference Profile Anchor 30 queue for profile generation agents",
+  "existing_profiles_excluded": [
+    "Lorehold, the Historian",
+    "Dina, Essence Brewer",
+    "Killian, Decisive Mentor",
+    "Prismari, the Inspiration",
+    "Quandrix, the Proof",
+    "Quintorius, History Chaser",
+    "Rootha, Mastering the Moment",
+    "Silverquill, the Disputant",
+    "Witherbloom, the Balancer",
+    "Zimone, Infinite Analyst",
+    "Aziza, Mage Tower Captain",
+    "Berta, Wise Extrapolator",
+    "Excava, the Risen Past",
+    "Gorma, the Gullet",
+    "Muddle, the Ever-Changing",
+    "Primo, the Unbounded",
+    "Scriv, the Obligator",
+    "Zaffai and the Tempests"
+  ],
+  "queue": [
+    {
+      "batch": "A",
+      "priority": 1,
+      "commander": "Atraxa, Praetors' Voice",
+      "color_identity": ["W", "U", "B", "G"],
+      "primary_theme": "proliferate_counters_superfriends",
+      "power_lane": "high_power_casual"
+    },
+    {
+      "batch": "A",
+      "priority": 2,
+      "commander": "Korvold, Fae-Cursed King",
+      "color_identity": ["B", "R", "G"],
+      "primary_theme": "sacrifice_treasure_value",
+      "power_lane": "high_power_casual"
+    },
+    {
+      "batch": "A",
+      "priority": 3,
+      "commander": "Muldrotha, the Gravetide",
+      "color_identity": ["B", "G", "U"],
+      "primary_theme": "graveyard_permanent_recursion",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "A",
+      "priority": 4,
+      "commander": "Chulane, Teller of Tales",
+      "color_identity": ["G", "W", "U"],
+      "primary_theme": "creature_value_ramp_draw",
+      "power_lane": "high_power_casual"
+    },
+    {
+      "batch": "A",
+      "priority": 5,
+      "commander": "Yuriko, the Tiger's Shadow",
+      "color_identity": ["U", "B"],
+      "primary_theme": "ninjas_topdeck_damage",
+      "power_lane": "high_power_cedh_adjacent"
+    },
+    {
+      "batch": "A",
+      "priority": 6,
+      "commander": "Kinnan, Bonder Prodigy",
+      "color_identity": ["G", "U"],
+      "primary_theme": "mana_dorks_artifact_ramp_combo",
+      "power_lane": "high_power_cedh"
+    },
+    {
+      "batch": "A",
+      "priority": 7,
+      "commander": "Winota, Joiner of Forces",
+      "color_identity": ["R", "W"],
+      "primary_theme": "combat_triggers_humans",
+      "power_lane": "high_power_cedh_adjacent"
+    },
+    {
+      "batch": "A",
+      "priority": 8,
+      "commander": "Prosper, Tome-Bound",
+      "color_identity": ["B", "R"],
+      "primary_theme": "exile_value_treasure",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "B",
+      "priority": 9,
+      "commander": "Edgar Markov",
+      "color_identity": ["W", "B", "R"],
+      "primary_theme": "vampire_typal_aggro_tokens",
+      "power_lane": "high_power_casual"
+    },
+    {
+      "batch": "B",
+      "priority": 10,
+      "commander": "Miirym, Sentinel Wyrm",
+      "color_identity": ["G", "U", "R"],
+      "primary_theme": "dragon_typal_copy",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "B",
+      "priority": 11,
+      "commander": "Isshin, Two Heavens as One",
+      "color_identity": ["R", "W", "B"],
+      "primary_theme": "attack_trigger_doubling",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "B",
+      "priority": 12,
+      "commander": "Teysa Karlov",
+      "color_identity": ["W", "B"],
+      "primary_theme": "aristocrats_death_triggers",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "B",
+      "priority": 13,
+      "commander": "Lathril, Blade of the Elves",
+      "color_identity": ["B", "G"],
+      "primary_theme": "elf_typal_tokens_drain",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "B",
+      "priority": 14,
+      "commander": "Aesi, Tyrant of Gyre Strait",
+      "color_identity": ["G", "U"],
+      "primary_theme": "lands_ramp_draw",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "B",
+      "priority": 15,
+      "commander": "Sythis, Harvest's Hand",
+      "color_identity": ["G", "W"],
+      "primary_theme": "enchantress",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "B",
+      "priority": 16,
+      "commander": "Urza, Lord High Artificer",
+      "color_identity": ["U"],
+      "primary_theme": "artifacts_control",
+      "power_lane": "high_power_cedh"
+    },
+    {
+      "batch": "C",
+      "priority": 17,
+      "commander": "Krenko, Mob Boss",
+      "color_identity": ["R"],
+      "primary_theme": "goblin_typal_tokens",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "C",
+      "priority": 18,
+      "commander": "K'rrik, Son of Yawgmoth",
+      "color_identity": ["B"],
+      "primary_theme": "life_as_mana_combo",
+      "power_lane": "high_power_cedh"
+    },
+    {
+      "batch": "C",
+      "priority": 19,
+      "commander": "Giada, Font of Hope",
+      "color_identity": ["W"],
+      "primary_theme": "angels_counters",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "C",
+      "priority": 20,
+      "commander": "Light-Paws, Emperor's Voice",
+      "color_identity": ["W"],
+      "primary_theme": "auras_voltron",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "C",
+      "priority": 21,
+      "commander": "Meren of Clan Nel Toth",
+      "color_identity": ["B", "G"],
+      "primary_theme": "graveyard_sacrifice_recursion",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "C",
+      "priority": 22,
+      "commander": "Niv-Mizzet, Parun",
+      "color_identity": ["U", "R"],
+      "primary_theme": "spellslinger_draw_damage",
+      "power_lane": "high_power"
+    },
+    {
+      "batch": "C",
+      "priority": 23,
+      "commander": "Brago, King Eternal",
+      "color_identity": ["W", "U"],
+      "primary_theme": "blink_etb_control",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "C",
+      "priority": 24,
+      "commander": "Feather, the Redeemed",
+      "color_identity": ["R", "W"],
+      "primary_theme": "heroic_protection_spells",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "D",
+      "priority": 25,
+      "commander": "Wilhelt, the Rotcleaver",
+      "color_identity": ["U", "B"],
+      "primary_theme": "zombie_typal_aristocrats",
+      "power_lane": "casual"
+    },
+    {
+      "batch": "D",
+      "priority": 26,
+      "commander": "Najeela, the Blade-Blossom",
+      "color_identity": ["W", "U", "B", "R", "G"],
+      "primary_theme": "warrior_combat_combo",
+      "power_lane": "high_power_cedh"
+    },
+    {
+      "batch": "D",
+      "priority": 27,
+      "commander": "The Ur-Dragon",
+      "color_identity": ["W", "U", "B", "R", "G"],
+      "primary_theme": "dragon_typal_big_mana",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "D",
+      "priority": 28,
+      "commander": "Jodah, the Unifier",
+      "color_identity": ["W", "U", "B", "R", "G"],
+      "primary_theme": "legendary_typal_cascade_value",
+      "power_lane": "casual_high_power"
+    },
+    {
+      "batch": "D",
+      "priority": 29,
+      "commander": "Omnath, Locus of Creation",
+      "color_identity": ["W", "U", "R", "G"],
+      "primary_theme": "landfall_value",
+      "power_lane": "high_power_casual"
+    },
+    {
+      "batch": "D",
+      "priority": 30,
+      "commander": "Anje Falkenrath",
+      "color_identity": ["B", "R"],
+      "primary_theme": "madness_discard_combo",
+      "power_lane": "high_power_cedh_adjacent"
+    }
+  ]
+}
