@@ -1,5 +1,34 @@
 # AI Generate Card Resolution Fix - 2026-05-12
 
+## Resultado final complementar - matriz publica 8/8
+
+**PASS complementar.** A matriz publica completa dos 8 Commander Reference
+Profiles Strixhaven lot2 foi reexecutada apos o commit
+`1dcf7ff31832d5fa9a6e53009a9e8caaf92d4701` e fechou `8/8` com `HTTP 200`,
+comandante preservado, `main_quantity=99`, `validation.is_valid=true`,
+`reference_profile_used=true` e `reference_card_stats_used=true`.
+
+Esta rodada confirma que o reparo de resolucao de card desbloqueou nao apenas a
+amostra Aziza/Excava/Zaffai, mas todos os 8 comandantes do lote:
+
+| Commander | `/cards` exact | HTTP | Commander preservado | Main qty | Validation | Profile/stats | On-theme | Fallback/warning |
+| --- | ---: | ---: | --- | ---: | --- | --- | ---: | --- |
+| Aziza, Mage Tower Captain | 2 | 200 | true | 99 | true | true / true | 46 | `validation_warnings` |
+| Berta, Wise Extrapolator | 2 | 200 | true | 99 | true | true / true | 44 | `validation_warnings` |
+| Excava, the Risen Past | 1 | 200 | true | 99 | true | true / true | 44 | `openai_timeout_deterministic_fallback` |
+| Gorma, the Gullet | 1 | 200 | true | 99 | true | true / true | 44 | `validation_warnings` |
+| Muddle, the Ever-Changing | 1 | 200 | true | 99 | true | true / true | 45 | `openai_timeout_deterministic_fallback` |
+| Primo, the Unbounded | 1 | 200 | true | 99 | true | true / true | 43 | `validation_warnings` |
+| Scriv, the Obligator | 1 | 200 | true | 99 | true | true / true | 39 | `validation_warnings` |
+| Zaffai and the Tempests | 2 | 200 | true | 99 | true | true / true | 52 | `validation_warnings` |
+
+Excava e Muddle foram repetidos por terem acionado timeout/fallback na amostra
+primaria; as repeticoes tambem retornaram deck valido, comandante preservado e
+main 99. Os invalid cards observados foram removidos com seguranca antes da
+validacao final e ficaram no bucket sanitizado `unresolved_or_not_in_public_db`.
+Nenhum 422, 5xx, auth/deploy blocker ou drift de contrato app-facing foi
+observado.
+
 ## Resultado
 
 **PASS.** Os 422 publicos da amostra Strixhaven lot2 foram desbloqueados sem

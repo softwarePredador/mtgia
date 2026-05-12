@@ -1,5 +1,132 @@
 # Commander Reference Profiles Strixhaven Lot 2 - Public Runtime - 2026-05-11
 
+## Resultado final em 2026-05-12 10h15
+
+**PASS.** O runtime publico completo dos 8 Commander Reference Profiles
+Strixhaven lot2 foi fechado no backend publico
+`https://evolution-cartinhas.8ktevp.easypanel.host` apos a correcao de card
+resolution do commit `1dcf7ff31832d5fa9a6e53009a9e8caaf92d4701`.
+
+Todos os 8 probes sanitizados de `POST /ai/generate` retornaram `200`,
+preservaram o comandante exato, entregaram `main_quantity=99`,
+`validation.is_valid=true`, `reference_profile_used=true` e
+`reference_card_stats_used=true`. Nenhum token, JWT, senha, DSN, URL de banco,
+chave OpenAI, prompt completo ou decklist completa foi registrado.
+
+## Escopo e deploy final
+
+| Item | Resultado |
+| --- | --- |
+| Branch alvo | `master` |
+| Commit local/remoto | `1dcf7ff31832d5fa9a6e53009a9e8caaf92d4701` |
+| `/health` publico | PASS, `git_sha=1dcf7ff31832d5fa9a6e53009a9e8caaf92d4701`, `environment=production` |
+| `/health/ready` publico | PASS, DB healthy, `cards_data.card_count=33791` |
+| Usuario QA descartavel | Criado com prefixo sanitizado `qa_strix_lot2` e dominio `example.invalid`; token usado apenas em memoria |
+| Scanner/camera/OCR | Fora do escopo |
+
+## Comandos executados na rodada final
+
+```bash
+git fetch origin master --quiet
+git pull --ff-only --quiet
+git status --short --branch
+curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health
+curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health/ready
+python3 <sanitized public /cards availability + auth + ai/generate lot2 probe runner>
+```
+
+Validacoes finais de fechamento foram executadas apos a atualizacao deste
+relatorio: `git diff --check` e scan simples de segredos nos arquivos alterados.
+
+## Disponibilidade publica dos comandantes
+
+| Commander | `/cards` status | `total_returned` | Exact matches |
+| --- | ---: | ---: | ---: |
+| Aziza, Mage Tower Captain | 200 | 2 | 2 |
+| Berta, Wise Extrapolator | 200 | 2 | 2 |
+| Excava, the Risen Past | 200 | 1 | 1 |
+| Gorma, the Gullet | 200 | 1 | 1 |
+| Muddle, the Ever-Changing | 200 | 1 | 1 |
+| Primo, the Unbounded | 200 | 1 | 1 |
+| Scriv, the Obligator | 200 | 1 | 1 |
+| Zaffai and the Tempests | 200 | 2 | 2 |
+
+## Probe matrix final de `/ai/generate`
+
+| Commander | HTTP | Elapsed ms | Fallback/warning | Cache | Commander returned | Preservado | Main qty | Validation | Invalid count | Profile/stats | On-theme | Off-identity aprox. |
+| --- | ---: | ---: | --- | --- | --- | --- | ---: | --- | ---: | --- | ---: | --- |
+| Aziza, Mage Tower Captain | 200 | 17,459 | `validation_warnings` | miss | Aziza, Mage Tower Captain | true | 99 | true | 2 | true / true | 46 | 0 por validacao backend |
+| Berta, Wise Extrapolator | 200 | 13,439 | `validation_warnings` | miss | Berta, Wise Extrapolator | true | 99 | true | 0 | true / true | 44 | 0 por validacao backend |
+| Excava, the Risen Past | 200 | 20,792 | `openai_timeout_deterministic_fallback` | miss | Excava, the Risen Past | true | 99 | true | 0 | true / true | 44 | 0 por validacao backend |
+| Gorma, the Gullet | 200 | 13,689 | `validation_warnings` | miss | Gorma, the Gullet | true | 99 | true | 1 | true / true | 44 | 0 por validacao backend |
+| Muddle, the Ever-Changing | 200 | 20,710 | `openai_timeout_deterministic_fallback` | miss | Muddle, the Ever-Changing | true | 99 | true | 0 | true / true | 45 | 0 por validacao backend |
+| Primo, the Unbounded | 200 | 10,348 | `validation_warnings` | miss | Primo, the Unbounded | true | 99 | true | 1 | true / true | 43 | 0 por validacao backend |
+| Scriv, the Obligator | 200 | 15,276 | `validation_warnings` | miss | Scriv, the Obligator | true | 99 | true | 0 | true / true | 39 | 0 por validacao backend |
+| Zaffai and the Tempests | 200 | 12,246 | `validation_warnings` | miss | Zaffai and the Tempests | true | 99 | true | 0 | true / true | 52 | 0 por validacao backend |
+
+Repeticao obrigatoria para timeout/fallback: Excava e Muddle foram repetidos
+uma vez cada. As repeticoes tambem retornaram `200`, comandante preservado,
+`main_quantity=99` e `validation.is_valid=true`; a repeticao de Excava teve
+1 invalid card removido com seguranca e a de Muddle teve 1 invalid card removido
+com seguranca. Nao houve 422 na matriz final.
+
+## Package keys finais observadas
+
+| Commander | Package keys |
+| --- | --- |
+| Aziza, Mage Tower Captain | `copy_worthy_spells`, `interaction_and_protection`, `spell_payoffs_and_copy`, `token_creature_sources`, `untap_vigilance_support` |
+| Berta, Wise Extrapolator | `counter_engine`, `interaction_and_protection`, `ramp`, `untap_support`, `x_spells_and_fractals` |
+| Excava, the Risen Past | `artifact_enchantment_engine`, `cheap_permanent_value_targets`, `graveyard_setup`, `interaction_and_protection`, `spirit_and_token_payoffs` |
+| Gorma, the Gullet | `counter_persist_support`, `death_payoffs_and_draw`, `fodder_and_recursion`, `interaction`, `sacrifice_outlets` |
+| Muddle, the Ever-Changing | `interaction_and_protection`, `nonlegendary_copy_targets`, `spell_velocity`, `spellslinger_payoffs`, `token_and_combat_payoffs` |
+| Primo, the Unbounded | `base_power_zero_threats`, `counter_engine`, `evasion_and_finish`, `interaction_and_protection`, `ramp` |
+| Scriv, the Obligator | `aura_enchantment_engine`, `draw_and_value`, `interaction_and_protection`, `politics_and_deterrents` |
+| Zaffai and the Tempests | `big_spell_payoffs`, `copy_recursion_payoffs`, `interaction_and_protection`, `ramp_and_cost_support`, `selection_and_setup` |
+
+## Timing summary final
+
+| Grupo | Min | p50 | Max |
+| --- | ---: | ---: | ---: |
+| 8 probes primarios | 10,348 ms | 14,482 ms | 20,792 ms |
+| 2 repeticoes de fallback/timeout | 16,237 ms | 18,524 ms | 20,811 ms |
+
+Latencia concentrada em OpenAI/fallback: `openai_ms` variou de 9,414 ms a
+20,002 ms nos probes primarios. `reference_profile_ms` ficou baixo
+(13-61 ms), `validation_ms` ficou em 172-406 ms quando exposto, e
+`meta_context_ms` ficou entre 0-2 ms.
+
+## Path matrix e contrato app/backend
+
+| Pergunta | Evidencia final |
+| --- | --- |
+| Path selecionado | Profile-guided `/ai/generate`; 6/8 passaram pela geracao principal com warnings de saneamento e 2/8 usaram `openai_timeout_deterministic_fallback` valido. |
+| Cache | 8/8 `cache.hit=false` na matriz primaria, evitando dependencia de resultados antigos. |
+| Job polling | Nao aplicavel; probes foram sync, sem `async=true`. |
+| Profile/card stats | 8/8 com `reference_profile_used=true` e `reference_card_stats_used=true`. |
+| App preview/apply | Resposta manteve o contrato `generated_deck.commander.name` + `generated_deck.cards[] {name, quantity}` consumido pelo app; nenhuma mudanca de contrato foi feita. |
+| Legalidade/identidade | `validation.is_valid=true` em 8/8; off-identity aproximado 0 por validacao backend strict. |
+| Complete/filler | Fora do escopo desta rodada; os probes foram de generate profile-guided, nao `/ai/optimize` complete. |
+| Meta deck references | Nao foram usados como fonte principal; a evidencia final veio de reference profiles/card stats do lote. |
+| Sentry/logging | Nao houve 5xx nem crash. O handler segue capturando excecoes inesperadas com tag `route=ai_generate`; 422 nao ocorreu na matriz final. |
+
+## Invalid cards e riscos
+
+- Invalid cards apareceram apenas como saneamento seguro em respostas `200`.
+  Buckets sanitizados: `unresolved_or_not_in_public_db`.
+- Contagens primarias: Aziza 2, Gorma 1, Primo 1; os demais 0. O deck final
+  permaneceu valido porque o backend removeu os nomes nao resolvidos antes da
+  validacao final.
+- Risco operacional restante: o refresh publico oficial de sets novos continua
+  recomendado para reduzir dependencias de self-healing pontual via
+  `/cards/resolve` e reduzir invalid cards gerados por cartas ainda ausentes no
+  DB publico.
+
+## Bloqueadores e menores proximos ajustes
+
+- **Bloqueadores:** nenhum para fechar o runtime publico lot2.
+- **Menor proximo ajuste:** acompanhar os warnings de invalid card por carta
+  ausente no DB publico e rodar refresh de sets novos no ambiente publico.
+
 ## Resultado atualizado em 2026-05-12 10h
 
 **PASS na amostra de unblock.** Os 8 comandantes que retornavam

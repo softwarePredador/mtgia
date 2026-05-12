@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Fechamento runtime publico Strixhaven lot2 8/8
+
+### O Porquê
+- Depois do unblock de resolucao de card em `1dcf7ff`, faltava provar a matriz
+  publica completa dos 8 Commander Reference Profiles Strixhaven lot2, nao
+  apenas a amostra Aziza/Excava/Zaffai.
+- O criterio de aceite era estrito: `POST /ai/generate` deve retornar `200`,
+  preservar o comandante exato, entregar `main_quantity=99` e
+  `validation.is_valid=true` para os 8 comandantes.
+
+### O Como
+- `master` foi sincronizada com `origin/master` e o backend publico confirmou
+  `/health.git_sha=1dcf7ff31832d5fa9a6e53009a9e8caaf92d4701`.
+- `/health/ready` confirmou DB healthy e `cards_data.card_count=33791`.
+- Foi criado usuario QA descartavel com prefixo sanitizado; JWT e credenciais
+  ficaram apenas em memoria.
+- Foram executados probes publicos sanitizados de `/cards` e `POST
+  /ai/generate` para Aziza, Berta, Excava, Gorma, Muddle, Primo, Scriv e Zaffai.
+  Prompts completos e decklists completas nao foram persistidos.
+- Excava e Muddle foram repetidos uma vez porque acionaram
+  `openai_timeout_deterministic_fallback` na amostra primaria.
+
+### Resultado
+- **PASS 8/8**: todos retornaram `HTTP 200`, comandante preservado,
+  `main_quantity=99`, `validation.is_valid=true`,
+  `reference_profile_used=true` e `reference_card_stats_used=true`.
+- Disponibilidade publica dos comandantes em `/cards`: Aziza 2 exact matches,
+  Berta 2, Excava 1, Gorma 1, Muddle 1, Primo 1, Scriv 1, Zaffai 2.
+- Latencia primaria: min 10,348 ms, p50 14,482 ms, max 20,792 ms; concentrada
+  em OpenAI/fallback. `reference_profile_ms` ficou em 13-61 ms e
+  `validation_ms` em 172-406 ms quando exposto.
+- Invalid cards apareceram apenas como saneamento seguro em respostas 200
+  (`unresolved_or_not_in_public_db`), sem quebrar a validacao final.
+- Nao houve drift de contrato app-facing; `API_CONTRACTS_AND_DATA_MAP.md` foi
+  consultado e nao precisou de alteracao.
+- Relatorios atualizados:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_RUNTIME_2026-05-11.md`
+  e `server/doc/RELATORIO_AI_GENERATE_CARD_RESOLUTION_FIX_2026-05-12.md`.
+
 ## 2026-05-12 — Unblock de resolucao Strixhaven lot2 em AI Generate
 
 ### O Porquê
