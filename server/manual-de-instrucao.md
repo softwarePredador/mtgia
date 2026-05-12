@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Commander Reference Profiles Anchor 30 Batch A
+
+### O Porquê
+- A base Anchor 30 amplia os Commander Reference Profiles para comandantes
+  populares e estaveis, melhorando `/ai/generate` quando o app envia
+  `commander_name`.
+- O Batch A prioriza arquétipos de alto reaproveitamento: proliferate/counters,
+  sacrifice/treasure, graveyard recursion, creature loops, ninjas/topdeck,
+  nonland mana combo, aggro-stax e exile value.
+
+### O Como
+- `master` foi sincronizada com `origin/master` antes da curadoria.
+- Foram consultados o plano Anchor 30, a queue JSON, o mapa de contratos e os
+  relatorios recentes de Strixhaven lot 1/lot 2/runtime.
+- A pesquisa web foi usada apenas como contexto agregado Commander/cEDH; nenhum
+  prompt completo, decklist completa, token, JWT, DSN, URL de banco ou chave
+  OpenAI foi persistido.
+- Foram criados profiles JSON sanitizados para Atraxa, Korvold, Muldrotha,
+  Chulane, Yuriko, Kinnan, Winota e Prosper em
+  `server/test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/`.
+- O runner generico `server/bin/commander_reference_profile.dart` executou
+  `--dry-run`, `--apply` e uma segunda execucao `--apply` para idempotencia.
+  Dois sinais foram ajustados antes do apply porque nao resolviam no DB:
+  `Lim-Dul's Vault` foi substituido por `Personal Tutor` no profile Yuriko e
+  `Rick, Steadfast Leader` por `Zealous Conscripts` no profile Winota.
+
+### Resultado
+- **PASS 8/8**: commander card resolved, `unresolved_count=0`,
+  `off_color_count=0` e `profile_usable_after_run=true` para todos os profiles
+  aplicados.
+- Idempotencia: 8/8 reaplicados com os mesmos hashes.
+- Contagens resolvidas: Atraxa 36, Chulane 35, Kinnan 35, Korvold 35,
+  Muldrotha 34, Prosper 35, Winota 36 e Yuriko 42.
+- `API_CONTRACTS_AND_DATA_MAP.md` foi atualizado para registrar a cobertura do
+  Anchor 30 Batch A no contrato experimental de `/ai/generate`.
+- Relatorio criado:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_2026-05-12.md`.
+
 ## 2026-05-12 — Fechamento runtime publico Strixhaven lot2 8/8
 
 ### O Porquê

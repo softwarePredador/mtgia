@@ -1,0 +1,134 @@
+{
+  "version": "anchor30_yuriko_the_tigers_shadow_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Yuriko, the Tiger's Shadow",
+  "confidence": "high",
+  "source_count": 6,
+  "updated_at": "2026-05-12T15:00:00Z",
+  "color_identity": ["U", "B"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Yuriko as a UB ninjas/topdeck damage Commander anchor.",
+      "Public Commander and cEDH sources label Yuriko as a Commander/cEDH deck commander.",
+      "The cEDH shell should remain separate from casual ninja tribal generation."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/decks/yuriko-the-tigers-shadow/cedh",
+    "https://learncedh.com/decklists/yuriko",
+    "https://edhtop16.com/commander/Yuriko,%20the%20Tiger's%20Shadow",
+    "https://draftsim.com/yuriko-commander-deck/",
+    "https://www.mtgtop8.com/archetype?a=1141&meta=240",
+    "https://moxfield.com/decks/HZG8C8uz0kGMv41TFlSlIQ"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "High-mana-value reveals are signals, not permission to overload uncastable cards.",
+    "Oracle/Consult and Doomsday are cEDH/high-power opt-in packages."
+  ],
+  "themes": [
+    {
+      "name": "ninjas_topdeck_damage",
+      "confidence": "high",
+      "notes": "Yuriko converts evasive attackers and ninjutsu into repeated table damage and card draw."
+    },
+    {
+      "name": "evasive_tempo",
+      "confidence": "high",
+      "notes": "One-mana evasive creatures enable early Yuriko triggers."
+    },
+    {
+      "name": "topdeck_manipulation",
+      "confidence": "high",
+      "notes": "Brainstorm-style setup controls reveal damage and protects draw quality."
+    },
+    {
+      "name": "cedh_oracle_consult",
+      "confidence": "medium_high",
+      "notes": "Compact win lines are proven in cEDH but must be bracket-aware."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 30, "max": 34},
+    "evasive_enablers": {"min": 10, "max": 15},
+    "ninjas": {"min": 10, "max": 17},
+    "topdeck_manipulation": {"min": 7, "max": 12},
+    "high_mv_reveals": {"min": 4, "max": 8},
+    "interaction": {"min": 10, "max": 16},
+    "combo_finishers": {"min": 0, "max": 5}
+  },
+  "expected_packages": {
+    "evasive_enablers": [
+      "Changeling Outcast",
+      "Faerie Seer",
+      "Ornithopter",
+      "Mothdust Changeling",
+      "Triton Shorestalker",
+      "Gingerbrute",
+      "Slither Blade",
+      "Universal Automaton"
+    ],
+    "ninjas": [
+      "Ingenious Infiltrator",
+      "Mist-Syndicate Naga",
+      "Mistblade Shinobi",
+      "Fallen Shinobi",
+      "Ninja of the Deep Hours",
+      "Moon-Circuit Hacker",
+      "Sakashima's Student",
+      "Prosperous Thief"
+    ],
+    "topdeck_manipulation": [
+      "Brainstorm",
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Mystical Tutor",
+      "Vampiric Tutor",
+      "Personal Tutor",
+      "Ponder",
+      "Preordain"
+    ],
+    "high_mv_reveals": [
+      "Draco",
+      "Blinkmoth Infusion",
+      "Commandeer",
+      "Temporal Trespass",
+      "Dig Through Time",
+      "Treasure Cruise",
+      "Commit // Memory"
+    ],
+    "cedh_combo": [
+      "Thassa's Oracle",
+      "Demonic Consultation",
+      "Tainted Pact",
+      "Doomsday"
+    ],
+    "interaction": [
+      "Force of Will",
+      "Fierce Guardianship",
+      "Snuff Out",
+      "Deadly Rollick",
+      "Swan Song",
+      "Drown in the Loch",
+      "Cyclonic Rift"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "uncastable_high_mv_overload",
+      "examples": ["too many expensive reveal-only cards"],
+      "reason": "Yuriko needs playable tempo and interaction, not dead cards."
+    },
+    {
+      "pattern": "non_evasive_enablers",
+      "examples": ["ground one-drops with no evasion"],
+      "reason": "Early damage triggers need reliable combat connection."
+    },
+    {
+      "pattern": "casual_to_cedh_unasked_upgrade",
+      "examples": ["Oracle/Consult in a casual ninja deck"],
+      "reason": "cEDH combo lines should follow explicit user intent or bracket."
+    }
+  ]
+}

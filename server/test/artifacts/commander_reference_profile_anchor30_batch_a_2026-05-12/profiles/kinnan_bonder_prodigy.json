@@ -1,0 +1,120 @@
+{
+  "version": "anchor30_kinnan_bonder_prodigy_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Kinnan, Bonder Prodigy",
+  "confidence": "high",
+  "source_count": 6,
+  "updated_at": "2026-05-12T15:00:00Z",
+  "color_identity": ["G", "U"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Kinnan as a GU mana dorks/artifact ramp/combo Commander anchor.",
+      "Public Commander and cEDH sources label Kinnan as a Commander/cEDH deck commander.",
+      "Kinnan is one of the strongest cEDH signals in Batch A, but casual big-mana play remains distinct."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/kinnan-bonder-prodigy/cedh",
+    "https://learncedh.com/decklists/kinnan",
+    "https://edhtop16.com/commander/Kinnan%2C%20Bonder%20Prodigy",
+    "https://www.mtgtop8.com/archetype?a=1246",
+    "https://draftsim.com/kinnan-bonder-prodigy-edh-deck/",
+    "https://archidekt.com/decks/7012154/cedh_kinnan_bonder_prodigy"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Expected packages exclude banned Mana Crypt, Jeweled Lotus, and Nadu.",
+    "Separate casual big-mana creature cheating from cEDH infinite-mana shells."
+  ],
+  "themes": [
+    {
+      "name": "mana_dorks_artifact_ramp_combo",
+      "confidence": "high",
+      "notes": "Kinnan doubles nonland mana and turns excess mana into board advantage."
+    },
+    {
+      "name": "infinite_mana_outlets",
+      "confidence": "high",
+      "notes": "Monolith and aura loops create deterministic big-mana finishes."
+    },
+    {
+      "name": "simic_creature_cheat",
+      "confidence": "medium_high",
+      "notes": "Kinnan's activated ability rewards high-impact creature hits in casual and high-power lanes."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 29, "max": 34},
+    "nonland_mana_sources": {"min": 18, "max": 26},
+    "mana_dorks": {"min": 10, "max": 16},
+    "artifact_mana": {"min": 6, "max": 11},
+    "infinite_mana_pieces": {"min": 4, "max": 8},
+    "payoffs_outlets": {"min": 5, "max": 9},
+    "interaction_protection": {"min": 9, "max": 14}
+  },
+  "expected_packages": {
+    "mana_dorks": [
+      "Llanowar Elves",
+      "Elvish Mystic",
+      "Birds of Paradise",
+      "Bloom Tender",
+      "Fyndhorn Elves",
+      "Arbor Elf",
+      "Incubation Druid",
+      "Maraleaf Pixie"
+    ],
+    "artifact_mana": [
+      "Sol Ring",
+      "Basalt Monolith",
+      "Grim Monolith",
+      "Mox Opal",
+      "Arcane Signet",
+      "Simic Signet",
+      "Talisman of Curiosity"
+    ],
+    "infinite_mana": [
+      "Basalt Monolith",
+      "Grim Monolith",
+      "Freed from the Real",
+      "Pemmin's Aura",
+      "Training Grounds",
+      "Staff of Domination"
+    ],
+    "payoffs": [
+      "Thrasios, Triton Hero",
+      "Hullbreaker Horror",
+      "Tidespout Tyrant",
+      "Finale of Devastation",
+      "Walking Ballista",
+      "Blue Sun's Zenith",
+      "Seedborn Muse"
+    ],
+    "tutors_interaction": [
+      "Worldly Tutor",
+      "Chord of Calling",
+      "Force of Will",
+      "Swan Song",
+      "Veil of Summer",
+      "Cyclonic Rift",
+      "Mystical Tutor"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "banned_fast_mana_or_nadu",
+      "examples": ["Mana Crypt", "Jeweled Lotus", "Nadu, Winged Wisdom"],
+      "reason": "Older high-power lists can contain cards banned in Commander."
+    },
+    {
+      "pattern": "land_ramp_over_nonland_mana",
+      "examples": ["too many Cultivate effects in cEDH lane"],
+      "reason": "Kinnan specifically doubles nonland mana sources."
+    },
+    {
+      "pattern": "off_color_bant_dorks",
+      "examples": ["Noble Hierarch", "Faeburrow Elder"],
+      "reason": "Some popular dorks have white color identity and are illegal in GU."
+    }
+  ]
+}

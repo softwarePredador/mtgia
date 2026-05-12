@@ -1,0 +1,125 @@
+{
+  "version": "anchor30_prosper_tome_bound_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Prosper, Tome-Bound",
+  "confidence": "high",
+  "source_count": 6,
+  "updated_at": "2026-05-12T15:00:00Z",
+  "color_identity": ["B", "R"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Prosper as a BR exile value/treasure Commander anchor.",
+      "Public Commander and cEDH sources label Prosper as a Commander/cEDH deck commander.",
+      "Rakdos storm/Breach packages should be separated from casual exile-value defaults."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/prosper-tome-bound/cedh",
+    "https://edh.wiki/commanders/prosper-tome-bound/",
+    "https://www.tcgplayer.com/content/article/Commander-MTG-Deck-Guide-Prosper-Tome-Bound/9f1a0533-dc8c-49ad-9139-4ea04685474a/",
+    "https://draftsim.com/prosper-edh-deck/",
+    "https://moxfield.com/decks/wSL7yM8vhUC67CjbFFjO2Q",
+    "https://mtgdecks.net/Commander/prosper-tome-bound-decklist-by-dan-aronowitz-2155112"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Expected packages exclude banned Dockside/Mana Crypt patterns.",
+    "Ad Nauseam/Breach storm is high-power/cEDH opt-in, not default precon-upgrade behavior."
+  ],
+  "themes": [
+    {
+      "name": "exile_value_treasure",
+      "confidence": "high",
+      "notes": "Prosper rewards casting from exile with treasure production."
+    },
+    {
+      "name": "impulse_draw_curve",
+      "confidence": "high",
+      "notes": "Exile draw must stay cheap enough to cast before it expires."
+    },
+    {
+      "name": "treasure_artifact_payoffs",
+      "confidence": "high",
+      "notes": "Treasure generation supports drain, storm, and artifact-sacrifice payoffs."
+    },
+    {
+      "name": "rakdos_breach_storm",
+      "confidence": "medium_high",
+      "notes": "Breach and ritual lines are proven high-power signals."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 33, "max": 36},
+    "exile_casting": {"min": 10, "max": 16},
+    "treasure_generation": {"min": 8, "max": 13},
+    "treasure_payoffs": {"min": 5, "max": 9},
+    "rituals": {"min": 3, "max": 8},
+    "interaction": {"min": 8, "max": 12},
+    "storm_combo": {"min": 0, "max": 6}
+  },
+  "expected_packages": {
+    "exile_casting": [
+      "Light Up the Stage",
+      "Reckless Impulse",
+      "Jeska's Will",
+      "Laelia, the Blade Reforged",
+      "Outpost Siege",
+      "Theater of Horrors",
+      "Valakut Exploration",
+      "Ignite the Future"
+    ],
+    "treasure_payoffs": [
+      "Xorn",
+      "Academy Manufactor",
+      "Marionette Master",
+      "Mirkwood Bats",
+      "Revel in Riches",
+      "Nadier's Nightblade",
+      "Mayhem Devil",
+      "Pitiless Plunderer"
+    ],
+    "storm_combo": [
+      "Underworld Breach",
+      "Lion's Eye Diamond",
+      "Grinding Station",
+      "Grapeshot",
+      "Wishclaw Talisman",
+      "Aetherflux Reservoir"
+    ],
+    "rituals": [
+      "Dark Ritual",
+      "Rite of Flame",
+      "Culling the Weak",
+      "Rain of Filth",
+      "Jeska's Will",
+      "Seething Song"
+    ],
+    "interaction": [
+      "Deflecting Swat",
+      "Pyroblast",
+      "Abrade",
+      "Opposition Agent",
+      "Deadly Rollick",
+      "Chaos Warp",
+      "Feed the Swarm"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "banned_treasure_fast_mana",
+      "examples": ["Dockside Extortionist", "Mana Crypt", "Jeweled Lotus"],
+      "reason": "Older Prosper lists can contain cards banned in Commander."
+    },
+    {
+      "pattern": "high_curve_exile_cards",
+      "examples": ["expensive impulse cards that cannot be cast before expiry"],
+      "reason": "Exile value needs a playable curve and mana conversion."
+    },
+    {
+      "pattern": "casual_to_storm_unasked_upgrade",
+      "examples": ["Ad Nauseam storm in a casual treasure deck"],
+      "reason": "Storm packages should follow explicit power-level intent."
+    }
+  ]
+}

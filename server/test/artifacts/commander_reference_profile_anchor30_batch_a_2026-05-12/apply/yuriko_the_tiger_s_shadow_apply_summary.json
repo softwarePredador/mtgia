@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Yuriko, the Tiger's Shadow",
+  "started_at": "2026-05-12T14:55:56.460365Z",
+  "finished_at": "2026-05-12T14:56:30.702558Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/apply",
+  "profile_hash": "eb0a7f3a2411",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Yuriko, the Tiger's Shadow",
+    "resolved": true,
+    "card_id": "aec81b2d-f3e0-42a9-81dc-785a9a33a65d",
+    "card_name": "Yuriko, the Tiger's Shadow"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 42,
+    "resolved_count": 42,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "cedh_combo": {
+        "resolved": 4,
+        "unresolved": 0
+      },
+      "evasive_enablers": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "high_mv_reveals": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "ninjas": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "topdeck_manipulation": {
+        "resolved": 8,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 42,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:2bfed7aeb895"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Prosper, Tome-Bound",
+  "started_at": "2026-05-12T14:59:08.695354Z",
+  "finished_at": "2026-05-12T14:59:37.003313Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/apply_idempotency",
+  "profile_hash": "e13c6277f9c5",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Prosper, Tome-Bound",
+    "resolved": true,
+    "card_id": "f9d76f06-9e0d-404c-a415-00db9bcd46d3",
+    "card_name": "Prosper, Tome-Bound"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 35,
+    "resolved_count": 35,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "exile_casting": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "interaction": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "rituals": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "storm_combo": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "treasure_payoffs": {
+        "resolved": 8,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 35,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:23b845a916c5"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}
