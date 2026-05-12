@@ -1,0 +1,119 @@
+{
+  "version": "anchor30_teysa_karlov_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Teysa Karlov",
+  "confidence": "high",
+  "source_count": 5,
+  "updated_at": "2026-05-12T17:30:00Z",
+  "color_identity": ["B", "W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Teysa as a WB aristocrats/death-trigger Commander anchor.",
+      "EDHREC, MTGGoldfish, Moxfield and Archidekt pages label Teysa Karlov as Commander deck context.",
+      "The profile models aristocrat redundancy, not lifegain-only Orzhov."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/teysa-karlov",
+    "https://edhrec.com/decks/teysa-karlov",
+    "https://www.mtggoldfish.com/archetype/teysa-karlov/decks",
+    "https://moxfield.com/decks/U2AoO0WbKket2qkVrGtOLA",
+    "https://archidekt.com/decks/7259083/teysa_karlov_high_power"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Aristocrat triangle coverage is the main reusable pattern.",
+    "Combo loops are power-lane aware and not casual defaults."
+  ],
+  "themes": [
+    {
+      "name": "aristocrats_death_triggers",
+      "confidence": "high",
+      "notes": "Teysa doubles death triggers and converts disposable creatures into cards, damage, and board control."
+    },
+    {
+      "name": "orzhov_tokens_sacrifice",
+      "confidence": "high",
+      "notes": "Fodder plus free sacrifice outlets keeps the engine resilient."
+    },
+    {
+      "name": "recursion_value",
+      "confidence": "medium_high",
+      "notes": "Small recursion packages rebuild after removal and enable repeatable death triggers."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 35, "max": 37},
+    "ramp": {"min": 9, "max": 11},
+    "draw_value": {"min": 10, "max": 14},
+    "interaction": {"min": 8, "max": 11},
+    "board_wipes": {"min": 2, "max": 4},
+    "protection": {"min": 2, "max": 4},
+    "sacrifice_outlets": {"min": 7, "max": 10},
+    "fodder_tokens": {"min": 10, "max": 15},
+    "death_payoffs": {"min": 7, "max": 10},
+    "recursion": {"min": 4, "max": 7}
+  },
+  "expected_packages": {
+    "death_payoffs": [
+      "Blood Artist",
+      "Cruel Celebrant",
+      "Zulaport Cutthroat",
+      "Bastion of Remembrance",
+      "Elenda, the Dusk Rose",
+      "Requiem Angel",
+      "Pitiless Plunderer"
+    ],
+    "sacrifice_outlets": [
+      "Viscera Seer",
+      "Carrion Feeder",
+      "Woe Strider",
+      "Yawgmoth, Thran Physician",
+      "Ashnod's Altar",
+      "Altar of Dementia",
+      "Phyrexian Altar"
+    ],
+    "fodder_tokens": [
+      "Ophiomancer",
+      "Hunted Witness",
+      "Doomed Traveler",
+      "Reassembling Skeleton",
+      "Jadar, Ghoulcaller of Nephalia",
+      "Bitterblossom"
+    ],
+    "draw_engines": [
+      "Skullclamp",
+      "Village Rites",
+      "Grim Haruspex",
+      "Midnight Reaper",
+      "Morbid Opportunist",
+      "Welcoming Vampire"
+    ],
+    "recursion_interaction": [
+      "Sun Titan",
+      "Victimize",
+      "Living Death",
+      "Swords to Plowshares",
+      "Anguished Unmaking",
+      "Generous Gift"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "lifegain_without_deaths",
+      "examples": ["Soul Sisters package without sacrifice or death payoffs"],
+      "reason": "Teysa doubles death triggers, not generic lifegain."
+    },
+    {
+      "pattern": "token_aggro_without_outlets",
+      "examples": ["wide tokens with no sacrifice outlets"],
+      "reason": "Fodder must connect to outlets and payoffs to be a Teysa engine."
+    },
+    {
+      "pattern": "combo_default",
+      "examples": ["deterministic loops in casual profile by default"],
+      "reason": "Loops are valid high-power signals but should respect user intent."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Miirym, Sentinel Wyrm",
+  "started_at": "2026-05-12T17:44:30.476029Z",
+  "finished_at": "2026-05-12T17:44:58.224691Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/apply_idempotency",
+  "profile_hash": "bbb3c148e89a",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Miirym, Sentinel Wyrm",
+    "resolved": true,
+    "card_id": "853bb909-0d88-4e51-a76c-baf8268b4336",
+    "card_name": "Miirym, Sentinel Wyrm"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 33,
+    "resolved_count": 33,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "copy_clone_engines": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "dragon_core": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "protection_interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "temur_value_payoffs": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "tribal_ramp_reduction": {
+        "resolved": 7,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 33,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:9e0719aeb66e"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

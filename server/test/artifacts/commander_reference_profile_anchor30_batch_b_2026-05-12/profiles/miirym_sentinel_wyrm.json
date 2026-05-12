@@ -1,0 +1,118 @@
+{
+  "version": "anchor30_miirym_sentinel_wyrm_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Miirym, Sentinel Wyrm",
+  "confidence": "high",
+  "source_count": 4,
+  "updated_at": "2026-05-12T17:30:00Z",
+  "color_identity": ["G", "R", "U"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Miirym as a GUR Dragon typal/copy Commander anchor.",
+      "EDHREC and public Commander deck pages label Miirym as a Commander deck commander.",
+      "cEDH relevance is not treated as proven; this profile is casual/high-power Dragon copy guidance."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/miirym-sentinel-wyrm",
+    "https://draftsim.com/miirym-edh-deck/",
+    "https://moxfield.com/decks/rNQ30r_R6Uq4a4tYnDYamw",
+    "https://archidekt.com/decks/12496233/miirym_sentinel_wyrm"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Dragon copy/ETB packages are prioritized over generic Temur goodstuff.",
+    "No mainstream cEDH default is asserted for this commander."
+  ],
+  "themes": [
+    {
+      "name": "dragon_typal_copy",
+      "confidence": "high",
+      "notes": "Miirym doubles nontoken Dragons, making every Dragon threat also a token-value engine."
+    },
+    {
+      "name": "temur_ramp_battlecruiser",
+      "confidence": "high",
+      "notes": "High ramp density is required to cast Dragon threats before the table stabilizes."
+    },
+    {
+      "name": "etb_damage_payoffs",
+      "confidence": "medium_high",
+      "notes": "Terror of the Peaks style effects convert copied Dragons into immediate damage."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 36, "max": 38},
+    "ramp": {"min": 12, "max": 16},
+    "draw_value": {"min": 9, "max": 12},
+    "interaction": {"min": 7, "max": 10},
+    "counter_protection": {"min": 4, "max": 7},
+    "board_wipes": {"min": 1, "max": 3},
+    "dragon_density": {"min": 18, "max": 24},
+    "copy_enablers": {"min": 5, "max": 9},
+    "etb_damage_payoffs": {"min": 5, "max": 8}
+  },
+  "expected_packages": {
+    "dragon_core": [
+      "Terror of the Peaks",
+      "Utvara Hellkite",
+      "Goldspan Dragon",
+      "Ancient Copper Dragon",
+      "Klauth, Unrivaled Ancient",
+      "Lathliss, Dragon Queen",
+      "Scourge of Valkas",
+      "Atarka, World Render"
+    ],
+    "copy_clone_engines": [
+      "Sakashima of a Thousand Faces",
+      "Spark Double",
+      "Irenicus's Vile Duplication",
+      "Rite of Replication",
+      "Reflections of Littjara",
+      "Molten Echoes"
+    ],
+    "tribal_ramp_reduction": [
+      "Dragonlord's Servant",
+      "Dragonspeaker Shaman",
+      "Herald's Horn",
+      "Dragon's Hoard",
+      "Orb of Dragonkind",
+      "Farseek",
+      "Nature's Lore"
+    ],
+    "temur_value_payoffs": [
+      "Garruk's Uprising",
+      "Temur Ascendancy",
+      "Kindred Discovery",
+      "Rhythm of the Wild",
+      "Dragon Tempest",
+      "Elemental Bond"
+    ],
+    "protection_interaction": [
+      "Heroic Intervention",
+      "Lightning Greaves",
+      "Swiftfoot Boots",
+      "Swan Song",
+      "Counterspell",
+      "Cyclonic Rift"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "dragon_pile_without_copy_payoff",
+      "examples": ["too many six-plus mana Dragons without ramp or ETB payoff"],
+      "reason": "Miirym needs ramp and copy/ETB synergy, not only expensive threats."
+    },
+    {
+      "pattern": "legend_clone_rules_mismatch",
+      "examples": ["clone package with no legend-safe support"],
+      "reason": "Clone packages must work with legendary permanents and token-copy rules."
+    },
+    {
+      "pattern": "cedh_assumption",
+      "examples": ["turbo combo shell"],
+      "reason": "Commander relevance is proven; cEDH default relevance is not proven."
+    }
+  ]
+}

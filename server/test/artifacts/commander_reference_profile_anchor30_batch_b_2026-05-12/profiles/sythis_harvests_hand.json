@@ -1,0 +1,117 @@
+{
+  "version": "anchor30_sythis_harvests_hand_reference_profile_v1_2026-05-12",
+  "source": "aggregate_reference_profile_v1",
+  "commander": "Sythis, Harvest's Hand",
+  "confidence": "high",
+  "source_count": 5,
+  "updated_at": "2026-05-12T17:30:00Z",
+  "color_identity": ["G", "W"],
+  "commander_relevance": {
+    "status": "proven",
+    "basis": [
+      "Anchor 30 plan lists Sythis as a GW enchantress Commander anchor.",
+      "EDHREC Commander/cEDH pages and public Commander guides label Sythis as a Commander deck commander.",
+      "cEDH stax is a separate high-power lane and not the casual default."
+    ]
+  },
+  "source_refs": [
+    "https://edhrec.com/commanders/sythis-harvests-hand",
+    "https://edhrec.com/commanders/sythis-harvests-hand/cedh",
+    "https://draftsim.com/sythis-edh-deck/",
+    "https://www.tcgplayer.com/content/article/Commander-MTG-Deck-Guide-Sythis-Harvest-s-Hand/0709c62f-b314-41af-9aee-32b7fc392945/",
+    "https://scrycheck.com/deck/16a5fd30dd011e32"
+  ],
+  "source_limit_notes": [
+    "Aggregate/manual reference only; no copied public decklist.",
+    "Enchantress density and enchantment-based ramp/removal are prioritized.",
+    "Oppressive stax is high-power opt-in, not default casual UX."
+  ],
+  "themes": [
+    {
+      "name": "enchantress",
+      "confidence": "high",
+      "notes": "Sythis turns cheap enchantments into cantrips and life buffer."
+    },
+    {
+      "name": "aura_ramp_pillow_fort",
+      "confidence": "high",
+      "notes": "Aura ramp, protective enchantments, and pillow-fort pieces keep the engine alive."
+    },
+    {
+      "name": "selesnya_enchantment_payoffs",
+      "confidence": "medium_high",
+      "notes": "Token and inevitability payoffs convert enchantment velocity into wins."
+    }
+  ],
+  "role_targets": {
+    "lands": {"min": 33, "max": 36},
+    "ramp": {"min": 9, "max": 12},
+    "enchantress_draw": {"min": 8, "max": 12},
+    "interaction": {"min": 8, "max": 11},
+    "board_wipes": {"min": 1, "max": 3},
+    "pillow_protection": {"min": 5, "max": 9},
+    "enchantment_density": {"min": 30, "max": 40},
+    "payoffs": {"min": 4, "max": 8},
+    "tutors": {"min": 3, "max": 6}
+  },
+  "expected_packages": {
+    "aura_ramp": [
+      "Utopia Sprawl",
+      "Wild Growth",
+      "Fertile Ground",
+      "Overgrowth",
+      "Sanctum Weaver",
+      "Mirari's Wake",
+      "Carpet of Flowers"
+    ],
+    "enchantress_redundancy": [
+      "Enchantress's Presence",
+      "Satyr Enchanter",
+      "Mesa Enchantress",
+      "Setessan Champion",
+      "Argothian Enchantress",
+      "Eidolon of Blossoms"
+    ],
+    "pillow_protection_stax": [
+      "Ghostly Prison",
+      "Sphere of Safety",
+      "Solitary Confinement",
+      "Sterling Grove",
+      "Greater Auramancy",
+      "Stony Silence"
+    ],
+    "enchantment_interaction": [
+      "Darksteel Mutation",
+      "Kenrith's Transformation",
+      "Grasp of Fate",
+      "Song of the Dryads",
+      "Aura of Silence",
+      "Seal of Cleansing"
+    ],
+    "win_payoffs": [
+      "Sigil of the Empty Throne",
+      "Archon of Sun's Grace",
+      "Hallowed Haunting",
+      "Destiny Spinner",
+      "Heliod, Sun-Crowned",
+      "Ancestral Mask"
+    ]
+  },
+  "avoid_patterns": [
+    {
+      "pattern": "low_enchantment_density",
+      "examples": ["Selesnya goodstuff with few enchantments"],
+      "reason": "Sythis needs enchantment density for velocity and life gain."
+    },
+    {
+      "pattern": "stax_default",
+      "examples": ["hard stax package in casual deck without user request"],
+      "reason": "cEDH/stax signals are real but socially risky for default generation."
+    },
+    {
+      "pattern": "aura_voltron_without_protection",
+      "examples": ["large aura stack without recursion or protection"],
+      "reason": "Aura-heavy lines need protection and card velocity."
+    }
+  ]
+}

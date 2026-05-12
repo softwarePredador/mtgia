@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Teysa Karlov",
+  "started_at": "2026-05-12T17:45:29.365532Z",
+  "finished_at": "2026-05-12T17:45:55.832118Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/apply_idempotency",
+  "profile_hash": "597df6873d0e",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Teysa Karlov",
+    "resolved": true,
+    "card_id": "f2eda272-16c9-47eb-b14f-bb30af3c7043",
+    "card_name": "Teysa Karlov"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 32,
+    "resolved_count": 32,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "death_payoffs": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "draw_engines": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "fodder_tokens": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "recursion_interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "sacrifice_outlets": {
+        "resolved": 7,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 32,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:c9597abff43f"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

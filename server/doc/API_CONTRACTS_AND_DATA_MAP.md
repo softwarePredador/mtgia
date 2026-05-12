@@ -215,6 +215,18 @@ selects a Commander/Brawl commander. See
 and
 `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_RUNTIME_2026-05-12.md`.
 
+Anchor 30 Batch B local DB-backed proof for `POST /ai/generate` guidance: on
+2026-05-12, exact Commander Reference Profiles were applied for Edgar Markov,
+Miirym, Sentinel Wyrm, Isshin, Two Heavens as One, Teysa Karlov, Lathril, Blade
+of the Elves, Aesi, Tyrant of Gyre Strait, Sythis, Harvest's Hand, and Urza,
+Lord High Artificer. The generic runner proved commander card resolution plus
+dry-run/apply/idempotency with `unresolved_count=0` and `off_color_count=0` for
+all 8; resolved package-card counts ranged from 27 to 37. Runtime-public
+validation is still the next gate after deploy, but the app-facing contract is
+unchanged: clients should send `commander_name` to activate exact
+profile/card-stats guidance. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_2026-05-12.md`.
+
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`
 is configured, the backend derives the internal `/ai/generate` URL from

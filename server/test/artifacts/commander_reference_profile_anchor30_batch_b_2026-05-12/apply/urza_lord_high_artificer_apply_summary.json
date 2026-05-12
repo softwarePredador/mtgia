@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Urza, Lord High Artificer",
+  "started_at": "2026-05-12T17:41:42.461687Z",
+  "finished_at": "2026-05-12T17:42:12.727115Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/apply",
+  "profile_hash": "e6b5cf7805ed",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Urza, Lord High Artificer",
+    "resolved": true,
+    "card_id": "f8a85e36-454b-42ee-afbb-a3c9ab67214c",
+    "card_name": "Urza, Lord High Artificer"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 37,
+    "resolved_count": 37,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "artifact_mana": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "control_countermagic": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "infinite_mana_combo": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "stax_parity_breakers": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "value_tutors": {
+        "resolved": 9,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 37,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:ccd44f54892a"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

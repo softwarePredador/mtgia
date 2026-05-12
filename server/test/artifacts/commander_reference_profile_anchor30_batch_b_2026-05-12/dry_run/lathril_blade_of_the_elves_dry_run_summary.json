@@ -1,0 +1,78 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "mode": "dry_run",
+  "db_mutations": false,
+  "commander": "Lathril, Blade of the Elves",
+  "started_at": "2026-05-12T17:37:43.896896Z",
+  "finished_at": "2026-05-12T17:37:47.551293Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/dry_run",
+  "profile_hash": "da5f3076153c",
+  "profile_confidence": "high",
+  "profile_usable_after_run": false,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Lathril, Blade of the Elves",
+    "resolved": true,
+    "card_id": "3e6af43b-85d0-4092-ab62-5963533089d5",
+    "card_name": "Lathril, Blade of the Elves"
+  },
+  "reference_card_stats": {
+    "table_mutated": false,
+    "stats_total": 32,
+    "resolved_count": 32,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "anthem_drain_finishers": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "mana_elves": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "protection_interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "token_makers": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "untap_synergy": {
+        "resolved": 6,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 0,
+    "loaded_unresolved_after_run": [],
+    "cache_version": null
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Isshin, Two Heavens as One",
+  "started_at": "2026-05-12T17:43:35.259418Z",
+  "finished_at": "2026-05-12T17:43:59.158797Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/apply_idempotency",
+  "profile_hash": "aa2147c5dc17",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Isshin, Two Heavens as One",
+    "resolved": true,
+    "card_id": "47065311-74e4-4694-a9f4-478e599abc1d",
+    "card_name": "Isshin, Two Heavens as One"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 27,
+    "resolved_count": 27,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "attack_token_makers": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "attacker_safety": {
+        "resolved": 6,
+        "unresolved": 0
+      },
+      "combat_damage_payoffs": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "extra_combat": {
+        "resolved": 4,
+        "unresolved": 0
+      },
+      "mardu_interaction_value": {
+        "resolved": 5,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 27,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:e01693f41812"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}

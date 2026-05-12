@@ -3,6 +3,47 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Commander Reference Profiles Anchor 30 Batch B
+
+### O Porquê
+- Depois de Batch A passar localmente e ter runtime publico aprovado com riscos
+  nao bloqueantes, o proximo passo da base Anchor 30 era ampliar cobertura de
+  Commander para tipal Vampires/Elves/Dragons, aristocrats, lands, enchantress,
+  attack triggers e artifacts/control.
+- O lote precisava usar apenas sinais agregados de Commander/cEDH, sem copiar
+  decklists completas e sem expor secrets, tokens, JWT, DSN, URL de banco ou
+  chaves externas.
+
+### O Como
+- `master` foi sincronizada com `origin/master` antes da execucao.
+- Foram consultados o plano Anchor 30, a fila
+  `anchor_30_queue.json`, `API_CONTRACTS_AND_DATA_MAP.md`, relatorio Batch A e
+  follow-up Chulane.
+- Foram criados 8 JSONs sanitizados em
+  `server/test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/profiles/`
+  para Edgar Markov, Miirym, Isshin, Teysa, Lathril, Aesi, Sythis e Urza.
+- Cada profile separa fatos locais, evidencia web agregada, interpretacao de
+  estrategia, themes, role targets, expected packages, avoid patterns,
+  confidence e source count.
+- O runner `server/bin/commander_reference_profile.dart` foi executado em
+  `--dry-run`, `--apply` e uma segunda vez em `--apply` para idempotencia.
+
+### Resultado
+- **PASS**: 8/8 profiles aplicados.
+- Todos os commanders resolveram no banco local/remoto configurado pelo runner.
+- Todos os profiles tiveram `unresolved_count=0` e `off_color_count=0`.
+- Os profiles ficaram `profile_usable_after_run=true` apos apply e apos
+  idempotencia.
+- Contagens resolvidas por commander: Aesi 30, Edgar 33, Isshin 27, Lathril 32,
+  Miirym 33, Sythis 31, Teysa 32 e Urza 37.
+- O contrato app-facing nao mudou; `/ai/generate` continua dependendo de
+  `commander_name` para ativar exact Commander Reference Profile e Reference Card
+  Stats.
+- Relatorio criado:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_2026-05-12.md`.
+- `API_CONTRACTS_AND_DATA_MAP.md` foi atualizado com a evidencia DB-backed de
+  Batch B e o proximo gate de runtime publico.
+
 ## 2026-05-12 — Follow-up Chulane invalid_cards_count no Anchor 30 Batch A
 
 ### O Porquê

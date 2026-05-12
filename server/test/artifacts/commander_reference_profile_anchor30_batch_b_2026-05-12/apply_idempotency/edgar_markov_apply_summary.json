@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "commander": "Edgar Markov",
+  "started_at": "2026-05-12T17:43:05.160360Z",
+  "finished_at": "2026-05-12T17:43:32.801241Z",
+  "artifact_dir": "test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/apply_idempotency",
+  "profile_hash": "726cb5c21483",
+  "profile_confidence": "high",
+  "profile_usable_after_run": true,
+  "tables_checked_before_schema_action": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "tables_checked_after": {
+    "commander_reference_profiles": true,
+    "commander_reference_card_stats": true,
+    "commander_card_synergy": true,
+    "card_role_scores": true,
+    "card_function_tags": true
+  },
+  "commander_card_resolution": {
+    "commander_name": "Edgar Markov",
+    "resolved": true,
+    "card_id": "09415448-0f19-42bb-a922-4a1f28142900",
+    "card_name": "Edgar Markov"
+  },
+  "reference_card_stats": {
+    "table_mutated": true,
+    "stats_total": 33,
+    "resolved_count": 33,
+    "unresolved_count": 0,
+    "unresolved_reference_cards": [],
+    "off_color_count": 0,
+    "off_color_reference_cards": [],
+    "package_coverage": {
+      "aristocrats_and_sacrifice": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "cheap_vampire_core": {
+        "resolved": 8,
+        "unresolved": 0
+      },
+      "high_power_combo_opt_in": {
+        "resolved": 5,
+        "unresolved": 0
+      },
+      "lords_and_combat_payoffs": {
+        "resolved": 7,
+        "unresolved": 0
+      },
+      "protection_and_interaction": {
+        "resolved": 6,
+        "unresolved": 0
+      }
+    },
+    "loaded_usable_after_run": 33,
+    "loaded_unresolved_after_run": [],
+    "cache_version": "reference_card_stats_v1:1f5ea95cdcf4"
+  },
+  "generate_contract": {
+    "request_field": "commander_name",
+    "enabled_for_any_persisted_profile": true,
+    "minimum_confidence": "medium",
+    "fallback_for_missing_profile": "legacy_generate_path"
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_secrets_recorded": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true,
+    "allow_unresolved_commander": false
+  }
+}
