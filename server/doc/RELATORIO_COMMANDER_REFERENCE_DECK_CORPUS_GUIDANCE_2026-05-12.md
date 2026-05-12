@@ -85,6 +85,27 @@ Resultado sanitizado:
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/public_probe_summary.json`.
 
+## Prova publica ampliada
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+Commit publicado: `9909e0be054a16ec1ee10f3fcba121c4e0e2a06f`.
+
+Resultado:
+
+| Modo | Probes | HTTP 200 | Validos | Lorehold preservado | Corpus usado | Fallback | Overlap top40 | p50 | p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `commander_name=Lorehold, the Historian` | 5 | 5/5 | 5/5 | 5/5 | 5/5 | 0/5 | 13-19, avg `16.2` | `18232ms` | `21034ms` |
+| Sem `commander_name` | 5 | 5/5 | 5/5 | 0/5 | 0/5 | 1/5 | 0-6, avg `3.0` | `11519ms` | `12742ms` |
+
+Conclusao: o guidance de corpus aumentou aderencia estrutural e preservou
+Lorehold em todas as amostras. A latencia ficou maior no caminho com corpus,
+mas sem fallback e dentro do envelope atual de `/ai/generate`.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/public_expanded/summary.json`.
+
 ## Validações
 
 ```bash
@@ -97,11 +118,11 @@ cd server && dart test test/commander_reference_deck_corpus_support_test.dart -r
 - `other` no classificador de roles ainda esta alto; o corpus ajuda a estrutura,
   mas ainda precisamos refinar roles como spellslinger, miracle/topdeck,
   exile/value e payoff.
-- A amostra local e pequena; o proximo gate publico deve rodar 5 probes com
-  `commander_name` e 5 sem, usando prompts variados.
+- O caminho com corpus teve p95 `21034ms`; aceitavel para async, mas deve
+  seguir monitorado.
 
 ## Proximo passo
 
-Rodar prova publica ampliada com 5 probes com `commander_name` e 5 sem, usando
-prompts variados, para medir estabilidade, latencia e ganho de overlap com o
-corpus.
+Refinar o classificador de roles do corpus para reduzir `other` e separar
+spellslinger, miracle/topdeck, exile/value, big-spell payoff, recursion e
+ritual/treasure antes de expandir o corpus para muitos comandantes.

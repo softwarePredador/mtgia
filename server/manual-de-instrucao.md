@@ -13919,3 +13919,24 @@ Prova publica:
 
 Proximo gate: prova publica ampliada com 5 probes com `commander_name` e 5 sem,
 medindo estabilidade, latencia e overlap com o corpus.
+
+## 113. Lorehold corpus guidance prova publica ampliada - 2026-05-12
+
+Foi executada prova publica ampliada contra
+`https://evolution-cartinhas.8ktevp.easypanel.host` em
+`9909e0be054a16ec1ee10f3fcba121c4e0e2a06f`.
+
+Resultado:
+
+- com `commander_name=Lorehold, the Historian`: 5/5 `HTTP 200`, 5/5 validos,
+  5/5 Lorehold preservado, 5/5 `reference_deck_corpus_used=true`, 0/5
+  fallback, overlap top40 `13-19`, media `16.2`, p95 `21034ms`;
+- sem `commander_name`: 5/5 `HTTP 200`, 5/5 validos, 0/5 Lorehold preservado,
+  0/5 corpus, 1/5 fallback, overlap top40 `0-6`, media `3.0`, p95 `12742ms`.
+
+Conclusao: o corpus guidance melhora aderencia e preservacao do comandante,
+com custo de latencia maior no caminho guided. O proximo trabalho deve focar
+em refinar roles para reduzir `other` antes de expandir em massa.
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/public_expanded/summary.json`.
