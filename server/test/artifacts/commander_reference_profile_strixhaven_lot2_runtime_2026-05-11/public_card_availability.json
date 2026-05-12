@@ -1,61 +1,69 @@
 {
-  "backend": "https://evolution-cartinhas.8ktevp.easypanel.host",
-  "checked_at": "2026-05-11T21:06:00Z",
-  "endpoint": "GET /cards?name=<commander>&limit=3",
-  "results": [
+  "card_availability": [
     {
       "commander": "Aziza, Mage Tower Captain",
+      "elapsed_ms": 718,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Berta, Wise Extrapolator",
+      "elapsed_ms": 645,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Excava, the Risen Past",
+      "elapsed_ms": 632,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Gorma, the Gullet",
+      "elapsed_ms": 662,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Muddle, the Ever-Changing",
+      "elapsed_ms": 664,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Primo, the Unbounded",
+      "elapsed_ms": 662,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Scriv, the Obligator",
+      "elapsed_ms": 647,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     },
     {
       "commander": "Zaffai and the Tempests",
+      "elapsed_ms": 645,
+      "exact_match_sample": [],
+      "exact_matches": 0,
       "status": 200,
-      "total_returned": 0,
-      "exact_matches": 0
+      "total_returned": 0
     }
   ],
-  "sanitization": {
-    "tokens_recorded": false,
-    "prompts_recorded": false,
-    "decklists_recorded": false,
-    "secrets_recorded": false
-  }
+  "run_id": "20260512T120035Z"
 }

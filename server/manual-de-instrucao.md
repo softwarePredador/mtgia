@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Revalidacao publica Strixhaven lote 2 ainda bloqueada
+
+### O Porquê
+- Era necessario validar o lote 2 de Commander Reference Profiles de
+  Strixhaven no backend publico apos novo deploy de `master`, garantindo que
+  `/ai/generate` preserva o comandante, entrega 99 cartas no main,
+  `validation.is_valid=true` e diagnostics de profile/card stats.
+- A auditoria anterior estava bloqueada em `a137dd5` porque os comandantes do
+  lote nao existiam como cards resolviveis no backend publico.
+
+### O Como
+- Sincronizado `master` com `origin/master` em
+  `e0266cc33ed3902c5b6595272dd9ceb0a2624ecb`.
+- `/health` publico confirmou `git_sha=e0266cc33ed3902c5b6595272dd9ceb0a2624ecb`
+  e `/health/ready` confirmou `cards_data.card_count=33777`.
+- Criado usuario QA descartavel; token recebido foi usado apenas em memoria e
+  nao foi persistido.
+- Executados 14 probes sanitizados de `/ai/generate`: 12 com
+  `commander_name` exato para os 8 comandantes do lote, incluindo 3 amostras
+  para Aziza e 3 para Zaffai, mais 2 baselines sem `commander_name`.
+- Nenhum token, JWT, senha, prompt completo, decklist completa, DSN, URL de
+  banco ou chave OpenAI foi registrado.
+
+### Resultado
+- **BLOCKED**: 12/12 probes com `commander_name` retornaram 422.
+- 12/12 ativaram `reference_profile_used=true` e
+  `reference_card_stats_used=true`, com `on_theme_candidate_count` entre 39 e
+  52 e `unresolved_reference_cards=[]`.
+- 0/12 preservaram comandante e 0/12 tiveram `validation.is_valid=true`.
+- 2/12 chegaram a `main_quantity=99`, mas ainda invalidos porque o comandante
+  nao resolve.
+- Causa raiz reprovada no deploy novo: `GET /cards?name=<commander>&limit=5`
+  retornou `total_returned=0` e `exact_matches=0` para todos os 8 comandantes.
+- Nao houve drift de contrato app-facing; `API_CONTRACTS_AND_DATA_MAP.md` nao
+  precisou de alteracao.
+- Relatorio/artifacts:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_RUNTIME_2026-05-11.md`
+  e `server/test/artifacts/commander_reference_profile_strixhaven_lot2_runtime_2026-05-11/`.
+
 ## 2026-05-12 — Revalidacao publica do tuning de timeout AI Generate
 
 ### O Porquê
