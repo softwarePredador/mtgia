@@ -221,11 +221,18 @@ Miirym, Sentinel Wyrm, Isshin, Two Heavens as One, Teysa Karlov, Lathril, Blade
 of the Elves, Aesi, Tyrant of Gyre Strait, Sythis, Harvest's Hand, and Urza,
 Lord High Artificer. The generic runner proved commander card resolution plus
 dry-run/apply/idempotency with `unresolved_count=0` and `off_color_count=0` for
-all 8; resolved package-card counts ranged from 27 to 37. Runtime-public
-validation is still the next gate after deploy, but the app-facing contract is
-unchanged: clients should send `commander_name` to activate exact
-profile/card-stats guidance. See
-`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_2026-05-12.md`.
+all 8; resolved package-card counts ranged from 27 to 37. Public runtime on
+deploy `75c0add` then returned `HTTP 200` for 12/12 sanitized probes with
+`commander_name`, `validation.is_valid=true`, `reference_profile_used=true`,
+`reference_card_stats_used=true`, and `main_quantity=99`. Baselines without
+`commander_name` stayed compatible but did not reliably preserve the requested
+commander/profile diagnostics. Aesi can return a double-face normalized
+commander name (`Aesi ... // Aesi ...`), so string consumers should compare the
+first face when needed. The app-facing contract is unchanged: clients should
+send `commander_name` to activate exact profile/card-stats guidance. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_2026-05-12.md`
+and
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_RUNTIME_2026-05-12.md`.
 
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`

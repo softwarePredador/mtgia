@@ -13688,3 +13688,32 @@ Leitura operacional:
   `unresolved=0`, `off_color_count=0`, dry-run/apply/idempotência e runtime
   público antes do próximo batch;
 - partner pairs ficaram fora da primeira onda para reduzir risco de contrato.
+
+## 107. Commander Reference Anchor 30 Batch B runtime - 2026-05-12
+
+O deploy publico do Batch B foi validado em
+`https://evolution-cartinhas.8ktevp.easypanel.host` no commit
+`75c0addf08faa85e5c4fcfb9cbf7673fc348367b`.
+
+Resultado:
+
+- `/health` e `/ready`: `200`;
+- 12/12 probes publicos com `commander_name` retornaram `HTTP 200`;
+- 12/12 retornaram `validation.is_valid=true`, `reference_profile_used=true`,
+  `reference_card_stats_used=true` e `main_quantity=99`;
+- comandantes cobertos: Edgar Markov, Miirym, Isshin, Teysa, Lathril, Aesi,
+  Sythis e Urza;
+- 2/12 probes usaram fallback por timeout, mas preservaram comandante e
+  validacao;
+- Aesi pode voltar com nome normalizado de dupla face (`Aesi ... // Aesi ...`);
+  consumidores devem comparar a primeira face quando precisarem de equivalencia
+  textual;
+- Sythis teve `invalid_cards_count=1` em uma amostra primaria, mas follow-up
+  publico retornou `0`, ficando como warning nao bloqueante.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_B_RUNTIME_2026-05-12.md`.
+
+Regra operacional: so avancar para o proximo batch depois de repetir o mesmo
+gate de apply DB-backed, deploy publico, probes publicos sanitizados e
+documentacao versionada.

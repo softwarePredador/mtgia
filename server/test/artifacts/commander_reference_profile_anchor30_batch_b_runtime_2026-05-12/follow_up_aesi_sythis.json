@@ -1,0 +1,40 @@
+{
+  "backend": "https://evolution-cartinhas.8ktevp.easypanel.host",
+  "created_at": "2026-05-12",
+  "results": [
+    {
+      "commander": "Aesi, Tyrant of Gyre Strait",
+      "status": 200,
+      "elapsed_ms": 631,
+      "warning_code": null,
+      "cache_hit": null,
+      "commander_returned": "Aesi, Tyrant of Gyre Strait // Aesi, Tyrant of Gyre Strait",
+      "commander_preserved_exact": false,
+      "commander_preserved_first_face": true,
+      "main_quantity": 99,
+      "validation_is_valid": true,
+      "invalid_cards_count": 0,
+      "reference_profile_used": true,
+      "reference_card_stats_used": true,
+      "on_theme_candidate_count": 30,
+      "unresolved_reference_cards_count": 0
+    },
+    {
+      "commander": "Sythis, Harvest's Hand",
+      "status": 200,
+      "elapsed_ms": 622,
+      "warning_code": null,
+      "cache_hit": null,
+      "commander_returned": "Sythis, Harvest's Hand",
+      "commander_preserved_exact": true,
+      "commander_preserved_first_face": true,
+      "main_quantity": 99,
+      "validation_is_valid": true,
+      "invalid_cards_count": 0,
+      "reference_profile_used": true,
+      "reference_card_stats_used": true,
+      "on_theme_candidate_count": 31,
+      "unresolved_reference_cards_count": 0
+    }
+  ]
+}
