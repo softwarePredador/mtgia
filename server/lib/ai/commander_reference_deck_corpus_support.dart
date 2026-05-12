@@ -159,6 +159,48 @@ class CommanderReferenceCorpusSummary {
       };
 }
 
+class CommanderReferenceDeckCorpusGuidance {
+  const CommanderReferenceDeckCorpusGuidance({
+    required this.commanderName,
+    required this.source,
+    required this.deckCount,
+    required this.acceptedDeckCount,
+    required this.averageRoleCounts,
+    required this.topCards,
+    required this.themeCounts,
+  });
+
+  final String commanderName;
+  final String source;
+  final int deckCount;
+  final int acceptedDeckCount;
+  final Map<String, double> averageRoleCounts;
+  final List<Map<String, dynamic>> topCards;
+  final Map<String, int> themeCounts;
+
+  bool get isUsable => acceptedDeckCount > 0;
+
+  Map<String, dynamic> toDiagnostics() => {
+        'reference_deck_corpus_used': isUsable,
+        'reference_deck_corpus_source': source,
+        'reference_deck_count': deckCount,
+        'accepted_reference_deck_count': acceptedDeckCount,
+        'average_role_counts': averageRoleCounts,
+        'top_card_count': topCards.length,
+        'top_cards': topCards
+            .take(16)
+            .map(
+              (card) => {
+                'card_name': card['card_name']?.toString(),
+                'deck_count': _intValue(card['deck_count']),
+                'role': card['role']?.toString(),
+              },
+            )
+            .toList(growable: false),
+        'theme_counts': themeCounts,
+      };
+}
+
 String normalizeCommanderReferenceDeckText(String value) =>
     normalizeCommanderReferenceCardName(value);
 
@@ -277,6 +319,115 @@ Future<List<CommanderReferenceDeckAnalysis>> analyzeCommanderReferenceDecks({
             resolvedCardsByName: resolved,
           ))
       .toList(growable: false);
+}
+
+Future<CommanderReferenceDeckCorpusGuidance?>
+    loadCommanderReferenceDeckCorpusGuidance({
+  required Pool pool,
+  required String? commanderName,
+}) async {
+  final commander = commanderName?.trim();
+  if (commander == null || commander.isEmpty) return null;
+
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT
+        commander_name,
+        source,
+        deck_count,
+        accepted_deck_count,
+        average_role_counts,
+        top_cards,
+        theme_counts
+      FROM commander_reference_deck_analysis
+      WHERE commander_name_normalized = @commander
+        AND accepted_deck_count > 0
+      ORDER BY accepted_deck_count DESC, updated_at DESC
+      LIMIT 1
+    '''),
+    parameters: {
+      'commander': normalizeCommanderReferenceDeckText(commander),
+    },
+  );
+  if (result.isEmpty) return null;
+
+  final row = result.first;
+  final topCards = _jsonList(row[5])
+      .whereType<Map>()
+      .map((value) => value.cast<String, dynamic>())
+      .toList(growable: false);
+
+  final guidance = CommanderReferenceDeckCorpusGuidance(
+    commanderName: row[0]?.toString() ?? commander,
+    source: row[1]?.toString() ?? 'commander_reference_deck_corpus_v1',
+    deckCount: _intValue(row[2]),
+    acceptedDeckCount: _intValue(row[3]),
+    averageRoleCounts: _jsonMap(row[4]).map(
+      (key, value) => MapEntry(key, _doubleValue(value)),
+    ),
+    topCards: topCards,
+    themeCounts: _jsonMap(row[6]).map(
+      (key, value) => MapEntry(key, _intValue(value)),
+    ),
+  );
+  return guidance.isUsable ? guidance : null;
+}
+
+String? commanderReferenceDeckCorpusCacheVersion(
+  CommanderReferenceDeckCorpusGuidance? guidance,
+) {
+  if (guidance == null || !guidance.isUsable) return null;
+  final material = jsonEncode({
+    'source': guidance.source,
+    'commander': normalizeCommanderReferenceDeckText(guidance.commanderName),
+    'accepted_deck_count': guidance.acceptedDeckCount,
+    'average_role_counts': guidance.averageRoleCounts,
+    'top_cards': guidance.topCards
+        .take(24)
+        .map(
+          (card) => {
+            'name': card['card_name']?.toString(),
+            'deck_count': _intValue(card['deck_count']),
+            'role': card['role']?.toString(),
+          },
+        )
+        .toList(growable: false),
+    'theme_counts': guidance.themeCounts,
+  });
+  return 'reference_deck_corpus_v1:${sha256.convert(utf8.encode(material)).toString().substring(0, 12)}';
+}
+
+String buildCommanderReferenceDeckCorpusPrompt(
+  CommanderReferenceDeckCorpusGuidance? guidance,
+) {
+  if (guidance == null || !guidance.isUsable) return '';
+  final roleLines = guidance.averageRoleCounts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  final roles = roleLines
+      .take(10)
+      .map((entry) => '- ${entry.key}: ${entry.value.toStringAsFixed(1)} avg')
+      .join('\n');
+  final recurrentCards = guidance.topCards
+      .take(18)
+      .map((card) {
+        final name = card['card_name']?.toString();
+        final deckCount = _intValue(card['deck_count']);
+        final role = card['role']?.toString();
+        if (name == null || name.isEmpty) return null;
+        return '$name${role == null || role.isEmpty ? '' : ' [$role]'} ($deckCount/${guidance.acceptedDeckCount})';
+      })
+      .whereType<String>()
+      .join(', ');
+
+  return '''
+Reference deck corpus v1 active for ${guidance.commanderName}:
+- Corpus size: ${guidance.acceptedDeckCount} accepted public reference decks.
+- Use this as aggregate structure only, not as a decklist to copy.
+- Average role shape:
+$roles
+- Recurrent package/card signals: $recurrentCards.
+- Keep final deck coherent and legal; do not force every recurrent card.
+''';
 }
 
 CommanderReferenceDeckAnalysis analyzeCommanderReferenceDeck({
@@ -731,6 +882,38 @@ Future<void> upsertCommanderReferenceDeckCorpus(
       },
     );
   }
+}
+
+Map<String, dynamic> _jsonMap(Object? raw) {
+  if (raw is Map<String, dynamic>) return raw;
+  if (raw is Map) return raw.cast<String, dynamic>();
+  if (raw is String && raw.trim().isNotEmpty) {
+    final decoded = jsonDecode(raw);
+    if (decoded is Map<String, dynamic>) return decoded;
+    if (decoded is Map) return decoded.cast<String, dynamic>();
+  }
+  return const <String, dynamic>{};
+}
+
+List<dynamic> _jsonList(Object? raw) {
+  if (raw is List) return raw;
+  if (raw is String && raw.trim().isNotEmpty) {
+    final decoded = jsonDecode(raw);
+    if (decoded is List) return decoded;
+  }
+  return const <dynamic>[];
+}
+
+int _intValue(Object? raw) {
+  if (raw is int) return raw;
+  if (raw is num) return raw.toInt();
+  return int.tryParse(raw?.toString() ?? '') ?? 0;
+}
+
+double _doubleValue(Object? raw) {
+  if (raw is double) return raw;
+  if (raw is num) return raw.toDouble();
+  return double.tryParse(raw?.toString() ?? '') ?? 0;
 }
 
 Set<String> _cardIdentity(Map<String, dynamic>? metadata) {

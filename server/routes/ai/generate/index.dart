@@ -11,6 +11,7 @@ import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
+import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
@@ -58,6 +59,7 @@ Future<Response> onRequest(RequestContext context) async {
     var archetypeReferenceStats = const <CommanderReferenceCardStat>[];
     var archetypeSourceCommanderNames = const <String>[];
     var archetypeCommanderColorIdentity = const <String>[];
+    CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance;
     final referenceProfileStopwatch = Stopwatch()..start();
     try {
       referenceProfile = await loadUsableCommanderReferenceProfile(
@@ -71,6 +73,11 @@ Future<Response> onRequest(RequestContext context) async {
         );
         referenceCardStats = statsLoad.stats;
         unresolvedReferenceCards = statsLoad.unresolvedCardNames;
+        referenceDeckCorpusGuidance =
+            await loadCommanderReferenceDeckCorpusGuidance(
+          pool: pool,
+          commanderName: requestedCommanderName,
+        );
       } else {
         final archetypeStatsLoad =
             await loadCompatibleCommanderReferenceArchetypeStats(
@@ -95,6 +102,7 @@ Future<Response> onRequest(RequestContext context) async {
     final referenceProfileVersion = _buildReferenceGenerateCacheVersion(
       referenceProfile: referenceProfile,
       referenceCardStats: referenceCardStats,
+      referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
       archetypeReferenceStats: archetypeReferenceStats,
     );
     final referenceGuidanceEnabled =
@@ -146,6 +154,7 @@ Future<Response> onRequest(RequestContext context) async {
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -292,6 +301,9 @@ Deck construction guidelines:
         ? [
             buildCommanderReferenceProfilePrompt(referenceProfile),
             buildCommanderReferenceCardStatsPrompt(referenceCardStats),
+            buildCommanderReferenceDeckCorpusPrompt(
+              referenceDeckCorpusGuidance,
+            ),
           ].where((line) => line.trim().isNotEmpty).join('\n')
         : archetypeReferenceStats.isNotEmpty
             ? buildCommanderReferenceArchetypeStatsPrompt(
@@ -381,6 +393,7 @@ $metaContext
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -434,6 +447,7 @@ $metaContext
           referenceProfile: referenceProfile,
           referenceCardStats: referenceCardStats,
           unresolvedReferenceCards: unresolvedReferenceCards,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
           archetypeReferenceStats: archetypeReferenceStats,
           archetypeSourceCommanderNames: archetypeSourceCommanderNames,
           archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -576,6 +590,8 @@ $metaContext
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
+          referenceDeckCorpusDiagnostics:
+              referenceDeckCorpusGuidance?.toDiagnostics(),
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
@@ -614,6 +630,7 @@ $metaContext
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
+        referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -762,6 +779,7 @@ Future<Response> _startAiGenerateAsyncJob({
 String? _buildReferenceGenerateCacheVersion({
   required Map<String, dynamic>? referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
+  CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
 }) {
   if (referenceProfile == null) {
@@ -778,8 +796,14 @@ String? _buildReferenceGenerateCacheVersion({
   final statsVersion = commanderReferenceCardStatsCacheVersion(
     referenceCardStats,
   );
-  if (statsVersion == null) return profileVersion;
-  return '$profileVersion:$statsVersion';
+  final corpusVersion = commanderReferenceDeckCorpusCacheVersion(
+    referenceDeckCorpusGuidance,
+  );
+  return [
+    profileVersion,
+    if (statsVersion != null) statsVersion,
+    if (corpusVersion != null) corpusVersion,
+  ].join(':');
 }
 
 Future<String?> _resolveReferenceGenerateCacheVersion({
@@ -809,9 +833,14 @@ Future<String?> _resolveReferenceGenerateCacheVersion({
       pool: pool,
       commanderName: commanderName,
     );
+    final corpusGuidance = await loadCommanderReferenceDeckCorpusGuidance(
+      pool: pool,
+      commanderName: commanderName,
+    );
     return _buildReferenceGenerateCacheVersion(
       referenceProfile: profile,
       referenceCardStats: statsLoad.stats,
+      referenceDeckCorpusGuidance: corpusGuidance,
     );
   } catch (error) {
     Log.w(
@@ -934,6 +963,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   List<String> unresolvedReferenceCards = const [],
+  CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
   List<String> archetypeSourceCommanderNames = const [],
   List<String> archetypeCommanderColorIdentity = const [],
@@ -1023,6 +1053,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
+          referenceDeckCorpusDiagnostics:
+              referenceDeckCorpusGuidance?.toDiagnostics(),
           referenceDeckEvaluation: referenceDeckEvaluation,
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
@@ -1059,6 +1091,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             stats: referenceCardStats,
             unresolvedCardNames: unresolvedReferenceCards,
           ),
+          referenceDeckCorpusDiagnostics:
+              referenceDeckCorpusGuidance?.toDiagnostics(),
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(

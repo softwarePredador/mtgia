@@ -180,6 +180,51 @@ void main() {
         containsAll(['Sol Ring', 'Swords to Plowshares']),
       );
     });
+
+    test('builds aggregate guidance prompt without copying full decklists', () {
+      const guidance = CommanderReferenceDeckCorpusGuidance(
+        commanderName: 'Lorehold, the Historian',
+        source: 'commander_reference_deck_corpus_v1',
+        deckCount: 3,
+        acceptedDeckCount: 3,
+        averageRoleCounts: {
+          'lands': 32,
+          'ramp': 14.67,
+          'interaction': 6,
+        },
+        topCards: [
+          {
+            'card_name': 'Arcane Signet',
+            'deck_count': 3,
+            'total_quantity': 3,
+            'role': 'ramp',
+          },
+          {
+            'card_name': 'Call Forth the Tempest',
+            'deck_count': 3,
+            'total_quantity': 3,
+            'role': 'board_wipe',
+          },
+        ],
+        themeCounts: {
+          'lorehold_reference_spellslinger_big_spells': 3,
+        },
+      );
+
+      final prompt = buildCommanderReferenceDeckCorpusPrompt(guidance);
+      final diagnostics = guidance.toDiagnostics();
+      final cacheVersion = commanderReferenceDeckCorpusCacheVersion(guidance);
+
+      expect(
+          prompt, contains('Corpus size: 3 accepted public reference decks'));
+      expect(prompt, contains('Use this as aggregate structure only'));
+      expect(prompt, contains('lands: 32.0 avg'));
+      expect(prompt, contains('Arcane Signet [ramp] (3/3)'));
+      expect(prompt, isNot(contains('cards":')));
+      expect(diagnostics['reference_deck_corpus_used'], isTrue);
+      expect(diagnostics['accepted_reference_deck_count'], equals(3));
+      expect(cacheVersion, startsWith('reference_deck_corpus_v1:'));
+    });
   });
 }
 

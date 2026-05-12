@@ -13866,3 +13866,44 @@ Importante: `/ai/generate` ainda nao consome o corpus. A proxima etapa deve
 integrar apenas agregados estruturais de Lorehold (targets por role,
 recorrencia de pacotes e alertas de desvio), sem injetar decklists completas no
 prompt nem copiar listas.
+
+## 112. Lorehold corpus guidance em `/ai/generate` - 2026-05-12
+
+O `/ai/generate` passou a consumir o corpus de decks completos de Lorehold
+somente como agregado estrutural.
+
+Sinais usados:
+
+- quantidade de decks aceitos;
+- medias de roles;
+- cartas/pacotes recorrentes com contagem de aparicao;
+- diagnostics sanitizados.
+
+O prompt nao recebe decklist completa. O texto enviado para a IA reforca que o
+corpus e estrutura agregada, nao lista a copiar.
+
+Diagnostics novos quando ativo:
+
+- `reference_deck_corpus_used`;
+- `reference_deck_corpus_source`;
+- `reference_deck_count`;
+- `accepted_reference_deck_count`;
+- `average_role_counts`;
+- `top_card_count`;
+- `top_cards`;
+- `theme_counts`.
+
+Prova local em `8082`:
+
+- 2/2 probes com `commander_name=Lorehold, the Historian`: `HTTP 200`,
+  `validation.is_valid=true`, commander preservado, `main_quantity=99`,
+  `reference_deck_corpus_used=true`, overlap top40 do corpus `10-14`;
+- 2/2 probes baseline sem `commander_name`: `HTTP 200`,
+  `validation.is_valid=true`, mas commander diferente e overlap top40 `0`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_GUIDANCE_2026-05-12.md`.
+
+Proximo gate: apos deploy publico, repetir prova contra
+`https://evolution-cartinhas.8ktevp.easypanel.host` e validar
+`reference_deck_corpus_used=true` no ambiente de producao.

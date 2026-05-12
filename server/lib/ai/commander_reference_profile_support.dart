@@ -268,12 +268,15 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
     'unresolved_reference_cards': <String>[],
     'package_keys': <String>[],
   },
+  Map<String, dynamic>? referenceDeckCorpusDiagnostics,
   Map<String, dynamic>? referenceDeckEvaluation,
 }) {
   if (profile == null) {
     return {
       'reference_profile_used': false,
       ...cardStatsDiagnostics,
+      if (referenceDeckCorpusDiagnostics != null)
+        ...referenceDeckCorpusDiagnostics,
       if (referenceDeckEvaluation != null)
         'reference_deck_evaluation': referenceDeckEvaluation,
     };
@@ -290,6 +293,8 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
     'themes': _themeNames(profile).take(8).toList(growable: false),
     'source_count': _sourceCount(profile),
     ...cardStatsDiagnostics,
+    if (referenceDeckCorpusDiagnostics != null)
+      ...referenceDeckCorpusDiagnostics,
     if (referenceDeckEvaluation != null)
       'reference_deck_evaluation': referenceDeckEvaluation,
   };
