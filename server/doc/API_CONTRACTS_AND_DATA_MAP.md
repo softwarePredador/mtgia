@@ -197,14 +197,23 @@ also resolve in `cards`/legalities so validation can preserve commander,
 Commander color identity, singleton and save-ready `card_id` semantics. See
 `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_STRIXHAVEN_LOT2_RUNTIME_2026-05-11.md`.
 
-Anchor 30 Batch A local profile proof for `POST /ai/generate` guidance: on
-2026-05-12, exact Commander Reference Profiles were applied for Atraxa,
-Chulane, Kinnan, Korvold, Muldrotha, Prosper, Winota, and Yuriko. The generic
-runner proved commander card resolution plus dry-run/apply/idempotency with
-`unresolved_count=0` and `off_color_count=0` for all 8; resolved package-card
-counts ranged from 34 to 42. Runtime `/ai/generate` probes remain a next step
-before promoting UX copy for the Anchor 30 batch. See
-`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_2026-05-12.md`.
+Anchor 30 Batch A local and public runtime proof for `POST /ai/generate`
+guidance: on 2026-05-12, exact Commander Reference Profiles were applied for
+Atraxa, Chulane, Kinnan, Korvold, Muldrotha, Prosper, Winota, and Yuriko. The
+generic runner proved commander card resolution plus dry-run/apply/idempotency
+with `unresolved_count=0` and `off_color_count=0` for all 8; resolved
+package-card counts ranged from 34 to 42. Public runtime on deploy `d7afb39`
+then returned `HTTP 200` for 12/12 sanitized probes across those 8 commanders
+including 3x Atraxa and 3x Kinnan, with commander preserved, `main_quantity=99`,
+`validation.is_valid=true`, `reference_profile_used=true`,
+`reference_card_stats_used=true`, `unresolved_reference_cards=0`, and no
+observed off-identity buckets. Baselines without `commander_name` stayed valid
+but did not activate profile/card-stats diagnostics or preserve the requested
+commander, so current mobile should send `commander_name` whenever the user
+selects a Commander/Brawl commander. See
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_2026-05-12.md`
+and
+`server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_RUNTIME_2026-05-12.md`.
 
 Operational note: async generate self-calls must preserve the externally
 observed scheme behind reverse proxies. When no `AI_GENERATE_INTERNAL_BASE_URL`

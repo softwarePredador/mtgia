@@ -3,6 +3,44 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Runtime publico Anchor 30 Batch A em AI Generate
+
+### O Porquê
+- Depois do deploy de `d7afb39`, faltava provar que os 8 Commander Reference
+  Profiles Anchor 30 Batch A funcionavam no backend publico, nao apenas no
+  runner DB-backed.
+- O criterio de aceite era app-facing: `/ai/generate` precisava retornar 200,
+  preservar o comandante, entregar 99 cartas no main, validar Commander e expor
+  diagnostics ativos de profile/card stats.
+
+### O Como
+- `master` foi sincronizada com `origin/master` e `/health` publico confirmou
+  `git_sha` iniciando em `d7afb39`.
+- Foi criado usuario QA descartavel sanitizado; JWT e senha ficaram apenas em
+  memoria.
+- Foram executados 12 probes sanitizados com `commander_name` exato: 3 Atraxa,
+  3 Kinnan e 1 para Korvold, Muldrotha, Chulane, Yuriko, Winota e Prosper.
+- Foram executados 2 baselines sem `commander_name` para Atraxa e Kinnan.
+- Nenhum prompt completo, decklist completa, token, JWT, DSN, URL de banco ou
+  chave OpenAI foi persistido.
+
+### Resultado
+- **PASS WITH RISKS**: 12/12 probes principais retornaram `HTTP 200`,
+  comandante preservado, `main_quantity=99`, `validation.is_valid=true`,
+  `reference_profile_used=true` e `reference_card_stats_used=true`.
+- `unresolved_reference_cards=0` em todos os probes principais e nenhum bucket
+  sanitizado indicou violacao de identidade de cor.
+- Latencia principal: min 633 ms, p50 8.870 ms, max 18.351 ms. Repeticoes
+  quentes de Atraxa/Kinnan cairam para ~600-900 ms.
+- Baselines sem `commander_name` continuaram validos, mas cairam no caminho
+  legacy/fallback, sem profile/stats e sem preservar Atraxa/Kinnan.
+- Risco residual: Chulane retornou comandante como face dupla normalizavel e
+  `invalid_cards_count=1` apesar de `validation.is_valid=true`.
+- Relatorio criado:
+  `server/doc/RELATORIO_COMMANDER_REFERENCE_PROFILE_ANCHOR30_BATCH_A_RUNTIME_2026-05-12.md`.
+- `API_CONTRACTS_AND_DATA_MAP.md` foi atualizado para registrar que o runtime
+  publico Anchor 30 Batch A deixou de ser pendencia.
+
 ## 2026-05-12 — Commander Reference Profiles Anchor 30 Batch A
 
 ### O Porquê
