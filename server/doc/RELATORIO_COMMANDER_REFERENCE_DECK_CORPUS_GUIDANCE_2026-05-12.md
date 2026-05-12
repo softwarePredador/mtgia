@@ -58,6 +58,33 @@ preservou commander, 99 cartas no main e diagnostics do corpus.
 Artifact:
 `server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/local_probe_summary.json`.
 
+## Prova publica
+
+Backend publico:
+`https://evolution-cartinhas.8ktevp.easypanel.host`.
+
+Commit publicado: `547cf708e5bac7d3bb771a9c0fa8926113be28f4`.
+
+Resultado sanitizado:
+
+| Campo | Valor |
+| --- | --- |
+| HTTP | `200` |
+| `validation.is_valid` | `true` |
+| Commander | `Lorehold, the Historian` |
+| Main quantity | `99` |
+| `reference_profile_used` | `true` |
+| `reference_card_stats_used` | `true` |
+| `reference_deck_corpus_used` | `true` |
+| `accepted_reference_deck_count` | `3` |
+| `reference_deck_count` | `3` |
+| `top_card_count` | `40` |
+| Fallback | `false` |
+| `timings.total_ms` | `15097` |
+
+Artifact:
+`server/test/artifacts/commander_reference_deck_corpus_guidance_lorehold_2026-05-12/public_probe_summary.json`.
+
 ## Validações
 
 ```bash
@@ -67,7 +94,6 @@ cd server && dart test test/commander_reference_deck_corpus_support_test.dart -r
 
 ## Riscos
 
-- A prova publica depende do deploy do commit desta sprint.
 - `other` no classificador de roles ainda esta alto; o corpus ajuda a estrutura,
   mas ainda precisamos refinar roles como spellslinger, miracle/topdeck,
   exile/value e payoff.
@@ -76,7 +102,6 @@ cd server && dart test test/commander_reference_deck_corpus_support_test.dart -r
 
 ## Proximo passo
 
-Apos deploy, rodar prova publica em `https://evolution-cartinhas.8ktevp.easypanel.host`
-confirmando `reference_deck_corpus_used=true`, `accepted_reference_deck_count=3`,
-`validation.is_valid=true`, commander preservado e melhoria de overlap contra o
-baseline sem `commander_name`.
+Rodar prova publica ampliada com 5 probes com `commander_name` e 5 sem, usando
+prompts variados, para medir estabilidade, latencia e ganho de overlap com o
+corpus.

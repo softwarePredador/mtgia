@@ -13904,6 +13904,18 @@ Prova local em `8082`:
 Relatorio:
 `server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_GUIDANCE_2026-05-12.md`.
 
-Proximo gate: apos deploy publico, repetir prova contra
-`https://evolution-cartinhas.8ktevp.easypanel.host` e validar
-`reference_deck_corpus_used=true` no ambiente de producao.
+Prova publica:
+
+- backend publico em `547cf708e5bac7d3bb771a9c0fa8926113be28f4`;
+- `HTTP 200`;
+- `validation.is_valid=true`;
+- commander preservado;
+- `main_quantity=99`;
+- `reference_profile_used=true`;
+- `reference_card_stats_used=true`;
+- `reference_deck_corpus_used=true`;
+- `accepted_reference_deck_count=3`;
+- fallback `false`.
+
+Proximo gate: prova publica ampliada com 5 probes com `commander_name` e 5 sem,
+medindo estabilidade, latencia e overlap com o corpus.
