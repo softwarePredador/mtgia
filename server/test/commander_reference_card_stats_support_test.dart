@@ -234,6 +234,39 @@ void main() {
       );
     });
 
+    test('requires exact local commander card resolution before apply', () {
+      final resolved = findResolvedCommanderReferenceCommanderCard(
+        commanderName: 'Aziza, Mage Tower Captain',
+        resolvedCardsByName: {
+          'aziza, mage tower captain': _resolvedCard(
+            id: 'aziza-id',
+            name: 'Aziza, Mage Tower Captain',
+            colorIdentity: const ['R', 'W'],
+            typeLine: 'Legendary Creature - Human Wizard',
+          ),
+        },
+      );
+
+      expect(resolved.resolved, isTrue);
+      expect(resolved.cardId, equals('aziza-id'));
+      expect(resolved.cardName, equals('Aziza, Mage Tower Captain'));
+
+      final wrongCard = findResolvedCommanderReferenceCommanderCard(
+        commanderName: 'Zaffai and the Tempests',
+        resolvedCardsByName: {
+          'zaffai, thunder conductor': _resolvedCard(
+            id: 'old-zaffai-id',
+            name: 'Zaffai, Thunder Conductor',
+            colorIdentity: const ['R', 'U'],
+            typeLine: 'Legendary Creature - Human Shaman',
+          ),
+        },
+      );
+
+      expect(wrongCard.resolved, isFalse);
+      expect(wrongCard.cardId, isNull);
+    });
+
     test('evaluator respects generic profile color identity', () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: 'Test Commander',

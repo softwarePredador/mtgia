@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Unblock de resolucao Strixhaven lot2 em AI Generate
+
+### O Porquê
+- O runtime publico dos Commander Reference Profiles Strixhaven lot2 estava
+  retornando 422 porque os 8 comandantes do lote existiam em
+  `commander_reference_profiles`, mas nao existiam como cards resolviveis em
+  `cards`.
+- Sem `card_id` real do comandante, `/ai/generate` nao podia preservar o
+  comandante nem validar legalidade/identidade de cor com seguranca.
+
+### O Como
+- Foi mantida a regra de nao adicionar aliases/fuzzy perigoso no caminho de
+  validacao: `GeneratedDeckValidationService` e
+  `resolveImportCardNames` continuam DB-only.
+- Os 8 nomes foram primeiro conferidos como cards reais por Scryfall exact e
+  depois populados no backend publico pela rota existente `POST /cards/resolve`,
+  que e o seam backend-owned de self-healing de cartas.
+- `server/bin/commander_reference_profile.dart` passou a auditar
+  `commander_card_resolution` e bloquear `--apply` quando o comandante do
+  profile nao resolve em `cards`. O override
+  `--allow-unresolved-commander` existe apenas para curadoria pre-release que
+  ainda nao deve ser tratada como runtime-ready.
+- `server/lib/ai/commander_reference_card_stats_support.dart` recebeu helper
+  DB-only/exact para resolver o card do comandante do profile, sem aceitar
+  substituicoes como `Zaffai, Thunder Conductor` para
+  `Zaffai and the Tempests`.
+
+### Resultado
+- Public `/cards` antes/depois: os 8 comandantes sairam de
+  `total_returned=0` para 1-2 resultados exatos.
+- Public `/ai/generate` amostra: Aziza, Excava e Zaffai retornaram `200`,
+  comandante preservado, `main_quantity=99`, `validation.is_valid=true`,
+  `reference_profile_used=true` e `reference_card_stats_used=true`.
+- Local 8082 repetiu a amostra com os mesmos criterios de validade.
+- `API_CONTRACTS_AND_DATA_MAP.md` nao teve drift: nenhum endpoint app-facing
+  mudou payload/response.
+- Relatorio:
+  `server/doc/RELATORIO_AI_GENERATE_CARD_RESOLUTION_FIX_2026-05-12.md`.
+
 ## 2026-05-12 — Revalidacao publica Strixhaven lote 2 ainda bloqueada
 
 ### O Porquê

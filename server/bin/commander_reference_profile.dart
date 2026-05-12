@@ -21,6 +21,8 @@ Future<void> main(List<String> args) async {
 
   final apply = args.contains('--apply');
   final dryRun = args.contains('--dry-run') || !apply;
+  final allowUnresolvedCommander =
+      args.contains('--allow-unresolved-commander');
   if (apply && args.contains('--dry-run')) {
     throw ArgumentError('Use apenas um modo: --dry-run ou --apply.');
   }
@@ -43,12 +45,26 @@ Future<void> main(List<String> args) async {
   try {
     final preTableAudit = await auditCommanderReferenceTables(pool);
     final profileHash = commanderReferenceProfileHash(profile);
+    final commanderCardResolution =
+        await resolveCommanderReferenceCommanderCard(
+      pool,
+      profile,
+    );
     final cardStatsResolution = await resolveCommanderReferenceCardStats(
       pool,
       profile,
     );
 
     if (apply) {
+      if (!commanderCardResolution.resolved && !allowUnresolvedCommander) {
+        throw StateError(
+          'Profile nao pode ser aplicado como runtime-ready porque o '
+          'comandante nao resolve em cards: $commanderName. '
+          'Sincronize/popule a carta primeiro ou use '
+          '--allow-unresolved-commander apenas para curadoria pre-release '
+          'nao runtime-ready.',
+        );
+      }
       if (cardStatsResolution.offColorCardNames.isNotEmpty) {
         throw StateError(
           'Profile contem cartas fora da identidade de cor do comandante: '
@@ -92,6 +108,7 @@ Future<void> main(List<String> args) async {
       'profile_usable_after_run': loadedProfile != null,
       'tables_checked_before_schema_action': preTableAudit,
       'tables_checked_after': postTableAudit,
+      'commander_card_resolution': commanderCardResolution.toJson(),
       'reference_card_stats': {
         'table_mutated': apply,
         'stats_total': cardStatsResolution.stats.length,
@@ -116,6 +133,7 @@ Future<void> main(List<String> args) async {
         'no_scraping': true,
         'no_secrets_recorded': true,
         'scanner_camera_ocr_mlkit_out_of_scope': true,
+        'allow_unresolved_commander': allowUnresolvedCommander,
       },
     };
 
@@ -126,6 +144,8 @@ Future<void> main(List<String> args) async {
       'commander': commanderName,
       'db_mutations': summary['db_mutations'],
       'profile_usable_after_run': summary['profile_usable_after_run'],
+      'commander_card_resolved':
+          (summary['commander_card_resolution'] as Map)['resolved'],
       'resolved_count':
           (summary['reference_card_stats'] as Map)['resolved_count'],
       'unresolved_count':
@@ -168,6 +188,7 @@ void _printUsage() {
 Usage:
   dart run bin/commander_reference_profile.dart --profile-json=<path> --dry-run
   dart run bin/commander_reference_profile.dart --profile-json=<path> --apply
+  dart run bin/commander_reference_profile.dart --profile-json=<path> --apply --allow-unresolved-commander
 
 Profile JSON minimo:
 {

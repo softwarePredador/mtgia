@@ -1,5 +1,46 @@
 # Commander Reference Profiles Strixhaven Lot 2 - Public Runtime - 2026-05-11
 
+## Resultado atualizado em 2026-05-12 10h
+
+**PASS na amostra de unblock.** Os 8 comandantes que retornavam
+`GET /cards?name=<commander>` com `total_returned=0` foram populados no backend
+publico pela rota existente `POST /cards/resolve`, com match exato Scryfall e
+sem aliases manuais. Depois disso, 3 probes publicos sanitizados de
+`/ai/generate` para Aziza, Excava e Zaffai retornaram `200`,
+`validation.is_valid=true`, comandante preservado e `main_quantity=99`.
+
+Resumo do reparo de dados publico:
+
+| Commander | Antes `/cards` | Resolve source | Match exato | Depois `/cards` |
+| --- | ---: | --- | --- | ---: |
+| Aziza, Mage Tower Captain | 0 | scryfall | true | 2 |
+| Berta, Wise Extrapolator | 0 | scryfall | true | 2 |
+| Excava, the Risen Past | 0 | scryfall | true | 1 |
+| Gorma, the Gullet | 0 | scryfall | true | 1 |
+| Muddle, the Ever-Changing | 0 | scryfall | true | 1 |
+| Primo, the Unbounded | 0 | scryfall | true | 1 |
+| Scriv, the Obligator | 0 | scryfall | true | 1 |
+| Zaffai and the Tempests | 0 | scryfall | true | 2 |
+
+Probes publicos apos reparo:
+
+| Commander | HTTP | Commander preservado | Main qty | Validation | Profile/stats |
+| --- | ---: | --- | ---: | --- | --- |
+| Aziza, Mage Tower Captain | 200 | true | 99 | true | true / true |
+| Excava, the Risen Past | 200 | true | 99 | true | true / true |
+| Zaffai and the Tempests | 200 | true | 99 | true | true / true |
+
+Fix preventivo implementado: `server/bin/commander_reference_profile.dart` agora
+inclui `commander_card_resolution` no summary e bloqueia `--apply` quando o
+comandante do profile nao resolve em `cards`, exceto com override explicito
+`--allow-unresolved-commander` para curadoria pre-release nao runtime-ready.
+Detalhes em
+`server/doc/RELATORIO_AI_GENERATE_CARD_RESOLUTION_FIX_2026-05-12.md`.
+
+Nota: a matriz publica completa 12/12 deste relatorio nao foi reexecutada nesta
+rodada; a amostra solicitada foi desbloqueada e o blocker raiz dos 8
+comandantes (`total_returned=0`) foi removido.
+
 ## Resultado atualizado em 2026-05-12
 
 **BLOCKED.** O backend publico ja serve o commit novo de `master`

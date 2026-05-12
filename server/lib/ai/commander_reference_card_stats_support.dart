@@ -93,6 +93,27 @@ class CommanderReferenceCardStatsResolution {
   }
 }
 
+class CommanderReferenceCommanderCardResolution {
+  const CommanderReferenceCommanderCardResolution({
+    required this.commanderName,
+    required this.resolved,
+    this.cardId,
+    this.cardName,
+  });
+
+  final String commanderName;
+  final bool resolved;
+  final String? cardId;
+  final String? cardName;
+
+  Map<String, dynamic> toJson() => {
+        'commander_name': commanderName,
+        'resolved': resolved,
+        if (cardId != null) 'card_id': cardId,
+        if (cardName != null) 'card_name': cardName,
+      };
+}
+
 class CommanderReferenceCardStatsLoadResult {
   const CommanderReferenceCardStatsLoadResult({
     required this.tableAvailable,
@@ -157,6 +178,80 @@ List<String> commanderReferenceCardLookupAliases(String cardName) {
     aliases.add(normalizeCommanderReferenceCardName(parts.first));
   }
   return aliases.where((alias) => alias.isNotEmpty).toList(growable: false);
+}
+
+CommanderReferenceCommanderCardResolution
+    findResolvedCommanderReferenceCommanderCard({
+  required String commanderName,
+  required Map<String, Map<String, dynamic>> resolvedCardsByName,
+}) {
+  final commander = commanderName.trim();
+  if (commander.isEmpty) {
+    return const CommanderReferenceCommanderCardResolution(
+      commanderName: '',
+      resolved: false,
+    );
+  }
+
+  final target = normalizeCommanderReferenceCardName(commander);
+  for (final entry in resolvedCardsByName.entries) {
+    final key = normalizeCommanderReferenceCardName(entry.key);
+    final resolvedName = entry.value['name']?.toString().trim() ?? '';
+    final resolvedNameNormalized =
+        normalizeCommanderReferenceCardName(resolvedName);
+    if (key != target && resolvedNameNormalized != target) continue;
+
+    final cardId = entry.value['id']?.toString().trim();
+    if (cardId == null || cardId.isEmpty) {
+      return CommanderReferenceCommanderCardResolution(
+        commanderName: commander,
+        resolved: false,
+        cardName: resolvedName.isEmpty ? null : resolvedName,
+      );
+    }
+
+    return CommanderReferenceCommanderCardResolution(
+      commanderName: commander,
+      resolved: true,
+      cardId: cardId,
+      cardName: resolvedName.isEmpty ? commander : resolvedName,
+    );
+  }
+
+  return CommanderReferenceCommanderCardResolution(
+    commanderName: commander,
+    resolved: false,
+  );
+}
+
+Future<CommanderReferenceCommanderCardResolution>
+    resolveCommanderReferenceCommanderCard(
+  Pool pool,
+  Map<String, dynamic> profile,
+) async {
+  final commanderName =
+      (profile['commander'] ?? profile['commander_name'] ?? '')
+          .toString()
+          .trim();
+  if (commanderName.isEmpty) {
+    return const CommanderReferenceCommanderCardResolution(
+      commanderName: '',
+      resolved: false,
+    );
+  }
+
+  final resolved = await resolveImportCardNames(
+    pool,
+    [
+      {'name': commanderName}
+    ],
+    preferredFormat: 'commander',
+  );
+
+  return findResolvedCommanderReferenceCommanderCard(
+    commanderName: commanderName,
+    resolvedCardsByName: resolved,
+  );
 }
 
 List<CommanderReferenceCardStat> buildLoreholdReferenceCardStatsFromProfile({
