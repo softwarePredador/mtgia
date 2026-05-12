@@ -173,3 +173,64 @@ main, `validation.is_valid=true`, cache miss nos probes, diagnostics coerentes e
 contrato app-facing estavel. A metrica `on_theme` segue aproximada e
 conservadora porque foi calculada apenas por heuristica agregada, sem persistir
 decklist completa.
+
+## Addendum 2026-05-12 08:31 BRT — Revalidacao publica no `master` atual
+
+### Objetivo
+
+Revalidar o backend publico depois dos commits posteriores ao tuning, garantindo
+que o comportamento introduzido por
+`76a8ddc561f686318a6cf0dc4cecefc79de024e1` continua ativo em
+`POST /ai/generate` com `commander_name=Velomachus Lorehold`.
+
+### Comandos executados
+
+| Comando | Resultado |
+| --- | --- |
+| `git fetch origin master --prune` | PASS, `master` local sincronizado com `origin/master` em `998960529660...`; `76a8ddc` permanece ancestral. |
+| Poll sanitizado de `GET /health` no backend publico | PASS WITH RISKS, 12 polls retornaram `200`, `environment=production`, `git_sha=998960529660...`; o SHA nao inicia com `76a8ddc` porque o deploy avancou, mas contem o commit esperado. |
+| Probe sanitizado Python: register QA descartavel + 5x `POST /ai/generate` | PASS, 5/5 `status=200`, 5/5 cache miss. |
+
+Credenciais, JWT, prompt completo, decklists completas, tokens, DSN, URL de
+banco e chaves OpenAI nao foram persistidos nem documentados.
+
+### Resultado publico no deploy atual
+
+| Variante | Velomachus N | Fallback rate | Status | Commander | Main | Validacao | Archetype reuse | OpenAI budget | p50 | p95 aprox. | On-theme aprox. |
+| --- | ---: | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |
+| Publico deploy `9989605` contendo `76a8ddc` | 5 | 0% | 5x 200 | 5/5 preservado | 5/5 = 99 | 5/5 valid | 5/5 | 20000 ms | 13739 ms | 18071 ms | 6 |
+
+Detalhe sanitizado por amostra:
+
+| Amostra | Status | Elapsed | Cache | Warning | Commander | Main | Validacao | Archetype reuse | Candidatos | Timeout |
+| --- | ---: | ---: | --- | --- | --- | ---: | --- | --- | ---: | ---: |
+| `public_9989605_1` | 200 | 18071 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_9989605_2` | 200 | 13739 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_9989605_3` | 200 | 13107 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_9989605_4` | 200 | 12935 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+| `public_9989605_5` | 200 | 13883 ms | miss | nenhum | Velomachus Lorehold | 99 | valid | true | 48 | 20000 ms |
+
+`diagnostics.reference_profile_used=false` e
+`diagnostics.reference_card_stats_used=false` continuaram indicando Archetype
+Reference Reuse, nao profile exato. As fontes observadas no deploy atual foram
+`Excava, the Risen Past` e `Lorehold, the Historian`, refletindo os profiles
+adicionados depois do tuning.
+
+### Comparacao com evidencia local/pre-deploy
+
+| Evidencia | Fallback rate | Leitura |
+| --- | ---: | --- |
+| Publico pre-deploy `a199569` | 40% | 2/5 fallbacks em amostra Velomachus reference-guided. |
+| Local staging 8s | 100% | 5/5 fallbacks no budget antigo. |
+| Local patch reference 20s | 0% | 5/5 OpenAI real no budget novo. |
+| Publico deploy `76a8ddc` | 0% | 5/5 OpenAI real, `timings.openai_timeout_ms=20000`. |
+| Publico deploy atual `9989605` | 0% | 5/5 OpenAI real, `timings.openai_timeout_ms=20000`, commit esperado ancestral. |
+
+### Resultado
+
+**PASS WITH RISKS.** O comportamento do tuning esta ativo no backend publico
+atual: fallback publico segue em 0% no caso-alvo, com comandante correto,
+`main_quantity=99`, `validation.is_valid=true`, diagnostics coerentes e budget
+OpenAI de 20s. O risco e somente de rastreabilidade do criterio de deploy: o
+`git_sha` publico ja nao inicia com `76a8ddc`, pois `master` foi implantado em
+um commit posterior (`9989605`) que contem o tuning como ancestral.

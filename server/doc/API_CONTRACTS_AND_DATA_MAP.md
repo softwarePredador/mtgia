@@ -176,6 +176,16 @@ off-identity issue observed. Sanitized comparison against a baseline without
 without exposing decklists. See
 `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`.
 
+Public timeout tuning revalidation for `POST /ai/generate`: on 2026-05-12,
+backend `998960529660...` contained the expected tuning commit `76a8ddc` as an
+ancestor and returned 5/5 sanitized cache-miss Velomachus Commander probes with
+`status=200`, `timings.openai_timeout_ms=20000`, no
+`openai_timeout_deterministic_fallback`, `archetype_reference_used=true`,
+`archetype_candidate_count=48`, `generated_deck.commander.name=Velomachus
+Lorehold`, `main_quantity=99`, and `validation.is_valid=true`. The deploy no
+longer started with `76a8ddc`, so the evidence is PASS WITH RISKS for exact-SHA
+traceability and PASS for active runtime behavior.
+
 Public Strixhaven lot 2 runtime proof for `POST /ai/generate`: on 2026-05-11,
 backend `a137dd5039884dabdb92862ee807322073d1ec40` activated exact
 `reference_profile_used=true` and `reference_card_stats_used=true` for Aziza,

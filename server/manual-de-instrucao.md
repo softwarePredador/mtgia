@@ -3,6 +3,45 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-05-12 — Revalidacao publica do tuning de timeout AI Generate
+
+### O Porquê
+- Era necessario confirmar, no backend publico atual, que o tuning
+  `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS` introduzido em `76a8ddc`
+  continuava ativo para `/ai/generate` com Commander Archetype Reference
+  Guidance.
+- O criterio estrito pedia `git_sha` iniciando em `76a8ddc`; durante a
+  auditoria, o deploy publico ja estava em commit posterior de `master`.
+
+### O Como
+- Sincronizado `master` com `origin/master` em `998960529660...`; confirmado que
+  `76a8ddc561f686318a6cf0dc4cecefc79de024e1` e ancestral.
+- Poll de `/health` no backend publico retornou 12x `200`,
+  `environment=production` e `git_sha=998960529660...`.
+- Criado usuario QA descartavel e executadas 5 amostras cache-miss sanitizadas
+  de `POST /ai/generate` para `Velomachus Lorehold`, formato Commander e tema
+  Boros big spells/topdeck/miracle/spellslinger/ramp/draw/removal/protection.
+- Nenhum JWT, senha, prompt completo, decklist completa, token, DSN,
+  `DATABASE_URL`, `OPENAI_API_KEY` ou outro segredo foi documentado.
+
+### Resultado
+- **PASS WITH RISKS**: o SHA publico nao inicia mais com `76a8ddc`, mas o
+  deploy atual contem o commit esperado e preserva o comportamento do tuning.
+- 5/5 probes retornaram `status=200`, cache miss,
+  `commander_returned=Velomachus Lorehold`, `main_quantity=99` e
+  `validation.is_valid=true`.
+- 5/5 usaram Archetype Reference Reuse com 48 candidatos e fontes
+  `Excava, the Risen Past` e `Lorehold, the Historian`.
+- 5/5 expuseram `timings.openai_timeout_ms=20000`; 0/5 retornaram
+  `openai_timeout_deterministic_fallback`.
+- Fallback publico permanece melhor que o baseline pre-deploy: `40%` em
+  `a199569` contra `0%` no deploy atual; p50 observado `13739 ms`, p95
+  aproximado `18071 ms`.
+- Relatorios atualizados:
+  `server/doc/RELATORIO_AI_GENERATE_REFERENCE_TIMEOUT_TUNING_2026-05-11.md`,
+  `server/doc/RELATORIO_COMMANDER_ARCHETYPE_REFERENCE_QUALITY_PROOF_2026-05-11.md`
+  e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
 ## 2026-05-11 — Runtime publico Strixhaven lote 2 bloqueado por cards ausentes
 
 ### O Porquê

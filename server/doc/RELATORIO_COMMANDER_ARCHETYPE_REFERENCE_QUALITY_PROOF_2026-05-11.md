@@ -233,3 +233,30 @@ staging 8s (`fallback_rate=100%`), o deploy reduziu fallback para 0% sem quebrar
 comandante, tamanho do main ou validacao. Resultado atualizado:
 **PASS** para o tuning de timeout em producao; a leitura de qualidade tematica
 permanece limitada por N=5 e por classificacao aproximada sem decklist completa.
+
+## Addendum 2026-05-12 08:31 BRT — Revalidacao no deploy `9989605`
+
+O backend publico foi revalidado depois de novos commits em `master`. `/health`
+retornou `git_sha=998960529660...`, portanto o deploy atual nao inicia mais com
+`76a8ddc`, mas `76a8ddc561f686318a6cf0dc4cecefc79de024e1` e ancestral do
+`master` implantado.
+
+| Criterio | Resultado |
+| --- | --- |
+| Backend publico contem o tuning | PASS, `76a8ddc` e ancestral de `9989605`. |
+| Usuario QA descartavel | PASS, sem documentar credenciais/JWT. |
+| Status HTTP | PASS, 5/5 `200`. |
+| Cache | PASS, 5/5 cache miss na rodada final. |
+| Commander | PASS, 5/5 retornaram e preservaram `Velomachus Lorehold`. |
+| Main deck | PASS, 5/5 com `main_quantity=99`. |
+| Validacao | PASS, 5/5 `validation.is_valid=true`. |
+| Archetype Reference Reuse | PASS, 5/5 `archetype_reference_used=true`, 48 candidatos. |
+| Source commanders | `Excava, the Risen Past` e `Lorehold, the Historian`. |
+| Fallback timeout | PASS, 0/5 com `openai_timeout_deterministic_fallback`. |
+| Timeout selecionado | PASS, 5/5 `timings.openai_timeout_ms=20000`. |
+| Timings | p50 `13739 ms`; p95 aproximado `18071 ms`. |
+
+Resultado atualizado: **PASS WITH RISKS** para a revalidacao de 2026-05-12.
+O comportamento de Archetype Reference Reuse e do timeout reference-guided segue
+correto e app-consumable, mas o criterio estrito de SHA exato deve ser lido como
+risco de rastreabilidade porque o backend publico ja esta em commit posterior.
