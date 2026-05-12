@@ -13806,3 +13806,63 @@ para copiar. Ele grava estrutura e agregados para uso futuro em generate/optimiz
 
 Proximo passo: Sprint 2 com 3-5 decks reais de `Lorehold, the Historian`,
 fornecidos/curados via JSON, para gerar a primeira analise agregada real.
+
+## 111. Lorehold Commander Reference Deck Corpus pilot - 2026-05-12
+
+Foi aplicado o primeiro corpus real de decks completos para
+`Lorehold, the Historian`.
+
+Fontes EDHREC fornecidas pelo usuario:
+
+- `https://edhrec.com/deckpreview/3SFEtbTKhht92q7FXEd3qA`;
+- `https://edhrec.com/deckpreview/A_z1s_GftOaC6u75p7_TDw`;
+- `https://edhrec.com/deckpreview/Bn4UCaNCLKSTPqkwxUnStQ`.
+
+Fluxo:
+
+- extrair apenas nomes, quantidades, board e metadados de fonte;
+- gerar `lorehold_edhrec_deckpreview_corpus.json`;
+- rodar `commander_reference_deck_corpus.dart --dry-run`;
+- sanar lacunas oficiais de freshness com
+  `backfill_missing_scryfall_cards.dart`;
+- rerodar dry-run;
+- aplicar corpus;
+- rerodar apply idempotente.
+
+Cartas oficiais backfilled via Scryfall por nome exato:
+
+- `Erode`;
+- `Improvisation Capstone`;
+- `Naktamun Lorespinner // Wheel of Fortune`;
+- `Restoration Seminar`.
+
+Resultado:
+
+- `deck_count=3`;
+- `accepted_deck_count=3`;
+- `rejected_deck_count=0`;
+- `commander_quantity=1` em todos;
+- `main_quantity=99` em todos;
+- `unresolved=0`;
+- `off_color=0`;
+- idempotencia OK.
+
+Agregado inicial de roles:
+
+- lands: `32.00`;
+- ramp: `14.67`;
+- interaction: `6.00`;
+- creature: `5.67`;
+- draw/value: `5.33`;
+- board wipe: `4.00`;
+- win condition: `3.00`;
+- protection: `2.33`;
+- other: `27.00`.
+
+Relatorio:
+`server/doc/RELATORIO_COMMANDER_REFERENCE_DECK_CORPUS_LOREHOLD_2026-05-12.md`.
+
+Importante: `/ai/generate` ainda nao consome o corpus. A proxima etapa deve
+integrar apenas agregados estruturais de Lorehold (targets por role,
+recorrencia de pacotes e alertas de desvio), sem injetar decklists completas no
+prompt nem copiar listas.

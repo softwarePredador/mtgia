@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-12T20:17:05.857385Z",
+  "finished_at": "2026-05-12T20:18:25.755812Z",
+  "requested_count": 4,
+  "scryfall_resolved_count": 4,
+  "already_present_count": 0,
+  "missing_before_apply_count": 4,
+  "applied_card_count": 4,
+  "failures": [],
+  "cards": [
+    {
+      "oracle_id": "2e467fab-e808-44d3-99bf-e3621baeb7cb",
+      "name": "Erode",
+      "set_code": "SOS",
+      "collector_number": "15",
+      "type_line": "Instant",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal"
+    },
+    {
+      "oracle_id": "fd4f0315-567a-4cc5-bc7e-88a9d2cee910",
+      "name": "Improvisation Capstone",
+      "set_code": "SOS",
+      "collector_number": "120",
+      "type_line": "Sorcery — Lesson",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal"
+    },
+    {
+      "oracle_id": "c78783e5-868d-4a8b-a4f8-95a92853cf0a",
+      "name": "Naktamun Lorespinner // Wheel of Fortune",
+      "set_code": "SOC",
+      "collector_number": "33",
+      "type_line": "Creature — Jackal Wizard // Sorcery",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal"
+    },
+    {
+      "oracle_id": "fd0a27a9-7d7e-4a16-9dd0-0715e6c97b36",
+      "name": "Restoration Seminar",
+      "set_code": "SOS",
+      "collector_number": "30",
+      "type_line": "Sorcery — Lesson",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal"
+    }
+  ]
+}

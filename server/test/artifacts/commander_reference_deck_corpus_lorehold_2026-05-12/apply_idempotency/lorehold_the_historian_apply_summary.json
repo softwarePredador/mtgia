@@ -1,0 +1,383 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-05-12T20:21:45.611026Z",
+  "finished_at": "2026-05-12T20:24:39.131296Z",
+  "artifact_dir": "test/artifacts/commander_reference_deck_corpus_lorehold_2026-05-12/apply_idempotency",
+  "deck_count": 3,
+  "accepted_deck_count": 3,
+  "rejected_deck_count": 0,
+  "analyses": [
+    {
+      "source_deck_key": "edhrec_lorehold_3SFEtbTKhht92q7FXEd3qA",
+      "commander_name": "Lorehold, the Historian",
+      "source": "edhrec_deckpreview",
+      "source_url": "https://edhrec.com/deckpreview/3SFEtbTKhht92q7FXEd3qA",
+      "power_lane": "unknown_edhrec_reference",
+      "theme": "lorehold_reference_spellslinger_big_spells",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "99166b3a-4bcb-453c-ae4c-30d78756cc8c",
+        "card_name": "Lorehold, the Historian"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 97,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 6,
+        "interaction": 6,
+        "lands": 25,
+        "ramp": 16,
+        "creature": 12,
+        "board_wipe": 4,
+        "win_condition": 1,
+        "other": 30
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_lorehold_A_z1s_GftOaC6u75p7_TDw",
+      "commander_name": "Lorehold, the Historian",
+      "source": "edhrec_deckpreview",
+      "source_url": "https://edhrec.com/deckpreview/A_z1s_GftOaC6u75p7_TDw",
+      "power_lane": "unknown_edhrec_reference",
+      "theme": "lorehold_reference_spellslinger_big_spells",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "99166b3a-4bcb-453c-ae4c-30d78756cc8c",
+        "card_name": "Lorehold, the Historian"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 90,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 6,
+        "lands": 36,
+        "other": 19,
+        "win_condition": 7,
+        "ramp": 16,
+        "board_wipe": 5,
+        "creature": 3,
+        "protection": 2,
+        "interaction": 6
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    },
+    {
+      "source_deck_key": "edhrec_lorehold_Bn4UCaNCLKSTPqkwxUnStQ",
+      "commander_name": "Lorehold, the Historian",
+      "source": "edhrec_deckpreview",
+      "source_url": "https://edhrec.com/deckpreview/Bn4UCaNCLKSTPqkwxUnStQ",
+      "power_lane": "unknown_edhrec_reference",
+      "theme": "lorehold_reference_spellslinger_big_spells",
+      "commander_card_resolution": {
+        "resolved": true,
+        "card_id": "99166b3a-4bcb-453c-ae4c-30d78756cc8c",
+        "card_name": "Lorehold, the Historian"
+      },
+      "main_quantity": 99,
+      "commander_quantity": 1,
+      "resolved_count": 89,
+      "unresolved_count": 0,
+      "unresolved_card_names": [],
+      "off_color_count": 0,
+      "off_color_card_names": [],
+      "singleton_violations": {},
+      "role_summary": {
+        "draw_value": 4,
+        "ramp": 12,
+        "lands": 35,
+        "board_wipe": 3,
+        "other": 32,
+        "protection": 5,
+        "interaction": 6,
+        "creature": 2,
+        "win_condition": 1
+      },
+      "accepted": true,
+      "rejection_reasons": []
+    }
+  ],
+  "aggregate": {
+    "Lorehold, the Historian": {
+      "commander_name": "Lorehold, the Historian",
+      "deck_count": 3,
+      "accepted_deck_count": 3,
+      "average_role_counts": {
+        "draw_value": 5.33,
+        "interaction": 6.0,
+        "lands": 32.0,
+        "ramp": 14.67,
+        "creature": 5.67,
+        "board_wipe": 4.0,
+        "win_condition": 3.0,
+        "other": 27.0,
+        "protection": 2.33
+      },
+      "top_cards": [
+        {
+          "card_name": "Wooded Foothills",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Arid Mesa",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "board_wipe"
+        },
+        {
+          "card_name": "Command Tower",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Dance with Calamity",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Deflecting Swat",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Esper Sentinel",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Gamble",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Gemstone Caverns",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Library of Leng",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Marsh Flats",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Monument to Endurance",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Plateau",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Redirect Lightning",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Sacred Foundry",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Scalding Tarn",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "other"
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Sol Ring",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Spectator Seating",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Urza's Saga",
+          "deck_count": 3,
+          "total_quantity": 3,
+          "role": "lands"
+        },
+        {
+          "card_name": "Hexing Squelcher",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "creature"
+        },
+        {
+          "card_name": "Mana Confluence",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "lands"
+        },
+        {
+          "card_name": "Dualcaster Mage",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "creature"
+        },
+        {
+          "card_name": "Cavern of Souls",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "lands"
+        },
+        {
+          "card_name": "City of Brass",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "lands"
+        },
+        {
+          "card_name": "Pyretic Ritual",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "ramp"
+        },
+        {
+          "card_name": "Pyroblast",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Red Elemental Blast",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "interaction"
+        },
+        {
+          "card_name": "Faithless Looting",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "other"
+        },
+        {
+          "card_name": "Flooded Strand",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "lands"
+        },
+        {
+          "card_name": "Archivist of Oghma",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "draw_value"
+        },
+        {
+          "card_name": "Bolt Bend",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "other"
+        },
+        {
+          "card_name": "Goblin Engineer",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "creature"
+        },
+        {
+          "card_name": "Simian Spirit Guide",
+          "deck_count": 2,
+          "total_quantity": 2,
+          "role": "ramp"
+        }
+      ],
+      "theme_counts": {
+        "lorehold_reference_spellslinger_big_spells": 3
+      }
+    }
+  },
+  "safety": {
+    "no_scraping": true,
+    "no_copied_decklist_runtime_generation": true,
+    "apply_requires_all_decks_accepted": true,
+    "scanner_camera_ocr_mlkit_out_of_scope": true
+  }
+}
